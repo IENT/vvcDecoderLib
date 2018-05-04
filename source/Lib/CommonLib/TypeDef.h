@@ -58,8 +58,12 @@
 #define JEM_COMP                                        ( 1 && JEM_TOOLS )
 
 #endif
+#ifndef QTBT_AS_IN_JEM
+#define QTBT_AS_IN_JEM                                    1
+
+#endif
 #ifndef HEVC_TOOLS
-#define HEVC_TOOLS                                        1
+#define HEVC_TOOLS                                        0
 
 #endif
 
@@ -118,9 +122,9 @@
 
 #define KEEP_PRED_AND_RESI_SIGNALS                        0
 
-#define ENABLE_BMS                                        0
+#define ENABLE_BMS                                        1
 
-#if JEM_COMP // macros which will cause changes in the decoder behavior ara marked with *** - keep them on to retain compatibility with JEM-toolcheck
+#if     JEM_COMP || QTBT_AS_IN_JEM                            // macros which will cause changes in the decoder behavior ara marked with *** - keep them on to retain compatibility with JEM-toolcheck
 #define HM_REPRODUCE_4x4_BLOCK_ESTIMATION_ORDER           0   // estimate 4x4 blocks as in HM
 #define HM_REPRODUCE_422_CHROMA_CONTEXT_RESET_BUG         1   // reproduce 4:2:2 context reset bug in HM
 #define HM_REPRODUCE_CONTEXT_IDX_CALCULATION              1   // reproduce HM context idx calculation
