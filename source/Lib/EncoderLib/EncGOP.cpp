@@ -2194,7 +2194,6 @@ Void EncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic,
         const UInt curSliceEnd = pcSlice->getSliceCurEndCtuTsAddr();
         if(curSliceEnd < numberOfCtusInFrame)
         {
-          const UInt sliceBits = pcSlice->getSliceBits();
           UInt independentSliceIdx = pcSlice->getIndependentSliceIdx();
           pcPic->allocateNewSlice();
           m_pcSliceEncoder->setSliceSegmentIdx      (uiNumSliceSegments);

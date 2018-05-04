@@ -375,7 +375,6 @@ Void LoopFilter::xSetEdgefilterMultipleSubPu(const CodingUnit& cu,
 void LoopFilter::xSetLoopfilterParam( const CodingUnit& cu )
 {
   const Slice& slice = *cu.slice;
-  const PPS&   pps   = *cu.cs->pps;
 
   if( slice.getDeblockingFilterDisable() )
   {

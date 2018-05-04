@@ -353,7 +353,7 @@ private:
   const unsigned            m_heightInGroups;
   const unsigned            m_log2BlockWidth;
   const unsigned            m_log2BlockHeight;
-#if JEM_TOOLS
+#if JEM_TOOLS && HEVC_USE_MDCS
   const unsigned            m_log2WidthInGroups;
   const unsigned            m_log2HeightInGroups;
 #endif

@@ -1159,7 +1159,9 @@ private:
   UInt              m_uiMaxDecPicBuffering[MAX_TLAYER];
   UInt              m_uiMaxLatencyIncreasePlus1[MAX_TLAYER];
 
+#if HEVC_USE_INTRA_SMOOTHING_T32 || HEVC_USE_INTRA_SMOOTHING_T64
   Bool              m_useStrongIntraSmoothing;
+#endif
 
   Bool              m_vuiParametersPresentFlag;
   VUI               m_vuiParameters;

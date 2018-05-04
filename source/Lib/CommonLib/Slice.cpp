@@ -1828,7 +1828,9 @@ SPS::SPS()
 #if HEVC_USE_SCALING_LISTS
 , m_scalingListEnabledFlag    (false)
 #endif
+#if HEVC_USE_INTRA_SMOOTHING_T32 || HEVC_USE_INTRA_SMOOTHING_T64
 , m_useStrongIntraSmoothing   (false)
+#endif
 , m_vuiParametersPresentFlag  (false)
 , m_vuiParameters             ()
 , m_spsNextExtension          (*this)

@@ -1631,13 +1631,13 @@ Void  EncLib::xInitPPSforTiles(PPS &pps)
 
 Void  EncCfg::xCheckGSParameters()
 {
+#if HEVC_TILES_WPP
   Int   iWidthInCU = ( m_iSourceWidth%m_maxCUWidth ) ? m_iSourceWidth/m_maxCUWidth + 1 : m_iSourceWidth/m_maxCUWidth;
   Int   iHeightInCU = ( m_iSourceHeight%m_maxCUHeight ) ? m_iSourceHeight/m_maxCUHeight + 1 : m_iSourceHeight/m_maxCUHeight;
   UInt  uiCummulativeColumnWidth = 0;
   UInt  uiCummulativeRowHeight = 0;
 
   //check the column relative parameters
-#if HEVC_TILES_WPP
   if( m_iNumColumnsMinus1 >= (1<<(LOG2_MAX_NUM_COLUMNS_MINUS1+1)) )
   {
     EXIT( "The number of columns is larger than the maximum allowed number of columns." );

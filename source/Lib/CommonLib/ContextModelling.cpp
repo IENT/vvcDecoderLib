@@ -226,7 +226,7 @@ CoeffCodingContext::CoeffCodingContext(const TransformUnit& tu, ComponentID comp
   , m_heightInGroups            (m_height >> m_log2CGHeight)
   , m_log2BlockWidth            (g_aucLog2[m_width])
   , m_log2BlockHeight           (g_aucLog2[m_height])
-#if JEM_TOOLS
+#if JEM_TOOLS && HEVC_USE_MDCS
   , m_log2WidthInGroups         (g_aucLog2[m_widthInGroups])
   , m_log2HeightInGroups        (g_aucLog2[m_heightInGroups])
 #endif
