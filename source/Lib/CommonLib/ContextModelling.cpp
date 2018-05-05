@@ -329,7 +329,7 @@ CoeffCodingContext::CoeffCodingContext(const TransformUnit& tu, ComponentID comp
     const_cast<int&>(m_lastShiftX)  = (log2sizeX + 1) >> 2;
     const_cast<int&>(m_lastShiftY)  = (log2sizeY + 1) >> 2;
   }
-#if JEM_TOOLS
+#if JEM_TOOLS && HEVC_USE_MDCS
   if( m_altResiCompId == 1 )
   {
     if( m_scanType && m_log2BlockWidth == 3 && m_log2BlockHeight == 3 )
