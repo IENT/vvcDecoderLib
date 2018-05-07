@@ -75,7 +75,8 @@ IntraSearch::IntraSearch()
   {
     m_pSharedPredTransformSkip[ch] = nullptr;
   }
-#if JEM_TOOLS
+#if JEM_TOOLS && !ENABLE_BMS
+
   m_pLMMFPredSaved = new Pel*[8];//4*(Cb+Cr)
   for (Int k = 0; k < 8; k++)
   {
@@ -166,7 +167,7 @@ Void IntraSearch::destroy()
     m_pSharedPredTransformSkip[ch] = nullptr;
   }
 
-#if JEM_TOOLS
+#if JEM_TOOLS && !ENABLE_BMS
   for (Int k = 0; k < 8; k++)
   {
     delete[]m_pLMMFPredSaved[k];
@@ -1030,8 +1031,10 @@ Void IntraSearch::estIntraPredChromaQT(CodingUnit &cu, Partitioner &partitioner)
 
           predIntraChromaLM(COMPONENT_Cb, piPredCb, pu, areaCb, uiMode);
 
+#if !ENABLE_BMS
           PelBuf savePredCb(m_pLMMFPredSaved[(uiMode - LM_CHROMA_F1_IDX) * 2], areaCb.width, areaCb);
           savePredCb.copyFrom(piPredCb);
+#endif
           uiSad += distParam.distFunc(distParam);
 
           CompArea areaCr = pu.Cr();
@@ -1043,9 +1046,10 @@ Void IntraSearch::estIntraPredChromaQT(CodingUnit &cu, Partitioner &partitioner)
 
           predIntraChromaLM(COMPONENT_Cr, piPredCr, pu, areaCr, uiMode);
 
+#if !ENABLE_BMS
           PelBuf savePredCr(m_pLMMFPredSaved[(uiMode - LM_CHROMA_F1_IDX) * 2 + 1], areaCr.width, areaCr);
           savePredCr.copyFrom(piPredCr);
-
+#endif
           uiSad += distParam.distFunc(distParam);
 
           auiSATDSortedcost[iCurLMMFIdx] = uiSad;
@@ -1647,7 +1651,7 @@ Void IntraSearch::xIntraCodingTUBlock(TransformUnit &tu, const ComponentID &comp
 
   //===== init availability pattern =====
   PelBuf sharedPredTS( m_pSharedPredTransformSkip[compID], area );
-#if JEM_TOOLS
+#if JEM_TOOLS && !ENABLE_BMS
   if( pu.cs->pcv->noRQT && pu.cs->sps->getSpsNext().isELMModeMFLM() && ( ( uiChFinalMode >= LM_CHROMA_F1_IDX ) && ( uiChFinalMode < LM_CHROMA_F1_IDX + LM_FILTER_NUM ) ) )
   {
     PelBuf savePred( m_pLMMFPredSaved[( uiChFinalMode - LM_CHROMA_F1_IDX ) * 2 + compID - COMPONENT_Cb], area.width, area );
@@ -1665,7 +1669,9 @@ Void IntraSearch::xIntraCodingTUBlock(TransformUnit &tu, const ComponentID &comp
 #if JEM_TOOLS
     if( compID != COMPONENT_Y && PU::isLMCMode( uiChFinalMode ) )
     {
+#if !ENABLE_BMS
       if( !PU::isMFLMEnabled(pu) || !pu.cs->pcv->noRQT)
+#endif
       {
         xGetLumaRecPixels( pu, area );
       }

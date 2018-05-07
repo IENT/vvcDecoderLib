@@ -3048,10 +3048,9 @@ Void AdaptiveLoopFilter::xFrameChromaAlf( ALFParam* pcAlfParam, const PelUnitBuf
   Int iTap = pcAlfParam->tap_chroma;
   Int *qh  = pcAlfParam->coeff_chroma;
 
-  Int i, x, y, value, N;//, offset;
+  Int i, x, y, value;//, offset;
   Pel PixSum[m_ALF_MAX_NUM_COEF];
 
-  N      = (iTap*iTap+1)>>1;
   //offset = iTap>>1;
   Int iHeight = recUnitBuf.get(compID).height;
   Int iWidth  = recUnitBuf.get(compID).width;
@@ -3112,6 +3111,7 @@ Void AdaptiveLoopFilter::xFrameChromaAlf( ALFParam* pcAlfParam, const PelUnitBuf
           *pTmpPixSum = (*pTmpDec1);
 
           value = 0;
+          const int N = (iTap*iTap+1)>>1;
           for(i=0; i<N; i++)
           {
             value += qh[i]*PixSum[i];
@@ -3193,6 +3193,7 @@ Void AdaptiveLoopFilter::xFrameChromaAlf( ALFParam* pcAlfParam, const PelUnitBuf
           *pTmpPixSum = (*pTmpDec1);
 
           value = 0;
+          const int N = (iTap*iTap+1)>>1;
           for(i=0; i<N; i++)
           {
             value += qh[i]*PixSum[i];
@@ -3308,6 +3309,7 @@ Void AdaptiveLoopFilter::xFrameChromaAlf( ALFParam* pcAlfParam, const PelUnitBuf
           *pTmpPixSum =(*pTmpDec1);
 
           value = 0;
+          const int N = (iTap*iTap+1)>>1;
           for(i=0; i<N; i++)
           {
             value += qh[i]*PixSum[i];

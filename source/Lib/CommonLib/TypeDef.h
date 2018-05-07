@@ -575,7 +575,7 @@ enum DFunc
   DF_SAD_FULL_NBIT32  = DF_SAD_FULL_NBIT+5,    ///<  32xM SAD with full bit usage
   DF_SAD_FULL_NBIT64  = DF_SAD_FULL_NBIT+6,    ///<  64xM SAD with full bit usage
   DF_SAD_FULL_NBIT16N = DF_SAD_FULL_NBIT+7,    ///< 16NxM SAD with full bit usage
-  
+
 #if WCG_EXT
   DF_SSE_WTD          = 54,                ///< general size SSE
   DF_SSE2_WTD         = DF_SSE_WTD+1,      ///<   4xM SSE
@@ -1186,7 +1186,11 @@ struct LumaLevelToDeltaQPMapping
   LumaLevelToDQPMode                 mode;             ///< use deltaQP determined by block luma level
   Double                             maxMethodWeight;  ///< weight of max luma value when mode = 2
   std::vector< std::pair<Int, Int> > mapping;          ///< first=luma level, second=delta QP.
+#if ENABLE_QPA
+  bool isEnabled() const { return (mode != LUMALVL_TO_DQP_DISABLED && mode != LUMALVL_TO_DQP_NUM_MODES); }
+#else
   Bool isEnabled() const { return mode!=LUMALVL_TO_DQP_DISABLED; }
+#endif
 };
 #endif
 

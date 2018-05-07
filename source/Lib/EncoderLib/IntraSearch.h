@@ -78,7 +78,7 @@ private:
 
   CodingStructure **m_pSaveCS;
 
-#if JEM_TOOLS
+#if JEM_TOOLS && !ENABLE_BMS
   Pel             **m_pLMMFPredSaved;
 
 #endif

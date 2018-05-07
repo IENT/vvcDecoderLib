@@ -1102,7 +1102,9 @@ void EncCu::xCheckModeSplit(CodingStructure *&tempCS, CodingStructure *&bestCS, 
   {
 #if HEVC_TILES_WPP
     const TileMap& tileMap = *tempCS->picture->tileMap;
-    const UInt CtuAddr = CU::getCtuAddr( *bestCS->getCU( partitioner.chType ) );
+#endif
+#if HEVC_TILES_WPP || HEVC_DEPENDENT_SLICES
+    const UInt CtuAddr             = CU::getCtuAddr( *bestCS->getCU( partitioner.chType ) );
 #endif
     const Bool isEndOfSlice        =    slice.getSliceMode() == FIXED_NUMBER_OF_BYTES
                                       && ((slice.getSliceBits() + CS::getEstBits(*bestCS)) > slice.getSliceArgument() << 3)
