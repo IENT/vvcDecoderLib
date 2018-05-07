@@ -877,7 +877,7 @@ void fastForwardDCT2_B128(const TCoeff *src, TCoeff *dst, Int shift, Int line, I
   TCoeff EEEEEE[2], EEEEEO[2];
   TCoeff add = 1 << (shift - 1);
 
-  const TMatrixCoeff(*iT)[128] = use ? g_aiTr128[DCT2] : g_aiT128[TRANSFORM_INVERSE];
+  const TMatrixCoeff(*iT)[128] = use ? g_aiTr128[DCT2] : g_aiT128[TRANSFORM_FORWARD];
 
   TCoeff* tmp = dst;
   for (j = 0; j<line - iSkipLine; j++)
