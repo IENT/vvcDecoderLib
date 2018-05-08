@@ -1470,8 +1470,8 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx, co
 
     if( dir != 0 )
     {
-#if JEM_TOOLS // TODO: check if correct here
       bool addTMvp = !( cs.sps->getSpsNext().getUseSubPuMvp() && isAvailableSubPu );
+#if JEM_TOOLS
       if( !addTMvp )
       {
         if( dir != mrgCtx.interDirNeighbours[subPuMvpPos] || LICFlag != mrgCtx.LICFlags[subPuMvpPos] )
@@ -1493,13 +1493,18 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx, co
           }
         }
       }
+#endif
 #if HM_JEM_MERGE_CANDS
+#if JEM_TOOLS
       int iSpanCand = isAvailableSubPu ? cnt - 1 : cnt;
+#else
+      int iSpanCand = cnt;
+#endif
       for( int i = 0; i < iSpanCand; i++ )
       {
-        if( mrgCtx.interDirNeighbours[i] == dir &&
-            mrgCtx.mvFieldNeighbours[i << 1] == mrgCtx.mvFieldNeighbours[uiArrayAddr << 1] &&
-            mrgCtx.mvFieldNeighbours[( i << 1 ) + 1] == mrgCtx.mvFieldNeighbours[( uiArrayAddr << 1 ) + 1] &&
+        if( mrgCtx.interDirNeighbours[  i           ] == dir &&
+            mrgCtx.mvFieldNeighbours [  i << 1      ] == mrgCtx.mvFieldNeighbours[  uiArrayAddr << 1      ] &&
+            mrgCtx.mvFieldNeighbours [( i << 1 ) + 1] == mrgCtx.mvFieldNeighbours[( uiArrayAddr << 1 ) + 1] &&
             mrgCtx.LICFlags[i] == LICFlag )
         {
           addTMvp = false;
@@ -1507,7 +1512,6 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx, co
       }
 #endif
       if( addTMvp )
-#endif
       {
         mrgCtx.interDirNeighbours[uiArrayAddr] = dir;
 #if JEM_TOOLS
