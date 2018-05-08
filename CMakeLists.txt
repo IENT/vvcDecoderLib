@@ -27,14 +27,6 @@ set( SKIP_SVN_REVISION OFF CACHE BOOL "Don't add SVN path and revision info to t
 set( SET_ENABLE_TRACING OFF CACHE BOOL "Set ENABLE_TRACING as a compiler flag" )
 set( ENABLE_TRACING OFF CACHE BOOL "If SET_ENABLE_TRACING is on, it will be set to this value" )
 
-if( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
-else()
-  set( SET_ENABLE_SPLIT_PARALLELISM OFF CACHE BOOL "Set ENABLE_SPLIT_PARALLELISM as a compiler flag" )
-  set( ENABLE_SPLIT_PARALLELISM OFF CACHE BOOL "If SET_ENABLE_SPLIT_PARALLELISM is on, it will be set to this value" )
-  set( SET_ENABLE_WPP_PARALLELISM OFF CACHE BOOL "Set ENABLE_WPP_PARALLELISM as a compiler flag" )
-  set( ENABLE_WPP_PARALLELISM OFF CACHE BOOL "If SET_ENABLE_WPP_PARALLELISM is on, it will be set to this value" )
-endif()
-
 if( CMAKE_COMPILER_IS_GNUCC )
   set( BUILD_STATIC OFF CACHE BOOL "Build static executables" )
 endif()
@@ -57,6 +49,19 @@ include( ${CMAKE_SOURCE_DIR}/cmake/CMakeBuild/cmake/modules/BBuildEnv.cmake )
 
 # Enable multithreading
 bb_multithreading()
+
+find_package(OpenMP)
+
+if( OpenMP_FOUND )
+  set( CMAKE_C_FLAGS          "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}" )
+  set( CMAKE_CXX_FLAGS        "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}" )
+  set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}" )
+  
+  set( SET_ENABLE_SPLIT_PARALLELISM OFF CACHE BOOL "Set ENABLE_SPLIT_PARALLELISM as a compiler flag" )
+  set( ENABLE_SPLIT_PARALLELISM     OFF CACHE BOOL "If SET_ENABLE_SPLIT_PARALLELISM is on, it will be set to this value" )
+  set( SET_ENABLE_WPP_PARALLELISM   OFF CACHE BOOL "Set ENABLE_WPP_PARALLELISM as a compiler flag" )
+  set( ENABLE_WPP_PARALLELISM       OFF CACHE BOOL "If SET_ENABLE_WPP_PARALLELISM is on, it will be set to this value" )
+endif()
 
 # Enable warnings for some generators and toolsets.
 bb_enable_warnings( gcc warnings-as-errors -Wno-sign-compare )
@@ -106,17 +111,6 @@ if( CMAKE_CXX_COMPILER_ID STREQUAL "GNU" )
 
   if( CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5.0 )
     add_compile_options( "-fabi-version=6" )
-  endif()
-endif()
-
-if( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
-  add_definitions( -DENABLE_SPLIT_PARALLELISM=0 )
-else()
-  find_package( OpenMP )
-  if( OPENMP_FOUND )
-    set( CMAKE_C_FLAGS          "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}" )
-    set( CMAKE_CXX_FLAGS        "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}" )
-    set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}" )
   endif()
 endif()
 
