@@ -1470,8 +1470,8 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx, co
 
     if( dir != 0 )
     {
-      bool addTMvp = !( cs.sps->getSpsNext().getUseSubPuMvp() && isAvailableSubPu );
 #if JEM_TOOLS
+      bool addTMvp = !( cs.sps->getSpsNext().getUseSubPuMvp() && isAvailableSubPu );
       if( !addTMvp )
       {
         if( dir != mrgCtx.interDirNeighbours[subPuMvpPos] || LICFlag != mrgCtx.LICFlags[subPuMvpPos] )
@@ -1493,6 +1493,8 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx, co
           }
         }
       }
+#else
+      bool addTMvp = true;
 #endif
 #if HM_JEM_MERGE_CANDS
 #if JEM_TOOLS
