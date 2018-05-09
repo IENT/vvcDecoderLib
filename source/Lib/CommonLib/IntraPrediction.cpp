@@ -237,7 +237,9 @@ void IntraPrediction::predIntraAng( const ComponentID compId, PelBuf &piPred, co
 
   const Int  srcStride = ( iWidth + iHeight + 1 );
 
+#if HEVC_USE_HOR_VER_PREDFILTERING
   const Bool enableEdgeFilters = !(CU::isRDPCMEnabled( *pu.cu ) && pu.cu->transQuantBypass);
+#endif
   Pel *ptrSrc = getPredictorPtr( compID, useFilteredPredSamples );
 
 #if JEM_TOOLS
@@ -296,8 +298,13 @@ void IntraPrediction::predIntraAng( const ComponentID compId, PelBuf &piPred, co
     {
     case( PLANAR_IDX ): xPredIntraPlanar( CPelBuf( ptrSrc, srcStride, srcStride ), piPred, *pu.cs->sps );         break;
     case( DC_IDX ):     xPredIntraDc    ( CPelBuf( ptrSrc, srcStride, srcStride ), piPred, channelType, false );  break; // including DCPredFiltering
+#if HEVC_USE_HOR_VER_PREDFILTERING
     default:            xPredIntraAng   ( CPelBuf( ptrSrc, srcStride, srcStride ), piPred, channelType,
-                                          uiDirMode, clpRng, enableEdgeFilters, *pu.cs->sps, false );             break;
+                                         uiDirMode, clpRng, enableEdgeFilters, *pu.cs->sps, false );             break;
+#else
+    default:            xPredIntraAng   ( CPelBuf( ptrSrc, srcStride, srcStride ), piPred, channelType,
+                                          uiDirMode, clpRng, *pu.cs->sps, false );             break;
+#endif
     }
 
     if( pPdpcParMain[5] != 0 )
@@ -337,8 +344,13 @@ void IntraPrediction::predIntraAng( const ComponentID compId, PelBuf &piPred, co
     {
     case( DC_IDX ):     xPredIntraDc    ( CPelBuf( ptrSrc, srcStride, srcStride ), piPred, channelType );            break; // including DCPredFiltering
     case( PLANAR_IDX ): xPredIntraPlanar( CPelBuf( ptrSrc, srcStride, srcStride ), piPred, *pu.cs->sps );            break;
+#if HEVC_USE_HOR_VER_PREDFILTERING
     default:            xPredIntraAng   ( CPelBuf( ptrSrc, srcStride, srcStride ), piPred, channelType, uiDirMode,
                                           pu.cs->slice->clpRng( compID ), enableEdgeFilters, *pu.cs->sps );          break;
+#else
+    default:            xPredIntraAng   ( CPelBuf( ptrSrc, srcStride, srcStride ), piPred, channelType, uiDirMode,
+                                          pu.cs->slice->clpRng( compID ), *pu.cs->sps );          break;
+#endif
     }
   }
 }
@@ -499,8 +511,10 @@ Void IntraPrediction::xFilterGroup(Pel* pMulDst[], Int i, Pel const * const piSr
 //NOTE: Bit-Limit - 24-bit source
 Void IntraPrediction::xPredIntraPlanar( const CPelBuf &pSrc, PelBuf &pDst, const SPS& sps )
 {
-  const UInt width = pDst.width;
+  const UInt width  = pDst.width;
   const UInt height = pDst.height;
+  const UInt log2W  = g_aucLog2[ width ];
+  const UInt log2H  = g_aucLog2[ height ];
 
   Int leftColumn[MAX_CU_SIZE + 1], topRow[MAX_CU_SIZE + 1], bottomRow[MAX_CU_SIZE], rightColumn[MAX_CU_SIZE];
   const UInt offset = width * height;
@@ -523,18 +537,19 @@ Void IntraPrediction::xPredIntraPlanar( const CPelBuf &pSrc, PelBuf &pDst, const
   for( Int k = 0; k < width; k++ )
   {
     bottomRow[k] = bottomLeft - topRow[k];
-    topRow[k]    = topRow[k] * height;
-    //topRow[k] <<= shift1Dver;
+    topRow[k]    = topRow[k] << log2H;
   }
 
   for( Int k = 0; k < height; k++ )
   {
     rightColumn[k] = topRight - leftColumn[k];
-    leftColumn[k]  = leftColumn[k] * width;
-    //leftColumn[k] <<= shift1Dhor;
+    leftColumn[k]  = leftColumn[k] << log2W;
   }
 
-  for( Int y = 0; y < height; y++ )
+  const UInt finalShift = 1 + log2W + log2H;
+  const UInt stride     = pDst.stride;
+  Pel*       pred       = pDst.buf;
+  for( Int y = 0; y < height; y++, pred += stride )
   {
     Int horPred = leftColumn[y];
 
@@ -544,7 +559,7 @@ Void IntraPrediction::xPredIntraPlanar( const CPelBuf &pSrc, PelBuf &pDst, const
       topRow[x] += bottomRow[x];
 
       Int vertPred = topRow[x];
-      pDst.at( x, y ) = ( ( horPred * height ) + ( vertPred * width ) + offset ) / ( width * height * 2 );
+      pred[x]      = ( ( horPred << log2H ) + ( vertPred << log2W ) + offset ) >> finalShift;
     }
   }
 }
@@ -609,7 +624,11 @@ Void IntraPrediction::xDCPredFiltering(const CPelBuf &pSrc, PelBuf &pDst, const 
 * from the extended main reference.
 */
 //NOTE: Bit-Limit - 25-bit source
+#if HEVC_USE_HOR_VER_PREDFILTERING
 Void IntraPrediction::xPredIntraAng( const CPelBuf &pSrc, PelBuf &pDst, const ChannelType channelType, const UInt dirMode, const ClpRng& clpRng, const Bool bEnableEdgeFilters, const SPS& sps, const bool enableBoundaryFilter )
+#else
+Void IntraPrediction::xPredIntraAng( const CPelBuf &pSrc, PelBuf &pDst, const ChannelType channelType, const UInt dirMode, const ClpRng& clpRng, const SPS& sps, const bool enableBoundaryFilter )
+#endif
 {
   Int width =Int(pDst.width);
   Int height=Int(pDst.height);
@@ -620,7 +639,9 @@ Void IntraPrediction::xPredIntraAng( const CPelBuf &pSrc, PelBuf &pDst, const Ch
   const Int        intraPredAngleMode = (bIsModeVer) ? (Int)dirMode - VER_IDX :  -((Int)dirMode - HOR_IDX);
   const Int        absAngMode         = abs(intraPredAngleMode);
   const Int        signAng            = intraPredAngleMode < 0 ? -1 : 1;
+#if HEVC_USE_HOR_VER_PREDFILTERING
   const Bool       edgeFilter         = bEnableEdgeFilters && isLuma(channelType) && (width <= MAXIMUM_INTRA_FILTERED_WIDTH) && (height <= MAXIMUM_INTRA_FILTERED_HEIGHT);
+#endif
 
   // Set bitshifts and scale the angle parameter to block size
 
@@ -690,7 +711,7 @@ Void IntraPrediction::xPredIntraAng( const CPelBuf &pSrc, PelBuf &pDst, const Ch
         pDstBuf[y*dstStride + x] = refMain[x + 1];
       }
     }
-
+#if HEVC_USE_HOR_VER_PREDFILTERING
     if (edgeFilter)
     {
       for( Int y = 0; y < height; y++ )
@@ -698,6 +719,7 @@ Void IntraPrediction::xPredIntraAng( const CPelBuf &pSrc, PelBuf &pDst, const Ch
         pDstBuf[y*dstStride] = ClipPel( pDstBuf[y*dstStride] + ( ( refSide[y + 1] - refSide[0] ) >> 1 ), clpRng );
       }
     }
+#endif
   }
   else
   {
@@ -761,6 +783,7 @@ Void IntraPrediction::xPredIntraAng( const CPelBuf &pSrc, PelBuf &pDst, const Ch
         }
       }
     }
+#if HEVC_USE_HOR_VER_PREDFILTERING
     if( edgeFilter && absAng <= 1 )
     {
       for( Int y = 0; y < height; y++ )
@@ -768,6 +791,7 @@ Void IntraPrediction::xPredIntraAng( const CPelBuf &pSrc, PelBuf &pDst, const Ch
         pDstBuf[y*dstStride] = ClipPel( pDstBuf[y*dstStride] + ((refSide[y + 1] - refSide[0]) >> 2), clpRng );
       }
     }
+#endif
   }
 
   // Flip the block if this is the horizontal mode
