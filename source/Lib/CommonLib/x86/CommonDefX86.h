@@ -180,24 +180,6 @@ static inline __m128i _mm_clip_epi8(__m128i v, __m128i low, __m128i hi)
 #ifdef USE_AVX2
 
 
-// will be available in AVX2-512
-#ifndef USE_AVX512
-#if ( _MSC_VER < 1910 )
-static inline __m128i _mm256_cvtsepi32_epi16_wrapper(__m256i I)
-{
-  __m256i T = _mm256_packs_epi32(I, I);  // Saturate_Int32_To_Int16
-  T = _mm256_permute4x64_epi64(T, 0xD8); // permute 1 <-> 2
-  return (_mm256_castsi256_si128(T));
-}
-#else
-static inline __m128i _mm256_cvtsepi32_epi16_wrapper(__m256i I)
-{
-  return _mm256_cvtsepi32_epi16( I );
-}
-#endif
-#endif
-
-
 #define TRANSPOSESTORE16x16_ALGN(T, D, stride)\
 {\
   TRANSPOSE16x16_AVX2(T); \
