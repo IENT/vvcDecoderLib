@@ -1377,7 +1377,7 @@ Void IntraSearch::xEncSubdivCbfQT(CodingStructure &cs, Partitioner &partitioner,
 {
   const UnitArea &currArea = partitioner.currArea();
   TransformUnit &currTU    = *cs.getTU( currArea.blocks[partitioner.chType], partitioner.chType );
-#if HEVC_USE_RQT || HM_EMT_NSST_AS_IN_JEM
+#if HEVC_USE_RQT || (JEM_TOOLS && HM_EMT_NSST_AS_IN_JEM)
   CodingUnit &currCU       = *currTU.cu;
 #endif
 #if HEVC_USE_RQT || ENABLE_CHROMA_422

@@ -1506,8 +1506,12 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx, co
       {
         if( mrgCtx.interDirNeighbours[  i           ] == dir &&
             mrgCtx.mvFieldNeighbours [  i << 1      ] == mrgCtx.mvFieldNeighbours[  uiArrayAddr << 1      ] &&
+#if JEM_TOOLS
             mrgCtx.mvFieldNeighbours [( i << 1 ) + 1] == mrgCtx.mvFieldNeighbours[( uiArrayAddr << 1 ) + 1] &&
             mrgCtx.LICFlags[i] == LICFlag )
+#else
+            mrgCtx.mvFieldNeighbours [( i << 1 ) + 1] == mrgCtx.mvFieldNeighbours[( uiArrayAddr << 1 ) + 1] )
+#endif
         {
           addTMvp = false;
         }
