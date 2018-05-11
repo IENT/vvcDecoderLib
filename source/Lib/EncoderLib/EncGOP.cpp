@@ -1535,7 +1535,7 @@ Void EncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic,
     }
 
     //-- For time output for each slice
-    auto beforeTime = std::chrono::high_resolution_clock::now();
+    auto beforeTime = std::chrono::steady_clock::now();
 
 #if !X0038_LAMBDA_FROM_QP_CAPABILITY
     UInt uiColDir = calculateCollocatedFromL1Flag(m_pcCfg, iGOPid, m_iGopSize);
@@ -2493,7 +2493,7 @@ Void EncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic,
       cabac_zero_word_padding(pcSlice, pcPic, binCountsInNalUnits, numBytesInVclNalUnits, accessUnit.back()->m_nalUnitData, m_pcCfg->getCabacZeroWordPaddingEnabled());
 
       //-- For time output for each slice
-      auto elapsed = std::chrono::high_resolution_clock::now() - beforeTime;
+      auto elapsed = std::chrono::steady_clock::now() - beforeTime;
       auto encTime = std::chrono::duration_cast<std::chrono::seconds>( elapsed ).count();
 
       std::string digestStr;

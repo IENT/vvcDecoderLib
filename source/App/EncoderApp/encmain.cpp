@@ -147,9 +147,10 @@ int main(int argc, char* argv[])
 #endif
 
   // starting time
-  auto startTime  = std::chrono::high_resolution_clock::now();
+  auto startTime  = std::chrono::steady_clock::now();
   std::time_t startTime2 = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
   fprintf(stdout, " started @ %s", std::ctime(&startTime2) );
+  clock_t startClock = clock();
 
   // call encoding function
 #ifndef _DEBUG
@@ -171,7 +172,8 @@ int main(int argc, char* argv[])
   }
 #endif
   // ending time
-  auto endTime = std::chrono::high_resolution_clock::now();
+  clock_t endClock = clock();
+  auto endTime = std::chrono::steady_clock::now();
   std::time_t endTime2 = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
   auto encTime = std::chrono::duration_cast<std::chrono::milliseconds>( endTime- startTime ).count();
   // destroy application encoder class
@@ -181,7 +183,9 @@ int main(int argc, char* argv[])
 
   printf( "\n finished @ %s", std::ctime(&endTime2) );
 
-  printf(" Total Time: %12.3f sec.\n", encTime / 1000.0 );
+  printf(" Total Time: %12.3f sec. [user] %12.3f sec. [elapsed]\n",
+         (endClock - startClock) * 1.0 / CLOCKS_PER_SEC,
+         encTime / 1000.0);
 
   return 0;
 }
