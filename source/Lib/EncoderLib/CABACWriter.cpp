@@ -1497,9 +1497,23 @@ void CABACWriter::intra_luma_pred_modes( const CodingUnit& cu )
           }
         }
 
+#if JVET_B0051_NON_MPM_MODE
+        m_BinEncoder.encodeBin(((ipred_mode % 4) == 0) ? 1 : 0, Ctx::IPredMode[0](4)); // flag to indicate if it is selected mode or non-selected mode
+        if (ipred_mode % 4 == 0)
+        {
+          m_BinEncoder.encodeBinsEP(ipred_mode >> 2, 4);  // selected mode is 4-bit FLC coded
+        }
+        else
+        {
+          ipred_mode -= ipred_mode >> 2;
+          ipred_mode--;
+          xWriteTruncBinCode(ipred_mode, 45);  // Non-selected mode is truncated binary coded
+        }
+#else
         int RealNumIntraMode = cu.cs->sps->getSpsNext().getRealNumIntraMode();
         if( ipred_mode < ( RealNumIntraMode - 8 ) ) { m_BinEncoder.encodeBinsEP( ipred_mode,      6 ); }
         else                                        { m_BinEncoder.encodeBinsEP( ipred_mode >> 2, 4 ); }
+#endif
       }
       else
 #endif
@@ -1590,9 +1604,23 @@ void CABACWriter::intra_luma_pred_mode( const PredictionUnit& pu )
           ipred_mode--;
         }
       }
+#if JVET_B0051_NON_MPM_MODE
+      m_BinEncoder.encodeBin(((ipred_mode % 4) == 0) ? 1 : 0, Ctx::IPredMode[0](4)); // flag to indicate if it is selected mode or non-selected mode
+      if (ipred_mode % 4 == 0)
+      {
+        m_BinEncoder.encodeBinsEP(ipred_mode >> 2, 4);  // selected mode is 4-bit FLC coded
+      }
+      else
+      {
+        ipred_mode -= ipred_mode >> 2;
+        ipred_mode--;
+        xWriteTruncBinCode(ipred_mode, 45);  // Non-selected mode is truncated binary coded
+      }
+#else
       int RealNumIntraMode = pu.cs->sps->getSpsNext().getRealNumIntraMode();
       if( ipred_mode < ( RealNumIntraMode - 8 ) ) { m_BinEncoder.encodeBinsEP( ipred_mode, 6 ); }
       else                                        { m_BinEncoder.encodeBinsEP( ( ipred_mode >> 2 ), 4 ); }
+#endif
     }
     else
 #endif

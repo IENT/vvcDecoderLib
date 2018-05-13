@@ -1412,6 +1412,19 @@ void CABACReader::intra_luma_pred_modes( CodingUnit &cu )
 #if JEM_TOOLS
       if( use65Ang )
       {
+#if JVET_B0051_NON_MPM_MODE
+        unsigned selected_flag = m_BinDecoder.decodeBin(Ctx::IPredMode[0](4));
+        if (selected_flag)
+        {
+          ipred_mode = m_BinDecoder.decodeBinsEP(4);
+          ipred_mode <<= 2;
+        }
+        else
+        {
+          xReadTruncBinCode(ipred_mode, 45);
+          ipred_mode += g_ipred_mode_table[ipred_mode];
+        }
+#else
         ipred_mode    = m_BinDecoder.decodeBinsEP( 4 );
         ipred_mode  <<= 2;
         int RealNumIntraMode = cu.cs->sps->getSpsNext().getRealNumIntraMode();
@@ -1419,6 +1432,7 @@ void CABACReader::intra_luma_pred_modes( CodingUnit &cu )
         {
           ipred_mode += m_BinDecoder.decodeBinsEP( 2 );
         }
+#endif
       }
       else
 #endif

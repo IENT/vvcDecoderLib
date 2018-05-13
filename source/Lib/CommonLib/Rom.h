@@ -305,6 +305,9 @@ extern const Int g_aiNonLMPosThrs[];
 
 extern const UChar g_NonMPM[257];
 
+#if JVET_B0051_NON_MPM_MODE
+extern const Int g_ipred_mode_table[];
+#endif
 #endif
 
 

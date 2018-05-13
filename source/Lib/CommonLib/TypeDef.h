@@ -58,6 +58,10 @@
 #define JEM_COMP                                        ( 1 && JEM_TOOLS )
 
 #endif
+#ifndef JVET_B0051_NON_MPM_MODE
+#define JVET_B0051_NON_MPM_MODE                         ( 1 && JEM_TOOLS )
+
+#endif
 #ifndef QTBT_AS_IN_JEM
 #define QTBT_AS_IN_JEM                                    1
 
