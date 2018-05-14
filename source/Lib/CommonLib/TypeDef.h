@@ -261,8 +261,7 @@
 
 #define RDOQ_CHROMA                                       1 ///< use of RDOQ in chroma
 
-
-
+#define QP_SWITCHING_FOR_PARALLEL                         1 ///< Replace floating point QP with a source-file frame number. After switching POC, increase base QP instead of frame level QP.
 
 // ====================================================================================================================
 // Derived macros

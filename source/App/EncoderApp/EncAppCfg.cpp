@@ -533,6 +533,24 @@ istream& SMultiValueInput<T>::readValues(std::istream &in)
   return in;
 }
 
+#if QP_SWITCHING_FOR_PARALLEL
+template <class T>
+static inline istream& operator >> (std::istream &in, EncAppCfg::OptionalValue<T> &value)
+{
+  in >> std::ws;
+  if (in.eof())
+  {
+    value.bPresent = false;
+  }
+  else
+  {
+    in >> value.value;
+    value.bPresent = true;
+  }
+  return in;
+}
+#endif
+
 static Void
 automaticallySelectRExtProfile(const Bool bUsingGeneralRExtTools,
                                const Bool bUsingChromaQPAdjustment,
@@ -913,7 +931,12 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
   ("IQPFactor,-IQF",                                  m_dIntraQpFactor,                                  -1.0, "Intra QP Factor for Lambda Computation. If negative, the default will scale lambda based on GOP size (unless LambdaFromQpEnable then IntraQPOffset is used instead)")
 
   /* Quantization parameters */
+#if QP_SWITCHING_FOR_PARALLEL
+  ("QP,q",                                            m_iQP,                                               30, "Qp value")
+  ("QPIncrementFrame,-qpif",                          m_qpIncrementAtSourceFrame,       OptionalValue<UInt>(), "If a source file frame number is specified, the internal QP will be incremented for all POCs associated with source frames >= frame number. If empty, do not increment.")
+#else
   ("QP,q",                                            m_fQP,                                             30.0, "Qp value, if value is float, QP is switched once during encoding")
+#endif
 #if X0038_LAMBDA_FROM_QP_CAPABILITY
   ("IntraQPOffset",                                   m_intraQPOffset,                                      0, "Qp offset value for intra slice, typically determined based on GOP size")
   ("LambdaFromQpEnable",                              m_lambdaFromQPEnable,                             false, "Enable flag for derivation of lambda from QP")
@@ -1586,6 +1609,23 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
   m_aidQP = new Int[ m_framesToBeEncoded + m_iGOPSize + 1 ];
   ::memset( m_aidQP, 0, sizeof(Int)*( m_framesToBeEncoded + m_iGOPSize + 1 ) );
 
+#if QP_SWITCHING_FOR_PARALLEL
+  if (m_qpIncrementAtSourceFrame.bPresent)
+  {
+    UInt switchingPOC = 0;
+    if (m_qpIncrementAtSourceFrame.value > m_FrameSkip)
+    {
+      // if switch source frame (ssf) = 10, and frame skip (fs)=2 and temporal subsample ratio (tsr) =1, then
+      //    for this simulation switch at POC 8 (=10-2).
+      // if ssf=10, fs=2, tsr=2, then for this simulation, switch at POC 4 (=(10-2)/2): POC0=Src2, POC1=Src4, POC2=Src6, POC3=Src8, POC4=Src10
+      switchingPOC = (m_qpIncrementAtSourceFrame.value - m_FrameSkip) / m_temporalSubsampleRatio;
+    }
+    for (UInt i = switchingPOC; i<(m_framesToBeEncoded + m_iGOPSize + 1); i++)
+    {
+      m_aidQP[i] = 1;
+    }
+  }
+#else
   // handling of floating-point QP values
   // if QP is not integer, sequence is split into two sections having QP and QP+1
   m_iQP = (Int)( m_fQP );
@@ -1599,6 +1639,7 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
       m_aidQP[i] = 1;
     }
   }
+#endif
 
   for(UInt ch=0; ch<MAX_NUM_CHANNEL_TYPE; ch++)
   {
@@ -3002,7 +3043,18 @@ Void EncAppCfg::xPrintParameter()
   msg( DETAILS, "Motion search range                    : %d\n", m_iSearchRange );
   msg( DETAILS, "Intra period                           : %d\n", m_iIntraPeriod );
   msg( DETAILS, "Decoding refresh type                  : %d\n", m_iDecodingRefreshType );
+#if QP_SWITCHING_FOR_PARALLEL
+  if (m_qpIncrementAtSourceFrame.bPresent)
+  {
+    msg( DETAILS, "QP                                     : %d (incrementing internal QP at source frame %d)\n", m_iQP, m_qpIncrementAtSourceFrame.value);
+  }
+  else
+  {
+    msg( DETAILS, "QP                                     : %d\n", m_iQP);
+  }
+#else
   msg( DETAILS, "QP                                     : %5.2f\n", m_fQP );
+#endif
   msg( DETAILS, "Max dQP signaling depth                : %d\n", m_iMaxCuDQPDepth);
 
   msg( DETAILS, "Cb QP Offset                           : %d\n", m_cbQpOffset   );

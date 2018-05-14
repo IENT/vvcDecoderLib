@@ -53,6 +53,17 @@
 /// encoder configuration class
 class EncAppCfg
 {
+#if QP_SWITCHING_FOR_PARALLEL
+public:
+  template <class T>
+  struct OptionalValue
+  {
+    Bool bPresent;
+    T    value;
+    OptionalValue() : bPresent(false), value() { }
+  };
+#endif
+
 protected:
   // file I/O
   std::string m_inputFileName;                                ///< source file name
@@ -134,7 +145,11 @@ protected:
   Bool      m_cabacBypassAlignmentEnabledFlag;
 
   // coding quality
+#if QP_SWITCHING_FOR_PARALLEL
+  OptionalValue<UInt> m_qpIncrementAtSourceFrame;             ///< Optional source frame number at which all subsequent frames are to use an increased internal QP.
+#else
   Double    m_fQP;                                            ///< QP value of key-picture (floating point)
+#endif
   Int       m_iQP;                                            ///< QP value of key-picture (integer)
 #if X0038_LAMBDA_FROM_QP_CAPABILITY
   Int       m_intraQPOffset;                                  ///< QP offset for intra slice (integer)
