@@ -430,14 +430,6 @@ void CoeffCodingContext::initSubblock( int SubsetId, bool sigGroupFlag )
     m_sigGroupCtxId = Ctx::SigCoeffGroup [ m_chType + 2 ]( sigRight | sigLower );
   }
 #endif
-#if JEM_TOOLS
-  if( m_altResiCompId == 2 )
-  {
-    m_sigCtxSet     = Ctx::SigFlag       [ m_chType + 4 ];
-    m_gt1FlagCtxSet = Ctx::GreaterOneFlag[ m_chType + 8 ];
-    m_sigGroupCtxId = Ctx::SigCoeffGroup [ m_chType + 0 ]( sigRight | sigLower );
-  }
-#endif
 }
 
 
@@ -504,103 +496,6 @@ unsigned CoeffCodingContext::sigCtxId( int scanPos ) const
     }
   }
   return m_sigCtxSet( offset );
-}
-#endif
-
-
-#if JEM_TOOLS
-void CoeffCodingContext::getAltResiCtxSet( const TCoeff* coeff,
-                                           int   scanPos,
-                                           UInt& sigCtxIdx,
-                                           UInt& gt1CtxIdx,
-                                           UInt& gt2CtxIdx,
-                                           UInt& goRicePar,
-                                           int   strd
-                                           )
-{
-  const UInt posY = m_scanPosY[scanPos];
-  const UInt posX = m_scanPosX[scanPos];
-
-  strd = strd == 0 ? m_width : strd;
-  const TCoeff *pData = coeff + posX + posY * strd;
-  const Int   widthM1 = m_width - 1;
-  const Int  heightM1 = m_height - 1;
-  const Int      diag = posX + posY;
-
-
-  Int sumAbs  = 0;
-  Int numPos1 = 0;
-  Int numPos2 = 0;
-  Int numPosN = 0;
-
-  if( posX < widthM1 )
-  {
-    sumAbs  += abs( pData[ 1 ] );
-    numPos1 += abs( pData[ 1 ] ) > 1;
-    numPos2 += abs( pData[ 1 ] ) > 2;
-    numPosN +=      pData[ 1 ] != 0;
-    if( posX < widthM1 - 1 )
-    {
-      sumAbs  += abs( pData[ 2 ] );
-      numPos1 += abs( pData[ 2 ] ) > 1;
-      numPos2 += abs( pData[ 2 ] ) > 2;
-      numPosN +=      pData[ 2 ] != 0;
-    }
-    if( posY < heightM1 )
-    {
-      sumAbs  += abs( pData[ m_width + 1 ] );
-      numPos1 += abs( pData[ m_width + 1 ] ) > 1;
-      numPos2 += abs( pData[ m_width + 1 ] ) > 2;
-      numPosN +=      pData[ m_width + 1 ] != 0;
-    }
-  }
-  if( posY < heightM1 )
-  {
-    sumAbs  += abs( pData[ m_width ] );
-    numPos1 += abs( pData[ m_width ] ) > 1;
-    numPos2 += abs( pData[ m_width ] ) > 2;
-    numPosN +=      pData[ m_width ] != 0;
-    if( posY < heightM1 - 1 )
-    {
-      sumAbs  += abs( pData[ 2 * m_width ] );
-      numPos1 += abs( pData[ 2 * m_width ] ) > 1;
-      numPos2 += abs( pData[ 2 * m_width ] ) > 2;
-      numPosN +=      pData[ 2 * m_width ] != 0;
-    }
-  }
-
-  unsigned val    = sumAbs - numPosN + 4;
-  unsigned order  = 0;
-  unsigned twopow = 1 << 3;
-  for( order = 0; order < MAX_GR_ORDER_RESIDUAL && twopow <= val; order++, twopow <<= 1 );
-  goRicePar = ( order == MAX_GR_ORDER_RESIDUAL ? ( MAX_GR_ORDER_RESIDUAL - 1 ) : order );
-
-  const Int ctxIdx1 = std::min( numPos1, 4 ) + 1;
-        Int ctxOfs1 = 0;
-
-  const Int ctxIdx2 = std::min( numPos2, 4 ) + 1;
-        Int ctxOfs2 = 0;
-
-  const Int ctxIdxN = std::min( numPosN, 5 );
-        Int ctxOfsN = diag < 2 ? 6 : 0;
-
-
-  if( m_chType == CHANNEL_TYPE_LUMA )
-  {
-    ctxOfs1 += diag < 3 ? 10 : ( diag < 10 ? 5 : 0 );
-    ctxOfs2 += diag < 3 ? 10 : ( diag < 10 ? 5 : 0 );
-    ctxOfsN += diag < 5 ? 6 : 0;
-  }
-
-  if( m_log2BlockSize > 2 && m_chType == CHANNEL_TYPE_LUMA )
-  {
-    ctxOfsN += 18 << std::min( 1, ( (int)m_log2BlockSize - 3 ) );
-  }
-
-  gt1CtxIdx = m_gt1FlagCtxSet( ctxOfs1 + ctxIdx1 );
-  gt2CtxIdx = m_gt1FlagCtxSet( ctxOfs2 + ctxIdx2 );
-  sigCtxIdx = m_sigCtxSet    ( ctxOfsN + ctxIdxN );
-
 }
 #endif
 

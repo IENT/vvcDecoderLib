@@ -116,10 +116,6 @@ public:
 #if JEM_TOOLS
   unsigned        altResiCompId   ()                        const { return m_altResiCompId; }
 #endif
-#if JEM_TOOLS
-  void            getAltResiCtxSet( const TCoeff* coeff, int scanPos, UInt& sigCtxIdx, UInt& gt1CtxIdx, UInt& gt2CtxIdx, UInt& goRicePar, int strd = 0 );
-#endif
-/*#endif*/
 
   unsigned        sigGroupCtxIdOfs() const
   {
