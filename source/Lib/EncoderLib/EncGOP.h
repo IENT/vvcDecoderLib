@@ -93,7 +93,9 @@ private:
   Analyze                 m_gcAnalyzeI;
   Analyze                 m_gcAnalyzeP;
   Analyze                 m_gcAnalyzeB;
-
+#if WCG_WPSNR
+  Analyze                 m_gcAnalyzeWPSNR;
+#endif
   Analyze                 m_gcAnalyzeAll_in;
   //  Data
   Bool                    m_bLongtermTestPictureHasBeenCoded;
@@ -197,6 +199,9 @@ protected:
                             , const UInt chromaShift = 0
 #endif
                              );
+#if WCG_WPSNR
+  Double xFindDistortionPlaneWPSNR(const CPelBuf& pic0, const CPelBuf& pic1, const UInt rshift, const CPelBuf& picLuma0, ComponentID compID, const ChromaFormat chfmt );
+#endif
   Double xCalculateRVM();
 
   Void xUpdateRasInit(Slice* slice);

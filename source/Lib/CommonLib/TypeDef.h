@@ -104,6 +104,7 @@
 #endif // ! ENABLE_TRACING
 
 #define WCG_EXT                                           0 // part of JEM sharp Luma qp
+#define WCG_WPSNR                                         WCG_EXT 
 
 #if HEVC_TOOLS
 #define HEVC_USE_RQT                                      0

@@ -162,14 +162,17 @@ public:
   }
 
 
-#if ENABLE_QPA
+#if ENABLE_QPA || WCG_WPSNR
   Void    printOut ( TChar cDelim, const ChromaFormat chFmt, const Bool printMSEBasedSNR, const Bool printSequenceMSE, const BitDepths &bitDepths, const bool useWPSNR = false )
 #else
   Void    printOut ( TChar cDelim, const ChromaFormat chFmt, const Bool printMSEBasedSNR, const Bool printSequenceMSE, const BitDepths &bitDepths )
 #endif
   {
+#if !WCG_WPSNR
     MsgLevel e_msg_level = cDelim == 'a' ? INFO: DETAILS;
-
+#else
+    MsgLevel e_msg_level = (cDelim == 'a') || (cDelim == 'w') ? INFO : DETAILS;
+#endif
     Double dFps     =   m_dFrmRate; //--CFG_KDY
     Double dScale   = dFps / 1000 / (Double)m_uiNumPic;
 
@@ -204,7 +207,7 @@ public:
       case CHROMA_400:
         if (printMSEBasedSNR)
         {
-#if ENABLE_QPA
+#if ENABLE_QPA || WCG_WPSNR
           if (useWPSNR) {
             msg( e_msg_level, "         \tTotal Frames |   "   "Bitrate     "  "Y-WPSNR" );
           } else
@@ -245,7 +248,7 @@ public:
         }
         else
         {
-#if ENABLE_QPA
+#if ENABLE_QPA || WCG_WPSNR
           if (useWPSNR) {
             msg( e_msg_level, "\tTotal Frames |   "   "Bitrate     "  "Y-WPSNR" );
           } else
@@ -291,7 +294,7 @@ public:
 
           if (printMSEBasedSNR)
           {
-#if ENABLE_QPA
+#if ENABLE_QPA || WCG_WPSNR
             if (useWPSNR) {
               msg( e_msg_level, "         \tTotal Frames |   "   "Bitrate     "  "Y-WPSNR   "  "U-WPSNR   "  "V-WPSNR   "  "YUV-WPSNR" );
             } else
@@ -348,7 +351,7 @@ public:
           }
           else
           {
-#if ENABLE_QPA
+#if ENABLE_QPA || WCG_WPSNR
             if (useWPSNR) {
               msg( e_msg_level, "\tTotal Frames |   "   "Bitrate     "  "Y-WPSNR   "  "U-WPSNR   "  "V-WPSNR   "  "YUV-WPSNR" );
             } else
@@ -464,7 +467,9 @@ extern Analyze             m_gcAnalyzeAll;
 extern Analyze             m_gcAnalyzeI;
 extern Analyze             m_gcAnalyzeP;
 extern Analyze             m_gcAnalyzeB;
-
+#if WCG_WPSNR
+extern Analyze             m_gcAnalyzeWPSNR;
+#endif
 extern Analyze             m_gcAnalyzeAll_in;
 
 //! \}

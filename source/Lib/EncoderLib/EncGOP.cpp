@@ -2596,6 +2596,10 @@ Void EncGOP::printOutSummary(UInt uiNumAllPicCoded, Bool isField, const Bool pri
 #if ENABLE_QPA
   const bool    useWPSNR = m_pcEncLib->getUseWPSNR();
 #endif
+#if WCG_WPSNR
+  const bool    useLumaWPSNR = m_pcEncLib->getLumaLevelToDeltaQPMapping().isEnabled();
+#endif
+
   if( m_pcCfg->getDecodeBitstream(0).empty() && m_pcCfg->getDecodeBitstream(1).empty() && !m_pcCfg->useFastForwardToPOC() )
   {
     CHECK( !( uiNumAllPicCoded == m_gcAnalyzeAll.getNumPic() ), "Unspecified error" );
@@ -2607,6 +2611,12 @@ Void EncGOP::printOutSummary(UInt uiNumAllPicCoded, Bool isField, const Bool pri
   m_gcAnalyzeI.setFrmRate( m_pcCfg->getFrameRate()*rateMultiplier / (Double)m_pcCfg->getTemporalSubsampleRatio());
   m_gcAnalyzeP.setFrmRate( m_pcCfg->getFrameRate()*rateMultiplier / (Double)m_pcCfg->getTemporalSubsampleRatio());
   m_gcAnalyzeB.setFrmRate( m_pcCfg->getFrameRate()*rateMultiplier / (Double)m_pcCfg->getTemporalSubsampleRatio());
+#if WCG_WPSNR
+  if (useLumaWPSNR)
+  {
+    m_gcAnalyzeWPSNR.setFrmRate(m_pcCfg->getFrameRate()*rateMultiplier / (Double)m_pcCfg->getTemporalSubsampleRatio());
+  }
+#endif
   
   const ChromaFormat chFmt = m_pcCfg->getChromaFormatIdc();
 
@@ -2627,6 +2637,13 @@ Void EncGOP::printOutSummary(UInt uiNumAllPicCoded, Bool isField, const Bool pri
   msg( DETAILS,"\n\nB Slices--------------------------------------------------------\n" );
   m_gcAnalyzeB.printOut('b', chFmt, printMSEBasedSNR, printSequenceMSE, bitDepths);
   
+#if WCG_WPSNR
+  if (useLumaWPSNR)
+  {
+    msg(DETAILS, "\nWPSNR SUMMARY --------------------------------------------------------\n");
+    m_gcAnalyzeWPSNR.printOut('w', chFmt, printMSEBasedSNR, printSequenceMSE, bitDepths, useLumaWPSNR);
+  }
+#endif
   if (!m_pcCfg->getSummaryOutFilename().empty())
   {
     m_gcAnalyzeAll.printSummary(chFmt, printSequenceMSE, bitDepths, m_pcCfg->getSummaryOutFilename());
@@ -2639,6 +2656,12 @@ Void EncGOP::printOutSummary(UInt uiNumAllPicCoded, Bool isField, const Bool pri
     m_gcAnalyzeB.printSummary(chFmt, printSequenceMSE, bitDepths, m_pcCfg->getSummaryPicFilenameBase()+"B.txt");
   }
 
+#if WCG_WPSNR
+  if (!m_pcCfg->getSummaryOutFilename().empty() && useLumaWPSNR)
+  {
+    m_gcAnalyzeWPSNR.printSummary(chFmt, printSequenceMSE, bitDepths, m_pcCfg->getSummaryOutFilename());
+  }
+#endif
   if(isField)
   {
     //-- interlaced summary
@@ -2655,6 +2678,12 @@ Void EncGOP::printOutSummary(UInt uiNumAllPicCoded, Bool isField, const Bool pri
     if (!m_pcCfg->getSummaryOutFilename().empty())
     {
       m_gcAnalyzeAll_in.printSummary(chFmt, printSequenceMSE, bitDepths, m_pcCfg->getSummaryOutFilename());
+#if WCG_WPSNR
+      if (useLumaWPSNR)
+      {
+        m_gcAnalyzeWPSNR.printSummary(chFmt, printSequenceMSE, bitDepths, m_pcCfg->getSummaryOutFilename());
+      }
+#endif
     }
   }
 
@@ -2908,6 +2937,59 @@ UInt64 EncGOP::xFindDistortionPlane(const CPelBuf& pic0, const CPelBuf& pic1, co
 
   return uiTotalDiff;
 }
+#if WCG_WPSNR
+Double EncGOP::xFindDistortionPlaneWPSNR(const CPelBuf& pic0, const CPelBuf& pic1, const UInt rshift, const CPelBuf& picLuma0, 
+  ComponentID compID, const ChromaFormat chfmt    )
+{
+  const bool    useLumaWPSNR = m_pcEncLib->getLumaLevelToDeltaQPMapping().isEnabled();
+  if (!useLumaWPSNR)
+  {
+    return 0;
+  }
+
+  Double uiTotalDiffWPSNR;
+  const  Pel*  pSrc0 = pic0.bufAt(0, 0);
+  const  Pel*  pSrc1 = pic1.bufAt(0, 0);
+  const  Pel*  pSrcLuma = picLuma0.bufAt(0, 0);
+  CHECK(pic0.width  != pic1.width , "Unspecified error");
+  CHECK(pic0.height != pic1.height, "Unspecified error");
+
+  if( rshift > 0 )
+  {
+    uiTotalDiffWPSNR = 0;
+    for (Int y = 0; y < pic0.height; y++)
+    {
+      for (Int x = 0; x < pic0.width; x++)
+      {
+        Intermediate_Int iTemp = pSrc0[x] - pSrc1[x];
+        Double dW = m_pcEncLib->getRdCost()->getWPSNRLumaLevelWeight(pSrcLuma[(x << getComponentScaleX(compID, chfmt))]);
+        uiTotalDiffWPSNR += ((dW * (Double)iTemp * (Double)iTemp)) * (Double)(1 >> rshift);
+      }
+      pSrc0 += pic0.stride;
+      pSrc1 += pic1.stride;
+      pSrcLuma += picLuma0.stride << getComponentScaleY(compID, chfmt);
+    }
+  }
+  else
+  {
+    uiTotalDiffWPSNR = 0;
+    for (Int y = 0; y < pic0.height; y++)
+    {
+      for (Int x = 0; x < pic0.width; x++)
+      {
+        Intermediate_Int iTemp = pSrc0[x] - pSrc1[x];
+        Double dW = m_pcEncLib->getRdCost()->getWPSNRLumaLevelWeight(pSrcLuma[x << getComponentScaleX(compID, chfmt)]);
+        uiTotalDiffWPSNR += dW * (Double)iTemp * (Double)iTemp;
+      }
+      pSrc0 += pic0.stride;
+      pSrc1 += pic1.stride;
+      pSrcLuma += picLuma0.stride << getComponentScaleY(compID, chfmt);
+    }
+  }
+
+  return uiTotalDiffWPSNR;
+}
+#endif
 
 Void EncGOP::xCalculateAddPSNRs( const Bool isField, const Bool isFieldTopFieldFirst, const Int iGOPid, Picture* pcPic, const AccessUnit&accessUnit, PicList &rcListPic, const int64_t dEncTime, const InputColourSpaceConversion snr_conversion, const Bool printFrameMSE, Double* PSNR_Y )
 {
@@ -2987,10 +3069,18 @@ Void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUn
   const bool    useWPSNR = m_pcEncLib->getUseWPSNR();
 #endif
   Double  dPSNR[MAX_NUM_COMPONENT];
-
+#if WCG_WPSNR
+  const bool    useLumaWPSNR = m_pcEncLib->getLumaLevelToDeltaQPMapping().isEnabled();
+  Double  dPSNRWeighted[MAX_NUM_COMPONENT];
+  Double  MSEyuvframeWeighted[MAX_NUM_COMPONENT];
+#endif
   for(Int i=0; i<MAX_NUM_COMPONENT; i++)
   {
     dPSNR[i]=0.0;
+#if WCG_WPSNR
+    dPSNRWeighted[i]=0.0;
+    MSEyuvframeWeighted[i] = 0.0;
+#endif
   }
 
   PelStorage interm;
@@ -3037,12 +3127,23 @@ Void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUn
     const UInt maxval = /*useWPSNR ? (1 << bitDepth) - 1 :*/ 255 << (bitDepth - 8); // fix with WPSNR: 1023 (4095) instead of 1020 (4080) for bit-depth 10 (12)
 #else
     const UInt64 uiSSDtemp = xFindDistortionPlane(recPB, orgPB, 0);
+#if WCG_WPSNR
+  const Double uiSSDtempWeighted = xFindDistortionPlaneWPSNR(recPB, orgPB, 0, org.get(COMPONENT_Y), compID, format);
+#endif
     const UInt maxval = 255 << (bitDepth - 8);
 #endif
     const UInt size   = width * height;
     const Double fRefValue = (Double)maxval * maxval * size;
     dPSNR[comp]       = uiSSDtemp ? 10.0 * log10(fRefValue / (Double)uiSSDtemp) : 999.99;
     MSEyuvframe[comp] = (Double)uiSSDtemp / size;
+#if WCG_WPSNR
+    if (useLumaWPSNR)
+    {
+      dPSNRWeighted[comp] = uiSSDtempWeighted ? 10.0 * log10(fRefValue / (Double)uiSSDtempWeighted) : 999.99;
+      MSEyuvframeWeighted[comp] = (Double)uiSSDtempWeighted / size;
+    }
+#endif
+
 #if ENABLE_QPA && FRAME_WEIGHTING
     if (useWPSNR) m_gcAnalyzeAll.addWeightedSSD(frameWeight * (double)uiSSDtemp / fRefValue, compID);
 #endif
@@ -3099,6 +3200,12 @@ Void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUn
     m_gcAnalyzeB.addResult (dPSNR, (Double)uibits, MSEyuvframe);
     *PSNR_Y = dPSNR[COMPONENT_Y];
   }
+#if WCG_WPSNR
+  if (useLumaWPSNR)
+  {
+    m_gcAnalyzeWPSNR.addResult(dPSNRWeighted, (Double)uibits, MSEyuvframeWeighted);
+  }
+#endif
 
   TChar c = (pcSlice->isIntra() ? 'I' : pcSlice->isInterP() ? 'P' : 'B');
   if (! pcPic->referenced)
@@ -3120,6 +3227,12 @@ Void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUn
     {
       msg( NOTICE, " [Y MSE %6.4lf  U MSE %6.4lf  V MSE %6.4lf]", MSEyuvframe[COMPONENT_Y], MSEyuvframe[COMPONENT_Cb], MSEyuvframe[COMPONENT_Cr] );
     }
+#if WCG_WPSNR
+    if (useLumaWPSNR)
+    {
+      msg(NOTICE, " [WY %6.4lf dB    WU %6.4lf dB    WV %6.4lf dB]", dPSNRWeighted[COMPONENT_Y], dPSNRWeighted[COMPONENT_Cb], dPSNRWeighted[COMPONENT_Cr]);
+    }
+#endif
     msg( NOTICE, " [ET %5.0f ]", dEncTime );
 
     // msg( SOME, " [WP %d]", pcSlice->getUseWeightedPrediction());
