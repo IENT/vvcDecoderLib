@@ -97,7 +97,9 @@ int main(int argc, char* argv[])
 #if ENABLE_SIMD_OPT
   std::string SIMD;
   df::program_options_lite::Options opts;
-  opts.addOptions() ( "SIMD", SIMD, string( "" ), "" );
+  opts.addOptions()
+    ( "SIMD", SIMD, string( "" ), "" )
+    ( "c", df::program_options_lite::parseConfigFile, "" );
   df::program_options_lite::SilentReporter err;
   df::program_options_lite::scanArgv( opts, argc, ( const TChar** ) argv, err );
   fprintf( stdout, "[SIMD=%s] ", read_x86_extension( SIMD ) );
