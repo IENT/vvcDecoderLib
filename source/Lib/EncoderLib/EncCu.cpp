@@ -638,7 +638,10 @@ void EncCu::xCompressCU( CodingStructure *&tempCS, CodingStructure *&bestCS, Par
 #if ENABLE_SPLIT_PARALLELISM
       CHECK( tempCS->picture->scheduler.getSplitJobId() > 0, "Changing lambda is only allowed in the master thread!" );
 #endif
-      updateLambda( &slice, currTestMode.qp );
+      if (currTestMode.qp >= 0)
+      {
+        updateLambda(&slice, currTestMode.qp);
+      }
     }
 #endif
 
