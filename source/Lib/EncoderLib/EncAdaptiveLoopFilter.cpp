@@ -1047,8 +1047,6 @@ Void EncAdaptiveLoopFilter::xFindFilterCoeffsLuma(const PelUnitBuf& orgUnitBuf, 
   Int filters_per_fr, sqrFiltLength;
 
   Double **ySym, ***ESym;
-  Int lambda_val = (Int) m_dLambdaLuma;
-      lambda_val = lambda_val * (1<<(2*m_nBitIncrement));
 
   sqrFiltLength = m_sqrFiltLengthTab[filtType];
 
@@ -2307,7 +2305,7 @@ Void EncAdaptiveLoopFilter::xCheckFilterMergingGalf(ALFParam& alfParam
 #if FORCE0
   Double lagrangianForce0;
 #endif
-  Int lambda =  ((Int)m_dLambdaLuma) * (1<<(2*m_nBitIncrement));
+  Double lambda =  m_dLambdaLuma * (1<<(2*m_nBitIncrement));
   Int sqrFiltLength;
 
   Double errorForce0CoeffTab[m_NO_VAR_BINS][2];
@@ -2415,7 +2413,7 @@ Void EncAdaptiveLoopFilter::xCheckFilterMergingGalf(ALFParam& alfParam
   coeffBitsForce0 = xCalcBitsForce0(m_filterCoeffSymQuant, filters_per_fr_best, filtType, codedVarBins);
   lagrangian = dist + lambda * coeffBits;
   lagrangianForce0 = distForce0 + lambda * coeffBitsForce0;
-  alfParam.forceCoeff0 = (lagrangian < lagrangianForce0) ? 0 : 1;
+  alfParam.forceCoeff0 = (lagrangianForce0 < lagrangian) ? 1 : 0;
   if (alfParam.forceCoeff0)
   {
     memcpy(alfParam.codedVarBins, codedVarBins, sizeof(int)*m_NO_VAR_BINS);
@@ -2512,7 +2510,7 @@ Void EncAdaptiveLoopFilter::xCheckFilterMergingAlf(ALFParam& alfParam
   Int interval[m_NO_VAR_BINS][2], intervalBest[m_NO_VAR_BINS][2];
   Int i, k, varInd;
   Double  lagrangian, lagrangianMin;
-  Int lambda =  ((Int)m_dLambdaLuma) * (1<<(2*m_nBitIncrement));
+  Double lambda =  m_dLambdaLuma * (1<<(2*m_nBitIncrement));
   Int sqrFiltLength;
 
   Double errorForce0CoeffTab[m_NO_VAR_BINS][2];
