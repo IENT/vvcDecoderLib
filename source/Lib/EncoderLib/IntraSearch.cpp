@@ -1524,15 +1524,24 @@ Void IntraSearch::xEncCoeffQT(CodingStructure &cs, Partitioner &partitioner, con
 {
   const UnitArea &currArea  = partitioner.currArea();
   TransformUnit &currTU     = *cs.getTU( currArea.blocks[partitioner.chType], partitioner.chType );
-#if HEVC_USE_RQT
+#if HEVC_USE_RQT || ENABLE_BMS
   UInt      currDepth       = partitioner.currTrDepth;
-#endif
-#if HEVC_USE_RQT
   const Bool subdiv         = currTU.depth > currDepth;
 
   if (subdiv)
   {
+#if ENABLE_BMS
+    if (partitioner.canSplit(TU_MAX_TR_SPLIT, cs))
+    {
+      partitioner.splitCurrArea(TU_MAX_TR_SPLIT, cs);
+    }
+    else
+#endif
+#if HEVC_USE_RQT
     partitioner.splitCurrArea( TU_QUAD_SPLIT, cs );
+#else
+      THROW("Implicit TU split not available!");
+#endif
 
     do
     {
