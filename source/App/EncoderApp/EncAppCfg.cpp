@@ -650,6 +650,7 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
 #endif
   Int tmpDecodedPictureHashSEIMappedType;
   string inputColourSpaceConvert;
+  string inputPathPrefix;
   ExtendedProfileName extendedProfile;
   Int saoOffsetBitShift[MAX_NUM_CHANNEL_TYPE];
 
@@ -718,6 +719,7 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
 #endif
   // File, I/O and source parameters
   ("InputFile,i",                                     m_inputFileName,                             string(""), "Original YUV input file name")
+  ("InputPathPrefix,-ipp",                            inputPathPrefix,                             string(""), "pathname to prepend to input filename")
   ("BitstreamFile,b",                                 m_bitstreamFileName,                         string(""), "Bitstream output file name")
   ("ReconFile,o",                                     m_reconFileName,                             string(""), "Reconstructed YUV output file name")
   ("SourceWidth,-wdt",                                m_iSourceWidth,                                       0, "Source picture width")
@@ -1323,7 +1325,7 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
    * Set any derived parameters
    */
 
-
+  m_inputFileName   = inputPathPrefix + m_inputFileName;
   m_framesToBeEncoded = ( m_framesToBeEncoded + m_temporalSubsampleRatio - 1 ) / m_temporalSubsampleRatio;
   m_adIntraLambdaModifier = cfg_adIntraLambdaModifier.values;
   if(m_isField)
