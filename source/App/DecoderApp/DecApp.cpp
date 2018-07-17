@@ -276,7 +276,11 @@ Void DecApp::xCreateDecLib()
   m_cDecLib.create();
 
   // initialize decoder class
-  m_cDecLib.init();
+  m_cDecLib.init( 
+#if JVET_J0090_MEMORY_BANDWITH_MEASURE
+    m_cacheCfgFile 
+#endif
+  );
   m_cDecLib.setDecodedPictureHashSEIEnabled(m_decodedPictureHashSEIEnabled);
 #if JEM_COMP
   m_cDecLib.setAssumeJEM( m_assumeJEM );

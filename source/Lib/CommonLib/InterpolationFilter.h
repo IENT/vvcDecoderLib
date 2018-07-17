@@ -40,6 +40,7 @@
 #define __INTERPOLATIONFILTER__
 
 #include "CommonDef.h"
+#include "CacheModel.h"
 
 //! \ingroup CommonLib
 //! \{
@@ -73,6 +74,10 @@ public:
   template<Int N>
   Void filterVer(const ClpRng& clpRng, Pel const* src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Bool isFirst, Bool isLast, TFilterCoeff const *coeff);
 
+protected:
+#if JVET_J0090_MEMORY_BANDWITH_MEASURE
+  static CacheModel* m_cacheModel;
+#endif
 public:
   InterpolationFilter();
   ~InterpolationFilter() {}
@@ -81,6 +86,7 @@ public:
   Void( *m_filterVer[3][2][2] )( const ClpRng& clpRng, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, TFilterCoeff const *coeff );
   Void( *m_filterCopy[2][2] )  ( const ClpRng& clpRng, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height );
 
+  void initInterpolationFilter( bool enable );
 #ifdef TARGET_SIMD_X86
   Void initInterpolationFilterX86();
   template <X86_VEXT vext>
@@ -93,6 +99,9 @@ public:
 #else
   Void filterHor(const ComponentID compID, Pel const* src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Int frac,               Bool isLast, const ChromaFormat fmt, const ClpRng& clpRng );
   Void filterVer(const ComponentID compID, Pel const* src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Int frac, Bool isFirst, Bool isLast, const ChromaFormat fmt, const ClpRng& clpRng );
+#endif
+#if JVET_J0090_MEMORY_BANDWITH_MEASURE
+  void cacheAssign( CacheModel *cache ) { m_cacheModel = cache; }
 #endif
 };
 

@@ -1105,3 +1105,11 @@ const CPelUnitBuf Picture::getBuf( const UnitArea &unit, const PictureType &type
   }
 }
 
+Pel* Picture::getOrigin( const PictureType &type, const ComponentID compID ) const
+{
+#if ENABLE_SPLIT_PARALLELISM
+  const int jId = type == PIC_ORIGINAL ? 0 : scheduler.getSplitPicId();
+#endif
+  return M_BUFS( jId, type ).getOrigin( compID );
+
+}

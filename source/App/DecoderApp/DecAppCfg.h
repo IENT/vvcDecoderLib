@@ -70,6 +70,7 @@ protected:
   Int           m_respectDefDispWindow;               ///< Only output content inside the default display window
   std::string   m_outputDecodedSEIMessagesFilename;   ///< filename to output decoded SEI messages to. If '-', then use stdout. If empty, do not output details.
   Bool          m_bClipOutputVideoToRec709Range;      ///< If true, clip the output video to the Rec 709 range on saving.
+  std::string   m_cacheCfgFile;                       ///< Config file of cache model
 #if JEM_COMP
   Bool          m_assumeJEM;
 #endif

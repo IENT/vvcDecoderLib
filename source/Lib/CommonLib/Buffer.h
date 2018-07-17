@@ -847,6 +847,7 @@ struct PelStorage : public PelUnitBuf
 
          PelUnitBuf getBuf( const UnitArea &unit );
   const CPelUnitBuf getBuf( const UnitArea &unit ) const;
+  Pel *getOrigin( const int id ) const { return m_origin[id]; }
 
 private:
 

@@ -42,6 +42,7 @@
 #include "CABACReader.h"
 #include "VLCReader.h"
 #include "SEIread.h"
+#include "CacheModel.h"
 
 #include "CommonLib/CommonDef.h"
 #include "CommonLib/Picture.h"
@@ -105,6 +106,9 @@ private:
 #endif
   // decoder side RD cost computation
   RdCost                  m_cRdCost;                      ///< RD cost computation class
+#if JVET_J0090_MEMORY_BANDWITH_MEASURE
+  CacheModel              m_cacheModel;
+#endif
 
   Bool isSkipPictureForBLA(Int& iPOCLastDisplay);
   Bool isRandomAccessSkipPicture(Int& iSkipFrame,  Int& iPOCLastDisplay);
@@ -137,7 +141,11 @@ public:
 
   Void  setDecodedPictureHashSEIEnabled(Int enabled) { m_decodedPictureHashSEIEnabled=enabled; }
 
-  Void  init();
+  void  init(
+#if JVET_J0090_MEMORY_BANDWITH_MEASURE
+    const std::string& cacheCfgFileName
+#endif
+  );
   Bool  decode(InputNALUnit& nalu, Int& iSkipFrame, Int& iPOCLastDisplay);
   Void  deletePicBuffer();
 

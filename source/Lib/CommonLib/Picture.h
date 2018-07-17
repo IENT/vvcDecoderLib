@@ -224,7 +224,7 @@ struct Picture : public UnitArea
 
   int  getPOC()                               const { return poc; }
   Void setBorderExtension( bool bFlag)              { m_bIsBorderExtended = bFlag;}
-
+  Pel* getOrigin( const PictureType &type, const ComponentID compID ) const;
 public:
   bool m_bIsBorderExtended;
   bool referenced;

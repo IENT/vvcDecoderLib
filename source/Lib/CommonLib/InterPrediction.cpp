@@ -221,6 +221,9 @@ Void InterPrediction::init( RdCost* pcRdCost, ChromaFormat chromaFormatIDC )
     m_uiaBIOShift[i] = ((1 << 15) + i / 2) / i;
   }
 #endif
+#if !JVET_J0090_MEMORY_BANDWITH_MEASURE
+  m_if.initInterpolationFilter( true );
+#endif
 }
 
 #if JEM_TOOLS
@@ -563,6 +566,7 @@ Void InterPrediction::xPredInterBlk ( const ComponentID& compID, const Predictio
 #endif
                                     )
 {
+  JVET_J0090_SET_REF_PICTURE( refPic, compID );
 #if JEM_TOOLS
   const Int       nFilterIdx = nFRUCMode ? pu.cs->slice->getSPS()->getSpsNext().getFRUCRefineFilter() : 0;
   const ChromaFormat  chFmt  = pu.chromaFormat;
@@ -664,11 +668,14 @@ Void InterPrediction::xPredInterBlk ( const ComponentID& compID, const Predictio
       vFilterSize = NTAPS_LUMA_FRUC;
     }
     m_if.filterHor(compID, (Pel*) refBuf.buf - ((vFilterSize >> 1) - 1) * refBuf.stride, refBuf.stride, tmpBuf.buf, tmpBuf.stride, width, height + vFilterSize - 1, xFrac, false,         chFmt, clpRng, nFilterIdx);
+    JVET_J0090_SET_CACHE_ENABLE( false );
     m_if.filterVer(compID, (Pel*) tmpBuf.buf + ((vFilterSize >> 1) - 1) * tmpBuf.stride, tmpBuf.stride, dstBuf.buf, dstBuf.stride, width, height,                   yFrac, false, rndRes, chFmt, clpRng, nFilterIdx);
 #else
     m_if.filterHor(compID, (Pel*) refBuf.buf - ((vFilterSize >> 1) - 1) * refBuf.stride, refBuf.stride, tmpBuf.buf, tmpBuf.stride, width, height + vFilterSize - 1, xFrac, false,         chFmt, clpRng);
+    JVET_J0090_SET_CACHE_ENABLE( false );
     m_if.filterVer(compID, (Pel*) tmpBuf.buf + ((vFilterSize >> 1) - 1) * tmpBuf.stride, tmpBuf.stride, dstBuf.buf, dstBuf.stride, width, height,                   yFrac, false, rndRes, chFmt, clpRng);
 #endif
+    JVET_J0090_SET_CACHE_ENABLE( true );
   }
 
 #if JEM_TOOLS
@@ -688,6 +695,7 @@ Void InterPrediction::xPredAffineBlk(const ComponentID& compID, const Prediction
     return;
   }
 
+  JVET_J0090_SET_REF_PICTURE( refPic, compID );
   const ChromaFormat chFmt = pu.chromaFormat;
   Int iScaleX = ::getComponentScaleX( compID, chFmt );
   Int iScaleY = ::getComponentScaleY( compID, chFmt );
@@ -811,7 +819,9 @@ Void InterPrediction::xPredAffineBlk(const ComponentID& compID, const Prediction
       else
       {
         m_if.filterHor( compID, (Pel*) refBuf.buf - ((vFilterSize>>1) -1)*refBuf.stride, refBuf.stride, tmpBuf.buf, tmpBuf.stride, blockWidth, blockHeight+vFilterSize-1, xFrac, false,      chFmt, clpRng);
+        JVET_J0090_SET_CACHE_ENABLE( false );
         m_if.filterVer( compID, tmpBuf.buf + ((vFilterSize>>1) -1)*tmpBuf.stride, tmpBuf.stride, dstBuf.buf + w + h * dstBuf.stride, dstBuf.stride, blockWidth, blockHeight, yFrac, false, !bi, chFmt, clpRng);
+        JVET_J0090_SET_CACHE_ENABLE( true );
       }
 
       // switch from x to x+AffineBlockSize, add deltaMvHor
@@ -894,6 +904,8 @@ void InterPrediction::xGetLICParams( const CodingUnit& cu,
     {
       int refVal  = ref[( ( k * cuWidth ) >> dimShift )] >> precShift;
       int recVal  = rec[( ( k * cuWidth ) >> dimShift )] >> precShift;
+
+      JVET_J0090_CACHE_ACCESS( &ref[( ( k * cuWidth ) >> dimShift )], __FILE__, __LINE__ );
       x          += refVal;
       y          += recVal;
       xx         += refVal * refVal;
@@ -1642,7 +1654,9 @@ Void InterPrediction::xGradFilterX( const Pel* piRefY, Int iRefStride, Pel* piDs
   int   shift0    = bitDepth-8;
   int   shift1    = 6 + iBIOGradShift - shift0;
   fracFilter2DVer ( piRefY - BIO_FILTER_HALF_LENGTH_MINUS_1, iRefStride, iWidth+BIO_FILTER_LENGTH_MINUS_1, iHeight, tmpStride,  tmp,    iMVyFrac, shift0 );
+  JVET_J0090_SET_CACHE_ENABLE( false );
   gradFilter2DHor ( tmp    + BIO_FILTER_HALF_LENGTH_MINUS_1, tmpStride,  iWidth,                           iHeight, iDstStride, piDstY, iMVxFrac, shift1 );
+  JVET_J0090_SET_CACHE_ENABLE( true );
 }
 
 Void InterPrediction::xGradFilterY( const Pel* piRefY, Int iRefStride, Pel* piDstY, Int iDstStride, Int iWidth, Int iHeight, Int iMVyFrac, Int iMVxFrac, const Int bitDepth )
@@ -1659,7 +1673,9 @@ Void InterPrediction::xGradFilterY( const Pel* piRefY, Int iRefStride, Pel* piDs
   Int   shift0    = bitDepth-8;
   Int   shift1    = 6 + iBIOGradShift - shift0;
   gradFilter2DVer ( piRefY - BIO_FILTER_HALF_LENGTH_MINUS_1, iRefStride, iWidth+BIO_FILTER_LENGTH_MINUS_1, iHeight, tmpStride,  tmp,    iMVyFrac, shift0 );
+  JVET_J0090_SET_CACHE_ENABLE( false );
   fracFilter2DHor ( tmp    + BIO_FILTER_HALF_LENGTH_MINUS_1, tmpStride,  iWidth,                           iHeight, iDstStride, piDstY, iMVxFrac, shift1 );
+  JVET_J0090_SET_CACHE_ENABLE( true );
 }
 
 Pel InterPrediction::optical_flow_averaging( Int64 s1, Int64 s2, Int64 s3, Int64 s5, Int64 s6, Pel pGradX0, Pel pGradX1, Pel pGradY0, Pel pGradY1, Pel pSrcY0Temp, Pel pSrcY1Temp,
@@ -1746,6 +1762,12 @@ inline Void InterPrediction::gradFilter2DVer( const Pel* piSrc, Int iSrcStride, 
   {
     for( int x = 0; x < width; x++ )
     {
+      JVET_J0090_CACHE_ACCESS( piSrcTmp,  __FILE__, __LINE__ );
+      JVET_J0090_CACHE_ACCESS( piSrcTmp1, __FILE__, __LINE__ );
+      JVET_J0090_CACHE_ACCESS( piSrcTmp2, __FILE__, __LINE__ );
+      JVET_J0090_CACHE_ACCESS( piSrcTmp3, __FILE__, __LINE__ );
+      JVET_J0090_CACHE_ACCESS( piSrcTmp4, __FILE__, __LINE__ );
+      JVET_J0090_CACHE_ACCESS( piSrcTmp5, __FILE__, __LINE__ );
       iSum     =  (  coeffs[0] * *piSrcTmp++
                    + coeffs[1] * *piSrcTmp1++
                    + coeffs[2] * *piSrcTmp2++
@@ -1787,6 +1809,12 @@ inline Void InterPrediction::gradFilter1DVer( const Pel* piSrc, Int iSrcStride, 
   {
     for( int x = 0; x < width; x++ )
     {
+      JVET_J0090_CACHE_ACCESS( piSrcTmp,  __FILE__, __LINE__ );
+      JVET_J0090_CACHE_ACCESS( piSrcTmp1, __FILE__, __LINE__ );
+      JVET_J0090_CACHE_ACCESS( piSrcTmp2, __FILE__, __LINE__ );
+      JVET_J0090_CACHE_ACCESS( piSrcTmp3, __FILE__, __LINE__ );
+      JVET_J0090_CACHE_ACCESS( piSrcTmp4, __FILE__, __LINE__ );
+      JVET_J0090_CACHE_ACCESS( piSrcTmp5, __FILE__, __LINE__ );
       iSum     =   (  coeffs[0] * *piSrcTmp++
                     + coeffs[1] * *piSrcTmp1++
                     + coeffs[2] * *piSrcTmp2++
@@ -1822,6 +1850,10 @@ inline Void InterPrediction::gradFilter1DHor( const Pel* piSrc, Int iSrcStride, 
   {
     for( int x = 0; x < width; x++ )
     {
+      for ( size_t i = 0 ; i < 6 ; i++ )
+      {
+        JVET_J0090_CACHE_ACCESS( piSrcTmp + i, __FILE__, __LINE__ );
+      }
       iSum     =  (  coeffs[0] * piSrcTmp[0]
                    + coeffs[1] * piSrcTmp[1]
                    + coeffs[2] * piSrcTmp[2]
@@ -1854,6 +1886,10 @@ inline Void InterPrediction::gradFilter2DHor( const Pel* piSrc, Int iSrcStride, 
   {
     for( int x = 0; x < width; x++ )
     {
+      for ( size_t i = 0 ; i < 6 ; i++ )
+      {
+        JVET_J0090_CACHE_ACCESS( piSrcTmp + i, __FILE__, __LINE__ );
+      }
       iSum     =   (  coeffs[0] * piSrcTmp[0]
                     + coeffs[1] * piSrcTmp[1]
                     + coeffs[2] * piSrcTmp[2]
@@ -1891,6 +1927,12 @@ inline Void InterPrediction::fracFilter2DVer( const Pel* piSrc, Int iSrcStride, 
   {
     for( int x = 0; x < width; x++ )
     {
+      JVET_J0090_CACHE_ACCESS( piSrcTmp,  __FILE__, __LINE__ );
+      JVET_J0090_CACHE_ACCESS( piSrcTmp1, __FILE__, __LINE__ );
+      JVET_J0090_CACHE_ACCESS( piSrcTmp2, __FILE__, __LINE__ );
+      JVET_J0090_CACHE_ACCESS( piSrcTmp3, __FILE__, __LINE__ );
+      JVET_J0090_CACHE_ACCESS( piSrcTmp4, __FILE__, __LINE__ );
+      JVET_J0090_CACHE_ACCESS( piSrcTmp5, __FILE__, __LINE__ );
       iSum     =  (  coeffs[0] * *piSrcTmp ++
                    + coeffs[1] * *piSrcTmp1++
                    + coeffs[2] * *piSrcTmp2++
@@ -1926,6 +1968,10 @@ inline Void InterPrediction::fracFilter2DHor( const Pel* piSrc, Int iSrcStride, 
   {
     for( int x = 0; x < width; x++ )
     {
+      for ( size_t i = 0 ; i < 6 ; i++ )
+      {
+        JVET_J0090_CACHE_ACCESS( piSrcTmp + i, __FILE__, __LINE__ );
+      }
       iSum     = (  coeffs[0] * piSrcTmp[0]
                   + coeffs[1] * piSrcTmp[1]
                   + coeffs[2] * piSrcTmp[2]
@@ -3094,7 +3140,9 @@ Void InterPrediction::xPredInterLines( const PredictionUnit& pu, const Picture* 
 
     Int vFilterSize = isLuma(compID) ? NTAPS_LUMA : NTAPS_CHROMA;
     m_if.filterHor(compID, (Pel*) refBuf.buf - ((vFilterSize >> 1) - 1) * refBuf.stride, refBuf.stride, tmpBuf.buf, tmpBuf.stride, width, height + vFilterSize - 1, xFrac, false,      chFmt, clpRng, 0);
+    JVET_J0090_SET_CACHE_ENABLE( false );
     m_if.filterVer(compID, (Pel*) tmpBuf.buf + ((vFilterSize >> 1) - 1) * tmpBuf.stride, tmpBuf.stride, dstBuf.buf, dstBuf.stride, width, height,                   yFrac, false, !bi, chFmt, clpRng, 0);
+    JVET_J0090_SET_CACHE_ENABLE( true );
   }
 }
 
@@ -3110,6 +3158,7 @@ Void InterPrediction::xFillPredBlckAndBorder( const PredictionUnit& pu, RefPicLi
 
   Int dstStride = MAX_CU_SIZE + DMVR_INTME_RANGE*2;
 
+  JVET_J0090_SET_REF_PICTURE( refPic, COMPONENT_Y );
   PelUnitBuf cPred = ( PelUnitBuf(pu.chromaFormat, PelBuf(m_cYuvPredTempDMVR[0], dstStride, iWidth + 2 * DMVR_INTME_RANGE, iHeight + 2 * DMVR_INTME_RANGE ) ) );
   cPred.Y().subBuf( Position{ DMVR_INTME_RANGE, DMVR_INTME_RANGE }, pu.lumaSize() ).copyFrom( cTmpY.subBuf( Position{ 0, 0 }, pu.lumaSize() ) );
 
@@ -3307,5 +3356,13 @@ Void InterPrediction::xProcessDMVR( PredictionUnit& pu, PelUnitBuf &pcYuvDst, co
 }
 #endif
 
+#if JVET_J0090_MEMORY_BANDWITH_MEASURE
+void InterPrediction::cacheAssign( CacheModel *cache )
+{
+  m_cacheModel = cache;
+  m_if.cacheAssign( cache );
+  m_if.initInterpolationFilter( !cache->isCacheEnable() );
+}
+#endif
 
 //! \}

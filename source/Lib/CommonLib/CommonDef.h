@@ -443,11 +443,17 @@ inline void msg( MsgLevel level, const char* fmt, ... )
 template<typename T> bool isPowerOf2( const T val ) { return ( val & ( val - 1 ) ) == 0; }
 
 #define MEMORY_ALIGN_DEF_SIZE       32  // for use with avx2 (256 bit)
+#define CACHE_MEM_ALIGN_SIZE      1024
 
 #define ALIGNED_MALLOC              1   ///< use 32-bit aligned malloc/free
 
 #if ALIGNED_MALLOC
-#if     ( _WIN32 && ( _MSC_VER > 1300 ) ) || defined (__MINGW64_VERSION_MAJOR)
+#if JVET_J0090_MEMORY_BANDWITH_MEASURE
+void *cache_mem_align_malloc(int size, int align_size);
+void cache_mem_align_free(void *ptr);
+#define xMalloc(type, len)          cache_mem_align_malloc(sizeof(type) * len, CACHE_MEM_ALIGN_SIZE)
+#define xFree(ptr)                  cache_mem_align_free(ptr)
+#elif     ( _WIN32 && ( _MSC_VER > 1300 ) ) || defined (__MINGW64_VERSION_MAJOR)
 #define xMalloc( type, len )        _aligned_malloc( sizeof(type)*(len), MEMORY_ALIGN_DEF_SIZE )
 #define xFree( ptr )                _aligned_free  ( ptr )
 #elif defined (__MINGW32__)

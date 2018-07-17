@@ -101,6 +101,9 @@ Bool DecAppCfg::parseCfg( Int argc, TChar* argv[] )
   ("TraceRule",                 sTracingRule,                         string( "" ), "Tracing rule (ex: \"D_CABAC:poc==8\" or \"D_REC_CB_LUMA:poc==8\")" )
   ("TraceFile",                 sTracingFile,                         string( "" ), "Tracing file" )
 #endif
+#if JVET_J0090_MEMORY_BANDWITH_MEASURE
+  ("CacheCfg",                  m_cacheCfgFile,                       string( "" ), "CacheCfg File" )
+#endif
 #if JEM_COMP
   ( "AssumeJEM",                m_assumeJEM,                            false, "Assume decoding a JEM bitstream - don't decode the SPSNext-header but set it as it would be set for default JEM configuration" );
 #endif

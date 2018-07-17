@@ -110,6 +110,9 @@ protected:
   Pel*                 m_cYuvPredTempDMVR[MAX_NUM_COMPONENT];
 
   UInt                 m_uiaBIOShift[64];
+#if JVET_J0090_MEMORY_BANDWITH_MEASURE
+  CacheModel*          m_cacheModel;
+#endif
 
   // motion compensation functions
 #define BIO_FILTER_LENGTH                 6
@@ -226,6 +229,9 @@ public:
 
   Bool    deriveFRUCMV        (PredictionUnit &pu);
   Bool    frucFindBlkMv4Pred  (PredictionUnit& pu, RefPicList eTargetRefPicList, const Int nTargetRefIdx, AMVPInfo* pInfo = NULL);
+#endif
+#if JVET_J0090_MEMORY_BANDWITH_MEASURE
+  void    cacheAssign( CacheModel *cache );
 #endif
 
 };

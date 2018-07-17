@@ -71,6 +71,9 @@
 
 #endif
 
+#ifndef JVET_J0090_MEMORY_BANDWITH_MEASURE
+#define JVET_J0090_MEMORY_BANDWITH_MEASURE                0
+#endif
 
 
 #ifndef ENABLE_WPP_PARALLELISM

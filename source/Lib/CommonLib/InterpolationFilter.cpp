@@ -45,6 +45,9 @@
 
 #include "ChromaFormat.h"
 
+#if JVET_J0090_MEMORY_BANDWITH_MEASURE
+CacheModel* InterpolationFilter::m_cacheModel;
+#endif
 //! \ingroup CommonLib
 //! \{
 
@@ -196,11 +199,6 @@ InterpolationFilter::InterpolationFilter()
   m_filterCopy[1][0]   = filterCopy<true, false>;
   m_filterCopy[1][1]   = filterCopy<true, true>;
 
-#if ENABLE_SIMD_OPT_MCIF
-#ifdef TARGET_SIMD_X86
-  initInterpolationFilterX86();
-#endif
-#endif
 }
 
 
@@ -241,6 +239,7 @@ Void InterpolationFilter::filterCopy( const ClpRng& clpRng, const Pel *src, Int 
 #else
         dst[col] = ClipPel( src[col], clpRng );
 #endif
+        JVET_J0090_CACHE_ACCESS( &src[col], __FILE__, __LINE__ );
       }
 
       src += srcStride;
@@ -257,6 +256,7 @@ Void InterpolationFilter::filterCopy( const ClpRng& clpRng, const Pel *src, Int 
       {
         Pel val = leftShift_round(src[col], shift);
         dst[col] = val - (Pel)IF_INTERNAL_OFFS;
+        JVET_J0090_CACHE_ACCESS( &src[col], __FILE__, __LINE__ );
       }
 
       src += srcStride;
@@ -275,6 +275,7 @@ Void InterpolationFilter::filterCopy( const ClpRng& clpRng, const Pel *src, Int 
         val = rightShift_round((val + IF_INTERNAL_OFFS), shift);
 
         dst[col] = ClipPel( val, clpRng );
+        JVET_J0090_CACHE_ACCESS( &src[col], __FILE__, __LINE__ );
       }
 
       src += srcStride;
@@ -361,20 +362,28 @@ Void InterpolationFilter::filter(const ClpRng& clpRng, Pel const *src, Int srcSt
 
       sum  = src[ col + 0 * cStride] * c[0];
       sum += src[ col + 1 * cStride] * c[1];
+      JVET_J0090_CACHE_ACCESS( &src[ col + 0 * cStride], __FILE__, __LINE__ );
+      JVET_J0090_CACHE_ACCESS( &src[ col + 1 * cStride], __FILE__, __LINE__ );
       if ( N >= 4 )
       {
         sum += src[ col + 2 * cStride] * c[2];
         sum += src[ col + 3 * cStride] * c[3];
+        JVET_J0090_CACHE_ACCESS( &src[ col + 2 * cStride], __FILE__, __LINE__ );
+        JVET_J0090_CACHE_ACCESS( &src[ col + 3 * cStride], __FILE__, __LINE__ );
       }
       if ( N >= 6 )
       {
         sum += src[ col + 4 * cStride] * c[4];
         sum += src[ col + 5 * cStride] * c[5];
+        JVET_J0090_CACHE_ACCESS( &src[ col + 4 * cStride], __FILE__, __LINE__ );
+        JVET_J0090_CACHE_ACCESS( &src[ col + 5 * cStride], __FILE__, __LINE__ );
       }
       if ( N == 8 )
       {
         sum += src[ col + 6 * cStride] * c[6];
         sum += src[ col + 7 * cStride] * c[7];
+        JVET_J0090_CACHE_ACCESS( &src[ col + 6 * cStride], __FILE__, __LINE__ );
+        JVET_J0090_CACHE_ACCESS( &src[ col + 7 * cStride], __FILE__, __LINE__ );
       }
 
       Pel val = ( sum + offset ) >> shift;
@@ -576,6 +585,23 @@ Void InterpolationFilter::filterVer( const ComponentID compID, Pel const *src, I
 #endif
     filterVer<NTAPS_CHROMA>( clpRng, src, srcStride, dst, dstStride, width, height, isFirst, isLast, m_chromaFilter[frac << ( 1 - csy )] );
   }
+}
+
+/**
+ * \brief turn on SIMD fuc
+ *
+ * \param bEn   enabled of SIMD function for interpolation
+ */
+void InterpolationFilter::initInterpolationFilter( bool enable )
+{
+#if ENABLE_SIMD_OPT_MCIF
+#ifdef TARGET_SIMD_X86
+  if ( enable )
+  {
+    initInterpolationFilterX86();
+  }
+#endif
+#endif
 }
 
 //! \}

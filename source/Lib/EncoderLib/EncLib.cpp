@@ -61,6 +61,9 @@ EncLib::EncLib()
   : m_spsMap( MAX_NUM_SPS )
   , m_ppsMap( MAX_NUM_PPS )
   , m_AUWriterIf( nullptr )
+#if JVET_J0090_MEMORY_BANDWITH_MEASURE
+  , m_cacheModel()
+#endif
 {
   m_iPOCLast          = -1;
   m_iNumPicRcvd       =  0;
@@ -121,6 +124,9 @@ Void EncLib::create ()
 #if JEM_TOOLS
   m_bilateralFilter.    create();
 #endif
+#endif
+#if JVET_J0090_MEMORY_BANDWITH_MEASURE
+  m_cInterSearch.cacheAssign( &m_cacheModel );
 #endif
   const UInt widthInCtus   = (getSourceWidth()  + m_maxCUWidth  - 1)  / m_maxCUWidth;
   const UInt heightInCtus  = (getSourceHeight() + m_maxCUHeight - 1) / m_maxCUHeight;
