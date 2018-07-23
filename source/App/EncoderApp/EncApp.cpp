@@ -97,6 +97,7 @@ Void EncApp::xInitLibCfg()
 
   m_cEncLib.setPrintMSEBasedSequencePSNR                         ( m_printMSEBasedSequencePSNR);
   m_cEncLib.setPrintFrameMSE                                     ( m_printFrameMSE);
+  m_cEncLib.setPrintHexPsnr(m_printHexPsnr);
   m_cEncLib.setPrintSequenceMSE                                  ( m_printSequenceMSE);
   m_cEncLib.setCabacZeroWordPaddingEnabled                       ( m_cabacZeroWordPaddingEnabled );
 

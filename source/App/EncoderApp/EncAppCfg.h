@@ -103,6 +103,7 @@ protected:
   ChromaFormat m_InputChromaFormatIDC;
 
   Bool      m_printMSEBasedSequencePSNR;
+  bool m_printHexPsnr;
   Bool      m_printFrameMSE;
   Bool      m_printSequenceMSE;
   Bool      m_cabacZeroWordPaddingEnabled;
