@@ -71,9 +71,6 @@ namespace CU
   bool isIntra                        (const CodingUnit &cu);
   bool isInter                        (const CodingUnit &cu);
   bool isRDPCMEnabled                 (const CodingUnit &cu);
-#if HEVC_USE_RQT
-  UInt getQuadtreeTULog2MinSizeInCU   (const CodingUnit &cu);
-#endif
   bool isLosslessCoded                (const CodingUnit &cu);
   UInt getIntraSizeIdx                (const CodingUnit &cu);
 
@@ -182,7 +179,7 @@ namespace TU
 #endif
   bool isNonTransformedResidualRotated(const TransformUnit &tu, const ComponentID &compID);
   bool getCbf                         (const TransformUnit &tu, const ComponentID &compID);
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
   bool getCbfAtDepth                  (const TransformUnit &tu, const ComponentID &compID, const unsigned &depth);
   void setCbfAtDepth                  (      TransformUnit &tu, const ComponentID &compID, const unsigned &depth, const bool &cbf);
 #else
@@ -192,9 +189,6 @@ namespace TU
   UInt getGolombRiceStatisticsIndex   (const TransformUnit &tu, const ComponentID &compID);
 #if HEVC_USE_MDCS
   UInt getCoefScanIdx                 (const TransformUnit &tu, const ComponentID &compID);
-#endif
-#if HEVC_USE_RQT
-  bool isProcessingAllQuadrants       (const UnitArea      &tuArea);
 #endif
   bool hasCrossCompPredInfo           (const TransformUnit &tu, const ComponentID &compID);
 

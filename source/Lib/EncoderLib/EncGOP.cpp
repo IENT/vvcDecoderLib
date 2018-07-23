@@ -367,11 +367,7 @@ Int EncGOP::xWriteVPS (AccessUnit &accessUnit, const VPS *vps)
 {
   OutputNALUnit nalu(NAL_UNIT_VPS);
   m_HLSWriter->setBitstream( &nalu.m_Bitstream );
-#if JEM_COMP
-  m_HLSWriter->codeVPS( vps, m_pcCfg->getGenerateJEM() );
-#else
   m_HLSWriter->codeVPS( vps );
-#endif
   accessUnit.push_back(new NALUnitEBSP(nalu));
   return (Int)(accessUnit.back()->m_nalUnitData.str().size()) * 8;
 }
@@ -381,11 +377,7 @@ Int EncGOP::xWriteSPS (AccessUnit &accessUnit, const SPS *sps)
 {
   OutputNALUnit nalu(NAL_UNIT_SPS);
   m_HLSWriter->setBitstream( &nalu.m_Bitstream );
-#if JEM_COMP
-  m_HLSWriter->codeSPS( sps, m_pcCfg->getGenerateJEM() );
-#else
   m_HLSWriter->codeSPS( sps );
-#endif
   accessUnit.push_back(new NALUnitEBSP(nalu));
   return (Int)(accessUnit.back()->m_nalUnitData.str().size()) * 8;
 
@@ -395,11 +387,7 @@ Int EncGOP::xWritePPS (AccessUnit &accessUnit, const PPS *pps)
 {
   OutputNALUnit nalu(NAL_UNIT_PPS);
   m_HLSWriter->setBitstream( &nalu.m_Bitstream );
-#if JEM_COMP
-  m_HLSWriter->codePPS( pps, m_pcCfg->getGenerateJEM() );
-#else
   m_HLSWriter->codePPS( pps );
-#endif
   accessUnit.push_back(new NALUnitEBSP(nalu));
   return (Int)(accessUnit.back()->m_nalUnitData.str().size()) * 8;
 }

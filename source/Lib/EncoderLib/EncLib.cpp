@@ -1255,7 +1255,6 @@ Void EncLib::xInitPPS(PPS &pps, const SPS &sps)
   pps.getPpsRangeExtension().setLog2SaoOffsetScale(CHANNEL_TYPE_LUMA,   m_log2SaoOffsetScale[CHANNEL_TYPE_LUMA  ]);
   pps.getPpsRangeExtension().setLog2SaoOffsetScale(CHANNEL_TYPE_CHROMA, m_log2SaoOffsetScale[CHANNEL_TYPE_CHROMA]);
 
-#if ! HM_NO_ADAPT_PPS_QP
   {
     int baseQp = 26;
     if( 16 == getGOPSize() )
@@ -1271,7 +1270,6 @@ Void EncLib::xInitPPS(PPS &pps, const SPS &sps)
 
     pps.setPicInitQPMinus26( std::min( maxDQP, std::max( minDQP, baseQp ) ));
   }
-#endif
 
 #if ER_CHROMA_QP_WCG_PPS
   if (getWCGChromaQPControl().isEnabled())

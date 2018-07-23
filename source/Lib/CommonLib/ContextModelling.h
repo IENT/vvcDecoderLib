@@ -422,9 +422,6 @@ public:
   bool      isChromaQpAdjCoded;
   UInt      numNonZeroCoeffNonTs;
   SChar     qp;                   // used as a previous(last) QP and for QP prediction
-#if HEVC_USE_RQT
-  int       quadtreeTULog2MinSizeInCU;
-#endif
 };
 
 class MergeCtx
@@ -455,7 +452,7 @@ namespace DeriveCtx
 {
 unsigned CtxCUsplit   ( const CodingStructure& cs, Partitioner& partitioner );
 unsigned CtxBTsplit   ( const CodingStructure& cs, Partitioner& partitioner );
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
 unsigned CtxQtCbf     ( const ComponentID compID, const unsigned trDepth );
 #else
 unsigned CtxQtCbf     ( const ComponentID compID );

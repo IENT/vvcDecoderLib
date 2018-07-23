@@ -282,9 +282,6 @@ Void DecApp::xCreateDecLib()
 #endif
   );
   m_cDecLib.setDecodedPictureHashSEIEnabled(m_decodedPictureHashSEIEnabled);
-#if JEM_COMP
-  m_cDecLib.setAssumeJEM( m_assumeJEM );
-#endif
   if (!m_outputDecodedSEIMessagesFilename.empty())
   {
     std::ostream &os=m_seiMessageFileStream.is_open() ? m_seiMessageFileStream : std::cout;

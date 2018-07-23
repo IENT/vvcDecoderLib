@@ -1043,19 +1043,11 @@ void InterPrediction::applyBiOptFlow( const PredictionUnit &pu, const CPelUnitBu
   }
   
   const ClpRng& clpRng        = pu.cu->cs->slice->clpRng(COMPONENT_Y);
-#if JEM_COMP
-  static const int   bitDepth        = clipBitDepths.recon[ toChannelType(COMPONENT_Y) ];
-  static const int   shiftNum        = IF_INTERNAL_PREC + 1 - bitDepth;
-  static const int   offset          = ( 1 << ( shiftNum - 1 ) ) + 2 * IF_INTERNAL_OFFS;
-  static const bool  bShortRefMV     = ( pu.cs->slice->getCheckLDC() && PU::isBIOLDB(pu) );
-  static const Int64 limit           = ( 12 << (IF_INTERNAL_PREC - bShortRefMV - bitDepth ) );
-#else
   const int   bitDepth        = clipBitDepths.recon[ toChannelType(COMPONENT_Y) ];
   const int   shiftNum        = IF_INTERNAL_PREC + 1 - bitDepth;
   const int   offset          = ( 1 << ( shiftNum - 1 ) ) + 2 * IF_INTERNAL_OFFS;
   const bool  bShortRefMV     = ( pu.cs->slice->getCheckLDC() && PU::isBIOLDB(pu) );
   const Int64 limit           = ( 12 << (IF_INTERNAL_PREC - bShortRefMV - bitDepth ) );
-#endif
   const Int64 regularizator_1 = 500 * (1<<(bitDepth-8)) * (1<<(bitDepth-8));
   const Int64 regularizator_2 = regularizator_1<<1;
   const Int64 denom_min_1     = 700 * (1<<(bitDepth-8)) * (1<<(bitDepth-8));
@@ -1318,13 +1310,8 @@ Void InterPrediction::subBlockOBMC( PredictionUnit  &pu, PelUnitBuf* pDst, Bool 
 
         Int  i1stPUWidth     = -1, i1stPUHeight = -1;
         Bool b2ndPU          = false;
-#if HEVC_USE_PART_SIZE
-  const Bool bVerticalPU     = ( ePartSize == SIZE_2NxN || ePartSize == SIZE_2NxnU || ePartSize == SIZE_2NxnD );
-  const Bool bHorizontalPU   = ( ePartSize == SIZE_Nx2N || ePartSize == SIZE_nLx2N || ePartSize == SIZE_nRx2N );
-#else
   const Bool bVerticalPU     = false;
   const Bool bHorizontalPU   = false;
-#endif
 
   const Bool bTwoPUs         = ( bVerticalPU || bHorizontalPU );
 
@@ -1347,11 +1334,7 @@ Void InterPrediction::subBlockOBMC( PredictionUnit  &pu, PelUnitBuf* pDst, Bool 
   const Int nRefineBlkSize = std::max( avgLength >> pu.cs->slice->getSPS()->getSpsNext().getFRUCSmallBlkRefineDepth(), FRUC_MERGE_REFINE_MINBLKSIZE );
 
   const Bool bNormal2Nx2N  = ePartSize == SIZE_2Nx2N && !bATMVP && !bFruc && !bAffine;
-#if HEVC_USE_PART_SIZE
-  const Bool bSubMotion    = ePartSize == SIZE_NxN || ( ePartSize == SIZE_2Nx2N && ( bATMVP || bFruc || bAffine ) );
-#else
   const Bool bSubMotion    = ePartSize == SIZE_2Nx2N && ( bATMVP || bFruc || bAffine );
-#endif
 
   MotionInfo currMi  = pu.getMotionInfo();
   MotionInfo NeighMi = MotionInfo();
@@ -2380,13 +2363,8 @@ Void InterPrediction::xFrucCollectSubBlkStartMv( PredictionUnit& pu, const Merge
     }
     else if (neighbor == 3)  // top-right neighbor
     {
-#if JEM_COMP
-      neibPos = pu.cu->Y().topRight().offset( 1, -1 );
-      neibPU = pu.cs->getPURestricted( neibPos, pu, pu.chType );
-#else
       neibPos = pu.Y().topRight().offset( 1, -1 );
       neibPU = pu.cs->getPURestricted( neibPos, pu, pu.chType );
-#endif
     }
     else if (neighbor == 4)  // below-left neighbor
     {

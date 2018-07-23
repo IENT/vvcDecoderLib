@@ -69,12 +69,6 @@ enum PartSplit
 #if ENABLE_BMS
   TU_MAX_TR_SPLIT,
 #endif
-#if HEVC_USE_RQT
-  TU_QUAD_SPLIT,
-#if HM_REPRODUCE_4x4_BLOCK_ESTIMATION_ORDER
-  TU_QUAD_SPLIT_HM,
-#endif
-#endif
   NUM_PART_SPLIT,
   CU_MT_SPLIT             = 1000, ///< dummy element to indicate the MT (multi-type-tree) split
   CU_BT_SPLIT             = 1001, ///< dummy element to indicate the BT split
@@ -113,7 +107,7 @@ protected:
 public:
   unsigned currDepth;
   unsigned currQtDepth;
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
   unsigned currTrDepth;
 #endif
   unsigned currBtDepth;
@@ -155,22 +149,6 @@ public:
   void setMaxMinDepth( unsigned& minDepth, unsigned& maxDepth, const CodingStructure& cs ) const;
 };
 
-#if HEVC_PARTITIONER
-class HEVCPartitioner : public AdaptiveDepthPartitioner
-{
-public:
-  void initCtu                    ( const UnitArea& ctuArea, const ChannelType _chTyp, const Slice& slice );
-  void splitCurrArea              ( const PartSplit split, const CodingStructure &cs );
-  void exitCurrSplit              ();
-  bool nextPart                   ( const CodingStructure &cs, bool autoPop = false );
-  bool hasNextPart                ();
-
-  bool canSplit                   ( const PartSplit split,                          const CodingStructure &cs );
-  bool isSplitImplicit            ( const PartSplit split,                          const CodingStructure &cs );
-  PartSplit getImplicitSplit      (                                                 const CodingStructure &cs );
-};
-
-#endif
 class QTBTPartitioner : public AdaptiveDepthPartitioner
 {
 public:
@@ -200,17 +178,7 @@ namespace PartitionerFactory
 
 namespace PartitionerImpl
 {
-#if HEVC_USE_PART_SIZE
-  Partitioning getPUPartitioning ( const CodingUnit &cu );
-#endif
   Partitioning getCUSubPartitions( const UnitArea   &cuArea, const CodingStructure &cs, const PartSplit splitType = CU_QUAD_SPLIT );
-#if HEVC_USE_RQT
-#if HM_REPRODUCE_4x4_BLOCK_ESTIMATION_ORDER
-  Partitioning getTUSubPartitions( const UnitArea   &tuArea, const CodingStructure &cs, bool hmCompatible = false );
-#else
-  Partitioning getTUSubPartitions( const UnitArea   &tuArea, const CodingStructure &cs );
-#endif
-#endif
 #if ENABLE_BMS
   Partitioning getMaxTuTiling    ( const UnitArea& curArea, const CodingStructure &cs );
 #endif

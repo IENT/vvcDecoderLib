@@ -709,25 +709,6 @@ const DecisionTreeTemplate g_mtSplitDTT = compile(
               /*0*/ DTT_SPLIT_TT_VERT,
               /*1*/ DTT_SPLIT_BT_VERT ) ) ) );
 
-#if HEVC_USE_PART_SIZE
-const DecisionTreeTemplate g_partSizeDTT = compile(
-  decision( DTT_PS_IS_2Nx2N,
-  /*0*/ decision( DTT_PS_IS_2Nx,
-        /*0*/ decision( DTT_PS_IS_NOT_NxN,
-              /*0*/ DTT_PS_NxN,
-              /*1*/ decision( DTT_PS_IS_Nx2N,
-                    /*0*/ decision( DTT_PS_IS_nRx2N,
-                          /*0*/ DTT_PS_nLx2N,
-                          /*1*/ DTT_PS_nRx2N ),
-                    /*1*/ DTT_PS_Nx2N ) ),
-        /*1*/ decision( DTT_PS_IS_2NxN,
-              /*0*/ decision( DTT_PS_IS_2NxnD,
-                    /*0*/ DTT_PS_2NxnU,
-                    /*1*/ DTT_PS_2NxnD ),
-              /*1*/ DTT_PS_2NxN ) ),
-  /*1*/ DTT_PS_2Nx2N ) );
-
-#endif
 
 #if JEM_TOOLS
 const DecisionTreeTemplate g_intraLumaMpmDTT = compile(

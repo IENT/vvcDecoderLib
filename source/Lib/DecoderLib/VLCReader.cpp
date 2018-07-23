@@ -372,11 +372,7 @@ Void HLSyntaxReader::parseShortTermRefPicSet( SPS* sps, ReferencePictureSet* rps
   rps->printDeltaPOC();
 }
 
-#if JEM_COMP
-Void HLSyntaxReader::parsePPS( PPS* pcPPS, bool assumeJEM )
-#else
 Void HLSyntaxReader::parsePPS( PPS* pcPPS )
-#endif
 {
 #if ENABLE_TRACING
   xTracePPSHeader ();
@@ -524,19 +520,6 @@ Void HLSyntaxReader::parsePPS( PPS* pcPPS )
   READ_FLAG( uiCode, "slice_segment_header_extension_present_flag");
   pcPPS->setSliceHeaderExtensionPresentFlag(uiCode);
 
-#if JEM_COMP
-  if( assumeJEM )
-  {
-    READ_FLAG( uiCode, "tch clip param enabled_flag" );
-    CHECK( uiCode == 0, "All JEM tools need to be enabled if assuming JEM" );
-    if( uiCode )
-    {
-      READ_CODE( 2, uiCode, "tch clip param quantiz" );
-
-      m_pcLastSPS->getSpsNext().setAClipQuant( 2 * uiCode );
-    }
-  }
-#endif
 
   READ_FLAG( uiCode, "pps_extension_present_flag");
   if (uiCode)
@@ -862,12 +845,10 @@ void HLSyntaxReader::parseSPSNext( SPSNext& spsNext, const bool usePCM )
     READ_FLAG( symbol,  "reserved_flag" );                          if( symbol != 0 ) EXIT("Incompatible version: SPSNext reserved flag not equal to zero (bitstream was probably created with newer software version)" );
   }
   READ_FLAG( symbol,  "mtt_enabled_flag" );                       spsNext.setMTTMode                ( symbol );
-#if !JEM_COMP
 #if ENABLE_WPP_PARALLELISM
   READ_FLAG( symbol,  "next_dqp_enabled_flag" );                  spsNext.setUseNextDQP             ( symbol != 0 );
 #else
   READ_FLAG( symbol,  "reserved_flag" );                          CHECK( symbol, "reserved flag not 0!" );
-#endif
 #endif
 
   // additional parameters
@@ -983,11 +964,7 @@ void HLSyntaxReader::parseSPSNext( SPSNext& spsNext, const bool usePCM )
   // ADD_NEW_TOOL : (sps extension parser) read tool enabling flags and associated parameters here
 }
 
-#if JEM_COMP
-Void HLSyntaxReader::parseSPS( SPS* pcSPS, bool assumeJEM )
-#else
 Void HLSyntaxReader::parseSPS(SPS* pcSPS)
-#endif
 {
 #if ENABLE_TRACING
   xTraceSPSHeader ();
@@ -1008,25 +985,16 @@ Void HLSyntaxReader::parseSPS(SPS* pcSPS)
   }
 
   parsePTL(pcSPS->getPTL(), 1, pcSPS->getMaxTLayers() - 1);
-#if JEM_COMP
-  if( assumeJEM )
-  {
-    pcSPS->getPTL()->getGeneralPTL()->setProfileIdc( Profile::NEXT );
-  }
-#endif
   READ_UVLC(     uiCode, "sps_seq_parameter_set_id" );           pcSPS->setSPSId( uiCode );
   CHECK(uiCode > 15, "Invalid SPS id signalled");
 
   READ_UVLC(     uiCode, "chroma_format_idc" );                  pcSPS->setChromaFormatIdc( ChromaFormat(uiCode) );
   CHECK(uiCode > 3, "Invalid chroma format signalled");
-#if ENABLE_CHROMA_422
-#else
   if( pcSPS->getChromaFormatIdc() == CHROMA_422 )
   {
     EXIT( "Error:  4:2:2 chroma sampling format not supported with current compiler setting."
           "\n        Set compiler flag \"ENABLE_CHROMA_422\" equal to 1 for enabling 4:2:2.\n" );
   }
-#endif
 
   if( pcSPS->getChromaFormatIdc() == CHROMA_444 )
   {
@@ -1083,45 +1051,11 @@ Void HLSyntaxReader::parseSPS(SPS* pcSPS)
     }
   }
 
-#if JEM_COMP
-  if( assumeJEM )
-  {
-    READ_UVLC( uiCode, "log2_CTU_size_minus2" );
-    pcSPS->setMaxCUHeight         ( 1 << ( uiCode + MIN_CU_LOG2 ) );
-    pcSPS->setMaxCUWidth          ( 1 << ( uiCode + MIN_CU_LOG2 ) );
-    pcSPS->getSpsNext().setCTUSize( 1 << ( uiCode + MIN_CU_LOG2 ) );
-    //UInt uiMax = uiCode;
-    UInt uiMinQT[3];
-    READ_UVLC( uiCode, "log2_minQT_ISliceLuma_minus2" );
-    uiMinQT[0] = 1 << ( uiCode + MIN_CU_LOG2 );
-    READ_UVLC( uiCode, "log2_minQT_ISliceChroma_minus2" );
-    uiMinQT[2] = 1 << ( uiCode + MIN_CU_LOG2 );
-    READ_UVLC( uiCode, "log2_minQT_PBSlice_minus2" );
-    uiMinQT[1] = 1 << ( uiCode + MIN_CU_LOG2 );
-    pcSPS->getSpsNext().setMinQTSizes( uiMinQT );
-    //pcSPS->setMaxTotalCUDepth( uiMax );
-
-    UInt uiMaxBTDepth, uiMaxBTDepthISliceL, uiMaxBTDepthISliceC;
-    READ_UVLC( uiCode, "max_bt_depth_minus2" );
-    uiMaxBTDepth = uiCode;
-    READ_UVLC( uiCode, "max_bt_depth_i_slice_luma_minus2" );
-    uiMaxBTDepthISliceL = uiCode;
-    READ_UVLC( uiCode, "max_bt_depth_i_slice_chroma_minus2" );
-    uiMaxBTDepthISliceC = uiCode;
-    pcSPS->getSpsNext().setMaxBTDepth( uiMaxBTDepth, uiMaxBTDepthISliceL, uiMaxBTDepthISliceC );
-  }
-#endif
 
   READ_UVLC( uiCode, "log2_min_luma_coding_block_size_minus3" );
   Int log2MinCUSize = uiCode + 3;
   pcSPS->setLog2MinCodingBlockSize(log2MinCUSize);
   READ_UVLC( uiCode, "log2_diff_max_min_luma_coding_block_size" );
-#if JEM_COMP
-  if( assumeJEM )
-  {
-    uiCode = g_aucLog2[pcSPS->getMaxCUWidth()] - 2;
-  }
-#endif
   pcSPS->setLog2DiffMaxMinCodingBlockSize(uiCode);
 
   if (pcSPS->getPTL()->getGeneralPTL()->getLevelIdc() >= Level::LEVEL5)
@@ -1130,52 +1064,18 @@ Void HLSyntaxReader::parseSPS(SPS* pcSPS)
   }
 
   Int maxCUDepthDelta = uiCode;
-#if JEM_COMP
-  if( !assumeJEM )
-  {
-#endif
   pcSPS->setMaxCUWidth  ( 1<<(log2MinCUSize + maxCUDepthDelta) );
   pcSPS->setMaxCUHeight ( 1<<(log2MinCUSize + maxCUDepthDelta) );
-#if JEM_COMP
-  }
-#endif
   READ_UVLC( uiCode, "log2_min_luma_transform_block_size_minus2" );   pcSPS->setQuadtreeTULog2MinSize( uiCode + 2 );
 
   READ_UVLC( uiCode, "log2_diff_max_min_luma_transform_block_size" ); pcSPS->setQuadtreeTULog2MaxSize( uiCode + pcSPS->getQuadtreeTULog2MinSize() );
-#if JEM_COMP
-  if( assumeJEM )
-  {
-    pcSPS->setMaxTrSize( pcSPS->getMaxCUWidth() );
-  }
-  else
-  {
-#endif
   pcSPS->setMaxTrSize( 1<<(uiCode + pcSPS->getQuadtreeTULog2MinSize()) );
-#if JEM_COMP
-  }
-#endif
 
-#if JEM_COMP
-  if( !assumeJEM )
-  {
-#endif
     READ_UVLC( uiCode, "max_transform_hierarchy_depth_inter" );    pcSPS->setQuadtreeTUMaxDepthInter( uiCode + 1 );
     READ_UVLC( uiCode, "max_transform_hierarchy_depth_intra" );    pcSPS->setQuadtreeTUMaxDepthIntra( uiCode + 1 );
-#if JEM_COMP
-  }
-  else
-  {
-    pcSPS->setQuadtreeTUMaxDepthInter( 1 );
-    pcSPS->setQuadtreeTUMaxDepthIntra( 1 );
-  }
-#endif
 
   Int addCuDepth = std::max (0, log2MinCUSize - (Int)pcSPS->getQuadtreeTULog2MinSize() );
-#if HEVC_USE_RQT && HEVC_USE_PART_SIZE
-  pcSPS->setMaxCodingDepth( maxCUDepthDelta + addCuDepth + getMaxCUDepthOffset( pcSPS->getChromaFormatIdc(), pcSPS->getQuadtreeTULog2MinSize() ) );
-#else
   pcSPS->setMaxCodingDepth( maxCUDepthDelta + addCuDepth );
-#endif
 
 #if HEVC_USE_SCALING_LISTS
   READ_FLAG( uiCode, "scaling_list_enabled_flag" );                 pcSPS->setScalingListFlag ( uiCode );
@@ -1240,102 +1140,6 @@ Void HLSyntaxReader::parseSPS(SPS* pcSPS)
   }
 
 
-#if JEM_COMP
-  if( assumeJEM )
-  {
-    SPSNext& spsNext = pcSPS->getSpsNext();
-    spsNext.setNextToolsEnabled       ( true );
-
-    spsNext.setUseQTBT                ( true );
-    spsNext.setUseIntra65Ang          ( true );
-    spsNext.setUseLargeCTU            ( true );
-    spsNext.setCABACEngineMode        ( 3 );
-    spsNext.setUseAltResiComp         ( true );
-    spsNext.setAltResiCompId          ( 1 );
-    spsNext.setUseHighPrecMv          ( true );
-    spsNext.setDisableMotCompress     ( false );
-    spsNext.setIntraPDPCMode          ( 2 );
-    spsNext.setUseIntraPDPC           ( 1 );
-    spsNext.setELMMode                ( 3 );
-    spsNext.setUseAClip               ( true );
-    spsNext.setCIPFMode               ( 1 );
-    spsNext.setUseMDMS                ( true );
-    spsNext.setUseDualITree           ( true );
-
-
-    m_pcLastSPS = pcSPS;
-
-    READ_FLAG( uiCode, "atmvp_flag" );
-    spsNext.setSubPuMvpMode           ( uiCode != 0 ? 3 : 0 );
-
-    READ_CODE( 3, uiCode, "log2_sub_pu_tmvp_size" );                // CHECK( !uiCode, "Wrong assumed JEM configuration" );//pcSPS->setSubPUTLog2Size( uiCode );
-    spsNext.setSubPuMvpLog2Size       ( uiCode );
-
-    READ_FLAG( uiCode, "obmc_flag" );                               // CHECK( !uiCode, "Wrong assumed JEM configuration" );//pcSPS->setOBMC( uiCode );
-    spsNext.setUseOBMC                ( uiCode );
-
-    if( uiCode )                                                    //
-    {                                                               //
-      READ_UVLC( uiCode, "obmc_blk_size" );                         // CHECK( !uiCode, "Wrong assumed JEM configuration" );//pcSPS->setOBMCBlkSize( uiCode );
-      CHECK( uiCode != 4 && uiCode != 8, "invalid obmc blk size" );                         //
-      spsNext.setOBMCBlkSize          ( uiCode );
-    }                                                               //
-                                                                    //
-    READ_FLAG( uiCode, "use_imv" );                                 // CHECK( !uiCode, "Wrong assumed JEM configuration" );//pcSPS->setIMV( uiCode );
-    spsNext.setImvMode                ( uiCode != 0 ? ImvMode::IMV_4PEL : ImvMode::IMV_OFF );
-
-    READ_FLAG( uiCode, "fruc_merge_mode" );                         // CHECK( !uiCode, "Wrong assumed JEM configuration" );//pcSPS->setUseFRUCMgrMode( uiCode );
-    spsNext.setUseFRUCMrgMode         ( uiCode != 0 );
-    if( uiCode )                                                    //
-    {                                                               //
-      READ_UVLC( uiCode, "fruc_refine_filter" );                    // CHECK( !uiCode, "Wrong assumed JEM configuration" );//pcSPS->setFRUCRefineFilter( uiCode );
-      spsNext.setFRUCRefineFilter     ( uiCode );
-      READ_UVLC( uiCode, "fruc_refine_range_in_pixel" );            // CHECK( !uiCode, "Wrong assumed JEM configuration" );//pcSPS->setFRUCRefineRange( uiCode << ( 2 + VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE ) );
-      spsNext.setFRUCRefineRange      ( uiCode << ( 2 + VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE ) );
-      READ_UVLC( uiCode, "fruc_small_blk_refine_depth" );           // CHECK( !uiCode, "Wrong assumed JEM configuration" );//pcSPS->setFRUCSmallBlkRefineDepth( uiCode );
-      spsNext.setFRUCSmallBlkRefineDepth( uiCode );
-    }                                                               //
-                                                                    //
-    READ_FLAG( uiCode, "illumination_comp_enabled_flag" );          // CHECK( !uiCode, "Wrong assumed JEM configuration" );//pcSPS->setICFlag( uiCode );
-    spsNext.setLICMode                ( uiCode != 0 );
-
-    READ_FLAG( uiCode, "use_alf_flag" );                            // CHECK( !uiCode, "Wrong assumed JEM configuration" );//pcSPS->setUseALF( uiCode ? true : false );
-    spsNext.setALFEnabled             ( uiCode == 1 );
-    spsNext.setGALFEnabled            ( uiCode == 1 );                               //
-
-    READ_FLAG( uiCode, "use_intra_emt" );                           // CHECK( !uiCode, "Wrong assumed JEM configuration" );//pcSPS->setUseIntraEMT( uiCode );
-    spsNext.setUseIntraEMT            ( uiCode != 0 );
-    READ_FLAG( uiCode, "use_inter_emt" );                           // CHECK( !uiCode, "Wrong assumed JEM configuration" );//pcSPS->setUseInterEMT( uiCode );
-    spsNext.setUseInterEMT            ( uiCode != 0 );
-                                                                    //
-    READ_FLAG( uiCode, "use_intra_klt" );                           // CHECK( uiCode, "Wrong assumed JEM configuration" );//pcSPS->setUseIntraEMT( uiCode );
-    READ_FLAG( uiCode, "use_inter_klt" );                           // CHECK( uiCode, "Wrong assumed JEM configuration" );//pcSPS->setUseInterEMT( uiCode );
-                                                                    //
-    READ_FLAG( uiCode, "intra_4tap_filter_enabled_flag" );          // CHECK( !uiCode, "Wrong assumed JEM configuration" );//pcSPS->setUseIntra4TapFilter( uiCode );
-    spsNext.setUseIntra4Tap           ( uiCode != 0 );
-                                                                    //
-    READ_FLAG( uiCode, "intra_boundary_filter_enabled_flag" );      // CHECK( !uiCode, "Wrong assumed JEM configuration" );//pcSPS->setUseIntraBoundaryFilter( uiCode );
-    spsNext.setUseIntraBoundaryFilter ( uiCode != 0 );
-                                                                    //
-    READ_FLAG( uiCode, "cross_component_prediction_enabled_flag" ); // CHECK( !uiCode, "Wrong assumed JEM configuration" );//pcSPS->setUseLMChroma( uiCode ? true : false );
-    spsNext.setUseLMChroma( uiCode != 0 );
-                                                                    //
-    READ_FLAG( uiCode, "bio_enabled_flag" );                        // CHECK( !uiCode, "Wrong assumed JEM configuration" );//pcSPS->setUseBIO( uiCode );
-    spsNext.setUseBIO                 ( uiCode );
-                                                                          //
-    READ_FLAG( uiCode, "dmvr_enabled_flag" );                       // CHECK( !uiCode, "Wrong assumed JEM configuration" );//pcSPS->setUseDMVR( uiCode );
-    spsNext.setUseDMVR                ( uiCode );
-                                                                    //
-    READ_FLAG( uiCode, "nsst_enabled_flag" );                       // CHECK( !uiCode, "Wrong assumed JEM configuration" );//pcSPS->setUseNSST( uiCode );
-    spsNext.setUseNSST                ( uiCode == 1 );
-
-    READ_FLAG( uiCode, "affine_enabled_flag" );                     // CHECK( !uiCode, "Wrong assumed JEM configuration" );//pcSPS->setUseAffine( uiCode );
-    spsNext.setUseAffine              ( uiCode );
-                                                                    //
-    READ_FLAG( uiCode, "bilateral_filter_enabled_flag" );           // CHECK( !uiCode, "Wrong assumed JEM configuration" );//pcSPS->setUseBilateralFilter( uiCode );
-    spsNext.setUseBIF                 ( uiCode );
-  }
-#endif
 
   READ_FLAG( uiCode, "sps_extension_present_flag");
   if (uiCode)

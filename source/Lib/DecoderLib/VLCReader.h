@@ -151,16 +151,8 @@ public:
   Void  parseVPS            ( VPS* pcVPS );
 #endif
   void  parseSPSNext        ( SPSNext& spsNext, const bool usePCM );
-#if JEM_COMP
-  Void  parseSPS            ( SPS* pcSPS, bool assumeJEM );
-#else
   Void  parseSPS            ( SPS* pcSPS );
-#endif
-#if JEM_COMP
-  Void  parsePPS            ( PPS* pcPPS, bool assumeJEM );
-#else
   Void  parsePPS            ( PPS* pcPPS );
-#endif
   Void  parseVUI            ( VUI* pcVUI, SPS* pcSPS );
   Void  parsePTL            ( PTL *rpcPTL, Bool profilePresentFlag, Int maxNumSubLayersMinus1 );
   Void  parseProfileTier    ( ProfileTierLevel *ptl, const Bool bIsSubLayer );
@@ -183,9 +175,6 @@ protected:
 #if JEM_TOOLS
 private:
   CABACDataStore* m_CABACDataStore;
-#endif
-#if JEM_COMP
-  SPS* m_pcLastSPS;
 #endif
 };
 

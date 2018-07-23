@@ -1249,7 +1249,7 @@ Void TrQuant::transformNxN(TransformUnit &tu, const ComponentID &compID, const Q
     }
   }
 
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
   // set coded block flag (CBF)
   TU::setCbfAtDepth (tu, compID, tu.depth, uiAbsSum > 0);
 #else

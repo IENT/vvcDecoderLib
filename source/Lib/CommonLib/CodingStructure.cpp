@@ -434,17 +434,6 @@ TransformUnit& CodingStructure::addTU( const UnitArea &unit, const ChannelType c
     CHECK( tu->cacheId != tu->cu->cacheId, "Inconsintent cacheId between the TU and assigned CU" );
 #endif
 
-#if ENABLE_CHROMA_422
-  if( pcv->multiBlock422 && tu->blocks.size() < MAX_NUM_TBLOCKS ) // special case: 5 transform blocks (2 per chroma component)
-  {
-    tu->blocks[ COMPONENT_Cb ].height >>= 1;
-    tu->blocks[ COMPONENT_Cr ].height >>= 1;
-    tu->blocks.push_back                ( tu->blocks[ COMPONENT_Cb ] );
-    tu->blocks.push_back                ( tu->blocks[ COMPONENT_Cr ] );
-    tu->blocks[ COMPONENT_Cb2].y       += tu->blocks[ COMPONENT_Cb ].height;
-    tu->blocks[ COMPONENT_Cr2].y       += tu->blocks[ COMPONENT_Cr ].height;
-  }
-#endif
 
   TransformUnit *prevTU = m_numTUs > 0 ? tus.back() : nullptr;
 
@@ -503,14 +492,6 @@ TransformUnit& CodingStructure::addTU( const UnitArea &unit, const ChannelType c
     pcmbuf[i] = m_pcmbuf[i] + m_offsets[i];
 
     unsigned areaSize = tu->blocks[i].area();
-#if ENABLE_CHROMA_422
-    if( pcv->multiBlock422 && i != COMPONENT_Y )
-    {
-      coeffs[i+SCND_TBLOCK_OFFSET] = coeffs[i] + areaSize;
-      pcmbuf[i+SCND_TBLOCK_OFFSET] = pcmbuf[i] + areaSize;
-      areaSize                   <<= 1;
-    }
-#endif
     m_offsets[i] += areaSize;
   }
 

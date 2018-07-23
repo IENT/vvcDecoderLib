@@ -1098,11 +1098,7 @@ bool CABACReader::coding_unit( CodingUnit &cu, Partitioner &partitioner, CUCtx& 
 #if JEM_TOOLS
   pdpc_flag ( cu );
 #endif
-#if HEVC_USE_PART_SIZE
-  part_mode ( cu );
-#else
   cu.partSize = SIZE_2Nx2N;
-#endif
 
   // --> create PUs
   CU::addPUs( cu );
@@ -1205,59 +1201,6 @@ void CABACReader::pred_mode( CodingUnit& cu )
   }
 }
 
-#if HEVC_USE_PART_SIZE
-void CABACReader::part_mode( CodingUnit& cu )
-{
-  if( cu.cs->pcv->only2Nx2N )
-  {
-    cu.partSize = SIZE_2Nx2N;
-    return;
-  }
-
-  const SPS&      sps                           = *cu.cs->sps;
-  const unsigned  cuWidth                       = cu.lumaSize().width;
-  const unsigned  cuHeight                      = cu.lumaSize().height;
-  const int       log2DiffMaxMinCodingBlockSize = sps.getLog2DiffMaxMinCodingBlockSize();
-
-  RExt__DECODER_DEBUG_BIT_STATISTICS_CREATE_SET_SIZE( STATS__CABAC_BITS__PART_SIZE, cu.blocks[cu.chType].lumaSize() );
-
-  DecisionTree dt( g_partSizeDTT );
-
-  dt.setCtxId( DTT_PS_IS_2Nx2N, Ctx::PartSize() );
-
-  if( CU::isIntra( cu ) )
-  {
-    dt.setAvail( DTT_PS_nLx2N, false );
-    dt.setAvail( DTT_PS_2NxN,  false );
-    dt.setAvail( DTT_PS_Nx2N,  false );
-    dt.setAvail( DTT_PS_nRx2N, false );
-    dt.setAvail( DTT_PS_2NxnU, false );
-    dt.setAvail( DTT_PS_2NxnD, false );
-    dt.setAvail( DTT_PS_NxN,   cu.qtDepth == log2DiffMaxMinCodingBlockSize );
-  }
-  else
-  {
-    const bool isAmpAvail = sps.getUseAMP() && cu.qtDepth < log2DiffMaxMinCodingBlockSize;
-
-    dt.setAvail( DTT_PS_2NxN,  true );
-    dt.setAvail( DTT_PS_Nx2N,  true );
-    dt.setAvail( DTT_PS_nLx2N, isAmpAvail );
-    dt.setAvail( DTT_PS_nRx2N, isAmpAvail );
-    dt.setAvail( DTT_PS_2NxnU, isAmpAvail );
-    dt.setAvail( DTT_PS_2NxnD, isAmpAvail );
-    dt.setAvail( DTT_PS_NxN,   cu.qtDepth == log2DiffMaxMinCodingBlockSize && !( cuWidth == 8 && cuHeight == 8 ) );
-
-    dt.setCtxId( DTT_PS_IS_2Nx,     Ctx::PartSize( 1 ) );
-    dt.setCtxId( DTT_PS_IS_2NxN,    Ctx::PartSize( 3 ) );
-    dt.setCtxId( DTT_PS_IS_NOT_NxN, Ctx::PartSize( 2 ) );
-    dt.setCtxId( DTT_PS_IS_Nx2N,    Ctx::PartSize( 3 ) );
-  }
-
-  unsigned id = decode_sparse_dt( dt );
-  cu.partSize = PartSize( id );
-}
-
-#endif
 #if JEM_TOOLS
 
 void CABACReader::pdpc_flag( CodingUnit& cu )
@@ -1470,21 +1413,11 @@ void CABACReader::intra_chroma_pred_modes( CodingUnit& cu )
     return;
   }
 
-#if HEVC_USE_PART_SIZE
-  int numBlocks = enable4ChromaPUsInIntraNxNCU( cu.chromaFormat ) ? CU::getNumPUs( cu ) : 1;
-
-#endif
   PredictionUnit *pu = cu.firstPU;
 
-#if HEVC_USE_PART_SIZE
-  for( int k = 0; k < numBlocks; k++ )
-#endif
   {
     CHECK( pu->cu != &cu, "Inkonsistent PU-CU mapping" );
     intra_chroma_pred_mode( *pu );
-#if HEVC_USE_PART_SIZE
-    pu = pu->next;
-#endif
   }
 }
 
@@ -1618,7 +1551,7 @@ void CABACReader::cu_residual( CodingUnit& cu, Partitioner &partitioner, CUCtx& 
     if( !cu.rootCbf )
     {
       TransformUnit& tu = cu.cs->addTU(cu, partitioner.chType);
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
       tu.depth = 0;
 #endif
       for( unsigned c = 0; c < tu.blocks.size(); c++ )
@@ -1632,9 +1565,6 @@ void CABACReader::cu_residual( CodingUnit& cu, Partitioner &partitioner, CUCtx& 
     }
   }
 
-#if HEVC_USE_RQT
-  cuCtx.quadtreeTULog2MinSizeInCU = CU::getQuadtreeTULog2MinSizeInCU( cu );
-#endif
   ChromaCbfs chromaCbfs;
   transform_tree( *cu.cs, partitioner, cuCtx, chromaCbfs );
 
@@ -2033,7 +1963,7 @@ void CABACReader::pcm_samples( TransformUnit& tu )
 
   const SPS&        sps       = *tu.cu->cs->sps;
   const ComponentID maxCompId = ( tu.chromaFormat == CHROMA_400 ? COMPONENT_Y : COMPONENT_Cr );
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
   tu.depth                    = 0;
 #endif
   for( ComponentID compID = COMPONENT_Y; compID <= maxCompId; compID = ComponentID(compID+1) )
@@ -2047,19 +1977,6 @@ void CABACReader::pcm_samples( TransformUnit& tu )
         samples.at(x, y) = m_BinDecoder.decodeBinsPCM( sampleBits );
       }
     }
-#if ENABLE_CHROMA_422
-    if( tu.cs->pcv->multiBlock422 && compID != COMPONENT_Y )
-    {
-      samples = tu.getPcmbuf( ComponentID( compID + SCND_TBLOCK_OFFSET ) );
-      for( unsigned y = 0; y < samples.height; y++ )
-      {
-        for( unsigned x = 0; x < samples.width; x++ )
-        {
-          samples.at(x, y) = m_BinDecoder.decodeBinsPCM( sampleBits );
-        }
-      }
-    }
-#endif
   }
   m_BinDecoder.start();
 }
@@ -2084,7 +2001,7 @@ void CABACReader::transform_tree( CodingStructure &cs, Partitioner &partitioner,
   if( cs.pcv->noRQT )
   {
     TransformUnit &tu = cs.addTU( CS::getArea( cs, area, partitioner.chType ), partitioner.chType );
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
     tu.depth = 0;
 #endif
 
@@ -2104,14 +2021,8 @@ void CABACReader::transform_tree( CodingStructure &cs, Partitioner &partitioner,
 
 #endif
   CodingUnit&     cu            = *cs.getCU( area.blocks[partitioner.chType], partitioner.chType );
-#if HEVC_USE_RQT || ENABLE_CHROMA_422
-  const unsigned  log2TrafoSize = g_aucLog2[area.lumaSize().width];
-#endif
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
   const unsigned  trDepth       = partitioner.currTrDepth;
-#if HEVC_USE_RQT
-  const SPS&      sps           = *cs.sps;
-#endif
 
   // split_transform_flag
   bool split = false;
@@ -2119,81 +2030,16 @@ void CABACReader::transform_tree( CodingStructure &cs, Partitioner &partitioner,
   {
     split = partitioner.canSplit( TU_MAX_TR_SPLIT, cs );
   }
-#if HEVC_USE_RQT
-#if HEVC_USE_PART_SIZE
-  else if( CU::isIntra( cu ) && cu.partSize == SIZE_NxN && trDepth == 0 )
-  {
-    split = true;
-  }
-#endif
-  else if( sps.getQuadtreeTUMaxDepthInter() == 1 && CU::isInter( cu ) && cu.partSize != SIZE_2Nx2N && trDepth == 0 )
-  {
-    split = ( log2TrafoSize > cuCtx.quadtreeTULog2MinSizeInCU );
-  }
-  else if( log2TrafoSize > sps.getQuadtreeTULog2MaxSize() )
-  {
-    split = true;
-  }
-  else if( log2TrafoSize == sps.getQuadtreeTULog2MinSize() )
-  {
-    split = false;
-  }
-  else if( log2TrafoSize == cuCtx.quadtreeTULog2MinSizeInCU )
-  {
-    split = false;
-  }
-  else
-  {
-    CHECK( log2TrafoSize <= cuCtx.quadtreeTULog2MinSizeInCU, "block cannot be split in multiple TUs" );
-
-    if( sps.getSpsNext().nextToolsEnabled() )
-    {
-      split = split_transform_flag( sps.getQuadtreeTULog2MaxSize() - log2TrafoSize );
-    }
-    else
-    {
-      split = split_transform_flag( 5 - log2TrafoSize );
-    }
-  }
-#endif
 #endif
 
   // cbf_cb & cbf_cr
-#if ENABLE_CHROMA_422
-  const bool twoChromaCbfs = ( cs.pcv->multiBlock422 && ( !split || log2TrafoSize == 3 ) );
-#endif
   if( area.chromaFormat != CHROMA_400 && area.blocks[COMPONENT_Cb].valid() && ( !CS::isDualITree( cs ) || partitioner.chType == CHANNEL_TYPE_CHROMA ) )
   {
-#if HEVC_USE_RQT
-    const bool firstCbfOfCU = ( trDepth == 0 );
-    const bool allQuadrants = TU::isProcessingAllQuadrants(area);
-    if( firstCbfOfCU || allQuadrants )
     {
-#if ENABLE_CHROMA_422
-      if( twoChromaCbfs )
-      {
-        chromaCbfs.Cb2 = chromaCbfs.Cb;
-        chromaCbfs.Cr2 = chromaCbfs.Cr;
-        if( chromaCbfs.Cb )
-        {
-          chromaCbfs.Cb  &= cbf_comp( cs, area.blocks[ COMPONENT_Cb ], trDepth );
-          chromaCbfs.Cb2 &= cbf_comp( cs, area.blocks[ COMPONENT_Cb ], trDepth );
-        }
-        if( chromaCbfs.Cr )
-        {
-          chromaCbfs.Cr  &= cbf_comp( cs, area.blocks[ COMPONENT_Cr ], trDepth );
-          chromaCbfs.Cr2 &= cbf_comp( cs, area.blocks[ COMPONENT_Cr ], trDepth );
-        }
-      }
-      else
-#endif
-#else
-    {
-#endif
       {
         if( chromaCbfs.Cb )
         {
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
           chromaCbfs.Cb &= cbf_comp( cs, area.blocks[COMPONENT_Cb], trDepth );
 #else
           chromaCbfs.Cb &= cbf_comp( cs, area.blocks[COMPONENT_Cb] );
@@ -2201,7 +2047,7 @@ void CABACReader::transform_tree( CodingStructure &cs, Partitioner &partitioner,
         }
         if( chromaCbfs.Cr )
         {
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
           chromaCbfs.Cr &= cbf_comp( cs, area.blocks[COMPONENT_Cr], trDepth );
 #else
           chromaCbfs.Cr &= cbf_comp( cs, area.blocks[COMPONENT_Cr] );
@@ -2215,7 +2061,7 @@ void CABACReader::transform_tree( CodingStructure &cs, Partitioner &partitioner,
     chromaCbfs = ChromaCbfs( false );
   }
 
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
   if( split )
   {
     {
@@ -2235,11 +2081,7 @@ void CABACReader::transform_tree( CodingStructure &cs, Partitioner &partitioner,
       }
       else
 #endif
-#if HEVC_USE_RQT
-      partitioner.splitCurrArea( TU_QUAD_SPLIT, cs );
-#else
         THROW( "Implicit TU split not available!" );
-#endif
     }
 
     do
@@ -2254,13 +2096,7 @@ void CABACReader::transform_tree( CodingStructure &cs, Partitioner &partitioner,
     const unsigned  currDepth = partitioner.currTrDepth;
     const unsigned numTBlocks = getNumberValidTBlocks( *cs.pcv );
 
-#if ENABLE_CHROMA_422
-    unsigned        anyCbfSet = 0;
-    unsigned        compCbf[5] = { 0, 0, 0, 0, 0 };
-    const bool      is_NxN_422 = ( cs.pcv->multiBlock422 && currArea.lumaSize().width == 8 );
-#else
     unsigned        compCbf[3] = { 0, 0, 0 };
-#endif
 
     for( auto &currTU : cs.traverseTUs( currArea, partitioner.chType ) )
     {
@@ -2270,34 +2106,7 @@ void CABACReader::transform_tree( CodingStructure &cs, Partitioner &partitioner,
       }
     }
 
-#if ENABLE_CHROMA_422
-    if( is_NxN_422 ) // very special case
     {
-      for( auto &currTU : cs.traverseTUs( currArea, partitioner.chType ) )
-      {
-        TU::setCbfAtDepth( currTU, COMPONENT_Y,   currDepth, compCbf[COMPONENT_Y] );
-        TU::setCbfAtDepth( currTU, COMPONENT_Cb,  currDepth, compCbf[COMPONENT_Cb] );
-        TU::setCbfAtDepth( currTU, COMPONENT_Cr,  currDepth, compCbf[COMPONENT_Cr] );
-        TU::setCbfAtDepth( currTU, COMPONENT_Cb2, currDepth, compCbf[COMPONENT_Cb2] );
-        TU::setCbfAtDepth( currTU, COMPONENT_Cr2, currDepth, compCbf[COMPONENT_Cr2] );
-      }
-
-      anyCbfSet  = compCbf[COMPONENT_Y];
-      anyCbfSet |= compCbf[COMPONENT_Cb];
-      anyCbfSet |= compCbf[COMPONENT_Cr];
-      anyCbfSet |= compCbf[COMPONENT_Cb2];
-      anyCbfSet |= compCbf[COMPONENT_Cr2];
-    }
-    else // usual case
-#endif
-    {
-#if ENABLE_CHROMA_422
-      if( cs.pcv->multiBlock422 )
-      {
-        compCbf[COMPONENT_Cb] |= compCbf[COMPONENT_Cb2];
-        compCbf[COMPONENT_Cr] |= compCbf[COMPONENT_Cr2];
-      }
-#endif
 
       for( auto &currTU : cs.traverseTUs( currArea, partitioner.chType ) )
       {
@@ -2324,10 +2133,10 @@ void CABACReader::transform_tree( CodingStructure &cs, Partitioner &partitioner,
         tu.getPcmbuf( ComponentID( compID ) ).fill( 0 );
       }
     }
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
     tu.depth = trDepth;
 #endif
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
     DTRACE( g_trace_ctx, D_SYNTAX, "transform_unit() pos=(%d,%d) size=%dx%d depth=%d trDepth=%d\n", tu.blocks[tu.chType].x, tu.blocks[tu.chType].y, tu.blocks[tu.chType].width, tu.blocks[tu.chType].height, cu.depth, partitioner.currTrDepth );
 #else
     DTRACE( g_trace_ctx, D_SYNTAX, "transform_unit() pos=(%d,%d) size=%dx%d depth=%d\n", tu.blocks[tu.chType].x, tu.blocks[tu.chType].y, tu.blocks[tu.chType].width, tu.blocks[tu.chType].height, cu.depth );
@@ -2335,7 +2144,7 @@ void CABACReader::transform_tree( CodingStructure &cs, Partitioner &partitioner,
 
     if( !isChroma( partitioner.chType ) )
     {
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
       if( !CU::isIntra( cu ) && trDepth == 0 && !chromaCbfs.sigChroma( area.chromaFormat ) )
       {
         TU::setCbfAtDepth( tu, COMPONENT_Y, trDepth, 1 );
@@ -2348,12 +2157,12 @@ void CABACReader::transform_tree( CodingStructure &cs, Partitioner &partitioner,
 #endif
       else
       {
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
         Bool cbfY = cbf_comp( cs, tu.Y(), trDepth );
 #else
         Bool cbfY = cbf_comp( cs, tu.Y() );
 #endif
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
         TU::setCbfAtDepth( tu, COMPONENT_Y, trDepth, ( cbfY ? 1 : 0 ) );
 #else
         TU::setCbf( tu, COMPONENT_Y, cbfY );
@@ -2362,16 +2171,9 @@ void CABACReader::transform_tree( CodingStructure &cs, Partitioner &partitioner,
     }
     if( area.chromaFormat != CHROMA_400 )
     {
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
       TU::setCbfAtDepth( tu, COMPONENT_Cb, trDepth, ( chromaCbfs.Cb ? 1 : 0 ) );
       TU::setCbfAtDepth( tu, COMPONENT_Cr, trDepth, ( chromaCbfs.Cr ? 1 : 0 ) );
-#if ENABLE_CHROMA_422
-      if( cs.pcv->multiBlock422 )
-      {
-        TU::setCbfAtDepth( tu, COMPONENT_Cb2, trDepth, ( chromaCbfs.Cb2 ? 1 : 0 ) );
-        TU::setCbfAtDepth( tu, COMPONENT_Cr2, trDepth, ( chromaCbfs.Cr2 ? 1 : 0 ) );
-      }
-#endif
 #else
       TU::setCbf( tu, COMPONENT_Cb, chromaCbfs.Cb );
       TU::setCbf( tu, COMPONENT_Cr, chromaCbfs.Cr );
@@ -2379,7 +2181,7 @@ void CABACReader::transform_tree( CodingStructure &cs, Partitioner &partitioner,
     }
 
 #if JEM_TOOLS && HM_EMT_NSST_AS_IN_JEM
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
     if( trDepth == 0 && TU::getCbfAtDepth( tu, COMPONENT_Y, 0 ) ) emt_cu_flag( cu );
 #else
     if( TU::getCbf( tu, COMPONENT_Y ) ) emt_cu_flag( cu );
@@ -2390,24 +2192,13 @@ void CABACReader::transform_tree( CodingStructure &cs, Partitioner &partitioner,
   }
 }
 
-#if HEVC_USE_RQT
-bool CABACReader::split_transform_flag( unsigned depth )
-{
-  RExt__DECODER_DEBUG_BIT_STATISTICS_CREATE_SET_SIZE( STATS__CABAC_BITS__TRANSFORM_SUBDIV_FLAG, Size( 1 << ( 5 - depth ), 1 << ( 5 - depth ) ) );
-
-  unsigned split = m_BinDecoder.decodeBin( Ctx::TransSubdivFlag( depth ) );
-  DTRACE( g_trace_ctx, D_SYNTAX, "split_transform_flag() ctx=%d split=%d\n", depth, split );
-  return ( split );
-}
-
-#endif
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
 bool CABACReader::cbf_comp( CodingStructure& cs, const CompArea& area, unsigned depth )
 #else
 bool CABACReader::cbf_comp( CodingStructure& cs, const CompArea& area )
 #endif
 {
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
   const unsigned  ctxId   = DeriveCtx::CtxQtCbf( area.compID, depth );
 #else
   const unsigned  ctxId   = DeriveCtx::CtxQtCbf( area.compID );
@@ -2497,11 +2288,7 @@ void CABACReader::transform_unit( TransformUnit& tu, CUCtx& cuCtx, ChromaCbfs& c
   CodingUnit& cu         = *tu.cu;
   bool        lumaOnly   = ( cu.chromaFormat == CHROMA_400 || !tu.blocks[COMPONENT_Cb].valid() );
   bool        cbfLuma    = ( tu.cbf[ COMPONENT_Y ] != 0 );
-#if ENABLE_CHROMA_422
-  bool        cbfChroma  = ( cu.chromaFormat == CHROMA_400 ? false : ( chromaCbfs.Cb || chromaCbfs.Cr || ( cu.cs->pcv->multiBlock422 && ( chromaCbfs.Cb2 || chromaCbfs.Cr2 ) ) ) );
-#else
   bool        cbfChroma  = ( cu.chromaFormat == CHROMA_400 ? false : ( chromaCbfs.Cb || chromaCbfs.Cr ) );
-#endif
 
 
 
@@ -2534,15 +2321,6 @@ void CABACReader::transform_unit( TransformUnit& tu, CUCtx& cuCtx, ChromaCbfs& c
         {
           residual_coding( tu, compID );
         }
-#if ENABLE_CHROMA_422
-        if( cu.cs->pcv->multiBlock422 )
-        {
-          if( tu.cbf[ compID + SCND_TBLOCK_OFFSET ] )
-          {
-            residual_coding( tu, ComponentID(compID+SCND_TBLOCK_OFFSET) );
-          }
-        }
-#endif
       }
     }
   }
@@ -2563,7 +2341,7 @@ void CABACReader::transform_unit_qtbt( TransformUnit& tu, CUCtx& cuCtx, ChromaCb
     for( ComponentID compID = COMPONENT_Cb; compID <= COMPONENT_Cr; compID = ComponentID( compID + 1 ) )
     {
       bool cbf = false;
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
       cbf = cbf_comp( *tu.cs, tu.blocks[compID], tu.depth );
       chromaCbfs.cbf( compID ) = cbf;
       TU::setCbfAtDepth( tu, compID, tu.depth, cbf ? 1 : 0 );
@@ -2589,7 +2367,7 @@ void CABACReader::transform_unit_qtbt( TransformUnit& tu, CUCtx& cuCtx, ChromaCb
   {
     if( !CU::isIntra( cu ) && !chromaCbfs.sigChroma( tu.chromaFormat ) )
     {
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
       TU::setCbfAtDepth( tu, COMPONENT_Y, tu.depth, 1 );
 #else
       TU::setCbf( tu, COMPONENT_Y, true );
@@ -2597,7 +2375,7 @@ void CABACReader::transform_unit_qtbt( TransformUnit& tu, CUCtx& cuCtx, ChromaCb
     }
     else
     {
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
       bool cbf = cbf_comp( *tu.cs, tu.Y(), tu.depth );
       TU::setCbfAtDepth( tu, COMPONENT_Y, tu.depth, cbf ? 1 : 0 );
 #else

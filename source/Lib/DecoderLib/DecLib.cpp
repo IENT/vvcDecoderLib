@@ -84,9 +84,6 @@ bool tryDecodePicture( Picture* pcEncPic, const int expectedPoc, const std::stri
 #endif
       );
 
-#if JEM_COMP
-      pcDecLib->setAssumeJEM( false );
-#endif
       pcDecLib->setDecodedPictureHashSEIEnabled( true );
 
       bFirstCall = false;
@@ -1231,11 +1228,7 @@ Void DecLib::xDecodeSPS( InputNALUnit& nalu )
 {
   SPS* sps = new SPS();
   m_HLSReader.setBitstream( &nalu.getBitstream() );
-#if JEM_COMP
-  m_HLSReader.parseSPS( sps, m_assumeJEM );
-#else
   m_HLSReader.parseSPS( sps );
-#endif
   m_parameterSetManager.storeSPS( sps, nalu.getBitstream().getFifo() );
 
   DTRACE( g_trace_ctx, D_QP_PER_CTU, "CTU Size: %dx%d", sps->getMaxCUWidth(), sps->getMaxCUHeight() );
@@ -1245,11 +1238,7 @@ Void DecLib::xDecodePPS( InputNALUnit& nalu )
 {
   PPS* pps = new PPS();
   m_HLSReader.setBitstream( &nalu.getBitstream() );
-#if JEM_COMP
-  m_HLSReader.parsePPS( pps, m_assumeJEM );
-#else
   m_HLSReader.parsePPS( pps );
-#endif
   m_parameterSetManager.storePPS( pps, nalu.getBitstream().getFifo() );
 }
 

@@ -253,13 +253,6 @@ void IntraPrediction::predIntraAng( const ComponentID compId, PelBuf &piPred, co
   {
     int idxW = std::min( 4, (int)g_aucLog2[iWidth]  - 1 );
     int idxH = std::min( 4, (int)g_aucLog2[iHeight] - 1 );
-#if HEVC_USE_PART_SIZE
-    if( !pu.cs->pcv->only2Nx2N )
-    {
-      CHECK( idxW != idxH, "Non-square partitions not supported by this config" );
-      if( pu.cu->partSize == SIZE_NxN && idxW == 1 ) { idxW = idxH = 0; }
-    }
-#endif
     const int *pPdpcParWidth;
     const int *pPdpcParHeight;
     if( pu.cs->sps->getSpsNext().isPlanarPDPC() )
@@ -1206,11 +1199,7 @@ void IntraPrediction::xFilterReferenceSamples( const Pel* refBufUnfiltered, Pel*
     const bool bilinearLeft  = abs( (bottomLeft + topLeft)  - (2 * refBufUnfiltered[predStride * tuHeight]) ) < threshold; //difference between the
     const bool bilinearAbove = abs( (topLeft    + topRight) - (2 * refBufUnfiltered[             tuWidth ]) ) < threshold; //ends and the middle
 
-#if JEM_COMP
-    if( tuWidth >= 32 && bilinearLeft && bilinearAbove )
-#else
     if( tuWidth >= 32 && tuHeight >= 32 && bilinearLeft && bilinearAbove )
-#endif
 #if !HEVC_USE_INTRA_SMOOTHING_T32
     if( tuWidth > 32 && tuHeight > 32 )
 #endif

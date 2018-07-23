@@ -54,10 +54,6 @@
 #define JEM_TOOLS                                         1 // Defines the inclusion of JEM tools into compiled executable
 
 #endif
-#ifndef JEM_COMP
-#define JEM_COMP                                        ( 1 && JEM_TOOLS )
-
-#endif
 #ifndef JVET_B0051_NON_MPM_MODE
 #define JVET_B0051_NON_MPM_MODE                         ( 1 && JEM_TOOLS )
 
@@ -110,7 +106,6 @@
 #define WCG_WPSNR                                         WCG_EXT 
 
 #if HEVC_TOOLS
-#define HEVC_USE_RQT                                      0
 #define HEVC_USE_INTRA_SMOOTHING_T32                      1
 #define HEVC_USE_INTRA_SMOOTHING_T64                      1
 #define JEM_USE_INTRA_BOUNDARY                            1
@@ -120,9 +115,6 @@
 #define HEVC_USE_MDCS                                     1
 #define HEVC_USE_SIGN_HIDING                              1
 #define HEVC_USE_SCALING_LISTS                            1
-#define HEVC_USE_PART_SIZE                              ( 1                       && HEVC_USE_RQT )
-#define HEVC_422                                        ( 1                       && HEVC_USE_RQT )
-#define HEVC_PARTITIONER                                ( 1 && HEVC_USE_PART_SIZE && HEVC_USE_RQT )
 #define HEVC_VPS                                          1
 #define HEVC_DEPENDENT_SLICES                             1
 #define HEVC_TILES_WPP                                    1
@@ -133,18 +125,8 @@
 
 #define ENABLE_BMS                                        1
 
-#if     JEM_COMP || QTBT_AS_IN_JEM                            // macros which will cause changes in the decoder behavior ara marked with *** - keep them on to retain compatibility with JEM-toolcheck
-#define HM_REPRODUCE_4x4_BLOCK_ESTIMATION_ORDER           0   // estimate 4x4 blocks as in HM
-#define HM_REPRODUCE_422_CHROMA_CONTEXT_RESET_BUG         1   // reproduce 4:2:2 context reset bug in HM
-#define HM_REPRODUCE_CONTEXT_IDX_CALCULATION              1   // reproduce HM context idx calculation
-#define HM_STORE_FRAC_BITS_AND_USE_ROUNDED_BITS           1   // storage and copying of frac bits in ctx classes
-#define HM_REPRODUCE_RDCOST_CALCULATION                   1   // calculate RD cost as in HM
-#define HM_ME_SR_VIOLATION                                1
-#define HM_POSTPONE_SPLIT_BITS                            1
-#define HM_16_6_BIT_EQUAL                                 1   // reproduce behavior of HM 16.6 rather than 16.13
-#define HM_EQ_MOTION_COST                                 1
+#if QTBT_AS_IN_JEM // macros which will cause changes in the decoder behavior ara marked with *** - keep them on to retain compatibility with JEM-toolcheck
 #define HM_NO_ADDITIONAL_SPEEDUPS                         1
-#define HM_NO_ADAPT_PPS_QP                                1   // disable corrected inital QP setup for RA GOP 16
 #define HM_QTBT_AS_IN_JEM                                 1   // ***
 #if     HM_QTBT_AS_IN_JEM
 #define HM_QTBT_AS_IN_JEM_CONTEXT                         1   // ***
@@ -173,7 +155,6 @@
 #error HM_QTBT_AS_IN_JEM_SYNTAX cannot be enabled if ENABLE_BMS is enabled
 #endif
 #endif
-#define ENABLE_CHROMA_422                               ( HEVC_422 ) // enables chroma 4:2:2 sampling format for HM, with QTBT it is implicitly handled, so the special handling can be disabled
 
 
 // ====================================================================================================================
@@ -221,23 +202,14 @@
 #define ENABLE_SIMD_OPT_DIST                            ( 1 && ENABLE_SIMD_OPT )                            ///< SIMD optimization for the distortion calculations(SAD,SSE,HADAMARD), no impact on RD performance
 // End of SIMD optimizations
 
-#define AMP_ENC_SPEEDUP                                   0 ///< encoder only speed-up by AMP mode skipping
-#if AMP_ENC_SPEEDUP
-#define AMP_MRG                                           1 ///< encoder only force merge for AMP partition (no motion search for AMP)
-#endif
 
-#define ENABLE_RQT_INTRA_SPEEDUP                          0 ///< tests one best mode with full rqt
 #define ENABLE_RQT_INTRA_SPEEDUP_MOD                      0 ///< tests two best modes with full rqt
 
-#if ENABLE_RQT_INTRA_SPEEDUP_MOD && !ENABLE_RQT_INTRA_SPEEDUP
+#if ENABLE_RQT_INTRA_SPEEDUP_MOD
 #error
 #endif
 
-#if HM_16_6_BIT_EQUAL
-#define ME_ENABLE_ROUNDING_OF_MVS                         0 ///< 0 (default) = disables rounding of motion vectors when right shifted,  1 = enables rounding
-#else
 #define ME_ENABLE_ROUNDING_OF_MVS                         1 ///< 0 (default) = disables rounding of motion vectors when right shifted,  1 = enables rounding
-#endif
 
 #define RDOQ_CHROMA_LAMBDA                                1 ///< F386: weighting of chroma for RDOQ
 
@@ -432,23 +404,11 @@ enum ComponentID
   COMPONENT_Y         = 0,
   COMPONENT_Cb        = 1,
   COMPONENT_Cr        = 2,
-#if ENABLE_CHROMA_422
-  SCND_TBLOCK_OFFSET  = 2,
-  COMPONENT_Cb2       = COMPONENT_Cb      + SCND_TBLOCK_OFFSET,
-  COMPONENT_Cr2       = COMPONENT_Cr      + SCND_TBLOCK_OFFSET,
-  MAX_NUM_COMPONENT   = 3,
-  MAX_NUM_TBLOCKS     = MAX_NUM_COMPONENT + SCND_TBLOCK_OFFSET
-#else
   MAX_NUM_COMPONENT   = 3,
   MAX_NUM_TBLOCKS     = MAX_NUM_COMPONENT
-#endif
 };
 
-#if ENABLE_CHROMA_422
-#define MAP_CHROMA(c) (ComponentID((c)>=MAX_NUM_COMPONENT?(c)-SCND_TBLOCK_OFFSET:(c)))
-#else
 #define MAP_CHROMA(c) (ComponentID(c))
-#endif
 
 enum InputColourSpaceConversion // defined in terms of conversion prior to input of encoder.
 {
@@ -485,18 +445,7 @@ enum DeblockEdgeDir
 enum PartSize
 {
   SIZE_2Nx2N           = 0,           ///< symmetric motion partition,  2Nx2N
-#if HEVC_USE_PART_SIZE
-  SIZE_2NxN            = 1,           ///< symmetric motion partition,  2Nx N
-  SIZE_Nx2N            = 2,           ///< symmetric motion partition,   Nx2N
-  SIZE_NxN             = 3,           ///< symmetric motion partition,   Nx N
-  SIZE_2NxnU           = 4,           ///< asymmetric motion partition, 2Nx( N/2) + 2Nx(3N/2)
-  SIZE_2NxnD           = 5,           ///< asymmetric motion partition, 2Nx(3N/2) + 2Nx( N/2)
-  SIZE_nLx2N           = 6,           ///< asymmetric motion partition, ( N/2)x2N + (3N/2)x2N
-  SIZE_nRx2N           = 7,           ///< asymmetric motion partition, (3N/2)x2N + ( N/2)x2N
-  NUMBER_OF_PART_SIZES = 8
-#else
   NUMBER_OF_PART_SIZES
-#endif
 };
 
 /// supported prediction type
@@ -1219,15 +1168,9 @@ class ChromaCbfs
 public:
   ChromaCbfs()
     : Cb(true), Cr(true)
-#if ENABLE_CHROMA_422
-    , Cb2(true), Cr2(true)
-#endif
   {}
   ChromaCbfs( bool _cbf )
     : Cb( _cbf ), Cr( _cbf )
-#if ENABLE_CHROMA_422
-    , Cb2( _cbf ), Cr2( _cbf )
-#endif
   {}
 public:
   bool sigChroma( ChromaFormat chromaFormat ) const
@@ -1236,31 +1179,17 @@ public:
     {
       return false;
     }
-#if ENABLE_CHROMA_422
-    else if( chromaFormat == CHROMA_422 )
-    {
-      return ( Cb || Cb2 || Cr || Cr2 );
-    }
-#endif
     return   ( Cb || Cr );
   }
   bool& cbf( ComponentID compID )
   {
-#if ENABLE_CHROMA_422
-    bool *cbfs[MAX_NUM_TBLOCKS] = { nullptr, &Cb, &Cr, &Cb2, &Cr2 };
-#else
     bool *cbfs[MAX_NUM_TBLOCKS] = { nullptr, &Cb, &Cr };
-#endif
 
     return *cbfs[compID];
   }
 public:
   bool Cb;
   bool Cr;
-#if ENABLE_CHROMA_422
-  bool Cb2;
-  bool Cr2;
-#endif
 };
 
 

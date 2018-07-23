@@ -556,10 +556,6 @@ protected:
   int         m_numWppExtraLines;
   bool        m_ensureWppBitEqual;
 #endif
-#if JEM_COMP
-
-  bool        m_generateJEM;
-#endif
 
 public:
   EncCfg()
@@ -1409,11 +1405,6 @@ public:
   int          getNumWppExtraLines()                           const { return m_numWppExtraLines; }
   void         setEnsureWppBitEqual( bool b)                         { m_ensureWppBitEqual = b; }
   bool         getEnsureWppBitEqual()                          const { return m_ensureWppBitEqual; }
-#endif
-#if JEM_COMP
-
-  void         setGenerateJEM( bool b )                              { m_generateJEM = b; }
-  bool         getGenerateJEM()                                const { return m_generateJEM; }
 #endif
 };
 

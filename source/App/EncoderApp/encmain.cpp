@@ -104,9 +104,6 @@ int main(int argc, char* argv[])
   df::program_options_lite::scanArgv( opts, argc, ( const TChar** ) argv, err );
   fprintf( stdout, "[SIMD=%s] ", read_x86_extension( SIMD ) );
 #endif
-#if JEM_COMP
-  fprintf( stdout, "[JEM_COMP] " );
-#endif
 #if ENABLE_TRACING
   fprintf( stdout, "[ENABLE_TRACING] " );
 #endif

@@ -104,9 +104,6 @@ Bool DecAppCfg::parseCfg( Int argc, TChar* argv[] )
 #if JVET_J0090_MEMORY_BANDWITH_MEASURE
   ("CacheCfg",                  m_cacheCfgFile,                       string( "" ), "CacheCfg File" )
 #endif
-#if JEM_COMP
-  ( "AssumeJEM",                m_assumeJEM,                            false, "Assume decoding a JEM bitstream - don't decode the SPSNext-header but set it as it would be set for default JEM configuration" );
-#endif
   ;
 
   po::setDefaults(opts);

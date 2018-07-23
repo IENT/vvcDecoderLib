@@ -199,11 +199,7 @@ public:
 
   void setModeCtrl( EncModeCtrl *modeCtrl ) { m_modeCtrl = modeCtrl;}
 
-#if AMP_MRG
-  Void predInterSearch(CodingUnit& cu, Partitioner& partitioner, Bool bUseMRG = false );
-#else
   Void predInterSearch(CodingUnit& cu, Partitioner& partitioner );
-#endif
 
   /// set ME search range
   Void setAdaptiveSearchRange       ( Int iDir, Int iRefIdx, Int iSearchRange) { CHECK(iDir >= MAX_NUM_REF_LIST_ADAPT_SR || iRefIdx>=Int(MAX_IDX_ADAPT_SR), "Invalid index"); m_aaiAdaptSR[iDir][iRefIdx] = iSearchRange; }
@@ -395,11 +391,6 @@ public:
   Void xEstimateInterResidualQT   (CodingStructure &cs, Partitioner &partitioner, Distortion *puiZeroDist = NULL);
   UInt64 xGetSymbolFracBitsInter  (CodingStructure &cs, Partitioner &partitioner);
 
-#if HM_REPRODUCE_4x4_BLOCK_ESTIMATION_ORDER
-private:
-
-  Void xChangeInterTUsFromSearchToCode( CodingStructure &cs, Partitioner &partitioner );
-#endif
 };// END CLASS DEFINITION EncSearch
 
 //! \}
