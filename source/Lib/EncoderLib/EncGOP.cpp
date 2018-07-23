@@ -50,6 +50,7 @@
 #include <math.h>
 #include <deque>
 #include <chrono>
+#include <cinttypes>
 
 #include "CommonLib/UnitTools.h"
 #include "CommonLib/dtrace_codingstruct.h"
@@ -3223,6 +3224,17 @@ Void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUn
          uibits );
 
     msg( NOTICE, " [Y %6.4lf dB    U %6.4lf dB    V %6.4lf dB]", dPSNR[COMPONENT_Y], dPSNR[COMPONENT_Cb], dPSNR[COMPONENT_Cr] );
+    
+    if (m_pcEncLib->getPrintHexPsnr())
+    {
+      uint64_t xPsnr[MAX_NUM_COMPONENT];
+      for (int i = 0; i < MAX_NUM_COMPONENT; i++)
+      {
+        xPsnr[i] = *reinterpret_cast<uint64_t *>(&dPSNR[i]);
+      }
+      msg(NOTICE, " [xY %16" PRIx64 " xU %16" PRIx64 " xV %16" PRIx64 "]", xPsnr[COMPONENT_Y], xPsnr[COMPONENT_Cb], xPsnr[COMPONENT_Cr]);
+    }
+
     if( printFrameMSE )
     {
       msg( NOTICE, " [Y MSE %6.4lf  U MSE %6.4lf  V MSE %6.4lf]", MSEyuvframe[COMPONENT_Y], MSEyuvframe[COMPONENT_Cb], MSEyuvframe[COMPONENT_Cr] );
