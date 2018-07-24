@@ -1716,6 +1716,12 @@ void EncCu::xCheckRDCostMerge2Nx2N( CodingStructure *&tempCS, CodingStructure *&
 
       tempCS->initStructData( encTestMode.qp, encTestMode.lossless );
     }
+#if JVET_K0352_MERGE_ENCOPT
+    else
+    {
+      uiNumMrgSATDCand = mergeCtx.numValidMergeCand;
+    }
+#endif
   }
 
   const UInt iteration = encTestMode.lossless ? 1 : 2;
