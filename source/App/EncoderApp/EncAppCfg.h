@@ -41,6 +41,9 @@
 #include "CommonLib/CommonDef.h"
 
 #include "EncoderLib/EncCfg.h"
+#if EXTENSION_360_VIDEO
+#include "AppEncHelper360/TExt360AppEncCfg.h"
+#endif
 #include <sstream>
 #include <vector>
 //! \ingroup EncoderApp
@@ -81,7 +84,10 @@ protected:
   UInt      m_temporalSubsampleRatio;                         ///< temporal subsample ratio, 2 means code every two frames
   Int       m_iSourceWidth;                                   ///< source width in pixel
   Int       m_iSourceHeight;                                  ///< source height in pixel (when interlaced = field height)
-
+#if EXTENSION_360_VIDEO
+  Int       m_inputFileWidth;                                 ///< width of image in input file  (this is equivalent to sourceWidth,  if sourceWidth  is not subsequently altered due to padding)
+  Int       m_inputFileHeight;                                ///< height of image in input file (this is equivalent to sourceHeight, if sourceHeight is not subsequently altered due to padding)
+#endif
   Int       m_iSourceHeightOrg;                               ///< original source height in pixel (when interlaced = frame height)
 
   Bool      m_isField;                                        ///< enable field coding
@@ -536,6 +542,12 @@ protected:
   bool        m_stopAfterFFtoPOC;
   bool        m_bs2ModPOCAndType;
   bool        m_forceDecodeBitstream1;
+
+#if EXTENSION_360_VIDEO
+  TExt360AppEncCfg m_ext360;
+  friend class TExt360AppEncCfg;
+  friend class TExt360AppEncTop;
+#endif
 
 
   // internal member functions

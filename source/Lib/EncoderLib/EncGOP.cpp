@@ -3138,6 +3138,9 @@ Void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUn
 #endif
   }
 
+#if EXTENSION_360_VIDEO
+  m_ext360.calculatePSNRs(pcPic);
+#endif
 
   /* calculate the size of the access unit, excluding:
    *  - any AnnexB contributions (start_code_prefix, zero_byte, etc.,)
@@ -3174,20 +3177,32 @@ Void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUn
 
   //===== add PSNR =====
   m_gcAnalyzeAll.addResult (dPSNR, (Double)uibits, MSEyuvframe);
+#if EXTENSION_360_VIDEO
+  m_ext360.addResult(m_gcAnalyzeAll);
+#endif
   if (pcSlice->isIntra())
   {
     m_gcAnalyzeI.addResult (dPSNR, (Double)uibits, MSEyuvframe);
     *PSNR_Y = dPSNR[COMPONENT_Y];
+#if EXTENSION_360_VIDEO
+    m_ext360.addResult(m_gcAnalyzeI);
+#endif
   }
   if (pcSlice->isInterP())
   {
     m_gcAnalyzeP.addResult (dPSNR, (Double)uibits, MSEyuvframe);
     *PSNR_Y = dPSNR[COMPONENT_Y];
+#if EXTENSION_360_VIDEO
+    m_ext360.addResult(m_gcAnalyzeP);
+#endif
   }
   if (pcSlice->isInterB())
   {
     m_gcAnalyzeB.addResult (dPSNR, (Double)uibits, MSEyuvframe);
     *PSNR_Y = dPSNR[COMPONENT_Y];
+#if EXTENSION_360_VIDEO
+    m_ext360.addResult(m_gcAnalyzeB);
+#endif
   }
 #if WCG_WPSNR
   if (useLumaWPSNR)
@@ -3224,6 +3239,10 @@ Void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUn
       }
       msg(NOTICE, " [xY %16" PRIx64 " xU %16" PRIx64 " xV %16" PRIx64 "]", xPsnr[COMPONENT_Y], xPsnr[COMPONENT_Cb], xPsnr[COMPONENT_Cr]);
     }
+
+#if EXTENSION_360_VIDEO
+    m_ext360.printPerPOCInfo(NOTICE);
+#endif
 
     if( printFrameMSE )
     {
