@@ -1703,7 +1703,13 @@ void CABACReader::prediction_unit( PredictionUnit& pu, MergeCtx& mrgCtx )
         mvd_coding( affLT );
         mvd_coding( affRT );
 
+#if JVET_K0220_ENC_CTRL
+        pu.mvdAffi[REF_PIC_LIST_0][0] = affLT;
+        pu.mvdAffi[REF_PIC_LIST_0][1] = affRT;
+#else
         PU::setAllAffineMvd( pu.getMotionBuf(), affLT, affRT, REF_PIC_LIST_0, pu.cs->pcv->rectCUs );
+
+#endif
       }
       else
 #endif
@@ -1732,7 +1738,12 @@ void CABACReader::prediction_unit( PredictionUnit& pu, MergeCtx& mrgCtx )
         mvd_coding( affLT );
         mvd_coding( affRT );
 
+#if JVET_K0220_ENC_CTRL
+        pu.mvdAffi[REF_PIC_LIST_1][0] = affLT;
+        pu.mvdAffi[REF_PIC_LIST_1][1] = affRT;
+#else
         PU::setAllAffineMvd( pu.getMotionBuf(), affLT, affRT, REF_PIC_LIST_1, pu.cs->pcv->rectCUs );
+#endif
       }
 #endif
       else

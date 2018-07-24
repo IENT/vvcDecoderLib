@@ -46,6 +46,10 @@
 #include "CommonLib/Unit.h"
 #include "CommonLib/UnitPartitioner.h"
 
+#if REUSE_CU_RESULTS
+#include "DecoderLib/DecCu.h"
+#endif
+
 #include "CABACWriter.h"
 #include "IntraSearch.h"
 #include "InterSearch.h"
@@ -64,6 +68,9 @@ class EncSlice;
 
 /// CU encoder class
 class EncCu
+#if REUSE_CU_RESULTS
+  : DecCu
+#endif
 {
 private:
 
@@ -180,9 +187,13 @@ protected:
                               ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode );
 #endif
 #if JEM_TOOLS
-  void xEncodeInterResidual( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode, int residualPass = 0, CodingStructure* imvCS = NULL, int emtMode = 1, bool* bestHasNonResi = NULL );
+  void xEncodeInterResidual   ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode, int residualPass = 0, CodingStructure* imvCS = NULL, int emtMode = 1, bool* bestHasNonResi = NULL );
 #else
-  void xEncodeInterResidual( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode, int residualPass, bool* bestHasNonResi );
+  void xEncodeInterResidual   ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode, int residualPass, bool* bestHasNonResi );
+#endif
+#if REUSE_CU_RESULTS
+
+  void xReuseCachedResult     ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &Partitioner );
 #endif
 };
 

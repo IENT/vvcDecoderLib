@@ -209,6 +209,12 @@ Void DecCu::xIntraRecBlk( TransformUnit& tu, const ComponentID compID )
 #if !KEEP_PRED_AND_RESI_SIGNALS
   pReco.copyFrom( piPred );
 #endif
+#if REUSE_CU_RESULTS
+  if( cs.pcv->isEncoder )
+  {
+    cs.picture->getRecoBuf( area ).copyFrom( pReco );
+  }
+#endif
 }
 
 Void DecCu::xReconIntraQT( CodingUnit &cu )
@@ -507,7 +513,11 @@ Void DecCu::xDeriveCUMV( CodingUnit &cu )
     }
     else
     {
+#if REUSE_CU_RESULTS
+      if( cu.imv && !cu.cs->pcv->isEncoder )
+#else
       if( cu.imv )
+#endif
       {
         PU::applyImv( pu, mrgCtx, m_pcInterPred );
       }
@@ -530,11 +540,16 @@ Void DecCu::xDeriveCUMV( CodingUnit &cu )
               //    Mv mv[3];
               CHECK( pu.refIdx[eRefList] < 0, "Unexpected negative refIdx." );
 
+#if JVET_K0220_ENC_CTRL
+              Mv mvLT = affineAMVPInfo.mvCandLT[mvp_idx] + pu.mvdAffi[eRefList][0];
+              Mv mvRT = affineAMVPInfo.mvCandRT[mvp_idx] + pu.mvdAffi[eRefList][1];
+#else
               Position posLT = pu.Y().topLeft();
               Position posRT = pu.Y().topRight();
 
               Mv mvLT = affineAMVPInfo.mvCandLT[mvp_idx] + pu.getMotionInfo( posLT ).mvdAffi[eRefList];
               Mv mvRT = affineAMVPInfo.mvCandRT[mvp_idx] + pu.getMotionInfo( posRT ).mvdAffi[eRefList];
+#endif
 
               CHECK( !mvLT.highPrec, "unexpected lp mv" );
               CHECK( !mvRT.highPrec, "unexpected lp mv" );

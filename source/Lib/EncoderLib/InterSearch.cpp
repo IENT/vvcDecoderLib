@@ -913,19 +913,24 @@ Void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
 
     m_pcRdCost->selectMotionLambda( cu.transQuantBypass );
 
+#if !JVET_K0220_ENC_CTRL
     Bool bFastSkipBi = false;
     if( auto slsCtrl = dynamic_cast< SaveLoadEncInfoCtrl* >( m_modeCtrl ) )
     {
       bFastSkipBi = ( LOAD_ENC_INFO == slsCtrl->getSaveLoadTag( pu ) && 3 != slsCtrl->getSaveLoadInterDir( pu ) );
     }
 
+#endif
 #if JEM_TOOLS
+#if !JVET_K0220_ENC_CTRL
     Bool bFastSkipAffine = false;
     if( pu.cs->sps->getSpsNext().getUseQTBT() && m_pcEncCfg->getUseSaveLoadEncInfo() )
     {
       SaveLoadEncInfoCtrl* modeCtrl = dynamic_cast<SaveLoadEncInfoCtrl*>( m_modeCtrl );
       bFastSkipAffine = modeCtrl && LOAD_ENC_INFO == modeCtrl->getSaveLoadTag( pu ) && !modeCtrl->getSaveLoadAffineFlag( pu );
     }
+
+#endif
     unsigned imvShift = pu.cu->imv << 1;
 #endif
 
@@ -1021,13 +1026,21 @@ Void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
       }
 
 #if JEM_TOOLS
+#if JVET_K0220_ENC_CTRL
+      if( cu.Y().width > 8 && cu.Y().height > 8 && cu.partSize == SIZE_2Nx2N && cu.slice->getSPS()->getSpsNext().getUseAffine() && !cu.LICFlag && cu.imv == 0 )
+#else
       if( cu.Y().width > 8 && cu.Y().height > 8 && cu.partSize == SIZE_2Nx2N && cu.slice->getSPS()->getSpsNext().getUseAffine() && !cu.LICFlag && cu.imv == 0 && !bFastSkipAffine )
+#endif
       {
         ::memcpy( cMvHevcTemp, cMvTemp, sizeof( cMvTemp ) );
       }
 #endif
       //  Bi-predictive Motion estimation
+#if JVET_K0220_ENC_CTRL
+      if( ( cs.slice->isInterB() ) && ( PU::isBipredRestriction( pu ) == false ) )
+#else
       if ( (cs.slice->isInterB()) && ( PU::isBipredRestriction(pu) == false)  && !bFastSkipBi )
+#endif
       {
         cMvBi[0] = cMv[0];
         cMvBi[1] = cMv[1];
@@ -1333,7 +1346,11 @@ Void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
 #endif
     CHECK( !( !cu.cs->pcv->only2Nx2N || cu.partSize == SIZE_2Nx2N ), "Unexpected part size for QTBT." );
 #if JEM_TOOLS
+#if JVET_K0220_ENC_CTRL
+    if( cu.Y().width > 8 && cu.Y().height > 8 && cu.partSize == SIZE_2Nx2N && cu.slice->getSPS()->getSpsNext().getUseAffine() && !cu.LICFlag && cu.imv == 0 )
+#else
     if( cu.Y().width > 8 && cu.Y().height > 8 && cu.partSize == SIZE_2Nx2N && cu.slice->getSPS()->getSpsNext().getUseAffine() && !cu.LICFlag && cu.imv == 0 && !bFastSkipAffine )
+#endif
     {
       // save normal hevc result
       UInt uiMRGIndex = pu.mergeIdx;
@@ -1354,7 +1371,11 @@ Void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
       cHevcMvField[1].setMvField( pu.mv[REF_PIC_LIST_1], pu.refIdx[REF_PIC_LIST_1] );
 
       // do affine ME & Merge
+#if JVET_K0220_ENC_CTRL
+      xPredAffineInterSearch( pu, origBuf, puIdx, uiLastModeTemp, uiAffineCost, cMvHevcTemp );
+#else
       xPredAffineInterSearch( pu, origBuf, puIdx, uiLastModeTemp, uiAffineCost, cMvHevcTemp, bFastSkipBi );
+#endif
 
       if ( uiHevcCost <= uiAffineCost )
       {
@@ -2478,8 +2499,12 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
                                           Int                   puIdx,
                                           UInt&                 lastMode,
                                           Distortion&           affineCost,
+#if JVET_K0220_ENC_CTRL
+                                          Mv                    hevcMv[2][33] )
+#else
                                           Mv                    hevcMv[2][33],
                                           Bool                  bFastSkipBi )
+#endif
 {
   const Slice &slice = *pu.cu->slice;
 
@@ -2656,7 +2681,11 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
   } // end Uni-prediction
 
   // Bi-directional prediction
+#if JVET_K0220_ENC_CTRL
+  if ( slice.isInterB() && !PU::isBipredRestriction(pu) )
+#else
   if ( slice.isInterB() && !PU::isBipredRestriction(pu) && !bFastSkipBi )
+#endif
   {
     // Set as best list0 and list1
     iRefIdxBi[0] = iRefIdx[0];
@@ -2855,8 +2884,15 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
       aacMvd[1][iVerIdx] = cMvBi[1][iVerIdx] - cMvPredBi[1][iRefIdxBi[1]][iVerIdx];
     }
 
+#if JVET_K0220_ENC_CTRL
+    pu.mvdAffi[REF_PIC_LIST_0][0] = aacMvd[0][0];
+    pu.mvdAffi[REF_PIC_LIST_0][1] = aacMvd[0][1];
+    pu.mvdAffi[REF_PIC_LIST_1][0] = aacMvd[1][0];
+    pu.mvdAffi[REF_PIC_LIST_1][1] = aacMvd[1][1];
+#else
     PU::setAllAffineMvd( pu.getMotionBuf(), aacMvd[0][0], aacMvd[0][1], REF_PIC_LIST_0, pu.cs->pcv->rectCUs );
     PU::setAllAffineMvd( pu.getMotionBuf(), aacMvd[1][0], aacMvd[1][1], REF_PIC_LIST_1, pu.cs->pcv->rectCUs );
+#endif
 
     pu.interDir = 3;
 
@@ -2877,8 +2913,16 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
     {
       aacMvd[0][iVerIdx] = aacMv[0][iVerIdx] - cMvPred[0][iRefIdx[0]][iVerIdx];
     }
+
+#if JVET_K0220_ENC_CTRL
+    pu.mvdAffi[REF_PIC_LIST_0][0] = aacMvd[0][0];
+    pu.mvdAffi[REF_PIC_LIST_0][1] = aacMvd[0][1];
+#else
     PU::setAllAffineMvd( pu.getMotionBuf(), aacMvd[0][0], aacMvd[0][1], REF_PIC_LIST_0, pu.cs->pcv->rectCUs );
+#endif
+
     pu.interDir = 1;
+
     pu.mvpIdx[REF_PIC_LIST_0] = aaiMvpIdx[0][iRefIdx[0]];
     pu.mvpNum[REF_PIC_LIST_0] = aaiMvpNum[0][iRefIdx[0]];
   }
@@ -2895,8 +2939,15 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
       aacMvd[1][iVerIdx] = aacMv[1][iVerIdx] - cMvPred[1][iRefIdx[1]][iVerIdx];
     }
 
+#if JVET_K0220_ENC_CTRL
+    pu.mvdAffi[REF_PIC_LIST_1][0] = aacMvd[1][0];
+    pu.mvdAffi[REF_PIC_LIST_1][1] = aacMvd[1][1];
+#else
     PU::setAllAffineMvd( pu.getMotionBuf(), aacMvd[1][0], aacMvd[1][1], REF_PIC_LIST_1, pu.cs->pcv->rectCUs );
+#endif
+
     pu.interDir = 2;
+
     pu.mvpIdx[REF_PIC_LIST_1] = aaiMvpIdx[1][iRefIdx[1]];
     pu.mvpNum[REF_PIC_LIST_1] = aaiMvpNum[1][iRefIdx[1]];
   }

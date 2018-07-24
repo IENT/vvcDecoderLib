@@ -3288,6 +3288,7 @@ Void PU::setAllAffineMv( PredictionUnit& pu, Mv affLT, Mv affRT, Mv affLB, RefPi
   mb.at(            0, mb.height - 1 ).mv[eRefList] = affLB;
   mb.at( mb.width - 1, mb.height - 1 ).mv[eRefList] = mv;
 }
+#if !JVET_K0220_ENC_CTRL
 
 Void PU::setAllAffineMvd( MotionBuf mb, const Mv& affLT, const Mv& affRT, RefPicList eRefList, Bool rectCUs )
 {
@@ -3320,6 +3321,7 @@ Void PU::setAllAffineMvd( MotionBuf mb, const Mv& affLT, const Mv& affRT, RefPic
     mb.at( mb.width-1, mb.height-1 ).mvdAffi[eRefList] = affRT - affLT;
   }
 }
+#endif
 #endif
 
 void PU::spanMotionInfo( PredictionUnit &pu, const MergeCtx &mrgCtx )

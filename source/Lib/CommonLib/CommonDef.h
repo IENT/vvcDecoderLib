@@ -285,7 +285,9 @@ static const Int MAX_CU_TILING_PARTITIONS = 1 << ( MAX_LOG2_DIFF_CU_TR_SIZE << 1
 #endif
 
 static const Int JVET_C0024_ZERO_OUT_TH =                          32;
+#if !JVET_K0220_ENC_CTRL
 static const Double JVET_D0077_SPLIT_DECISION_COST_SCALE =       1.05;
+#endif
 
 static const Int MAX_NUM_PART_IDXS_IN_CTU_WIDTH = MAX_CU_SIZE/MIN_PU_SIZE; ///< maximum number of partition indices across the width of a CTU (or height of a CTU)
 static const Int SCALING_LIST_REM_NUM =                             6;
@@ -355,7 +357,9 @@ static const SplitSeries SPLIT_DMULT        =                       5;
 static const SplitSeries SPLIT_MASK         =                      31;      ///< = (1 << SPLIT_BITS) - 1
 
 static const Int    SKIP_DEPTH =                                    3;
+#if !JVET_K0220_ENC_CTRL
 static const Int    SKIPHORNOVERQT_DEPTH_TH =                       2;
+#endif
 static const Int    PICTURE_DISTANCE_TH =                           1;
 static const Int    FAST_SKIP_DEPTH =                               2;
 

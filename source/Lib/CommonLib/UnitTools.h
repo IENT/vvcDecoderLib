@@ -150,7 +150,9 @@ namespace PU
   void getAffineMergeCand             (const PredictionUnit &pu, MvField (*mvFieldNeighbours)[3], unsigned char &interDirNeighbours, int &numValidMergeCand );
   void setAllAffineMvField            (      PredictionUnit &pu, MvField *mvField, RefPicList eRefList );
   void setAllAffineMv                 (      PredictionUnit &pu, Mv affLT, Mv affRT, Mv affLB, RefPicList eRefList );
+#if !JVET_K0220_ENC_CTRL
   void setAllAffineMvd                (      MotionBuf mb, const Mv& affLT, const Mv& affRT, RefPicList eRefList, Bool useQTBT );
+#endif
   bool isBIOLDB                       (const PredictionUnit &pu);
 #endif
   bool isBiPredFromDifferentDir       (const PredictionUnit &pu);
