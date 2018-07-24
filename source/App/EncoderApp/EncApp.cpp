@@ -44,6 +44,9 @@
 
 #include "EncApp.h"
 #include "EncoderLib/AnnexBwrite.h"
+#if EXTENSION_360_VIDEO
+#include "AppEncHelper360/TExt360AppEncTop.h"
+#endif
 
 using namespace std;
 
@@ -566,8 +569,11 @@ Void EncApp::xCreateLib( std::list<PelUnitBuf*>& recBufList
 {
   // Video I/O
   m_cVideoIOYuvInputFile.open( m_inputFileName,     false, m_inputBitDepth, m_MSBExtendedBitDepth, m_internalBitDepth );  // read  mode
+#if EXTENSION_360_VIDEO
+  m_cVideoIOYuvInputFile.skipFrames(m_FrameSkip, m_inputFileWidth, m_inputFileHeight, m_InputChromaFormatIDC);
+#else
   m_cVideoIOYuvInputFile.skipFrames(m_FrameSkip, m_iSourceWidth - m_aiPad[0], m_iSourceHeight - m_aiPad[1], m_InputChromaFormatIDC);
-
+#endif
   if (!m_reconFileName.empty())
   {
     m_cVideoIOYuvReconFile.open(m_reconFileName, true, m_outputBitDepth, m_outputBitDepth, m_internalBitDepth);  // write mode
@@ -641,11 +647,25 @@ Void EncApp::encode()
 
   orgPic.create( unitArea );
   trueOrgPic.create( unitArea );
+#if EXTENSION_360_VIDEO
+  TExt360AppEncTop           ext360(*this, m_cEncLib.getGOPEncoder()->getExt360Data(), *(m_cEncLib.getGOPEncoder()), orgPic);
+#endif
 
   while ( !bEos )
   {
     // read input YUV file
+#if EXTENSION_360_VIDEO
+    if (ext360.isEnabled())
+    {
+      ext360.read(m_cVideoIOYuvInputFile, orgPic, trueOrgPic, ipCSC);
+    }
+    else
+    {
+      m_cVideoIOYuvInputFile.read(orgPic, trueOrgPic, ipCSC, m_aiPad, m_InputChromaFormatIDC, m_bClipInputVideoToRec709Range);
+    }
+#else
     m_cVideoIOYuvInputFile.read( orgPic, trueOrgPic, ipCSC, m_aiPad, m_InputChromaFormatIDC, m_bClipInputVideoToRec709Range );
+#endif
 
     // increase number of received frames
     m_iFrameRcvd++;
@@ -683,7 +703,11 @@ Void EncApp::encode()
     // temporally skip frames
     if( m_temporalSubsampleRatio > 1 )
     {
+#if EXTENSION_360_VIDEO
+      m_cVideoIOYuvInputFile.skipFrames(m_temporalSubsampleRatio - 1, m_inputFileWidth, m_inputFileHeight, m_InputChromaFormatIDC);
+#else
       m_cVideoIOYuvInputFile.skipFrames(m_temporalSubsampleRatio-1, m_iSourceWidth - m_aiPad[0], m_iSourceHeight - m_aiPad[1], m_InputChromaFormatIDC);
+#endif
     }
   }
 

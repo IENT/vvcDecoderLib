@@ -189,7 +189,11 @@ Bool VideoIOYuv::isFail()
  * This function correctly handles cases where the input file is not
  * seekable, by consuming bytes.
  */
+#if EXTENSION_360_VIDEO
+Void VideoIOYuv::skipFrames(Int numFrames, UInt width, UInt height, ChromaFormat format)
+#else
 Void VideoIOYuv::skipFrames(UInt numFrames, UInt width, UInt height, ChromaFormat format)
+#endif
 {
   if (!numFrames)
   {
@@ -272,8 +276,11 @@ static Bool readPlane(Pel* dst,
   const UInt height_dest      = height444>>csy_dest;
   const UInt pad_x_dest       = pad_x444>>csx_dest;
   const UInt pad_y_dest       = pad_y444>>csy_dest;
+#if EXTENSION_360_VIDEO
+  const UInt stride_dest = stride444;
+#else
   const UInt stride_dest      = stride444>>csx_dest;
-
+#endif
   const UInt full_width_dest  = width_dest+pad_x_dest;
   const UInt full_height_dest = height_dest+pad_y_dest;
 
@@ -709,8 +716,9 @@ Bool VideoIOYuv::read ( PelUnitBuf& pic, PelUnitBuf& picOrg, const InputColourSp
   }
 
   const PelBuf areaBufY = picOrg.get(COMPONENT_Y);
+#if !EXTENSION_360_VIDEO
   const UInt stride444      = areaBufY.stride;
-
+#endif
   // compute actual YUV width & height excluding padding size
   const UInt pad_h444       = aiPad[0];
   const UInt pad_v444       = aiPad[1];
@@ -732,6 +740,9 @@ Bool VideoIOYuv::read ( PelUnitBuf& pic, PelUnitBuf& picOrg, const InputColourSp
     const Pel minval = b709Compliance? ((   1 << (desired_bitdepth - 8))   ) : 0;
     const Pel maxval = b709Compliance? ((0xff << (desired_bitdepth - 8)) -1) : (1 << desired_bitdepth) - 1;
     Pel* const dst = picOrg.get(compID).bufAt(0,0);
+#if EXTENSION_360_VIDEO
+    const UInt stride444 = picOrg.get(compID).stride;
+#endif
     if ( ! readPlane( dst, m_cHandle, is16bit, stride444, width444, height444, pad_h444, pad_v444, compID, picOrg.chromaFormat, format, m_fileBitdepth[chType]))
     {
       return false;
@@ -742,9 +753,13 @@ Bool VideoIOYuv::read ( PelUnitBuf& pic, PelUnitBuf& picOrg, const InputColourSp
       scalePlane( picOrg.get(compID), m_bitdepthShift[chType], minval, maxval);
     }
   }
-
+  
+#if EXTENSION_360_VIDEO
+  if (pic.chromaFormat != NUM_CHROMA_FORMAT)
+    ColourSpaceConvert(picOrg, pic, ipcsc, true);
+#else
   ColourSpaceConvert( picOrg, pic, ipcsc, true);
-
+#endif
   return true;
 }
 

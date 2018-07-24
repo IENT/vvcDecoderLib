@@ -2,7 +2,11 @@
 cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
 
 # project name
-project( NextSoftware )
+if( EXTENSION_360_VIDEO )
+  project( NextSoftware360 )
+else()
+  project( NextSoftware )
+endif()
 
 # use ccache
 find_program( CCACHE_FOUND ccache )
@@ -23,6 +27,7 @@ if( CMAKE_SYSTEM_NAME STREQUAL "Linux" )
   endif()
 endif()
 
+set( EXTENSION_360_VIDEO OFF CACHE BOOL "If EXTENSION_360_VIDEO is on, 360Lib will be added" )
 set( SKIP_SVN_REVISION OFF CACHE BOOL "Don't add SVN path and revision info to the encoder and decoder output" )
 set( SET_ENABLE_TRACING OFF CACHE BOOL "Set ENABLE_TRACING as a compiler flag" )
 set( ENABLE_TRACING OFF CACHE BOOL "If SET_ENABLE_TRACING is on, it will be set to this value" )
@@ -125,6 +130,10 @@ endif()
 
 # add needed subdirectories
 add_subdirectory( "source/Lib/CommonLib" )
+if( EXTENSION_360_VIDEO )
+  add_subdirectory( "source/Lib/Lib360" )
+  add_subdirectory( "source/Lib/AppEncHelper360" )
+endif()
 add_subdirectory( "source/Lib/DecoderAnalyserLib" )
 add_subdirectory( "source/Lib/DecoderLib" )
 add_subdirectory( "source/Lib/EncoderLib" )
@@ -135,3 +144,6 @@ add_subdirectory( "source/App/DecoderApp" )
 add_subdirectory( "source/App/EncoderApp" )
 add_subdirectory( "source/App/SEIRemovalApp" )
 add_subdirectory( "source/App/Parcat" )
+if( EXTENSION_360_VIDEO )
+  add_subdirectory( "source/App/utils/360ConvertApp" )
+endif()
