@@ -174,15 +174,7 @@ protected:
 
   ChromaCbfs xRecurIntraChromaCodingQT  (CodingStructure &cs, Partitioner& pm);
 
-#if ENABLE_RQT_INTRA_SPEEDUP
-#if JEM_TOOLS
-  Void xRecurIntraCodingLumaQT    ( CodingStructure &cs, Partitioner& pm, const Bool &checkFirst, int savedEmtIndex = -1 );
-#else
-  Void xRecurIntraCodingLumaQT    ( CodingStructure &cs, Partitioner& pm, const Bool &checkFirst );
-#endif
-#else
   Void xRecurIntraCodingLumaQT    ( CodingStructure &cs, Partitioner& pm );
-#endif
 
 
   void encPredIntraDPCM( const ComponentID &compID, PelBuf &pOrg, PelBuf &pDst, const UInt &uiDirMode );

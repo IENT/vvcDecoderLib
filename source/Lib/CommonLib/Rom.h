@@ -198,29 +198,6 @@ extern const DecisionTreeTemplate g_mtSplitDTT;
 // decision tree for QTBT split
 extern const DecisionTreeTemplate g_qtbtSplitDTT;
 
-#if HEVC_USE_PART_SIZE
-enum PartSizeDecisionTree
-{
-  DTT_PS_2Nx2N  = 0,           // end-node - id same as in 'enum PartSize'
-  DTT_PS_2NxN   = 1,           // end-node - id same as in 'enum PartSize'
-  DTT_PS_Nx2N   = 2,           // end-node - id same as in 'enum PartSize'
-  DTT_PS_NxN    = 3,           // end-node - id same as in 'enum PartSize'
-  DTT_PS_2NxnU  = 4,           // end-node - id same as in 'enum PartSize'
-  DTT_PS_2NxnD  = 5,           // end-node - id same as in 'enum PartSize'
-  DTT_PS_nLx2N  = 6,           // end-node - id same as in 'enum PartSize'
-  DTT_PS_nRx2N  = 7,           // end-node - id same as in 'enum PartSize'
-  DTT_PS_IS_2Nx2N,             // decision node
-  DTT_PS_IS_2Nx,               // decision node
-  DTT_PS_IS_NOT_NxN,           // decision node
-  DTT_PS_IS_2NxN,              // decision node
-  DTT_PS_IS_Nx2N,              // decision node
-  DTT_PS_IS_nRx2N,             // decision node
-  DTT_PS_IS_2NxnD              // decision node
-};
-
-extern const DecisionTreeTemplate g_partSizeDTT;
-
-#endif
 #if JEM_TOOLS
 enum IntraLumaMpmDecisionTree
 {

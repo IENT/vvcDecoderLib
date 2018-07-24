@@ -500,7 +500,7 @@ Void TransformUnit::initData()
     transformSkip[i] = false;
     compAlpha[i]     = 0;
   }
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
   depth              = 0;
 #endif
 #if JEM_TOOLS
@@ -539,7 +539,7 @@ TransformUnit& TransformUnit::operator=(const TransformUnit& other)
     transformSkip[i] = other.transformSkip[i];
     compAlpha[i]     = other.compAlpha[i];
   }
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
   depth              = other.depth;
 #endif
 #if JEM_TOOLS
@@ -564,7 +564,7 @@ Void TransformUnit::copyComponentFrom(const TransformUnit& other, const Componen
   transformSkip[i] = other.transformSkip[i];
   compAlpha[i]     = other.compAlpha[i];
 
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
   depth            = other.depth;
 
 #endif

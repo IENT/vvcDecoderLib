@@ -81,9 +81,6 @@ private:
   ParameterSetManager     m_parameterSetManager;  // storage for parameter sets
   Slice*                  m_apcSlicePilot;
 
-#if JEM_COMP
-  bool                    m_assumeJEM;
-#endif
 
   SEIMessages             m_SEIs; ///< List of SEI messages that have been received before the first slice and between slices, excluding prefix SEIs...
 
@@ -162,10 +159,6 @@ public:
   Void  setDecodedSEIMessageOutputStream(std::ostream *pOpStream) { m_pDecodedSEIOutputStream = pOpStream; }
   UInt  getNumberOfChecksumErrorsDetected() const { return m_numberOfChecksumErrorsDetected; }
 
-#if JEM_COMP
-  bool  getAssumeJEM() const { return m_assumeJEM; }
-  void  setAssumeJEM( bool b ) { m_assumeJEM = b; }
-#endif
 protected:
   Void  xUpdateRasInit(Slice* slice);
 

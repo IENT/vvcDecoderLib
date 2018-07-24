@@ -82,9 +82,6 @@ protected:
 #if JEM_TOOLS
   static const uint16_t     m_InistateToCount [128];          //       JMP   MP   MPI
 #endif
-#if HM_REPRODUCE_CONTEXT_IDX_CALCULATION
-  static const double       m_StateToProbLPS  [ 64];          // Std
-#endif
 };
 
 
@@ -125,10 +122,6 @@ public:
   uint16_t        getState          ()                            const { return    uint16_t(m_State); }
   void            setState          ( uint16_t pState )                 { m_State = uint8_t ( pState); }
 public:
-#if HM_REPRODUCE_CONTEXT_IDX_CALCULATION
-  double          getProb0          ()                            const { return ( mps() ? m_StateToProbLPS[state()] : 1.0-m_StateToProbLPS[state()] );  }
-  double          getProb1          ()                            const { return ( mps() ? 1.0-m_StateToProbLPS[state()] : m_StateToProbLPS[state()] );  }
-#endif
   uint64_t        estFracExcessBits ( const BinProbModel_Std& r ) const
   {
     return ( ((uint64_t)m_EstFracProb[m_State^0]) * m_EstFracBits[r.m_State^0]
@@ -176,10 +169,6 @@ public:
   uint16_t        getState          ()                            const { return state(); }
   void            setState          ( uint16_t pState )                 { m_P1 = m_P0 = pState; }
 public:
-#if HM_REPRODUCE_CONTEXT_IDX_CALCULATION
-  double          getProb0          ()                            const { return 1.0-getProb1(); }
-  double          getProb1          ()                            const { return double(state())/double(32768); }
-#endif
   uint64_t        estFracExcessBits ( const BinProbModel_JMP& r ) const
   {
     const  int32_t prob = (m_P0 + m_P1) >> 1;
@@ -228,10 +217,6 @@ public:
   uint16_t        getState          ()                            const { return state(); }
   void            setState          ( uint16_t pState )                 { m_P0 = pState; }
 public:
-#if HM_REPRODUCE_CONTEXT_IDX_CALCULATION
-  double          getProb0          ()                            const { return 1.0-getProb1(); }
-  double          getProb1          ()                            const { return double(state())/double(32768); }
-#endif
   uint64_t        estFracExcessBits ( const BinProbModel_JAW& r ) const
   {
     const  int32_t prob = m_P0;
@@ -281,10 +266,6 @@ public:
   uint16_t        getState          ()                            const { return state(); }
   void            setState          ( uint16_t pState )                 { m_P0 = m_P1 = pState; }
 public:
-#if HM_REPRODUCE_CONTEXT_IDX_CALCULATION
-  double          getProb0          ()                            const { return 1.0-getProb1(); }
-  double          getProb1          ()                            const { return double(state())/double(32768); }
-#endif
   uint64_t        estFracExcessBits ( const BinProbModel_JMPAW& r ) const
   {
     const  int32_t prob = (m_P0 + m_P1) >> 1;
@@ -514,9 +495,6 @@ public:
     default:        break;
     }
     ::memcpy( m_GRAdaptStats, ctx.m_GRAdaptStats, sizeof( unsigned ) * RExt__GOLOMB_RICE_ADAPTATION_STATISTICS_SETS );
-#if HM_STORE_FRAC_BITS_AND_USE_ROUNDED_BITS
-    m_FracBitsStore = ctx.m_FracBitsStore;
-#endif
     return *this;
   }
 
@@ -533,9 +511,6 @@ public:
 #endif
     default:        break;
     }
-#if HM_STORE_FRAC_BITS_AND_USE_ROUNDED_BITS
-    m_FracBitsStore = subCtx.m_Ctx.m_FracBitsStore;
-#endif
     return std::move(subCtx);
   }
 
@@ -555,9 +530,6 @@ public:
     {
       m_GRAdaptStats[k] = 0;
     }
-#if HM_STORE_FRAC_BITS_AND_USE_ROUNDED_BITS
-    m_FracBitsStore = 0;
-#endif
   }
 
   void  loadPStates( const std::vector<uint16_t>& probStates )
@@ -636,10 +608,6 @@ public:
   unsigned            getBPMType      ()                        const { return m_BPMType; }
   const Ctx&          getCtx          ()                        const { return *this; }
   Ctx&                getCtx          ()                              { return *this; }
-#if HM_STORE_FRAC_BITS_AND_USE_ROUNDED_BITS
-  const uint64_t&     getFracBits     ()                        const { return m_FracBitsStore; }
-  uint64_t&           getFracBits     ()                              { return m_FracBitsStore; }
-#endif
 
   explicit operator   const CtxStore<BinProbModel_Std>  &()     const { return m_CtxStore_Std; }
   explicit operator         CtxStore<BinProbModel_Std>  &()           { return m_CtxStore_Std; }
@@ -676,9 +644,6 @@ private:
 #endif
 protected:
   unsigned                      m_GRAdaptStats[RExt__GOLOMB_RICE_ADAPTATION_STATISTICS_SETS];
-#if HM_STORE_FRAC_BITS_AND_USE_ROUNDED_BITS
-  uint64_t                      m_FracBitsStore;
-#endif
 #if ENABLE_SPLIT_PARALLELISM || ENABLE_WPP_PARALLELISM
 
 public:

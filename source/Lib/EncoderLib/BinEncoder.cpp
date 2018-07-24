@@ -432,9 +432,6 @@ BinEncIf* TBinEncoder<BinProbModel>::getTestBinEncoder() const
 template <class BinProbModel>
 BitEstimatorBase::BitEstimatorBase( const BinProbModel* dummy )
   : BinEncIf      ( dummy )
-#if HM_STORE_FRAC_BITS_AND_USE_ROUNDED_BITS
-  , m_EstFracBits ( Ctx::getFracBits() )
-#endif
 {
   m_EstFracBits = 0;
 }

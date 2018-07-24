@@ -116,7 +116,7 @@ void Partitioner::copyState( const Partitioner& other )
   currQtDepth = other.currQtDepth;
   currDepth   = other.currDepth;
   currMtDepth = other.currMtDepth;
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
   currTrDepth = other.currTrDepth;
 #endif
 #if !HM_QTBT_ONLY_QT_IMPLICIT
@@ -206,200 +206,6 @@ void AdaptiveDepthPartitioner::setMaxMinDepth( unsigned& minDepth, unsigned& max
   maxDepth = std::min<unsigned>( stdMaxDepth, maxDepth + 1 );
 }
 
-#if HEVC_PARTITIONER
-//////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////
-// HEVCPartitioner
-//////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////
-
-Void HEVCPartitioner::initCtu( const UnitArea& ctuArea, const ChannelType _chType, const Slice& slice )
-{
-#if _DEBUG
-  m_currArea  = ctuArea;
-#endif
-  currDepth   = 0;
-  currTrDepth = 0;
-  currBtDepth = 0;
-  currMtDepth = 0;
-  currQtDepth = 0;
-  chType      = _chType;
-
-  m_partStack.clear();
-  m_partStack.push_back( PartLevel( CTU_LEVEL, Partitioning{ ctuArea } ) );
-}
-
-Void HEVCPartitioner::splitCurrArea( const PartSplit split, const CodingStructure& cs )
-{
-  CHECKD( !canSplit( split, cs ), "Trying to apply a prohibited split!" );
-
-  switch( split )
-  {
-  case CU_QUAD_SPLIT:
-    m_partStack.push_back( PartLevel( split, PartitionerImpl::getCUSubPartitions( currArea(), cs ) ) );
-    break;
-  case TU_QUAD_SPLIT:
-    m_partStack.push_back( PartLevel( split, PartitionerImpl::getTUSubPartitions( currArea(), cs ) ) );
-    break;
-#if HM_REPRODUCE_4x4_BLOCK_ESTIMATION_ORDER
-  case TU_QUAD_SPLIT_HM:
-    m_partStack.push_back( PartLevel( split, PartitionerImpl::getTUSubPartitions( currArea(), cs, true ) ) );
-    break;
-#endif
-  default:
-    THROW( "Unknown split mode" );
-    break;
-  }
-
-  currDepth++;
-#if _DEBUG
-  m_currArea = m_partStack.back().parts.front();
-#endif
-
-#if HM_REPRODUCE_4x4_BLOCK_ESTIMATION_ORDER
-  if( split == TU_QUAD_SPLIT || split == TU_QUAD_SPLIT_HM )
-#else
-  if( split == TU_QUAD_SPLIT )
-#endif
-  {
-    currTrDepth++;
-  }
-  else
-  {
-    currTrDepth = 0;
-  }
-
-  currQtDepth++;
-}
-
-bool HEVCPartitioner::canSplit( const PartSplit split, const CodingStructure &cs )
-{
-  switch( split )
-  {
-  case CTU_LEVEL:
-    THROW( "Checking if top level split is possible" );
-    return true;
-    break;
-#if HM_REPRODUCE_4x4_BLOCK_ESTIMATION_ORDER
-  case TU_QUAD_SPLIT_HM:
-#endif
-  case TU_QUAD_SPLIT:
-    // not important, only for HM compatibility
-    return true;
-    break;
-  case CU_QUAD_SPLIT:
-    {
-      unsigned minQtSize = cs.pcv->getMinQtSize( *cs.slice, chType );
-      if( currArea().lwidth() <=  minQtSize || currArea().lheight() <= minQtSize ) return false;
-
-      return true;
-    }
-    break;
-  case CU_HORZ_SPLIT:
-  case CU_VERT_SPLIT:
-  case CU_BT_SPLIT:
-  case CU_MT_SPLIT:
-  case CU_TRIV_SPLIT:
-  case CU_TRIH_SPLIT:
-#if ENABLE_BMS
-  case TU_MAX_TR_SPLIT:
-#endif
-    return false;
-    break;
-  default:
-    THROW( "Unknown split mode" );
-    return false;
-    break;
-  }
-
-  return true;
-}
-
-bool HEVCPartitioner::isSplitImplicit( const PartSplit split, const CodingStructure &cs )
-{
-  return split == getImplicitSplit( cs );
-}
-
-PartSplit HEVCPartitioner::getImplicitSplit( const CodingStructure &cs )
-{
-  if( m_partStack.back().checkdIfImplicit )
-  {
-    return m_partStack.back().implicitSplit;
-  }
-
-  PartSplit split = CU_DONT_SPLIT;
-
-  if( !cs.picture->Y().contains( currArea().Y().bottomRight() ) )
-  {
-    split = CU_QUAD_SPLIT;
-  }
-
-  m_partStack.back().checkdIfImplicit = true;
-  m_partStack.back().isImplicit       = split != CU_DONT_SPLIT;
-  m_partStack.back().implicitSplit    = split;
-
-  return split;
-}
-
-Void HEVCPartitioner::exitCurrSplit()
-{
-  m_partStack.pop_back();
-
-  CHECK( currDepth == 0, "depth is '0', although a split was performed" );
-  currDepth--;
-#if _DEBUG
-  m_currArea = m_partStack.back().parts[m_partStack.back().idx];
-#endif
-
-  if( currTrDepth > 0 ) currTrDepth--;
-
-  CHECK( currQtDepth == 0, "QT depth is '0', although a QT split was performed" );
-  currQtDepth--;
-}
-
-Bool HEVCPartitioner::nextPart(const CodingStructure &cs, bool autoPop /*= false*/)
-{
-  const Position &prevPos = currArea().blocks[chType].pos();
-
-  unsigned currIdx = ++m_partStack.back().idx;
-
-  m_partStack.back().checkdIfImplicit = false;
-  m_partStack.back().isImplicit       = false;
-
-  if( currIdx == 1 )
-  {
-    const CodingUnit* prevCU = cs.getCU( prevPos, chType );
-    m_partStack.back().firstSubPartSplit = prevCU ? CU::getSplitAtDepth( *prevCU, currDepth ) : CU_DONT_SPLIT;
-  }
-
-  if( currIdx < m_partStack.back().parts.size() )
-  {
-#if _DEBUG
-    m_currArea = m_partStack.back().parts[currIdx];
-#endif
-    return true;
-  }
-  else
-  {
-    if( autoPop ) exitCurrSplit();
-    return false;
-  }
-}
-
-bool HEVCPartitioner::hasNextPart()
-{
-  return ( ( m_partStack.back().idx + 1 ) < m_partStack.back().parts.size() );
-}
-
-#endif
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
@@ -420,7 +226,7 @@ Void QTBTPartitioner::initCtu( const UnitArea& ctuArea, const ChannelType _chTyp
   m_currArea = ctuArea;
 #endif
   currDepth   = 0;
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
   currTrDepth = 0;
 #endif
   currBtDepth = 0;
@@ -474,26 +280,13 @@ Void QTBTPartitioner::splitCurrArea( const PartSplit split, const CodingStructur
   m_currArea = m_partStack.back().parts.front();
 #endif
 
-#if HEVC_USE_RQT
-#if HM_REPRODUCE_4x4_BLOCK_ESTIMATION_ORDER
-  if( split == TU_QUAD_SPLIT || split == TU_QUAD_SPLIT_HM )
-#else
-  if( split == TU_QUAD_SPLIT )
-#endif
-  {
-    THROW( "QTBT does not allow for RQT" );
-  }
-#if ENABLE_BMS
-  else
-#endif
-#endif
 #if ENABLE_BMS
   if( split == TU_MAX_TR_SPLIT )
   {
     currTrDepth++;
   }
 #endif
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
   else
   {
     currTrDepth = 0;
@@ -565,14 +358,6 @@ bool QTBTPartitioner::canSplit( const PartSplit split, const CodingStructure &cs
 #if ENABLE_BMS
   case TU_MAX_TR_SPLIT:
     return area.width > maxTrSize || area.height > maxTrSize;
-    break;
-#endif
-#if HM_REPRODUCE_4x4_BLOCK_ESTIMATION_ORDER
-  case TU_QUAD_SPLIT_HM:
-#endif
-#if HEVC_USE_RQT
-  case TU_QUAD_SPLIT:
-    return false;
     break;
 #endif
   case CU_QUAD_SPLIT:
@@ -764,7 +549,7 @@ Void QTBTPartitioner::exitCurrSplit()
 #endif
   else
   {
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
     CHECK( currTrDepth > 0, "RQT found with QTBT partitioner" );
 
 #endif
@@ -827,11 +612,7 @@ Partitioner* PartitionerFactory::get( const Slice& slice )
   }
   else
   {
-#if HEVC_PARTITIONER
-    return new HEVCPartitioner;
-#else
     THROW( "Unknown partitioner!" );
-#endif
   }
 }
 
@@ -839,222 +620,6 @@ Partitioner* PartitionerFactory::get( const Slice& slice )
 // Partitioner methods describing the actual partitioning logic
 //////////////////////////////////////////////////////////////////////////
 
-#if HEVC_USE_PART_SIZE
-Partitioning PartitionerImpl::getPUPartitioning( const CodingUnit &cu )
-{
-  Partitioning pus;
-
-  pus.reserve( 4 );
-
-  switch( cu.partSize )
-  {
-  case SIZE_2Nx2N:
-    pus.push_back( cu );
-    break;
-  case SIZE_2NxN:
-  {
-    CHECK( !CU::isInter( cu ), "2NxN split applied to non inter CU" );
-
-    UnitArea pu( cu );
-
-    for( UInt i = 0; i < pu.blocks.size(); i++ )
-    {
-      pu.blocks[i].height >>= 1;
-    }
-
-    pus.push_back( pu );
-
-    for( UInt i = 0; i < pu.blocks.size(); i++ )
-    {
-      pu.blocks[i].y += pu.blocks[i].height;
-    }
-
-    pus.push_back( pu );
-  }
-  break;
-  case SIZE_Nx2N:
-  {
-    CHECK( !CU::isInter( cu ), "Nx2N split applied to non inter CU" );
-
-    UnitArea pu( cu );
-
-    for( UInt i = 0; i < pu.blocks.size(); i++ )
-    {
-      pu.blocks[i].width >>= 1;
-    }
-
-    pus.push_back( pu );
-
-    for( UInt i = 0; i < pu.blocks.size(); i++ )
-    {
-      pu.blocks[i].x += pu.blocks[i].width;
-    }
-
-    pus.push_back( pu );
-  }
-  break;
-  case SIZE_NxN:
-  {
-    Bool splitChroma = true;
-
-    if( CU::isIntra( cu ) )
-    {
-      CHECK( cu.lumaSize().width != ( cu.cs->sps->getMaxCUWidth() >> cu.cs->sps->getLog2DiffMaxMinCodingBlockSize() ), "NxN intra split performed at not maximal CU depth" );
-      splitChroma = enable4ChromaPUsInIntraNxNCU(cu.chromaFormat);
-    }
-
-    for( UInt i = 0; i < 4; i++ )
-    {
-      UnitArea pu( cu.chromaFormat );
-
-      // split the luma channel
-      {
-        const CompArea& Y = cu.Y();
-        Position pos = Y;
-
-        if ((i & 1) == 1) pos.x += Y.width  / 2;
-        if (i > 1)        pos.y += Y.height / 2;
-
-        pu.blocks.push_back(CompArea(COMPONENT_Y, cu.chromaFormat, pos, Size(Y.width / 2, Y.height / 2)));
-      }
-
-      if (!splitChroma)
-      {
-        if (i == 0)
-        {
-          // add the not-split chroma channel
-          for (UInt c = 1; c < cu.blocks.size(); c++)
-          {
-            pu.blocks.push_back(cu.blocks[c]);
-          }
-        }
-        else
-        {
-          for (UInt c = 1; c < cu.blocks.size(); c++)
-          {
-            pu.blocks.push_back(CompArea());
-          }
-        }
-      }
-
-      if (splitChroma)
-      {
-        // split the chroma channel
-        for (UInt c = 1; c < cu.blocks.size(); c++)
-        {
-          const CompArea& area = cu.blocks[c];
-          Position pos = area;
-
-          if ((i & 1) == 1) pos.x += area.width  / 2;
-          if (i > 1)        pos.y += area.height / 2;
-
-          pu.blocks.push_back(CompArea(area.compID, cu.chromaFormat, pos, Size(area.width / 2, area.height / 2)));
-        }
-      }
-
-      pus.push_back(pu);
-    }
-  }
-  break;
-  case SIZE_2NxnU:
-  {
-    CHECK( !CU::isInter( cu ), "2NxnU split applied to non inter CU" );
-
-    UnitArea pu(cu);
-
-    for (UInt i = 0; i < pu.blocks.size(); i++)
-    {
-      pu.blocks[i].height >>= 2;
-    }
-
-    pus.push_back(pu);
-
-    for (UInt i = 0; i < pu.blocks.size(); i++)
-    {
-      pu.blocks[i].y      +=  pu.blocks[i].height;
-      pu.blocks[i].height += (pu.blocks[i].height << 1);
-    }
-
-    pus.push_back(pu);
-  }
-  break;
-  case SIZE_2NxnD:
-  {
-    CHECK( !CU::isInter( cu ), "2NxnD split applied to non inter CU" );
-
-    UnitArea pu( cu );
-
-    for( UInt i = 0; i < pu.blocks.size(); i++ )
-    {
-      pu.blocks[i].height >>= 1;
-      pu.blocks[i].height  += ( pu.blocks[i].height >> 1 );
-    }
-
-    pus.push_back( pu );
-
-    for( UInt i = 0; i < pu.blocks.size(); i++ )
-    {
-      pu.blocks[i].y      += pu.blocks[i].height;
-      pu.blocks[i].height /= 3;
-    }
-
-    pus.push_back( pu );
-  }
-  break;
-  case SIZE_nLx2N:
-  {
-    CHECK( !CU::isInter( cu ), "nLx2N split applied to non inter CU" );
-
-    UnitArea pu( cu );
-
-    for( UInt i = 0; i < pu.blocks.size(); i++ )
-    {
-      pu.blocks[i].width >>= 2;
-    }
-
-    pus.push_back(pu);
-
-    for( UInt i = 0; i < pu.blocks.size(); i++ )
-    {
-      pu.blocks[i].x     +=  pu.blocks[i].width;
-      pu.blocks[i].width += ( pu.blocks[i].width << 1 );
-    }
-
-    pus.push_back( pu );
-  }
-  break;
-  case SIZE_nRx2N:
-  {
-    CHECK( !CU::isInter( cu ), "nRx2N split applied to non inter CU" );
-
-    UnitArea pu( cu );
-
-    for( UInt i = 0; i < pu.blocks.size(); i++ )
-    {
-      pu.blocks[i].width >>= 1;
-      pu.blocks[i].width  += ( pu.blocks[i].width >> 1 );
-    }
-
-    pus.push_back(pu);
-
-    for( UInt i = 0; i < pu.blocks.size(); i++ )
-    {
-      pu.blocks[i].x     += pu.blocks[i].width;
-      pu.blocks[i].width /= 3;
-    }
-
-    pus.push_back( pu );
-  }
-  break;
-  default:
-    THROW( "Unknown PU partition mode" );
-    break;
-  }
-
-  return std::move( pus );
-}
-
-#endif
 Partitioning PartitionerImpl::getCUSubPartitions( const UnitArea &cuArea, const CodingStructure &cs, const PartSplit _splitType /*= CU_QUAD_SPLIT*/ )
 {
   const PartSplit splitType = _splitType;
@@ -1248,89 +813,6 @@ Partitioning PartitionerImpl::getCUSubPartitions( const UnitArea &cuArea, const 
   }
 }
 
-#if HEVC_USE_RQT
-#if HM_REPRODUCE_4x4_BLOCK_ESTIMATION_ORDER
-Partitioning PartitionerImpl::getTUSubPartitions(const UnitArea &tuArea, const CodingStructure &cs, bool hmCompatible)
-#else
-Partitioning PartitionerImpl::getTUSubPartitions(const UnitArea &tuArea, const CodingStructure &cs)
-#endif
-{
-  Bool canSplit = tuArea.lumaSize().width > MIN_TU_SIZE && tuArea.lumaSize().height > MIN_TU_SIZE;
-
-  Partitioning ret(4);
-
-  if (canSplit)
-  {
-    if( tuArea.chromaFormat == CHROMA_400 )
-    {
-      CompArea  blkY  = tuArea.Y();
-      blkY.width    >>= 1;
-      blkY.height   >>= 1;
-      ret[0] = UnitArea( tuArea.chromaFormat, blkY );
-      blkY.x         += blkY.width;
-      ret[1] = UnitArea( tuArea.chromaFormat, blkY );
-      blkY.x         -= blkY.width;
-      blkY.y         += blkY.height;
-      ret[2] = UnitArea( tuArea.chromaFormat, blkY );
-      blkY.x         += blkY.width;
-      ret[3] = UnitArea( tuArea.chromaFormat, blkY );
-    }
-    else
-    {
-      Bool splitChroma = false;
-
-      for (UInt i = 0; i < 4; i++)
-      {
-        ret[i] = tuArea;
-
-        CompArea& blkY  = ret[i].blocks[ COMPONENT_Y  ];
-        CompArea& blkCb = ret[i].blocks[ COMPONENT_Cb ];
-        CompArea& blkCr = ret[i].blocks[ COMPONENT_Cr ];
-
-        blkY.width  /= 2;
-        blkY.height /= 2;
-
-        if (blkCb.width > MIN_TU_SIZE)
-        {
-          blkCb.width  /= 2;
-          blkCb.height /= 2;
-          blkCr.width  /= 2;
-          blkCr.height /= 2;
-          splitChroma   = true;
-        }
-        else if (i < 3)
-        {
-          blkCb = CompArea();
-          blkCr = CompArea();
-        }
-
-        if ((i & 1) == 1)
-        {
-          blkY. x += blkY. width;
-          if (splitChroma) blkCb.x += blkCb.width;
-          if (splitChroma) blkCr.x += blkCr.width;
-        }
-
-        if (i > 1)
-        {
-          blkY. y += blkY. height;
-          if (splitChroma) blkCb.y += blkCb.height;
-          if (splitChroma) blkCr.y += blkCr.height;
-        }
-      }
-#if HM_REPRODUCE_4x4_BLOCK_ESTIMATION_ORDER
-      if( !splitChroma && hmCompatible )
-      {
-        std::swap( ret.front().Cb(), ret.back().Cb() );
-        std::swap( ret.front().Cr(), ret.back().Cr() );
-      }
-#endif
-    }
-  }
-  return std::move(ret);
-}
-
-#endif
 #if ENABLE_BMS
 static const int g_maxRtGridSize = 3;
 

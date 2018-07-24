@@ -528,10 +528,6 @@ protected:
   bool        m_stopAfterFFtoPOC;
   bool        m_bs2ModPOCAndType;
   bool        m_forceDecodeBitstream1;
-#if JEM_COMP
-
-  bool        m_generateJEM;
-#endif
 
 
   // internal member functions

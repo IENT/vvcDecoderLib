@@ -127,18 +127,10 @@ public:
   UInt  getNumberOfWrittenBits  ()                      { return m_pcBitIf->getNumberOfWrittenBits();  }
   Void  codeVUI                 ( const VUI *pcVUI, const SPS* pcSPS );
   Void  codeSPSNext             ( const SPSNext& spsNext, const bool usePCM );
-#if JEM_COMP
-  Void  codeSPS                 ( const SPS* pcSPS, bool generateJEM );
-  Void  codePPS                 ( const PPS* pcPPS, bool generateJEM );
-#if HEVC_VPS
-  Void  codeVPS                 ( const VPS* pcVPS, bool generateJEM );
-#endif
-#else
   Void  codeSPS                 ( const SPS* pcSPS );
   Void  codePPS                 ( const PPS* pcPPS );
 #if HEVC_VPS
   Void  codeVPS                 ( const VPS* pcVPS );
-#endif
 #endif
   Void  codeSliceHeader         ( Slice* pcSlice );
   Void  codePTL                 ( const PTL* pcPTL, Bool profilePresentFlag, Int maxNumSubLayersMinus1);
@@ -154,9 +146,6 @@ public:
 #if JEM_TOOLS
 private:
   CABACDataStore* m_CABACDataStore;
-#endif
-#if JEM_TOOLS
-  const SPS*      m_lastSPS;
 #endif
 };
 

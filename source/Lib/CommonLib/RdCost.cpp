@@ -65,25 +65,6 @@ Double RdCost::calcRdCost( uint64_t fracBits, Distortion distortion, bool useUna
 Double RdCost::calcRdCost( uint64_t fracBits, Distortion distortion )
 #endif
 {
-#if HM_REPRODUCE_RDCOST_CALCULATION
-  if( m_costMode == COST_STANDARD_LOSSY )
-  {
-#if HM_16_6_BIT_EQUAL
-#if WCG_EXT
-    return floor( double( distortion ) + ( useUnadjustedLambda ? m_dLambda_unadjusted : m_dLambda ) * double( fracBits >> SCALE_BITS ) + 0.5 );
-#else
-    return floor( double( distortion ) + m_dLambda * double( fracBits >> SCALE_BITS ) + 0.5 );
-#endif
-#else
-    // in HM, a rounding (floor(x+.5)) is done, which makes cost differ sometimes
-#if WCG_EXT
-    return double( distortion ) + ( useUnadjustedLambda ? m_dLambda_unadjusted : m_dLambda ) * double( fracBits >> SCALE_BITS );
-#else
-    return double( distortion ) + m_dLambda * double( fracBits >> SCALE_BITS );
-#endif
-#endif
-  }
-#endif
 
 #if WCG_EXT
   return ( useUnadjustedLambda ? m_DistScaleUnadjusted : m_DistScale ) * double( distortion ) + double( fracBits );

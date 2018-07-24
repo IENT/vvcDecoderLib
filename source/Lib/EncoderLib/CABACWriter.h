@@ -107,9 +107,6 @@ public:
   void        cu_transquant_bypass_flag ( const CodingUnit&             cu );
   void        cu_skip_flag              ( const CodingUnit&             cu );
   void        pred_mode                 ( const CodingUnit&             cu );
-#if HEVC_USE_PART_SIZE
-  void        part_mode                 ( const CodingUnit&             cu );
-#endif
 #if JEM_TOOLS
   void        pdpc_flag                 ( const CodingUnit&             cu );
 #endif
@@ -154,10 +151,7 @@ public:
 
   // transform tree (clause 7.3.8.8)
   void        transform_tree            ( const CodingStructure&        cs,       Partitioner&      pm,     CUCtx& cuCtx,   ChromaCbfs& chromaCbfs );
-#if HEVC_USE_RQT
-  void        split_transform_flag      ( bool                          split,    unsigned          depth );
-#endif
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
   void        cbf_comp                  ( const CodingStructure&        cs,       bool              cbf,    const CompArea& area, unsigned depth );
 #else
   void        cbf_comp                  ( const CodingStructure&        cs,       bool              cbf,    const CompArea& area );

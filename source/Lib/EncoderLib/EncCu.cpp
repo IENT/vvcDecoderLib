@@ -178,11 +178,7 @@ void EncCu::create( EncCfg* encCfg )
   }
   else
   {
-#if HEVC_PARTITIONER
-    m_modeCtrl = new EncModeCtrlQTwithRQT();
-#else
     THROW( "Unknown partitioner!" );
-#endif
   }
 
   for( unsigned ui = 0; ui < MRG_MAX_NUM_CANDS; ui++ )
@@ -533,7 +529,6 @@ void EncCu::xCheckBestMode( CodingStructure *&tempCS, CodingStructure *&bestCS, 
 
     if( m_modeCtrl->useModeResult( encTestMode, tempCS, partitioner ) )
     {
-#if !HM_POSTPONE_SPLIT_BITS
       if( tempCS->cus.size() == 1 )
       {
         // if tempCS is not a split-mode
@@ -544,7 +539,6 @@ void EncCu::xCheckBestMode( CodingStructure *&tempCS, CodingStructure *&bestCS, 
           xFillPCMBuffer( cu );
         }
       }
-#endif
 
       std::swap( tempCS, bestCS );
       // store temp best CI for next CU coding
@@ -691,22 +685,6 @@ void EncCu::xCompressCU( CodingStructure *&tempCS, CodingStructure *&bestCS, Par
     {
       xCheckIntraPCM( tempCS, bestCS, partitioner, currTestMode );
     }
-#if HM_POSTPONE_SPLIT_BITS
-    else if( currTestMode.type == ETM_POST_DONT_SPLIT )
-    {
-      CodingUnit* cu = bestCS->getCU( partitioner.chType );
-
-      if( CU::isLosslessCoded( *cu ) && !cu->ipcm )
-      {
-        xFillPCMBuffer( *cu );
-      }
-
-      m_CABACEstimator->getCtx() = m_CurrCtx->best;
-
-      xEncodeDontSplit( *bestCS, partitioner );
-      m_CurrCtx->best = m_CABACEstimator->getCtx();
-    }
-#endif
     else if( isModeSplit( currTestMode ) )
     {
 
@@ -1150,9 +1128,6 @@ void EncCu::xCheckRDCostIntra( CodingStructure *&tempCS, CodingStructure *&bestC
   double bestInterCost        = m_modeCtrl->getBestInterCost();
 #endif
 #if JEM_TOOLS
-#if HEVC_USE_PART_SIZE
-  bool isAllIntra             = m_pcEncCfg->getIntraPeriod() == 1;
-#endif
 #endif
 #if JEM_TOOLS
   double costSize2Nx2NemtFirstPass = m_modeCtrl->getEmtSize2Nx2NFirstPassCost();
@@ -1290,9 +1265,6 @@ void EncCu::xCheckRDCostIntra( CodingStructure *&tempCS, CodingStructure *&bestC
 #if JEM_TOOLS
     m_CABACEstimator->pdpc_flag      ( cu );
 #endif
-#if HEVC_USE_PART_SIZE
-    m_CABACEstimator->part_mode      ( cu );
-#endif
     m_CABACEstimator->cu_pred_data   ( cu );
     m_CABACEstimator->pcm_data       ( cu );
 
@@ -1306,9 +1278,7 @@ void EncCu::xCheckRDCostIntra( CodingStructure *&tempCS, CodingStructure *&bestC
     tempCS->fracBits = m_CABACEstimator->getEstFracBits();
     tempCS->cost     = m_pcRdCost->calcRdCost(tempCS->fracBits, tempCS->dist);
 
-#if !HM_POSTPONE_SPLIT_BITS
     xEncodeDontSplit( *tempCS, partitioner );
-#endif
 
     xCheckDQP( *tempCS, partitioner );
 
@@ -1365,18 +1335,6 @@ void EncCu::xCheckRDCostIntra( CodingStructure *&tempCS, CodingStructure *&bestC
       }
     }
 
-#if HEVC_USE_PART_SIZE
-    //now we check whether the second pass of EMT with SIZE_NxN should be skipped or not
-    if( !emtCuFlag && isAllIntra && cu.partSize == SIZE_NxN && m_pcEncCfg->getFastIntraEMT() )
-    {
-      costSize2Nx2NemtFirstPass = m_modeCtrl->getEmtSize2Nx2NFirstPassCost();
-      const double thEmtIntraFastSkipNxN = 1.2; // Skip checking "NxN using EMT" if "NxN using DCT2" is worse than "2Nx2N using DCT2"
-      if( costSizeNxNemtFirstPass > thEmtIntraFastSkipNxN * costSize2Nx2NemtFirstPass )
-      {
-        break;
-      }
-    }
-#endif
 #endif
   } //for emtCuFlag
 }
@@ -1405,12 +1363,7 @@ void EncCu::xCheckIntraPCM(CodingStructure *&tempCS, CodingStructure *&bestCS, P
 
   tempCS->addPU(tempCS->area, partitioner.chType);
   
-#if HEVC_USE_RQT
-  TransformUnit & tu  = tempCS->addTU(tempCS->area, partitioner.chType);
-  tu.depth            = 0;
-#else
   tempCS->addTU( tempCS->area, partitioner.chType );
-#endif
 
   m_pcIntraSearch->IPCMSearch(*tempCS, partitioner);
 
@@ -1428,18 +1381,13 @@ void EncCu::xCheckIntraPCM(CodingStructure *&tempCS, CodingStructure *&bestCS, P
     m_CABACEstimator->cu_skip_flag ( cu );
   }
   m_CABACEstimator->pred_mode      ( cu );
-#if HEVC_USE_PART_SIZE
-  m_CABACEstimator->part_mode      ( cu );
-#endif
   m_CABACEstimator->pcm_data       ( cu );
 
 
   tempCS->fracBits = m_CABACEstimator->getEstFracBits();
   tempCS->cost     = m_pcRdCost->calcRdCost(tempCS->fracBits, tempCS->dist);
 
-#if !HM_POSTPONE_SPLIT_BITS
   xEncodeDontSplit( *tempCS, partitioner );
-#endif
 
   xCheckDQP( *tempCS, partitioner );
 
@@ -1902,11 +1850,7 @@ void EncCu::xCheckRDCostInter( CodingStructure *&tempCS, CodingStructure *&bestC
 #endif
   CU::addPUs( cu );
 
-#if AMP_MRG
-  m_pcInterSearch->predInterSearch( cu, partitioner, ( encTestMode.opts & ETO_FORCE_MERGE ) );
-#else
   m_pcInterSearch->predInterSearch( cu, partitioner );
-#endif
 
 #if JEM_TOOLS
   const unsigned wIdx = gp_sizeIdxInfo->idxFrom( tempCS->area.lwidth () );
@@ -2190,11 +2134,7 @@ bool EncCu::xCheckRDCostInterIMV( CodingStructure *&tempCS, CodingStructure *&be
   }
   else
   {
-#if AMP_MRG
-    m_pcInterSearch->predInterSearch( cu, partitioner, false );
-#else
     m_pcInterSearch->predInterSearch( cu, partitioner );
-#endif
   }
 
   if( !CU::hasSubCUNonZeroMVd( cu ) )
@@ -2315,9 +2255,7 @@ void EncCu::xEncodeInterResidual( CodingStructure *&tempCS, CodingStructure *&be
     double emtFirstPassCost = tempCS->cost;
 #endif
 
-#if !HM_POSTPONE_SPLIT_BITS
     xEncodeDontSplit( *tempCS, partitioner );
-#endif
 
     xCheckDQP( *tempCS, partitioner );
 

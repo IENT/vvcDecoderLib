@@ -355,135 +355,6 @@ inline Void InterSearch::xTZSearchHelp( IntTZSearchStruct& rcStruct, const Int i
 }
 
 
-#if HM_ME_SR_VIOLATION
-inline Void InterSearch::xTZ2PointSearch( IntTZSearchStruct& rcStruct )
-{
-  const SearchRange& sr = rcStruct.searchRange;
-
-  // 2 point search,                   //   1 2 3
-  // check only the 2 untested points  //   4 0 5
-  // around the start point            //   6 7 8
-  Int iStartX = rcStruct.iBestX;
-  Int iStartY = rcStruct.iBestY;
-  switch( rcStruct.ucPointNr )
-  {
-  case 1:
-  {
-    if ( (iStartX - 1) >= sr.left )
-    {
-      xTZSearchHelp( rcStruct, iStartX - 1, iStartY, 0, 2 );
-    }
-    if ( (iStartY - 1) >= sr.top )
-    {
-      xTZSearchHelp( rcStruct, iStartX, iStartY - 1, 0, 2 );
-    }
-  }
-  break;
-  case 2:
-  {
-    if ( (iStartY - 1) >= sr.top )
-    {
-      if ( (iStartX - 1) >= sr.left )
-      {
-        xTZSearchHelp( rcStruct, iStartX - 1, iStartY - 1, 0, 2 );
-      }
-      if ( (iStartX + 1) <= sr.right )
-      {
-        xTZSearchHelp( rcStruct, iStartX + 1, iStartY - 1, 0, 2 );
-      }
-    }
-  }
-  break;
-  case 3:
-  {
-    if ( (iStartY - 1) >= sr.top )
-    {
-      xTZSearchHelp( rcStruct, iStartX, iStartY - 1, 0, 2 );
-    }
-    if ( (iStartX + 1) <= sr.right )
-    {
-      xTZSearchHelp( rcStruct, iStartX + 1, iStartY, 0, 2 );
-    }
-  }
-  break;
-  case 4:
-  {
-    if ( (iStartX - 1) >= sr.left )
-    {
-      if ( (iStartY + 1) <= sr.bottom )
-      {
-        xTZSearchHelp( rcStruct, iStartX - 1, iStartY + 1, 0, 2 );
-      }
-      if ( (iStartY - 1) >= sr.top )
-      {
-        xTZSearchHelp( rcStruct, iStartX - 1, iStartY - 1, 0, 2 );
-      }
-    }
-  }
-  break;
-  case 5:
-  {
-    if ( (iStartX + 1) <= sr.right )
-    {
-      if ( (iStartY - 1) >= sr.top )
-      {
-        xTZSearchHelp( rcStruct, iStartX + 1, iStartY - 1, 0, 2 );
-      }
-      if ( (iStartY + 1) <= sr.bottom )
-      {
-        xTZSearchHelp( rcStruct, iStartX + 1, iStartY + 1, 0, 2 );
-      }
-    }
-  }
-  break;
-  case 6:
-  {
-    if ( (iStartX - 1) >= sr.left )
-    {
-      xTZSearchHelp( rcStruct, iStartX - 1, iStartY , 0, 2 );
-    }
-    if ( (iStartY + 1) <= sr.bottom )
-    {
-      xTZSearchHelp( rcStruct, iStartX, iStartY + 1, 0, 2 );
-    }
-  }
-  break;
-  case 7:
-  {
-    if ( (iStartY + 1) <= sr.bottom )
-    {
-      if ( (iStartX - 1) >= sr.left )
-      {
-        xTZSearchHelp( rcStruct, iStartX - 1, iStartY + 1, 0, 2 );
-      }
-      if ( (iStartX + 1) <= sr.right )
-      {
-        xTZSearchHelp( rcStruct, iStartX + 1, iStartY + 1, 0, 2 );
-      }
-    }
-  }
-  break;
-  case 8:
-  {
-    if ( (iStartX + 1) <= sr.right )
-    {
-      xTZSearchHelp( rcStruct, iStartX + 1, iStartY, 0, 2 );
-    }
-    if ( (iStartY + 1) <= sr.bottom )
-    {
-      xTZSearchHelp( rcStruct, iStartX, iStartY + 1, 0, 2 );
-    }
-  }
-  break;
-  default:
-  {
-    THROW("Invalid point");
-  }
-  break;
-  } // switch( rcStruct.ucPointNr )
-
-}
-#else
 
 inline Void InterSearch::xTZ2PointSearch( IntTZSearchStruct& rcStruct )
 {
@@ -512,7 +383,6 @@ inline Void InterSearch::xTZ2PointSearch( IntTZSearchStruct& rcStruct )
   }
 }
 
-#endif
 
 inline Void InterSearch::xTZ8PointSquareSearch( IntTZSearchStruct& rcStruct, const Int iStartX, const Int iStartY, const Int iDist )
 {
@@ -931,11 +801,7 @@ Void InterSearch::xFRUCMrgEstimation( PredictionUnit& pu, PelUnitBuf& origBuf, D
 #endif
 
 //! search of the best candidate for inter prediction
-#if AMP_MRG
-Void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner, Bool bUseMRG)
-#else
 Void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
-#endif
 {
   CodingStructure& cs = *cu.cs;
 
@@ -983,14 +849,8 @@ Void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
   // Loop over Prediction Units
   CHECK(!cu.firstPU, "CU does not contain any PUs");
   UInt         puIdx = 0;
-#if HEVC_USE_PART_SIZE
-  UInt         numPUs = CU::getNumPUs(cu);
-
-  for( auto &pu : CU::traversePUs( cu ) )
-#else
   auto &pu = *cu.firstPU;
 
-#endif
   {
     // motion estimation only evaluates luma component
     m_maxCompIDToPred = MAX_NUM_COMPONENT;
@@ -1069,17 +929,6 @@ Void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
     unsigned imvShift = pu.cu->imv << 1;
 #endif
 
-#if AMP_MRG
-    Bool bTestNormalMC = true;
-
-    if ( bUseMRG && cu.lumaSize().width > 8 && numPUs == 2 )
-    {
-      bTestNormalMC = false;
-    }
-
-    if( bTestNormalMC )
-    {
-#endif
       //  Uni-directional prediction
       for ( Int iRefList = 0; iRefList < iNumPredDir; iRefList++ )
       {
@@ -1176,18 +1025,6 @@ Void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
       {
         ::memcpy( cMvHevcTemp, cMvTemp, sizeof( cMvTemp ) );
       }
-#endif
-#if HEVC_PARTITIONER
-      auto hevcPartitioner = dynamic_cast<HEVCPartitioner*>( &partitioner );
-
-      if( !bFastSkipBi && m_pcEncCfg->getUseFastLCTU() && m_pcEncCfg->getLargeCTU() && hevcPartitioner )
-      {
-        unsigned minDepth = 0;
-        unsigned maxDepth = g_aucLog2[pu.cs->sps->getSpsNext().getCTUSize()] - g_aucLog2[pu.cs->sps->getSpsNext().getMinQTSize( B_SLICE, CHANNEL_TYPE_LUMA )];
-        hevcPartitioner->setMaxMinDepth( minDepth, maxDepth, cs );
-        bFastSkipBi = !(pu.cu->qtDepth < maxDepth || pu.lumaSize().area() >= 64);
-      }
-
 #endif
       //  Bi-predictive Motion estimation
       if ( (cs.slice->isInterB()) && ( PU::isBipredRestriction(pu) == false)  && !bFastSkipBi )
@@ -1361,9 +1198,6 @@ Void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
         } // for loop-iter
       } // if (B_SLICE)
 
-#if AMP_MRG
-    } //end if bTestNormalMC
-#endif
 
 
       //  Clear Motion Field
@@ -1388,10 +1222,6 @@ Void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
     uiBits [1] = bitsValidList1;
     uiCost [1] = costValidList1;
 
-#if AMP_MRG
-    if (bTestNormalMC)
-    {
-#endif
 #if JEM_TOOLS
       uiLastModeTemp = uiLastMode;
 #endif
@@ -1436,29 +1266,14 @@ Void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
 
         uiMEBits = uiBits[1];
       }
-#if AMP_MRG
-    } // end if bTestNormalMC
-#endif
 
     if ( cu.partSize != SIZE_2Nx2N )
     {
       UInt uiMRGIndex    = 0;
 
-#if AMP_MRG
-      // calculate ME cost
-      Distortion uiMEError = std::numeric_limits<Distortion>::max();
-      Distortion uiMECost  = std::numeric_limits<Distortion>::max();
-
-      if( bTestNormalMC )
-      {
-        uiMEError = xGetInterPredictionError( pu, origBuf );
-        uiMECost = uiMEError + m_pcRdCost->getCost( uiMEBits );
-      }
-#else
       // calculate ME cost
       Distortion uiMEError = xGetInterPredictionError( pu, origBuf );
       Distortion uiMECost = uiMEError + m_pcRdCost->getCost( uiMEBits );
-#endif
       // save ME result.
       InterPredictionData savedPU = pu;
 
@@ -1672,42 +1487,6 @@ Void InterSearch::xGetBlkBits( PartSize eCUMode, Bool bPSlice, Int iPartIdx, UIn
     uiBlkBit[1] = 3;
     uiBlkBit[2] = 5;
   }
-#if HEVC_USE_PART_SIZE
-  else if ( (eCUMode == SIZE_2NxN || eCUMode == SIZE_2NxnU) || eCUMode == SIZE_2NxnD )
-  {
-    UInt aauiMbBits[2][3][3] = { { {0,0,3}, {0,0,0}, {0,0,0} } , { {5,7,7}, {7,5,7}, {9-3,9-3,9-3} } };
-    if ( bPSlice )
-    {
-      uiBlkBit[0] = 3;
-      uiBlkBit[1] = 0;
-      uiBlkBit[2] = 0;
-    }
-    else
-    {
-      ::memcpy( uiBlkBit, aauiMbBits[iPartIdx][uiLastMode], 3*sizeof(UInt) );
-    }
-  }
-  else if ( (eCUMode == SIZE_Nx2N || eCUMode == SIZE_nLx2N) || eCUMode == SIZE_nRx2N )
-  {
-    UInt aauiMbBits[2][3][3] = { { {0,2,3}, {0,0,0}, {0,0,0} } , { {5,7,7}, {7-2,7-2,9-2}, {9-3,9-3,9-3} } };
-    if ( bPSlice )
-    {
-      uiBlkBit[0] = 3;
-      uiBlkBit[1] = 0;
-      uiBlkBit[2] = 0;
-    }
-    else
-    {
-      ::memcpy( uiBlkBit, aauiMbBits[iPartIdx][uiLastMode], 3*sizeof(UInt) );
-    }
-  }
-  else if ( eCUMode == SIZE_NxN )
-  {
-    uiBlkBit[0] = (! bPSlice) ? 3 : 1;
-    uiBlkBit[1] = 3;
-    uiBlkBit[2] = 5;
-  }
-#endif
   else
   {
     THROW("Wrong part size!");
@@ -1911,27 +1690,6 @@ Void InterSearch::xMotionEstimation(PredictionUnit& pu, PelUnitBuf& origBuf, Ref
   bool bQTBTMV  = false;
   bool bQTBTMV2 = false;
   Mv cIntMv;
-#if HM_ME_SR_VIOLATION
-  if( bBi )
-  {
-    xSetSearchRange(pu, rcMv, iSrchRng, cStruct.searchRange);
-  }
-  else
-  {
-    bool bValid = blkCache && blkCache->getMv( pu, eRefPicList, iRefIdxPred, cIntMv );
-
-    if( bValid )
-    {
-      cIntMv <<= 2;
-      xSetSearchRange( pu, cIntMv, 1, cStruct.searchRange );
-      bQTBTMV = true;
-    }
-    else
-    {
-      xSetSearchRange( pu, rcMvPred, iSrchRng, cStruct.searchRange );
-    }
-  }
-#else
   if( !bBi )
   {
     bool bValid = blkCache && blkCache->getMv( pu, eRefPicList, iRefIdxPred, cIntMv );
@@ -1942,7 +1700,6 @@ Void InterSearch::xMotionEstimation(PredictionUnit& pu, PelUnitBuf& origBuf, Ref
     }
   }
 
-#endif
 
   m_pcRdCost->setPredictor( rcMvPred );
 
@@ -1962,12 +1719,10 @@ Void InterSearch::xMotionEstimation(PredictionUnit& pu, PelUnitBuf& origBuf, Ref
   //  Do integer search
   if( ( m_motionEstimationSearchMethod == MESEARCH_FULL ) || bBi || bQTBTMV )
   {
-#if !HM_ME_SR_VIOLATION
     if( !bQTBTMV )
     {
       xSetSearchRange( pu, ( bBi ? rcMv : rcMvPred ), iSrchRng, cStruct.searchRange );
     }
-#endif
     cStruct.subShiftMode = m_pcEncCfg->getFastInterSearchMode() == FASTINTERSEARCH_MODE1 || m_pcEncCfg->getFastInterSearchMode() == FASTINTERSEARCH_MODE3 ? 2 : 0;
     xPatternSearch( cStruct, rcMv, ruiCost);
   }
@@ -2214,11 +1969,7 @@ Void InterSearch::xTZSearch( const PredictionUnit& pu,
     }
   }
 
-#if HM_ME_SR_VIOLATION
-  SearchRange sr = cStruct.searchRange;
-#else
   SearchRange& sr = cStruct.searchRange;
-#endif
 
   if (pIntegerMv2Nx2NPred != 0)
   {
@@ -2233,10 +1984,8 @@ Void InterSearch::xTZSearch( const PredictionUnit& pu,
       // only test integerMv2Nx2NPred if not obviously previously tested.
       xTZSearchHelp( cStruct, integerMv2Nx2NPred.getHor(), integerMv2Nx2NPred.getVer(), 0, 0);
     }
-#if !HM_ME_SR_VIOLATION
   }
   {
-#endif
     // set search range
     Mv currBestMv(cStruct.iBestX, cStruct.iBestY );
     currBestMv <<= 2;
@@ -2480,11 +2229,7 @@ Void InterSearch::xTZSearchSelective( const PredictionUnit& pu,
     xTZSearchHelp( cStruct, 0, 0, 0, 0 );
   }
 
-#if HM_ME_SR_VIOLATION
-  SearchRange sr = cStruct.searchRange;
-#else
   SearchRange& sr = cStruct.searchRange;
-#endif
 
   if ( pIntegerMv2Nx2NPred != 0 )
   {
@@ -2495,10 +2240,8 @@ Void InterSearch::xTZSearchSelective( const PredictionUnit& pu,
 
     xTZSearchHelp( cStruct, integerMv2Nx2NPred.getHor(), integerMv2Nx2NPred.getVer(), 0, 0);
 
-#if !HM_ME_SR_VIOLATION
   }
   {
-#endif
     // set search range
     Mv currBestMv(cStruct.iBestX, cStruct.iBestY );
     currBestMv <<= 2;
@@ -3950,23 +3693,17 @@ Void InterSearch::setWpScalingDistParam( Int iRefIdx, RefPicList eRefPicListCur,
 Void InterSearch::xEncodeInterResidualQT(CodingStructure &cs, Partitioner &partitioner, const ComponentID &compID)
 {
   const UnitArea& currArea    = partitioner.currArea();
-#if HEVC_USE_RQT
-  const SPS &sps              = *cs.sps;
-#endif
   const TransformUnit &currTU = *cs.getTU(currArea.lumaPos(), partitioner.chType);
   const CodingUnit &cu        = *currTU.cu;
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
   const unsigned currDepth    = partitioner.currTrDepth;
 
   const Bool bSubdiv          = currDepth != currTU.depth;
-#if HEVC_USE_RQT
-  const UInt uiLog2TrSize     = g_aucLog2[currArea.lumaSize().width];
-#endif
 #endif
 
   if (compID == MAX_NUM_TBLOCKS)  // we are not processing a channel, instead we always recurse and code the CBFs
   {
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
     if( cs.pcv->noRQT )
     {
 #if ENABLE_BMS
@@ -3979,72 +3716,19 @@ Void InterSearch::xEncodeInterResidualQT(CodingStructure &cs, Partitioner &parti
       CHECK( bSubdiv, "transformsplit not supported" );
     }
 #endif
-#if HEVC_USE_RQT
-    else if (uiLog2TrSize <= sps.getQuadtreeTULog2MaxSize() && uiLog2TrSize > CU::getQuadtreeTULog2MinSizeInCU(cu))
-    {
-      if (sps.getQuadtreeTUMaxDepthInter() == 1 && cu.partSize != SIZE_2Nx2N)
-      {
-        CHECK(!bSubdiv, "Implicit subdivision ignored"); // Inferred splitting rule - see derivation and use of interSplitFlag in the specification.
-      }
-      else
-      {
-        if( sps.getSpsNext().nextToolsEnabled() )
-        {
-          m_CABACEstimator->split_transform_flag( bSubdiv, sps.getQuadtreeTULog2MaxSize() - uiLog2TrSize );
-        }
-        else
-        {
-          m_CABACEstimator->split_transform_flag( bSubdiv, 5 - uiLog2TrSize );
-        }
-      }
-    }
-
-#endif
     CHECK(CU::isIntra(cu), "Inter search provided with intra CU");
 
     if( cu.chromaFormat != CHROMA_400 )
     {
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
       const bool firstCbfOfCU = ( currDepth == 0 );
-#if HEVC_USE_RQT
-      const bool allQuadrants = TU::isProcessingAllQuadrants( currArea );
-#endif
-#if ENABLE_CHROMA_422
-      const bool twoChromaCbfs = ( cs.pcv->multiBlock422 && ( !bSubdiv || currArea.lumaSize().width == 8 ) );
-      if( twoChromaCbfs )
       {
-        if( firstCbfOfCU || ( allQuadrants && TU::getCbfAtDepth( currTU, COMPONENT_Cb, currDepth - 1 ) ) )
-        {
-          const bool  chroma_cbf1 = TU::getCbfAtDepth( currTU, COMPONENT_Cb, currDepth );
-          const bool  chroma_cbf2 = TU::getCbfAtDepth( currTU, COMPONENT_Cb2, currDepth );
-          m_CABACEstimator->cbf_comp( cs, chroma_cbf1, currArea.blocks[COMPONENT_Cb], currDepth );
-          m_CABACEstimator->cbf_comp( cs, chroma_cbf2, currArea.blocks[COMPONENT_Cb], currDepth );
-        }
-        if( firstCbfOfCU || ( allQuadrants && TU::getCbfAtDepth( currTU, COMPONENT_Cr, currDepth - 1 ) ) )
-        {
-          const bool  chroma_cbf1 = TU::getCbfAtDepth( currTU, COMPONENT_Cr, currDepth );
-          const bool  chroma_cbf2 = TU::getCbfAtDepth( currTU, COMPONENT_Cr2, currDepth );
-          m_CABACEstimator->cbf_comp( cs, chroma_cbf1, currArea.blocks[COMPONENT_Cr], currDepth );
-          m_CABACEstimator->cbf_comp( cs, chroma_cbf2, currArea.blocks[COMPONENT_Cr], currDepth );
-        }
-      }
-      else
-#endif
-      {
-#if HEVC_USE_RQT
-        if( firstCbfOfCU || ( allQuadrants && TU::getCbfAtDepth( currTU, COMPONENT_Cb, currDepth - 1 ) ) )
-#else
         if( firstCbfOfCU || TU::getCbfAtDepth( currTU, COMPONENT_Cb, currDepth - 1 ) )
-#endif
         {
           const bool  chroma_cbf = TU::getCbfAtDepth( currTU, COMPONENT_Cb, currDepth );
           m_CABACEstimator->cbf_comp( cs, chroma_cbf, currArea.blocks[COMPONENT_Cb], currDepth );
         }
-#if HEVC_USE_RQT
-        if( firstCbfOfCU || ( allQuadrants && TU::getCbfAtDepth( currTU, COMPONENT_Cr, currDepth - 1 ) ) )
-#else
         if( firstCbfOfCU || TU::getCbfAtDepth( currTU, COMPONENT_Cr, currDepth - 1 ) )
-#endif
         {
           const bool  chroma_cbf = TU::getCbfAtDepth( currTU, COMPONENT_Cr, currDepth );
           m_CABACEstimator->cbf_comp( cs, chroma_cbf, currArea.blocks[COMPONENT_Cr], currDepth );
@@ -4065,7 +3749,7 @@ Void InterSearch::xEncodeInterResidualQT(CodingStructure &cs, Partitioner &parti
 #endif
   }
 
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
   if (!bSubdiv)
 #endif
   {
@@ -4081,20 +3765,10 @@ Void InterSearch::xEncodeInterResidualQT(CodingStructure &cs, Partitioner &parti
         {
           m_CABACEstimator->residual_coding( currTU, compID );
         }
-#if ENABLE_CHROMA_422
-        if( cs.pcv->multiBlock422 && compID != COMPONENT_Y )
-        {
-          ComponentID compID2 = ComponentID( compID + SCND_TBLOCK_OFFSET );
-          if( TU::getCbf( currTU, compID2 ) )
-          {
-            m_CABACEstimator->residual_coding( currTU, compID2 );
-          }
-        }
-#endif
       }
     }
   }
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
   else
   {
     if( compID == MAX_NUM_TBLOCKS || TU::getCbfAtDepth( currTU, compID, currDepth ) )
@@ -4106,15 +3780,7 @@ Void InterSearch::xEncodeInterResidualQT(CodingStructure &cs, Partitioner &parti
       }
       else
 #endif
-#if HEVC_USE_RQT
-#if HM_REPRODUCE_4x4_BLOCK_ESTIMATION_ORDER
-      partitioner.splitCurrArea( TU_QUAD_SPLIT_HM, cs );
-#else
-      partitioner.splitCurrArea( TU_QUAD_SPLIT   , cs );
-#endif
-#else
         THROW( "Implicit TU split not available!" );
-#endif
 
       do
       {
@@ -4127,7 +3793,7 @@ Void InterSearch::xEncodeInterResidualQT(CodingStructure &cs, Partitioner &parti
 #endif
 #if JEM_TOOLS && !HM_EMT_NSST_AS_IN_JEM
 
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
   if( isLuma( compID ) && currDepth == 0 )
 #else
   if( isLuma( compID ) )
@@ -4145,36 +3811,10 @@ Void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &par
   const PPS &pps           = *cs.pps;
   const UInt numValidComp  = getNumberValidComponents( sps.getChromaFormatIdc() );
   const UInt numTBlocks    = getNumberValidTBlocks   ( *cs.pcv );
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
   const unsigned currDepth = partitioner.currTrDepth;
 
-#if HEVC_USE_RQT
-  const CodingUnit &cu     = *cs.getCU( partitioner.chType );
-  const UInt uiLog2TrSize  = g_aucLog2[currArea.lumaSize().width];
-
-  Bool SplitFlag = (sps.getQuadtreeTUMaxDepthInter() == 1) && CU::isInter(cu) && cu.partSize != SIZE_2Nx2N;
-
-  Bool bCheckFull;
-
-  if (SplitFlag && currDepth == 0 && uiLog2TrSize > CU::getQuadtreeTULog2MinSizeInCU(cu))
-  {
-    bCheckFull = false;
-  }
-  else if ( !cs.pcv->noRQT )
-  {
-    bCheckFull = uiLog2TrSize <= sps.getQuadtreeTULog2MaxSize();
-  }
-  else
-  {
-    bCheckFull = true;
-  }
-
-  Bool bCheckSplit = uiLog2TrSize > CU::getQuadtreeTULog2MinSizeInCU( cu ) && !cs.pcv->noRQT;
-
-  CHECK(!bCheckFull && !bCheckSplit, "Testing disabled for both full search and subdivision");
-#else
   Bool bCheckSplit = false, bCheckFull = false;
-#endif
 #if ENABLE_BMS
   if( cs.pcv->noRQT )
   {
@@ -4186,27 +3826,6 @@ Void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &par
   // get temporary data
   CodingStructure *csSplit = nullptr;
   CodingStructure *csFull  = nullptr;
-#if HEVC_USE_RQT
-  if (bCheckFull && bCheckSplit)
-  {
-    csSplit = m_pSplitCS[gp_sizeIdxInfo->idxFrom( cu.lwidth() )][gp_sizeIdxInfo->idxFrom( cu.lheight() )][currDepth];
-    csFull  = m_pFullCS [gp_sizeIdxInfo->idxFrom( cu.lwidth() )][gp_sizeIdxInfo->idxFrom( cu.lheight() )][currDepth];
-
-    cs.initSubStructure(*csSplit, partitioner.chType, cs.area, true);
-    cs.initSubStructure(*csFull,  partitioner.chType, cs.area, true);
-
-    csFull ->getOrgResiBuf().copyFrom(cs.getOrgResiBuf());
-    csSplit->getOrgResiBuf().copyFrom(cs.getOrgResiBuf());
-#if JEM_TOOLS
-    if( cs.sps->getSpsNext().getUseBIF() )
-    {
-      csFull ->getPredBuf().copyFrom(cs.getPredBuf());
-      csSplit->getPredBuf().copyFrom(cs.getPredBuf());
-    }
-#endif
-  }
-  else
-#endif
   if (bCheckSplit)
   {
     csSplit = &cs;
@@ -4221,13 +3840,8 @@ Void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &par
 #endif
 
   Distortion uiSingleDist         = 0;
-#if ENABLE_CHROMA_422
-  Distortion uiSingleDistComp [5] = { 0, 0, 0, 0, 0 };
-  TCoeff     uiAbsSum         [5] = { 0, 0, 0, 0, 0 };
-#else
   Distortion uiSingleDistComp [3] = { 0, 0, 0 };
   TCoeff     uiAbsSum         [3] = { 0, 0, 0 };
-#endif
 
   const TempCtx ctxStart  ( m_CtxCache, m_CABACEstimator->getCtx() );
   TempCtx       ctxBest   ( m_CtxCache );
@@ -4235,7 +3849,7 @@ Void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &par
   if (bCheckFull)
   {
     TransformUnit &tu = csFull->addTU(currArea, partitioner.chType);
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
     tu.depth          = currDepth;
 #endif
 #if JEM_TOOLS
@@ -4262,22 +3876,10 @@ Void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &par
 
     TransformUnit &bestTU = saveCS.addTU( currArea, partitioner.chType );
 
-#if ENABLE_CHROMA_422
-    static const ComponentID c2comp[2][MAX_NUM_TBLOCKS] =
-    {
-      { COMPONENT_Y, COMPONENT_Cb, COMPONENT_Cr,  MAX_NUM_TBLOCKS, MAX_NUM_TBLOCKS },
-      { COMPONENT_Y, COMPONENT_Cb, COMPONENT_Cb2, COMPONENT_Cr,    COMPONENT_Cr2   }
-    };
-    const ComponentID*  getComp     = c2comp[ numTBlocks >> 2 ];
-#endif
 
     for( UInt c = 0; c < numTBlocks; c++ )
     {
-#if ENABLE_CHROMA_422
-      const ComponentID compID    = getComp[c];
-#else
       const ComponentID compID    = ComponentID(c);
-#endif
       const CompArea&   compArea  = tu.blocks[compID];
       const Int channelBitDepth   = sps.getBitDepth(toChannelType(compID));
 
@@ -4376,7 +3978,7 @@ Void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &par
               nonCoeffDist = m_pcRdCost->getDistPart( zeroBuf, orgResi, channelBitDepth, compID, DF_SSE ); // initialized with zero residual distortion
             }
 
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
             m_CABACEstimator->cbf_comp( *csFull, false, compArea, currDepth );
 #else
             m_CABACEstimator->cbf_comp( *csFull, false, compArea );
@@ -4410,7 +4012,7 @@ Void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &par
               m_CABACEstimator->getCtx() = ctxStart;
               m_CABACEstimator->resetBits();
             }
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
             m_CABACEstimator->cbf_comp( *csFull, true, compArea, currDepth );
 #else
             m_CABACEstimator->cbf_comp( *csFull, true, compArea );
@@ -4520,39 +4122,13 @@ Void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &par
     m_CABACEstimator->getCtx() = ctxStart;
     m_CABACEstimator->resetBits();
 
-#if HEVC_USE_RQT
-    if( !cs.pcv->noRQT )
-    {
-      if (uiLog2TrSize > CU::getQuadtreeTULog2MinSizeInCU(cu))
-      {
-        if( sps.getSpsNext().nextToolsEnabled() )
-        {
-          m_CABACEstimator->split_transform_flag( false, sps.getQuadtreeTULog2MaxSize() - uiLog2TrSize );
-        }
-        else
-        {
-          m_CABACEstimator->split_transform_flag( false, 5 - uiLog2TrSize );
-        }
-      }
-    }
-
-#endif
-#if ENABLE_CHROMA_422
-    static const ComponentID cbf_c2comp[2][5] =
-    {
-      { COMPONENT_Cb, COMPONENT_Cr,  COMPONENT_Y,  MAX_NUM_TBLOCKS, MAX_NUM_TBLOCKS },
-      { COMPONENT_Cb, COMPONENT_Cb2, COMPONENT_Cr, COMPONENT_Cr2,   COMPONENT_Y     }
-    };
-    const ComponentID*       cbf_getComp      = cbf_c2comp[ numTBlocks >> 2 ];
-#else
     static const ComponentID cbf_getComp[3] = { COMPONENT_Cb, COMPONENT_Cr, COMPONENT_Y };
-#endif
     for( unsigned c = 0; c < numTBlocks; c++)
     {
       const ComponentID compID = cbf_getComp[c];
       if( tu.blocks[compID].valid() )
       {
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
         m_CABACEstimator->cbf_comp( *csFull, TU::getCbfAtDepth( tu, compID, currDepth ), tu.blocks[compID], currDepth );
 #else
         m_CABACEstimator->cbf_comp( *csFull, TU::getCbf( tu, compID ), tu.blocks[compID] );
@@ -4575,17 +4151,6 @@ Void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &par
           m_CABACEstimator->residual_coding( tu, compID );
         }
         uiSingleDist += uiSingleDistComp[compID];
-#if ENABLE_CHROMA_422
-        if( cs.pcv->multiBlock422 && ch != COMPONENT_Y )
-        {
-          ComponentID compID2 = ComponentID( compID + SCND_TBLOCK_OFFSET );
-          if( TU::getCbf( tu, compID2 ) )
-          {
-            m_CABACEstimator->residual_coding( tu, compID2 );
-          }
-          uiSingleDist += uiSingleDistComp[compID2];
-        }
-#endif
       }
     }
 
@@ -4599,14 +4164,8 @@ Void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &par
     else
 #endif
     csFull->cost      = m_pcRdCost->calcRdCost(csFull->fracBits, csFull->dist);
-#if HEVC_USE_RQT
-    if (bCheckSplit)
-    {
-      ctxBest = m_CABACEstimator->getCtx();
-    }
-#endif
   } // check full
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
 
   // code sub-blocks
   if( bCheckSplit )
@@ -4623,15 +4182,7 @@ Void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &par
     }
     else
 #endif
-#if HEVC_USE_RQT
-#if HM_REPRODUCE_4x4_BLOCK_ESTIMATION_ORDER
-    partitioner.splitCurrArea( TU_QUAD_SPLIT_HM, cs );
-#else
-    partitioner.splitCurrArea( TU_QUAD_SPLIT, cs );
-#endif
-#else
       THROW( "Implicit TU split not available!" );
-#endif
 
     do
     {
@@ -4649,12 +4200,7 @@ Void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &par
     partitioner.exitCurrSplit();
 
     unsigned        anyCbfSet   =   0;
-#if ENABLE_CHROMA_422
-    unsigned        compCbf[5]  = { 0, 0, 0, 0, 0 };
-    const bool      is_NxN_422  = ( cs.pcv->multiBlock422 && currArea.lumaSize().width == 8 );
-#else
     unsigned        compCbf[3]  = { 0, 0, 0 };
-#endif
 
 #if JEM_TOOLS
     bool isSplit = bCheckFull ? false : true;
@@ -4671,34 +4217,7 @@ Void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &par
         }
       }
 
-#if ENABLE_CHROMA_422
-      if( is_NxN_422 ) // very special case
       {
-        for( auto &currTU : csSplit->traverseTUs( currArea, partitioner.chType ) )
-        {
-          TU::setCbfAtDepth ( currTU, COMPONENT_Y,   currDepth, compCbf[ COMPONENT_Y  ] );
-          TU::setCbfAtDepth ( currTU, COMPONENT_Cb,  currDepth, compCbf[ COMPONENT_Cb ] );
-          TU::setCbfAtDepth ( currTU, COMPONENT_Cr,  currDepth, compCbf[ COMPONENT_Cr ] );
-          TU::setCbfAtDepth ( currTU, COMPONENT_Cb2, currDepth, compCbf[ COMPONENT_Cb2] );
-          TU::setCbfAtDepth ( currTU, COMPONENT_Cr2, currDepth, compCbf[ COMPONENT_Cr2] );
-        }
-
-        anyCbfSet  = compCbf[ COMPONENT_Y  ];
-        anyCbfSet |= compCbf[ COMPONENT_Cb ];
-        anyCbfSet |= compCbf[ COMPONENT_Cr ];
-        anyCbfSet |= compCbf[ COMPONENT_Cb2];
-        anyCbfSet |= compCbf[ COMPONENT_Cr2];
-      }
-      else // usual case
-#endif
-      {
-#if ENABLE_CHROMA_422
-        if( cs.pcv->multiBlock422 )
-        {
-          compCbf[ COMPONENT_Cb ] |= compCbf[ COMPONENT_Cb2 ];
-          compCbf[ COMPONENT_Cr ] |= compCbf[ COMPONENT_Cr2 ];
-        }
-#endif
 
         for( auto &currTU : csSplit->traverseTUs( currArea, partitioner.chType ) )
         {
@@ -4878,11 +4397,7 @@ Void InterSearch::encodeResAndCalcRdInterCU(CodingStructure &cs, Partitioner &pa
   const Int  numValidTBlocks   = ::getNumberValidTBlocks( *cs.pcv );
   for (UInt i = 0; i < numValidTBlocks; i++)
   {
-#if HEVC_USE_RQT
-    cu.rootCbf |= TU::getCbfAtDepth( firstTU, ComponentID( i ), 0 );
-#else
     cu.rootCbf |= TU::getCbf( firstTU, ComponentID( i ) );
-#endif
   }
 
   // -------------------------------------------------------
@@ -4905,9 +4420,6 @@ Void InterSearch::encodeResAndCalcRdInterCU(CodingStructure &cs, Partitioner &pa
     cu.firstTU = cu.lastTU = &tu;
   }
 
-#if HM_REPRODUCE_4x4_BLOCK_ESTIMATION_ORDER
-  xChangeInterTUsFromSearchToCode( cs, partitioner );
-#endif
 
   // all decisions now made. Fully encode the CU, including the headers:
   m_CABACEstimator->getCtx() = ctxStart;
@@ -4989,9 +4501,6 @@ UInt64 InterSearch::xGetSymbolFracBitsInter(CodingStructure &cs, Partitioner &pa
 
     m_CABACEstimator->cu_skip_flag( cu );
     m_CABACEstimator->pred_mode   ( cu );
-#if HEVC_USE_PART_SIZE
-    m_CABACEstimator->part_mode   ( cu );
-#endif
     m_CABACEstimator->cu_pred_data( cu );
     CUCtx cuCtx;
     cuCtx.isDQPCoded = true;
@@ -5003,72 +4512,4 @@ UInt64 InterSearch::xGetSymbolFracBitsInter(CodingStructure &cs, Partitioner &pa
   return fracBits;
 }
 
-#if HM_REPRODUCE_4x4_BLOCK_ESTIMATION_ORDER
-Void InterSearch::xChangeInterTUsFromSearchToCode( CodingStructure &cs, Partitioner &partitioner )
-{
-  const TransformUnit &currTU = *cs.getTU( partitioner.currArea().lumaPos(), partitioner.chType );
-
-  const Bool bSubdiv = partitioner.currTrDepth != currTU.depth;
-
-  if( !bSubdiv )  // we are not processing a channel, instead we always recurse and code the CBFs
-  {
-  }
-  else
-  {
-    const auto subTUs = PartitionerImpl::getTUSubPartitions( partitioner.currArea(), cs );
-
-    // move the chroma sub-blocks from the first sub TU to the last
-    if( !TU::isProcessingAllQuadrants( subTUs[0] ) )
-    {
-      TransformUnit &firstTU = *cs.getTU( subTUs[0].lumaPos(), partitioner.chType );
-      TransformUnit &lastTU  = *cs.getTU( subTUs[3].lumaPos(), partitioner.chType );
-
-#if ENABLE_CHROMA_422
-      TCoeff *coefff[2][MAX_NUM_TBLOCKS] = { { firstTU.getCoeffs( COMPONENT_Y ).buf, nullptr, nullptr, nullptr, nullptr }, { lastTU.getCoeffs( COMPONENT_Y ).buf, nullptr, nullptr, nullptr, nullptr } };
-      Pel    *pcmbuf[2][MAX_NUM_TBLOCKS] = { { firstTU.getPcmbuf( COMPONENT_Y ).buf, nullptr, nullptr, nullptr, nullptr }, { lastTU.getPcmbuf( COMPONENT_Y ).buf, nullptr, nullptr, nullptr, nullptr } };
-#else
-      TCoeff *coefff[2][MAX_NUM_TBLOCKS] = { { firstTU.getCoeffs( COMPONENT_Y ).buf, nullptr, nullptr }, { lastTU.getCoeffs( COMPONENT_Y ).buf, nullptr, nullptr } };
-      Pel    *pcmbuf[2][MAX_NUM_TBLOCKS] = { { firstTU.getPcmbuf( COMPONENT_Y ).buf, nullptr, nullptr }, { lastTU.getPcmbuf( COMPONENT_Y ).buf, nullptr, nullptr } };
-#endif
-
-      UInt maxNumTBlocks = getNumberValidTBlocks( *cs.pcv );
-
-      for( UInt i = 1; i < maxNumTBlocks; i++ )
-      {
-        ComponentID compID = ComponentID( i );
-
-        if( !firstTU.blocks[i].valid() ) continue;
-
-        coefff[1][i] = firstTU.getCoeffs( compID ).buf;
-        pcmbuf[1][i] = firstTU.getPcmbuf( compID ).buf;
-
-        lastTU.blocks[i] = firstTU.blocks[i];
-      }
-
-      lastTU.init( coefff[1], pcmbuf[1] );
-
-      for( UInt i = 1; i < maxNumTBlocks; i++ )
-      {
-        if( !firstTU.blocks[i].valid() ) continue;
-
-        lastTU.copyComponentFrom( firstTU, ComponentID( i ) );
-        firstTU.blocks[i] = CompArea();
-      }
-
-      firstTU.init( coefff[0], pcmbuf[0] );
-    }
-    else
-    {
-      partitioner.splitCurrArea( TU_QUAD_SPLIT, cs );
-
-      do
-      {
-        xChangeInterTUsFromSearchToCode( cs, partitioner );
-      } while( partitioner.nextPart( cs ) );
-
-      partitioner.exitCurrSplit();
-    }
-  }
-}
-#endif
 

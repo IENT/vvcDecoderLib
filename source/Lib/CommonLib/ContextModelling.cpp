@@ -551,13 +551,13 @@ unsigned DeriveCtx::CtxCUsplit( const CodingStructure& cs, Partitioner& partitio
   return ctxId;
 }
 
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
 unsigned DeriveCtx::CtxQtCbf( const ComponentID compID, const unsigned trDepth )
 #else
 unsigned DeriveCtx::CtxQtCbf( const ComponentID compID )
 #endif
 {
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
   if( isChroma( compID ) )
   {
     return trDepth;

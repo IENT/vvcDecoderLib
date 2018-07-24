@@ -167,11 +167,7 @@ public:
 #endif
   }
   Void           setCostScale             ( Int iCostScale )           { m_iCostScale = iCostScale; }
-#if HM_EQ_MOTION_COST
-  Distortion     getCost                  ( UInt b )                   { return Distortion( (((UInt)floor(65536.0 * m_motionLambda)) * b) >> 16 ); }
-#else
   Distortion     getCost                  ( UInt b )                   { return Distortion( m_motionLambda * b ); }
-#endif
 
 #if ENABLE_SPLIT_PARALLELISM
   void copyState( const RdCost& other );

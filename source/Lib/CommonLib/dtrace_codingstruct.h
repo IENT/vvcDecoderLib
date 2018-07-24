@@ -77,11 +77,7 @@ inline void dtraceModeCost(CodingStructure &cs, double lambda)
 
 #if OLD_RDCOST
   UInt64 tempBits = cs.fracBits >> SCALE_BITS;
-#if HM_16_6_BIT_EQUAL
-  UInt64 tempCost = (UInt64)floor(cs.dist + (double)tempBits * lambda + 0.5);
-#else
   UInt64 tempCost = (UInt64)(cs.dist + (double)tempBits * lambda);
-#endif
 #else
   UInt64 tempBits = cs.fracBits;
   UInt64 tempCost = (UInt64)cs.cost;
@@ -157,13 +153,8 @@ inline void dtraceBestMode(CodingStructure *&tempCS, CodingStructure *&bestCS, d
 #if OLD_RDCOST
   UInt64 tempBits = tempCS->fracBits >> SCALE_BITS;
   UInt64 bestBits = bestCS->fracBits >> SCALE_BITS;
-#if HM_16_6_BIT_EQUAL
-  UInt64 tempCost = (UInt64)floor(tempCS->dist + (double)tempBits * lambda + 0.5);
-  UInt64 bestCost = (UInt64)floor(bestCS->dist + (double)bestBits * lambda + 0.5);
-#else
   UInt64 tempCost = (UInt64)(tempCS->dist + (double)tempBits * lambda);
   UInt64 bestCost = (UInt64)(bestCS->dist + (double)bestBits * lambda);
-#endif
 #else
   UInt64 tempBits = tempCS->fracBits;
   UInt64 bestBits = bestCS->fracBits;

@@ -244,23 +244,9 @@ public:
   void      restart             ()                                    { m_EstFracBits = (m_EstFracBits >> SCALE_BITS) << SCALE_BITS; }
   void      reset               ( int qp, int initId )                { Ctx::init( qp, initId ); m_EstFracBits = 0;}
 public:
-#if HM_STORE_FRAC_BITS_AND_USE_ROUNDED_BITS
-  void      resetBits           ()                                    { m_EstFracBits &= ((1 << SCALE_BITS) - 1); }
-#else
   void      resetBits           ()                                    { m_EstFracBits = 0; }
-#endif
 
-#if HM_STORE_FRAC_BITS_AND_USE_ROUNDED_BITS
-#if ENABLE_TRACING
-  uint64_t  getEstFracBits      ()                              const {
-    DTRACE( g_trace_ctx, D_EST_FRAC_BITS, "FBits=%d\n", m_EstFracBits );
-    return ( ( m_EstFracBits >> SCALE_BITS ) << SCALE_BITS );         }   // rounding to yields same results as HM
-#else
-  uint64_t  getEstFracBits      ()                              const { return ((m_EstFracBits >> SCALE_BITS) << SCALE_BITS); }   // rounding to yields same results as HM
-#endif
-#else
   uint64_t  getEstFracBits      ()                              const { return m_EstFracBits; }
-#endif
   unsigned  getNumBins          ( unsigned ctxId )              const { THROW( "not supported for BitEstimator" ); return 0; }
 public:
   void      encodeBinEP         ( unsigned bin                      ) { m_EstFracBits += BinProbModelBase::estFracBitsEP (); }
@@ -279,11 +265,7 @@ public:
   unsigned  getNumWrittenBits   ()                                      { /*THROW( "Not supported" );*/ return (UInt)( 0/*m_EstFracBits*//* >> SCALE_BITS*/ ); }
 
 protected:
-#if HM_STORE_FRAC_BITS_AND_USE_ROUNDED_BITS
-  uint64_t&               m_EstFracBits;
-#else
   uint64_t                m_EstFracBits;
-#endif
 };
 
 

@@ -951,7 +951,7 @@ Void QuantRDOQ::xRateDistOptQuant(TransformUnit &tu, const ComponentID &compID, 
   Int     iBestLastIdxP1      = 0;
 
 
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
   if( !CU::isIntra( *tu.cu ) && isLuma( compID ) && tu.depth == 0 )
 #else
   if( !CU::isIntra( *tu.cu ) && isLuma( compID ) )
@@ -963,7 +963,7 @@ Void QuantRDOQ::xRateDistOptQuant(TransformUnit &tu, const ComponentID &compID, 
   }
   else
   {
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
     BinFracBits fracBitsQtCbf = fracBits.getFracBitsArray( Ctx::QtCbf[chType]( DeriveCtx::CtxQtCbf( rect.compID, tu.depth ) ) );
 #else
     BinFracBits fracBitsQtCbf = fracBits.getFracBitsArray( Ctx::QtCbf[chType]( DeriveCtx::CtxQtCbf( rect.compID ) ) );

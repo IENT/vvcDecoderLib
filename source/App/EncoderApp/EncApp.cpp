@@ -551,9 +551,6 @@ Void EncApp::xInitLibCfg()
   m_cEncLib.setEnsureWppBitEqual                                 ( m_ensureWppBitEqual );
 
 #endif
-#if JEM_COMP
-  m_cEncLib.setGenerateJEM                                       ( m_generateJEM );
-#endif
 }
 
 Void EncApp::xCreateLib( std::list<PelUnitBuf*>& recBufList

@@ -421,7 +421,7 @@ struct TransformUnit : public UnitArea
   CodingStructure *cs;
   ChannelType      chType;
 
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
   UChar        depth;
 #endif
 #if JEM_TOOLS

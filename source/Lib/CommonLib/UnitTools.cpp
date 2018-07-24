@@ -258,42 +258,6 @@ bool CU::isRDPCMEnabled(const CodingUnit& cu)
   return cu.cs->sps->getSpsRangeExtension().getRdpcmEnabledFlag(cu.predMode == MODE_INTRA ? RDPCM_SIGNAL_IMPLICIT : RDPCM_SIGNAL_EXPLICIT);
 }
 
-#if HEVC_USE_RQT
-UInt CU::getQuadtreeTULog2MinSizeInCU(const CodingUnit& cu)
-{
-  const SPS &sps = *cu.cs->sps;
-
-  const UInt log2CbSize         = g_aucLog2[cu.lumaSize().width];
-  const UInt quadtreeTUMaxDepth =  isIntra(cu) ? sps.getQuadtreeTUMaxDepthIntra() : sps.getQuadtreeTUMaxDepthInter();
-#if HEVC_USE_PART_SIZE
-  const Int intraSplitFlag      = (isIntra(cu) && cu.partSize == SIZE_NxN) ? 1 : 0;
-#else
-  const Int intraSplitFlag      = 0;
-#endif
-  const Int interSplitFlag      = ((quadtreeTUMaxDepth == 1) && isInter(cu) && (cu.partSize != SIZE_2Nx2N));
-
-  UInt log2MinTUSizeInCU = 0;
-
-  if (log2CbSize < (sps.getQuadtreeTULog2MinSize() + quadtreeTUMaxDepth - 1 + interSplitFlag + intraSplitFlag))
-  {
-    // when fully making use of signaled TUMaxDepth + inter/intraSplitFlag, resulting luma TB size is < QuadtreeTULog2MinSize
-    log2MinTUSizeInCU = sps.getQuadtreeTULog2MinSize();
-  }
-  else
-  {
-    // when fully making use of signaled TUMaxDepth + inter/intraSplitFlag, resulting luma TB size is still >= QuadtreeTULog2MinSize
-    log2MinTUSizeInCU = log2CbSize - (quadtreeTUMaxDepth - 1 + interSplitFlag + intraSplitFlag); // stop when trafoDepth == hierarchy_depth = splitFlag
-
-    if (log2MinTUSizeInCU > sps.getQuadtreeTULog2MaxSize())
-    {
-      // when fully making use of signaled TUMaxDepth + inter/intraSplitFlag, resulting luma TB size is still > QuadtreeTULog2MaxSize
-      log2MinTUSizeInCU = sps.getQuadtreeTULog2MaxSize();
-    }
-  }
-  return log2MinTUSizeInCU;
-}
-
-#endif
 bool CU::isLosslessCoded(const CodingUnit &cu)
 {
   return cu.cs->pps->getTransquantBypassEnabledFlag() && cu.transQuantBypass;
@@ -328,12 +292,7 @@ bool CU::isSameCtu(const CodingUnit& cu, const CodingUnit& cu2)
 
 UInt CU::getIntraSizeIdx(const CodingUnit &cu)
 {
-#if HEVC_USE_PART_SIZE
-  UInt  uiShift = ( cu.partSize == SIZE_NxN ? 1 : 0 );
-  UChar uiWidth = cu.lumaSize().width >> uiShift;
-#else
   UChar uiWidth = cu.lumaSize().width;
-#endif
 
   UInt  uiCnt   = 0;
 
@@ -416,16 +375,7 @@ UInt CU::getNumPUs( const CodingUnit& cu )
 
 void CU::addPUs( CodingUnit& cu )
 {
-#if HEVC_USE_PART_SIZE
-  const auto puAreas = PartitionerImpl::getPUPartitioning( cu );
-
-  for( const auto &puArea : puAreas )
-  {
-    cu.cs->addPU( CS::getArea( *cu.cs, puArea, cu.chType ), cu.chType );
-  }
-#else
   cu.cs->addPU( CS::getArea( *cu.cs, cu, cu.chType ), cu.chType );
-#endif
 }
 
 
@@ -1084,11 +1034,7 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx, co
   //left
   const PredictionUnit* puLeft = cs.getPURestricted( posLB.offset( -1, 0 ), pu, pu.chType );
 
-#if HEVC_USE_PART_SIZE
-  const Bool isAvailableA1 = puLeft && isDiffMER( pu, *puLeft ) && ( pu.cu != puLeft->cu || pu.cu->partSize == SIZE_NxN ) && CU::isInter( *puLeft->cu );
-#else
   const Bool isAvailableA1 = puLeft && isDiffMER( pu, *puLeft ) && pu.cu != puLeft->cu && CU::isInter( *puLeft->cu );
-#endif
 
   if( isAvailableA1 )
   {
@@ -1128,11 +1074,7 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx, co
   // above
   const PredictionUnit *puAbove = cs.getPURestricted( posRT.offset( 0, -1 ), pu, pu.chType );
 
-#if HEVC_USE_PART_SIZE
-  Bool isAvailableB1 = puAbove && isDiffMER( pu, *puAbove ) && ( pu.cu != puAbove->cu || pu.cu->partSize == SIZE_NxN ) && CU::isInter( *puAbove->cu );
-#else
   Bool isAvailableB1 = puAbove && isDiffMER( pu, *puAbove ) && pu.cu != puAbove->cu && CU::isInter( *puAbove->cu );
-#endif
 
   if( isAvailableB1 )
   {
@@ -3888,14 +3830,14 @@ bool TU::isNonTransformedResidualRotated(const TransformUnit &tu, const Componen
 
 bool TU::getCbf( const TransformUnit &tu, const ComponentID &compID )
 {
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
   return getCbfAtDepth( tu, compID, tu.depth );
 #else
   return tu.cbf[compID];
 #endif
 }
 
-#if HEVC_USE_RQT || ENABLE_BMS
+#if ENABLE_BMS
 bool TU::getCbfAtDepth(const TransformUnit &tu, const ComponentID &compID, const unsigned &depth)
 {
   return ((tu.cbf[compID] >> depth) & 1) == 1;
@@ -3995,20 +3937,6 @@ UInt TU::getCoefScanIdx(const TransformUnit &tu, const ComponentID &compID)
   else
   {
     return SCAN_DIAG;
-  }
-}
-
-#endif
-#if HEVC_USE_RQT
-bool TU::isProcessingAllQuadrants(const UnitArea &tuArea)
-{
-  if (tuArea.chromaFormat == CHROMA_444)
-  {
-    return true;
-  }
-  else
-  {
-    return tuArea.Cb().valid() && tuArea.lumaSize().width != tuArea.chromaSize().width;
   }
 }
 

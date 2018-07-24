@@ -795,19 +795,6 @@ const uint16_t ProbModelTables::m_InistateToCount[128] =
 };
 
 #endif
-#if HM_REPRODUCE_CONTEXT_IDX_CALCULATION
-const double ProbModelTables::m_StateToProbLPS[64] =
-{
-  0.50000000, 0.47460857, 0.45050660, 0.42762859, 0.40591239, 0.38529900, 0.36573242, 0.34715948,
-  0.32952974, 0.31279528, 0.29691064, 0.28183267, 0.26752040, 0.25393496, 0.24103941, 0.22879875,
-  0.21717969, 0.20615069, 0.19568177, 0.18574449, 0.17631186, 0.16735824, 0.15885931, 0.15079198,
-  0.14313433, 0.13586556, 0.12896592, 0.12241667, 0.11620000, 0.11029903, 0.10469773, 0.09938088,
-  0.09433404, 0.08954349, 0.08499621, 0.08067986, 0.07658271, 0.07269362, 0.06900203, 0.06549791,
-  0.06217174, 0.05901448, 0.05601756, 0.05317283, 0.05047256, 0.04790942, 0.04547644, 0.04316702,
-  0.04097487, 0.03889405, 0.03691890, 0.03504406, 0.03326442, 0.03157516, 0.02997168, 0.02844963,
-  0.02700488, 0.02563349, 0.02433175, 0.02309612, 0.02192323, 0.02080991, 0.01975312, 0.01875000
-};
-#endif
 
 
 
@@ -1452,9 +1439,6 @@ Ctx::Ctx( const Ctx& ctx )
   , m_CtxStore_JAW    ( ctx.m_CtxStore_JAW    )
   , m_CtxStore_JMPAW  ( ctx.m_CtxStore_JMPAW  )
 #endif
-#if HM_STORE_FRAC_BITS_AND_USE_ROUNDED_BITS
-  , m_FracBitsStore   ( ctx.m_FracBitsStore   )
-#endif
 {
   ::memcpy( m_GRAdaptStats, ctx.m_GRAdaptStats, sizeof( unsigned ) * RExt__GOLOMB_RICE_ADAPTATION_STATISTICS_SETS );
 }
@@ -1695,9 +1679,6 @@ void CtxWSizeStore::xInitMappingTable( const SPS* sps )
   if( false /* VCEG_AZ08_KLT_COMMON */ )
   {
     // dummy placeholder -- MTT contexts, not used in JEM compatibility modus
-#if JEM_COMP
-    addCtxSetToMapping    ( m_codeId2ctxId, Ctx::BTSplitFlag,            6, 2 );
-#endif
   }
   addCtxSetToMapping      ( m_codeId2ctxId, Ctx::TransquantBypassFlag,   0, 1 );
   addCtxSetToMapping      ( m_codeId2ctxId, Ctx::RdpcmFlag,              0, 2 );

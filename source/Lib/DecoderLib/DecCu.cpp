@@ -302,12 +302,6 @@ DecCu::xIntraRecQT(CodingUnit &cu, const ChannelType chType)
       for( UInt compID = COMPONENT_Cb; compID < numValidComp; compID++ )
       {
         xIntraRecBlk( currTU, ComponentID( compID ) );
-#if ENABLE_CHROMA_422
-        if( cu.cs->pcv->multiBlock422 )
-        {
-          xIntraRecBlk( currTU, ComponentID( compID + SCND_TBLOCK_OFFSET ) );
-        }
-#endif
       }
     }
   }
@@ -424,12 +418,6 @@ Void DecCu::xDecodeInterTexture(CodingUnit &cu)
     for( auto& currTU : CU::traverseTUs( cu ) )
     {
       xDecodeInterTU( currTU, compID );
-#if ENABLE_CHROMA_422
-      if( cu.cs->pcv->multiBlock422 && compID != COMPONENT_Y )
-      {
-        xDecodeInterTU( currTU, ComponentID( compID + SCND_TBLOCK_OFFSET ) );
-      }
-#endif
     }
   }
 }

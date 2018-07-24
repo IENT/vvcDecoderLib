@@ -1283,9 +1283,6 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
 #else
   ("EnsureWppBitEqual",                               m_ensureWppBitEqual,                      false, "Ensure the results are equal to results with WPP-style parallelism, even if WPP is off")
 #endif
-#if JEM_COMP
-  ("GenerateJEM",                                     m_generateJEM,                            false, "Generate a JEM-compatible bitstream!")
-#endif
     ;
 
   for(Int i=1; i<MAX_GOP+1; i++)
@@ -1836,11 +1833,7 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
       uiAddCUDepth++;
     }
 
-#if HEVC_USE_RQT && HEVC_USE_PART_SIZE
-    m_uiMaxCodingDepth = m_uiMaxCUDepth + uiAddCUDepth + getMaxCUDepthOffset( m_chromaFormatIDC, m_quadtreeTULog2MinSize ); // if minimum TU larger than 4x4, allow for additional part indices for 4:2:2 SubTUs.
-#else
     m_uiMaxCodingDepth = m_uiMaxCUDepth + uiAddCUDepth; // if minimum TU larger than 4x4, allow for additional part indices for 4:2:2 SubTUs.
-#endif
     m_uiLog2DiffMaxMinCodingBlockSize = m_uiMaxCUDepth - 1;
 
     m_uiCTUSize = m_uiMaxCUWidth;
@@ -1891,9 +1884,7 @@ Bool EncAppCfg::xCheckParameter()
 
   if( m_profile != Profile::NEXT )
   {
-#if !HEVC_USE_RQT
     THROW( "Next profile with an alternative partitioner has to be enabled if HEVC_USE_RQT is off!" );
-#endif
 #if ENABLE_WPP_PARALLELISM
     xConfirmPara( m_numWppThreads > 1, "WPP-style parallelization only supported with NEXT profile" );
 #endif
@@ -2059,23 +2050,6 @@ Bool EncAppCfg::xCheckParameter()
 
 
 
-#if JEM_COMP
-  if( m_LICMode )
-  {
-    if( m_QTBT && !m_FastPicLevelLIC )
-    {
-      msg( DETAILS, "***************************************************************************\n" );
-      msg( DETAILS, "** WARNING: To be equal to JEM, FastPicLevelLIC has to be on with QTBT!  **\n" );
-      msg( DETAILS, "***************************************************************************\n" );
-    }
-    else if( !m_QTBT && m_FastPicLevelLIC )
-    {
-      msg( DETAILS, "*****************************************************************************\n" );
-      msg( DETAILS, "** WARNING: To be equal to JEM, FastPicLevelLIC has to be off without QTBT!**\n" );
-      msg( DETAILS, "*****************************************************************************\n" );
-    }
-  }
-#endif
 
   xConfirmPara(m_bitstreamFileName.empty(), "A bitstream file name must be specified (BitstreamFile)");
   const UInt maxBitDepth=(m_chromaFormatIDC==CHROMA_400) ? m_internalBitDepth[CHANNEL_TYPE_LUMA] : std::max(m_internalBitDepth[CHANNEL_TYPE_LUMA], m_internalBitDepth[CHANNEL_TYPE_CHROMA]);
@@ -2147,10 +2121,7 @@ Bool EncAppCfg::xCheckParameter()
     xConfirmPara(m_enableIntraReferenceSmoothing==false, "EnableIntraReferenceSmoothing must be enabled for non main-RExt profiles.");
     xConfirmPara(m_cabacBypassAlignmentEnabledFlag, "AlignCABACBeforeBypass cannot be enabled for non main-RExt profiles.");
   }
-#if ENABLE_CHROMA_422
-#else
   xConfirmPara( m_chromaFormatIDC==CHROMA_422, "4:2:2 chroma sampling format not supported with current compiler setting. Set compiler flag \"ENABLE_CHROMA_422\" equal to 1 for enabling 4:2:2.\n\n" );
-#endif
 
   // check range of parameters
   xConfirmPara( m_inputBitDepth[CHANNEL_TYPE_LUMA  ] < 8,                                   "InputBitDepth must be at least 8" );
@@ -2271,15 +2242,6 @@ Bool EncAppCfg::xCheckParameter()
   }
 #endif
 
-#if JEM_COMP && JEM_TOOLS
-  if( m_ImvMode == IMV_DEFAULT )
-  {
-    msg( WARNING, "********************************************************\n" );
-    msg( WARNING, "** WARNING: IMVMode=1 is not compatible with JEM 7.0  **\n" );
-    msg( WARNING, "********************************************************\n" );
-  }
-
-#endif
   xConfirmPara( m_iQP < -6 * (m_internalBitDepth[CHANNEL_TYPE_LUMA] - 8) || m_iQP > MAX_QP, "QP exceeds supported range (-QpBDOffsety to 51)" );
 #if W0038_DB_OPT
   xConfirmPara( m_deblockingFilterMetric!=0 && (m_bLoopFilterDisable || m_loopFilterOffsetInPPS), "If DeblockingFilterMetric is non-zero then both LoopFilterDisable and LoopFilterOffsetInPPS must be 0");
