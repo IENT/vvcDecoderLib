@@ -113,7 +113,7 @@ public:
   unsigned currBtDepth;
   unsigned currMtDepth;
 
-#if !HM_QTBT_ONLY_QT_IMPLICIT
+#if !HM_QTBT_ONLY_QT_IMPLICIT || JVET_K0554
   unsigned currImplicitBtDepth;
 #endif
   ChannelType chType;
