@@ -110,7 +110,7 @@ struct MotionInfo
   UShort   sliceIdx;
 
   Mv      mv     [ NUM_REF_PIC_LIST_01 ];
-#if JEM_TOOLS
+#if JEM_TOOLS && !JVET_K0220_ENC_CTRL
   Mv      mvdAffi[ NUM_REF_PIC_LIST_01 ];
 #endif
   Short   refIdx [ NUM_REF_PIC_LIST_01 ];

@@ -345,8 +345,12 @@ protected:
                                     Int                   puIdx,
                                     UInt&                 lastMode,
                                     Distortion&           affineCost,
+#if JVET_K0220_ENC_CTRL
+                                    Mv                    hevcMv[2][33]
+#else
                                     Mv                    hevcMv[2][33],
                                     Bool                  bFastSkipBi
+#endif
                                   );
 
   Void xAffineMotionEstimation    ( PredictionUnit& pu,

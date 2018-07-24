@@ -351,6 +351,13 @@ Void PredictionUnit::initData()
     refIdx[i] = -1;
     mv[i]     .setZero();
     mvd[i]    .setZero();
+#if JEM_TOOLS && JVET_K0220_ENC_CTRL
+
+    for( UInt j = 0; j < 2; j++ )
+    {
+      mvdAffi[i][j].setZero();
+    }
+#endif
   }
 }
 
@@ -381,6 +388,13 @@ PredictionUnit& PredictionUnit::operator=(const InterPredictionData& predData)
     mv[i]       = predData.mv[i];
     mvd[i]      = predData.mvd[i];
     refIdx[i]   = predData.refIdx[i];
+#if JEM_TOOLS && JVET_K0220_ENC_CTRL
+
+    for( UInt j = 0; j < 2; j++ )
+    {
+      mvdAffi[i][j] = predData.mvdAffi[i][j];
+    }
+#endif
   }
 
   return *this;
@@ -408,6 +422,13 @@ PredictionUnit& PredictionUnit::operator=( const PredictionUnit& other )
     mv[i]       = other.mv[i];
     mvd[i]      = other.mvd[i];
     refIdx[i]   = other.refIdx[i];
+#if JEM_TOOLS && JVET_K0220_ENC_CTRL
+
+    for( UInt j = 0; j < 2; j++ )
+    {
+      mvdAffi[i][j] = other.mvdAffi[i][j];
+    }
+#endif
   }
 
   return *this;

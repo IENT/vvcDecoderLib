@@ -258,8 +258,10 @@ protected:
   bool      m_useFastMrg;
   bool      m_usePbIntraFast;
   bool      m_useAMaxBT;
+#if !JVET_K0220_ENC_CTRL
   bool      m_useSaveLoadEncInfo;
   bool      m_useSaveLoadSplitDecision;
+#endif
   bool      m_e0023FastEnc;
   bool      m_contentBasedFastQtbt;
 
@@ -780,11 +782,14 @@ public:
   bool      getUsePbIntraFast               () const         { return m_usePbIntraFast; }
   Void      setUseAMaxBT                    ( bool  n )      { m_useAMaxBT = n; }
   bool      getUseAMaxBT                    () const         { return m_useAMaxBT; }
+
+#if !JVET_K0220_ENC_CTRL
   Void      setUseSaveLoadEncInfo           ( bool  b )      { m_useSaveLoadEncInfo = b; }
   Void      setUseSaveLoadSplitDecision     ( bool  b )      { m_useSaveLoadSplitDecision = b; }
   bool      getUseSaveLoadEncInfo           () const         { return m_useSaveLoadEncInfo; }
   bool      getUseSaveLoadSplitDecision     () const         { return m_useSaveLoadSplitDecision; }
 
+#endif
   void      setUseE0023FastEnc              ( bool b )       { m_e0023FastEnc = b; }
   bool      getUseE0023FastEnc              () const         { return m_e0023FastEnc; }
   void      setUseContentBasedFastQtbt      ( bool b )       { m_contentBasedFastQtbt = b; }
@@ -838,7 +843,11 @@ public:
 #endif
 
   Void      setChromaFormatIdc              ( ChromaFormat cf ) { m_chromaFormatIDC = cf; }
+#if REUSE_CU_RESULTS
+  ChromaFormat  getChromaFormatIdc          ( ) const        { return m_chromaFormatIDC; }
+#else
   ChromaFormat  getChromaFormatIdc          ( )              { return m_chromaFormatIDC; }
+#endif
 
 #if SHARP_LUMA_DELTA_QP
   Void      setLumaLevelToDeltaQPControls( const LumaLevelToDeltaQPMapping &lumaLevelToDeltaQPMapping ) { m_lumaLevelToDeltaQPMapping=lumaLevelToDeltaQPMapping; }

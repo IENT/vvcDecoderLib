@@ -70,6 +70,9 @@ enum EncTestModeType
   ETM_SPLIT_TT_H,
   ETM_SPLIT_TT_V,
   ETM_POST_DONT_SPLIT, // dummy mode to collect the data from the unsplit coding
+#if REUSE_CU_RESULTS
+  ETM_RECO_CACHED,
+#endif
 #if JEM_TOOLS
   ETM_TRIGGER_IMV_LIST,
 #endif
@@ -272,7 +275,11 @@ protected:
 public:
 
   virtual ~EncModeCtrl              () {}
-
+  
+#if REUSE_CU_RESULTS
+  virtual void create               ( const EncCfg& cfg )                                                                   = 0;
+  virtual void destroy              ()                                                                                      = 0;
+#endif
   virtual void initCTUEncoding      ( const Slice &slice )                                                                  = 0;
   virtual void initCULevel          ( Partitioner &partitioner, const CodingStructure& cs )                                 = 0;
   virtual void finishCULevel        ( Partitioner &partitioner )                                                            = 0;
@@ -299,7 +306,9 @@ public:
   EncTestMode  lastTestMode         () const;
   void         setEarlySkipDetected ();
   virtual void setBest              ( CodingStructure& cs );
+#if !JVET_K0220_ENC_CTRL
   bool         hasOnlySplitModes    () const;
+#endif
   bool         anyMode              () const;
 
   const ComprCUCtx& getComprCUCtx   () { CHECK( m_ComprCUCtxList.empty(), "Accessing empty list!"); return m_ComprCUCtxList.back(); }
@@ -331,6 +340,7 @@ protected:
 // some utility interfaces that expose some functionality that can be used without concerning about which particular controller is used
 //////////////////////////////////////////////////////////////////////////
 
+#if !JVET_K0220_ENC_CTRL
 struct SaveLoadStruct
 {
   unsigned        split;
@@ -387,6 +397,7 @@ public:
 #endif
 };
 
+#endif
 static const int MAX_STORED_CU_INFO_REFS = 4;
 
 struct CodedCUInfo
@@ -445,18 +456,68 @@ public:
   void setMv  ( const UnitArea& area, const RefPicList refPicList, const int iRefIdx, const Mv& rMv );
 };
 
+#if REUSE_CU_RESULTS
+struct BestEncodingInfo
+{
+  CodingUnit     cu;
+  PredictionUnit pu;
+  TransformUnit  tu;
+  EncTestMode    testMode;
+
+  int            poc;
+};
+
+class BestEncInfoCache
+{
+private:
+
+  unsigned            m_numWidths, m_numHeights;
+  const Slice        *m_slice_bencinf;
+  BestEncodingInfo ***m_bestEncInfo[MAX_CU_SIZE >> MIN_CU_LOG2][MAX_CU_SIZE >> MIN_CU_LOG2];
+  TCoeff             *m_pCoeff;
+  Pel                *m_pPcmBuf;
+  CodingStructure     m_dummyCS;
+  XUCache             m_dummyCache;
+
+protected:
+
+  void create   ( const ChromaFormat chFmt );
+  void destroy  ();
+  void init     ( const Slice &slice );
+
+  bool setFromCs( const CodingStructure& cs, const Partitioner& partitioner );
+  bool isValid  ( const CodingStructure& cs, const Partitioner& partitioner );
+
+  // TODO: implement copyState
+
+public:
+
+  BestEncInfoCache() : m_slice_bencinf( nullptr ), m_dummyCS( m_dummyCache.cuCache, m_dummyCache.puCache, m_dummyCache.tuCache ) {}
+  virtual ~BestEncInfoCache() {}
+
+  bool     setCsFrom( CodingStructure& cs, EncTestMode& testMode, const Partitioner& partitioner ) const;
+};
+
+#endif
 //////////////////////////////////////////////////////////////////////////
 // EncModeCtrlMTnoRQT - allows and controls modes introduced by QTBT (inkl. multi-type-tree)
 //                    - only 2Nx2N, no RQT, additional binary/triary CU splits
 //////////////////////////////////////////////////////////////////////////
 
+#if JVET_K0220_ENC_CTRL
+class EncModeCtrlMTnoRQT : public EncModeCtrl, public CacheBlkInfoCtrl
+#else
 class EncModeCtrlMTnoRQT : public EncModeCtrl, public SaveLoadEncInfoCtrl, public CacheBlkInfoCtrl
+#endif
+#if REUSE_CU_RESULTS
+  , public BestEncInfoCache
+#endif
 {
   enum ExtraFeatures
   {
     DID_HORZ_SPLIT = 0,
     DID_VERT_SPLIT,
-#if !HM_NO_ADDITIONAL_SPEEDUPS
+#if !HM_NO_ADDITIONAL_SPEEDUPS || JVET_K0220_ENC_CTRL
     DID_QUAD_SPLIT,
 #endif
     BEST_HORZ_SPLIT_COST,
@@ -466,19 +527,24 @@ class EncModeCtrlMTnoRQT : public EncModeCtrl, public SaveLoadEncInfoCtrl, publi
     DO_TRIH_SPLIT,
     DO_TRIV_SPLIT,
     BEST_NON_SPLIT_COST,
+#if !JVET_K0220_ENC_CTRL
     HISTORY_NEED_TO_SAVE,
     HISTORY_DO_SAVE,
     SAVE_LOAD_TAG,
+#endif
 #if JEM_TOOLS
     BEST_NO_IMV_COST,
     BEST_IMV_COST,
     LAST_NSST_IDX,
     SKIP_OTHER_NSST,
 #endif
-#if !HM_NO_ADDITIONAL_SPEEDUPS
+#if !HM_NO_ADDITIONAL_SPEEDUPS || JVET_K0220_ENC_CTRL
     QT_BEFORE_BT,
     IS_BEST_NOSPLIT_SKIP,
     MAX_QT_SUB_DEPTH,
+#endif
+#if REUSE_CU_RESULTS
+    IS_REUSING_CU,
 #endif
     NUM_EXTRA_FEATURES
   };
@@ -490,6 +556,10 @@ public:
   EncModeCtrlMTnoRQT ();
   ~EncModeCtrlMTnoRQT();
 
+#if REUSE_CU_RESULTS
+  virtual void create             ( const EncCfg& cfg );
+  virtual void destroy            ();
+#endif
   virtual void initCTUEncoding    ( const Slice &slice );
   virtual void initCULevel        ( Partitioner &partitioner, const CodingStructure& cs );
   virtual void finishCULevel      ( Partitioner &partitioner );
