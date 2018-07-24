@@ -694,9 +694,22 @@ class CtxStateBuf
 public:
   CtxStateBuf () : m_valid(false)                 {}
   ~CtxStateBuf()                                  {}
-  __inline void reset       ()                    {   m_valid = false; }
-  __inline bool getIfValid  ( Ctx& ctx )  const   { if( m_valid ) { ctx.loadPStates( m_states ); return true; } return false; }
-  __inline void store ( const Ctx& ctx )          { ctx.savePStates( m_states ); m_valid = true; }
+  inline void reset() { m_valid = false; }
+  inline bool getIfValid(Ctx &ctx) const
+  {
+    if (m_valid)
+    {
+      ctx.loadPStates(m_states);
+      return true;
+    }
+    return false;
+  }
+  inline void store(const Ctx &ctx)
+  {
+    ctx.savePStates(m_states);
+    m_valid = true;
+  }
+
 private:
   std::vector<uint16_t> m_states;
   bool                  m_valid;
@@ -707,10 +720,37 @@ class CtxStateArray
 public:
   CtxStateArray () {}
   ~CtxStateArray() {}
-  __inline void resetAll    ()                              { for( std::size_t k = 0; k < m_data.size(); k++ ) { m_data[k].reset(); } }
-  __inline void resize      ( std::size_t reqSize )         { if( m_data.size() < reqSize ) { m_data.resize(reqSize); } }
-  __inline bool getIfValid  ( Ctx& ctx, unsigned id ) const { if( id <  m_data.size() ) { return m_data[id].getIfValid(ctx); } return false; }
-  __inline void store ( const Ctx& ctx, unsigned id )       { if( id >= m_data.size() ) { resize(id+1); } m_data[id].store(ctx); }    
+  inline void resetAll()
+  {
+    for (std::size_t k = 0; k < m_data.size(); k++)
+    {
+      m_data[k].reset();
+    }
+  }
+  inline void resize(std::size_t reqSize)
+  {
+    if (m_data.size() < reqSize)
+    {
+      m_data.resize(reqSize);
+    }
+  }
+  inline bool getIfValid(Ctx &ctx, unsigned id) const
+  {
+    if (id < m_data.size())
+    {
+      return m_data[id].getIfValid(ctx);
+    }
+    return false;
+  }
+  inline void store(const Ctx &ctx, unsigned id)
+  {
+    if (id >= m_data.size())
+    {
+      resize(id + 1);
+    }
+    m_data[id].store(ctx);
+  }
+
 private:
   std::vector<CtxStateBuf> m_data;
 };

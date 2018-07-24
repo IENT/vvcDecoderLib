@@ -237,22 +237,28 @@ namespace DQIntern
     void initBlock( const TransformUnit& tu, const ComponentID     compID );
     void initCtx  ( const TransformUnit& tu, const FracBitsAccess& fracBitsAccess );
 
-    __inline  bool                  luma          ()                    const { return m_compID == COMPONENT_Y; }
-    __inline  int32_t               widthInSbb    ()                    const { return m_widthInSbb; }
-    __inline  int32_t               heightInSbb   ()                    const { return m_heightInSbb; }
-    __inline  int32_t               numCoeff      ()                    const { return m_numCoeff; }
-    __inline  int32_t               numSbb        ()                    const { return m_numSbb; }
-    __inline  int32_t               sbbSize       ()                    const { return m_sbbSize; }
-    __inline  int32_t               sbbPos        ( unsigned scanIdx  ) const { return m_scanSbbId2SbbPos [scanIdx>>m_log2SbbSize]; }
-    __inline  int32_t               rasterPos     ( unsigned scanIdx  ) const { return m_scanId2BlkPos    [scanIdx]; }
-    __inline  int32_t               posX          ( unsigned scanIdx  ) const { return m_scanId2PosX      [scanIdx]; }
-    __inline  int32_t               posY          ( unsigned scanIdx  ) const { return m_scanId2PosY      [scanIdx]; }
-    __inline  const NbInfoSbb&      nbInfoSbb     ( unsigned scanIdx  ) const { return m_scanId2NbInfoSbb [scanIdx]; }
-    __inline  const NbInfoOut*      nbInfoOut     ()                    const { return m_scanId2NbInfoOut; }
-    __inline  const BinFracBits*    sigSbbFracBits()                    const { return m_sigSbbFracBits; }
-    __inline  const BinFracBits*    sigFlagBits   ( unsigned stateId  ) const { return m_sigFracBits[std::max(((int)stateId)-1,0)]; }
-    __inline  const CoeffFracBits*  gtxFracBits   ( unsigned stateId  ) const { return m_gtxFracBits; }
-    __inline  int32_t               lastOffset    ( unsigned scanIdx )  const { return m_lastBitsX[ m_scanId2PosX[scanIdx] ] + m_lastBitsY[ m_scanId2PosY[scanIdx] ]; }
+    inline bool               luma() const { return m_compID == COMPONENT_Y; }
+    inline int32_t            widthInSbb() const { return m_widthInSbb; }
+    inline int32_t            heightInSbb() const { return m_heightInSbb; }
+    inline int32_t            numCoeff() const { return m_numCoeff; }
+    inline int32_t            numSbb() const { return m_numSbb; }
+    inline int32_t            sbbSize() const { return m_sbbSize; }
+    inline int32_t            sbbPos(unsigned scanIdx) const { return m_scanSbbId2SbbPos[scanIdx >> m_log2SbbSize]; }
+    inline int32_t            rasterPos(unsigned scanIdx) const { return m_scanId2BlkPos[scanIdx]; }
+    inline int32_t            posX(unsigned scanIdx) const { return m_scanId2PosX[scanIdx]; }
+    inline int32_t            posY(unsigned scanIdx) const { return m_scanId2PosY[scanIdx]; }
+    inline const NbInfoSbb &  nbInfoSbb(unsigned scanIdx) const { return m_scanId2NbInfoSbb[scanIdx]; }
+    inline const NbInfoOut *  nbInfoOut() const { return m_scanId2NbInfoOut; }
+    inline const BinFracBits *sigSbbFracBits() const { return m_sigSbbFracBits; }
+    inline const BinFracBits *sigFlagBits(unsigned stateId) const
+    {
+      return m_sigFracBits[std::max(((int) stateId) - 1, 0)];
+    }
+    inline const CoeffFracBits *gtxFracBits(unsigned stateId) const { return m_gtxFracBits; }
+    inline int32_t              lastOffset(unsigned scanIdx) const
+    {
+      return m_lastBitsX[m_scanId2PosX[scanIdx]] + m_lastBitsY[m_scanId2PosY[scanIdx]];
+    }
 
   private:
     void  xSetLastCoeffOffset ( const FracBitsAccess& fracBitsAccess, const TransformUnit& tu );
@@ -486,12 +492,12 @@ namespace DQIntern
     {
       xSet( firstPos );
     }
-    __inline bool  valid ()         const { return scanIdx >= 0; }
+    inline bool    valid() const { return scanIdx >= 0; }
     void           next  ()               { xSet( scanIdx-1 ); }
     void           set   ( int id )       { xSet(id); }
 
   private:
-    __inline void xSet( int _scanIdx )
+    inline void xSet(int _scanIdx)
     {
       scanIdx = _scanIdx;
       if( scanIdx >= 0 )
@@ -573,9 +579,9 @@ namespace DQIntern
     void  dequantBlock  ( const TransformUnit& tu, const ComponentID compID, const QpParam& cQP, CoeffBuf& recCoeff   ) const;
     void  initQuantBlock( const TransformUnit& tu, const ComponentID compID, const QpParam& cQP, const double lambda  );
 
-    __inline void    preQuantCoeff     ( const TCoeff absCoeff, PQData* pqData )    const;
-    __inline TCoeff  getLastThreshold  ()                                           const { return m_thresLast; }
-    __inline TCoeff  getSSbbThreshold  ()                                           const { return m_thresSSbb; }
+    inline void   preQuantCoeff(const TCoeff absCoeff, PQData *pqData) const;
+    inline TCoeff getLastThreshold() const { return m_thresLast; }
+    inline TCoeff getSSbbThreshold() const { return m_thresSSbb; }
 
   private:
     // quantization
@@ -592,7 +598,7 @@ namespace DQIntern
     int64_t           m_DistOrgFact;
   };
 
-  __inline int ceil_log2( uint64_t x )
+  inline int ceil_log2(uint64_t x)
   {
     static const uint64_t t[6] = { 0xFFFFFFFF00000000ull, 0x00000000FFFF0000ull, 0x000000000000FF00ull, 0x00000000000000F0ull, 0x000000000000000Cull, 0x0000000000000002ull };
     int y = (((x & (x - 1)) == 0) ? 0 : 1);
@@ -736,7 +742,7 @@ namespace DQIntern
     }
   }
 
-  __inline void Quantizer::preQuantCoeff( const TCoeff absCoeff, PQData* pqData ) const
+  inline void Quantizer::preQuantCoeff(const TCoeff absCoeff, PQData *pqData) const
   {
     int64_t scaledOrg = int64_t( absCoeff ) * m_QScale;
     TCoeff  qIdx      = std::max<TCoeff>( 1, std::min<TCoeff>( m_maxQIdx, TCoeff( ( scaledOrg + m_QAdd ) >> m_QShift ) ) );
@@ -783,12 +789,9 @@ namespace DQIntern
   public:
     CommonCtx() : m_currSbbCtx( m_allSbbCtx ), m_prevSbbCtx( m_currSbbCtx + 4 ) {}
 
-    __inline void swap()
-    {
-      std::swap( m_currSbbCtx, m_prevSbbCtx );
-    }
+    inline void swap() { std::swap(m_currSbbCtx, m_prevSbbCtx); }
 
-    __inline void reset( const RateEstimator& rateEst )
+    inline void reset(const RateEstimator &rateEst)
     {
       m_nbInfo = rateEst.nbInfoOut();
       ::memcpy( m_sbbFlagBits, rateEst.sigSbbFracBits(), 2*sizeof(BinFracBits) );
@@ -802,7 +805,7 @@ namespace DQIntern
       }
     }
 
-    __inline void update( const ScanInfo& scanInfo, const State* prevState, State& currState );
+    inline void update(const ScanInfo &scanInfo, const State *prevState, State &currState);
 
   private:
     const NbInfoOut*            m_nbInfo;
@@ -821,10 +824,11 @@ namespace DQIntern
     State( const RateEstimator& rateEst, CommonCtx& commonCtx, const int stateId );
 
     template<uint8_t numIPos>
-    __inline void  updateState   ( const ScanInfo& scanInfo, const State* prevStates,                          const Decision& decision );
-    __inline void  updateStateEOS( const ScanInfo& scanInfo, const State* prevStates, const State* skipStates, const Decision& decision );
+    inline void updateState(const ScanInfo &scanInfo, const State *prevStates, const Decision &decision);
+    inline void updateStateEOS(const ScanInfo &scanInfo, const State *prevStates, const State *skipStates,
+                               const Decision &decision);
 
-    __inline void  init()
+    inline void init()
     {
       m_rdCost        = std::numeric_limits<int64_t>::max()>>1;
       m_numSigSbb     = 0;
@@ -834,8 +838,7 @@ namespace DQIntern
       m_goRicePar     = 0;
     }
 
-    template <ScanPosType spt>
-    __inline void checkRdCostZero( Decision& decision ) const
+    template<ScanPosType spt> inline void checkRdCostZero(Decision &decision) const
     {
       int64_t rdCost = m_rdCost;
       if( spt == SCAN_ISCSBB )
@@ -862,7 +865,7 @@ namespace DQIntern
       }
     }
 
-    __inline int32_t getLevelBits( const unsigned level ) const
+    inline int32_t getLevelBits(const unsigned level) const
     {
       if( level < 5 )
       {
@@ -886,8 +889,7 @@ namespace DQIntern
       return bits + ( ( g_auiGoRiceRange[ m_goRicePar ] + 1 + ( length << 1 ) - m_goRicePar ) << SCALE_BITS );
     }
 
-    template <ScanPosType spt>
-    __inline void checkRdCostNonZero( const PQData& pqData, Decision& decision )  const
+    template<ScanPosType spt> inline void checkRdCostNonZero(const PQData &pqData, Decision &decision) const
     {
       int64_t rdCost = m_rdCost + pqData.deltaDist + getLevelBits( pqData.absLevel );
       if( spt == SCAN_ISCSBB )
@@ -910,7 +912,7 @@ namespace DQIntern
       }
     }
 
-    __inline void checkRdCostStart( int32_t lastOffset, const PQData& pqData, Decision& decision ) const
+    inline void checkRdCostStart(int32_t lastOffset, const PQData &pqData, Decision &decision) const
     {
       int64_t rdCost = pqData.deltaDist + lastOffset + getLevelBits( pqData.absLevel );
       if( rdCost < decision.rdCost )
@@ -921,7 +923,7 @@ namespace DQIntern
       }
     }
 
-    __inline void checkRdCostSkipSbb( Decision& decision )  const
+    inline void checkRdCostSkipSbb(Decision &decision) const
     {
       int64_t rdCost = m_rdCost + m_sbbFracBits.intBits[0];
       if( rdCost < decision.rdCost )
@@ -957,9 +959,8 @@ namespace DQIntern
   {
   }
 
-
   template<uint8_t numIPos>
-  __inline void State::updateState( const ScanInfo& scanInfo, const State* prevStates, const Decision& decision )
+  inline void State::updateState(const ScanInfo &scanInfo, const State *prevStates, const Decision &decision)
   {
     m_rdCost = decision.rdCost;
     if( decision.prevId > -2 )
@@ -1026,7 +1027,8 @@ namespace DQIntern
     }
   }
 
-  __inline void State::updateStateEOS( const ScanInfo& scanInfo, const State* prevStates, const State* skipStates, const Decision& decision )
+  inline void State::updateStateEOS(const ScanInfo &scanInfo, const State *prevStates, const State *skipStates,
+                                    const Decision &decision)
   {
     m_rdCost = decision.rdCost;
     if( decision.prevId > -2 )
@@ -1058,9 +1060,7 @@ namespace DQIntern
     }
   }
 
-
-
-  __inline void CommonCtx::update( const ScanInfo& scanInfo, const State* prevState, State& currState )
+  inline void CommonCtx::update(const ScanInfo &scanInfo, const State *prevState, State &currState)
   {
     uint8_t*    sbbFlags  = m_currSbbCtx[ currState.m_stateId ].sbbFlags;
     uint8_t*    levels    = m_currSbbCtx[ currState.m_stateId ].levels;
