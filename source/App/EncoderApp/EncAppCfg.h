@@ -447,7 +447,7 @@ protected:
 
   Int       m_TMVPModeId;
 #if JVET_K0072
-  Bool      m_depQuantEnabledFlag;
+  bool      m_depQuantEnabledFlag;
 #if HEVC_USE_SIGN_HIDING
   Bool      m_signDataHidingEnabledFlag;
 #endif

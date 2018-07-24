@@ -469,7 +469,7 @@ protected:
 #endif
   Int       m_TMVPModeId;
 #if JVET_K0072
-  Bool      m_DepQuantEnabledFlag;
+  bool      m_DepQuantEnabledFlag;
 #endif
   Bool      m_SignDataHidingEnabledFlag;
   Bool      m_RCEnableRateControl;
@@ -1224,8 +1224,8 @@ public:
   WeightedPredictionMethod getWeightedPredictionMethod() const       { return m_weightedPredictionMethod; }
   Void         setWeightedPredictionMethod( WeightedPredictionMethod m ) { m_weightedPredictionMethod = m; }
 #if JVET_K0072
-  Void         setDepQuantEnabledFlag( Bool b )                      { m_DepQuantEnabledFlag = b;    }
-  Bool         getDepQuantEnabledFlag()                              { return m_DepQuantEnabledFlag; }
+  void         setDepQuantEnabledFlag( bool b )                      { m_DepQuantEnabledFlag = b;    }
+  bool         getDepQuantEnabledFlag()                              { return m_DepQuantEnabledFlag; }
 #endif
 #if HEVC_USE_SIGN_HIDING
   Void         setSignDataHidingEnabledFlag( Bool b )                { m_SignDataHidingEnabledFlag = b;    }
