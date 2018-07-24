@@ -82,6 +82,30 @@ private:
   // RDOQ functions
   Void xRateDistOptQuant(TransformUnit &tu, const ComponentID &compID, const CCoeffBuf &pSrc, TCoeff &uiAbsSum, const QpParam &cQP, const Ctx &ctx);
 
+#if JVET_K0072
+  inline UInt xGetCodedLevel( Double&            rd64CodedCost,
+                              Double&            rd64CodedCost0,
+                              Double&            rd64CodedCostSig,
+                              Intermediate_Int   lLevelDouble,
+                              UInt               uiMaxAbsLevel,
+                              const BinFracBits* fracBitsSig,
+                              const BinFracBits& fracBitsPar,
+                              const BinFracBits& fracBitsGt1,
+                              const BinFracBits& fracBitsGt2,
+                              UShort             ui16AbsGoRice,
+                              Int                iQBits,
+                              Double             errorScale,
+                              Bool               bLast,
+                              Bool               useLimitedPrefixLength,
+                              const Int          maxLog2TrDynamicRange ) const;
+  inline Int xGetICRate     ( const UInt         uiAbsLevel,
+                              const BinFracBits& fracBitsPar,
+                              const BinFracBits& fracBitsGt1,
+                              const BinFracBits& fracBitsGt2,
+                              const UShort       ui16AbsGoRice,
+                              const Bool         useLimitedPrefixLength,
+                              const Int          maxLog2TrDynamicRange  ) const;
+#else
   inline UInt xGetCodedLevel  ( Double&             rd64CodedCost,
                                 Double&             rd64CodedCost0,
                                 Double&             rd64CodedCostSig,
@@ -114,6 +138,7 @@ private:
                            const Bool         useLimitedPrefixLength,
                            const Int          maxLog2TrDynamicRange
                          ) const;
+#endif
   inline Double xGetRateLast         ( const int* lastBitsX, const int* lastBitsY,
                                        unsigned        PosX, unsigned   PosY                              ) const;
 

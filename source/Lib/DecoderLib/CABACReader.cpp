@@ -2048,9 +2048,17 @@ void CABACReader::transform_tree( CodingStructure &cs, Partitioner &partitioner,
         if( chromaCbfs.Cr )
         {
 #if ENABLE_BMS
+#if JVET_K0072
+          chromaCbfs.Cr &= cbf_comp( cs, area.blocks[COMPONENT_Cr], trDepth, chromaCbfs.Cb );
+#else
           chromaCbfs.Cr &= cbf_comp( cs, area.blocks[COMPONENT_Cr], trDepth );
+#endif
+#else
+#if JVET_K0072
+          chromaCbfs.Cr &= cbf_comp( cs, area.blocks[COMPONENT_Cr], chromaCbfs.Cb );
 #else
           chromaCbfs.Cr &= cbf_comp( cs, area.blocks[COMPONENT_Cr] );
+#endif
 #endif
         }
       }
@@ -2193,17 +2201,34 @@ void CABACReader::transform_tree( CodingStructure &cs, Partitioner &partitioner,
 }
 
 #if ENABLE_BMS
+#if JVET_K0072
+bool CABACReader::cbf_comp( CodingStructure& cs, const CompArea& area, unsigned depth, const bool prevCbCbf )
+#else
 bool CABACReader::cbf_comp( CodingStructure& cs, const CompArea& area, unsigned depth )
+#endif
+#else
+#if JVET_K0072
+bool CABACReader::cbf_comp( CodingStructure& cs, const CompArea& area, const bool prevCbCbf )
 #else
 bool CABACReader::cbf_comp( CodingStructure& cs, const CompArea& area )
 #endif
+#endif
 {
+#if JVET_K0072
+#if ENABLE_BMS
+  const unsigned  ctxId   = DeriveCtx::CtxQtCbf( area.compID, depth, prevCbCbf );
+#else
+  const unsigned  ctxId   = DeriveCtx::CtxQtCbf( area.compID, prevCbCbf );
+#endif
+  const CtxSet&   ctxSet  = Ctx::QtCbf[ area.compID ];
+#else
 #if ENABLE_BMS
   const unsigned  ctxId   = DeriveCtx::CtxQtCbf( area.compID, depth );
 #else
   const unsigned  ctxId   = DeriveCtx::CtxQtCbf( area.compID );
 #endif
   const CtxSet&   ctxSet  = Ctx::QtCbf[ toChannelType(area.compID) ];
+#endif
 
   RExt__DECODER_DEBUG_BIT_STATISTICS_CREATE_SET_SIZE2(STATS__CABAC_BITS__QT_CBF, area.size(), area.compID);
 
@@ -2338,15 +2363,28 @@ void CABACReader::transform_unit_qtbt( TransformUnit& tu, CUCtx& cuCtx, ChromaCb
 
   if( !lumaOnly )
   {
+#if JVET_K0072
+    bool prevCbf = false;
+#endif
     for( ComponentID compID = COMPONENT_Cb; compID <= COMPONENT_Cr; compID = ComponentID( compID + 1 ) )
     {
       bool cbf = false;
 #if ENABLE_BMS
+#if JVET_K0072
+      cbf = cbf_comp( *tu.cs, tu.blocks[compID], tu.depth, prevCbf );
+      prevCbf = cbf;
+#else
       cbf = cbf_comp( *tu.cs, tu.blocks[compID], tu.depth );
+#endif
       chromaCbfs.cbf( compID ) = cbf;
       TU::setCbfAtDepth( tu, compID, tu.depth, cbf ? 1 : 0 );
 #else
+#if JVET_K0072
+      cbf = cbf_comp( *tu.cs, tu.blocks[compID], prevCbf );
+      prevCbf = cbf;
+#else
       cbf = cbf_comp( *tu.cs, tu.blocks[compID] );
+#endif
       chromaCbfs.cbf( compID ) = cbf;
       TU::setCbf( tu, compID, cbf );
 #endif
@@ -2483,7 +2521,11 @@ void CABACReader::residual_coding( TransformUnit& tu, ComponentID compID )
 
 #if HEVC_USE_SIGN_HIDING
   // determine sign hiding
+#if JVET_K0072
+  bool signHiding  = ( cu.cs->slice->getSignDataHidingEnabledFlag() && !cu.transQuantBypass && tu.rdpcm[compID] == RDPCM_OFF );
+#else
   bool signHiding  = ( cu.cs->pps->getSignDataHidingEnabledFlag() && !cu.transQuantBypass && tu.rdpcm[compID] == RDPCM_OFF );
+#endif
   if(  signHiding && CU::isIntra(cu) && CU::isRDPCMEnabled(cu) && tu.transformSkip[compID] )
   {
     const ChannelType chType    = toChannelType( compID );
@@ -2502,7 +2544,10 @@ void CABACReader::residual_coding( TransformUnit& tu, ComponentID compID )
   CoeffCodingContext  cctx    ( tu, compID );
 #endif
   TCoeff*             coeff   = tu.getCoeffs( compID ).buf;
+#if JVET_K0072
+#else
   unsigned&           GRStats = m_BinDecoder.getCtx().getGRAdaptStats( TU::getGolombRiceStatisticsIndex( tu, compID ) );
+#endif
 #if JEM_TOOLS
   unsigned            numSig  = 0;
 #endif
@@ -2511,7 +2556,12 @@ void CABACReader::residual_coding( TransformUnit& tu, ComponentID compID )
   cctx.setScanPosLast( last_sig_coeff( cctx ) );
 
   // parse subblocks
+#if JVET_K0072
+  const int stateTransTab = ( tu.cs->slice->getDepQuantEnabledFlag() ? 32040 : 0 );
+  int       state         = 0;
+#else
   cctx.setGoRiceStats( GRStats );
+#endif
 
 #if JEM_TOOLS
   bool useEmt = ( cu.cs->sps->getSpsNext().getUseIntraEMT() && cu.predMode == MODE_INTRA ) || ( cu.cs->sps->getSpsNext().getUseInterEMT() && cu.predMode != MODE_INTRA );
@@ -2521,7 +2571,11 @@ void CABACReader::residual_coding( TransformUnit& tu, ComponentID compID )
     for( int subSetId = ( cctx.scanPosLast() >> cctx.log2CGSize() ); subSetId >= 0; subSetId--)
     {
       cctx.initSubblock       ( subSetId );
+#if JVET_K0072
+      residual_coding_subblock( cctx, coeff, stateTransTab, state );
+#else
       residual_coding_subblock( cctx, coeff );
+#endif
 #if JEM_TOOLS
       if (useEmt)
       {
@@ -2530,9 +2584,13 @@ void CABACReader::residual_coding( TransformUnit& tu, ComponentID compID )
       }
 #endif
     }
-  GRStats = cctx.currGoRiceStats();
-#if JEM_TOOLS && HM_EMT_NSST_AS_IN_JEM
 
+#if JVET_K0072
+#else
+    GRStats = cctx.currGoRiceStats();
+#endif
+
+#if JEM_TOOLS && HM_EMT_NSST_AS_IN_JEM
   if( useEmt && !tu.transformSkip[compID] && compID == COMPONENT_Y && tu.cu->emtFlag )
   {
     if( CU::isIntra( *tu.cu ) )
@@ -2833,6 +2891,162 @@ int CABACReader::last_sig_coeff( CoeffCodingContext& cctx )
 
 
 
+#if JVET_K0072
+void CABACReader::residual_coding_subblock( CoeffCodingContext& cctx, TCoeff* coeff, const int stateTransTable, int& state )
+{
+  // NOTE: All coefficients of the subblock must be set to zero before calling this function
+#if RExt__DECODER_DEBUG_BIT_STATISTICS
+  CodingStatisticsClassType ctype_group ( STATS__CABAC_BITS__SIG_COEFF_GROUP_FLAG,  cctx.width(), cctx.height(), cctx.compID() );
+  CodingStatisticsClassType ctype_map   ( STATS__CABAC_BITS__SIG_COEFF_MAP_FLAG,    cctx.width(), cctx.height(), cctx.compID() );
+  CodingStatisticsClassType ctype_par   ( STATS__CABAC_BITS__PAR_FLAG,              cctx.width(), cctx.height(), cctx.compID() );
+  CodingStatisticsClassType ctype_gt1   ( STATS__CABAC_BITS__GT1_FLAG,              cctx.width(), cctx.height(), cctx.compID() );
+  CodingStatisticsClassType ctype_gt2   ( STATS__CABAC_BITS__GT2_FLAG,              cctx.width(), cctx.height(), cctx.compID() );
+  CodingStatisticsClassType ctype_escs  ( STATS__CABAC_BITS__ESCAPE_BITS,           cctx.width(), cctx.height(), cctx.compID() );
+#endif
+
+  //===== init =====
+  const int   minSubPos   = cctx.minSubPos();
+  const bool  isLast      = cctx.isLast();
+  int         firstSigPos = ( isLast ? cctx.scanPosLast() : cctx.maxSubPos() );
+  int         nextSigPos  = firstSigPos;
+
+  //===== decode significant_coeffgroup_flag =====
+  RExt__DECODER_DEBUG_BIT_STATISTICS_SET( ctype_group );
+  bool sigGroup = ( isLast || !minSubPos );
+  if( !sigGroup )
+  {
+    sigGroup = m_BinDecoder.decodeBin( cctx.sigGroupCtxId() );
+  }
+  if( sigGroup )
+  {
+    cctx.setSigGroup();
+  }
+  else
+  {
+    return;
+  }
+
+  uint8_t   ctxOffset[16];
+  unsigned  nextPass = 0;
+
+  //===== decode absolute values =====
+  const int inferSigPos   = nextSigPos != cctx.scanPosLast() ? ( cctx.isNotFirst() ? minSubPos : -1 ) : nextSigPos;
+#if HEVC_USE_SIGN_HIDING
+  int       firstNZPos    = nextSigPos;
+  int       lastNZPos     = -1;
+#endif
+  int       numNonZero    =  0;
+  int       sigBlkPos[ 1 << MLS_CG_SIZE ];
+
+  for( ; nextSigPos >= minSubPos; nextSigPos-- )
+  {
+    int      blkPos     = cctx.blockPos( nextSigPos );
+    unsigned sigFlag    = ( !numNonZero && nextSigPos == inferSigPos );
+    if( !sigFlag )
+    {
+      RExt__DECODER_DEBUG_BIT_STATISTICS_SET( ctype_map );
+      const unsigned sigCtxId = cctx.sigCtxIdAbs( nextSigPos, coeff, state );
+      sigFlag = m_BinDecoder.decodeBin( sigCtxId );
+      DTRACE( g_trace_ctx, D_SYNTAX_RESI, "sig_bin() bin=%d ctx=%d\n", sigFlag, sigCtxId );
+    }
+
+    if( sigFlag )
+    {
+      uint8_t&  ctxOff = ctxOffset[ nextSigPos - minSubPos ];
+      ctxOff           = cctx.ctxOffsetAbs();
+      sigBlkPos[ numNonZero++ ] = blkPos;
+#if HEVC_USE_SIGN_HIDING
+      firstNZPos = nextSigPos;
+      lastNZPos  = std::max<int>( lastNZPos, nextSigPos );
+#endif
+
+      RExt__DECODER_DEBUG_BIT_STATISTICS_SET( ctype_par );
+      unsigned parFlag = m_BinDecoder.decodeBin( cctx.parityCtxIdAbs(ctxOff) );
+      DTRACE( g_trace_ctx, D_SYNTAX_RESI, "par_flag() bin=%d ctx=%d\n", parFlag, cctx.parityCtxIdAbs(ctxOff) );
+
+      RExt__DECODER_DEBUG_BIT_STATISTICS_SET( ctype_gt1 );
+      unsigned gt1Flag = m_BinDecoder.decodeBin( cctx.greater1CtxIdAbs(ctxOff) );
+      DTRACE( g_trace_ctx, D_SYNTAX_RESI, "gt1_flag() bin=%d ctx=%d\n", gt1Flag, cctx.greater1CtxIdAbs(ctxOff) );
+      coeff[blkPos] += 1+parFlag+(gt1Flag<<1);
+      nextPass      |= gt1Flag;
+    }
+
+    state = ( stateTransTable >> ((state<<2)+((coeff[blkPos]&1)<<1)) ) & 3;
+  }
+
+  //===== 2nd PASS: gt2 =====
+  if( nextPass )
+  {
+    nextPass = 0;
+    for( int scanPos = firstSigPos; scanPos >= minSubPos; scanPos-- )
+    {
+      TCoeff& tcoeff = coeff[ cctx.blockPos( scanPos ) ];
+      if( tcoeff > 2 )
+      {
+        RExt__DECODER_DEBUG_BIT_STATISTICS_SET( ctype_gt2 );
+        uint8_t& ctxOff  = ctxOffset[ scanPos - minSubPos ];
+        unsigned gt2Flag = m_BinDecoder.decodeBin( cctx.greater2CtxIdAbs(ctxOff) );
+        DTRACE( g_trace_ctx, D_SYNTAX_RESI, "gt2_flag() bin=%d ctx=%d\n", gt2Flag, cctx.greater2CtxIdAbs(ctxOff) );
+        tcoeff    += (gt2Flag<<1);
+        nextPass  |=  gt2Flag;
+      }
+    }
+  }
+
+  //===== 3rd PASS: Go-rice codes =====
+  if( nextPass )
+  {
+    for( int scanPos = firstSigPos; scanPos >= minSubPos; scanPos-- )
+    {
+      TCoeff& tcoeff = coeff[ cctx.blockPos( scanPos ) ];
+      if( tcoeff > 4 )
+      {
+        RExt__DECODER_DEBUG_BIT_STATISTICS_SET( ctype_escs );
+        unsigned ricePar = cctx.GoRiceParAbs( scanPos, coeff );
+        int  remAbsLevel = m_BinDecoder.decodeRemAbsEP( ricePar, cctx.extPrec(), cctx.maxLog2TrDRange() );
+        DTRACE( g_trace_ctx, D_SYNTAX_RESI, "rem_val() bin=%d ctx=%d\n", remAbsLevel, ricePar );
+        tcoeff += (remAbsLevel<<1);
+      }
+    }
+  }
+
+  //===== decode sign's =====
+  RExt__DECODER_DEBUG_BIT_STATISTICS_CREATE_SET_SIZE2( STATS__CABAC_BITS__SIGN_BIT, Size( cctx.width(), cctx.height() ), cctx.compID() );
+#if HEVC_USE_SIGN_HIDING
+  const unsigned  numSigns    = ( cctx.hideSign( firstNZPos, lastNZPos ) ? numNonZero - 1 : numNonZero );
+  unsigned        signPattern = m_BinDecoder.decodeBinsEP( numSigns ) << ( 32 - numSigns );
+#else
+  unsigned        signPattern = m_BinDecoder.decodeBinsEP( numNonZero ) << ( 32 - numNonZero );
+#endif
+
+  //===== set final coefficents =====
+  int sumAbs = 0;
+#if HEVC_USE_SIGN_HIDING
+  for( unsigned k = 0; k < numSigns; k++ )
+#else
+  for( unsigned k = 0; k < numNonZero; k++ )
+#endif
+  {
+    int AbsCoeff          = coeff[ sigBlkPos[ k ] ];
+    sumAbs               += AbsCoeff;
+    coeff[ sigBlkPos[k] ] = ( signPattern & ( 1u << 31 ) ? -AbsCoeff : AbsCoeff );
+    signPattern         <<= 1;
+  }
+#if HEVC_USE_SIGN_HIDING
+  if( numNonZero > numSigns )
+  {
+    int k                 = numSigns;
+    int AbsCoeff          = coeff[ sigBlkPos[ k ] ];
+    sumAbs               += AbsCoeff;
+    coeff[ sigBlkPos[k] ] = ( sumAbs & 1 ? -AbsCoeff : AbsCoeff );
+  }
+#endif
+#if JEM_TOOLS
+  cctx.setEmtNumSigCoeff( numNonZero );
+#endif
+}
+
+#else
 
 void CABACReader::residual_coding_subblock( CoeffCodingContext& cctx, TCoeff* coeff )
 {
@@ -3244,6 +3458,7 @@ void CABACReader::residual_coding_subblock( CoeffCodingContext& cctx, TCoeff* co
 #endif
   }
 }
+#endif
 
 
 

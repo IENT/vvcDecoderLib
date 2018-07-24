@@ -72,6 +72,12 @@ Slice::Slice()
 , m_bioLDBPossible                ( false )
 , m_UseLIC                        ( false )
 #endif
+#if JVET_K0072 
+, m_depQuantEnabledFlag           ( false )
+#if HEVC_USE_SIGN_HIDING
+, m_signDataHidingEnabledFlag     ( false )
+#endif
+#endif
 , m_bCheckLDC                     ( false )
 , m_iSliceQpDelta                 ( 0 )
 , m_iDepth                        ( 0 )
@@ -1720,8 +1726,11 @@ SPSNext::SPSNext( SPS& sps )
 #if JEM_TOOLS
   , m_IMV                       ( false )
 #endif
+#if JVET_K0072
+#else
 #if JEM_TOOLS
   , m_altResiComp               ( false )
+#endif
 #endif
 #if JEM_TOOLS
   , m_highPrecMv                ( false )
@@ -1770,8 +1779,11 @@ SPSNext::SPSNext( SPS& sps )
 #if JEM_TOOLS
   , m_ImvMode                   ( IMV_OFF )
 #endif
+#if JVET_K0072
+#else
 #if JEM_TOOLS
   , m_altResiCompId             ( 0 )
+#endif
 #endif
 #if JEM_TOOLS
   , m_LICMode                   ( 0 )
@@ -1910,8 +1922,11 @@ PPS::PPS()
 , m_numTileColumnsMinus1             (0)
 , m_numTileRowsMinus1                (0)
 #endif
+#if JVET_K0072
+#else
 #if HEVC_USE_SIGN_HIDING
 , m_signDataHidingEnabledFlag        (false)
+#endif
 #endif
 , m_cabacInitPresentFlag             (false)
 , m_sliceHeaderExtensionPresentFlag  (false)

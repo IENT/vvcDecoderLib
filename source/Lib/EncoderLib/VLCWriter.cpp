@@ -221,8 +221,11 @@ Void HLSWriter::codePPS( const PPS* pcPPS )
 #endif
   WRITE_FLAG( pcPPS->getOutputFlagPresentFlag() ? 1 : 0,     "output_flag_present_flag" );
   WRITE_CODE( pcPPS->getNumExtraSliceHeaderBits(), 3,        "num_extra_slice_header_bits");
+#if JVET_K0072
+#else
 #if HEVC_USE_SIGN_HIDING
   WRITE_FLAG( pcPPS->getSignDataHidingEnabledFlag(),         "sign_data_hiding_enabled_flag" );
+#endif
 #endif
   WRITE_FLAG( pcPPS->getCabacInitPresentFlag() ? 1 : 0,   "cabac_init_present_flag" );
   WRITE_UVLC( pcPPS->getNumRefIdxL0DefaultActive()-1,     "num_ref_idx_l0_default_active_minus1");
@@ -546,8 +549,11 @@ Void HLSWriter::codeSPSNext( const SPSNext& spsNext, const bool usePCM )
 #if JEM_TOOLS
   WRITE_FLAG( spsNext.getUseIMV() ? 1 : 0,                                                      "imv_enable_flag" );
 #endif
+#if JVET_K0072
+#else
 #if JEM_TOOLS
   WRITE_FLAG( spsNext.getUseAltResiComp() ? 1 : 0,                                              "alternative_residual_compression_flag" );
+#endif
 #endif
 #if JEM_TOOLS
   WRITE_FLAG( spsNext.getUseHighPrecMv() ? 1 : 0,                                               "high_precision_motion_vectors" );
@@ -639,11 +645,14 @@ Void HLSWriter::codeSPSNext( const SPSNext& spsNext, const bool usePCM )
   {
     WRITE_UVLC( spsNext.getMTTMode() - 1,                                                       "mtt_mode_minus1" );
   }
+#if JVET_K0072
+#else
 #if JEM_TOOLS
   if (spsNext.getUseAltResiComp())
   {
     WRITE_UVLC(spsNext.getAltResiCompId() - 1, "alt_resi_comp_minus1");
   }
+#endif
 #endif
 #if JEM_TOOLS
   if( spsNext.getUseOBMC() )
@@ -1257,6 +1266,19 @@ Void HLSWriter::codeSliceHeader         ( Slice* pcSlice )
     {
       WRITE_FLAG( pcSlice->getUseLIC() ? 1 : 0, "slice_lic_enable_flag" );
     }
+#endif
+#if JVET_K0072
+    WRITE_FLAG( pcSlice->getDepQuantEnabledFlag() ? 1 : 0, "dep_quant_enable_flag" );
+#if HEVC_USE_SIGN_HIDING
+    if( !pcSlice->getDepQuantEnabledFlag() )
+    {
+      WRITE_FLAG( pcSlice->getSignDataHidingEnabledFlag() ? 1 : 0, "sign_data_hiding_enable_flag" );
+    }
+    else
+    {
+      CHECK( pcSlice->getSignDataHidingEnabledFlag(), "sign data hiding not supported when dependent quantization is enabled" );
+    }
+#endif
 #endif
     if( pcSlice->getSPS()->getSpsNext().getUseQTBT() )
     {

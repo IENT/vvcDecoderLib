@@ -207,7 +207,10 @@ protected:
 #endif
 #if JEM_TOOLS
   unsigned  m_CABACEngineMode;
+#if JVET_K0072
+#else
   unsigned  m_altResiCompId;
+#endif
 #endif
 #if JEM_TOOLS
   bool      m_highPrecisionMv;
@@ -443,8 +446,11 @@ protected:
   UInt      m_maxNumMergeCand;                                ///< Max number of merge candidates
 
   Int       m_TMVPModeId;
+#if JVET_K0072
+  Bool      m_depQuantEnabledFlag;
 #if HEVC_USE_SIGN_HIDING
   Bool      m_signDataHidingEnabledFlag;
+#endif
 #endif
   Bool      m_RCEnableRateControl;                ///< enable rate control or not
   Int       m_RCTargetBitrate;                    ///< target bitrate when rate control is enabled
