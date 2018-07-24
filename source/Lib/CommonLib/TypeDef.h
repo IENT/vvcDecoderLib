@@ -53,6 +53,8 @@
 
 #define JVET_K0072                                        1
 
+#define JVET_K0554                                        1 // when adopting, also remove the macro HM_QTBT_ONLY_QT_IMPLICIT (keep the case for value 0)
+
 #ifndef JEM_TOOLS
 #define JEM_TOOLS                                         1 // Defines the inclusion of JEM tools into compiled executable
 
@@ -138,7 +140,11 @@
 #define HM_QTBT_AS_IN_JEM_SYNTAX                        ( 1 && !( ENABLE_BMS ) ) // *** -- cannot be enabled if ENABLE_BMS is on
 #define HM_QTBT_AS_IN_JEM_QUANT                           1   // ***
 #define HM_QTBT_REPRODUCE_FAST_LCTU_BUG                   1
+#if JVET_K0554
+#define HM_QTBT_ONLY_QT_IMPLICIT                          0   // ***
+#else
 #define HM_QTBT_ONLY_QT_IMPLICIT                          1   // ***
+#endif
 #define HM_EMT_IMV_AS_IN_JEM                              1
 #endif
 #define HM_PDPC_AS_IN_JEM                                 1   // *** - PM: reproducing JEM behavior
