@@ -3230,7 +3230,9 @@ Void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUn
       uint64_t xPsnr[MAX_NUM_COMPONENT];
       for (int i = 0; i < MAX_NUM_COMPONENT; i++)
       {
-        xPsnr[i] = *reinterpret_cast<uint64_t *>(&dPSNR[i]);
+        copy(reinterpret_cast<uint8_t *>(&dPSNR[i]),
+             reinterpret_cast<uint8_t *>(&dPSNR[i]) + sizeof(dPSNR[i]),
+             reinterpret_cast<uint8_t *>(&xPsnr[i]));
       }
       msg(NOTICE, " [xY %16" PRIx64 " xU %16" PRIx64 " xV %16" PRIx64 "]", xPsnr[COMPONENT_Y], xPsnr[COMPONENT_Cb], xPsnr[COMPONENT_Cr]);
     }
