@@ -50,6 +50,9 @@
 #include <assert.h>
 #include <cassert>
 
+
+#define JVET_K0072                                        1
+
 #ifndef JEM_TOOLS
 #define JEM_TOOLS                                         1 // Defines the inclusion of JEM tools into compiled executable
 
@@ -118,6 +121,8 @@
 #define HEVC_VPS                                          1
 #define HEVC_DEPENDENT_SLICES                             1
 #define HEVC_TILES_WPP                                    1
+#elif JVET_K0072
+#define HEVC_USE_SIGN_HIDING                              1
 #endif
 
 

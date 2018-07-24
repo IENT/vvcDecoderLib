@@ -216,7 +216,10 @@ protected:
 #endif
 #if JEM_TOOLS
   unsigned  m_CABACEngineMode;
+#if JVET_K0072
+#else
   unsigned  m_altResiCompId;
+#endif
 #endif
 #if JEM_TOOLS
   bool      m_highPrecMv;
@@ -465,6 +468,9 @@ protected:
   std::string m_scalingListFileName;              ///< quantization matrix file name
 #endif
   Int       m_TMVPModeId;
+#if JVET_K0072
+  bool      m_DepQuantEnabledFlag;
+#endif
   Bool      m_SignDataHidingEnabledFlag;
   Bool      m_RCEnableRateControl;
   Int       m_RCTargetBitrate;
@@ -669,8 +675,11 @@ public:
   void      setCABACEngineMode              ( UInt mode )    { m_CABACEngineMode = mode; }
   UInt      getCABACEngineMode              ()               { return m_CABACEngineMode; }
 
+#if JVET_K0072
+#else
   void      setAltResiCompId                ( unsigned n )   { m_altResiCompId = n; }
   unsigned  getAltResiCompId                ()               { return m_altResiCompId; }
+#endif
 #endif
 #if JEM_TOOLS
   void      setHighPrecisionMv              ( bool b )       { m_highPrecMv = b; }
@@ -1214,6 +1223,10 @@ public:
   Int          getTMVPModeId ()                                      { return m_TMVPModeId; }
   WeightedPredictionMethod getWeightedPredictionMethod() const       { return m_weightedPredictionMethod; }
   Void         setWeightedPredictionMethod( WeightedPredictionMethod m ) { m_weightedPredictionMethod = m; }
+#if JVET_K0072
+  void         setDepQuantEnabledFlag( bool b )                      { m_DepQuantEnabledFlag = b;    }
+  bool         getDepQuantEnabledFlag()                              { return m_DepQuantEnabledFlag; }
+#endif
 #if HEVC_USE_SIGN_HIDING
   Void         setSignDataHidingEnabledFlag( Bool b )                { m_SignDataHidingEnabledFlag = b;    }
   Bool         getSignDataHidingEnabledFlag()                        { return m_SignDataHidingEnabledFlag; }

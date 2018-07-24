@@ -40,6 +40,8 @@
 #include "CodingStructure.h"
 #include "Picture.h"
 
+#if JVET_K0072
+#else
 #if !HM_QTBT_AS_IN_JEM_CONTEXT
 static const uint8_t spat_bypass_luma_all           []  = { 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27 };
 static const uint8_t spat_bypass_chroma_all         []  = { 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 };
@@ -209,6 +211,7 @@ static const uint8_t** spat_sig_ctx[2][5][3] =
   }
 };
 #endif
+#endif
 
 #if HEVC_USE_SIGN_HIDING
 CoeffCodingContext::CoeffCodingContext(const TransformUnit& tu, ComponentID component, bool signHide)
@@ -232,11 +235,17 @@ CoeffCodingContext::CoeffCodingContext(const TransformUnit& tu, ComponentID comp
 #endif
   , m_log2BlockSize             ((m_log2BlockWidth + m_log2BlockHeight)>>1)
   , m_maxNumCoeff               (m_width * m_height)
+#if JVET_K0072
+#else
   , m_AlignFlag                 (tu.cs->sps->getSpsRangeExtension().getCabacBypassAlignmentEnabledFlag())
+#endif
 #if HEVC_USE_SIGN_HIDING
   , m_signHiding                (signHide)
 #endif
+#if JVET_K0072
+#else
   , m_useGoRiceParAdapt         (tu.cs->sps->getSpsRangeExtension().getPersistentRiceAdaptationEnabledFlag())
+#endif
   , m_extendedPrecision         (tu.cs->sps->getSpsRangeExtension().getExtendedPrecisionProcessingFlag())
   , m_maxLog2TrDynamicRange     (tu.cs->sps->getMaxLog2TrDynamicRange(m_chType))
 #if HEVC_USE_MDCS
@@ -257,11 +266,14 @@ CoeffCodingContext::CoeffCodingContext(const TransformUnit& tu, ComponentID comp
   , m_lastShiftX                (0)
   , m_lastShiftY                (0)
   , m_TrafoBypass               (tu.cs->sps->getSpsRangeExtension().getTransformSkipContextEnabledFlag() &&  (tu.cu->transQuantBypass || tu.transformSkip[m_compID]))
+#if JVET_K0072
+#else
   , m_SigBlockType              (m_TrafoBypass ? 0 : m_width == 4 && m_height == 4 ? 1 : m_width == 8 && m_height == 8 ? 2 : m_log2CGSize==2 ? 4 : 3 )
 #if !HM_QTBT_AS_IN_JEM_CONTEXT
   , m_SigScanPatternBase        (spat_sig_ctx[m_chType][m_SigBlockType][m_scanType])
 #endif
   , m_sigCtxSet                 (Ctx::SigFlag[m_chType])
+#endif
   , m_scanPosLast               (-1)
   , m_subSetId                  (-1)
   , m_subSetPos                 (-1)
@@ -270,6 +282,13 @@ CoeffCodingContext::CoeffCodingContext(const TransformUnit& tu, ComponentID comp
   , m_minSubPos                 (-1)
   , m_maxSubPos                 (-1)
   , m_sigGroupCtxId             (-1)
+#if JVET_K0072
+  , m_tmplCpSum1                (-1)
+  , m_tmplCpDiag                (-1)
+  , m_sigFlagCtxSet             { Ctx::SigFlag[m_chType], Ctx::SigFlag[m_chType+2], Ctx::SigFlag[m_chType+4] }
+  , m_parFlagCtxSet             ( Ctx::ParFlag[m_chType] )
+  , m_gtxFlagCtxSet             { Ctx::GtxFlag[m_chType], Ctx::GtxFlag[m_chType+2] }
+#else
 #if !HM_QTBT_AS_IN_JEM_CONTEXT
   , m_sigScanCtxId              (0)
 #endif
@@ -277,9 +296,13 @@ CoeffCodingContext::CoeffCodingContext(const TransformUnit& tu, ComponentID comp
   , m_gt2FlagCtxId              (-1)
   , m_currentGolombRiceStatistic(-1)
   , m_prevGt2                   (false)
+#endif
   , m_sigCoeffGroupFlag         ()
+#if JVET_K0072
+#else
 #if JEM_TOOLS
   , m_altResiCompId             ( tu.cs->sps->getSpsNext().getAltResiCompId() )
+#endif
 #endif
 #if JEM_TOOLS
   , m_emtNumSigCoeff            (0)
@@ -329,6 +352,8 @@ CoeffCodingContext::CoeffCodingContext(const TransformUnit& tu, ComponentID comp
     const_cast<int&>(m_lastShiftX)  = (log2sizeX + 1) >> 2;
     const_cast<int&>(m_lastShiftY)  = (log2sizeY + 1) >> 2;
   }
+#if JVET_K0072
+#else
 #if JEM_TOOLS && HEVC_USE_MDCS
   if( m_altResiCompId == 1 )
   {
@@ -346,6 +371,7 @@ CoeffCodingContext::CoeffCodingContext(const TransformUnit& tu, ComponentID comp
 #endif
   }
 #endif
+#endif
 }
 
 void CoeffCodingContext::initSubblock( int SubsetId, bool sigGroupFlag )
@@ -360,6 +386,13 @@ void CoeffCodingContext::initSubblock( int SubsetId, bool sigGroupFlag )
   {
     m_sigCoeffGroupFlag.set ( m_subSetPos );
   }
+#if JVET_K0072
+  unsigned  CGPosY    = m_subSetPosY;
+  unsigned  CGPosX    = m_subSetPosX;
+  unsigned  sigRight  = unsigned( ( CGPosX + 1 ) < m_widthInGroups  ? m_sigCoeffGroupFlag[ m_subSetPos + 1               ] : false );
+  unsigned  sigLower  = unsigned( ( CGPosY + 1 ) < m_heightInGroups ? m_sigCoeffGroupFlag[ m_subSetPos + m_widthInGroups ] : false );
+  m_sigGroupCtxId     = Ctx::SigCoeffGroup[m_chType]( sigRight | sigLower );
+#else
   unsigned  CGPosY   = 0;
   unsigned  CGPosX   = 0;
   unsigned  sigRight = 0;
@@ -430,9 +463,12 @@ void CoeffCodingContext::initSubblock( int SubsetId, bool sigGroupFlag )
     m_sigGroupCtxId = Ctx::SigCoeffGroup [ m_chType + 2 ]( sigRight | sigLower );
   }
 #endif
+#endif
 }
 
 
+#if JVET_K0072
+#else
 #if HM_QTBT_AS_IN_JEM_CONTEXT // ctx modeling for subblocks != 4x4
 unsigned CoeffCodingContext::sigCtxId( int scanPos ) const
 {
@@ -498,6 +534,7 @@ unsigned CoeffCodingContext::sigCtxId( int scanPos ) const
   return m_sigCtxSet( offset );
 }
 #endif
+#endif
 
 
 unsigned DeriveCtx::CtxCUsplit( const CodingStructure& cs, Partitioner& partitioner )
@@ -552,11 +589,25 @@ unsigned DeriveCtx::CtxCUsplit( const CodingStructure& cs, Partitioner& partitio
 }
 
 #if ENABLE_BMS
+#if JVET_K0072
+unsigned DeriveCtx::CtxQtCbf( const ComponentID compID, const unsigned trDepth, const bool prevCbCbf )
+#else
 unsigned DeriveCtx::CtxQtCbf( const ComponentID compID, const unsigned trDepth )
+#endif
+#else
+#if JVET_K0072
+unsigned DeriveCtx::CtxQtCbf( const ComponentID compID, const bool prevCbCbf )
 #else
 unsigned DeriveCtx::CtxQtCbf( const ComponentID compID )
 #endif
+#endif
 {
+#if JVET_K0072
+  if( compID == COMPONENT_Cr )
+  {
+    return ( prevCbCbf ? 1 : 0 );
+  }
+#endif
 #if ENABLE_BMS
   if( isChroma( compID ) )
   {

@@ -66,7 +66,7 @@ public:
   ~TrQuant();
 
   // initialize class
-  Void init       (
+  Void init      (
                     const Quant* otherQuant,
                     const UInt uiMaxTrSize,
                     const bool bUseRDOQ             = false,
@@ -74,8 +74,11 @@ public:
 #if T0196_SELECTIVE_RDOQ
                     const bool useSelectiveRDOQ     = false,
 #endif
+#if JVET_K0072
+#else
 #if JEM_TOOLS
                     const UInt uiAltResiCompId      = 0,
+#endif
 #endif
                     const bool bEnc                 = false,
                     const bool useTransformSkipFast = false,

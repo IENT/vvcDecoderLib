@@ -817,8 +817,11 @@ private:
 #if JEM_TOOLS
   bool              m_IMV;                        // 9
 #endif
+#if JVET_K0072
+#else
 #if JEM_TOOLS
   bool              m_altResiComp;                // 10
+#endif
 #endif
 #if JEM_TOOLS
   bool              m_highPrecMv;                 // 11
@@ -878,9 +881,12 @@ private:
   //imv
   ImvMode     m_ImvMode;
 #endif
+#if JVET_K0072
+#else
 #if JEM_TOOLS
   // ARC
   unsigned    m_altResiCompId;
+#endif
 #endif
 #if JEM_TOOLS
   // local illumination compensation
@@ -947,9 +953,12 @@ public:
   void      setUseAffine          ( bool b )                                        { m_Affine = b; }
   bool      getUseAffine          ()                                      const     { return m_Affine; }
 #endif
+#if JVET_K0072
+#else
 #if JEM_TOOLS
   void      setUseAltResiComp     ( bool b )                                        { m_altResiComp = b; }
   bool      getUseAltResiComp     ()                                      const     { return m_altResiComp; }
+#endif
 #endif
 #if JEM_TOOLS
   void      setUseHighPrecMv      ( bool b )                                        { m_highPrecMv = b; }
@@ -1047,10 +1056,13 @@ public:
   ImvMode   getImvMode            ()                                      const     { return m_ImvMode; }
 #endif
 
+#if JVET_K0072
+#else
 #if JEM_TOOLS
   // ARC
   void      setAltResiCompId      ( unsigned    mode )                              { m_altResiCompId = mode; }
   unsigned  getAltResiCompId      ()                                      const     { return m_altResiCompId; }
+#endif
 #endif
 
 #if JEM_TOOLS
@@ -1434,8 +1446,11 @@ private:
   std::vector<Int> m_tileRowHeight;
 #endif
 
+#if JVET_K0072
+#else
 #if HEVC_USE_SIGN_HIDING
   Bool             m_signDataHidingEnabledFlag;
+#endif
 #endif
   Bool             m_cabacInitPresentFlag;
 
@@ -1544,9 +1559,12 @@ public:
   UInt                   getTileRowHeight(UInt rowIdx) const                              { return m_tileRowHeight[rowIdx];               }
 #endif
 
+#if JVET_K0072
+#else
 #if HEVC_USE_SIGN_HIDING
   Void                   setSignDataHidingEnabledFlag( Bool b )                           { m_signDataHidingEnabledFlag = b;              }
   Bool                   getSignDataHidingEnabledFlag() const                             { return m_signDataHidingEnabledFlag;           }
+#endif
 #endif
   Void                   setCabacInitPresentFlag( Bool flag )                             { m_cabacInitPresentFlag = flag;                }
   Bool                   getCabacInitPresentFlag() const                                  { return m_cabacInitPresentFlag;                }
@@ -1642,6 +1660,12 @@ private:
 #if JEM_TOOLS
   Bool                       m_bioLDBPossible;
   bool                       m_UseLIC;
+#endif
+#if JVET_K0072 
+  bool                       m_depQuantEnabledFlag;
+#if HEVC_USE_SIGN_HIDING
+  bool                       m_signDataHidingEnabledFlag;
+#endif
 #endif
   Bool                       m_bCheckLDC;
 
@@ -1847,6 +1871,14 @@ public:
   bool                        getUseLIC()                                   const    { return m_UseLIC; }
   void                        setUseLIC( bool b )                                    { m_UseLIC = b; }
   void                        setUseLICOnPicLevel( bool fastPicDecision );
+#endif
+#if JVET_K0072
+  Void                        setDepQuantEnabledFlag( Bool b )                       { m_depQuantEnabledFlag = b; }
+  Bool                        getDepQuantEnabledFlag() const                         { return m_depQuantEnabledFlag; }
+#if HEVC_USE_SIGN_HIDING
+  Void                        setSignDataHidingEnabledFlag( Bool b )                 { m_signDataHidingEnabledFlag = b;              }
+  Bool                        getSignDataHidingEnabledFlag() const                   { return m_signDataHidingEnabledFlag;           }
+#endif
 #endif
 
   Void                        initEqualRef();

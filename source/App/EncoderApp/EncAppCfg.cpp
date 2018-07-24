@@ -814,7 +814,10 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
 #endif
   ("SubPuMvpLog2Size",                                m_SubPuMvpLog2Size,                                  2u, "Sub-PU TMVP size index: 2^n")
   ("CABACEngine",                                     m_CABACEngineMode,                                   0u, "CABAC engine mode (0:standard, 1:multi-parameter, 2:adaptive window, 3:multi-par. + adap. window)  [default: 0]")
+#if JVET_K0072
+#else
   ("AltResiComp",                                     m_altResiCompId,                                     0u, "Alternative residual compression mode (0:off, 1:JEM)  [default: off]")
+#endif
 #else
 #endif
 #if JEM_TOOLS
@@ -1072,8 +1075,15 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
   ("ScalingList",                                     m_useScalingListId,                    SCALING_LIST_OFF, "0/off: no scaling list, 1/default: default scaling lists, 2/file: scaling lists specified in ScalingListFile")
   ("ScalingListFile",                                 m_scalingListFileName,                       string(""), "Scaling list file name. Use an empty string to produce help.")
 #endif
+#if JVET_K0072
+  ("DepQuant",                                        m_depQuantEnabledFlag,                                          true )
+#if HEVC_USE_SIGN_HIDING
+  ("SignHideFlag,-SBH",                               m_signDataHidingEnabledFlag,                                    false )
+#endif
+#else
 #if HEVC_USE_SIGN_HIDING
   ("SignHideFlag,-SBH",                               m_signDataHidingEnabledFlag,                                    true)
+#endif
 #endif
   ("MaxNumMergeCand",                                 m_maxNumMergeCand,                                   5u, "Maximum number of merge candidates")
   /* Misc. */
@@ -1902,7 +1912,11 @@ Bool EncAppCfg::xCheckParameter()
 #endif
 #if JEM_TOOLS
     xConfirmPara( m_CABACEngineMode > 0, "CABAC engine mode > 0 is only allowed with NEXT profile" );
+#if JVET_K0072
+    xConfirmPara( m_depQuantEnabledFlag, "Dependent quantization can only be used with NEXT profile" );
+#else
     xConfirmPara( m_altResiCompId > 0, "Alternative residual compression can only be used with NEXT profile" );
+#endif
 #endif
 #if JEM_TOOLS
     xConfirmPara( m_highPrecisionMv, "High precision MV for temporal merging can only be used with NEXT profile" );
@@ -1954,6 +1968,15 @@ Bool EncAppCfg::xCheckParameter()
  #if JEM_TOOLS
     xConfirmPara( m_CABACEngineMode > 3,                 "CABAC engine mode must be less than or equal to 3." );
  #endif
+#if JVET_K0072
+    if( m_depQuantEnabledFlag )
+    {
+      xConfirmPara( !m_useRDOQ || !m_useRDOQTS, "RDOQ and RDOQTS must be equal to 1 if dependent quantization is enabled" );
+#if HEVC_USE_SIGN_HIDING
+      xConfirmPara( m_signDataHidingEnabledFlag, "SignHideFlag must be equal to 0 if dependent quantization is enabled" );
+#endif
+    }
+#endif
 #if JEM_TOOLS
     xConfirmPara( m_LICMode > 2,                         "LICMode > 2 is not supported." );
 #endif
@@ -2030,9 +2053,12 @@ Bool EncAppCfg::xCheckParameter()
   }
 #endif
 
- #if JEM_TOOLS
+#if JVET_K0072
+#else
+#if JEM_TOOLS
   xConfirmPara( m_altResiCompId > 1, "Alternative residual compression Id out of range  (0:off, 1:JEM)" );
  #endif
+#endif
 
   xConfirmPara( m_useAMaxBT && !m_QTBT, "AMaxBT can only be used with QTBT!" );
 
@@ -3141,6 +3167,9 @@ Void EncAppCfg::xPrintParameter()
 #endif
   msg( VERBOSE, "TMVPMode:%d ", m_TMVPModeId     );
 
+#if JVET_K0072
+  msg( VERBOSE, " DQ:%d ", m_depQuantEnabledFlag);
+#endif
 #if HEVC_USE_SIGN_HIDING
   msg( VERBOSE, " SignBitHidingFlag:%d ", m_signDataHidingEnabledFlag);
 #endif
@@ -3171,8 +3200,11 @@ Void EncAppCfg::xPrintParameter()
     msg( VERBOSE, "IMV:%d ", m_ImvMode );
     if( !m_QTBT ) msg( VERBOSE, "IMVMaxCand:%d ", m_ImvMaxCand );
 #endif
+#if JVET_K0072
+#else
 #if JEM_TOOLS
     msg( VERBOSE, "AltResiComp:%d ", m_altResiCompId );
+#endif
 #endif
 #if JEM_TOOLS
     msg( VERBOSE, "HighPrecMv:%d ", m_highPrecisionMv );

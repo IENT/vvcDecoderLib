@@ -92,8 +92,11 @@ public:
   virtual Void init( UInt uiMaxTrSize,
                      Bool useRDOQ = false,
                      Bool useRDOQTS = false,
+#if JVET_K0072
+#else
 #if JEM_TOOLS
                      UInt uiAltResiCompId = 0,
+#endif
 #endif
 #if T0196_SELECTIVE_RDOQ
                      Bool useSelectiveRDOQ = false
@@ -150,8 +153,11 @@ protected:
 #if T0196_SELECTIVE_RDOQ
   Bool     m_useSelectiveRDOQ;
 #endif
+#if JVET_K0072
+#else
 #if JEM_TOOLS
   Int      m_altResiCompId;
+#endif
 #endif
 #if HEVC_USE_SCALING_LISTS
 private:

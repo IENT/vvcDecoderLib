@@ -397,8 +397,11 @@ Void HLSyntaxReader::parsePPS( PPS* pcPPS )
 
   READ_CODE(3, uiCode, "num_extra_slice_header_bits");                pcPPS->setNumExtraSliceHeaderBits(uiCode);
 
+#if JVET_K0072
+#else
 #if HEVC_USE_SIGN_HIDING
   READ_FLAG ( uiCode, "sign_data_hiding_enabled_flag" );              pcPPS->setSignDataHidingEnabledFlag( uiCode );
+#endif
 #endif
 
   READ_FLAG( uiCode,   "cabac_init_present_flag" );            pcPPS->setCabacInitPresentFlag( uiCode ? true : false );
@@ -811,8 +814,11 @@ void HLSyntaxReader::parseSPSNext( SPSNext& spsNext, const bool usePCM )
 #if JEM_TOOLS
   READ_FLAG( symbol,    "imv_enable_flag" );                        spsNext.setUseIMV                 ( symbol != 0 );
 #endif
+#if JVET_K0072
+#else
 #if JEM_TOOLS
   READ_FLAG( symbol,    "alternative_residual_compression_flag" );  spsNext.setUseAltResiComp         ( symbol != 0 ); spsNext.setAltResiCompId( symbol );
+#endif
 #endif
 #if JEM_TOOLS
   READ_FLAG( symbol,    "high_precision_motion_vectors" );          spsNext.setUseHighPrecMv          ( symbol != 0 );
@@ -916,11 +922,14 @@ void HLSyntaxReader::parseSPSNext( SPSNext& spsNext, const bool usePCM )
     READ_UVLC( symbol,  "mtt_mode_minus1" );                        spsNext.setMTTMode( symbol + 1 );
   }
 
+#if JVET_K0072
+#else
 #if JEM_TOOLS
   if( spsNext.getUseAltResiComp() )
   {
     READ_UVLC( symbol,  "alt_resi_comp_minus1" );                   spsNext.setAltResiCompId( symbol + 1 );
   }
+#endif
 #endif
 
 #if JEM_TOOLS
@@ -1744,6 +1753,17 @@ Void HLSyntaxReader::parseSliceHeader (Slice* pcSlice, ParameterSetManager *para
       READ_FLAG( uiCode, "slice_lic_enable_flag" );
       pcSlice->setUseLIC( uiCode != 0 );
     }
+#endif
+#if JVET_K0072 
+    READ_FLAG( uiCode, "dep_quant_enable_flag" );
+    pcSlice->setDepQuantEnabledFlag( uiCode != 0 );
+#if HEVC_USE_SIGN_HIDING
+    if( !pcSlice->getDepQuantEnabledFlag() )
+    {
+      READ_FLAG( uiCode, "sign_data_hiding_enable_flag" );
+      pcSlice->setSignDataHidingEnabledFlag( uiCode != 0 );
+    }
+#endif
 #endif
     if( sps->getSpsNext().getUseQTBT() )
     {

@@ -296,8 +296,11 @@ Void EncLib::init( Bool isFieldCoding, AUWriterIf* auWriterIf )
 #if T0196_SELECTIVE_RDOQ
                           m_useSelectiveRDOQ,
 #endif
+#if JVET_K0072
+#else
 #if JEM_TOOLS
                           sps0.getSpsNext().getAltResiCompId(),
+#endif
 #endif
                           true,
                           m_useTransformSkipFast
@@ -341,8 +344,11 @@ Void EncLib::init( Bool isFieldCoding, AUWriterIf* auWriterIf )
 #if T0196_SELECTIVE_RDOQ
                    m_useSelectiveRDOQ,
 #endif
+#if JVET_K0072
+#else
 #if JEM_TOOLS
                    sps0.getSpsNext().getAltResiCompId(),
+#endif
 #endif
                    true,
                    m_useTransformSkipFast
@@ -838,9 +844,12 @@ Void EncLib::xInitSPS(SPS &sps)
   sps.getSpsNext().setImvMode               ( ImvMode(m_ImvMode) );
   sps.getSpsNext().setUseIMV                ( m_ImvMode != IMV_OFF );
 #endif
+#if JVET_K0072
+#else
 #if JEM_TOOLS
   sps.getSpsNext().setUseAltResiComp        ( m_altResiCompId != 0 );
   sps.getSpsNext().setAltResiCompId         ( m_altResiCompId );
+#endif
 #endif
 #if JEM_TOOLS
   sps.getSpsNext().setUseHighPrecMv         ( m_highPrecMv );
@@ -1317,8 +1326,11 @@ Void EncLib::xInitPPS(PPS &pps, const SPS &sps)
   pps.setUseWP( m_useWeightedPred );
   pps.setWPBiPred( m_useWeightedBiPred );
   pps.setOutputFlagPresentFlag( false );
+#if JVET_K0072
+#else
 #if HEVC_USE_SIGN_HIDING
   pps.setSignDataHidingEnabledFlag(getSignDataHidingEnabledFlag());
+#endif
 #endif
 
   if ( getDeblockingFilterMetric() )

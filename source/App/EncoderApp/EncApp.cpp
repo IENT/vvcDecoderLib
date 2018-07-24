@@ -228,7 +228,10 @@ Void EncApp::xInitLibCfg()
 #endif
 #if JEM_TOOLS
   m_cEncLib.setCABACEngineMode                                   ( m_CABACEngineMode );
+#if JVET_K0072
+#else
   m_cEncLib.setAltResiCompId                                     ( m_altResiCompId );
+#endif
 #endif
 #if JEM_TOOLS
   m_cEncLib.setHighPrecisionMv                                   ( m_highPrecisionMv );
@@ -468,8 +471,11 @@ Void EncApp::xInitLibCfg()
   m_cEncLib.setUseScalingListId                                  ( m_useScalingListId  );
   m_cEncLib.setScalingListFileName                               ( m_scalingListFileName );
 #endif
+#if JVET_K0072
+  m_cEncLib.setDepQuantEnabledFlag                               ( m_depQuantEnabledFlag);
 #if HEVC_USE_SIGN_HIDING
   m_cEncLib.setSignDataHidingEnabledFlag                         ( m_signDataHidingEnabledFlag);
+#endif
 #endif
   m_cEncLib.setUseRateCtrl                                       ( m_RCEnableRateControl );
   m_cEncLib.setTargetBitrate                                     ( m_RCTargetBitrate );

@@ -57,15 +57,18 @@ public:
   CoeffCodingContext( const TransformUnit& tu, ComponentID component );
 #endif
 public:
-  void initSubblock     ( int SubsetId, bool sigGroupFlag = false );
+  void  initSubblock     ( int SubsetId, bool sigGroupFlag = false );
 public:
   void  resetSigGroup   ()                      { m_sigCoeffGroupFlag.reset( m_subSetPos ); }
   void  setSigGroup     ()                      { m_sigCoeffGroupFlag.set( m_subSetPos ); }
   void  setScanPosLast  ( int       posLast )   { m_scanPosLast = posLast; }
+#if JVET_K0072
+#else
   void  setGt2Flag      ( bool      gt2Flag )   { m_prevGt2 = gt2Flag; }
   void  setGoRiceStats  ( unsigned  GRStats )   { m_currentGolombRiceStatistic = GRStats; }
   void  incGoRiceStats  ()                      { m_currentGolombRiceStatistic++; }
   void  decGoRiceStats  ()                      { m_currentGolombRiceStatistic--; }
+#endif
 public:
   ComponentID     compID          ()                        const { return m_compID; }
   int             subSetId        ()                        const { return m_subSetId; }
@@ -78,12 +81,18 @@ public:
   unsigned        log2BlockWidth  ()                        const { return m_log2BlockWidth; }
   unsigned        log2BlockHeight ()                        const { return m_log2BlockHeight; }
   unsigned        log2BlockSize   ()                        const { return m_log2BlockSize; }
+#if JVET_K0072
+#else
   bool            updGoRiceStats  ()                        const { return m_useGoRiceParAdapt; }
+#endif
   bool            extPrec         ()                        const { return m_extendedPrecision; }
   int             maxLog2TrDRange ()                        const { return m_maxLog2TrDynamicRange; }
   unsigned        maxNumCoeff     ()                        const { return m_maxNumCoeff; }
+#if JVET_K0072
+#else
   unsigned        currGoRiceStats ()                        const { return m_currentGolombRiceStatistic; }
   bool            alignFlag       ()                        const { return m_AlignFlag; }
+#endif
   int             scanPosLast     ()                        const { return m_scanPosLast; }
   int             minSubPos       ()                        const { return m_minSubPos; }
   int             maxSubPos       ()                        const { return m_maxSubPos; }
@@ -105,6 +114,8 @@ public:
   unsigned        lastXCtxId      ( unsigned  posLastX  )   const { return m_CtxSetLastX( m_lastOffsetX + ( posLastX >> m_lastShiftX ) ); }
   unsigned        lastYCtxId      ( unsigned  posLastY  )   const { return m_CtxSetLastY( m_lastOffsetY + ( posLastY >> m_lastShiftY ) ); }
   unsigned        sigGroupCtxId   ()                        const { return m_sigGroupCtxId; }
+#if JVET_K0072
+#else
 #if HM_QTBT_AS_IN_JEM_CONTEXT // ctx modeling for subblocks != 4x4
   unsigned        sigCtxId        ( int       scanPos   )   const;
 #else
@@ -121,6 +132,97 @@ public:
   {
     return Ctx::SigCoeffGroup[ m_chType + 2 ]( 0 );
   }
+#endif
+
+#if JVET_K0072
+  unsigned sigCtxIdAbs( int scanPos, const TCoeff* coeff, const int state )
+  {
+    const UInt    posY      = m_scanPosY[ scanPos ];
+    const UInt    posX      = m_scanPosX[ scanPos ];
+    const TCoeff* pData     = coeff + posX + posY * m_width;
+    const Int     diag      = posX + posY;
+    Int           numPos    = 0;
+    Int           sumAbs    = 0;
+#define UPDATE(x) {int a=abs(x);sumAbs+=std::min(4-(a&1),a);numPos+=!!a;}
+    if( posX < m_width-1 )
+    {
+      UPDATE( pData[1] );
+      if( posX < m_width-2 )
+      {
+        UPDATE( pData[2] );
+      }
+      if( posY < m_height-1 )
+      {
+        UPDATE( pData[m_width+1] );
+      }
+    }
+    if( posY < m_height-1 )
+    {
+      UPDATE( pData[m_width] );
+      if( posY < m_height-2 )
+      {
+        UPDATE( pData[m_width<<1] );
+      }
+    }
+#undef UPDATE
+    int ctxOfs = std::min( sumAbs, 5 ) + ( diag < 2 ? 6 : 0 );
+    if( m_chType == CHANNEL_TYPE_LUMA )
+    {
+      ctxOfs += diag < 5 ? 6 : 0;
+    }
+    m_tmplCpDiag = diag;
+    m_tmplCpSum1 = sumAbs - numPos;
+    return m_sigFlagCtxSet[std::max( 0, state-1 )]( ctxOfs );
+  }
+
+  uint8_t ctxOffsetAbs()
+  {
+    int offset = 0;
+    if( m_tmplCpDiag != -1 )
+    {
+      offset  = std::min( m_tmplCpSum1, 4 ) + 1;
+      offset += ( !m_tmplCpDiag ? ( m_chType == CHANNEL_TYPE_LUMA ? 15 : 5 ) : m_chType == CHANNEL_TYPE_LUMA ? m_tmplCpDiag < 3 ? 10 : ( m_tmplCpDiag < 10 ? 5 : 0 ) : 0 );
+    }
+    return uint8_t(offset);
+  }
+
+  unsigned parityCtxIdAbs   ( uint8_t offset )  const { return m_parFlagCtxSet   ( offset ); }
+  unsigned greater1CtxIdAbs ( uint8_t offset )  const { return m_gtxFlagCtxSet[1]( offset ); }
+  unsigned greater2CtxIdAbs ( uint8_t offset )  const { return m_gtxFlagCtxSet[0]( offset ); }
+
+  unsigned GoRiceParAbs( int scanPos, const TCoeff* coeff ) const
+  {
+#define UPDATE(x) sum+=abs(x)-!!x
+    const UInt    posY      = m_scanPosY[ scanPos ];
+    const UInt    posX      = m_scanPosX[ scanPos ];
+    const TCoeff* pData     = coeff + posX + posY * m_width;
+    Int           sum       = 0;
+    if( posX < m_width-1 )
+    {
+      UPDATE( pData[1] );
+      if( posX < m_width-2 )
+      {
+        UPDATE( pData[2] );
+      }
+      if( posY < m_height-1 )
+      {
+        UPDATE( pData[m_width+1] );
+      }
+    }
+    if( posY < m_height-1 )
+    {
+      UPDATE( pData[m_width] );
+      if( posY < m_height-2 )
+      {
+        UPDATE( pData[m_width<<1] );
+      }
+    }
+#undef UPDATE
+    int     r = g_auiGoRicePars[ std::min( sum, 31 ) ];
+    return  r;
+  }
+
+#else
   unsigned        sigCtxId        ( int       scanPos,
                               const TCoeff*   coeff,
                                     int       strd = 0  )
@@ -330,6 +432,7 @@ public:
     }
     return ( order == MAX_GR_ORDER_RESIDUAL ? ( MAX_GR_ORDER_RESIDUAL - 1 ) : order );
   }
+#endif
 
 #if JEM_TOOLS
   unsigned        emtNumSigCoeff()                          const { return m_emtNumSigCoeff; }
@@ -355,11 +458,17 @@ private:
 #endif
   const unsigned            m_log2BlockSize;
   const unsigned            m_maxNumCoeff;
+#if JVET_K0072
+#else
   const bool                m_AlignFlag;
+#endif
 #if HEVC_USE_SIGN_HIDING
   const bool                m_signHiding;
 #endif
+#if JVET_K0072
+#else
   const bool                m_useGoRiceParAdapt;
+#endif
   const bool                m_extendedPrecision;
   const int                 m_maxLog2TrDynamicRange;
   CoeffScanType             m_scanType;
@@ -376,11 +485,14 @@ private:
   const int                 m_lastShiftX;
   const int                 m_lastShiftY;
   const bool                m_TrafoBypass;
+#if JVET_K0072
+#else
   const int                 m_SigBlockType;
 #if !HM_QTBT_AS_IN_JEM_CONTEXT
   const uint8_t**           m_SigScanPatternBase;
 #endif
   CtxSet                    m_sigCtxSet;
+#endif
   // modified
   int                       m_scanPosLast;
   int                       m_subSetId;
@@ -390,6 +502,13 @@ private:
   int                       m_minSubPos;
   int                       m_maxSubPos;
   unsigned                  m_sigGroupCtxId;
+#if JVET_K0072
+  int                       m_tmplCpSum1;
+  int                       m_tmplCpDiag;
+  CtxSet                    m_sigFlagCtxSet[3];
+  CtxSet                    m_parFlagCtxSet;
+  CtxSet                    m_gtxFlagCtxSet[2];
+#else
 #if HM_QTBT_AS_IN_JEM_CONTEXT
   int                       m_sigCGPattern;
 #else
@@ -399,9 +518,13 @@ private:
   unsigned                  m_gt2FlagCtxId;
   unsigned                  m_currentGolombRiceStatistic;
   bool                      m_prevGt2;
+#endif
   std::bitset<MLS_GRP_NUM>  m_sigCoeffGroupFlag;
+#if JVET_K0072
+#else
 #if JEM_TOOLS
   unsigned                  m_altResiCompId;
+#endif
 #endif
 #if JEM_TOOLS
   unsigned                  m_emtNumSigCoeff;
@@ -453,9 +576,17 @@ namespace DeriveCtx
 unsigned CtxCUsplit   ( const CodingStructure& cs, Partitioner& partitioner );
 unsigned CtxBTsplit   ( const CodingStructure& cs, Partitioner& partitioner );
 #if ENABLE_BMS
+#if JVET_K0072
+unsigned CtxQtCbf     ( const ComponentID compID, const unsigned trDepth, const bool prevCbCbf );
+#else
 unsigned CtxQtCbf     ( const ComponentID compID, const unsigned trDepth );
+#endif
+#else
+#if JVET_K0072
+unsigned CtxQtCbf     ( const ComponentID compID, const bool prevCbCbf );
 #else
 unsigned CtxQtCbf     ( const ComponentID compID );
+#endif
 #endif
 unsigned CtxInterDir  ( const PredictionUnit& pu );
 unsigned CtxSkipFlag  ( const CodingUnit& cu );

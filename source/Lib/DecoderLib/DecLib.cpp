@@ -789,9 +789,13 @@ Void DecLib::xActivateParameterSets()
     // Recursive structure
     m_cCuDecoder.init( &m_cTrQuant, &m_cIntraPred, &m_cInterPred );
 #if JEM_TOOLS
-    m_cTrQuant  .init( nullptr, sps->getMaxTrSize(), false, false, false, 0, false, false, sps->getSpsNext().getUseIntra65Ang(), pps->pcv->rectCUs );
+#if JVET_K0072
+    m_cTrQuant.init( nullptr, sps->getMaxTrSize(), false, false, false, false, false, sps->getSpsNext().getUseIntra65Ang(), pps->pcv->rectCUs );
 #else
-    m_cTrQuant  .init( nullptr, sps->getMaxTrSize(), false, false, false, false, false, pps->pcv->rectCUs );
+    m_cTrQuant.init( nullptr, sps->getMaxTrSize(), false, false, false, 0, false, false, sps->getSpsNext().getUseIntra65Ang(), pps->pcv->rectCUs );
+#endif
+#else
+    m_cTrQuant.init( nullptr, sps->getMaxTrSize(), false, false, false, false, false, pps->pcv->rectCUs );
 #endif
 
     // RdCost
