@@ -1394,7 +1394,7 @@ Bool EncModeCtrlMTnoRQT::tryMode( const EncTestMode& encTestmode, const CodingSt
 
   if( isBoundary && encTestmode.type != ETM_SPLIT_QT )
   {
-#if !HM_QTBT_ONLY_QT_IMPLICIT
+#if !HM_QTBT_ONLY_QT_IMPLICIT || JVET_K0554
     return getPartSplit( encTestmode ) == implicitSplit;
 #else
     return false;
@@ -2107,7 +2107,7 @@ Bool EncModeCtrlMTnoRQT::useModeResult( const EncTestMode& encTestmode, CodingSt
 
   if( ( tempCS->sps->getSpsNext().getMTTMode() & 1 ) == 1 )
   {
-#if !HM_QTBT_ONLY_QT_IMPLICIT
+#if !HM_QTBT_ONLY_QT_IMPLICIT || JVET_K0554
     int maxMtD = tempCS->pcv->getMaxBtDepth( *tempCS->slice, partitioner.chType ) + partitioner.currImplicitBtDepth;
 #else
     int maxMtD = tempCS->pcv->getMaxBtDepth( *tempCS->slice, partitioner.chType );

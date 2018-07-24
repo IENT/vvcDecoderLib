@@ -119,7 +119,7 @@ void Partitioner::copyState( const Partitioner& other )
 #if ENABLE_BMS
   currTrDepth = other.currTrDepth;
 #endif
-#if !HM_QTBT_ONLY_QT_IMPLICIT
+#if !HM_QTBT_ONLY_QT_IMPLICIT || JVET_K0554
   currImplicitBtDepth
               = other.currImplicitBtDepth;
 #endif
@@ -232,7 +232,7 @@ Void QTBTPartitioner::initCtu( const UnitArea& ctuArea, const ChannelType _chTyp
   currBtDepth = 0;
   currMtDepth = 0;
   currQtDepth = 0;
-#if !HM_QTBT_ONLY_QT_IMPLICIT
+#if !HM_QTBT_ONLY_QT_IMPLICIT || JVET_K0554
   currImplicitBtDepth = 0;
 #endif
   chType      = _chType;
@@ -245,7 +245,7 @@ Void QTBTPartitioner::splitCurrArea( const PartSplit split, const CodingStructur
 {
   CHECKD( !canSplit( split, cs ), "Trying to apply a prohibited split!" );
 
-#if !HM_QTBT_ONLY_QT_IMPLICIT
+#if !HM_QTBT_ONLY_QT_IMPLICIT || JVET_K0554
   bool isImplicit = isSplitImplicit( split, cs );
 #endif
   bool canQtSplit = canSplit( CU_QUAD_SPLIT, cs );
@@ -296,7 +296,7 @@ Void QTBTPartitioner::splitCurrArea( const PartSplit split, const CodingStructur
   if( split == CU_HORZ_SPLIT || split == CU_VERT_SPLIT || split == CU_TRIH_SPLIT || split == CU_TRIV_SPLIT )
   {
     currBtDepth++;
-#if !HM_QTBT_ONLY_QT_IMPLICIT
+#if !HM_QTBT_ONLY_QT_IMPLICIT || JVET_K0554
     if( isImplicit ) currImplicitBtDepth++;
 #endif
     currMtDepth++;
@@ -325,7 +325,7 @@ bool QTBTPartitioner::canSplit( const PartSplit split, const CodingStructure &cs
   // the minimal and maximal sizes are given in luma samples
   const CompArea area           = currArea().Y();
 
-#if !HM_QTBT_ONLY_QT_IMPLICIT
+#if !HM_QTBT_ONLY_QT_IMPLICIT || JVET_K0554
   const unsigned maxBTD         = cs.pcv->getMaxBtDepth( *cs.slice, chType ) + currImplicitBtDepth;
 #else
   const unsigned maxBTD         = cs.pcv->getMaxBtDepth( *cs.slice, chType );
@@ -366,15 +366,27 @@ bool QTBTPartitioner::canSplit( const PartSplit split, const CodingStructure &cs
     PartSplit lastSplit = m_partStack.back().split;
     if( lastSplit != CTU_LEVEL && lastSplit != CU_QUAD_SPLIT )                  return false;
 
+#if !JVET_K0554
     // allowing QT split even if a BT split is implied
     if( implicitSplit != CU_DONT_SPLIT )                                        return true;
 
+#endif
     unsigned minQtSize = cs.pcv->getMinQtSize( *cs.slice, chType );
     if( currArea().lwidth() <= minQtSize || currArea().lheight() <= minQtSize ) return false;
 
+#if JVET_K0554
+    // allowing QT split even if a BT split is implied
+    if( implicitSplit != CU_DONT_SPLIT )                                        return true;
+
+#endif
     return true;
   }
   break;
+#if JVET_K0554
+  case CU_DONT_SPLIT:
+    return implicitSplit == CU_DONT_SPLIT;
+    break;
+#endif
   // general check for BT split, specific checks are done in a separate switch
   case CU_HORZ_SPLIT:
   case CU_VERT_SPLIT:
@@ -404,7 +416,7 @@ bool QTBTPartitioner::canSplit( const PartSplit split, const CodingStructure &cs
       }
     }
   }
-#if !HM_QTBT_ONLY_QT_IMPLICIT
+#if !HM_QTBT_ONLY_QT_IMPLICIT || JVET_K0554
     if( implicitSplit == split )                                   return true;
     if( implicitSplit != CU_DONT_SPLIT && implicitSplit != split ) return false;
 #endif
@@ -475,7 +487,7 @@ PartSplit QTBTPartitioner::getImplicitSplit( const CodingStructure &cs )
     const bool isBlInPic = cs.picture->Y().contains( currArea().Y().bottomLeft() );
     const bool isTrInPic = cs.picture->Y().contains( currArea().Y().topRight() );
 
-#if HM_QTBT_ONLY_QT_IMPLICIT
+#if HM_QTBT_ONLY_QT_IMPLICIT && !JVET_K0554
     if( !isBlInPic || !isTrInPic )
     {
       split = CU_QUAD_SPLIT;
@@ -484,8 +496,14 @@ PartSplit QTBTPartitioner::getImplicitSplit( const CodingStructure &cs )
     const CompArea& area      = currArea().Y();
     const unsigned maxBtSize  = cs.pcv->getMaxBtSize( *cs.slice, chType );
     const bool isBtAllowed    = area.width <= maxBtSize && area.height <= maxBtSize;
+#if JVET_K0554
+    const unsigned minQtSize  = cs.pcv->getMinQtSize( *cs.slice, chType );
+    const bool isQtAllowed    = area.width >  minQtSize && area.height >  minQtSize && currBtDepth == 0;
 
+    if( !isBlInPic && !isTrInPic && isQtAllowed )
+#else
     if( !isBlInPic && !isTrInPic )
+#endif
     {
       split = CU_QUAD_SPLIT;
     }
@@ -530,7 +548,7 @@ Void QTBTPartitioner::exitCurrSplit()
     CHECK( currBtDepth == 0, "BT depth is '0', athough a BT split was performed" );
     CHECK( currMtDepth == 0, "MT depth is '0', athough a BT split was performed" );
     currMtDepth--;
-#if !HM_QTBT_ONLY_QT_IMPLICIT
+#if !HM_QTBT_ONLY_QT_IMPLICIT || JVET_K0554
     if( m_partStack.back().isImplicit ) currImplicitBtDepth--;
 #endif
     currBtDepth--;
