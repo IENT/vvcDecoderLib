@@ -3468,6 +3468,15 @@ Int EncAdaptiveLoopFilter::gnsSolveByChol( Double **LHS, Double *rhs, Double *x,
   double U[m_MAX_SQR_FILT_LENGTH][m_MAX_SQR_FILT_LENGTH];    /* Upper triangular Cholesky factor of LHS */
   int  i, singular;          /* Looping variable */
 
+  // Initialize to avoid compiler warnings
+  for (int i = 0; i < m_MAX_SQR_FILT_LENGTH; i++)
+  {
+    for (int j = 0; j < m_MAX_SQR_FILT_LENGTH; j++)
+    {
+      U[i][j] = 0.0;
+    }
+  }
+
   /* The equation to be solved is LHSx = rhs */
 
   /* Compute upper triangular U such that U'*U = LHS */
