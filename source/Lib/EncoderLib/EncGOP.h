@@ -54,6 +54,9 @@
 #include "CABACWriter.h"
 #include "SEIwrite.h"
 #include "SEIEncoder.h"
+#if EXTENSION_360_VIDEO
+#include "AppEncHelper360/TExt360EncGop.h"
+#endif
 
 #include "Analyze.h"
 #include "RateCtrl.h"
@@ -97,6 +100,13 @@ private:
   Analyze                 m_gcAnalyzeWPSNR;
 #endif
   Analyze                 m_gcAnalyzeAll_in;
+#if EXTENSION_360_VIDEO
+  TExt360EncGop           m_ext360;
+public:
+  TExt360EncGop &getExt360Data() { return m_ext360; }
+private:
+#endif
+
   //  Data
   Bool                    m_bLongtermTestPictureHasBeenCoded;
   Bool                    m_bLongtermTestPictureHasBeenCoded2;
@@ -178,6 +188,13 @@ public:
   EncSlice*  getSliceEncoder()   { return m_pcSliceEncoder; }
   NalUnitType getNalUnitType( Int pocCurr, Int lastIdr, Bool isField );
   Void arrangeLongtermPicturesInRPS(Slice *, PicList& );
+
+#if EXTENSION_360_VIDEO
+  Analyze& getAnalyzeAllData() { return m_gcAnalyzeAll; }
+  Analyze& getAnalyzeIData() { return m_gcAnalyzeI; }
+  Analyze& getAnalyzePData() { return m_gcAnalyzeP; }
+  Analyze& getAnalyzeBData() { return m_gcAnalyzeB; }
+#endif
 
 protected:
   RateCtrl* getRateCtrl()       { return m_pcRateCtrl;  }

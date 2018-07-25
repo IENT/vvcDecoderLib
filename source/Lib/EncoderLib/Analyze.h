@@ -48,6 +48,9 @@
 #include "CommonLib/CommonDef.h"
 #include "CommonLib/ChromaFormat.h"
 #include "math.h"
+#if EXTENSION_360_VIDEO
+#include "AppEncHelper360/TExt360EncAnalyze.h"
+#endif
 
 //! \ingroup EncoderLib
 //! \{
@@ -72,6 +75,9 @@ private:
 #if ENABLE_QPA && FRAME_WEIGHTING
   double    m_sumWSSD[MAX_NUM_COMPONENT];   // weighted SSDs
   double    m_sumW;
+#endif
+#if EXTENSION_360_VIDEO
+  TExt360EncAnalyze m_ext360;
 #endif
 
 public:
@@ -102,6 +108,9 @@ public:
   Double  getBits()                   const { return  m_dAddBits;   }
   Void    setBits(Double numBits)     { m_dAddBits = numBits; }
   UInt    getNumPic()                 const { return  m_uiNumPic;   }
+#if EXTENSION_360_VIDEO
+  TExt360EncAnalyze& getExt360Info() { return m_ext360; }
+#endif
 
   Void    setFrmRate  (Double dFrameRate) { m_dFrmRate = dFrameRate; } //--CFG_KDY
   Void    clear()
@@ -119,6 +128,9 @@ public:
     m_sumW = 0;
 #endif
     m_uiNumPic = 0;
+#if EXTENSION_360_VIDEO
+    m_ext360.clear();
+#endif
   }
 
 
@@ -357,6 +369,9 @@ public:
             } else
 #endif
             msg( e_msg_level, "\tTotal Frames |   "   "Bitrate     "  "Y-PSNR    "  "U-PSNR    "  "V-PSNR    "  "YUV-PSNR " );
+#if EXTENSION_360_VIDEO
+            m_ext360.printHeader(e_msg_level);
+#endif
 
             if (printSequenceMSE)
             {
@@ -384,6 +399,10 @@ public:
 #endif
                    getPsnr(COMPONENT_Cr) / (Double)getNumPic(),
                    PSNRyuv );
+
+#if EXTENSION_360_VIDEO
+            m_ext360.printPSNRs(getNumPic(), e_msg_level);
+#endif
 
             if (printSequenceMSE)
             {

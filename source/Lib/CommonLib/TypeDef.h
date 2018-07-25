@@ -83,6 +83,9 @@
 #define JVET_J0090_MEMORY_BANDWITH_MEASURE                0
 #endif
 
+#ifndef EXTENSION_360_VIDEO
+#define EXTENSION_360_VIDEO                               0   ///< extension for 360/spherical video coding support; this macro should be controlled by makefile, as it would be used to control whether the library is built and linked
+#endif
 
 #ifndef ENABLE_WPP_PARALLELISM
 #define ENABLE_WPP_PARALLELISM                            0

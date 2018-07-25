@@ -107,6 +107,9 @@ EncAppCfg::EncAppCfg()
 : m_inputColourSpaceConvert(IPCOLOURSPACE_UNCHANGED)
 , m_snrInternalColourSpace(false)
 , m_outputInternalColourSpace(false)
+#if EXTENSION_360_VIDEO
+, m_ext360(*this)
+#endif
 {
   m_aidQP = NULL;
   m_startOfCodedInterval = NULL;
@@ -1297,6 +1300,11 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
 #endif
     ;
 
+#if EXTENSION_360_VIDEO
+  TExt360AppEncCfg::TExt360AppEncCfgContext ext360CfgContext;
+  m_ext360.addOptions(opts, ext360CfgContext);
+#endif
+
   for(Int i=1; i<MAX_GOP+1; i++)
   {
     std::ostringstream cOSS;
@@ -1334,6 +1342,11 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
   /*
    * Set any derived parameters
    */
+#if EXTENSION_360_VIDEO
+  m_inputFileWidth = m_iSourceWidth;
+  m_inputFileHeight = m_iSourceHeight;
+  m_ext360.setMaxCUInfo(m_uiCTUSize, 1 << MIN_CU_LOG2);
+#endif
 
   m_inputFileName   = inputPathPrefix + m_inputFileName;
   m_framesToBeEncoded = ( m_framesToBeEncoded + m_temporalSubsampleRatio - 1 ) / m_temporalSubsampleRatio;
@@ -1430,6 +1443,9 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
 
   m_InputChromaFormatIDC = numberToChromaFormat(tmpInputChromaFormat);
   m_chromaFormatIDC      = ((tmpChromaFormat == 0) ? (m_InputChromaFormatIDC) : (numberToChromaFormat(tmpChromaFormat)));
+#if EXTENSION_360_VIDEO
+  m_ext360.processOptions(ext360CfgContext);
+#endif
 
   CHECK( !( tmpWeightedPredictionMethod >= 0 && tmpWeightedPredictionMethod <= WP_PER_PICTURE_WITH_HISTOGRAM_AND_PER_COMPONENT_AND_CLIPPING_AND_EXTENSION ), "Error in cfg" );
   m_weightedPredictionMethod = WeightedPredictionMethod(tmpWeightedPredictionMethod);
@@ -2960,6 +2976,10 @@ Bool EncAppCfg::xCheckParameter()
   xConfirmPara(unsigned(m_LMChroma) > 4, "ELMMode exceeds range (0 to 4)");
 
 #endif
+#if EXTENSION_360_VIDEO
+  check_failed |= m_ext360.verifyParameters();
+#endif
+
 #undef xConfirmPara
   return check_failed;
 }
@@ -3287,6 +3307,10 @@ Void EncAppCfg::xPrintParameter()
   }
   msg( VERBOSE, "NumWppThreads:%d+%d ", m_numWppThreads, m_numWppExtraLines );
   msg( VERBOSE, "EnsureWppBitEqual:%d ", m_ensureWppBitEqual );
+
+#if EXTENSION_360_VIDEO
+  m_ext360.outputConfigurationSummary();
+#endif
 
   msg( VERBOSE, "\n\n");
 

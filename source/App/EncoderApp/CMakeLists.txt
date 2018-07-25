@@ -63,6 +63,10 @@ endif()
 
 target_link_libraries( ${EXE_NAME} CommonLib EncoderLib DecoderLib Utilities Threads::Threads ${ADDITIONAL_LIBS} )
 
+if( EXTENSION_360_VIDEO )
+  target_link_libraries( ${EXE_NAME} Lib360 AppEncHelper360 )
+endif()
+
 # Add a SVN revision generator
 # a custom target that is always built
 add_custom_target( EncSvnHeader ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/svnheader.h )
