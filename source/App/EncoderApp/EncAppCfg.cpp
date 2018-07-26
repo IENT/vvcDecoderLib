@@ -968,6 +968,8 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
 
   ("CbQpOffset,-cbqpofs",                             m_cbQpOffset,                                         0, "Chroma Cb QP Offset")
   ("CrQpOffset,-crqpofs",                             m_crQpOffset,                                         0, "Chroma Cr QP Offset")
+  ("CbQpOffsetDualTree",                              m_cbQpOffsetDualTree,                                 1, "Chroma Cb QP Offset for dual tree")
+  ("CrQpOffsetDualTree",                              m_crQpOffsetDualTree,                                 1, "Chroma Cr QP Offset for dual tree")
 #if ER_CHROMA_QP_WCG_PPS
   ("WCGPPSEnable",                                    m_wcgChromaQpControl.enabled,                     false, "1: Enable the WCG PPS chroma modulation scheme. 0 (default) disabled")
   ("WCGPPSCbQpScale",                                 m_wcgChromaQpControl.chromaCbQpScale,               1.0, "WCG PPS Chroma Cb QP Scale")
@@ -2316,6 +2318,10 @@ Bool EncAppCfg::xCheckParameter()
   xConfirmPara( m_cbQpOffset >  12,   "Max. Chroma Cb QP Offset is  12" );
   xConfirmPara( m_crQpOffset < -12,   "Min. Chroma Cr QP Offset is -12" );
   xConfirmPara( m_crQpOffset >  12,   "Max. Chroma Cr QP Offset is  12" );
+  xConfirmPara( m_cbQpOffsetDualTree < -12,   "Min. Chroma Cb QP Offset for dual tree is -12" );
+  xConfirmPara( m_cbQpOffsetDualTree >  12,   "Max. Chroma Cb QP Offset for dual tree is  12" );
+  xConfirmPara( m_crQpOffsetDualTree < -12,   "Min. Chroma Cr QP Offset for dual tree is -12" );
+  xConfirmPara( m_crQpOffsetDualTree >  12,   "Max. Chroma Cr QP Offset for dual tree is  12" );
 
   xConfirmPara( m_iQPAdaptationRange <= 0,                                                  "QP Adaptation Range must be more than 0" );
   if (m_iDecodingRefreshType == 2)
@@ -3077,8 +3083,8 @@ Void EncAppCfg::xPrintParameter()
 #endif
   msg( DETAILS, "Max dQP signaling depth                : %d\n", m_iMaxCuDQPDepth);
 
-  msg( DETAILS, "Cb QP Offset                           : %d\n", m_cbQpOffset   );
-  msg( DETAILS, "Cr QP Offset                           : %d\n", m_crQpOffset);
+  msg( DETAILS, "Cb QP Offset (dual tree)               : %d (%d)\n", m_cbQpOffset, m_cbQpOffsetDualTree);
+  msg( DETAILS, "Cr QP Offset (dual tree)               : %d (%d)\n", m_crQpOffset, m_crQpOffsetDualTree);
   msg( DETAILS, "QP adaptation                          : %d (range=%d)\n", m_bUseAdaptiveQP, (m_bUseAdaptiveQP ? m_iQPAdaptationRange : 0) );
   msg( DETAILS, "GOP size                               : %d\n", m_iGOPSize );
   msg( DETAILS, "Input bit depth                        : (Y:%d, C:%d)\n", m_inputBitDepth[CHANNEL_TYPE_LUMA], m_inputBitDepth[CHANNEL_TYPE_CHROMA] );

@@ -172,6 +172,8 @@ Void EncApp::xInitLibCfg()
   m_cEncLib.setDiffCuChromaQpOffsetDepth                         ( m_diffCuChromaQpOffsetDepth );
   m_cEncLib.setChromaCbQpOffset                                  ( m_cbQpOffset     );
   m_cEncLib.setChromaCrQpOffset                                  ( m_crQpOffset  );
+  m_cEncLib.setChromaCbQpOffsetDualTree                          ( m_cbQpOffsetDualTree );
+  m_cEncLib.setChromaCrQpOffsetDualTree                          ( m_crQpOffsetDualTree );
 #if ER_CHROMA_QP_WCG_PPS
   m_cEncLib.setWCGChromaQpControl                                ( m_wcgChromaQpControl );
 #endif

@@ -305,6 +305,8 @@ protected:
 
   Int       m_chromaCbQpOffset;                 //  Chroma Cb QP Offset (0:default)
   Int       m_chromaCrQpOffset;                 //  Chroma Cr Qp Offset (0:default)
+  int       m_chromaCbQpOffsetDualTree;         //  Chroma Cb QP Offset for dual tree 
+  int       m_chromaCrQpOffsetDualTree;         //  Chroma Cr Qp Offset for dual tree 
 #if ER_CHROMA_QP_WCG_PPS
   WCGChromaQPControl m_wcgChromaQpControl;                    ///< Wide-colour-gamut chroma QP control.
 #endif
@@ -832,6 +834,10 @@ public:
 
   Void      setChromaCbQpOffset             ( Int   i )      { m_chromaCbQpOffset = i; }
   Void      setChromaCrQpOffset             ( Int   i )      { m_chromaCrQpOffset = i; }
+  void      setChromaCbQpOffsetDualTree     ( int   i )      { m_chromaCbQpOffsetDualTree = i; }
+  void      setChromaCrQpOffsetDualTree     ( int   i )      { m_chromaCrQpOffsetDualTree = i; }
+  int       getChromaCbQpOffsetDualTree     ()         const { return m_chromaCbQpOffsetDualTree; }
+  int       getChromaCrQpOffsetDualTree     ()         const { return m_chromaCrQpOffsetDualTree; }
 #if ER_CHROMA_QP_WCG_PPS
   Void      setWCGChromaQpControl           ( const WCGChromaQPControl &ctrl )     { m_wcgChromaQpControl = ctrl; }
   const WCGChromaQPControl &getWCGChromaQPControl () const { return m_wcgChromaQpControl; }

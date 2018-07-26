@@ -2132,6 +2132,12 @@ Void EncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic,
     trySkipOrDecodePicture( decPic, encPic, *m_pcCfg, pcPic );
 
     pcPic->cs->slice = pcSlice; // please keep this
+    if (pcSlice->getPPS()->getSliceChromaQpFlag() && CS::isDualITree(*pcSlice->getPic()->cs))
+    {
+      // overwrite chroma qp offset for dual tree
+      pcSlice->setSliceChromaQpDelta(COMPONENT_Cb, m_pcCfg->getChromaCbQpOffsetDualTree());
+      pcSlice->setSliceChromaQpDelta(COMPONENT_Cr, m_pcCfg->getChromaCrQpOffsetDualTree());
+    }
     if( encPic )
     // now compress (trial encode) the various slice segments (slices, and dependent slices)
     {
