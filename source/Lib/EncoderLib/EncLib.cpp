@@ -1318,6 +1318,10 @@ Void EncLib::xInitPPS(PPS &pps, const SPS &sps)
   }
   pps.setSliceChromaQpFlag(bChromaDeltaQPEnabled);
 #endif
+  if (!pps.getSliceChromaQpFlag() && sps.getSpsNext().getUseDualITree())
+  {
+    pps.setSliceChromaQpFlag(m_chromaCbQpOffsetDualTree != 0 || m_chromaCrQpOffsetDualTree != 0);
+  }
 
 #if HEVC_TILES_WPP
   pps.setEntropyCodingSyncEnabledFlag( m_entropyCodingSyncEnabledFlag );

@@ -172,6 +172,8 @@ protected:
 
   Int       m_cbQpOffset;                                     ///< Chroma Cb QP Offset (0:default)
   Int       m_crQpOffset;                                     ///< Chroma Cr QP Offset (0:default)
+  Int       m_cbQpOffsetDualTree;                             ///< Chroma Cb QP Offset for dual tree (overwrite m_cbQpOffset for dual tree)
+  Int       m_crQpOffsetDualTree;                             ///< Chroma Cr QP Offset for dual tree (overwrite m_crQpOffset for dual tree)
 #if ER_CHROMA_QP_WCG_PPS
   WCGChromaQPControl m_wcgChromaQpControl;                    ///< Wide-colour-gamut chroma QP control.
 #endif
