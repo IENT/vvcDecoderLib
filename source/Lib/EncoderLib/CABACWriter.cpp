@@ -271,8 +271,29 @@ void CABACWriter::coding_tree_unit( CodingStructure& cs, const UnitArea& area, i
   {
     sao( *cs.slice, ctuRsAddr );
   }
+
+#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
+  if (CS::isDualITree(cs) && cs.pcv->chrFormat != CHROMA_400)
+  {
+    CUCtx chromaCuCtx(qps[CH_C]);
+    Partitioner *chromaPartitioner = PartitionerFactory::get(*cs.slice);
+    chromaPartitioner->initCtu(area, CH_C, *cs.slice);
+
+    dual_tree_implicit_qt_split(cs, *partitioner, cuCtx, *chromaPartitioner, chromaCuCtx);
+
+    qps[CH_L] = cuCtx.qp;
+    qps[CH_C] = chromaCuCtx.qp;
+
+    delete chromaPartitioner;
+  }
+  else
+  {
+#endif
   coding_tree( cs, *partitioner, cuCtx );
   qps[CH_L] = cuCtx.qp;
+#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
+  }
+#else
   if( CS::isDualITree( cs ) && cs.pcv->chrFormat != CHROMA_400 )
   {
     CUCtx cuCtxChroma( qps[CH_C] );
@@ -280,6 +301,7 @@ void CABACWriter::coding_tree_unit( CodingStructure& cs, const UnitArea& area, i
     coding_tree( cs, *partitioner, cuCtxChroma );
     qps[CH_C] = cuCtxChroma.qp;
   }
+#endif
 
   delete partitioner;
 }
@@ -1075,6 +1097,78 @@ void CABACWriter::coding_tree( const CodingStructure& cs, Partitioner& partition
   DTRACE_BLOCK_REC_COND( ( !isEncoding() ), cs.picture->getRecoBuf( cu ), cu, cu.predMode );
 }
 
+#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
+void CABACWriter::dual_tree_implicit_qt_split(const CodingStructure& cs, Partitioner& lumaPartitioner, CUCtx& lumaCuCtx, Partitioner& chromaPartitioner, CUCtx& chromaCuCtx)
+{
+  //luma
+  const PPS      &pps = *cs.pps;
+
+  // Reset delta QP coding flag and ChromaQPAdjustemt coding flag
+  if (pps.getUseDQP() && lumaPartitioner.currDepth <= pps.getMaxCuDQPDepth())
+  {
+    lumaCuCtx.isDQPCoded = false;
+  }
+  if (cs.slice->getUseChromaQpAdj() && lumaPartitioner.currDepth <= pps.getPpsRangeExtension().getDiffCuChromaQpOffsetDepth())
+  {
+    lumaCuCtx.isChromaQpAdjCoded = false;
+  }
+
+  //chroma
+
+  // Reset delta QP coding flag and ChromaQPAdjustemt coding flag
+  if (pps.getUseDQP() && chromaPartitioner.currDepth <= pps.getMaxCuDQPDepth())
+  {
+    chromaCuCtx.isDQPCoded = false;
+  }
+  if (cs.slice->getUseChromaQpAdj() && chromaPartitioner.currDepth <= pps.getPpsRangeExtension().getDiffCuChromaQpOffsetDepth())
+  {
+    chromaCuCtx.isChromaQpAdjCoded = false;
+  }
+
+  // inferred QT-split to 64x64 unit and encoding the dual tree syntaxes for each 64x64 unit
+  lumaPartitioner.splitCurrArea(CU_QUAD_SPLIT, cs);
+  chromaPartitioner.splitCurrArea(CU_QUAD_SPLIT, cs);
+
+  bool beContinue = true;
+  bool luma_continue = true;   // should be lumaContinue
+  bool chroma_continue = true;  // should be chromaContinue
+
+  while (beContinue)
+  {
+    if (lumaPartitioner.currArea().lwidth() > 64 || lumaPartitioner.currArea().lheight() > 64)
+    {
+      if (cs.picture->blocks[lumaPartitioner.chType].contains(lumaPartitioner.currArea().blocks[lumaPartitioner.chType].pos()))
+      {
+        dual_tree_implicit_qt_split(cs, lumaPartitioner, lumaCuCtx, chromaPartitioner, chromaCuCtx);
+      }
+      luma_continue = lumaPartitioner.nextPart(cs);
+      chroma_continue = chromaPartitioner.nextPart(cs);
+      CHECK(luma_continue != chroma_continue, "luma chroma partition should be matched");
+      beContinue = luma_continue;
+    }
+    else
+    {
+      if (cs.picture->blocks[lumaPartitioner.chType].contains(lumaPartitioner.currArea().blocks[lumaPartitioner.chType].pos()))
+      {
+        coding_tree(cs, lumaPartitioner, lumaCuCtx);
+      }
+      luma_continue = lumaPartitioner.nextPart(cs);
+      if (cs.picture->blocks[chromaPartitioner.chType].contains(chromaPartitioner.currArea().blocks[chromaPartitioner.chType].pos()))
+      {
+        coding_tree(cs, chromaPartitioner, chromaCuCtx);
+      }
+      chroma_continue = chromaPartitioner.nextPart(cs);
+      CHECK(luma_continue != chroma_continue, "luma chroma partition should be matched");
+      beContinue = luma_continue;
+    }
+  }
+
+  lumaPartitioner.exitCurrSplit();
+  chromaPartitioner.exitCurrSplit();
+
+  return;
+}
+#endif
 
 void CABACWriter::split_cu_flag( bool split, const CodingStructure& cs, Partitioner& partitioner )
 {
@@ -1092,6 +1186,13 @@ void CABACWriter::split_cu_flag( bool split, const CodingStructure& cs, Partitio
   {
     return;
   }
+#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
+  if (cs.slice->getSliceType() == I_SLICE && (partitioner.currArea().lumaSize().width > 64 || partitioner.currArea().lumaSize().height > 64))
+  {
+    CHECK(split != true, "should be split to max TU size");
+    return;
+  }
+#endif
   unsigned  ctxId = DeriveCtx::CtxCUsplit( cs, partitioner );
   m_BinEncoder.encodeBin( (split), Ctx::SplitFlag(ctxId) );
 

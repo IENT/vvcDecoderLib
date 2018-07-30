@@ -81,6 +81,9 @@ public:
 #endif
   // coding (quad)tree (clause 7.3.8.4)
   bool        coding_tree               ( CodingStructure&              cs,     Partitioner&    pm,       CUCtx& cuCtx );
+#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
+  bool        dual_tree_implicit_qt_split(CodingStructure&              cs,    Partitioner&    lumaPartitioner, CUCtx& lumaCuCtx, Partitioner& chromaPartitioner, CUCtx& chromaCuCtx);
+#endif
   bool        split_cu_flag             ( CodingStructure&              cs,     Partitioner&    pm );
   PartSplit   split_cu_mode_mt          ( CodingStructure&              cs,     Partitioner&    pm );
 

@@ -162,6 +162,26 @@ bool CABACReader::coding_tree_unit( CodingStructure& cs, const UnitArea& area, i
 
   sao( cs, ctuRsAddr );
 
+#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
+  bool isLast = false;
+
+  if (CS::isDualITree(cs) && cs.pcv->chrFormat != CHROMA_400)
+  {
+    Partitioner *chromaPartitioner = PartitionerFactory::get(*cs.slice);
+    chromaPartitioner->initCtu(area, CH_C, *cs.slice);
+    CUCtx cuCtxChroma(qps[CH_C]);
+
+    isLast = dual_tree_implicit_qt_split(cs, *partitioner, cuCtx, *chromaPartitioner, cuCtxChroma);
+    qps[CH_L] = cuCtx.qp;
+    qps[CH_C] = cuCtxChroma.qp;
+    delete chromaPartitioner;
+  }
+  else
+  {
+    isLast = coding_tree(cs, *partitioner, cuCtx); // should avoid the duplicated codes
+    qps[CH_L] = cuCtx.qp;
+  }
+#else
   bool isLast = coding_tree( cs, *partitioner, cuCtx );
   qps[CH_L] = cuCtx.qp;
   if( !isLast && CS::isDualITree( cs ) && cs.pcv->chrFormat != CHROMA_400 )
@@ -171,6 +191,7 @@ bool CABACReader::coding_tree_unit( CodingStructure& cs, const UnitArea& area, i
     isLast = coding_tree( cs, *partitioner, cuCtxChroma );
     qps[CH_C] = cuCtxChroma.qp;
   }
+#endif
 
   DTRACE_COND( ctuRsAddr == 0, g_trace_ctx, D_QP_PER_CTU, "\n%4d %2d", cs.picture->poc, cs.slice->getSliceQpBase() );
   DTRACE     (                 g_trace_ctx, D_QP_PER_CTU, " %3d",           qps[CH_L] - cs.slice->getSliceQpBase() );
@@ -985,6 +1006,116 @@ bool CABACReader::coding_tree( CodingStructure& cs, Partitioner& partitioner, CU
   return isLastCtu;
 }
 
+#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
+bool CABACReader::dual_tree_implicit_qt_split(CodingStructure& cs, Partitioner& lumaPartitioner, CUCtx& lumaCuCtx, Partitioner& chromaPartitioner, CUCtx& chromaCuCtx)
+{
+  const PPS      &pps = *cs.pps;
+  bool           lastSegment = false;
+  bool           lastSegmentC = false;
+
+  //luma
+  // Reset delta QP coding flag and ChromaQPAdjustemt coding flag
+  if (pps.getUseDQP() && lumaPartitioner.currDepth <= pps.getMaxCuDQPDepth())
+  {
+    lumaCuCtx.isDQPCoded = false;
+  }
+  if (cs.slice->getUseChromaQpAdj() && lumaPartitioner.currDepth <= pps.getPpsRangeExtension().getDiffCuChromaQpOffsetDepth())
+  {
+    lumaCuCtx.isChromaQpAdjCoded = false;
+  }
+  //chroma
+
+  // Reset delta QP coding flag and ChromaQPAdjustemt coding flag
+  if (pps.getUseDQP() && chromaPartitioner.currDepth <= pps.getMaxCuDQPDepth())
+  {
+    chromaCuCtx.isDQPCoded = false;
+  }
+  if (cs.slice->getUseChromaQpAdj() && chromaPartitioner.currDepth <= pps.getPpsRangeExtension().getDiffCuChromaQpOffsetDepth())
+  {
+    chromaCuCtx.isChromaQpAdjCoded = false;
+  }
+
+
+
+  // inferred QT-split to 64x64 unit and parsing the dual tree syntaxes for each 64x64 unit
+  lumaPartitioner.splitCurrArea(CU_QUAD_SPLIT, cs);
+  chromaPartitioner.splitCurrArea(CU_QUAD_SPLIT, cs);
+
+  bool beContinue = true;
+  bool lumaContinue = true;
+  bool chromaContinue = true;
+
+  while (beContinue)
+  {
+    if (lumaPartitioner.currArea().lwidth() > 64 || lumaPartitioner.currArea().lheight() > 64)
+    {
+      if (!lastSegment && cs.area.blocks[lumaPartitioner.chType].contains(lumaPartitioner.currArea().blocks[lumaPartitioner.chType].pos()))
+      {
+        lastSegmentC = dual_tree_implicit_qt_split(cs, lumaPartitioner, lumaCuCtx, chromaPartitioner, chromaCuCtx);
+      }
+      lumaContinue = lumaPartitioner.nextPart(cs);
+      chromaContinue = chromaPartitioner.nextPart(cs);
+      CHECK(lumaContinue != chromaContinue, "luma chroma partition should be matched");
+      beContinue = lumaContinue;
+    }
+    else
+    {
+      if (!lastSegment && cs.area.blocks[lumaPartitioner.chType].contains(lumaPartitioner.currArea().blocks[lumaPartitioner.chType].pos()))
+      {
+        lastSegment = coding_tree(cs, lumaPartitioner, lumaCuCtx);
+      }
+      lumaContinue = lumaPartitioner.nextPart(cs);
+      if (!lastSegmentC && cs.area.blocks[chromaPartitioner.chType].contains(chromaPartitioner.currArea().blocks[chromaPartitioner.chType].pos()))
+      {
+        lastSegmentC = coding_tree(cs, chromaPartitioner, chromaCuCtx);
+      }
+      chromaContinue = chromaPartitioner.nextPart(cs);
+      CHECK(lumaContinue != chromaContinue, "luma chroma partition should be matched");
+      CHECK(lastSegment == true, "luma should not be the last segment");
+      beContinue = lumaContinue;
+    }
+  }
+
+  lumaPartitioner.exitCurrSplit();
+  chromaPartitioner.exitCurrSplit();
+
+
+  CodingUnit* currentCu = cs.getCU(lumaPartitioner.currArea().lumaPos(), CHANNEL_TYPE_LUMA);
+  CodingUnit* nextCu = nullptr;
+  CodingUnit* tempLastLumaCu = nullptr;
+  CodingUnit* tempLastChromaCu = nullptr;
+  ChannelType currentChType = currentCu->chType;
+  while (currentCu->next != nullptr)
+  {
+    nextCu = currentCu->next;
+    if (currentChType != nextCu->chType && currentChType == CHANNEL_TYPE_LUMA)
+    {
+      tempLastLumaCu = currentCu;
+      if (tempLastChromaCu != nullptr) //swap
+      {
+        tempLastChromaCu->next = nextCu;
+      }
+    }
+    else if (currentChType != nextCu->chType && currentChType == CHANNEL_TYPE_CHROMA)
+    {
+      tempLastChromaCu = currentCu;
+      if (tempLastLumaCu != nullptr) //swap
+      {
+        tempLastLumaCu->next = nextCu;
+      }
+    }
+    currentCu = nextCu;
+    currentChType = currentCu->chType;
+  }
+
+  //CodingUnit* chromaFirstCu = cs.getCU(cs.area.chromaPos(), CHANNEL_TYPE_CHROMA);
+  CodingUnit* chromaFirstCu = cs.getCU(chromaPartitioner.currArea().chromaPos(), CHANNEL_TYPE_CHROMA);
+  tempLastLumaCu->next = chromaFirstCu;
+
+  return lastSegmentC;
+}
+#endif
+
 PartSplit CABACReader::split_cu_mode_mt( CodingStructure& cs, Partitioner &partitioner )
 {
   RExt__DECODER_DEBUG_BIT_STATISTICS_CREATE_SET( STATS__CABAC_BITS__SPLIT_FLAG );
@@ -1041,6 +1172,12 @@ bool CABACReader::split_cu_flag( CodingStructure& cs, Partitioner &partitioner )
   {
     return false;
   }
+#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
+  if (cs.slice->getSliceType() == I_SLICE && (partitioner.currArea().lumaSize().width > 64 || partitioner.currArea().lumaSize().height > 64))
+  {
+    return true;
+  }
+#endif
 
   RExt__DECODER_DEBUG_BIT_STATISTICS_CREATE_SET_SIZE( STATS__CABAC_BITS__SPLIT_FLAG, partitioner.currArea().lumaSize() );
 
