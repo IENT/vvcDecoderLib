@@ -50,6 +50,7 @@
 #include <assert.h>
 #include <cassert>
 
+#define DEBLOCKING_GRID_8x8                               1
 
 #define JVET_K0072                                        1
 
