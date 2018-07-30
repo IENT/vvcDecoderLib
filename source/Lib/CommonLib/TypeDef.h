@@ -50,6 +50,7 @@
 #include <assert.h>
 #include <cassert>
 
+#define DB_TU_FIX                                         1 // fix in JVET_K0307, JVET-K0237, JVET-K0369, JVET-K0232, JVET-K0315
 
 #define JVET_K0072                                        1
 

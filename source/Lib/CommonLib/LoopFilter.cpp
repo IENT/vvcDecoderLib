@@ -310,11 +310,43 @@ void LoopFilter::xDeblockCU( CodingUnit& cu, const DeblockEdgeDir edgeDir )
     }
   }
 
+#if DB_TU_FIX==0
   const unsigned PartIdxIncr  = ( cu.cs->pcv->noRQT && cu.cs->pcv->only2Nx2N ? 1 : ( DEBLOCK_SMALLEST_BLOCK / uiPelsInPart ? DEBLOCK_SMALLEST_BLOCK / uiPelsInPart : 1 ) );
   const unsigned uiSizeInPU   = ( cu.cs->pcv->noRQT && cu.cs->pcv->only2Nx2N ? 1 : pcv.partsInCtuWidth >> cu.qtDepth );
+#endif
   const unsigned shiftFactor  = edgeDir == EDGE_VER ? ::getComponentScaleX( COMPONENT_Cb, pcv.chrFormat ) : ::getComponentScaleY( COMPONENT_Cb, pcv.chrFormat );
   const bool bAlwaysDoChroma  = pcv.chrFormat == CHROMA_444 || pcv.noRQT;
 
+#if DB_TU_FIX
+  UInt uiOrtogonalLength = 1;
+  UInt uiOrtogonalIncrement = 1;
+
+  if (cu.blocks[COMPONENT_Y].valid())
+  {
+    if ((cu.blocks[COMPONENT_Y].height > 64) && (edgeDir == EDGE_HOR))
+    {
+      uiOrtogonalIncrement = 64 / 4;
+      uiOrtogonalLength = cu.blocks[COMPONENT_Y].height / 4;
+    }
+    if ((cu.blocks[COMPONENT_Y].width > 64) && (edgeDir == EDGE_VER))
+    {
+      uiOrtogonalIncrement = 64 / 4;
+      uiOrtogonalLength = cu.blocks[COMPONENT_Y].width / 4;
+
+    }
+  }
+  for (int iEdge = 0; iEdge < uiOrtogonalLength; iEdge += uiOrtogonalIncrement)
+  {
+    if (cu.blocks[COMPONENT_Y].valid())
+    {
+      xEdgeFilterLuma(cu, edgeDir, iEdge);
+    }
+    if (cu.blocks[COMPONENT_Cb].valid() && pcv.chrFormat != CHROMA_400 && (bAlwaysDoChroma || (uiPelsInPart > DEBLOCK_SMALLEST_BLOCK) || (iEdge % ((DEBLOCK_SMALLEST_BLOCK << shiftFactor) / uiPelsInPart)) == 0))
+    {
+      xEdgeFilterChroma(cu, edgeDir, iEdge);
+    }
+  }
+#else
   for( int iEdge = 0; iEdge < uiSizeInPU; iEdge += PartIdxIncr )
   {
     if( cu.blocks[COMPONENT_Y].valid() )
@@ -327,6 +359,7 @@ void LoopFilter::xDeblockCU( CodingUnit& cu, const DeblockEdgeDir edgeDir )
       xEdgeFilterChroma( cu, edgeDir, iEdge );
     }
   }
+#endif
 }
 
 
