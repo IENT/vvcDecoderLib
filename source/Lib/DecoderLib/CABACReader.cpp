@@ -968,9 +968,9 @@ bool CABACReader::coding_tree( CodingStructure& cs, Partitioner& partitioner, CU
         {
           if (partitioner.currArea().lwidth() > 64 || partitioner.currArea().lheight() > 64)
           {
-            if (!lastSegment && cs.area.blocks[partitioner.chType].contains(partitioner.currArea().blocks[partitioner.chType].pos()))
+            if (!lastSegmentC && cs.area.blocks[partitioner.chType].contains(partitioner.currArea().blocks[partitioner.chType].pos()))
             {
-              lastSegment = coding_tree(cs, partitioner, cuCtx, pPartitionerChroma, pCuCtxChroma);
+              lastSegmentC = coding_tree(cs, partitioner, cuCtx, pPartitionerChroma, pCuCtxChroma);
             }
             lumaContinue = partitioner.nextPart(cs);
             chromaContinue = pPartitionerChroma->nextPart(cs);
