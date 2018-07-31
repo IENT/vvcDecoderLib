@@ -204,7 +204,11 @@ Void EncSampleAdaptiveOffset::initCABACEstimator( CABACEncoder* cabacEncoder, Ct
 }
 
 
+#if K0238_SAO_GREEDY_MERGE_ENCODING
+Void EncSampleAdaptiveOffset::SAOProcess(CodingStructure& cs, Bool* sliceEnabled, const Double *lambdas, const Bool bTestSAODisableAtPictureLevel, const Double saoEncodingRate, const Double saoEncodingRateChroma, Bool isPreDBFSamplesUsed, Bool isgreedymergeEncoding )
+#else
 Void EncSampleAdaptiveOffset::SAOProcess(CodingStructure& cs, Bool* sliceEnabled, const Double *lambdas, const Bool bTestSAODisableAtPictureLevel, const Double saoEncodingRate, const Double saoEncodingRateChroma, Bool isPreDBFSamplesUsed )
+#endif
 {
   PelUnitBuf org = cs.getOrgBuf();
   PelUnitBuf res = cs.getRecoBuf();
@@ -225,7 +229,11 @@ Void EncSampleAdaptiveOffset::SAOProcess(CodingStructure& cs, Bool* sliceEnabled
 
   //block on/off
   std::vector<SAOBlkParam> reconParams(cs.pcv->sizeInCtus);
+#if K0238_SAO_GREEDY_MERGE_ENCODING
+  decideBlkParams(cs, sliceEnabled, m_statData, src, res, &reconParams[0], cs.picture->getSAO(), bTestSAODisableAtPictureLevel, saoEncodingRate, saoEncodingRateChroma, isgreedymergeEncoding);
+#else
   decideBlkParams(cs, sliceEnabled, m_statData, src, res, &reconParams[0], cs.picture->getSAO(), bTestSAODisableAtPictureLevel, saoEncodingRate, saoEncodingRateChroma);
+#endif
 
   DTRACE_UPDATE(g_trace_ctx, (std::make_pair("poc", cs.slice->getPOC())));
   DTRACE_PIC_COMP(D_REC_CB_LUMA_SAO, cs, cs.getRecoBuf(), COMPONENT_Y);
@@ -754,9 +762,15 @@ Void EncSampleAdaptiveOffset::deriveModeMergeRDO(const BitDepths &bitDepths, Int
   }
 }
 
+#if K0238_SAO_GREEDY_MERGE_ENCODING
+Void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, Bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, PelUnitBuf& srcYuv, PelUnitBuf& resYuv,
+                                               SAOBlkParam* reconParams, SAOBlkParam* codedParams, const Bool bTestSAODisableAtPictureLevel,
+                                               const Double saoEncodingRate, const Double saoEncodingRateChroma, const Bool isgreedymergeEncoding)
+#else
 Void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, Bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, PelUnitBuf& srcYuv, PelUnitBuf& resYuv,
                                                SAOBlkParam* reconParams, SAOBlkParam* codedParams, const Bool bTestSAODisableAtPictureLevel,
                                                const Double saoEncodingRate, const Double saoEncodingRateChroma)
+#endif
 {
   const PreCalcValues& pcv = *cs.pcv;
   Bool allBlksDisabled = true;
@@ -774,6 +788,32 @@ Void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, Bool* sliceEn
   SAOBlkParam modeParam;
   Double minCost, modeCost;
 
+#if K0238_SAO_GREEDY_MERGE_ENCODING 
+  Double minCost2 = 0;
+  std::vector<SAOStatData**> groupBlkStat;
+  if (isgreedymergeEncoding)
+  {
+    groupBlkStat.resize(cs.pcv->sizeInCtus);
+    for (UInt k = 0; k < cs.pcv->sizeInCtus; k++)
+    {
+      groupBlkStat[k] = new SAOStatData*[MAX_NUM_COMPONENT];
+      for (UInt compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++)
+      {
+        groupBlkStat[k][compIdx] = new SAOStatData[NUM_SAO_NEW_TYPES];
+      }
+    }
+  }
+  SAOBlkParam  testBlkParam;
+  SAOBlkParam  groupParam;
+  SAOBlkParam* tempMergeList[NUM_SAO_MERGE_TYPES] = { NULL };
+  SAOBlkParam* startingMergeList[NUM_SAO_MERGE_TYPES] = { NULL };
+
+  Int     mergeCtuAddr = 1; //Ctu to be merged
+  Int     groupSize = 1;
+  Double  Cost[2] = { 0, 0 };
+  TempCtx ctxBeforeMerge(m_CtxCache);
+  TempCtx ctxAfterMerge(m_CtxCache);
+#endif
 
   Double totalCost = 0; // Used if bTestSAODisableAtPictureLevel==true
 
@@ -794,6 +834,13 @@ Void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, Bool* sliceEn
 
       const TempCtx  ctxStart ( m_CtxCache, SAOCtx( m_CABACEstimator->getCtx() ) );
       TempCtx        ctxBest  ( m_CtxCache );
+
+#if K0238_SAO_GREEDY_MERGE_ENCODING
+      if (ctuRsAddr == (mergeCtuAddr - 1))
+      {
+        ctxBeforeMerge = SAOCtx(m_CABACEstimator->getCtx());
+      }
+#endif
 
       //get merge list
       SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES] = { NULL };
@@ -832,7 +879,9 @@ Void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, Bool* sliceEn
         }
       } //mode
 
+#if !K0238_SAO_GREEDY_MERGE_ENCODING
       totalCost += minCost;
+#endif
 
       m_CABACEstimator->getCtx() = SAOCtx( ctxBest );
 
@@ -840,12 +889,158 @@ Void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, Bool* sliceEn
       reconParams[ctuRsAddr] = codedParams[ctuRsAddr];
       reconstructBlkSAOParam(reconParams[ctuRsAddr], mergeList);
 
+#if K0238_SAO_GREEDY_MERGE_ENCODING  
+      if (isgreedymergeEncoding)
+      {
+        if (ctuRsAddr == (mergeCtuAddr - 1))
+        {
+          Cost[0] = minCost;  //previous
+          groupSize = 1;
+          getMergeList(cs, ctuRsAddr, reconParams, startingMergeList);
+        }
+        else if (ctuRsAddr == mergeCtuAddr)
+        {
+          Cost[1] = minCost;
+          minCost2 = MAX_DOUBLE;
+          for (Int tmp = groupSize; tmp >= 0; tmp--)
+          {
+            for (Int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++)
+            {
+              for (Int i = 0; i < NUM_SAO_NEW_TYPES; i++)
+              {
+                for (Int j = 0; j < MAX_NUM_SAO_CLASSES; j++)
+                {
+                  if (tmp == groupSize)
+                  {
+                    groupBlkStat[ctuRsAddr][compIdx][i].count[j] = blkStats[ctuRsAddr - tmp][compIdx][i].count[j];
+                    groupBlkStat[ctuRsAddr][compIdx][i].diff[j] = blkStats[ctuRsAddr - tmp][compIdx][i].diff[j];
+                  }
+                  else
+                  {
+                    groupBlkStat[ctuRsAddr][compIdx][i].count[j] += blkStats[ctuRsAddr - tmp][compIdx][i].count[j];
+                    groupBlkStat[ctuRsAddr][compIdx][i].diff[j] += blkStats[ctuRsAddr - tmp][compIdx][i].diff[j];
+                  }
+                }
+              }
+            }
+          }
 
+          // Derive new offset for grouped CTUs
+          m_CABACEstimator->getCtx() = SAOCtx(ctxBeforeMerge);
+          deriveModeNewRDO(cs.sps->getBitDepths(), ctuRsAddr, startingMergeList, sliceEnabled, groupBlkStat, modeParam, modeCost);
+
+          //rate for mergeLeft CTB
+          testBlkParam[COMPONENT_Y].modeIdc = SAO_MODE_MERGE;
+          testBlkParam[COMPONENT_Y].typeIdc = SAO_MERGE_LEFT;
+          m_CABACEstimator->resetBits();
+          m_CABACEstimator->sao_block_pars(testBlkParam, cs.sps->getBitDepths(), sliceEnabled, true, false, true);
+          Double rate = FracBitsScale * (Double)m_CABACEstimator->getEstFracBits();
+          for (Int i = groupSize; i > 0; i--)
+          {
+            modeCost += rate;
+          }
+
+          if (modeCost < minCost2)
+          {
+            groupParam = modeParam;
+            minCost2 = modeCost;
+            ctxAfterMerge = SAOCtx(m_CABACEstimator->getCtx());
+          }
+
+          // Test merge mode for grouped CTUs
+          m_CABACEstimator->getCtx() = SAOCtx(ctxStart);
+          deriveModeMergeRDO(cs.sps->getBitDepths(), ctuRsAddr, startingMergeList, sliceEnabled, groupBlkStat, modeParam, modeCost);
+          for (Int i = groupSize; i > 0; i--)
+          {
+            modeCost += rate;
+          }
+
+          if (modeCost < minCost2)
+          {
+            minCost2 = modeCost;
+            groupParam = modeParam;
+            ctxAfterMerge = SAOCtx(m_CABACEstimator->getCtx());
+          }
+
+          totalCost += Cost[0];
+          totalCost += Cost[1];
+
+          if ((Cost[0] + Cost[1]) > minCost2) //merge current CTU
+          {
+            //original merge all
+            totalCost = totalCost - Cost[0] - Cost[1] + minCost2;
+            codedParams[ctuRsAddr - groupSize] = groupParam;
+            for (Int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++)
+            {
+              codedParams[ctuRsAddr][compIdx].modeIdc = SAO_MODE_MERGE;
+              codedParams[ctuRsAddr][compIdx].typeIdc = SAO_MERGE_LEFT;
+            }
+            for (Int i = groupSize; i >= 0; i--) //change previous results
+            {
+              reconParams[ctuRsAddr - i] = codedParams[ctuRsAddr - i];
+              getMergeList(cs, ctuRsAddr - i, reconParams, tempMergeList);
+              reconstructBlkSAOParam(reconParams[ctuRsAddr - i], tempMergeList);
+            }
+
+            mergeCtuAddr += 1;
+            if (mergeCtuAddr % pcv.widthInCtus == 0) //reaching the end of a row
+            {
+              mergeCtuAddr += 1;
+            }
+            else //next CTU can be merged with current group
+            {
+              Cost[0] = minCost2;
+              groupSize += 1;
+            }
+            m_CABACEstimator->getCtx() = SAOCtx(ctxAfterMerge);
+          }
+          else // don't merge current CTU
+          {
+            mergeCtuAddr += 1;
+            // Current block will be the starting block for successive operations
+            Cost[0] = Cost[1];
+            getMergeList(cs, ctuRsAddr, reconParams, startingMergeList);
+            groupSize = 1;
+            m_CABACEstimator->getCtx() = SAOCtx(ctxStart);
+            ctxBeforeMerge = SAOCtx(m_CABACEstimator->getCtx());
+            m_CABACEstimator->getCtx() = SAOCtx(ctxBest);
+            if (mergeCtuAddr% pcv.widthInCtus == 0) //reaching the end of a row
+            {
+              mergeCtuAddr += 1;
+            }
+          } //else, if(Cost[0] + Cost[1] > minCost2)
+        }//else if (ctuRsAddr == mergeCtuAddr)
+      }
+      else
+      {
+        offsetCTU(area, srcYuv, resYuv, reconParams[ctuRsAddr], cs);
+      }
+#else
       offsetCTU(area, srcYuv, resYuv, reconParams[ctuRsAddr], cs);
+#endif
       ctuRsAddr++;
     } //ctuRsAddr
   }
+#if K0238_SAO_GREEDY_MERGE_ENCODING
+  //reconstruct
+  if (isgreedymergeEncoding)
+  {
+    ctuRsAddr = 0;
+    for (UInt yPos = 0; yPos < pcv.lumaHeight; yPos += pcv.maxCUHeight)
+    {
+      for (UInt xPos = 0; xPos < pcv.lumaWidth; xPos += pcv.maxCUWidth)
+      {
+        const UInt width = (xPos + pcv.maxCUWidth > pcv.lumaWidth) ? (pcv.lumaWidth - xPos) : pcv.maxCUWidth;
+        const UInt height = (yPos + pcv.maxCUHeight > pcv.lumaHeight) ? (pcv.lumaHeight - yPos) : pcv.maxCUHeight;
 
+        const UnitArea area(pcv.chrFormat, Area(xPos, yPos, width, height));
+
+        offsetCTU(area, srcYuv, resYuv, reconParams[ctuRsAddr], cs);
+        ctuRsAddr++;
+      }
+    }
+  }
+#endif
   if (!allBlksDisabled && (totalCost >= 0) && bTestSAODisableAtPictureLevel) //SAO has not beneficial in this case - disable it
   {
     for( ctuRsAddr = 0; ctuRsAddr < pcv.sizeInCtus; ctuRsAddr++)
