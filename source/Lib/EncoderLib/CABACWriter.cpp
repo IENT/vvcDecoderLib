@@ -1068,6 +1068,19 @@ void CABACWriter::coding_tree( const CodingStructure& cs, Partitioner& partition
     cuCtx.qp = CU::predictQP( cu, cuCtx.qp );
   }
 
+#if JVET_K0346
+  if (!cs.slice->isIntra() && m_EncCu)
+  {
+    PredictionUnit& pu = *cu.firstPU;
+    if (pu.mergeFlag && (pu.mergeType == MRG_TYPE_SUBPU_ATMVP || pu.mergeType == MRG_TYPE_SUBPU_ATMVP_EXT))
+    {
+      UInt uiLayer = cs.slice->getDepth();
+      m_EncCu->incrementASTMVPBlkSize(uiLayer, cu.Y().width*cu.Y().height);
+      m_EncCu->incrementASTMVPBlkNum(uiLayer, 1);
+    }
+  }
+#endif
+
   // coding unit
   coding_unit( cu, partitioner, cuCtx );
 

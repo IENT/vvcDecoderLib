@@ -1389,6 +1389,16 @@ Void HLSWriter::codeSliceHeader         ( Slice* pcSlice )
     }
   }
 
+#if JVET_K0346
+  if (pcSlice->getSPS()->getSpsNext().getUseSubPuMvp() && !pcSlice->isIntra())
+  {
+    WRITE_FLAG(pcSlice->getAtmvpSliceSubblkSizeEnable(), "slice_atmvp_subblk_size_enable_flag");
+    if (pcSlice->getAtmvpSliceSubblkSizeEnable())
+    {
+      WRITE_CODE(pcSlice->getAtmvpSubblkLog2Size() - MIN_CU_LOG2, 3, "log2_slice_sub_pu_tmvp_size_minus2");
+    }
+  }
+#endif
 #endif
   if(pcSlice->getPPS()->getSliceHeaderExtensionPresentFlag())
   {

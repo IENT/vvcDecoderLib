@@ -119,6 +119,12 @@ private:
 #if JEM_TOOLS
   MotionInfo            m_SubPuMiBuf      [( MAX_CU_SIZE * MAX_CU_SIZE ) >> ( MIN_CU_LOG2 << 1 )];
   MotionInfo            m_SubPuExtMiBuf   [( MAX_CU_SIZE * MAX_CU_SIZE ) >> ( MIN_CU_LOG2 << 1 )];
+#if JVET_K0346
+  UInt                  m_uiASTMVPBlkSize[10];
+  UInt                  m_uiASTMVPBlkNum[10];
+  UInt                  m_uiPrevPOC;
+  Bool                  m_bClearASTMVPStatic;
+#endif
 #endif
 #if JEM_TOOLS
   MotionInfo            m_SubPuFrucBuf    [( MAX_CU_SIZE * MAX_CU_SIZE ) >> ( MIN_CU_LOG2 << 1 )];
@@ -148,6 +154,28 @@ public:
   int   updateCtuDataISlice ( const CPelBuf buf );
 
   EncModeCtrl* getModeCtrl  () { return m_modeCtrl; }
+
+#if JVET_K0346
+  Void clearASTMVPStatics()
+  {
+    ::memset(m_uiASTMVPBlkSize, 0, sizeof(m_uiASTMVPBlkSize));
+    ::memset(m_uiASTMVPBlkNum, 0, sizeof(m_uiASTMVPBlkNum));
+  }
+
+  Void clearOneTLayerASTMVPStatics(UInt uiLayer)
+  {
+    m_uiASTMVPBlkSize[uiLayer] = 0;
+    m_uiASTMVPBlkNum[uiLayer] = 0;
+  }
+  UInt getASTMVPBlkSize(UInt uiLayer) { return m_uiASTMVPBlkSize[uiLayer]; }
+  UInt getASTMVPBlkNum(UInt uiLayer) { return m_uiASTMVPBlkNum[uiLayer]; }
+  Void incrementASTMVPBlkSize(UInt uiLayer, UInt inc) { m_uiASTMVPBlkSize[uiLayer] += inc; }
+  Void incrementASTMVPBlkNum(UInt uiLayer, UInt inc) { m_uiASTMVPBlkNum[uiLayer] += inc; }
+  Void setPrevPOC(UInt uiPOC) { m_uiPrevPOC = uiPOC; }
+  UInt getPrevPOC() { return m_uiPrevPOC; }
+  Void setClearASTMVPStatic(Bool b) { m_bClearASTMVPStatic = b; }
+  Bool getClearASTMVPStatic() { return m_bClearASTMVPStatic; }
+#endif
 
   ~EncCu();
 

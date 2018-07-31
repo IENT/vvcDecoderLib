@@ -1330,7 +1330,7 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx, co
 
     if (((posRB.x + pcv.minCUWidth) < pcv.lumaWidth) && ((posRB.y + pcv.minCUHeight) < pcv.lumaHeight))
     {
-#if JEM_TOOLS
+#if JEM_TOOLS && !JVET_K0346
       if( cs.sps->getSpsNext().getUseSubPuMvp() )
       {
         // COM16_C806_GEN_MRG_IMPROVEMENT
@@ -2438,12 +2438,63 @@ static bool deriveScaledMotionTemporal( const Slice&      slice,
   return false;
 }
 
+#if JVET_K0346
+Void clipColBlkMv(int& iMvX, int& iMvY, const PredictionUnit& pu)
+{
+  Position puPos = pu.lumaPos();
+  Size     puSize = pu.lumaSize();
+
+  int iCTUSize = pu.cs->sps->getSpsNext().getCTUSize();
+  int iCTUX = puPos.x / iCTUSize*iCTUSize;
+  int iCTUY = puPos.y / iCTUSize*iCTUSize;
+
+  int iHorMax = std::min((int)pu.cs->sps->getPicWidthInLumaSamples(), iCTUX + iCTUSize + 4) - puSize.width;
+  int iHorMin = std::max((int)0, iCTUX);
+  int iVerMax = std::min((int)pu.cs->sps->getPicHeightInLumaSamples(), iCTUY + iCTUSize) - puSize.height;
+  int iVerMin = std::min((int)0, iCTUY);
+
+  iHorMax = iHorMax - puPos.x;
+  iHorMin = iHorMin - puPos.x;
+  iVerMax = iVerMax - puPos.y;
+  iVerMin = iVerMin - puPos.y;
+
+  iMvX = std::min(iHorMax, std::max(iHorMin, iMvX));
+  iMvY = std::min(iVerMax, std::max(iVerMin, iMvY));
+}
+#endif
+
 bool PU::getInterMergeSubPuMvpCand( const PredictionUnit &pu, MergeCtx& mrgCtx, bool& LICFlag, const int count )
 {
   const Slice   &slice   = *pu.cs->slice;
+#if JVET_K0346
+  const unsigned scale = 4 * std::max<Int>(1, 4 * AMVP_DECIMATION_FACTOR / 4);
+  const unsigned mask = ~(scale - 1);
+#else
   const SPSNext &spsNext =  pu.cs->sps->getSpsNext();
+#endif
 
   const Picture *pColPic = slice.getRefPic( RefPicList( slice.isInterB() ? 1 - slice.getColFromL0Flag() : 0 ), slice.getColRefIdx() );
+#if JVET_K0346
+  Mv cTMv;
+  RefPicList eFetchRefPicList = RefPicList(slice.isInterB() ? 1 - slice.getColFromL0Flag() : 0);
+
+  bool bTerminate = false;
+  for (unsigned uiCurrRefListId = 0; uiCurrRefListId < (slice.getSliceType() == B_SLICE ? 2 : 1) && !bTerminate; uiCurrRefListId++)
+  {
+    for (int uiN = 0; uiN < count && !bTerminate; uiN++)
+    {
+      RefPicList eCurrRefPicList = RefPicList(slice.getCheckLDC() ? (slice.getColFromL0Flag() ? uiCurrRefListId : 1 - uiCurrRefListId) : uiCurrRefListId);
+
+      if ((mrgCtx.interDirNeighbours[uiN] & (1 << eCurrRefPicList)) && slice.getRefPic(eCurrRefPicList, mrgCtx.mvFieldNeighbours[uiN * 2 + eCurrRefPicList].refIdx) == pColPic)
+      {
+        cTMv = mrgCtx.mvFieldNeighbours[uiN * 2 + eCurrRefPicList].mv;
+        bTerminate = true;
+        eFetchRefPicList = eCurrRefPicList;
+        break;
+      }
+    }
+  }
+#else
   int iPocColPic         = pColPic->getPOC();
   Mv cTMv;
 
@@ -2464,6 +2515,7 @@ bool PU::getInterMergeSubPuMvpCand( const PredictionUnit &pu, MergeCtx& mrgCtx, 
       }
     }
   }
+#endif
 
   ///////////////////////////////////////////////////////////////////////
   ////////          GET Initial Temporal Vector                  ////////
@@ -2482,19 +2534,75 @@ bool PU::getInterMergeSubPuMvpCand( const PredictionUnit &pu, MergeCtx& mrgCtx, 
   // compute the location of the current PU
   Position puPos    = pu.lumaPos();
   Size puSize       = pu.lumaSize();
+#if JVET_K0346
+  int iNumPartLine = std::max(puSize.width >> slice.getAtmvpSubblkLog2Size(), 1u);
+  int iNumPartCol  = std::max(puSize.height >> slice.getAtmvpSubblkLog2Size(), 1u);
+  int iPUHeight    = iNumPartCol == 1 ? puSize.height : 1 << slice.getAtmvpSubblkLog2Size();
+  int iPUWidth     = iNumPartLine == 1 ? puSize.width : 1 << slice.getAtmvpSubblkLog2Size();
+#else
   int iNumPartLine  = std::max( puSize.width  >> spsNext.getSubPuMvpLog2Size(), 1u );
   int iNumPartCol   = std::max( puSize.height >> spsNext.getSubPuMvpLog2Size(), 1u );
   int iPUHeight     = iNumPartCol  == 1 ? puSize.height : 1 << spsNext.getSubPuMvpLog2Size();
   int iPUWidth      = iNumPartLine == 1 ? puSize.width  : 1 << spsNext.getSubPuMvpLog2Size();
+#endif
 
   Mv cColMv;
   // use coldir.
   bool     bBSlice  = slice.isInterB();
+#if !JVET_K0346
   unsigned bColL0   = slice.getColFromL0Flag();
+#endif
 
   Position centerPos;
 
   bool found = false;
+#if JVET_K0346
+  cTempVector = cTMv;
+  int iTempX = ((cTempVector.getHor() + mvRndOffs) >> mvPrec);
+  int iTempY = ((cTempVector.getVer() + mvRndOffs) >> mvPrec);
+  clipColBlkMv(iTempX, iTempY, pu);
+
+  if (puSize.width == iPUWidth && puSize.height == iPUHeight)
+  {
+    centerPos.x = puPos.x + (puSize.width >> 1) + iTempX;
+    centerPos.y = puPos.y + (puSize.height >> 1) + iTempY;
+  }
+  else
+  {
+    centerPos.x = puPos.x + ((puSize.width / iPUWidth) >> 1)   * iPUWidth + (iPUWidth >> 1) + iTempX;
+    centerPos.y = puPos.y + ((puSize.height / iPUHeight) >> 1) * iPUHeight + (iPUHeight >> 1) + iTempY;
+  }
+
+  centerPos.x = Clip3(0, (int)pColPic->lwidth() - 1, centerPos.x);
+  centerPos.y = Clip3(0, (int)pColPic->lheight() - 1, centerPos.y);
+
+  centerPos = Position{ PosType(centerPos.x & mask), PosType(centerPos.y & mask) };
+
+  // derivation of center motion parameters from the collocated CU
+  const MotionInfo &mi = pColPic->cs->getMotionInfo(centerPos);
+
+  if (mi.isInter)
+  {
+    for (UInt uiCurrRefListId = 0; uiCurrRefListId < (bBSlice ? 2 : 1); uiCurrRefListId++)
+    {
+      RefPicList  eCurrRefPicList = RefPicList(uiCurrRefListId);
+
+      if (deriveScaledMotionTemporal(slice, centerPos, pColPic, eCurrRefPicList, cColMv, tempLICFlag, eFetchRefPicList))
+      {
+        // set as default, for further motion vector field spanning
+        mrgCtx.mvFieldNeighbours[(count << 1) + uiCurrRefListId].setMvField(cColMv, 0);
+        mrgCtx.interDirNeighbours[count] |= (1 << uiCurrRefListId);
+        LICFlag = tempLICFlag;
+        found = true;
+      }
+      else
+      {
+        mrgCtx.mvFieldNeighbours[(count << 1) + uiCurrRefListId].setMvField(Mv(), NOT_VALID);
+        mrgCtx.interDirNeighbours[count] &= ~(1 << uiCurrRefListId);
+      }
+    }
+  }
+#else
   bool bInit = false;
   for( unsigned uiLX = 0; uiLX < ( bBSlice ? 2 : 1 ) && !found; uiLX++ )
   {
@@ -2566,6 +2674,7 @@ bool PU::getInterMergeSubPuMvpCand( const PredictionUnit &pu, MergeCtx& mrgCtx, 
       }
     }
   }
+#endif
 
   if( !found )
   {
@@ -2576,8 +2685,13 @@ bool PU::getInterMergeSubPuMvpCand( const PredictionUnit &pu, MergeCtx& mrgCtx, 
   int yOff = iPUHeight / 2;
 
   // compute the location of the current PU
+#if JVET_K0346
+  xOff += iTempX;
+  yOff += iTempY;
+#else
   xOff += ( ( cTempVector.getHor() + mvRndOffs ) >> mvPrec );
   yOff += ( ( cTempVector.getVer() + mvRndOffs ) >> mvPrec );
+#endif
 
   int iPicWidth  = pColPic->lwidth()  - 1;
   int iPicHeight = pColPic->lheight() - 1;
@@ -2594,6 +2708,10 @@ bool PU::getInterMergeSubPuMvpCand( const PredictionUnit &pu, MergeCtx& mrgCtx, 
 
       colPos.x = Clip3( 0, iPicWidth, colPos.x );
       colPos.y = Clip3( 0, iPicHeight, colPos.y );
+
+#if JVET_K0346 
+      colPos = Position{ PosType(colPos.x & mask), PosType(colPos.y & mask) };
+#endif
 
       const MotionInfo &colMi = pColPic->cs->getMotionInfo( colPos );
 
@@ -2869,10 +2987,17 @@ bool PU::getInterMergeSubPuRecurCand( const PredictionUnit &pu, MergeCtx& mrgCtx
   // compute the location of the current PU
   Position puPos    = pu.lumaPos();
   Size puSize       = pu.lumaSize();
+#if JVET_K0346
+  int iNumPartLine = std::max(puSize.width >> slice.getAtmvpSubblkLog2Size(), 1u);
+  int iNumPartCol  = std::max(puSize.height >> slice.getAtmvpSubblkLog2Size(), 1u);
+  int iPUHeight    = iNumPartCol == 1 ? puSize.height : 1 << slice.getAtmvpSubblkLog2Size();
+  int iPUWidth     = iNumPartLine == 1 ? puSize.width : 1 << slice.getAtmvpSubblkLog2Size();
+#else
   int iNumPartLine  = std::max( puSize.width  >> spsNext.getSubPuMvpLog2Size(), 1u );
   int iNumPartCol   = std::max( puSize.height >> spsNext.getSubPuMvpLog2Size(), 1u );
   int iPUHeight     = iNumPartCol  == 1 ? puSize.height : 1 << spsNext.getSubPuMvpLog2Size();
   int iPUWidth      = iNumPartLine == 1 ? puSize.width  : 1 << spsNext.getSubPuMvpLog2Size();
+#endif
   int iNumPart      = iNumPartCol * iNumPartLine;
 
   unsigned uiSameCount      = 0;

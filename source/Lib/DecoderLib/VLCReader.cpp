@@ -1918,6 +1918,22 @@ Void HLSyntaxReader::parseSliceHeader (Slice* pcSlice, ParameterSetManager *para
         }
       }
     }
+#if JVET_K0346
+    if (sps->getSpsNext().getUseSubPuMvp() && !pcSlice->isIntra())
+    {
+      READ_FLAG(uiCode, "slice_atmvp_subblk_size_enable_flag");
+      pcSlice->setAtmvpSliceSubblkSizeEnable(uiCode);
+      if (pcSlice->getAtmvpSliceSubblkSizeEnable())
+      {
+        READ_CODE(3, uiCode, "slice_atmvp_subblk_size_log2");
+        pcSlice->setAtmvpSubblkLog2Size(uiCode + MIN_CU_LOG2);
+      }
+      else
+      {
+        pcSlice->setAtmvpSubblkLog2Size(sps->getSpsNext().getSubPuMvpLog2Size());
+      }
+    }
+#endif
 #endif
   }
 

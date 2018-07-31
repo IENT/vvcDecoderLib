@@ -1128,6 +1128,58 @@ Void EncSlice::compressSlice( Picture* pcPic, const Bool bCompressEntireSlice, c
 #endif
   m_pcCuEncoder->getModeCtrl()->setFastDeltaQp(bFastDeltaQP);
 
+#if JVET_K0346
+  if (pcSlice->getSPS()->getSpsNext().getUseSubPuMvp())
+  {
+    if (!pcSlice->isIntra())
+    {
+      if (pcSlice->getPOC() > m_pcCuEncoder->getPrevPOC() && m_pcCuEncoder->getClearASTMVPStatic())
+      {
+        m_pcCuEncoder->clearASTMVPStatics();
+        m_pcCuEncoder->setClearASTMVPStatic(false);
+      }
+
+      UInt uiLayer = pcSlice->getDepth();
+      UInt uiASTMVPBlkSize = m_pcCuEncoder->getASTMVPBlkSize(uiLayer);
+      UInt uiASTMVPBlkNum = m_pcCuEncoder->getASTMVPBlkNum(uiLayer);
+
+      if (uiASTMVPBlkNum > 0)
+      {
+        UInt uiATMVPBlkSizeTh = pcSlice->getCheckLDC() ? 75 : 27;
+        UInt uiAveBlkSize = uiASTMVPBlkSize / uiASTMVPBlkNum;
+        if (uiAveBlkSize < (uiATMVPBlkSizeTh*uiATMVPBlkSizeTh))
+        {
+          pcSlice->setAtmvpSubblkLog2Size(2);
+        }
+        else
+        {
+          pcSlice->setAtmvpSubblkLog2Size(3);
+        }
+        m_pcCuEncoder->clearOneTLayerASTMVPStatics(uiLayer);
+      }
+      else
+      {
+        pcSlice->setAtmvpSubblkLog2Size(pcSlice->getSPS()->getSpsNext().getSubPuMvpLog2Size());
+        CHECK(uiASTMVPBlkSize != 0, "ASTMVP blksize should be 0");
+      }
+
+      if (pcSlice->getAtmvpSubblkLog2Size() == pcSlice->getSPS()->getSpsNext().getSubPuMvpLog2Size())
+      {
+        pcSlice->setAtmvpSliceSubblkSizeEnable(false);
+      }
+      else
+      {
+        pcSlice->setAtmvpSliceSubblkSizeEnable(true);
+      }
+    }
+    else
+    {
+      m_pcCuEncoder->setPrevPOC(pcSlice->getPOC());
+      m_pcCuEncoder->setClearASTMVPStatic(true);
+    }
+  }
+#endif
+
   //------------------------------------------------------------------------------
   //  Weighted Prediction parameters estimation.
   //------------------------------------------------------------------------------

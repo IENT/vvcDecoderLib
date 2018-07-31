@@ -303,6 +303,9 @@ void EncCu::init( EncLib* pcEncLib, const SPS& sps PARL_PARAM( const int tId ) )
   m_pcTrQuant          = pcEncLib->getTrQuant( PARL_PARAM0( tId ) );
   m_pcRdCost           = pcEncLib->getRdCost ( PARL_PARAM0( tId ) );
   m_CABACEstimator     = pcEncLib->getCABACEncoder( PARL_PARAM0( tId ) )->getCABACEstimator( &sps );
+#if JVET_K0346
+  m_CABACEstimator->setEncCu(this);
+#endif
   m_CtxCache           = pcEncLib->getCtxCache( PARL_PARAM0( tId ) );
   m_pcRateCtrl         = pcEncLib->getRateCtrl();
   m_pcSliceEncoder     = pcEncLib->getSliceEncoder();
@@ -320,6 +323,12 @@ void EncCu::init( EncLib* pcEncLib, const SPS& sps PARL_PARAM( const int tId ) )
   m_pcInterSearch->setModeCtrl( m_modeCtrl );
 #if !JVET_K0220_ENC_CTRL
   m_pcIntraSearch->setModeCtrl( m_modeCtrl );
+#endif
+#if JVET_K0346
+  ::memset(m_uiASTMVPBlkSize, 0, sizeof(m_uiASTMVPBlkSize));
+  ::memset(m_uiASTMVPBlkNum, 0, sizeof(m_uiASTMVPBlkNum));
+  m_uiPrevPOC = MAX_UINT;
+  m_bClearASTMVPStatic = false;
 #endif
 }
 

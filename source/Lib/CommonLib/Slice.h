@@ -1744,6 +1744,11 @@ private:
 
   Bool                       m_enableTMVPFlag;
 
+#if JVET_K0346
+  Bool                       m_bSliceAtmvpSubBlkSizeSliceEnable;
+  Int                        m_iATmvpSubBlkLog2Size;
+#endif
+
   SliceType                  m_encCABACTableIdx;           // Used to transmit table selection across slices.
 
   clock_t                    m_iProcessingStartTime;
@@ -1999,6 +2004,13 @@ public:
   Void                        setEncCABACTableIdx( SliceType idx )                   { m_encCABACTableIdx = idx;                                     }
   SliceType                   getEncCABACTableIdx() const                            { return m_encCABACTableIdx;                                    }
 
+#if JVET_K0346
+  Void                        setAtmvpSliceSubblkSizeEnable(Bool b) { m_bSliceAtmvpSubBlkSizeSliceEnable = b; }
+  Bool                        getAtmvpSliceSubblkSizeEnable()                  const { return m_bSliceAtmvpSubBlkSizeSliceEnable; }
+  Void                        setAtmvpSubblkLog2Size(Int n) { m_iATmvpSubBlkLog2Size = n; }
+  Int                         getAtmvpSubblkLog2Size()                         const { return m_iATmvpSubBlkLog2Size; }
+#endif
+
   Void                        setSliceQpBase( Int i )                                { m_iSliceQpBase = i;                                           }
   Int                         getSliceQpBase()                                 const { return m_iSliceQpBase;                                        }
 
@@ -2227,7 +2239,7 @@ public:
   PreCalcValues( const SPS& sps, const PPS& pps, bool _isEncoder )
     : chrFormat           ( sps.getChromaFormatIdc() )
     , multiBlock422       ( chrFormat == CHROMA_422 && !sps.getSpsNext().getUseQTBT() )
-#if JEM_TOOLS
+#if JEM_TOOLS && !JVET_K0346
     , noMotComp           ( sps.getSpsNext().getDisableMotCompress() || sps.getSpsNext().getUseSubPuMvp() )
 #else
     , noMotComp           ( sps.getSpsNext().getDisableMotCompress() )
