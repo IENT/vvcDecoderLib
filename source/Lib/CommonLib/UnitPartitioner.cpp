@@ -404,7 +404,7 @@ bool QTBTPartitioner::canSplit( const PartSplit split, const CodingStructure &cs
       return false;
     }
 #if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
-    if (cs.slice->getSliceType() == I_SLICE && (area.width > 64 || area.height > 64))
+    if (CS::isDualITree(cs) && (area.width > 64 || area.height > 64))
     {
       return false;
     }
@@ -422,7 +422,7 @@ bool QTBTPartitioner::canSplit( const PartSplit split, const CodingStructure &cs
       }
     }
 #if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
-    if (cs.slice->getSliceType() == I_SLICE && (area.width > 64 || area.height > 64))
+    if (CS::isDualITree(cs) && (area.width > 64 || area.height > 64))
     {
       return false;
     }
@@ -442,7 +442,7 @@ bool QTBTPartitioner::canSplit( const PartSplit split, const CodingStructure &cs
     if(      ( area.width > maxBtSize || area.height > maxBtSize )
         && ( ( area.width > maxTtSize || area.height > maxTtSize ) || cs.sps->getSpsNext().getMTTMode() == 0 ) ) return false;
 #if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
-    if (cs.slice->getSliceType() == I_SLICE && (area.width > 64 || area.height > 64))
+    if (CS::isDualITree(cs) && (area.width > 64 || area.height > 64))
     {
       return false;
     }
@@ -539,7 +539,7 @@ PartSplit QTBTPartitioner::getImplicitSplit( const CodingStructure &cs )
     }
 #endif
 #if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
-    if (cs.slice->getSliceType() == I_SLICE && (currArea().Y().width > 64 || currArea().Y().height > 64))
+    if (CS::isDualITree(cs) && (currArea().Y().width > 64 || currArea().Y().height > 64))
     {
       split = CU_QUAD_SPLIT;
     }

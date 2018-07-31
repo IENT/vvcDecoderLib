@@ -1186,13 +1186,6 @@ void CABACWriter::split_cu_flag( bool split, const CodingStructure& cs, Partitio
   {
     return;
   }
-#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
-  if (cs.slice->getSliceType() == I_SLICE && (partitioner.currArea().lumaSize().width > 64 || partitioner.currArea().lumaSize().height > 64))
-  {
-    CHECK(split != true, "should be split to max TU size");
-    return;
-  }
-#endif
   unsigned  ctxId = DeriveCtx::CtxCUsplit( cs, partitioner );
   m_BinEncoder.encodeBin( (split), Ctx::SplitFlag(ctxId) );
 

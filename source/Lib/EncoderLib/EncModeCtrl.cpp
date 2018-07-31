@@ -1485,7 +1485,7 @@ Bool EncModeCtrlMTnoRQT::tryMode( const EncTestMode& encTestmode, const CodingSt
     }
 
 #if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
-    if (cs.slice->getSliceType() == I_SLICE && (partitioner.currArea().lumaSize().width > 64 || partitioner.currArea().lumaSize().height > 64))
+    if (CS::isDualITree(cs) && (partitioner.currArea().lumaSize().width > 64 || partitioner.currArea().lumaSize().height > 64))
     {
       return false;
     }

@@ -1172,12 +1172,6 @@ bool CABACReader::split_cu_flag( CodingStructure& cs, Partitioner &partitioner )
   {
     return false;
   }
-#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
-  if (cs.slice->getSliceType() == I_SLICE && (partitioner.currArea().lumaSize().width > 64 || partitioner.currArea().lumaSize().height > 64))
-  {
-    return true;
-  }
-#endif
 
   RExt__DECODER_DEBUG_BIT_STATISTICS_CREATE_SET_SIZE( STATS__CABAC_BITS__SPLIT_FLAG, partitioner.currArea().lumaSize() );
 
