@@ -50,6 +50,18 @@ void roundMV( Mv & rMV, unsigned imvShift )
   rMV.setHor( ( ( rMV.getHor() + offset ) >> imvShift ) << imvShift );
   rMV.setVer( ( ( rMV.getVer() + offset ) >> imvShift ) << imvShift );
 }
+
+#if JVET_K_AFFINE_BUG_FIXES
+void roundAffineMv( Int& mvx, Int& mvy, Int nShift )
+{
+  const int nOffset = 1 << (nShift - 1);
+  mvx = mvx >= 0 ? (mvx + nOffset) >> nShift : -((-mvx + nOffset) >> nShift);
+  mvy = mvy >= 0 ? (mvy + nOffset) >> nShift : -((-mvy + nOffset) >> nShift);
+
+  mvx = Clip3( -32768, 32767, mvx );
+  mvy = Clip3( -32768, 32767, mvy );
+}
+#endif
 #endif
 
 Void clipMv( Mv& rcMv, const Position& pos, const SPS& sps )

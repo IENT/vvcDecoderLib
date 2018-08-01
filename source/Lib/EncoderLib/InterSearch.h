@@ -75,8 +75,13 @@ private:
   PelStorage      m_tmpPredStorage              [NUM_REF_PIC_LIST_01];
   PelStorage      m_tmpStorageLCU;
   PelStorage      m_tmpAffiStorage;
+#if JVET_K0367_AFFINE_FIX_POINT
+  Pel*            m_tmpAffiError;
+  Int*            m_tmpAffiDeri[2];
+#else
   Int*            m_tmpAffiError;
   Double*         m_tmpAffiDeri[2];
+#endif
 
   CodingStructure ****m_pSplitCS;
   CodingStructure ****m_pFullCS;
@@ -153,6 +158,27 @@ public:
 
 #if ENABLE_SPLIT_PARALLELISM
   Void copyState                    ( const InterSearch& other );
+#endif
+
+#if JVET_K0367_AFFINE_FIX_POINT
+  Void ( *m_HorizontalSobelFilter ) (Pel *const pPred, const Int iPredStride, Int *const piDerivate, const Int iDerivateBufStride, const Int iWidth, const Int iHeight);
+
+  Void ( *m_VerticalSobelFilter   ) (Pel *const pPred, const Int iPredStride, Int *const piDerivate, const Int iDerivateBufStride, const Int iWidth, const Int iHeight);
+
+  Void ( *m_EqualCoeffComputer    ) (Pel *pResidue, Int iResidueStride, Int **ppiDerivate, Int iDerivateBufStride, Int64( *pi64EqualCoeff )[7], Int iWidth, Int iHeight, Bool b6Param);
+
+  static Void xHorizontalSobelFilter (Pel *const pPred, const Int iPredStride, Int *const piDerivate, const Int iDerivateBufStride, const Int iWidth, const Int iHeight);
+
+  static Void xVerticalSobelFilter(Pel *const pPred, const Int iPredStride, Int *const piDerivate, const Int iDerivateBufStride, const Int iWidth, const Int iHeight);
+
+  static Void xEqualCoeffComputer (Pel *pResidue, Int iResidueStride, Int **ppiDerivate, Int iDerivateBufStride, Int64( *pi64EqualCoeff )[7], Int iWidth, Int iHeight, Bool b6Param);
+
+#if ENABLE_SIMD_OPT_AFFINE_ME
+#ifdef TARGET_SIMD_X86
+  Void initAffineMEFunctionX86();
+  Void _initAffineMEFunctionX86();
+#endif
+#endif
 #endif
 
 protected:
@@ -350,6 +376,10 @@ protected:
 #else
                                     Mv                    hevcMv[2][33],
                                     Bool                  bFastSkipBi
+#endif
+#if JVET_K0185_AFFINE_6PARA_ENC
+                                  , Mv                    acMvAffine4Para[2][33][3]
+                                  , Int                   iRefIdx4Para[2]
 #endif
                                   );
 

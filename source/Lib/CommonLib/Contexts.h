@@ -334,6 +334,9 @@ public:
   static const CtxSet   RefPic;
 #if JEM_TOOLS
   static const CtxSet   AffineFlag;
+#if JVET_K0337_AFFINE_6PARA
+  static const CtxSet   AffineType;
+#endif
 #endif
   static const CtxSet   Mvd;
   static const CtxSet   TransSubdivFlag;

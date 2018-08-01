@@ -62,6 +62,22 @@
 
 #define JVET_K0554                                        1 // when adopting, also remove the macro HM_QTBT_ONLY_QT_IMPLICIT (keep the case for value 0)
 
+
+#define JVET_K_AFFINE_REFACTOR                            1 // bit-exact AFFINE refactor, suggest to remove this macro when adopted
+#define JVET_K0367_AFFINE_FIX_POINT                       1 // bit-exact SIMD optimization for affine ME
+
+#if JVET_K_AFFINE_REFACTOR
+#define JVET_K_AFFINE_BUG_FIXES                           1 // several affine bug fixes from JVET-K0052, JVET-K0103, JVET-K0367
+
+#define JVET_K0184_AFFINE_4X4                             1 // CE4.1.1 fixed 4x4 sub-block size
+#define JVET_K0337_AFFINE_MVP_IMPROVE                     1 // CE4.1.3 Affine MVP construction
+#define JVET_K0337_AFFINE_MVD_PREDICTION                  1 // CE4.1.3 Affine MVD prediction
+#define JVET_K0337_AFFINE_6PARA                           1 // CE4.1.3 CU level 4-para/6-para switching
+#if JVET_K0337_AFFINE_6PARA
+#define JVET_K0185_AFFINE_6PARA_ENC                       1 // CE4.1.5 Affine 6-para encoder
+#endif
+#endif
+
 #ifndef JEM_TOOLS
 #define JEM_TOOLS                                         1 // Defines the inclusion of JEM tools into compiled executable
 
@@ -225,6 +241,9 @@
 #define ENABLE_SIMD_OPT_MCIF                            ( 1 && ENABLE_SIMD_OPT )                            ///< SIMD optimization for the interpolation filter, no impact on RD performance
 #define ENABLE_SIMD_OPT_BUFFER                          ( 1 && ENABLE_SIMD_OPT )                            ///< SIMD optimization for the buffer operations, no impact on RD performance
 #define ENABLE_SIMD_OPT_DIST                            ( 1 && ENABLE_SIMD_OPT )                            ///< SIMD optimization for the distortion calculations(SAD,SSE,HADAMARD), no impact on RD performance
+#if JVET_K0367_AFFINE_FIX_POINT
+#define ENABLE_SIMD_OPT_AFFINE_ME                       ( 1 && ENABLE_SIMD_OPT )                            ///< SIMD optimization for affine ME, no impact on RD performance
+#endif
 // End of SIMD optimizations
 
 

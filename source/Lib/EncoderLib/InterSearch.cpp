@@ -49,6 +49,9 @@
 #include "CommonLib/BilateralFilter.h"
 #endif
 
+#if ENABLE_SIMD_OPT_AFFINE_ME
+#include <immintrin.h>
+#endif
 
 #include "EncModeCtrl.h"
 #include "EncLib.h"
@@ -114,6 +117,18 @@ InterSearch::InterSearch()
   }
 
   setWpScalingDistParam( -1, REF_PIC_LIST_X, nullptr );
+
+#if JVET_K0367_AFFINE_FIX_POINT
+  m_HorizontalSobelFilter = xHorizontalSobelFilter;
+  m_VerticalSobelFilter   = xVerticalSobelFilter;
+  m_EqualCoeffComputer    = xEqualCoeffComputer;
+
+#if ENABLE_SIMD_OPT_AFFINE_ME
+#ifdef TARGET_SIMD_X86
+  initAffineMEFunctionX86();
+#endif
+#endif
+#endif
 }
 
 
@@ -244,9 +259,15 @@ Void InterSearch::init( EncCfg*        pcEncCfg,
   }
   m_tmpStorageLCU.create( UnitArea( cform, Area( 0, 0, MAX_CU_SIZE, MAX_CU_SIZE ) ) );
   m_tmpAffiStorage.create( UnitArea( cform, Area( 0, 0, MAX_CU_SIZE, MAX_CU_SIZE ) ) );
+#if JVET_K0367_AFFINE_FIX_POINT
+  m_tmpAffiError = new Pel[MAX_CU_SIZE * MAX_CU_SIZE];
+  m_tmpAffiDeri[0] = new Int[MAX_CU_SIZE * MAX_CU_SIZE];
+  m_tmpAffiDeri[1] = new Int[MAX_CU_SIZE * MAX_CU_SIZE];
+#else
   m_tmpAffiError   = new Int   [MAX_CU_SIZE * MAX_CU_SIZE];
   m_tmpAffiDeri[0] = new Double[MAX_CU_SIZE * MAX_CU_SIZE];
   m_tmpAffiDeri[1] = new Double[MAX_CU_SIZE * MAX_CU_SIZE];
+#endif
 #if JEM_TOOLS
   m_obmcOrgMod.create( UnitArea( cform, Area( 0, 0, MAX_CU_SIZE, MAX_CU_SIZE ) ) );
 #endif
@@ -1371,10 +1392,91 @@ Void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
       cHevcMvField[1].setMvField( pu.mv[REF_PIC_LIST_1], pu.refIdx[REF_PIC_LIST_1] );
 
       // do affine ME & Merge
+#if JVET_K0185_AFFINE_6PARA_ENC
+      cu.affineType = AFFINEMODEL_4PARAM;
+      Mv acMvAffine4Para[2][33][3];
+      Int iRefIdx4Para[2] = { -1, -1 };
+
+#if JVET_K0220_ENC_CTRL
+      xPredAffineInterSearch( pu, origBuf, puIdx, uiLastModeTemp, uiAffineCost, cMvHevcTemp, acMvAffine4Para, iRefIdx4Para );
+#else
+      xPredAffineInterSearch( pu, origBuf, puIdx, uiLastModeTemp, uiAffineCost, cMvHevcTemp, bFastSkipBi, acMvAffine4Para, iRefIdx4Para );
+#endif
+      if ( cu.slice->getSPS()->getSpsNext().getUseAffineType() )
+      {
+        if ( uiAffineCost < uiHevcCost * 1.05 ) ///< condition for 6 parameter affine ME
+        {
+          // save 4 parameter results
+          Mv cBestMv[2][3], cBestMvd[2][3];
+          Int iBestMvpIdx[2], iBestMvpNum[2], iBestRefIdx[2];
+          UInt uiBestDir;
+
+          uiBestDir = pu.interDir;
+          iBestRefIdx[0] = pu.refIdx[0];
+          iBestRefIdx[1] = pu.refIdx[1];
+          iBestMvpIdx[0] = pu.mvpIdx[0];
+          iBestMvpIdx[1] = pu.mvpIdx[1];
+          iBestMvpNum[0] = pu.mvpNum[0];
+          iBestMvpNum[1] = pu.mvpNum[1];
+
+          const CMotionBuf &mb = pu.getMotionBuf();
+          for ( Int refList = 0; refList < 2; refList++ )
+          {
+            cBestMv[refList][0] = mb.at( 0, 0 ).mv[refList];
+            cBestMv[refList][1] = mb.at( mb.width - 1, 0 ).mv[refList];
+            cBestMv[refList][2] = mb.at( 0, mb.height - 1 ).mv[refList];
+
+            cBestMvd[refList][0] = pu.mvdAffi[refList][0];
+            cBestMvd[refList][1] = pu.mvdAffi[refList][1];
+            cBestMvd[refList][2] = pu.mvdAffi[refList][2];
+          }
+
+          iRefIdx4Para[0] = iBestRefIdx[0];
+          iRefIdx4Para[1] = iBestRefIdx[1];
+
+          Distortion uiAffine6Cost = std::numeric_limits<Distortion>::max();
+          cu.affineType = AFFINEMODEL_6PARAM;
+#if JVET_K0220_ENC_CTRL
+          xPredAffineInterSearch( pu, origBuf, puIdx, uiLastModeTemp, uiAffine6Cost, cMvHevcTemp, acMvAffine4Para, iRefIdx4Para );
+#else
+          xPredAffineInterSearch( pu, origBuf, puIdx, uiLastModeTemp, uiAffine6Cost, cMvHevcTemp, bFastSkipBi, acMvAffine4Para, iRefIdx4Para );
+#endif
+
+          // reset to 4 parameter affine inter mode
+          if ( uiAffineCost <= uiAffine6Cost )
+          {
+            cu.affineType = AFFINEMODEL_4PARAM;
+            pu.interDir = uiBestDir;
+            pu.refIdx[0] = iBestRefIdx[0];
+            pu.refIdx[1] = iBestRefIdx[1];
+            pu.mvpIdx[0] = iBestMvpIdx[0];
+            pu.mvpIdx[1] = iBestMvpIdx[1];
+            pu.mvpNum[0] = iBestMvpNum[0];
+            pu.mvpNum[1] = iBestMvpNum[1];
+
+            for ( Int iVerIdx = 0; iVerIdx < 3; iVerIdx++ )
+            {
+              pu.mvdAffi[REF_PIC_LIST_0][iVerIdx] = cBestMvd[0][iVerIdx];
+              pu.mvdAffi[REF_PIC_LIST_1][iVerIdx] = cBestMvd[1][iVerIdx];
+            }
+
+            PU::setAllAffineMv( pu, cBestMv[0][0], cBestMv[0][1], cBestMv[0][2], REF_PIC_LIST_0 );
+            PU::setAllAffineMv( pu, cBestMv[1][0], cBestMv[1][1], cBestMv[1][2], REF_PIC_LIST_1 );
+          }
+          else
+          {
+            uiAffineCost = uiAffine6Cost;
+          }
+        }
+
+        uiAffineCost += m_pcRdCost->getCost( 1 ); // add one bit for affine_type
+      }
+#else
 #if JVET_K0220_ENC_CTRL
       xPredAffineInterSearch( pu, origBuf, puIdx, uiLastModeTemp, uiAffineCost, cMvHevcTemp );
 #else
       xPredAffineInterSearch( pu, origBuf, puIdx, uiLastModeTemp, uiAffineCost, cMvHevcTemp, bFastSkipBi );
+#endif
 #endif
 
       if ( uiHevcCost <= uiAffineCost )
@@ -2494,29 +2596,819 @@ Void InterSearch::xPatternSearchFracDIF(
 }
 
 #if JEM_TOOLS
+#if JVET_K0367_AFFINE_FIX_POINT
+#if ENABLE_SIMD_OPT_AFFINE_ME
+#ifdef TARGET_SIMD_X86
+static Void simdHorizontalSobelFilter
+(
+  Pel *const pPred,
+  const Int iPredStride,
+  Int *const piDerivate,
+  const Int iDerivateBufStride,
+  const Int iWidth,
+  const Int iHeight
+)
+{
+  __m128i mmPred[4];
+  __m128i mm2xPred[2];
+  __m128i mmIntermediates[4];
+  __m128i mmDerivate[2];
+
+  assert( !(iHeight % 2) );
+  assert( !(iWidth % 4) );
+
+  /* Derivates of the rows and columns at the boundary are done at the end of this function */
+  /* The value of iCol and iRow indicate the columns and rows for which the derivates have already been ccomputed */
+  for ( Int iCol = 1; (iCol + 2) < iWidth; iCol += 2 )
+  {
+    mmPred[0] = _mm_loadl_epi64( reinterpret_cast<const __m128i *>(&pPred[0 * iPredStride + iCol - 1]) );
+    mmPred[1] = _mm_loadl_epi64( reinterpret_cast<const __m128i *>(&pPred[1 * iPredStride + iCol - 1]) );
+
+    mmPred[0] = _mm_cvtepi16_epi32( mmPred[0] );
+    mmPred[1] = _mm_cvtepi16_epi32( mmPred[1] );
+
+    for ( Int iRow = 1; iRow < (iHeight - 1); iRow += 2 )
+    {
+      mmPred[2] = _mm_loadl_epi64( reinterpret_cast<const __m128i *>(&pPred[(iRow + 1) * iPredStride + iCol - 1]) );
+      mmPred[3] = _mm_loadl_epi64( reinterpret_cast<const __m128i *>(&pPred[(iRow + 2) * iPredStride + iCol - 1]) );
+
+      mmPred[2] = _mm_cvtepi16_epi32( mmPred[2] );
+      mmPred[3] = _mm_cvtepi16_epi32( mmPred[3] );
+
+      mm2xPred[0] = _mm_slli_epi32( mmPred[1], 1 );
+      mm2xPred[1] = _mm_slli_epi32( mmPred[2], 1 );
+
+      mmIntermediates[0] = _mm_add_epi32( mm2xPred[0], mmPred[0] );
+      mmIntermediates[2] = _mm_add_epi32( mm2xPred[1], mmPred[1] );
+
+      mmIntermediates[0] = _mm_add_epi32( mmIntermediates[0], mmPred[2] );
+      mmIntermediates[2] = _mm_add_epi32( mmIntermediates[2], mmPred[3] );
+
+      mmPred[0] = mmPred[2];
+      mmPred[1] = mmPred[3];
+
+      mmIntermediates[1] = _mm_srli_si128( mmIntermediates[0], 8 );
+      mmIntermediates[3] = _mm_srli_si128( mmIntermediates[2], 8 );
+
+      mmDerivate[0] = _mm_sub_epi32( mmIntermediates[1], mmIntermediates[0] );
+      mmDerivate[1] = _mm_sub_epi32( mmIntermediates[3], mmIntermediates[2] );
+
+      _mm_storel_epi64( reinterpret_cast<__m128i *> (&piDerivate[iCol + (iRow + 0) * iDerivateBufStride]), mmDerivate[0] );
+      _mm_storel_epi64( reinterpret_cast<__m128i *> (&piDerivate[iCol + (iRow + 1) * iDerivateBufStride]), mmDerivate[1] );
+    }
+  }
+
+  for ( Int j = 1; j < (iHeight - 1); j++ )
+  {
+    piDerivate[j * iDerivateBufStride] = piDerivate[j * iDerivateBufStride + 1];
+    piDerivate[j * iDerivateBufStride + (iWidth - 1)] = piDerivate[j * iDerivateBufStride + (iWidth - 2)];
+  }
+
+  memcpy
+  (
+    piDerivate,
+    piDerivate + iDerivateBufStride,
+    iWidth * sizeof( piDerivate[0] )
+  );
+
+  memcpy
+  (
+    piDerivate + (iHeight - 1) * iDerivateBufStride,
+    piDerivate + (iHeight - 2) * iDerivateBufStride,
+    iWidth * sizeof( piDerivate[0] )
+  );
+}
+
+static Void simdVerticalSobelFilter
+(
+  Pel *const pPred,
+  const Int iPredStride,
+  Int *const piDerivate,
+  const Int iDerivateBufStride,
+  const Int iWidth,
+  const Int iHeight
+)
+{
+  __m128i mmPred[4];
+  __m128i mmIntermediates[6];
+  __m128i mmDerivate[2];
+
+  assert( !(iHeight % 2) );
+  assert( !(iWidth % 4) );
+
+  /* Derivates of the rows and columns at the boundary are done at the end of this function */
+  /* The value of iCol and iRow indicate the columns and rows for which the derivates have already been ccomputed */
+  for ( Int iCol = 1; iCol < (iWidth - 1); iCol += 2 )
+  {
+    mmPred[0] = _mm_loadl_epi64( reinterpret_cast<const __m128i *>(&pPred[0 * iPredStride + iCol - 1]) );
+    mmPred[1] = _mm_loadl_epi64( reinterpret_cast<const __m128i *>(&pPred[1 * iPredStride + iCol - 1]) );
+
+    mmPred[0] = _mm_cvtepi16_epi32( mmPred[0] );
+    mmPred[1] = _mm_cvtepi16_epi32( mmPred[1] );
+
+    for ( Int iRow = 1; iRow < (iHeight - 1); iRow += 2 )
+    {
+      mmPred[2] = _mm_loadl_epi64( reinterpret_cast<const __m128i *>(&pPred[(iRow + 1) * iPredStride + iCol - 1]) );
+      mmPred[3] = _mm_loadl_epi64( reinterpret_cast<const __m128i *>(&pPred[(iRow + 2) * iPredStride + iCol - 1]) );
+
+      mmPred[2] = _mm_cvtepi16_epi32( mmPred[2] );
+      mmPred[3] = _mm_cvtepi16_epi32( mmPred[3] );
+
+      mmIntermediates[0] = _mm_sub_epi32( mmPred[2], mmPred[0] );
+      mmIntermediates[3] = _mm_sub_epi32( mmPred[3], mmPred[1] );
+
+      mmPred[0] = mmPred[2];
+      mmPred[1] = mmPred[3];
+
+      mmIntermediates[1] = _mm_srli_si128( mmIntermediates[0], 4 );
+      mmIntermediates[4] = _mm_srli_si128( mmIntermediates[3], 4 );
+      mmIntermediates[2] = _mm_srli_si128( mmIntermediates[0], 8 );
+      mmIntermediates[5] = _mm_srli_si128( mmIntermediates[3], 8 );
+
+      mmIntermediates[1] = _mm_slli_epi32( mmIntermediates[1], 1 );
+      mmIntermediates[4] = _mm_slli_epi32( mmIntermediates[4], 1 );
+
+      mmIntermediates[0] = _mm_add_epi32( mmIntermediates[0], mmIntermediates[2] );
+      mmIntermediates[3] = _mm_add_epi32( mmIntermediates[3], mmIntermediates[5] );
+
+      mmDerivate[0] = _mm_add_epi32( mmIntermediates[0], mmIntermediates[1] );
+      mmDerivate[1] = _mm_add_epi32( mmIntermediates[3], mmIntermediates[4] );
+
+      _mm_storel_epi64( reinterpret_cast<__m128i *> (&piDerivate[iCol + (iRow + 0) * iDerivateBufStride]), mmDerivate[0] );
+      _mm_storel_epi64( reinterpret_cast<__m128i *> (&piDerivate[iCol + (iRow + 1) * iDerivateBufStride]), mmDerivate[1] );
+    }
+  }
+
+  for ( Int j = 1; j < (iHeight - 1); j++ )
+  {
+    piDerivate[j * iDerivateBufStride] = piDerivate[j * iDerivateBufStride + 1];
+    piDerivate[j * iDerivateBufStride + (iWidth - 1)] = piDerivate[j * iDerivateBufStride + (iWidth - 2)];
+  }
+
+  memcpy
+  (
+    piDerivate,
+    piDerivate + iDerivateBufStride,
+    iWidth * sizeof( piDerivate[0] )
+  );
+
+  memcpy
+  (
+    piDerivate + (iHeight - 1) * iDerivateBufStride,
+    piDerivate + (iHeight - 2) * iDerivateBufStride,
+    iWidth * sizeof( piDerivate[0] )
+  );
+}
+
+#define CALC_EQUAL_COEFF_8PXLS(x1,x2,y1,y2,tmp0,tmp1,tmp2,tmp3,inter0,inter1,inter2,inter3,loadLocation)       \
+{                                                                                                              \
+inter0 = _mm_mul_epi32(x1, y1);                                                                                \
+inter1 = _mm_mul_epi32(tmp0, tmp2);                                                                            \
+inter2 = _mm_mul_epi32(x2, y2);                                                                                \
+inter3 = _mm_mul_epi32(tmp1, tmp3);                                                                            \
+inter2 = _mm_add_epi64(inter0, inter2);                                                                        \
+inter3 = _mm_add_epi64(inter1, inter3);                                                                        \
+inter0 = _mm_loadl_epi64(loadLocation);                                                                        \
+inter3 = _mm_add_epi64(inter2, inter3);                                                                        \
+inter1 = _mm_srli_si128(inter3, 8);                                                                            \
+inter3 = _mm_add_epi64(inter1, inter3);                                                                        \
+inter3 = _mm_add_epi64(inter0, inter3);                                                                        \
+}
+
+static Void simdEqualCoeffComputer
+(
+  Pel *pResidue,
+  Int iResidueStride,
+  Int **ppiDerivate,
+  Int iDerivateBufStride,
+  Int64( *pi64EqualCoeff )[7],
+  Int iWidth,
+  Int iHeight,
+  Bool b6Param
+)
+{
+  __m128i mmTwo, mmFour;
+  __m128i mmTmp[4];
+  __m128i mmIntermediate[4];
+  __m128i mmIndxK, mmIndxJ[2];
+  __m128i mmResidue[2];
+
+  // Add directly to indexes to get new index
+  mmTwo = _mm_set1_epi32( 2 );
+  mmFour = _mm_set1_epi32( 4 );
+
+  if ( b6Param )
+  {
+    __m128i mmC[12];
+
+    //  C for 1st row of pixels
+    //  mmC[0] = iC[0][i] | iC[0][i+1] | iC[0][i+2] | iC[0][i+3]
+    //  mmC[1] = iC[1][i] | iC[1][i+1] | iC[1][i+2] | iC[1][i+3]
+    //  mmC[2] = iC[2][i] | iC[2][i+1] | iC[2][i+2] | iC[2][i+3]
+    //  mmC[3] = iC[3][i] | iC[3][i+1] | iC[3][i+2] | iC[3][i+3]
+    //  mmC[4] = iC[4][i] | iC[4][i+1] | iC[4][i+2] | iC[4][i+3]
+    //  mmC[5] = iC[5][i] | iC[5][i+1] | iC[5][i+2] | iC[5][i+3]
+
+    //  C for 2nd row of pixels
+    //  mmC[6] = iC[6][i] | iC[6][i+1] | iC[6][i+2] | iC[6][i+3]
+    //  mmC[7] = iC[7][i] | iC[7][i+1] | iC[7][i+2] | iC[7][i+3]
+    //  mmC[8] = iC[8][i] | iC[8][i+1] | iC[8][i+2] | iC[8][i+3]
+    //  mmC[9] = iC[9][i] | iC[9][i+1] | iC[9][i+2] | iC[9][i+3]
+    //  mmC[10] = iC[10][i] | iC[10][i+1] | iC[10][i+2] | iC[10][i+3]
+    //  mmC[11] = iC[11][i] | iC[11][i+1] | iC[11][i+2] | iC[11][i+3]
+
+    Int iIdx1 = 0, iIdx2 = 0;
+    iIdx1 = -2 * iDerivateBufStride - 4;
+    iIdx2 = -iDerivateBufStride - 4;
+    mmIndxJ[0] = _mm_set1_epi32( -2 );
+    mmIndxJ[1] = _mm_set1_epi32( -1 );
+
+    for ( Int j = 0; j < iHeight; j += 2 )
+    {
+      mmIndxJ[0] = _mm_add_epi32( mmIndxJ[0], mmTwo );
+      mmIndxJ[1] = _mm_add_epi32( mmIndxJ[1], mmTwo );
+      mmIndxK = _mm_set_epi32( -1, -2, -3, -4 );
+      iIdx1 += (iDerivateBufStride << 1);
+      iIdx2 += (iDerivateBufStride << 1);
+
+      for ( Int k = 0; k < iWidth; k += 4 )
+      {
+        iIdx1 += 4;
+        iIdx2 += 4;
+
+        mmIndxK = _mm_add_epi32( mmIndxK, mmFour );
+
+        // 1st row
+        mmC[0] = _mm_loadu_si128( (const __m128i*)&ppiDerivate[0][iIdx1] );
+        mmC[2] = _mm_loadu_si128( (const __m128i*)&ppiDerivate[1][iIdx1] );
+        // 2nd row
+        mmC[6] = _mm_loadu_si128( (const __m128i*)&ppiDerivate[0][iIdx2] );
+        mmC[8] = _mm_loadu_si128( (const __m128i*)&ppiDerivate[1][iIdx2] );
+
+        // 1st row
+        mmC[1] = _mm_mullo_epi32( mmIndxK, mmC[0] );
+        mmC[3] = _mm_mullo_epi32( mmIndxK, mmC[2] );
+        mmC[4] = _mm_mullo_epi32( mmIndxJ[0], mmC[0] );
+        mmC[5] = _mm_mullo_epi32( mmIndxJ[0], mmC[2] );
+
+        // 2nd row
+        mmC[7] = _mm_mullo_epi32( mmIndxK, mmC[6] );
+        mmC[9] = _mm_mullo_epi32( mmIndxK, mmC[8] );
+        mmC[10] = _mm_mullo_epi32( mmIndxJ[1], mmC[6] );
+        mmC[11] = _mm_mullo_epi32( mmIndxJ[1], mmC[8] );
+
+        // Residue
+        mmResidue[0] = _mm_loadl_epi64( (const __m128i*)&pResidue[iIdx1] );
+        mmResidue[1] = _mm_loadl_epi64( (const __m128i*)&pResidue[iIdx2] );
+
+        mmResidue[0] = _mm_cvtepi16_epi32( mmResidue[0] );
+        mmResidue[1] = _mm_cvtepi16_epi32( mmResidue[1] );
+
+        mmResidue[0] = _mm_slli_epi32( mmResidue[0], 3 );
+        mmResidue[1] = _mm_slli_epi32( mmResidue[1], 3 );
+
+        // Calculate residue coefficients first
+        mmTmp[2] = _mm_srli_si128( mmResidue[0], 4 );
+        mmTmp[3] = _mm_srli_si128( mmResidue[1], 4 );
+
+        // 1st row
+        mmTmp[0] = _mm_srli_si128( mmC[0], 4 );
+        mmTmp[1] = _mm_srli_si128( mmC[6], 4 );
+        // 7th col of row
+        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[6], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[1][6] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[1][6], mmIntermediate[3] );
+
+        // 2nd row
+        mmTmp[0] = _mm_srli_si128( mmC[1], 4 );
+        mmTmp[1] = _mm_srli_si128( mmC[7], 4 );
+        // 7th col of row
+        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[7], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[2][6] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[2][6], mmIntermediate[3] );
+
+        // 3rd row
+        mmTmp[0] = _mm_srli_si128( mmC[2], 4 );
+        mmTmp[1] = _mm_srli_si128( mmC[8], 4 );
+        // 7th col of row
+        CALC_EQUAL_COEFF_8PXLS( mmC[2], mmC[8], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[3][6] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[3][6], mmIntermediate[3] );
+
+        // 4th row
+        mmTmp[0] = _mm_srli_si128( mmC[3], 4 );
+        mmTmp[1] = _mm_srli_si128( mmC[9], 4 );
+        // 7th col of row
+        CALC_EQUAL_COEFF_8PXLS( mmC[3], mmC[9], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[4][6] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[4][6], mmIntermediate[3] );
+
+        // 5th row
+        mmTmp[0] = _mm_srli_si128( mmC[4], 4 );
+        mmTmp[1] = _mm_srli_si128( mmC[10], 4 );
+        // 7th col of row
+        CALC_EQUAL_COEFF_8PXLS( mmC[4], mmC[10], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[5][6] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[5][6], mmIntermediate[3] );
+
+        // 6th row
+        mmTmp[0] = _mm_srli_si128( mmC[5], 4 );
+        mmTmp[1] = _mm_srli_si128( mmC[11], 4 );
+        // 7th col of row
+        CALC_EQUAL_COEFF_8PXLS( mmC[5], mmC[11], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[6][6] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[6][6], mmIntermediate[3] );
+
+        //Start calculation of coefficient matrix
+        // 1st row
+        mmTmp[0] = _mm_srli_si128( mmC[0], 4 );
+        mmTmp[1] = _mm_srli_si128( mmC[6], 4 );
+
+        // 1st col of row
+        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[6], mmC[0], mmC[6], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[1][0] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[1][0], mmIntermediate[3] );
+        // 2nd col of row and 1st col of 2nd row
+        mmTmp[2] = _mm_srli_si128( mmC[1], 4 );
+        mmTmp[3] = _mm_srli_si128( mmC[7], 4 );
+        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[6], mmC[1], mmC[7], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[1][1] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[1][1], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[2][0], mmIntermediate[3] );
+        // 3rd col of row and 1st col of 3rd row
+        mmTmp[2] = _mm_srli_si128( mmC[2], 4 );
+        mmTmp[3] = _mm_srli_si128( mmC[8], 4 );
+        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[6], mmC[2], mmC[8], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[1][2] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[1][2], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[3][0], mmIntermediate[3] );
+        // 4th col of row and 1st col of 4th row
+        mmTmp[2] = _mm_srli_si128( mmC[3], 4 );
+        mmTmp[3] = _mm_srli_si128( mmC[9], 4 );
+        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[6], mmC[3], mmC[9], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[1][3] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[1][3], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[4][0], mmIntermediate[3] );
+        // 5th col of row and 1st col of the 5th row
+        mmTmp[2] = _mm_srli_si128( mmC[4], 4 );
+        mmTmp[3] = _mm_srli_si128( mmC[10], 4 );
+        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[6], mmC[4], mmC[10], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[1][4] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[1][4], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[5][0], mmIntermediate[3] );
+        // 6th col of row and 1st col of the 6th row
+        mmTmp[2] = _mm_srli_si128( mmC[5], 4 );
+        mmTmp[3] = _mm_srli_si128( mmC[11], 4 );
+        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[6], mmC[5], mmC[11], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[1][5] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[1][5], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[6][0], mmIntermediate[3] );
+
+        // 2nd row
+        mmTmp[0] = _mm_srli_si128( mmC[1], 4 );
+        mmTmp[1] = _mm_srli_si128( mmC[7], 4 );
+
+        // 2nd col of row
+        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[7], mmC[1], mmC[7], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[2][1] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[2][1], mmIntermediate[3] );
+        // 3rd col of row and 2nd col of 3rd row
+        mmTmp[2] = _mm_srli_si128( mmC[2], 4 );
+        mmTmp[3] = _mm_srli_si128( mmC[8], 4 );
+        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[7], mmC[2], mmC[8], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[2][2] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[2][2], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[3][1], mmIntermediate[3] );
+        // 4th col of row and 2nd col of 4th row
+        mmTmp[2] = _mm_srli_si128( mmC[3], 4 );
+        mmTmp[3] = _mm_srli_si128( mmC[9], 4 );
+        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[7], mmC[3], mmC[9], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[2][3] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[2][3], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[4][1], mmIntermediate[3] );
+        // 5th col of row and 1st col of the 5th row
+        mmTmp[2] = _mm_srli_si128( mmC[4], 4 );
+        mmTmp[3] = _mm_srli_si128( mmC[10], 4 );
+        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[7], mmC[4], mmC[10], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[2][4] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[2][4], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[5][1], mmIntermediate[3] );
+        // 6th col of row and 1st col of the 6th row
+        mmTmp[2] = _mm_srli_si128( mmC[5], 4 );
+        mmTmp[3] = _mm_srli_si128( mmC[11], 4 );
+        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[7], mmC[5], mmC[11], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[2][5] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[2][5], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[6][1], mmIntermediate[3] );
+
+        // 3rd row
+        mmTmp[0] = _mm_srli_si128( mmC[2], 4 );
+        mmTmp[1] = _mm_srli_si128( mmC[8], 4 );
+
+        //3rd Col of row
+        CALC_EQUAL_COEFF_8PXLS( mmC[2], mmC[8], mmC[2], mmC[8], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[3][2] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[3][2], mmIntermediate[3] );
+        // 4th col of row and 3rd col of 4th row
+        mmTmp[2] = _mm_srli_si128( mmC[3], 4 );
+        mmTmp[3] = _mm_srli_si128( mmC[9], 4 );
+        CALC_EQUAL_COEFF_8PXLS( mmC[2], mmC[8], mmC[3], mmC[9], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[3][3] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[3][3], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[4][2], mmIntermediate[3] );
+        // 5th col of row and 1st col of the 5th row
+        mmTmp[2] = _mm_srli_si128( mmC[4], 4 );
+        mmTmp[3] = _mm_srli_si128( mmC[10], 4 );
+        CALC_EQUAL_COEFF_8PXLS( mmC[2], mmC[8], mmC[4], mmC[10], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[3][4] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[3][4], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[5][2], mmIntermediate[3] );
+        // 6th col of row and 1st col of the 6th row
+        mmTmp[2] = _mm_srli_si128( mmC[5], 4 );
+        mmTmp[3] = _mm_srli_si128( mmC[11], 4 );
+        CALC_EQUAL_COEFF_8PXLS( mmC[2], mmC[8], mmC[5], mmC[11], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[3][5] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[3][5], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[6][2], mmIntermediate[3] );
+
+        // 4th row
+        mmTmp[0] = _mm_srli_si128( mmC[3], 4 );
+        mmTmp[1] = _mm_srli_si128( mmC[9], 4 );
+
+        // 4th col of row
+        CALC_EQUAL_COEFF_8PXLS( mmC[3], mmC[9], mmC[3], mmC[9], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[4][3] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[4][3], mmIntermediate[3] );
+        // 5th col of row and 1st col of the 5th row
+        mmTmp[2] = _mm_srli_si128( mmC[4], 4 );
+        mmTmp[3] = _mm_srli_si128( mmC[10], 4 );
+        CALC_EQUAL_COEFF_8PXLS( mmC[3], mmC[9], mmC[4], mmC[10], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[4][4] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[4][4], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[5][3], mmIntermediate[3] );
+        // 6th col of row and 1st col of the 6th row
+        mmTmp[2] = _mm_srli_si128( mmC[5], 4 );
+        mmTmp[3] = _mm_srli_si128( mmC[11], 4 );
+        CALC_EQUAL_COEFF_8PXLS( mmC[3], mmC[9], mmC[5], mmC[11], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[4][5] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[4][5], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[6][3], mmIntermediate[3] );
+
+        // 5th row
+        mmTmp[0] = _mm_srli_si128( mmC[4], 4 );
+        mmTmp[1] = _mm_srli_si128( mmC[10], 4 );
+        // 5th col of row and 1st col of the 5th row
+        CALC_EQUAL_COEFF_8PXLS( mmC[4], mmC[10], mmC[4], mmC[10], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[5][4] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[5][4], mmIntermediate[3] );
+        // 6th col of row and 1st col of the 6th row
+        mmTmp[2] = _mm_srli_si128( mmC[5], 4 );
+        mmTmp[3] = _mm_srli_si128( mmC[11], 4 );
+        CALC_EQUAL_COEFF_8PXLS( mmC[4], mmC[10], mmC[5], mmC[11], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[5][5] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[5][5], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[6][4], mmIntermediate[3] );
+
+        // 6th row
+        mmTmp[0] = _mm_srli_si128( mmC[5], 4 );
+        mmTmp[1] = _mm_srli_si128( mmC[11], 4 );
+        // 5th col of row and 1st col of the 5th row
+        CALC_EQUAL_COEFF_8PXLS( mmC[5], mmC[11], mmC[5], mmC[11], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[6][5] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[6][5], mmIntermediate[3] );
+      }
+
+      iIdx1 -= (iWidth);
+      iIdx2 -= (iWidth);
+    }
+  }
+  else
+  {
+    __m128i mmC[8];
+
+    //  C for 1st row of pixels
+    //  mmC[0] = iC[0][i] | iC[0][i+1] | iC[0][i+2] | iC[0][i+3]
+    //  mmC[1] = iC[1][i] | iC[1][i+1] | iC[1][i+2] | iC[1][i+3]
+    //  mmC[2] = iC[2][i] | iC[2][i+1] | iC[2][i+2] | iC[2][i+3]
+    //  mmC[3] = iC[3][i] | iC[3][i+1] | iC[3][i+2] | iC[3][i+3]
+    //  C for 2nd row of pixels
+    //  mmC[4] = iC[0][i] | iC[0][i+1] | iC[0][i+2] | iC[0][i+3]
+    //  mmC[5] = iC[1][i] | iC[1][i+1] | iC[1][i+2] | iC[1][i+3]
+    //  mmC[6] = iC[2][i] | iC[2][i+1] | iC[2][i+2] | iC[2][i+3]
+    //  mmC[7] = iC[3][i] | iC[3][i+1] | iC[3][i+2] | iC[3][i+3]
+    Int iIdx1 = 0, iIdx2 = 0;
+    iIdx1 = -2 * iDerivateBufStride - 4;
+    iIdx2 = -iDerivateBufStride - 4;
+    mmIndxJ[0] = _mm_set1_epi32( -2 );
+    mmIndxJ[1] = _mm_set1_epi32( -1 );
+
+    for ( Int j = 0; j < iHeight; j += 2 )
+    {
+      mmIndxJ[0] = _mm_add_epi32( mmIndxJ[0], mmTwo );
+      mmIndxJ[1] = _mm_add_epi32( mmIndxJ[1], mmTwo );
+      mmIndxK = _mm_set_epi32( -1, -2, -3, -4 );
+      iIdx1 += (iDerivateBufStride << 1);
+      iIdx2 += (iDerivateBufStride << 1);
+
+      for ( Int k = 0; k < iWidth; k += 4 )
+      {
+        iIdx1 += 4;
+        iIdx2 += 4;
+
+        mmIndxK = _mm_add_epi32( mmIndxK, mmFour );
+
+        mmC[0] = _mm_loadu_si128( (const __m128i*)&ppiDerivate[0][iIdx1] );
+        mmC[2] = _mm_loadu_si128( (const __m128i*)&ppiDerivate[1][iIdx1] );
+        mmC[4] = _mm_loadu_si128( (const __m128i*)&ppiDerivate[0][iIdx2] );
+        mmC[6] = _mm_loadu_si128( (const __m128i*)&ppiDerivate[1][iIdx2] );
+
+        mmC[1] = _mm_mullo_epi32( mmIndxK, mmC[0] );
+        mmC[3] = _mm_mullo_epi32( mmIndxJ[0], mmC[0] );
+        mmC[5] = _mm_mullo_epi32( mmIndxK, mmC[4] );
+        mmC[7] = _mm_mullo_epi32( mmIndxJ[1], mmC[4] );
+
+        mmResidue[0] = _mm_loadl_epi64( (const __m128i*)&pResidue[iIdx1] );
+        mmResidue[1] = _mm_loadl_epi64( (const __m128i*)&pResidue[iIdx2] );
+
+        mmTmp[0] = _mm_mullo_epi32( mmIndxJ[0], mmC[2] );
+        mmTmp[1] = _mm_mullo_epi32( mmIndxK, mmC[2] );
+        mmTmp[2] = _mm_mullo_epi32( mmIndxJ[1], mmC[6] );
+        mmTmp[3] = _mm_mullo_epi32( mmIndxK, mmC[6] );
+
+        mmResidue[0] = _mm_cvtepi16_epi32( mmResidue[0] );
+        mmResidue[1] = _mm_cvtepi16_epi32( mmResidue[1] );
+
+        mmC[1] = _mm_add_epi32( mmC[1], mmTmp[0] );
+        mmC[3] = _mm_sub_epi32( mmC[3], mmTmp[1] );
+        mmC[5] = _mm_add_epi32( mmC[5], mmTmp[2] );
+        mmC[7] = _mm_sub_epi32( mmC[7], mmTmp[3] );
+
+        mmResidue[0] = _mm_slli_epi32( mmResidue[0], 3 );
+        mmResidue[1] = _mm_slli_epi32( mmResidue[1], 3 );
+
+        //Start calculation of coefficient matrix
+        // 1st row
+        mmTmp[0] = _mm_srli_si128( mmC[0], 4 );
+        mmTmp[1] = _mm_srli_si128( mmC[4], 4 );
+
+        // 1st col of row
+        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[4], mmC[0], mmC[4], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[1][0] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[1][0], mmIntermediate[3] );
+        // 2nd col of row and 1st col of 2nd row
+        mmTmp[2] = _mm_srli_si128( mmC[1], 4 );
+        mmTmp[3] = _mm_srli_si128( mmC[5], 4 );
+        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[4], mmC[1], mmC[5], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[1][1] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[1][1], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[2][0], mmIntermediate[3] );
+        // 3rd col of row and 1st col of 3rd row
+        mmTmp[2] = _mm_srli_si128( mmC[2], 4 );
+        mmTmp[3] = _mm_srli_si128( mmC[6], 4 );
+        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[4], mmC[2], mmC[6], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[1][2] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[1][2], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[3][0], mmIntermediate[3] );
+        // 4th col of row and 1st col of 4th row
+        mmTmp[2] = _mm_srli_si128( mmC[3], 4 );
+        mmTmp[3] = _mm_srli_si128( mmC[7], 4 );
+        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[4], mmC[3], mmC[7], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[1][3] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[1][3], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[4][0], mmIntermediate[3] );
+        // 5th col of row
+        mmTmp[2] = _mm_srli_si128( mmResidue[0], 4 );
+        mmTmp[3] = _mm_srli_si128( mmResidue[1], 4 );
+        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[4], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[1][4] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[1][4], mmIntermediate[3] );
+
+        // 2nd row
+        mmTmp[0] = _mm_srli_si128( mmC[1], 4 );
+        mmTmp[1] = _mm_srli_si128( mmC[5], 4 );
+
+        // 2nd col of row
+        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[5], mmC[1], mmC[5], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[2][1] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[2][1], mmIntermediate[3] );
+        // 3rd col of row and 2nd col of 3rd row
+        mmTmp[2] = _mm_srli_si128( mmC[2], 4 );
+        mmTmp[3] = _mm_srli_si128( mmC[6], 4 );
+        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[5], mmC[2], mmC[6], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[2][2] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[2][2], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[3][1], mmIntermediate[3] );
+        // 4th col of row and 2nd col of 4th row
+        mmTmp[2] = _mm_srli_si128( mmC[3], 4 );
+        mmTmp[3] = _mm_srli_si128( mmC[7], 4 );
+        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[5], mmC[3], mmC[7], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[2][3] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[2][3], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[4][1], mmIntermediate[3] );
+        // 5th col of row
+        mmTmp[2] = _mm_srli_si128( mmResidue[0], 4 );
+        mmTmp[3] = _mm_srli_si128( mmResidue[1], 4 );
+        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[5], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[2][4] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[2][4], mmIntermediate[3] );
+
+        // 3rd row
+        mmTmp[0] = _mm_srli_si128( mmC[2], 4 );
+        mmTmp[1] = _mm_srli_si128( mmC[6], 4 );
+
+        //3rd Col of row
+        CALC_EQUAL_COEFF_8PXLS( mmC[2], mmC[6], mmC[2], mmC[6], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[3][2] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[3][2], mmIntermediate[3] );
+        // 4th col of row and 3rd col of 4th row
+        mmTmp[2] = _mm_srli_si128( mmC[3], 4 );
+        mmTmp[3] = _mm_srli_si128( mmC[7], 4 );
+        CALC_EQUAL_COEFF_8PXLS( mmC[2], mmC[6], mmC[3], mmC[7], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[3][3] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[3][3], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[4][2], mmIntermediate[3] );
+        // 5th col of row
+        mmTmp[2] = _mm_srli_si128( mmResidue[0], 4 );
+        mmTmp[3] = _mm_srli_si128( mmResidue[1], 4 );
+        CALC_EQUAL_COEFF_8PXLS( mmC[2], mmC[6], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[3][4] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[3][4], mmIntermediate[3] );
+
+        // 4th row
+        mmTmp[0] = _mm_srli_si128( mmC[3], 4 );
+        mmTmp[1] = _mm_srli_si128( mmC[7], 4 );
+
+        // 4th col of row
+        CALC_EQUAL_COEFF_8PXLS( mmC[3], mmC[7], mmC[3], mmC[7], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[4][3] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[4][3], mmIntermediate[3] );
+        // 5th col of row
+        mmTmp[2] = _mm_srli_si128( mmResidue[0], 4 );
+        mmTmp[3] = _mm_srli_si128( mmResidue[1], 4 );
+        CALC_EQUAL_COEFF_8PXLS( mmC[3], mmC[7], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[4][4] );
+        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[4][4], mmIntermediate[3] );
+      }
+
+      iIdx1 -= (iWidth);
+      iIdx2 -= (iWidth);
+    }
+  }
+}
+
+Void InterSearch::_initAffineMEFunctionX86()
+{
+  m_HorizontalSobelFilter = simdHorizontalSobelFilter;
+  m_VerticalSobelFilter = simdVerticalSobelFilter;
+  m_EqualCoeffComputer = simdEqualCoeffComputer;
+}
+
+Void InterSearch::initAffineMEFunctionX86()
+{
+  auto vext = read_x86_extension_flags();
+  switch ( vext ) {
+  case AVX512:
+  case AVX2:
+  case AVX:
+  case SSE42:
+  case SSE41:
+    _initAffineMEFunctionX86( /*iBitDepthY, iBitDepthC*/ );
+    break;
+  default:
+    break;
+  }
+}
+#endif
+#endif
+
+Void InterSearch::xHorizontalSobelFilter
+(
+  Pel *const pPred,
+  const Int iPredStride,
+  Int *const piDerivate,
+  const Int iDerivateBufStride,
+  const Int iWidth,
+  const Int iHeight
+)
+{
+  for ( Int j = 1; j < iHeight - 1; j++ )
+  {
+    for ( Int k = 1; k < iWidth - 1; k++ )
+    {
+      Int iCenter = j * iPredStride + k;
+
+      piDerivate[j * iDerivateBufStride + k] =
+        (pPred[iCenter + 1 - iPredStride] -
+          pPred[iCenter - 1 - iPredStride] +
+          (pPred[iCenter + 1] << 1) -
+          (pPred[iCenter - 1] << 1) +
+          pPred[iCenter + 1 + iPredStride] -
+          pPred[iCenter - 1 + iPredStride]);
+    }
+
+    piDerivate[j * iDerivateBufStride] = piDerivate[j * iDerivateBufStride + 1];
+    piDerivate[j * iDerivateBufStride + iWidth - 1] = piDerivate[j * iDerivateBufStride + iWidth - 2];
+  }
+
+  piDerivate[0] = piDerivate[iDerivateBufStride + 1];
+  piDerivate[iWidth - 1] = piDerivate[iDerivateBufStride + iWidth - 2];
+  piDerivate[(iHeight - 1) * iDerivateBufStride] = piDerivate[(iHeight - 2) * iDerivateBufStride + 1];
+  piDerivate[(iHeight - 1) * iDerivateBufStride + iWidth - 1] = piDerivate[(iHeight - 2) * iDerivateBufStride + (iWidth - 2)];
+
+  for ( Int j = 1; j < iWidth - 1; j++ )
+  {
+    piDerivate[j] = piDerivate[iDerivateBufStride + j];
+    piDerivate[(iHeight - 1) * iDerivateBufStride + j] = piDerivate[(iHeight - 2) * iDerivateBufStride + j];
+  }
+}
+
+Void InterSearch::xVerticalSobelFilter
+(
+  Pel *const pPred,
+  const Int iPredStride,
+  Int *const piDerivate,
+  const Int iDerivateBufStride,
+  const Int iWidth,
+  const Int iHeight
+)
+{
+  for ( Int k = 1; k < iWidth - 1; k++ )
+  {
+    for ( Int j = 1; j < iHeight - 1; j++ )
+    {
+      Int iCenter = j * iPredStride + k;
+
+      piDerivate[j * iDerivateBufStride + k] =
+        (pPred[iCenter + iPredStride - 1] -
+          pPred[iCenter - iPredStride - 1] +
+          (pPred[iCenter + iPredStride] << 1) -
+          (pPred[iCenter - iPredStride] << 1) +
+          pPred[iCenter + iPredStride + 1] -
+          pPred[iCenter - iPredStride + 1]);
+    }
+
+    piDerivate[k] = piDerivate[iDerivateBufStride + k];
+    piDerivate[(iHeight - 1) * iDerivateBufStride + k] = piDerivate[(iHeight - 2) * iDerivateBufStride + k];
+  }
+
+  piDerivate[0] = piDerivate[iDerivateBufStride + 1];
+  piDerivate[iWidth - 1] = piDerivate[iDerivateBufStride + iWidth - 2];
+  piDerivate[(iHeight - 1) * iDerivateBufStride] = piDerivate[(iHeight - 2) * iDerivateBufStride + 1];
+  piDerivate[(iHeight - 1) * iDerivateBufStride + iWidth - 1] = piDerivate[(iHeight - 2) * iDerivateBufStride + (iWidth - 2)];
+
+  for ( Int j = 1; j < iHeight - 1; j++ )
+  {
+    piDerivate[j * iDerivateBufStride] = piDerivate[j * iDerivateBufStride + 1];
+    piDerivate[j * iDerivateBufStride + iWidth - 1] = piDerivate[j * iDerivateBufStride + iWidth - 2];
+  }
+}
+
+Void InterSearch::xEqualCoeffComputer
+(
+  Pel *pResidue,
+  Int iResidueStride,
+  Int **ppiDerivate,
+  Int iDerivateBufStride,
+  Int64( *pi64EqualCoeff )[7],
+  Int iWidth,
+  Int iHeight,
+  Bool b6Param
+)
+{
+  Int iAffineParamNum = b6Param ? 6 : 4;
+
+  for ( Int j = 0; j != iHeight; j++ )
+  {
+    for ( Int k = 0; k != iWidth; k++ )
+    {
+      Int iC[6];
+
+      Int iIdx = j * iDerivateBufStride + k;
+      if ( !b6Param )
+      {
+        iC[0] = ppiDerivate[0][iIdx];
+        iC[1] = k * ppiDerivate[0][iIdx] + j * ppiDerivate[1][iIdx];
+        iC[2] = ppiDerivate[1][iIdx];
+        iC[3] = j * ppiDerivate[0][iIdx] - k * ppiDerivate[1][iIdx];
+      }
+      else
+      {
+        iC[0] = ppiDerivate[0][iIdx];
+        iC[1] = k * ppiDerivate[0][iIdx];
+        iC[2] = ppiDerivate[1][iIdx];
+        iC[3] = k * ppiDerivate[1][iIdx];
+        iC[4] = j * ppiDerivate[0][iIdx];
+        iC[5] = j * ppiDerivate[1][iIdx];
+      }
+      for ( Int col = 0; col < iAffineParamNum; col++ )
+      {
+        for ( Int row = 0; row < iAffineParamNum; row++ )
+        {
+          pi64EqualCoeff[col + 1][row] += (Int64)iC[col] * iC[row];
+        }
+        pi64EqualCoeff[col + 1][iAffineParamNum] += ((Int64)iC[col] * pResidue[iIdx]) << 3;
+      }
+    }
+  }
+}
+#endif
+
 Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
                                           PelUnitBuf&           origBuf,
                                           Int                   puIdx,
                                           UInt&                 lastMode,
                                           Distortion&           affineCost,
 #if JVET_K0220_ENC_CTRL
-                                          Mv                    hevcMv[2][33] )
+                                          Mv                    hevcMv[2][33]
 #else
                                           Mv                    hevcMv[2][33],
-                                          Bool                  bFastSkipBi )
+                                          Bool                  bFastSkipBi
 #endif
+#if JVET_K0185_AFFINE_6PARA_ENC
+                                        , Mv                    acMvAffine4Para[2][33][3]
+                                        , Int                   iRefIdx4Para[2]
+#endif
+                                         )
 {
   const Slice &slice = *pu.cu->slice;
 
   affineCost = std::numeric_limits<Distortion>::max();
 
   Mv        cMvZero;
+#if !JVET_K_AFFINE_REFACTOR
   Mv        aacMvd[2][3];
+#endif
   Mv        aacMv[2][3];
   Mv        cMvBi[2][3];
   Mv        cMvTemp[2][33][3];
 
   Int       iNumPredDir = slice.isInterP() ? 1 : 2;
+
+#if JVET_K_AFFINE_REFACTOR
+  Int iMvNum = 2;
+#if JVET_K0185_AFFINE_6PARA_ENC
+  iMvNum = pu.cu->affineType ? 3 : 2;
+#endif
+#endif
 
   // Mvp
   Mv        cMvPred[2][33][3];
@@ -2589,6 +3481,13 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
       xEstimateAffineAMVP( pu, affiAMVPInfoTemp[eRefPicList], origBuf, eRefPicList, iRefIdxTemp, cMvPred[iRefList][iRefIdxTemp], &biPDistTemp );
       aaiMvpIdx[iRefList][iRefIdxTemp] = pu.mvpIdx[eRefPicList];
       aaiMvpNum[iRefList][iRefIdxTemp] = pu.mvpNum[eRefPicList];;
+#if JVET_K0185_AFFINE_6PARA_ENC // reuse refidx of 4-para
+      if ( pu.cu->affineType == AFFINEMODEL_6PARAM && iRefIdx4Para[iRefList] != iRefIdxTemp )
+      {
+        xCopyAffineAMVPInfo( affiAMVPInfoTemp[eRefPicList], aacAffineAMVPInfo[iRefList][iRefIdxTemp] );
+        continue;
+      }
+#endif
 
       // set hevc ME result as start search position when it is best than mvp
       for ( Int i=0; i<3; i++ )
@@ -2598,6 +3497,34 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
       PelUnitBuf predBuf = m_tmpStorageLCU.getBuf( UnitAreaRelative(*pu.cu, pu) );
 
       UInt uiCandCost = xGetAffineTemplateCost( pu, origBuf, predBuf, mvHevc, aaiMvpIdx[iRefList][iRefIdxTemp], AMVP_MAX_NUM_CANDS, eRefPicList, iRefIdxTemp );
+
+#if JVET_K0185_AFFINE_6PARA_ENC // use 4-parameter results as start point
+      if ( pu.cu->affineType == AFFINEMODEL_6PARAM )
+      {
+        Mv mvFour[3];
+        mvFour[0] = acMvAffine4Para[iRefList][iRefIdxTemp][0];
+        mvFour[1] = acMvAffine4Para[iRefList][iRefIdxTemp][1];
+
+        Int shift = MAX_CU_DEPTH;
+        Int vx2 = (mvFour[0].getHor() << shift) - ((mvFour[1].getVer() - mvFour[0].getVer()) << (shift + g_aucLog2[pu.lheight()] - g_aucLog2[pu.lwidth()]));
+        Int vy2 = (mvFour[0].getVer() << shift) + ((mvFour[1].getHor() - mvFour[0].getHor()) << (shift + g_aucLog2[pu.lheight()] - g_aucLog2[pu.lwidth()]));
+        vx2 >>= shift;
+        vy2 >>= shift;
+        mvFour[2] = Mv( vx2, vy2, true );
+        mvFour[2].roundMV2SignalPrecision();
+
+        UInt uiCandCostInherit = xGetAffineTemplateCost( pu, origBuf, predBuf, mvFour, aaiMvpIdx[iRefList][iRefIdxTemp], AMVP_MAX_NUM_CANDS, eRefPicList, iRefIdxTemp );
+        if ( uiCandCostInherit < uiCandCost )
+        {
+          uiCandCost = uiCandCostInherit;
+          for ( Int i = 0; i < 3; i++ )
+          {
+            mvHevc[i] = mvFour[i];
+          }
+        }
+      }
+#endif
+
       if ( uiCandCost < biPDistTemp )
       {
         ::memcpy( cMvTemp[iRefList][iRefIdxTemp], mvHevc, sizeof(Mv)*3 );
@@ -2627,11 +3554,22 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
           uiCostTemp = uiCostTempL0[iList1ToList0Idx];
 
           uiCostTemp -= m_pcRdCost->getCost( uiBitsTempL0[iList1ToList0Idx] );
-
+#if JVET_K_AFFINE_REFACTOR
+          for (Int iVerIdx = 0; iVerIdx < iMvNum; iVerIdx++)
+#else
           for ( Int iVerIdx = 0; iVerIdx < ( pu.cs->pcv->rectCUs ? 2 : 3 ); iVerIdx++ )
+#endif
           {
             m_pcRdCost->setPredictor( cMvPred[iRefList][iRefIdxTemp][iVerIdx] );
             const int shift = cMvTemp[1][iRefIdxTemp][iVerIdx].highPrec ? VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : 0;
+#if JVET_K0337_AFFINE_MVD_PREDICTION
+            Mv secondPred;
+            if ( iVerIdx != 0 )
+            {
+              secondPred = cMvPred[iRefList][iRefIdxTemp][iVerIdx] + (cMvTemp[1][iRefIdxTemp][0] - cMvPred[1][iRefIdxTemp][0]);
+              m_pcRdCost->setPredictor( secondPred );
+            }
+#endif
             uiBitsTemp += m_pcRdCost->getBitsOfVectorWithPredictor( cMvTemp[1][iRefIdxTemp][iVerIdx].getHor()>>shift, cMvTemp[1][iRefIdxTemp][iVerIdx].getVer()>>shift, 0 );
           }
           /*calculate the correct cost*/
@@ -2679,6 +3617,13 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
       }
     } // End refIdx loop
   } // end Uni-prediction
+
+#if JVET_K0185_AFFINE_6PARA_ENC // save 4-parameter UNI-ME results
+  if ( pu.cu->affineType == AFFINEMODEL_4PARAM )
+  {
+    ::memcpy( acMvAffine4Para, cMvTemp, sizeof( cMvTemp ) );
+  }
+#endif
 
   // Bi-directional prediction
 #if JVET_K0220_ENC_CTRL
@@ -2794,6 +3739,13 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
 
       for ( Int iRefIdxTemp = iRefStart; iRefIdxTemp <= iRefEnd; iRefIdxTemp++ )
       {
+#if JVET_K0185_AFFINE_6PARA_ENC // reuse refidx of 4-para
+        if ( pu.cu->affineType == AFFINEMODEL_6PARAM && iRefIdx4Para[iRefList] != iRefIdxTemp )
+        {
+          continue;
+        }
+#endif
+
         // update bits
         uiBitsTemp = uiMbBits[2] + uiMotBits[1-iRefList];
         if( slice.getNumRefIdx(eRefPicList) > 1 )
@@ -2861,6 +3813,14 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
   pu.mvpNum[REF_PIC_LIST_0] = NOT_VALID;
   pu.mvpNum[REF_PIC_LIST_1] = NOT_VALID;
 
+#if JVET_K_AFFINE_REFACTOR
+  for ( Int iVerIdx = 0; iVerIdx < 3; iVerIdx++ )
+  {
+    pu.mvdAffi[REF_PIC_LIST_0][iVerIdx] = cMvZero;
+    pu.mvdAffi[REF_PIC_LIST_1][iVerIdx] = cMvZero;
+  }
+#endif
+
   // Set Motion Field
   memcpy( aacMv[1], mvValidList1, sizeof(Mv)*3 );
   iRefIdx[1] = refIdxValidList1;
@@ -2878,6 +3838,20 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
     pu.refIdx[REF_PIC_LIST_0] = iRefIdxBi[0];
     pu.refIdx[REF_PIC_LIST_1] = iRefIdxBi[1];
 
+#if JVET_K_AFFINE_REFACTOR
+    for ( Int iVerIdx = 0; iVerIdx < iMvNum; iVerIdx++ )
+    {
+      pu.mvdAffi[REF_PIC_LIST_0][iVerIdx] = cMvBi[0][iVerIdx] - cMvPredBi[0][iRefIdxBi[0]][iVerIdx];
+      pu.mvdAffi[REF_PIC_LIST_1][iVerIdx] = cMvBi[1][iVerIdx] - cMvPredBi[1][iRefIdxBi[1]][iVerIdx];
+#if JVET_K0337_AFFINE_MVD_PREDICTION
+      if ( iVerIdx != 0 )
+      {
+        pu.mvdAffi[0][iVerIdx] = pu.mvdAffi[0][iVerIdx] - pu.mvdAffi[0][0];
+        pu.mvdAffi[1][iVerIdx] = pu.mvdAffi[1][iVerIdx] - pu.mvdAffi[1][0];
+      }
+#endif
+    }
+#else
     for ( Int iVerIdx=0; iVerIdx<2; iVerIdx++ )
     {
       aacMvd[0][iVerIdx] = cMvBi[0][iVerIdx] - cMvPredBi[0][iRefIdxBi[0]][iVerIdx];
@@ -2892,6 +3866,7 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
 #else
     PU::setAllAffineMvd( pu.getMotionBuf(), aacMvd[0][0], aacMvd[0][1], REF_PIC_LIST_0, pu.cs->pcv->rectCUs );
     PU::setAllAffineMvd( pu.getMotionBuf(), aacMvd[1][0], aacMvd[1][1], REF_PIC_LIST_1, pu.cs->pcv->rectCUs );
+#endif
 #endif
 
     pu.interDir = 3;
@@ -2909,6 +3884,18 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
     PU::setAllAffineMv( pu, aacMv[0][0], aacMv[0][1], aacMv[0][2], REF_PIC_LIST_0 );
     pu.refIdx[REF_PIC_LIST_0] = iRefIdx[0];
 
+#if JVET_K_AFFINE_REFACTOR
+    for ( Int iVerIdx = 0; iVerIdx < iMvNum; iVerIdx++ )
+    {
+      pu.mvdAffi[REF_PIC_LIST_0][iVerIdx] = aacMv[0][iVerIdx] - cMvPred[0][iRefIdx[0]][iVerIdx];
+#if JVET_K0337_AFFINE_MVD_PREDICTION
+      if ( iVerIdx != 0 )
+      {
+        pu.mvdAffi[0][iVerIdx] = pu.mvdAffi[0][iVerIdx] - pu.mvdAffi[0][0];
+      }
+#endif
+    }
+#else
     for ( Int iVerIdx=0; iVerIdx<2; iVerIdx++ )
     {
       aacMvd[0][iVerIdx] = aacMv[0][iVerIdx] - cMvPred[0][iRefIdx[0]][iVerIdx];
@@ -2920,7 +3907,7 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
 #else
     PU::setAllAffineMvd( pu.getMotionBuf(), aacMvd[0][0], aacMvd[0][1], REF_PIC_LIST_0, pu.cs->pcv->rectCUs );
 #endif
-
+#endif
     pu.interDir = 1;
 
     pu.mvpIdx[REF_PIC_LIST_0] = aaiMvpIdx[0][iRefIdx[0]];
@@ -2934,6 +3921,18 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
     PU::setAllAffineMv( pu, aacMv[1][0], aacMv[1][1], aacMv[1][2], REF_PIC_LIST_1 );
     pu.refIdx[REF_PIC_LIST_1] = iRefIdx[1];
 
+#if JVET_K_AFFINE_REFACTOR
+    for ( Int iVerIdx = 0; iVerIdx < iMvNum; iVerIdx++ )
+    {
+      pu.mvdAffi[REF_PIC_LIST_1][iVerIdx] = aacMv[1][iVerIdx] - cMvPred[1][iRefIdx[1]][iVerIdx];
+#if JVET_K0337_AFFINE_MVD_PREDICTION
+      if ( iVerIdx != 0 )
+      {
+        pu.mvdAffi[1][iVerIdx] = pu.mvdAffi[1][iVerIdx] - pu.mvdAffi[1][0];
+      }
+#endif
+    }
+#else
     for ( Int iVerIdx=0; iVerIdx<2; iVerIdx++ )
     {
       aacMvd[1][iVerIdx] = aacMv[1][iVerIdx] - cMvPred[1][iRefIdx[1]][iVerIdx];
@@ -2945,7 +3944,7 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
 #else
     PU::setAllAffineMvd( pu.getMotionBuf(), aacMvd[1][0], aacMvd[1][1], REF_PIC_LIST_1, pu.cs->pcv->rectCUs );
 #endif
-
+#endif
     pu.interDir = 2;
 
     pu.mvpIdx[REF_PIC_LIST_1] = aaiMvpIdx[1][iRefIdx[1]];
@@ -2955,6 +3954,13 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
 
 Void solveEqual( Double** dEqualCoeff, Int iOrder, Double* dAffinePara )
 {
+#if JVET_K_AFFINE_BUG_FIXES
+  for ( Int k = 0; k < iOrder; k++ )
+  {
+    dAffinePara[k] = 0.;
+  }
+#endif
+
   // row echelon
   for ( Int i = 1; i < iOrder; i++ )
   {
@@ -2982,6 +3988,12 @@ Void solveEqual( Double** dEqualCoeff, Int iOrder, Double* dAffinePara )
     }
 
     // elimination first column
+#if JVET_K_AFFINE_BUG_FIXES
+    if ( dEqualCoeff[i][i - 1] == 0. )
+    {
+      return;
+    }
+#endif
     for ( Int j = i+1; j < iOrder+1; j++ )
     {
       for ( Int k = i; k < iOrder+1; k++ )
@@ -2991,9 +4003,25 @@ Void solveEqual( Double** dEqualCoeff, Int iOrder, Double* dAffinePara )
     }
   }
 
+#if JVET_K_AFFINE_BUG_FIXES
+  if ( dEqualCoeff[iOrder][iOrder - 1] == 0. )
+  {
+    return;
+  }
+#endif
   dAffinePara[iOrder-1] = dEqualCoeff[iOrder][iOrder] / dEqualCoeff[iOrder][iOrder-1];
   for ( Int i = iOrder-2; i >= 0; i-- )
   {
+#if JVET_K_AFFINE_BUG_FIXES
+    if ( dEqualCoeff[i + 1][i] == 0. )
+    {
+      for ( Int k = 0; k < iOrder; k++ )
+      {
+        dAffinePara[k] = 0.;
+      }
+      return;
+    }
+#endif
     Double temp = 0;
     for ( Int j = i+1; j < iOrder; j++ )
     {
@@ -3010,6 +4038,10 @@ Void InterSearch::xCheckBestAffineMVP( PredictionUnit &pu, AffineAMVPInfo &affin
     return;
   }
 
+#if JVET_K0185_AFFINE_6PARA_ENC
+  Int iMvNum = pu.cu->affineType ? 3 : 2;
+#endif
+
   m_pcRdCost->selectMotionLambda( pu.cu->transQuantBypass );
   m_pcRdCost->setCostScale ( 0 );
 
@@ -3017,10 +4049,23 @@ Void InterSearch::xCheckBestAffineMVP( PredictionUnit &pu, AffineAMVPInfo &affin
 
   // Get origin MV bits
   Int iOrgMvBits = 0;
+#if JVET_K0185_AFFINE_6PARA_ENC
+  for ( Int iVerIdx = 0; iVerIdx < iMvNum; iVerIdx++ )
+#else
   for ( Int iVerIdx=0; iVerIdx<2; iVerIdx++ )
+#endif
   {
     m_pcRdCost->setPredictor ( acMvPred[iVerIdx] );
     const int shift = acMv[iVerIdx].highPrec ? VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : 0;
+
+#if JVET_K0337_AFFINE_MVD_PREDICTION
+    Mv secondPred;
+    if ( iVerIdx != 0 )
+    {
+      secondPred = acMvPred[iVerIdx] + (acMv[0] - acMvPred[0]);
+      m_pcRdCost->setPredictor( secondPred );
+    }
+#endif
     iOrgMvBits += m_pcRdCost->getBitsOfVectorWithPredictor( acMv[iVerIdx].getHor()>>shift, acMv[iVerIdx].getVer()>>shift, 0 );
   }
   iOrgMvBits += m_auiMVPIdxCost[riMVPIdx][AMVP_MAX_NUM_CANDS];
@@ -3034,10 +4079,32 @@ Void InterSearch::xCheckBestAffineMVP( PredictionUnit &pu, AffineAMVPInfo &affin
     }
 
     Int iMvBits = 0;
+#if JVET_K0185_AFFINE_6PARA_ENC
+    for ( Int iVerIdx = 0; iVerIdx < iMvNum; iVerIdx++ )
+#else
     for ( Int iVerIdx=0; iVerIdx<2; iVerIdx++ )
+#endif
     {
+#if JVET_K0185_AFFINE_6PARA_ENC
+      m_pcRdCost->setPredictor( iVerIdx == 2 ? affineAMVPInfo.mvCandLB[iMVPIdx] :
+        (iVerIdx == 1 ? affineAMVPInfo.mvCandRT[iMVPIdx] : affineAMVPInfo.mvCandLT[iMVPIdx]) );
+#else
       m_pcRdCost->setPredictor ( iVerIdx ? affineAMVPInfo.mvCandRT[iMVPIdx] : affineAMVPInfo.mvCandLT[iMVPIdx] );
+#endif
       const int shift = acMv[iVerIdx].highPrec ? VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : 0;
+
+#if JVET_K0337_AFFINE_MVD_PREDICTION
+      Mv secondPred;
+      if ( iVerIdx != 0 )
+      {
+#if JVET_K0185_AFFINE_6PARA_ENC
+        secondPred = (iVerIdx == 1 ? affineAMVPInfo.mvCandRT[iMVPIdx] : affineAMVPInfo.mvCandLT[iMVPIdx]) + (acMv[0] - affineAMVPInfo.mvCandLT[iMVPIdx]);
+#else
+        secondPred = affineAMVPInfo.mvCandRT[iMVPIdx] + (acMv[0] - affineAMVPInfo.mvCandLT[iMVPIdx]);
+#endif
+        m_pcRdCost->setPredictor( secondPred );
+      }
+#endif
       iMvBits += m_pcRdCost->getBitsOfVectorWithPredictor( acMv[iVerIdx].getHor()>>shift, acMv[iVerIdx].getVer()>>shift, 0 );
     }
     iMvBits += m_auiMVPIdxCost[iMVPIdx][AMVP_MAX_NUM_CANDS];
@@ -3106,7 +4173,13 @@ Void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
 
   // Set delta mv
   // malloc buffer
+#if JVET_K0185_AFFINE_6PARA_ENC
+  Int iParaNum = pu.cu->affineType ? 7 : 5;
+  Int iAffineParaNum = iParaNum - 1;
+  Int iMvNum = pu.cu->affineType ? 3 : 2;
+#else
   static const Int iParaNum = 5;
+#endif
   Double **pdEqualCoeff;
   pdEqualCoeff = new Double *[iParaNum];
   for ( Int i = 0; i < iParaNum; i++ )
@@ -3114,8 +4187,14 @@ Void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
     pdEqualCoeff[i] = new Double[iParaNum];
   }
 
+#if JVET_K0367_AFFINE_FIX_POINT
+  Int64  i64EqualCoeff[7][7];
+  Pel    *piError = m_tmpAffiError;
+  Int    *pdDerivate[2];
+#else
   Int    *piError = m_tmpAffiError;
   Double *pdDerivate[2];
+#endif
   pdDerivate[0] = m_tmpAffiDeri[0];
   pdDerivate[1] = m_tmpAffiDeri[1];
 
@@ -3125,11 +4204,18 @@ Void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
   // do motion compensation with origin mv
   clipMv( acMvTemp[0], pu.cu->lumaPos(), *pu.cs->sps );
   clipMv( acMvTemp[1], pu.cu->lumaPos(), *pu.cs->sps );
+#if JVET_K0185_AFFINE_6PARA_ENC
+  if ( pu.cu->affineType == AFFINEMODEL_6PARAM )
+  {
+    clipMv( acMvTemp[2], pu.cu->lumaPos(), *pu.cs->sps );
+  }
+#endif
+#if !JVET_K_AFFINE_BUG_FIXES
   Int vx2 =  - ( acMvTemp[1].getVer() - acMvTemp[0].getVer() ) * height / width + acMvTemp[0].getHor();
   Int vy2 =    ( acMvTemp[1].getHor() - acMvTemp[0].getHor() ) * height / width + acMvTemp[0].getVer();
   acMvTemp[2] = Mv( vx2, vy2, true );
   clipMv( acMvTemp[2], pu.cu->lumaPos(), *pu.cs->sps );
-
+#endif
   xPredAffineBlk( COMPONENT_Y, pu, refPic, acMvTemp, predBuf, false, pu.cs->slice->clpRng( COMPONENT_Y ) );
 
   // get error
@@ -3139,13 +4225,25 @@ Void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
   m_pcRdCost->setCostScale(0);
   uiBitsBest = ruiBits;
   DTRACE( g_trace_ctx, D_COMMON, " (%d) xx uiBitsBest=%d\n", DTRACE_GET_COUNTER(g_trace_ctx,D_COMMON), uiBitsBest );
+#if JVET_K0185_AFFINE_6PARA_ENC
+  for ( Int i = 0; i < iMvNum; i++ )
+#else
   for ( Int i=0; i<2; i++ )
+#endif
   {
     DTRACE( g_trace_ctx, D_COMMON, "#mvPredForBits=(%d,%d) \n", acMvPred[i].getHor(), acMvPred[i].getVer() );
     m_pcRdCost->setPredictor( acMvPred[i] );
     DTRACE( g_trace_ctx, D_COMMON, "#mvForBits=(%d,%d) \n", acMvTemp[i].getHor(), acMvTemp[i].getVer() );
 
     const int shift = acMvTemp[i].highPrec ? VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : 0;
+#if JVET_K0337_AFFINE_MVD_PREDICTION
+    Mv secondPred;
+    if ( i != 0 )
+    {
+      secondPred = acMvPred[i] + (acMvTemp[0] - acMvPred[0]);
+      m_pcRdCost->setPredictor( secondPred );
+    }
+#endif
     uiBitsBest += m_pcRdCost->getBitsOfVectorWithPredictor( acMvTemp[i].getHor()>>shift, acMvTemp[i].getVer()>>shift, 0 );
     DTRACE( g_trace_ctx, D_COMMON, " (%d) yy uiBitsBest=%d\n", DTRACE_GET_COUNTER(g_trace_ctx,D_COMMON), uiBitsBest );
   }
@@ -3158,7 +4256,24 @@ Void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
   const Int bufStride = pBuf->Y().stride;
   const Int predBufStride = predBuf.Y().stride;
 
+#if JVET_K0185_AFFINE_6PARA_ENC
+  Int iIterTime;
+  if ( pu.cu->affineType == AFFINEMODEL_6PARAM )
+  {
+    iIterTime = bBi ? 3 : 4;
+  }
+  else
+  {
+    iIterTime = bBi ? 3 : 5;
+  }
+
+  if ( !pu.cu->cs->sps->getSpsNext().getUseAffineType() )
+  {
+    iIterTime = bBi ? 5 : 7;
+  }
+#else
   Int iIterTime = bBi ? 5 : 7;
+#endif
   for ( Int iter=0; iter<iIterTime; iter++ )    // iterate loop
   {
     /*********************************************************************************
@@ -3182,6 +4297,9 @@ Void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
     // -2 0 2
     // -1 0 1
     pPred = predBuf.Y().buf;
+#if JVET_K0367_AFFINE_FIX_POINT
+    m_HorizontalSobelFilter( pPred, predBufStride, pdDerivate[0], width, width, height );
+#else
     for ( Int j = 1; j < height-1; j++ )
     {
       for ( Int k = 1; k < width-1; k++ )
@@ -3205,12 +4323,15 @@ Void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
       pdDerivate[0][j] = pdDerivate[0][width+j];
       pdDerivate[0][(height-1)*width+j] = pdDerivate[0][(height-2)*width+j];
     }
+#endif
 
     // sobel y direction
     // -1 -2 -1
     //  0  0  0
     //  1  2  1
-
+#if JVET_K0367_AFFINE_FIX_POINT
+    m_VerticalSobelFilter( pPred, predBufStride, pdDerivate[1], width, width, height );
+#else
     for ( Int k=1; k < width-1; k++ )
     {
       for ( Int j = 1; j < height-1; j++ )
@@ -3234,8 +4355,31 @@ Void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
       pdDerivate[1][j*width] = pdDerivate[1][j*width+1];
       pdDerivate[1][j*width+width-1] = pdDerivate[1][j*width+width-2];
     }
+#endif
 
     // solve delta x and y
+#if JVET_K0367_AFFINE_FIX_POINT
+    for ( Int row = 0; row < iParaNum; row++ )
+    {
+      memset( &i64EqualCoeff[row][0], 0, iParaNum * sizeof( Int64 ) );
+    }
+
+    m_EqualCoeffComputer( piError, width, pdDerivate, width, i64EqualCoeff, width, height
+#if JVET_K0185_AFFINE_6PARA_ENC
+      , (pu.cu->affineType == AFFINEMODEL_6PARAM)
+#else
+      , false
+#endif
+    );
+
+    for ( Int row = 0; row < iParaNum; row++ )
+    {
+      for ( Int i = 0; i < iParaNum; i++ )
+      {
+        pdEqualCoeff[row][i] = (Double)i64EqualCoeff[row][i];
+      }
+    }
+#else
     for ( Int m = 0; m != iParaNum; m++ )
     {
       for ( Int n = 0; n != iParaNum; n++ )
@@ -3249,6 +4393,34 @@ Void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
       for ( Int k = 0; k != width; k++ )
       {
         Int iIdx = j * width + k;
+#if JVET_K0185_AFFINE_6PARA_ENC
+        Double dC[6];
+        if ( pu.cu->affineType )
+        {
+          dC[0] = pdDerivate[0][iIdx];
+          dC[1] = k * pdDerivate[0][iIdx];
+          dC[2] = pdDerivate[1][iIdx];
+          dC[3] = k * pdDerivate[1][iIdx];
+          dC[4] = j * pdDerivate[0][iIdx];
+          dC[5] = j * pdDerivate[1][iIdx];
+        }
+        else
+        {
+          dC[0] = pdDerivate[0][iIdx];
+          dC[1] = k * pdDerivate[0][iIdx] + j * pdDerivate[1][iIdx];
+          dC[2] = pdDerivate[1][iIdx];
+          dC[3] = j * pdDerivate[0][iIdx] - k * pdDerivate[1][iIdx];
+        }
+
+        for ( Int col = 0; col < iAffineParaNum; col++ )
+        {
+          for ( Int row = 0; row < iAffineParaNum; row++ )
+          {
+            pdEqualCoeff[col + 1][row] += dC[col] * dC[row];
+          }
+          pdEqualCoeff[col + 1][iAffineParaNum] += (Double)(piError[iIdx] * dC[col]);
+        }
+#else
         Double dC[4];
         dC[0] = pdDerivate[0][iIdx];
         dC[1] = k * pdDerivate[0][iIdx] + j * pdDerivate[1][iIdx];
@@ -3263,8 +4435,42 @@ Void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
           }
           pdEqualCoeff[col+1][4] += (Double)( piError[iIdx] * dC[col] );
         }
+#endif
       }
     }
+#endif
+
+#if JVET_K0185_AFFINE_6PARA_ENC
+    Double dAffinePara[6];
+    Double dDeltaMv[6];
+    Mv acDeltaMv[3];
+
+    solveEqual( pdEqualCoeff, iAffineParaNum, dAffinePara );
+
+    // convert to delta mv
+    dDeltaMv[0] = dAffinePara[0];
+    dDeltaMv[2] = dAffinePara[2];
+    if ( pu.cu->affineType == AFFINEMODEL_6PARAM )
+    {
+      dDeltaMv[1] = dAffinePara[1] * width + dAffinePara[0];
+      dDeltaMv[3] = dAffinePara[3] * width + dAffinePara[2];
+      dDeltaMv[4] = dAffinePara[4] * height + dAffinePara[0];
+      dDeltaMv[5] = dAffinePara[5] * height + dAffinePara[2];
+    }
+    else
+    {
+      dDeltaMv[1] = dAffinePara[1] * width + dAffinePara[0];
+      dDeltaMv[3] = -dAffinePara[3] * width + dAffinePara[2];
+    }
+
+    acDeltaMv[0] = Mv( (Int)(dDeltaMv[0] * 4 + SIGN( dDeltaMv[0] ) * 0.5) << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, (Int)(dDeltaMv[2] * 4 + SIGN( dDeltaMv[2] ) * 0.5) << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, true );
+    acDeltaMv[1] = Mv( (Int)(dDeltaMv[1] * 4 + SIGN( dDeltaMv[1] ) * 0.5) << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, (Int)(dDeltaMv[3] * 4 + SIGN( dDeltaMv[3] ) * 0.5) << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, true );
+
+    if ( pu.cu->affineType == AFFINEMODEL_6PARAM )
+    {
+      acDeltaMv[2] = Mv( (Int)(dDeltaMv[4] * 4 + SIGN( dDeltaMv[4] ) * 0.5) << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, (Int)(dDeltaMv[5] * 4 + SIGN( dDeltaMv[5] ) * 0.5) << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, true );
+    }
+#else
     Double dAffinePara[4];
     solveEqual( pdEqualCoeff, 4, dAffinePara );
 
@@ -3279,9 +4485,14 @@ Void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
     Mv acDeltaMv[3];
     acDeltaMv[0] = Mv( (Int)(dDeltaMv[0] * 4 + SIGN(dDeltaMv[0]) * 0.5 ) << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, (Int)(dDeltaMv[2] * 4 + SIGN(dDeltaMv[2]) * 0.5 ) << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, true );
     acDeltaMv[1] = Mv( (Int)(dDeltaMv[1] * 4 + SIGN(dDeltaMv[1]) * 0.5 ) << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, (Int)(dDeltaMv[3] * 4 + SIGN(dDeltaMv[3]) * 0.5 ) << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, true );
+#endif
 
     Bool bAllZero = false;
+#if JVET_K0185_AFFINE_6PARA_ENC
+    for ( Int i = 0; i < iMvNum; i++ )
+#else
     for ( Int i=0; i<2; i++ )
+#endif
     {
       if ( acDeltaMv[i].getHor() != 0 || acDeltaMv[i].getVer() != 0 )
       {
@@ -3295,16 +4506,27 @@ Void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
       break;
 
     // do motion compensation with updated mv
+#if JVET_K0185_AFFINE_6PARA_ENC
+    for ( Int i = 0; i < iMvNum; i++ )
+#else
     for ( Int i=0; i<2; i++ )
+#endif
     {
       acMvTemp[i] += acDeltaMv[i];
+#if JVET_K_AFFINE_BUG_FIXES
+      acMvTemp[i].hor = Clip3( -32768, 32767, acMvTemp[i].hor );
+      acMvTemp[i].ver = Clip3( -32768, 32767, acMvTemp[i].ver );
+      acMvTemp[i].roundMV2SignalPrecision();
+#endif
       clipMv(acMvTemp[i], pu.cu->lumaPos(), *pu.cs->sps);
     }
+#if !JVET_K_AFFINE_BUG_FIXES
+    Int vx2, vy2;
     vx2 =  - ( acMvTemp[1].getVer() - acMvTemp[0].getVer() ) * height / width + acMvTemp[0].getHor();
     vy2 =    ( acMvTemp[1].getHor() - acMvTemp[0].getHor() ) * height / width + acMvTemp[0].getVer();
     acMvTemp[2].set( vx2, vy2 );
     clipMv(acMvTemp[2], pu.cu->lumaPos(), *pu.cs->sps);
-
+#endif
     xPredAffineBlk( COMPONENT_Y, pu, refPic, acMvTemp, predBuf, false, pu.cu->slice->clpRng( COMPONENT_Y ) );
 
     // get error
@@ -3314,10 +4536,22 @@ Void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
     // get cost with mv
     m_pcRdCost->setCostScale(0);
     UInt uiBitsTemp = ruiBits;
+#if JVET_K0185_AFFINE_6PARA_ENC
+    for ( Int i = 0; i < iMvNum; i++ )
+#else
     for ( Int i=0; i<2; i++ )
+#endif
     {
       m_pcRdCost->setPredictor( acMvPred[i] );
       const int shift = acMvTemp[i].highPrec ? VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : 0;
+#if JVET_K0337_AFFINE_MVD_PREDICTION
+      Mv secondPred;
+      if ( i != 0 )
+      {
+        secondPred = acMvPred[i] + (acMvTemp[0] - acMvPred[0]);
+        m_pcRdCost->setPredictor( secondPred );
+      }
+#endif
       uiBitsTemp += m_pcRdCost->getBitsOfVectorWithPredictor( acMvTemp[i].getHor()>>shift, acMvTemp[i].getVer()>>shift, 0 );
     }
 

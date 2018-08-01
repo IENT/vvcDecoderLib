@@ -224,6 +224,9 @@ protected:
 #if JEM_TOOLS
   bool      m_highPrecMv;
   bool      m_Affine;
+#if JVET_K0337_AFFINE_6PARA
+  bool      m_AffineType;
+#endif
   bool      m_BIO;
 #endif
   bool      m_DisableMotionCompression;
@@ -694,6 +697,10 @@ public:
 
   void      setAffine                       ( bool b )       { m_Affine = b; }
   bool      getAffine                       ()         const { return m_Affine; }
+#if JVET_K0337_AFFINE_6PARA
+  void      setAffineType( bool b )                          { m_AffineType = b; }
+  bool      getAffineType()                            const { return m_AffineType; }
+#endif
 #endif
   void      setDisableMotionCompression     ( bool b )       { m_DisableMotionCompression = b; }
   bool      getDisableMotionCompression     ()         const { return m_DisableMotionCompression; }

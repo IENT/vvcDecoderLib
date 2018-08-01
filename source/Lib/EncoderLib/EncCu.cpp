@@ -1834,7 +1834,11 @@ void EncCu::xCheckRDCostAffineMerge2Nx2N( CodingStructure *&tempCS, CodingStruct
     return;
   }
 
+#if JVET_K_AFFINE_BUG_FIXES
+  if ( bestCS->area.lumaSize().width < 8 || bestCS->area.lumaSize().height < 8 )
+#else
   if( tempCS->pcv->rectCUs && bestCS->area.lumaSize().area() < 64 )
+#endif
   {
     return;
   }

@@ -854,6 +854,9 @@ Void EncLib::xInitSPS(SPS &sps)
 #if JEM_TOOLS
   sps.getSpsNext().setUseHighPrecMv         ( m_highPrecMv );
   sps.getSpsNext().setUseAffine             ( m_Affine );
+#if JVET_K0337_AFFINE_6PARA
+  sps.getSpsNext().setUseAffineType         ( m_AffineType );
+#endif
   sps.getSpsNext().setUseBIO                ( m_BIO );
 #endif
   sps.getSpsNext().setDisableMotCompress    ( m_DisableMotionCompression );

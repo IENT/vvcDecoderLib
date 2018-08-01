@@ -572,6 +572,12 @@ Void HLSWriter::codeSPSNext( const SPSNext& spsNext, const bool usePCM )
   WRITE_FLAG( spsNext.getUseOBMC() ? 1 : 0,                                                     "obmc_flag" );
   WRITE_FLAG( spsNext.getUseFRUCMrgMode() ? 1 : 0,                                              "fruc_merge_flag" );
   WRITE_FLAG( spsNext.getUseAffine() ? 1 : 0,                                                   "affine_flag" );
+#if JVET_K0337_AFFINE_6PARA
+  if ( spsNext.getUseAffine() )
+  {
+    WRITE_FLAG( spsNext.getUseAffineType() ? 1 : 0,                                             "affine_type_flag" );
+  }
+#endif
   WRITE_FLAG( spsNext.getUseAClip() ? 1 : 0,                                                    "adaptive_clipping_flag" );
 #endif
 #if JEM_TOOLS

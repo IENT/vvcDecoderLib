@@ -1001,6 +1001,15 @@ const CtxSet ContextSetCfg::AffineFlag = ContextSetCfg::addCtxSet
   {  197, 185, 201,},
   {  CNU, CNU, CNU,},
 });
+
+#if JVET_K0337_AFFINE_6PARA
+const CtxSet ContextSetCfg::AffineType = ContextSetCfg::addCtxSet
+({
+  { 92,  },
+  { 77,  },
+  { CNU, },
+});
+#endif
 #endif
 
 const CtxSet ContextSetCfg::Mvd = ContextSetCfg::addCtxSet

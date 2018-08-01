@@ -1860,9 +1860,15 @@ void CABACWriter::prediction_unit( const PredictionUnit& pu )
 #if JEM_TOOLS
       if( pu.cu->affine )
       {
-#if JVET_K0220_ENC_CTRL
+#if JVET_K0220_ENC_CTRL || JVET_K_AFFINE_REFACTOR
         mvd_coding( pu.mvdAffi[REF_PIC_LIST_0][0], 0 );
         mvd_coding( pu.mvdAffi[REF_PIC_LIST_0][1], 0 );
+#if JVET_K0337_AFFINE_6PARA
+        if ( pu.cu->affineType == AFFINEMODEL_6PARAM )
+        {
+          mvd_coding( pu.mvdAffi[REF_PIC_LIST_0][2], 0 );
+        }
+#endif
 #else
         CMotionBuf mb = pu.getMotionBuf();
         mvd_coding( mb.at(          0, 0 ).mvdAffi[REF_PIC_LIST_0], 0 );
@@ -1888,9 +1894,15 @@ void CABACWriter::prediction_unit( const PredictionUnit& pu )
 #if JEM_TOOLS
         if( pu.cu->affine )
         {
-#if JVET_K0220_ENC_CTRL
+#if JVET_K0220_ENC_CTRL || JVET_K_AFFINE_REFACTOR
           mvd_coding( pu.mvdAffi[REF_PIC_LIST_1][0], 0 );
           mvd_coding( pu.mvdAffi[REF_PIC_LIST_1][1], 0 );
+#if JVET_K0337_AFFINE_6PARA
+          if ( pu.cu->affineType == AFFINEMODEL_6PARAM )
+          {
+            mvd_coding( pu.mvdAffi[REF_PIC_LIST_1][2], 0 );
+          }
+#endif
 #else
           CMotionBuf mb = pu.getMotionBuf();
           mvd_coding( mb.at(          0, 0 ).mvdAffi[REF_PIC_LIST_1], 0 );
@@ -1937,6 +1949,17 @@ void CABACWriter::affine_flag( const CodingUnit& cu )
   DTRACE( g_trace_ctx, D_COMMON, " (%d) affine_flag() affine=%d\n", DTRACE_GET_COUNTER(g_trace_ctx, D_COMMON), cu.affine ? 1 : 0 );
 
   DTRACE( g_trace_ctx, D_SYNTAX, "affine_flag() affine=%d ctx=%d pos=(%d,%d)\n", cu.affine ? 1 : 0, ctxId, cu.Y().x, cu.Y().y );
+
+#if JVET_K0337_AFFINE_6PARA
+  if ( cu.affine && !cu.firstPU->mergeFlag && cu.cs->sps->getSpsNext().getUseAffineType() )
+  {
+    unsigned ctxId = 0;
+    m_BinEncoder.encodeBin( cu.affineType, Ctx::AffineType( ctxId ) );
+
+    DTRACE( g_trace_ctx, D_COMMON, " (%d) affine_type() affine_type=%d\n", DTRACE_GET_COUNTER( g_trace_ctx, D_COMMON ), cu.affineType ? 1 : 0 );
+    DTRACE( g_trace_ctx, D_SYNTAX, "affine_type() affine_type=%d ctx=%d pos=(%d,%d)\n", cu.affineType ? 1 : 0, ctxId, cu.Y().x, cu.Y().y );
+  }
+#endif
 }
 #endif
 

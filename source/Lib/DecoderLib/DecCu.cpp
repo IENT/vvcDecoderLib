@@ -540,13 +540,15 @@ Void DecCu::xDeriveCUMV( CodingUnit &cu )
               //    Mv mv[3];
               CHECK( pu.refIdx[eRefList] < 0, "Unexpected negative refIdx." );
 
-#if JVET_K0220_ENC_CTRL
+#if JVET_K0220_ENC_CTRL || JVET_K_AFFINE_REFACTOR
               Mv mvLT = affineAMVPInfo.mvCandLT[mvp_idx] + pu.mvdAffi[eRefList][0];
               Mv mvRT = affineAMVPInfo.mvCandRT[mvp_idx] + pu.mvdAffi[eRefList][1];
+#if JVET_K0337_AFFINE_MVD_PREDICTION
+              mvRT += pu.mvdAffi[eRefList][0];
+#endif
 #else
               Position posLT = pu.Y().topLeft();
               Position posRT = pu.Y().topRight();
-
               Mv mvLT = affineAMVPInfo.mvCandLT[mvp_idx] + pu.getMotionInfo( posLT ).mvdAffi[eRefList];
               Mv mvRT = affineAMVPInfo.mvCandRT[mvp_idx] + pu.getMotionInfo( posRT ).mvdAffi[eRefList];
 #endif
@@ -554,6 +556,19 @@ Void DecCu::xDeriveCUMV( CodingUnit &cu )
               CHECK( !mvLT.highPrec, "unexpected lp mv" );
               CHECK( !mvRT.highPrec, "unexpected lp mv" );
 
+#if JVET_K_AFFINE_BUG_FIXES
+              Mv mvLB;
+#if JVET_K0337_AFFINE_6PARA
+              if ( cu.affineType == AFFINEMODEL_6PARAM )
+              {
+                mvLB = affineAMVPInfo.mvCandLB[mvp_idx] + pu.mvdAffi[eRefList][2];
+#if JVET_K0337_AFFINE_MVD_PREDICTION
+                mvLB += pu.mvdAffi[eRefList][0];
+#endif
+                CHECK( !mvLB.highPrec, "unexpected lp mv" );
+              }
+#endif
+#else
               Int iWidth = pu.Y().width;
               Int iHeight = pu.Y().height;
               Int vx2 =  - ( mvRT.getVer() - mvLT.getVer() ) * iHeight / iWidth + mvLT.getHor();
@@ -564,6 +579,7 @@ Void DecCu::xDeriveCUMV( CodingUnit &cu )
               clipMv(mvLT, pu.cu->lumaPos(), *pu.cs->sps);
               clipMv(mvRT, pu.cu->lumaPos(), *pu.cs->sps);
               clipMv(mvLB, pu.cu->lumaPos(), *pu.cs->sps);
+#endif
               PU::setAllAffineMv( pu, mvLT, mvRT, mvLB, eRefList );
             }
           }

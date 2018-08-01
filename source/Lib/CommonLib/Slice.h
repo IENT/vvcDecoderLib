@@ -840,6 +840,9 @@ private:
   bool              m_OBMC;                       // 20
   bool              m_FRUC;                       // 21
   bool              m_Affine;                     // 22
+#if JVET_K0337_AFFINE_6PARA
+  bool              m_AffineType;
+#endif
   bool              m_AClip;                      // 23
 #endif
 #if JEM_TOOLS
@@ -952,6 +955,10 @@ public:
   bool      getUseIMV             ()                                      const     { return m_IMV; }
   void      setUseAffine          ( bool b )                                        { m_Affine = b; }
   bool      getUseAffine          ()                                      const     { return m_Affine; }
+#if JVET_K0337_AFFINE_6PARA
+  void      setUseAffineType      ( bool b )                                        { m_AffineType = b; }
+  bool      getUseAffineType      ()                                      const     { return m_AffineType; }
+#endif
 #endif
 #if JVET_K0072
 #else

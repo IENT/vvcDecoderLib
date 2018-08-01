@@ -1699,16 +1699,22 @@ void CABACReader::prediction_unit( PredictionUnit& pu, MergeCtx& mrgCtx )
 #if JEM_TOOLS
       if( pu.cu->affine )
       {
+#if JVET_K_AFFINE_REFACTOR || JVET_K0220_ENC_CTRL
+        mvd_coding( pu.mvdAffi[REF_PIC_LIST_0][0] );
+        mvd_coding( pu.mvdAffi[REF_PIC_LIST_0][1] );
+
+#if JVET_K0337_AFFINE_6PARA
+        if ( pu.cu->affineType == AFFINEMODEL_6PARAM )
+        {
+          mvd_coding( pu.mvdAffi[REF_PIC_LIST_0][2] );
+        }
+#endif
+#else
         Mv affLT, affRT;
         mvd_coding( affLT );
         mvd_coding( affRT );
 
-#if JVET_K0220_ENC_CTRL
-        pu.mvdAffi[REF_PIC_LIST_0][0] = affLT;
-        pu.mvdAffi[REF_PIC_LIST_0][1] = affRT;
-#else
         PU::setAllAffineMvd( pu.getMotionBuf(), affLT, affRT, REF_PIC_LIST_0, pu.cs->pcv->rectCUs );
-
 #endif
       }
       else
@@ -1718,30 +1724,43 @@ void CABACReader::prediction_unit( PredictionUnit& pu, MergeCtx& mrgCtx )
       }
       mvp_flag    ( pu, REF_PIC_LIST_0 );
     }
-#if JEM_TOOLS
+#if JEM_TOOLS && !JVET_K_AFFINE_REFACTOR
     else if( pu.cu->affine )
     {
       PU::setAllAffineMv( pu, Mv(), Mv(), Mv(), REF_PIC_LIST_0 ); // done in JEM, but maybe unnecessary
     }
 #endif
+
     if( pu.interDir != 1 /* PRED_L0 */ )
     {
       ref_idx     ( pu, REF_PIC_LIST_1 );
       if( pu.cu->cs->slice->getMvdL1ZeroFlag() && pu.interDir == 3 /* PRED_BI */ )
       {
         pu.mvd[ REF_PIC_LIST_1 ] = Mv();
+#if JVET_K_AFFINE_REFACTOR
+        pu.mvdAffi[REF_PIC_LIST_1][0] = Mv();
+        pu.mvdAffi[REF_PIC_LIST_1][1] = Mv();
+        pu.mvdAffi[REF_PIC_LIST_1][2] = Mv();
+#endif
       }
 #if JEM_TOOLS
       else if( pu.cu->affine )
       {
+#if JVET_K_AFFINE_REFACTOR || JVET_K0220_ENC_CTRL
+        mvd_coding( pu.mvdAffi[REF_PIC_LIST_1][0] );
+        mvd_coding( pu.mvdAffi[REF_PIC_LIST_1][1] );
+
+#if JVET_K0337_AFFINE_6PARA
+        if ( pu.cu->affineType == AFFINEMODEL_6PARAM )
+        {
+          mvd_coding( pu.mvdAffi[REF_PIC_LIST_1][2] );
+        }
+#endif
+#else
         Mv affLT, affRT;
         mvd_coding( affLT );
         mvd_coding( affRT );
 
-#if JVET_K0220_ENC_CTRL
-        pu.mvdAffi[REF_PIC_LIST_1][0] = affLT;
-        pu.mvdAffi[REF_PIC_LIST_1][1] = affRT;
-#else
         PU::setAllAffineMvd( pu.getMotionBuf(), affLT, affRT, REF_PIC_LIST_1, pu.cs->pcv->rectCUs );
 #endif
       }
@@ -1752,7 +1771,7 @@ void CABACReader::prediction_unit( PredictionUnit& pu, MergeCtx& mrgCtx )
       }
       mvp_flag    ( pu, REF_PIC_LIST_1 );
     }
-#if JEM_TOOLS
+#if JEM_TOOLS && !JVET_K_AFFINE_REFACTOR
     else if( pu.cu->affine )
     {
       PU::setAllAffineMv( pu, Mv(), Mv(), Mv(), REF_PIC_LIST_1 ); // done in JEM, but maybe not necessary
@@ -1795,6 +1814,19 @@ void CABACReader::affine_flag( CodingUnit& cu )
   cu.affine = m_BinDecoder.decodeBin( Ctx::AffineFlag( ctxId ) );
 
   DTRACE( g_trace_ctx, D_SYNTAX, "affine_flag() affine=%d ctx=%d pos=(%d,%d)\n", cu.affine ? 1 : 0, ctxId, cu.Y().x, cu.Y().y );
+
+#if JVET_K0337_AFFINE_6PARA
+  if ( cu.affine && !cu.firstPU->mergeFlag && cu.cs->sps->getSpsNext().getUseAffineType() )
+  {
+    ctxId = 0;
+    cu.affineType = m_BinDecoder.decodeBin( Ctx::AffineType( ctxId ) );
+    DTRACE( g_trace_ctx, D_SYNTAX, "affine_type() affine_type=%d ctx=%d pos=(%d,%d)\n", cu.affineType ? 1 : 0, ctxId, cu.Y().x, cu.Y().y );
+  }
+  else
+  {
+    cu.affineType = AFFINEMODEL_4PARAM;
+  }
+#endif
 }
 #endif
 

@@ -835,6 +835,12 @@ void HLSyntaxReader::parseSPSNext( SPSNext& spsNext, const bool usePCM )
   READ_FLAG( symbol,    "obmc_flag" );                              spsNext.setUseOBMC                ( symbol != 0 );
   READ_FLAG( symbol,    "fruc_merge_flag" );                        spsNext.setUseFRUCMrgMode         ( symbol != 0 );
   READ_FLAG( symbol,    "affine_flag" );                            spsNext.setUseAffine              ( symbol != 0 );
+#if JVET_K0337_AFFINE_6PARA
+  if ( spsNext.getUseAffine() )
+  {
+    READ_FLAG( symbol,  "affine_type_flag" );                       spsNext.setUseAffineType          ( symbol != 0 );
+  }
+#endif
   READ_FLAG( symbol,    "adaptive_clipping_flag" );                 spsNext.setUseAClip               ( symbol != 0 );
 #endif
 #if JEM_TOOLS
