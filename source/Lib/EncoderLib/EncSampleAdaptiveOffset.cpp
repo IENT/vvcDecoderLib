@@ -879,9 +879,15 @@ Void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, Bool* sliceEn
         }
       } //mode
 
-#if !K0238_SAO_GREEDY_MERGE_ENCODING
-      totalCost += minCost;
+#if K0238_SAO_GREEDY_MERGE_ENCODING
+      if (!isgreedymergeEncoding)
+      {
 #endif
+      totalCost += minCost;
+#if K0238_SAO_GREEDY_MERGE_ENCODING
+      }
+#endif
+
 
       m_CABACEstimator->getCtx() = SAOCtx( ctxBest );
 
@@ -1013,11 +1019,12 @@ Void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, Bool* sliceEn
       }
       else
       {
-        offsetCTU(area, srcYuv, resYuv, reconParams[ctuRsAddr], cs);
-      }
-#else
-      offsetCTU(area, srcYuv, resYuv, reconParams[ctuRsAddr], cs);
 #endif
+      offsetCTU(area, srcYuv, resYuv, reconParams[ctuRsAddr], cs);
+#if K0238_SAO_GREEDY_MERGE_ENCODING 
+      }
+#endif
+
       ctuRsAddr++;
     } //ctuRsAddr
   }
