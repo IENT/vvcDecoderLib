@@ -59,7 +59,7 @@
 #endif
 
 #define JVET_K0352_MERGE_ENCOPT                           1 // encoder optimization for merge
-#define JVET_K0556_MAX_TT_SIZE_64                         1 // Maximun TT size is set to 64x64 for P/B-slice
+#define JVET_K0556_MAX_TT_SIZE_64                         1 // Maximum TT size is set to 64x64 for P/B-slice
 
 #define JVET_K0554                                        1 // when adopting, also remove the macro HM_QTBT_ONLY_QT_IMPLICIT (keep the case for value 0)
 
