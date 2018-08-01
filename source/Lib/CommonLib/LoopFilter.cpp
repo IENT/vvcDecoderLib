@@ -317,33 +317,46 @@ void LoopFilter::xDeblockCU( CodingUnit& cu, const DeblockEdgeDir edgeDir )
   const unsigned shiftFactor  = edgeDir == EDGE_VER ? ::getComponentScaleX( COMPONENT_Cb, pcv.chrFormat ) : ::getComponentScaleY( COMPONENT_Cb, pcv.chrFormat );
   const bool bAlwaysDoChroma  = pcv.chrFormat == CHROMA_444 || pcv.noRQT;
 
+#if DEBLOCKING_GRID_8x8
+  if (edgeDir == EDGE_HOR)
+  {
+    if (!((cu.block(COMPONENT_Y).y % 8) == 0))
+      return;
+  }
+  else
+  {
+    if (!((cu.block(COMPONENT_Y).x % 8) == 0))
+      return;
+  }
+#endif
+
 #if DB_TU_FIX
-  UInt uiOrtogonalLength = 1;
-  UInt uiOrtogonalIncrement = 1;
+  unsigned int orthogonalLength = 1;
+  unsigned int orthogonalIncrement = 1;
 
   if (cu.blocks[COMPONENT_Y].valid())
   {
     if ((cu.blocks[COMPONENT_Y].height > 64) && (edgeDir == EDGE_HOR))
     {
-      uiOrtogonalIncrement = 64 / 4;
-      uiOrtogonalLength = cu.blocks[COMPONENT_Y].height / 4;
+      orthogonalIncrement = 64 / 4;
+      orthogonalLength = cu.blocks[COMPONENT_Y].height / 4;
     }
     if ((cu.blocks[COMPONENT_Y].width > 64) && (edgeDir == EDGE_VER))
     {
-      uiOrtogonalIncrement = 64 / 4;
-      uiOrtogonalLength = cu.blocks[COMPONENT_Y].width / 4;
+      orthogonalIncrement = 64 / 4;
+      orthogonalLength = cu.blocks[COMPONENT_Y].width / 4;
 
     }
   }
-  for (int iEdge = 0; iEdge < uiOrtogonalLength; iEdge += uiOrtogonalIncrement)
+  for (int edge = 0; edge < orthogonalLength; edge += orthogonalIncrement)
   {
     if (cu.blocks[COMPONENT_Y].valid())
     {
-      xEdgeFilterLuma(cu, edgeDir, iEdge);
+      xEdgeFilterLuma(cu, edgeDir, edge);
     }
-    if (cu.blocks[COMPONENT_Cb].valid() && pcv.chrFormat != CHROMA_400 && (bAlwaysDoChroma || (uiPelsInPart > DEBLOCK_SMALLEST_BLOCK) || (iEdge % ((DEBLOCK_SMALLEST_BLOCK << shiftFactor) / uiPelsInPart)) == 0))
+    if (cu.blocks[COMPONENT_Cb].valid() && pcv.chrFormat != CHROMA_400 && (bAlwaysDoChroma || (uiPelsInPart > DEBLOCK_SMALLEST_BLOCK) || (edge % ((DEBLOCK_SMALLEST_BLOCK << shiftFactor) / uiPelsInPart)) == 0))
     {
-      xEdgeFilterChroma(cu, edgeDir, iEdge);
+      xEdgeFilterChroma(cu, edgeDir, edge);
     }
   }
 #else

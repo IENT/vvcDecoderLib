@@ -50,6 +50,7 @@
 #include <assert.h>
 #include <cassert>
 
+#define DEBLOCKING_GRID_8x8                               1
 #define DB_TU_FIX                                         1 // fix in JVET_K0307, JVET-K0237, JVET-K0369, JVET-K0232, JVET-K0315
 
 #define JVET_K0072                                        1
@@ -61,6 +62,7 @@
 
 #define JVET_K0352_MERGE_ENCOPT                           1 // encoder optimization for merge
 
+#define JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK     1 // Dual coding tree is enabled under 64x64 block level instead of CTU level
 #define JVET_K0554                                        1 // when adopting, also remove the macro HM_QTBT_ONLY_QT_IMPLICIT (keep the case for value 0)
 
 #ifndef JEM_TOOLS
