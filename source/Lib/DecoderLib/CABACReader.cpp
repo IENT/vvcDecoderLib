@@ -162,6 +162,25 @@ bool CABACReader::coding_tree_unit( CodingStructure& cs, const UnitArea& area, i
 
   sao( cs, ctuRsAddr );
 
+#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
+  bool isLast = false;
+
+  if (CS::isDualITree(cs) && cs.pcv->chrFormat != CHROMA_400)
+  {
+    Partitioner *chromaPartitioner = PartitionerFactory::get(*cs.slice);
+    chromaPartitioner->initCtu(area, CH_C, *cs.slice);
+    CUCtx cuCtxChroma(qps[CH_C]);
+    isLast = coding_tree(cs, *partitioner, cuCtx, chromaPartitioner, &cuCtxChroma);
+    qps[CH_L] = cuCtx.qp;
+    qps[CH_C] = cuCtxChroma.qp;
+    delete chromaPartitioner;
+  }
+  else
+  {
+    isLast = coding_tree(cs, *partitioner, cuCtx);
+    qps[CH_L] = cuCtx.qp;
+  }
+#else
   bool isLast = coding_tree( cs, *partitioner, cuCtx );
   qps[CH_L] = cuCtx.qp;
   if( !isLast && CS::isDualITree( cs ) && cs.pcv->chrFormat != CHROMA_400 )
@@ -171,6 +190,7 @@ bool CABACReader::coding_tree_unit( CodingStructure& cs, const UnitArea& area, i
     isLast = coding_tree( cs, *partitioner, cuCtxChroma );
     qps[CH_C] = cuCtxChroma.qp;
   }
+#endif
 
   DTRACE_COND( ctuRsAddr == 0, g_trace_ctx, D_QP_PER_CTU, "\n%4d %2d", cs.picture->poc, cs.slice->getSliceQpBase() );
   DTRACE     (                 g_trace_ctx, D_QP_PER_CTU, " %3d",           qps[CH_L] - cs.slice->getSliceQpBase() );
@@ -879,7 +899,11 @@ Void CABACReader::alf_chroma( ALFParam& alfParam )
 //    split split_cu_mode_mt  ( cs, partitioner )
 //================================================================================
 
+#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
+bool CABACReader::coding_tree( CodingStructure& cs, Partitioner& partitioner, CUCtx& cuCtx, Partitioner* pPartitionerChroma, CUCtx* pCuCtxChroma)
+#else
 bool CABACReader::coding_tree( CodingStructure& cs, Partitioner& partitioner, CUCtx& cuCtx )
+#endif
 {
   const PPS      &pps         = *cs.pps;
   const UnitArea &currArea    = partitioner.currArea();
@@ -894,6 +918,22 @@ bool CABACReader::coding_tree( CodingStructure& cs, Partitioner& partitioner, CU
   {
     cuCtx.isChromaQpAdjCoded  = false;
   }
+
+#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
+  // Reset delta QP coding flag and ChromaQPAdjustemt coding flag
+  if (CS::isDualITree(cs) && pPartitionerChroma != nullptr)
+  {
+
+    if (pps.getUseDQP() && pPartitionerChroma->currDepth <= pps.getMaxCuDQPDepth())
+    {
+      pCuCtxChroma->isDQPCoded = false;
+    }
+    if (cs.slice->getUseChromaQpAdj() && pPartitionerChroma->currDepth <= pps.getPpsRangeExtension().getDiffCuChromaQpOffsetDepth())
+    {
+      pCuCtxChroma->isChromaQpAdjCoded = false;
+    }
+  }
+#endif
 
   const PartSplit implicitSplit = partitioner.getImplicitSplit( cs );
 
@@ -914,8 +954,88 @@ bool CABACReader::coding_tree( CodingStructure& cs, Partitioner& partitioner, CU
     // quad-tree split
     if( qtSplit )
     {
-      partitioner.splitCurrArea( CU_QUAD_SPLIT, cs );
+#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
+      if (CS::isDualITree(cs) && pPartitionerChroma != nullptr && (partitioner.currArea().lwidth() >= 64 || partitioner.currArea().lheight() >= 64))
+      {
+        partitioner.splitCurrArea(CU_QUAD_SPLIT, cs);
+        pPartitionerChroma->splitCurrArea(CU_QUAD_SPLIT, cs);
+        bool beContinue = true;
+        bool lumaContinue = true;
+        bool chromaContinue = true;
+        bool lastSegmentC = false;
 
+        while (beContinue)
+        {
+          if (partitioner.currArea().lwidth() > 64 || partitioner.currArea().lheight() > 64)
+          {
+            if (!lastSegmentC && cs.area.blocks[partitioner.chType].contains(partitioner.currArea().blocks[partitioner.chType].pos()))
+            {
+              lastSegmentC = coding_tree(cs, partitioner, cuCtx, pPartitionerChroma, pCuCtxChroma);
+            }
+            lumaContinue = partitioner.nextPart(cs);
+            chromaContinue = pPartitionerChroma->nextPart(cs);
+            CHECK(lumaContinue != chromaContinue, "luma chroma partition should be matched");
+            beContinue = lumaContinue;
+          }
+          else
+          {
+            //dual tree coding under 64x64 block
+            if (!lastSegment && cs.area.blocks[partitioner.chType].contains(partitioner.currArea().blocks[partitioner.chType].pos()))
+            {
+              lastSegment = coding_tree(cs, partitioner, cuCtx);
+            }
+            lumaContinue = partitioner.nextPart(cs);
+            if (!lastSegmentC && cs.area.blocks[pPartitionerChroma->chType].contains(pPartitionerChroma->currArea().blocks[pPartitionerChroma->chType].pos()))
+            {
+              lastSegmentC = coding_tree(cs, *pPartitionerChroma, *pCuCtxChroma);
+            }
+            chromaContinue = pPartitionerChroma->nextPart(cs);
+            CHECK(lumaContinue != chromaContinue, "luma chroma partition should be matched");
+            CHECK(lastSegment == true, "luma should not be the last segment");
+            beContinue = lumaContinue;
+          }
+        }
+        partitioner.exitCurrSplit();
+        pPartitionerChroma->exitCurrSplit();
+
+        //cat the chroma CUs together
+        CodingUnit* currentCu = cs.getCU(partitioner.currArea().lumaPos(), CHANNEL_TYPE_LUMA);
+        CodingUnit* nextCu = nullptr;
+        CodingUnit* tempLastLumaCu = nullptr;
+        CodingUnit* tempLastChromaCu = nullptr;
+        ChannelType currentChType = currentCu->chType;
+        while (currentCu->next != nullptr)
+        {
+          nextCu = currentCu->next;
+          if (currentChType != nextCu->chType && currentChType == CHANNEL_TYPE_LUMA)
+          {
+            tempLastLumaCu = currentCu;
+            if (tempLastChromaCu != nullptr) //swap
+            {
+              tempLastChromaCu->next = nextCu;
+            }
+          }
+          else if (currentChType != nextCu->chType && currentChType == CHANNEL_TYPE_CHROMA)
+          {
+            tempLastChromaCu = currentCu;
+            if (tempLastLumaCu != nullptr) //swap
+            {
+              tempLastLumaCu->next = nextCu;
+            }
+          }
+          currentCu = nextCu;
+          currentChType = currentCu->chType;
+        }
+
+        CodingUnit* chromaFirstCu = cs.getCU(pPartitionerChroma->currArea().chromaPos(), CHANNEL_TYPE_CHROMA);
+        tempLastLumaCu->next = chromaFirstCu;
+
+        lastSegment = lastSegmentC;
+      }
+      else
+      {
+#endif
+      partitioner.splitCurrArea( CU_QUAD_SPLIT, cs );
       do
       {
         if( !lastSegment && cs.area.blocks[partitioner.chType].contains( partitioner.currArea().blocks[partitioner.chType].pos() ) )
@@ -925,6 +1045,9 @@ bool CABACReader::coding_tree( CodingStructure& cs, Partitioner& partitioner, CU
       } while( partitioner.nextPart( cs ) );
 
       partitioner.exitCurrSplit();
+#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
+      }
+#endif
       return lastSegment;
     }
   }
@@ -949,7 +1072,7 @@ bool CABACReader::coding_tree( CodingStructure& cs, Partitioner& partitioner, CU
         {
           if( !lastSegment && cs.area.blocks[partitioner.chType].contains( partitioner.currArea().blocks[partitioner.chType].pos() ) )
           {
-            lastSegment = coding_tree( cs, partitioner, cuCtx );
+            lastSegment = coding_tree(cs, partitioner, cuCtx);
           }
         } while( partitioner.nextPart( cs ) );
 

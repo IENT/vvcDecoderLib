@@ -108,7 +108,11 @@ public:
 
 #endif
   // coding (quad)tree (clause 7.3.8.4)
+#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
+  void        coding_tree               ( const CodingStructure&        cs,       Partitioner&      pm,         CUCtx& cuCtx, Partitioner* pPartitionerChroma = nullptr, CUCtx* pCuCtxChroma = nullptr);
+#else
   void        coding_tree               ( const CodingStructure&        cs,       Partitioner&      pm,         CUCtx& cuCtx );
+#endif
   void        split_cu_flag             ( bool                          split,    const CodingStructure& cs,    Partitioner& pm );
   void        split_cu_mode_mt          ( const PartSplit               split,    const CodingStructure& cs,    Partitioner& pm );
 
