@@ -803,7 +803,6 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
   ("MaxBTDepthISliceL",                               m_uiMaxBTDepthI,                                     3u, "MaxBTDepthISliceL")
   ("MaxBTDepthISliceC",                               m_uiMaxBTDepthIChroma,                               3u, "MaxBTDepthISliceC")
   ("DualITree",                                       m_dualTree,                                       false, "Use separate QTBT trees for intra slice luma and chroma channel types")
-  ("QtbtDualITree",                                   m_dualTree,                                       false, "Use separate QTBT trees for intra slice luma and chroma channel types")
   ("LargeCTU",                                        m_LargeCTU,                                       false, "Enable large CTU (0:off, 1:on)  [default: off]")
 #if JEM_TOOLS
   ("NSST",                                            m_NSST,                                           false, "Enable NSST (0:off, 1:on)  [default: off]")
