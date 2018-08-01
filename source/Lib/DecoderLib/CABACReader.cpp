@@ -921,7 +921,7 @@ bool CABACReader::coding_tree( CodingStructure& cs, Partitioner& partitioner, CU
 
 #if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
   // Reset delta QP coding flag and ChromaQPAdjustemt coding flag
-  if (CS::isDualITree(cs) && pPartitionerChroma != NULL)
+  if (CS::isDualITree(cs) && pPartitionerChroma != nullptr)
   {
 
     if (pps.getUseDQP() && pPartitionerChroma->currDepth <= pps.getMaxCuDQPDepth())
@@ -955,7 +955,7 @@ bool CABACReader::coding_tree( CodingStructure& cs, Partitioner& partitioner, CU
     if( qtSplit )
     {
 #if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
-      if (CS::isDualITree(cs) && pPartitionerChroma != NULL && (partitioner.currArea().lwidth() >= 64 || partitioner.currArea().lheight() >= 64))
+      if (CS::isDualITree(cs) && pPartitionerChroma != nullptr && (partitioner.currArea().lwidth() >= 64 || partitioner.currArea().lheight() >= 64))
       {
         partitioner.splitCurrArea(CU_QUAD_SPLIT, cs);
         pPartitionerChroma->splitCurrArea(CU_QUAD_SPLIT, cs);

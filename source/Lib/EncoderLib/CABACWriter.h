@@ -99,7 +99,7 @@ public:
 #endif
   // coding (quad)tree (clause 7.3.8.4)
 #if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
-  void        coding_tree               ( const CodingStructure&        cs,       Partitioner&      pm,         CUCtx& cuCtx, Partitioner* pPartitionerChroma = NULL, CUCtx* pCuCtxChroma = NULL);
+  void        coding_tree               ( const CodingStructure&        cs,       Partitioner&      pm,         CUCtx& cuCtx, Partitioner* pPartitionerChroma = nullptr, CUCtx* pCuCtxChroma = nullptr);
 #else
   void        coding_tree               ( const CodingStructure&        cs,       Partitioner&      pm,         CUCtx& cuCtx );
 #endif
