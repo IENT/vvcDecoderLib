@@ -1161,9 +1161,9 @@ void CABACWriter::coding_tree( const CodingStructure& cs, Partitioner& partition
     PredictionUnit& pu = *cu.firstPU;
     if (pu.mergeFlag && (pu.mergeType == MRG_TYPE_SUBPU_ATMVP || pu.mergeType == MRG_TYPE_SUBPU_ATMVP_EXT))
     {
-      UInt uiLayer = cs.slice->getDepth();
-      m_EncCu->incrementASTMVPBlkSize(uiLayer, cu.Y().width*cu.Y().height);
-      m_EncCu->incrementASTMVPBlkNum(uiLayer, 1);
+      unsigned int layerId = cs.slice->getDepth();
+      m_EncCu->incrementSubMergeBlkSize(layerId, cu.Y().width*cu.Y().height);
+      m_EncCu->incrementSubMergeBlkNum(layerId, 1);
     }
   }
 #endif

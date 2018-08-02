@@ -1133,49 +1133,49 @@ Void EncSlice::compressSlice( Picture* pcPic, const Bool bCompressEntireSlice, c
   {
     if (!pcSlice->isIntra())
     {
-      if (pcSlice->getPOC() > m_pcCuEncoder->getPrevPOC() && m_pcCuEncoder->getClearASTMVPStatic())
+      if (pcSlice->getPOC() > m_pcCuEncoder->getPrevPOC() && m_pcCuEncoder->getClearSubMergeStatic())
       {
-        m_pcCuEncoder->clearASTMVPStatics();
-        m_pcCuEncoder->setClearASTMVPStatic(false);
+        m_pcCuEncoder->clearSubMergeStatics();
+        m_pcCuEncoder->setClearSubMergeStatic(false);
       }
 
-      UInt uiLayer = pcSlice->getDepth();
-      UInt uiASTMVPBlkSize = m_pcCuEncoder->getASTMVPBlkSize(uiLayer);
-      UInt uiASTMVPBlkNum = m_pcCuEncoder->getASTMVPBlkNum(uiLayer);
+      unsigned int layer = pcSlice->getDepth();
+      unsigned int subMergeBlkSize = m_pcCuEncoder->getSubMergeBlkSize(layer);
+      unsigned int subMergeBlkNum = m_pcCuEncoder->getSubMergeBlkNum(layer);
 
-      if (uiASTMVPBlkNum > 0)
+      if (subMergeBlkNum > 0)
       {
-        UInt uiATMVPBlkSizeTh = pcSlice->getCheckLDC() ? 75 : 27;
-        UInt uiAveBlkSize = uiASTMVPBlkSize / uiASTMVPBlkNum;
-        if (uiAveBlkSize < (uiATMVPBlkSizeTh*uiATMVPBlkSizeTh))
+        unsigned int subMergeBlkSizeTh = pcSlice->getCheckLDC() ? 75 : 27;
+        unsigned int aveBlkSize = subMergeBlkSize / subMergeBlkNum;
+        if (aveBlkSize < (subMergeBlkSizeTh*subMergeBlkSizeTh))
         {
-          pcSlice->setAtmvpSubblkLog2Size(2);
+          pcSlice->setSubPuMvpSubblkLog2Size(2);
         }
         else
         {
-          pcSlice->setAtmvpSubblkLog2Size(3);
+          pcSlice->setSubPuMvpSubblkLog2Size(3);
         }
-        m_pcCuEncoder->clearOneTLayerASTMVPStatics(uiLayer);
+        m_pcCuEncoder->clearOneTLayerSubMergeStatics(layer);
       }
       else
       {
-        pcSlice->setAtmvpSubblkLog2Size(pcSlice->getSPS()->getSpsNext().getSubPuMvpLog2Size());
-        CHECK(uiASTMVPBlkSize != 0, "ASTMVP blksize should be 0");
+        pcSlice->setSubPuMvpSubblkLog2Size(pcSlice->getSPS()->getSpsNext().getSubPuMvpLog2Size());
+        CHECK(subMergeBlkSize != 0, "subMerge blksize should be 0");
       }
 
-      if (pcSlice->getAtmvpSubblkLog2Size() == pcSlice->getSPS()->getSpsNext().getSubPuMvpLog2Size())
+      if (pcSlice->getSubPuMvpSubblkLog2Size() == pcSlice->getSPS()->getSpsNext().getSubPuMvpLog2Size())
       {
-        pcSlice->setAtmvpSliceSubblkSizeEnable(false);
+        pcSlice->setSubPuMvpSliceSubblkSizeEnable(false);
       }
       else
       {
-        pcSlice->setAtmvpSliceSubblkSizeEnable(true);
+        pcSlice->setSubPuMvpSliceSubblkSizeEnable(true);
       }
     }
     else
     {
       m_pcCuEncoder->setPrevPOC(pcSlice->getPOC());
-      m_pcCuEncoder->setClearASTMVPStatic(true);
+      m_pcCuEncoder->setClearSubMergeStatic(true);
     }
   }
 #endif

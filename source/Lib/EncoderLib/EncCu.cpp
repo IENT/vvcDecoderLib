@@ -325,10 +325,10 @@ void EncCu::init( EncLib* pcEncLib, const SPS& sps PARL_PARAM( const int tId ) )
   m_pcIntraSearch->setModeCtrl( m_modeCtrl );
 #endif
 #if JVET_K0346
-  ::memset(m_uiASTMVPBlkSize, 0, sizeof(m_uiASTMVPBlkSize));
-  ::memset(m_uiASTMVPBlkNum, 0, sizeof(m_uiASTMVPBlkNum));
-  m_uiPrevPOC = MAX_UINT;
-  m_bClearASTMVPStatic = false;
+  ::memset(m_subMergeBlkSize, 0, sizeof(m_subMergeBlkSize));
+  ::memset(m_subMergeBlkNum, 0, sizeof(m_subMergeBlkNum));
+  m_prevPOC = MAX_UINT;
+  m_clearSubMergeStatic = false;
 #endif
 }
 

@@ -129,8 +129,8 @@ Slice::Slice()
 , m_LFCrossSliceBoundaryFlag      ( false )
 , m_enableTMVPFlag                ( true )
 #if JVET_K0346
-, m_bSliceAtmvpSubBlkSizeSliceEnable(false)
-, m_iATmvpSubBlkLog2Size            (2)
+, m_subPuMvpSubBlkSizeSliceEnable(false)
+, m_subPuMvpSubBlkLog2Size       (2)
 #endif
 , m_encCABACTableIdx              (I_SLICE)
 , m_iProcessingStartTime          ( 0 )
@@ -225,8 +225,8 @@ Void Slice::initSlice()
   m_cabacWinUpdateMode   = 0;
   m_enableTMVPFlag       = true;
 #if JVET_K0346
-  m_bSliceAtmvpSubBlkSizeSliceEnable = false;
-  m_iATmvpSubBlkLog2Size             = 2;
+  m_subPuMvpSubBlkSizeSliceEnable = false;
+  m_subPuMvpSubBlkLog2Size        = 2;
 #endif
 }
 
@@ -851,8 +851,8 @@ Void Slice::copySliceInfo(Slice *pSrc, bool cpyAlmostAll)
   m_LFCrossSliceBoundaryFlag      = pSrc->m_LFCrossSliceBoundaryFlag;
   m_enableTMVPFlag                = pSrc->m_enableTMVPFlag;
 #if JVET_K0346
-  m_bSliceAtmvpSubBlkSizeSliceEnable = pSrc->m_bSliceAtmvpSubBlkSizeSliceEnable;
-  m_iATmvpSubBlkLog2Size             = pSrc->m_iATmvpSubBlkLog2Size;
+  m_subPuMvpSubBlkSizeSliceEnable = pSrc->m_subPuMvpSubBlkSizeSliceEnable;
+  m_subPuMvpSubBlkLog2Size        = pSrc->m_subPuMvpSubBlkLog2Size;
 #endif
   m_maxNumMergeCand               = pSrc->m_maxNumMergeCand;
   if( cpyAlmostAll ) m_encCABACTableIdx  = pSrc->m_encCABACTableIdx;

@@ -1745,8 +1745,8 @@ private:
   Bool                       m_enableTMVPFlag;
 
 #if JVET_K0346
-  Bool                       m_bSliceAtmvpSubBlkSizeSliceEnable;
-  Int                        m_iATmvpSubBlkLog2Size;
+  bool                       m_subPuMvpSubBlkSizeSliceEnable;
+  int                        m_subPuMvpSubBlkLog2Size;
 #endif
 
   SliceType                  m_encCABACTableIdx;           // Used to transmit table selection across slices.
@@ -2005,10 +2005,10 @@ public:
   SliceType                   getEncCABACTableIdx() const                            { return m_encCABACTableIdx;                                    }
 
 #if JVET_K0346
-  Void                        setAtmvpSliceSubblkSizeEnable(Bool b) { m_bSliceAtmvpSubBlkSizeSliceEnable = b; }
-  Bool                        getAtmvpSliceSubblkSizeEnable()                  const { return m_bSliceAtmvpSubBlkSizeSliceEnable; }
-  Void                        setAtmvpSubblkLog2Size(Int n) { m_iATmvpSubBlkLog2Size = n; }
-  Int                         getAtmvpSubblkLog2Size()                         const { return m_iATmvpSubBlkLog2Size; }
+  void                        setSubPuMvpSliceSubblkSizeEnable(bool b) { m_subPuMvpSubBlkSizeSliceEnable = b; }
+  bool                        getSubPuMvpSliceSubblkSizeEnable()                  const { return m_subPuMvpSubBlkSizeSliceEnable; }
+  void                        setSubPuMvpSubblkLog2Size(int n) { m_subPuMvpSubBlkLog2Size = n; }
+  int                         getSubPuMvpSubblkLog2Size()                         const { return m_subPuMvpSubBlkLog2Size; }
 #endif
 
   Void                        setSliceQpBase( Int i )                                { m_iSliceQpBase = i;                                           }

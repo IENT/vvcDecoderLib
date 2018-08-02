@@ -324,22 +324,31 @@ Void InterPrediction::xSubPuMC( PredictionUnit& pu, PelUnitBuf& predBuf, const R
   Position puPos    = pu.lumaPos();
   Size puSize       = pu.lumaSize();
 
+#if JVET_K0346
+  int numPartLine, numPartCol, puHeight, puWidth;
+#else
   int iNumPartLine, iNumPartCol, iPUHeight, iPUWidth;
+#endif
   if( pu.mergeType == MRG_TYPE_FRUC )
   {
     UInt nRefineBlockSize = xFrucGetSubBlkSize( pu, puSize.width, puSize.height );
 
+#if JVET_K0346
+    puHeight     = std::min(puSize.width, nRefineBlockSize);
+    puWidth      = std::min(puSize.height, nRefineBlockSize);
+#else
     iPUHeight     = std::min( puSize.width,  nRefineBlockSize );
     iPUWidth      = std::min( puSize.height, nRefineBlockSize );
+#endif
   }
   else
   {
 #if JVET_K0346
     const Slice& slice = *pu.cs->slice;
-    iNumPartLine = std::max(puSize.width >> slice.getAtmvpSubblkLog2Size(), 1u);
-    iNumPartCol  = std::max(puSize.height >> slice.getAtmvpSubblkLog2Size(), 1u);
-    iPUHeight    = iNumPartCol == 1 ? puSize.height : 1 << slice.getAtmvpSubblkLog2Size();
-    iPUWidth     = iNumPartLine == 1 ? puSize.width : 1 << slice.getAtmvpSubblkLog2Size();
+    numPartLine = std::max(puSize.width >> slice.getSubPuMvpSubblkLog2Size(), 1u);
+    numPartCol  = std::max(puSize.height >> slice.getSubPuMvpSubblkLog2Size(), 1u);
+    puHeight    = numPartCol == 1 ? puSize.height : 1 << slice.getSubPuMvpSubblkLog2Size();
+    puWidth     = numPartLine == 1 ? puSize.width : 1 << slice.getSubPuMvpSubblkLog2Size();
 #else
     iNumPartLine  = std::max( puSize.width  >> spsNext.getSubPuMvpLog2Size(), 1u );
     iNumPartCol   = std::max( puSize.height >> spsNext.getSubPuMvpLog2Size(), 1u );
@@ -356,40 +365,40 @@ Void InterPrediction::xSubPuMC( PredictionUnit& pu, PelUnitBuf& predBuf, const R
 
   // join sub-pus containing the same motion
 #if JVET_K0346
-  bool bVerMC = puSize.height > puSize.width;
-  int  iFstStart = (!bVerMC ? puPos.y : puPos.x);
-  int  iSecStart = (!bVerMC ? puPos.x : puPos.y);
-  int  iFstEnd = (!bVerMC ? puPos.y + puSize.height : puPos.x + puSize.width);
-  int  iSecEnd = (!bVerMC ? puPos.x + puSize.width : puPos.y + puSize.height);
-  int  iFstStep = (!bVerMC ? iPUHeight : iPUWidth);
-  int  iSecStep = (!bVerMC ? iPUWidth : iPUHeight);
+  bool verMC = puSize.height > puSize.width;
+  int  fstStart = (!verMC ? puPos.y : puPos.x);
+  int  secStart = (!verMC ? puPos.x : puPos.y);
+  int  fstEnd = (!verMC ? puPos.y + puSize.height : puPos.x + puSize.width);
+  int  secEnd = (!verMC ? puPos.x + puSize.width : puPos.y + puSize.height);
+  int  fstStep = (!verMC ? puHeight : puWidth);
+  int  secStep = (!verMC ? puWidth : puHeight);
 
-  for (int iFstDim = iFstStart; iFstDim < iFstEnd; iFstDim += iFstStep)
+  for (int fstDim = fstStart; fstDim < fstEnd; fstDim += fstStep)
   {
-    for (int iSecDim = iSecStart; iSecDim < iSecEnd; iSecDim += iSecStep)
+    for (int secDim = secStart; secDim < secEnd; secDim += secStep)
     {
-      int x = !bVerMC ? iSecDim : iFstDim;
-      int y = !bVerMC ? iFstDim : iSecDim;
+      int x = !verMC ? secDim : fstDim;
+      int y = !verMC ? fstDim : secDim;
       const MotionInfo &curMi = pu.getMotionInfo(Position{ x, y });
 
-      int iLength = iSecStep;
-      int iLater = iSecDim + iSecStep;
+      int length = secStep;
+      int later  = secDim + secStep;
 
-      while (iLater < iSecEnd)
+      while (later < secEnd)
       {
-        const MotionInfo &laterMi = !bVerMC ? pu.getMotionInfo(Position{ iLater, iFstDim }) : pu.getMotionInfo(Position{ iFstDim, iLater });
+        const MotionInfo &laterMi = !verMC ? pu.getMotionInfo(Position{ later, fstDim }) : pu.getMotionInfo(Position{ fstDim, later });
         if (laterMi == curMi)
         {
-          iLength += iSecStep;
+          length += secStep;
         }
         else
         {
           break;
         }
-        iLater += iSecStep;
+        later += secStep;
       }
-      int dx = !bVerMC ? iLength : iPUWidth;
-      int dy = !bVerMC ? iPUHeight : iLength;
+      int dx = !verMC ? length : puWidth;
+      int dy = !verMC ? puHeight : length;
 
       subPu.UnitArea::operator=(UnitArea(pu.chromaFormat, Area(x, y, dx, dy)));
       subPu = curMi;
@@ -397,7 +406,7 @@ Void InterPrediction::xSubPuMC( PredictionUnit& pu, PelUnitBuf& predBuf, const R
 
       subPu.mvRefine = false;
       motionCompensation(subPu, subPredBuf, eRefPicList);
-      iSecDim = iLater - iSecStep;
+      secDim = later - secStep;
     }
   }
 #else
@@ -1451,7 +1460,7 @@ Void InterPrediction::subBlockOBMC( PredictionUnit  &pu, PelUnitBuf* pDst, Bool 
         }
 
 #if JVET_K0346
-        Bool bSubBlockOBMCSimp = (bOBMCSimp || ((pu.mergeType == MRG_TYPE_SUBPU_ATMVP || pu.mergeType == MRG_TYPE_SUBPU_ATMVP_EXT) && (1 << pu.cs->slice->getAtmvpSubblkLog2Size()) == 4));
+        bool bSubBlockOBMCSimp = (bOBMCSimp || ((pu.mergeType == MRG_TYPE_SUBPU_ATMVP || pu.mergeType == MRG_TYPE_SUBPU_ATMVP_EXT) && (1 << pu.cs->slice->getSubPuMvpSubblkLog2Size()) == 4));
 #else
         Bool bSubBlockOBMCSimp = ( bOBMCSimp || ( (pu.mergeType == MRG_TYPE_SUBPU_ATMVP || pu.mergeType == MRG_TYPE_SUBPU_ATMVP_EXT ) && ( 1 << pu.cs->sps->getSpsNext().getSubPuMvpLog2Size() ) == 4 ) );
 #endif
@@ -2501,10 +2510,10 @@ Void InterPrediction::xFrucCollectSubBlkStartMv( PredictionUnit& pu, const Merge
     Position subPos   = pu.lumaPos() - basePuPos;
 #if JVET_K0346
     const Slice& slice = *pu.cs->slice;
-    int iNumPartLine   = std::max(pu.lumaSize().width >> slice.getAtmvpSubblkLog2Size(), 1u);
-    int iNumPartCol    = std::max(pu.lumaSize().height >> slice.getAtmvpSubblkLog2Size(), 1u);
-    int iPUHeight      = iNumPartCol == 1 ? pu.lumaSize().height : 1 << slice.getAtmvpSubblkLog2Size();
-    int iPUWidth       = iNumPartLine == 1 ? pu.lumaSize().width : 1 << slice.getAtmvpSubblkLog2Size();
+    int numPartLine   = std::max(pu.lumaSize().width >> slice.getSubPuMvpSubblkLog2Size(), 1u);
+    int numPartCol    = std::max(pu.lumaSize().height >> slice.getSubPuMvpSubblkLog2Size(), 1u);
+    int puHeight      = numPartCol == 1 ? pu.lumaSize().height : 1 << slice.getSubPuMvpSubblkLog2Size();
+    int puWidth       = numPartLine == 1 ? pu.lumaSize().width : 1 << slice.getSubPuMvpSubblkLog2Size();
 #else
     int iNumPartLine  = std::max( pu.lumaSize().width  >> pu.cs->sps->getSpsNext().getSubPuMvpLog2Size(), 1u );
     int iNumPartCol   = std::max( pu.lumaSize().height >> pu.cs->sps->getSpsNext().getSubPuMvpLog2Size(), 1u );
@@ -2512,9 +2521,15 @@ Void InterPrediction::xFrucCollectSubBlkStartMv( PredictionUnit& pu, const Merge
     int iPUWidth      = iNumPartLine == 1 ? pu.lumaSize().width  : 1 << pu.cs->sps->getSpsNext().getSubPuMvpLog2Size();
 #endif
 
+#if JVET_K0346
+    for (int y = subPos.y; y < subPos.y + pu.lumaSize().height; y += puHeight)
+    {
+      for (int x = subPos.x; x < subPos.x + pu.lumaSize().width; x += puWidth)
+#else
     for( int y = subPos.y; y < subPos.y + pu.lumaSize().height; y += iPUHeight )
     {
       for( int x = subPos.x; x < subPos.x + pu.lumaSize().width; x += iPUWidth )
+#endif
       {
         const MotionInfo subPuMi = mergeCtx.subPuMvpMiBuf.at( g_miScaling.scale( Position( x, y ) ) );
         if( rMvStart.refIdx == subPuMi.refIdx[eRefPicList] && subPuMi.interDir & ( 1 << eRefPicList ) )

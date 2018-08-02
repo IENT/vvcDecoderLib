@@ -120,10 +120,10 @@ private:
   MotionInfo            m_SubPuMiBuf      [( MAX_CU_SIZE * MAX_CU_SIZE ) >> ( MIN_CU_LOG2 << 1 )];
   MotionInfo            m_SubPuExtMiBuf   [( MAX_CU_SIZE * MAX_CU_SIZE ) >> ( MIN_CU_LOG2 << 1 )];
 #if JVET_K0346
-  UInt                  m_uiASTMVPBlkSize[10];
-  UInt                  m_uiASTMVPBlkNum[10];
-  UInt                  m_uiPrevPOC;
-  Bool                  m_bClearASTMVPStatic;
+  unsigned int          m_subMergeBlkSize[10];
+  unsigned int          m_subMergeBlkNum[10];
+  unsigned int          m_prevPOC;
+  bool                  m_clearSubMergeStatic;
 #endif
 #endif
 #if JEM_TOOLS
@@ -156,25 +156,25 @@ public:
   EncModeCtrl* getModeCtrl  () { return m_modeCtrl; }
 
 #if JVET_K0346
-  Void clearASTMVPStatics()
+  void clearSubMergeStatics()
   {
-    ::memset(m_uiASTMVPBlkSize, 0, sizeof(m_uiASTMVPBlkSize));
-    ::memset(m_uiASTMVPBlkNum, 0, sizeof(m_uiASTMVPBlkNum));
+    ::memset(m_subMergeBlkSize, 0, sizeof(m_subMergeBlkSize));
+    ::memset(m_subMergeBlkNum, 0, sizeof(m_subMergeBlkNum));
   }
 
-  Void clearOneTLayerASTMVPStatics(UInt uiLayer)
+  void clearOneTLayerSubMergeStatics(unsigned int layer)
   {
-    m_uiASTMVPBlkSize[uiLayer] = 0;
-    m_uiASTMVPBlkNum[uiLayer] = 0;
+    m_subMergeBlkSize[layer] = 0;
+    m_subMergeBlkNum[layer] = 0;
   }
-  UInt getASTMVPBlkSize(UInt uiLayer) { return m_uiASTMVPBlkSize[uiLayer]; }
-  UInt getASTMVPBlkNum(UInt uiLayer) { return m_uiASTMVPBlkNum[uiLayer]; }
-  Void incrementASTMVPBlkSize(UInt uiLayer, UInt inc) { m_uiASTMVPBlkSize[uiLayer] += inc; }
-  Void incrementASTMVPBlkNum(UInt uiLayer, UInt inc) { m_uiASTMVPBlkNum[uiLayer] += inc; }
-  Void setPrevPOC(UInt uiPOC) { m_uiPrevPOC = uiPOC; }
-  UInt getPrevPOC() { return m_uiPrevPOC; }
-  Void setClearASTMVPStatic(Bool b) { m_bClearASTMVPStatic = b; }
-  Bool getClearASTMVPStatic() { return m_bClearASTMVPStatic; }
+  unsigned int getSubMergeBlkSize(unsigned int layer) { return m_subMergeBlkSize[layer]; }
+  unsigned int getSubMergeBlkNum(unsigned int layer) { return m_subMergeBlkNum[layer]; }
+  void incrementSubMergeBlkSize(unsigned int layer, unsigned int inc) { m_subMergeBlkSize[layer] += inc; }
+  void incrementSubMergeBlkNum(unsigned int layer, unsigned int inc) { m_subMergeBlkNum[layer] += inc; }
+  void setPrevPOC(unsigned int poc) { m_prevPOC = poc; }
+  unsigned int getPrevPOC() { return m_prevPOC; }
+  void setClearSubMergeStatic(bool b) { m_clearSubMergeStatic = b; }
+  bool getClearSubMergeStatic() { return m_clearSubMergeStatic; }
 #endif
 
   ~EncCu();
