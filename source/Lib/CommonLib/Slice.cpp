@@ -1713,7 +1713,9 @@ SPSNext::SPSNext( SPS& sps )
 #if JEM_TOOLS
   , m_NSST                      ( false )
   , m_Intra4Tap                 ( false )
+#if !INTRA67_3MPM
   , m_Intra65Ang                ( false )
+#endif
 #endif
   , m_LargeCTU                  ( false )
 #if JEM_TOOLS

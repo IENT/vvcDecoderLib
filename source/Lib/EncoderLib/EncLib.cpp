@@ -304,8 +304,10 @@ Void EncLib::init( Bool isFieldCoding, AUWriterIf* auWriterIf )
 #endif
                           true,
                           m_useTransformSkipFast
+#if !INTRA67_3MPM
 #if JEM_TOOLS
                           , m_Intra65Ang
+#endif
 #endif
                           , m_QTBT
     );
@@ -352,8 +354,10 @@ Void EncLib::init( Bool isFieldCoding, AUWriterIf* auWriterIf )
 #endif
                    true,
                    m_useTransformSkipFast
+#if !INTRA67_3MPM
 #if JEM_TOOLS
                    , m_Intra65Ang
+#endif
 #endif
                    , m_QTBT
   );
@@ -832,7 +836,9 @@ Void EncLib::xInitSPS(SPS &sps)
 #if JEM_TOOLS
   sps.getSpsNext().setUseNSST               ( m_NSST );
   sps.getSpsNext().setUseIntra4Tap          ( m_Intra4Tap );
+#if !INTRA67_3MPM
   sps.getSpsNext().setUseIntra65Ang         ( m_Intra65Ang );
+#endif
   sps.getSpsNext().setUseIntraBoundaryFilter( m_IntraBoundaryFilter );
   sps.getSpsNext().setSubPuMvpMode          ( m_SubPuMvpMode );
   sps.getSpsNext().setSubPuMvpLog2Size      ( m_SubPuMvpLog2Size );

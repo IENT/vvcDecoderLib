@@ -53,6 +53,10 @@
 #define DEBLOCKING_GRID_8x8                               1
 #define DB_TU_FIX                                         1 // fix in JVET_K0307, JVET-K0237, JVET-K0369, JVET-K0232, JVET-K0315
 
+#ifndef INTRA67_3MPM  // JVET-K0529
+#define INTRA67_3MPM                                      1
+#endif
+
 #define JVET_K0072                                        1
 
 #define JVET_K0220_ENC_CTRL                               1 // remove HM_NO_ADDITIONAL_SPEEDUPS when adopting

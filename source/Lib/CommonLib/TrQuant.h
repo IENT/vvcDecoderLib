@@ -82,8 +82,10 @@ public:
 #endif
                     const bool bEnc                 = false,
                     const bool useTransformSkipFast = false,
+#if !INTRA67_3MPM
 #if JEM_TOOLS
                     const bool use65IntraModes      = false,
+#endif
 #endif
                     const bool rectTUs              = false
   );
@@ -135,8 +137,10 @@ protected:
   Bool     m_bEnc;
   Bool     m_useTransformSkipFast;
 
+#if !INTRA67_3MPM
 #if JEM_TOOLS
   bool     m_use65IntraModes;
+#endif
 #endif
   bool     m_rectTUs;
 
