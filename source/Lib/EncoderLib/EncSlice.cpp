@@ -1128,6 +1128,58 @@ Void EncSlice::compressSlice( Picture* pcPic, const Bool bCompressEntireSlice, c
 #endif
   m_pcCuEncoder->getModeCtrl()->setFastDeltaQp(bFastDeltaQP);
 
+#if JVET_K0346
+  if (pcSlice->getSPS()->getSpsNext().getUseSubPuMvp())
+  {
+    if (!pcSlice->isIntra())
+    {
+      if (pcSlice->getPOC() > m_pcCuEncoder->getPrevPOC() && m_pcCuEncoder->getClearSubMergeStatic())
+      {
+        m_pcCuEncoder->clearSubMergeStatics();
+        m_pcCuEncoder->setClearSubMergeStatic(false);
+      }
+
+      unsigned int layer = pcSlice->getDepth();
+      unsigned int subMergeBlkSize = m_pcCuEncoder->getSubMergeBlkSize(layer);
+      unsigned int subMergeBlkNum = m_pcCuEncoder->getSubMergeBlkNum(layer);
+
+      if (subMergeBlkNum > 0)
+      {
+        unsigned int subMergeBlkSizeTh = pcSlice->getCheckLDC() ? 75 : 27;
+        unsigned int aveBlkSize = subMergeBlkSize / subMergeBlkNum;
+        if (aveBlkSize < (subMergeBlkSizeTh*subMergeBlkSizeTh))
+        {
+          pcSlice->setSubPuMvpSubblkLog2Size(2);
+        }
+        else
+        {
+          pcSlice->setSubPuMvpSubblkLog2Size(3);
+        }
+        m_pcCuEncoder->clearOneTLayerSubMergeStatics(layer);
+      }
+      else
+      {
+        pcSlice->setSubPuMvpSubblkLog2Size(pcSlice->getSPS()->getSpsNext().getSubPuMvpLog2Size());
+        CHECK(subMergeBlkSize != 0, "subMerge blksize should be 0");
+      }
+
+      if (pcSlice->getSubPuMvpSubblkLog2Size() == pcSlice->getSPS()->getSpsNext().getSubPuMvpLog2Size())
+      {
+        pcSlice->setSubPuMvpSliceSubblkSizeEnable(false);
+      }
+      else
+      {
+        pcSlice->setSubPuMvpSliceSubblkSizeEnable(true);
+      }
+    }
+    else
+    {
+      m_pcCuEncoder->setPrevPOC(pcSlice->getPOC());
+      m_pcCuEncoder->setClearSubMergeStatic(true);
+    }
+  }
+#endif
+
   //------------------------------------------------------------------------------
   //  Weighted Prediction parameters estimation.
   //------------------------------------------------------------------------------
