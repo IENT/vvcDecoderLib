@@ -51,6 +51,7 @@
 #include <cassert>
 
 
+#define JVET_K0190_CCLM_ONLY                     1 //JVET-K0190, Test4.1.8. (turn off Cb-to-Cr residual prediction)
 #define JVET_K0072                                        1
 
 #define JVET_K0220_ENC_CTRL                               1 // remove HM_NO_ADDITIONAL_SPEEDUPS when adopting

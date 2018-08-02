@@ -157,12 +157,13 @@ Void DecCu::xIntraRecBlk( TransformUnit& tu, const ComponentID compID )
   {
     m_pcIntraPred->predIntraAng( compID, piPred, pu, bUseFilteredPredictions );
 #if JEM_TOOLS
-
+#if !JVET_K0190_CCLM_ONLY
     if( compID == COMPONENT_Cr && sps.getSpsNext().getUseLMChroma() )
     {
       const CPelBuf pResiCb = cs.getResiBuf( tu.Cb() );
       m_pcIntraPred->addCrossColorResi( compID, piPred, tu, pResiCb );
     }
+#endif
 #endif
   }
 

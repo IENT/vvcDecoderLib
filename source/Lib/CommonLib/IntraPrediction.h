@@ -149,8 +149,9 @@ public:
   // Cross-component Chroma
   Void predIntraChromaLM          (const ComponentID compID, PelBuf &piPred, const PredictionUnit &pu, const CompArea& chromaArea, Int intraDir);
   Void xGetLumaRecPixels          (const PredictionUnit &pu, CompArea chromaArea);
+#if !JVET_K0190_CCLM_ONLY
   Void addCrossColorResi          (const ComponentID compID, PelBuf &piPred, const TransformUnit &tu, const CPelBuf &pResiCb);
-
+#endif
 #endif
   /// set parameters from CU data for accessing intra data
   Void initIntraPatternChType     (const CodingUnit &cu, const CompArea &area, const Bool bFilterRefSamples = false );

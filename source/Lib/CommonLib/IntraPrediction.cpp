@@ -446,7 +446,7 @@ Void IntraPrediction::predIntraChromaLM(const ComponentID compID, PelBuf &piPred
     piPred.linearTransform(a, iShift, b, true, pu.cs->slice->clpRng(compID));
   }
 }
-
+#if !JVET_K0190_CCLM_ONLY
 Void IntraPrediction::addCrossColorResi(const ComponentID compID, PelBuf &piPred, const TransformUnit &tu, const CPelBuf &pResiCb)
 {
   const CompArea& chromaArea = tu.block(compID);
@@ -481,7 +481,7 @@ Void IntraPrediction::addCrossColorResi(const ComponentID compID, PelBuf &piPred
     pResi += uiResiStride;
   }
 }
-
+#endif
 #endif
 
 Void IntraPrediction::xFilterGroup(Pel* pMulDst[], Int i, Pel const * const piSrc, Int iRecStride, Bool bAboveAvaillable, Bool bLeftAvaillable)
