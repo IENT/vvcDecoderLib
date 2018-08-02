@@ -205,7 +205,9 @@ protected:
 #if JEM_TOOLS
   bool      m_NSST;
   bool      m_Intra4Tap;
+#if !INTRA67_3MPM
   bool      m_Intra65Ang;
+#endif
   bool      m_IntraBoundaryFilter;                            ///< Indicates whether intra boundary filter is used
 #endif
   bool      m_LargeCTU;

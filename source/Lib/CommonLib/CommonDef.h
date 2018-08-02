@@ -224,8 +224,12 @@ static const UInt  EMT_INTRA_MAX_CU_WITH_QTBT =                    64; ///< Max 
 static const UInt  EMT_INTER_MAX_CU_WITH_QTBT =                    64; ///< Max Inter CU size applying EMT, supported values: 8, 16, 32, 64, 128
 
 #endif
-static const Int NUM_MOST_PROBABLE_MODES =                          3;
-static const Int NUM_MOST_PROBABLE_MODES_67 =                       6;
+#if INTRA67_3MPM
+static const int NUM_MOST_PROBABLE_MODES = 3;
+#else
+static const Int NUM_MOST_PROBABLE_MODES = 3;
+static const Int NUM_MOST_PROBABLE_MODES_67 = 6;
+#endif
 #if JEM_TOOLS
 static const Int MMLM_SAMPLE_NEIGHBOR_LINES =                       2;
 static const Int LM_SYMBOL_NUM =                   (1 + NUM_LMC_MODE);
@@ -353,7 +357,11 @@ static const Int    MAX_BT_DEPTH_C      =                           0;      ///<
 static const Int    MAX_BT_SIZE_C       =                          64;      ///< [1<<MIN_QT_SIZE_C, 1<<CTU_LOG2], in luma samples
 static const Int    MIN_BT_SIZE_C       =                           4;      ///< can be set down to 4, in luma samples
 
-static const Int    MAX_TT_SIZE_INTER  =                          128;      ///< for initialization, [1<<MIN_BT_SIZE_INTER, 1<<CTU_LOG2]
+#if JVET_K0556_MAX_TT_SIZE_64
+static const Int    MAX_TT_SIZE_INTER  =                           64;      ///< for initialization, [1<<MIN_CU_LOG2, 64]
+#else
+static const Int    MAX_TT_SIZE_INTER  =                          128;      ///< for initialization, [1<<MIN_CU_LOG2, 1<<CTU_LOG2]
+#endif
 static const Int    MIN_TT_SIZE_INTER  =                            4;      ///<
 
 static const SplitSeries SPLIT_BITS         =                       5;

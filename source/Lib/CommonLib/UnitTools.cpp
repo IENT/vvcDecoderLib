@@ -505,7 +505,11 @@ int PU::getIntraMPMs( const PredictionUnit &pu, unsigned* mpm, const ChannelType
   const unsigned numMPMs = pu.cs->pcv->numMPMs;
 #endif
 #if JEM_TOOLS
-  if( pu.cs->sps->getSpsNext().getUseIntra65Ang() || isChromaMDMS )
+#if INTRA67_3MPM
+  if (isChromaMDMS)
+#else
+  if (pu.cs->sps->getSpsNext().getUseIntra65Ang() || isChromaMDMS)
+#endif
   {
     Int  numCand = -1;
     UInt modeIdx =  0;
@@ -660,6 +664,86 @@ int PU::getIntraMPMs( const PredictionUnit &pu, unsigned* mpm, const ChannelType
   }
   else
 #endif
+#if INTRA67_3MPM
+  {
+    int numCand      = -1;
+    int leftIntraDir = DC_IDX, aboveIntraDir = DC_IDX;
+
+    const CompArea &area = pu.block(getFirstComponentOfChannel(channelType));
+    const Position &pos  = area.pos();
+
+    // Get intra direction of left PU
+    const PredictionUnit *puLeft = pu.cs->getPURestricted(pos.offset(-1, 0), pu, channelType);
+
+    if (puLeft && CU::isIntra(*puLeft->cu))
+    {
+      leftIntraDir = puLeft->intraDir[channelType];
+
+      if (isChroma(channelType) && leftIntraDir == DM_CHROMA_IDX)
+      {
+        leftIntraDir = puLeft->intraDir[0];
+      }
+    }
+
+    // Get intra direction of above PU
+    const PredictionUnit *puAbove = pu.cs->getPURestricted(pos.offset(0, -1), pu, channelType);
+
+    if (puAbove && CU::isIntra(*puAbove->cu) && CU::isSameCtu(*pu.cu, *puAbove->cu))
+    {
+      aboveIntraDir = puAbove->intraDir[channelType];
+
+      if (isChroma(channelType) && aboveIntraDir == DM_CHROMA_IDX)
+      {
+        aboveIntraDir = puAbove->intraDir[0];
+      }
+    }
+
+    CHECK(2 >= numMPMs, "Invalid number of most probable modes");
+
+    const int offset = (int) NUM_LUMA_MODE - 5;
+    const int mod    = offset + 3;
+
+    if (leftIntraDir == aboveIntraDir)
+    {
+      numCand = 1;
+
+      if (leftIntraDir > DC_IDX)   // angular modes
+      {
+        mpm[0] = leftIntraDir;
+        mpm[1] = ((leftIntraDir + offset) % mod) + 2;
+        mpm[2] = ((leftIntraDir - 1) % mod) + 2;
+      }
+      else   // non-angular
+      {
+        mpm[0] = PLANAR_IDX;
+        mpm[1] = DC_IDX;
+        mpm[2] = VER_IDX;
+      }
+    }
+    else
+    {
+      numCand = 2;
+
+      mpm[0] = leftIntraDir;
+      mpm[1] = aboveIntraDir;
+
+      if (leftIntraDir && aboveIntraDir)   // both modes are non-planar
+      {
+        mpm[2] = PLANAR_IDX;
+      }
+      else
+      {
+        mpm[2] = (leftIntraDir + aboveIntraDir) < 2 ? VER_IDX : DC_IDX;
+      }
+    }
+    for (int i = 0; i < numMPMs; i++)
+    {
+      CHECK(mpm[i] >= NUM_LUMA_MODE, "Invalid MPM");
+    }
+    CHECK(numCand == 0, "No candidates found");
+    return numCand;
+  }
+#else
   {
     Int numCand = -1;
     Int leftIntraDir = DC_IDX, aboveIntraDir = DC_IDX;
@@ -740,6 +824,7 @@ int PU::getIntraMPMs( const PredictionUnit &pu, unsigned* mpm, const ChannelType
     CHECK( numCand == 0, "No candidates found" );
     return numCand;
   }
+#endif
 }
 
 #if JEM_TOOLS

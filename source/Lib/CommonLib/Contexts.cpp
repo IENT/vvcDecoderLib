@@ -948,6 +948,11 @@ const CtxSet ContextSetCfg::IPredMode[] =
 {
   ContextSetCfg::addCtxSet
   ({
+#if INTRA67_3MPM
+    { 183 },
+    { 154 },
+    { 184 },
+#else
 #if JVET_B0051_NON_MPM_MODE
     {  183, CNU, CNU, CNU, 184 },
     {  154, CNU, CNU, CNU, 184 },
@@ -956,6 +961,7 @@ const CtxSet ContextSetCfg::IPredMode[] =
     {  183, CNU, CNU, CNU,  },
     {  154, CNU, CNU, CNU,  },
     {  184, CNU, CNU, CNU,  },
+#endif
 #endif
   }),
   ContextSetCfg::addCtxSet
@@ -1682,7 +1688,11 @@ void CtxWSizeStore::xInitMappingTable( const SPS* sps )
   const SPSNext&  spsNext             = sps->getSpsNext();
   unsigned        numCtxSplitFlag     = ( spsNext.getUseLargeCTU() ? 5 : 3 ); // hard-wired in JEM
   unsigned        numCtxMergeIdx      = ( true /* COM16_C806_GEN_MRG_IMPROVEMENT */ ? 5 : 1 );
+#if INTRA67_3MPM
+  unsigned        numCtxIPredLuma = 1;
+#else
   unsigned        numCtxIPredLuma     = ( spsNext.getUseIntra65Ang() ? ( false /*JVET_B0051_NON_MPM_MODE */ ? 12 : 9 ) : 1 ); // hard-wired in JEM
+#endif
   unsigned        numCtxIPredChroma   = ( true /* JVET_E0077_ENHANCED_LM */ ? 8 : 2 ) + ( spsNext.getUseMDMS() ? 4 : 0 );
   unsigned        numCtxTransSubdiv   = ( spsNext.getUseLargeCTU() || spsNext.getUseQTBT() ? 4 : 3 ); // hard-wired in JEM
   unsigned        numCtxLastXY        = ( spsNext.getUseLargeCTU() || spsNext.getUseQTBT() ? 25 : 15 ); // hard-wired in JEM

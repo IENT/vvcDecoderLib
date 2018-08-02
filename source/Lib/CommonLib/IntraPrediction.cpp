@@ -262,8 +262,13 @@ void IntraPrediction::predIntraAng( const ComponentID compId, PelBuf &piPred, co
     }
     else
     {
+#if INTRA67_3MPM
+      pPdpcParWidth  = g_pdpc_pred_param[idxW][uiDirMode];
+      pPdpcParHeight = g_pdpc_pred_param[idxH][uiDirMode];
+#else
       pPdpcParWidth = g_pdpc_pred_param[idxW][g_intraMode65to33AngMapping[uiDirMode]];
       pPdpcParHeight = g_pdpc_pred_param[idxH][g_intraMode65to33AngMapping[uiDirMode]];
+#endif
     }
     const int *pPdpcParMain   = (iWidth < iHeight) ? pPdpcParHeight : pPdpcParWidth;
 

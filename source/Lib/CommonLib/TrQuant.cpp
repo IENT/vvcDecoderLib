@@ -138,9 +138,11 @@ void xTrMxN_EMT( const Int bitDepth, const Pel *residual, size_t stride, TCoeff 
 #else
 void xTrMxN_EMT( const Int bitDepth, const Pel *residual, size_t stride, TCoeff *coeff, Int iWidth, Int iHeight, const int maxLog2TrDynamicRange,
 #endif
-  const UChar ucMode, const UChar ucTrIdx, const bool use65intraModes
-  , const bool useQTBT
-  )
+  const UChar ucMode, const UChar ucTrIdx
+#if !INTRA67_3MPM
+  , const bool use65intraModes
+#endif
+  , const bool useQTBT )
 {
   const Int TRANSFORM_MATRIX_SHIFT = g_transformMatrixShift[TRANSFORM_FORWARD];
   const Int shift_1st = ((g_aucLog2[iWidth ]) + bitDepth + TRANSFORM_MATRIX_SHIFT) - maxLog2TrDynamicRange + COM16_C806_TRANS_PREC;
@@ -181,6 +183,10 @@ void xTrMxN_EMT( const Int bitDepth, const Pel *residual, size_t stride, TCoeff 
   if( ucMode != INTER_MODE_IDX && ucTrIdx != DCT2_EMT )
   {
     UInt  nTrSubsetHor, nTrSubsetVer;
+#if INTRA67_3MPM
+    nTrSubsetHor = g_aucTrSetHorz[ucMode];
+    nTrSubsetVer = g_aucTrSetVert[ucMode];
+#else
     if( use65intraModes )
     {
       nTrSubsetHor = g_aucTrSetHorz[ucMode];
@@ -191,6 +197,7 @@ void xTrMxN_EMT( const Int bitDepth, const Pel *residual, size_t stride, TCoeff 
       nTrSubsetHor = g_aucTrSetHorz35[ucMode];
       nTrSubsetVer = g_aucTrSetVert35[ucMode];
     }
+#endif
     nTrIdxHor = g_aiTrSubsetIntra[nTrSubsetHor][ucTrIdx  & 1];
     nTrIdxVer = g_aiTrSubsetIntra[nTrSubsetVer][ucTrIdx >> 1];
   }
@@ -221,9 +228,17 @@ void xTrMxN_EMT( const Int bitDepth, const Pel *residual, size_t stride, TCoeff 
 */
 
 #if HEVC_USE_4x4_DSTVII
+#if INTRA67_3MPM
+void xITrMxN_EMT(const Int bitDepth, const TCoeff *coeff, Pel *residual, size_t stride, Int iWidth, Int iHeight, UInt uiSkipWidth, UInt uiSkipHeight, Bool useDST, const Int maxLog2TrDynamicRange, UChar ucMode, UChar ucTrIdx )
+#else
 void xITrMxN_EMT( const Int bitDepth, const TCoeff *coeff, Pel *residual, size_t stride, Int iWidth, Int iHeight, UInt uiSkipWidth, UInt uiSkipHeight, Bool useDST, const Int maxLog2TrDynamicRange, UChar ucMode, UChar ucTrIdx, bool use65intraModes )
+#endif
+#else
+#if INTRA67_3MPM
+void xITrMxN_EMT(const Int bitDepth, const TCoeff *coeff, Pel *residual, size_t stride, Int iWidth, Int iHeight, UInt uiSkipWidth, UInt uiSkipHeight, const Int maxLog2TrDynamicRange, UChar ucMode, UChar ucTrIdx )
 #else
 void xITrMxN_EMT( const Int bitDepth, const TCoeff *coeff, Pel *residual, size_t stride, Int iWidth, Int iHeight, UInt uiSkipWidth, UInt uiSkipHeight, const Int maxLog2TrDynamicRange, UChar ucMode, UChar ucTrIdx, bool use65intraModes )
+#endif
 #endif
 {
   const Int TRANSFORM_MATRIX_SHIFT = g_transformMatrixShift[TRANSFORM_INVERSE];
@@ -244,6 +259,10 @@ void xITrMxN_EMT( const Int bitDepth, const TCoeff *coeff, Pel *residual, size_t
   if( ucMode != INTER_MODE_IDX && ucTrIdx != DCT2_EMT )
   {
     UInt  nTrSubsetHor, nTrSubsetVer;
+#if INTRA67_3MPM
+    nTrSubsetHor = g_aucTrSetHorz[ucMode];
+    nTrSubsetVer = g_aucTrSetVert[ucMode];
+#else
     if( use65intraModes )
     {
       nTrSubsetHor = g_aucTrSetHorz[ucMode];
@@ -254,6 +273,7 @@ void xITrMxN_EMT( const Int bitDepth, const TCoeff *coeff, Pel *residual, size_t
       nTrSubsetHor = g_aucTrSetHorz35[ucMode];
       nTrSubsetVer = g_aucTrSetVert35[ucMode];
     }
+#endif
     nTrIdxHor = g_aiTrSubsetIntra[nTrSubsetHor][ucTrIdx  & 1];
     nTrIdxVer = g_aiTrSubsetIntra[nTrSubsetVer][ucTrIdx >> 1];
   }
@@ -508,8 +528,10 @@ Void TrQuant::init( const Quant* otherQuant,
 #endif
                     const bool bEnc,
                     const bool useTransformSkipFast,
+#if !INTRA67_3MPM
 #if JEM_TOOLS
                     const bool use65IntraModes,
+#endif
 #endif
                     const bool rectTUs
 )
@@ -517,8 +539,10 @@ Void TrQuant::init( const Quant* otherQuant,
   m_uiMaxTrSize          = uiMaxTrSize;
   m_bEnc                 = bEnc;
   m_useTransformSkipFast = useTransformSkipFast;
+#if !INTRA67_3MPM
 #if JEM_TOOLS
   m_use65IntraModes      = use65IntraModes;
+#endif
 #endif
   m_rectTUs              = rectTUs;
 
@@ -1008,10 +1032,18 @@ void TrQuant::xT( const TransformUnit &tu, const ComponentID &compID, const CPel
 
   if( ucTrIdx != DCT2_HEVC )
   {
+#if INTRA67_3MPM
+#if HEVC_USE_4x4_DSTVII
+    xTrMxN_EMT(channelBitDepth, resi.buf, resi.stride, dstCoeff.buf, iWidth, iHeight, useDST, maxLog2TrDynamicRange, ucMode, ucTrIdx
+#else
+    xTrMxN_EMT(channelBitDepth, resi.buf, resi.stride, dstCoeff.buf, iWidth, iHeight, maxLog2TrDynamicRange, ucMode, ucTrIdx
+#endif
+#else
 #if HEVC_USE_4x4_DSTVII
     xTrMxN_EMT( channelBitDepth, resi.buf, resi.stride, dstCoeff.buf, iWidth, iHeight, useDST, maxLog2TrDynamicRange, ucMode, ucTrIdx, m_use65IntraModes
 #else
     xTrMxN_EMT( channelBitDepth, resi.buf, resi.stride, dstCoeff.buf, iWidth, iHeight, maxLog2TrDynamicRange, ucMode, ucTrIdx, m_use65IntraModes
+#endif
 #endif
       , m_rectTUs
       );
@@ -1055,11 +1087,18 @@ void TrQuant::xIT( const TransformUnit &tu, const ComponentID &compID, const CCo
       iSkipWidth  = pCoeff.width  >> 1;
       iSkipHeight = pCoeff.height >> 1;
     }
-
+#if INTRA67_3MPM
+#if HEVC_USE_4x4_DSTVII
+    xITrMxN_EMT(channelBitDepth, pCoeff.buf, pResidual.buf, pResidual.stride, pCoeff.width, pCoeff.height, iSkipWidth, iSkipHeight, useDST, maxLog2TrDynamicRange, ucMode, ucTrIdx );
+#else
+    xITrMxN_EMT(channelBitDepth, pCoeff.buf, pResidual.buf, pResidual.stride, pCoeff.width, pCoeff.height, iSkipWidth, iSkipHeight, maxLog2TrDynamicRange, ucMode, ucTrIdx );
+#endif
+#else
 #if HEVC_USE_4x4_DSTVII
     xITrMxN_EMT( channelBitDepth, pCoeff.buf, pResidual.buf, pResidual.stride, pCoeff.width, pCoeff.height, iSkipWidth, iSkipHeight, useDST, maxLog2TrDynamicRange, ucMode, ucTrIdx, m_use65IntraModes );
 #else
     xITrMxN_EMT( channelBitDepth, pCoeff.buf, pResidual.buf, pResidual.stride, pCoeff.width, pCoeff.height, iSkipWidth, iSkipHeight, maxLog2TrDynamicRange, ucMode, ucTrIdx, m_use65IntraModes );
+#endif
 #endif
   }
   else
@@ -1176,10 +1215,14 @@ UChar TrQuant::getEmtMode( TransformUnit tu, const ComponentID compID )
       CodingStructure &cs      = *tu.cs;
       const PredictionUnit &pu = *cs.getPU( tu.blocks[compID].pos(), toChannelType( compID ) );
       const UInt uiChFinalMode = PU::getFinalIntraMode( pu, toChannelType( compID ) );
+#if INTRA67_3MPM
+      ucMode = uiChFinalMode;
+#else
 #if JEM_TOOLS
       ucMode                   = m_use65IntraModes ? uiChFinalMode : g_intraMode65to33AngMapping[uiChFinalMode];
 #else
       ucMode                   = g_intraMode65to33AngMapping[uiChFinalMode];
+#endif
 #endif
     }
     else

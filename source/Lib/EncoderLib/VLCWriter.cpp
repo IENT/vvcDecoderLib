@@ -536,7 +536,9 @@ Void HLSWriter::codeSPSNext( const SPSNext& spsNext, const bool usePCM )
 #if JEM_TOOLS
   WRITE_FLAG( spsNext.getUseNSST() ? 1 : 0,                                                     "nsst_enabled_flag" );
   WRITE_FLAG( spsNext.getUseIntra4Tap() ? 1 : 0,                                                "intra_4tap_flag" );
+#if !INTRA67_3MPM
   WRITE_FLAG( spsNext.getUseIntra65Ang() ? 1 : 0,                                               "intra_65ang_flag" );
+#endif
 #endif
   WRITE_FLAG( spsNext.getUseLargeCTU() ? 1 : 0,                                                 "large_ctu_flag" );
 #if JEM_TOOLS
