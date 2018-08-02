@@ -790,9 +790,17 @@ Void DecLib::xActivateParameterSets()
     m_cCuDecoder.init( &m_cTrQuant, &m_cIntraPred, &m_cInterPred );
 #if JEM_TOOLS
 #if JVET_K0072
+#if INTRA67_3MPM
+    m_cTrQuant.init(nullptr, sps->getMaxTrSize(), false, false, false, false, false, pps->pcv->rectCUs);
+#else
     m_cTrQuant.init( nullptr, sps->getMaxTrSize(), false, false, false, false, false, sps->getSpsNext().getUseIntra65Ang(), pps->pcv->rectCUs );
+#endif
+#else
+#if INTRA67_3MPM
+    m_cTrQuant.init(nullptr, sps->getMaxTrSize(), false, false, false, 0, false, false, pps->pcv->rectCUs);
 #else
     m_cTrQuant.init( nullptr, sps->getMaxTrSize(), false, false, false, 0, false, false, sps->getSpsNext().getUseIntra65Ang(), pps->pcv->rectCUs );
+#endif
 #endif
 #else
     m_cTrQuant.init( nullptr, sps->getMaxTrSize(), false, false, false, false, false, pps->pcv->rectCUs );

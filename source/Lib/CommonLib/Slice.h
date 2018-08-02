@@ -804,7 +804,9 @@ private:
 #if JEM_TOOLS
   bool              m_NSST;                       // 2
   bool              m_Intra4Tap;                  // 3
+#if !INTRA67_3MPM
   bool              m_Intra65Ang;                 // 4
+#endif
 #endif
   bool              m_LargeCTU;                   // 5
 #if JEM_TOOLS
@@ -930,8 +932,10 @@ public:
   bool      getUseNSST            ()                                      const     { return m_NSST; }
   void      setUseIntra4Tap       ( bool b )                                        { m_Intra4Tap = b; }
   bool      getUseIntra4Tap       ()                                      const     { return m_Intra4Tap; }
+#if !INTRA67_3MPM
   void      setUseIntra65Ang      ( bool b )                                        { m_Intra65Ang = b; }
   bool      getUseIntra65Ang      ()                                      const     { return m_Intra65Ang; }
+#endif
 #endif
   void      setUseLargeCTU        ( bool b )                                        { m_LargeCTU = b; }
   bool      getUseLargeCTU        ()                                      const     { return m_LargeCTU; }
@@ -2251,10 +2255,14 @@ public:
     , lumaWidth           ( sps.getPicWidthInLumaSamples() )
     , lumaHeight          ( sps.getPicHeightInLumaSamples() )
     , fastDeltaQPCuMaxSize( Clip3(sps.getMaxCUHeight() >> (sps.getLog2DiffMaxMinCodingBlockSize()), sps.getMaxCUHeight(), 32u) )
+#if INTRA67_3MPM
+    , numMPMs             (NUM_MOST_PROBABLE_MODES)
+#else
 #if JEM_TOOLS
     , numMPMs             ( sps.getSpsNext().getUseIntra65Ang() ? NUM_MOST_PROBABLE_MODES_67 : NUM_MOST_PROBABLE_MODES )
 #else
     , numMPMs             ( NUM_MOST_PROBABLE_MODES )
+#endif
 #endif
     , noRQT               (  sps.getSpsNext().getUseQTBT() )
     , rectCUs             (  sps.getSpsNext().getUseQTBT() )

@@ -801,7 +801,9 @@ void HLSyntaxReader::parseSPSNext( SPSNext& spsNext, const bool usePCM )
 #if JEM_TOOLS
   READ_FLAG( symbol,    "nsst_enabled_flag" );                      spsNext.setUseNSST                ( symbol != 0 );
   READ_FLAG( symbol,    "intra_4tap_flag" );                        spsNext.setUseIntra4Tap           ( symbol != 0 );
+#if !INTRA67_3MPM
   READ_FLAG( symbol,    "intra_65ang_flag" );                       spsNext.setUseIntra65Ang          ( symbol != 0 );
+#endif
 #endif
   READ_FLAG( symbol,    "large_ctu_flag" );                         spsNext.setUseLargeCTU            ( symbol != 0 );
 #if JEM_TOOLS

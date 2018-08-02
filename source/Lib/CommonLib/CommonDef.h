@@ -220,8 +220,12 @@ static const UInt  EMT_INTRA_MAX_CU_WITH_QTBT =                    64; ///< Max 
 static const UInt  EMT_INTER_MAX_CU_WITH_QTBT =                    64; ///< Max Inter CU size applying EMT, supported values: 8, 16, 32, 64, 128
 
 #endif
-static const Int NUM_MOST_PROBABLE_MODES =                          3;
-static const Int NUM_MOST_PROBABLE_MODES_67 =                       6;
+#if INTRA67_3MPM
+static const int NUM_MOST_PROBABLE_MODES = 3;
+#else
+static const Int NUM_MOST_PROBABLE_MODES = 3;
+static const Int NUM_MOST_PROBABLE_MODES_67 = 6;
+#endif
 #if JEM_TOOLS
 static const Int MMLM_SAMPLE_NEIGHBOR_LINES =                       2;
 static const Int LM_SYMBOL_NUM =                   (1 + NUM_LMC_MODE);

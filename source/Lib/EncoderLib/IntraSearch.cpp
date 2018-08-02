@@ -407,11 +407,15 @@ Void IntraSearch::estIntraPredLumaQT( CodingUnit &cu, Partitioner &partitioner )
     else
     {
       numModesForFullRD = m_pcEncCfg->getFastUDIUseMPMEnabled() ? g_aucIntraModeNumFast_UseMPM[uiWidthBit] : g_aucIntraModeNumFast_NotUseMPM[uiWidthBit];
+#if INTRA67_3MPM
+      numModesForFullRD -= 1;
+#else
 #if JEM_TOOLS
       if( cs.sps->getSpsNext().getUseIntra65Ang() )
       {
         numModesForFullRD -= 1;
       }
+#endif
 #endif
     }
 
@@ -569,7 +573,57 @@ Void IntraSearch::estIntraPredLumaQT( CodingUnit &cu, Partitioner &partitioner )
 #endif
         // forget the extra modes
         uiRdModeList.resize( numModesForFullRD );
+#if INTRA67_3MPM
+        static_vector<unsigned, FAST_UDI_MAX_RDMODE_NUM> parentCandList(FAST_UDI_MAX_RDMODE_NUM);
+        std::copy_n(uiRdModeList.begin(), numModesForFullRD, parentCandList.begin());
 
+        // Second round of SATD for extended Angular modes
+        for (int modeIdx = 0; modeIdx < numModesForFullRD; modeIdx++)
+        {
+          unsigned parentMode = parentCandList[modeIdx];
+          if (parentMode > (DC_IDX + 1) && parentMode < (NUM_LUMA_MODE - 1))
+          {
+            for (int subModeIdx = -1; subModeIdx <= 1; subModeIdx += 2)
+            {
+              unsigned mode = parentMode + subModeIdx;
+
+              if (cu.partSize == SIZE_2Nx2N && cu.nsstIdx >= ((mode <= DC_IDX) ? 3 : 4))
+              {
+                continue;
+              }
+
+              if (!bSatdChecked[mode])
+              {
+                pu.intraDir[0] = mode;
+
+                if (useDPCMForFirstPassIntraEstimation(pu, mode))
+                {
+                  encPredIntraDPCM(COMPONENT_Y, piOrg, piPred, mode);
+                }
+                else
+                {
+                  predIntraAng(COMPONENT_Y, piPred, pu,
+                               IntraPrediction::useFilteredIntraRefSamples(COMPONENT_Y, pu, true, pu));
+                }
+                // use Hadamard transform here
+                Distortion sad = distParam.distFunc(distParam);
+
+                // NB xFracModeBitsIntra will not affect the mode for chroma that may have already been pre-estimated.
+                m_CABACEstimator->getCtx() = SubCtx(Ctx::IPredMode[CHANNEL_TYPE_LUMA], ctxStartIntraMode);
+
+                uint64_t fracModeBits = xFracModeBitsIntra(pu, mode, CHANNEL_TYPE_LUMA);
+
+                double cost = (double) sad + (double) fracModeBits * sqrtLambdaForFirstPass;
+
+                updateCandList(mode, cost, uiRdModeList, CandCostList, numModesForFullRD);
+                updateCandList(mode, sad, uiHadModeList, CandHadList, 3);
+
+                bSatdChecked[mode] = true;
+              }
+            }
+          }
+        }
+#else
 #if JEM_TOOLS
         if( cs.sps->getSpsNext().getUseIntra65Ang() )
         {
@@ -623,6 +677,7 @@ Void IntraSearch::estIntraPredLumaQT( CodingUnit &cu, Partitioner &partitioner )
           }
         }
 
+#endif
 #endif
         if( m_pcEncCfg->getFastUDIUseMPMEnabled() )
         {

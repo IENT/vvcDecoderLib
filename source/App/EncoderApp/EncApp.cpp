@@ -219,7 +219,9 @@ Void EncApp::xInitLibCfg()
 #if JEM_TOOLS
   m_cEncLib.setNSST                                              ( m_NSST );
   m_cEncLib.setIntra4Tap                                         ( m_Intra4Tap );
+#if !INTRA67_3MPM
   m_cEncLib.setIntra65Ang                                        ( m_Intra65Ang );
+#endif
   m_cEncLib.setUseIntraBoundaryFilter                            ( m_IntraBoundaryFilter);
 #endif
   m_cEncLib.setLargeCTU                                          ( m_LargeCTU );
