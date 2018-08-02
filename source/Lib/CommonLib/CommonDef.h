@@ -349,7 +349,11 @@ static const Int    MAX_BT_DEPTH_C      =                           0;      ///<
 static const Int    MAX_BT_SIZE_C       =                          64;      ///< [1<<MIN_QT_SIZE_C, 1<<CTU_LOG2], in luma samples
 static const Int    MIN_BT_SIZE_C       =                           4;      ///< can be set down to 4, in luma samples
 
-static const Int    MAX_TT_SIZE_INTER  =                          128;      ///< for initialization, [1<<MIN_BT_SIZE_INTER, 1<<CTU_LOG2]
+#if JVET_K0556_MAX_TT_SIZE_64
+static const Int    MAX_TT_SIZE_INTER  =                           64;      ///< for initialization, [1<<MIN_CU_LOG2, 64]
+#else
+static const Int    MAX_TT_SIZE_INTER  =                          128;      ///< for initialization, [1<<MIN_CU_LOG2, 1<<CTU_LOG2]
+#endif
 static const Int    MIN_TT_SIZE_INTER  =                            4;      ///<
 
 static const SplitSeries SPLIT_BITS         =                       5;
