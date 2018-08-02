@@ -289,7 +289,7 @@ protected:
   Bool      m_saoCtuBoundary;
 
 #if K0238_SAO_GREEDY_MERGE_ENCODING
-  Bool      m_saoGreedyMergeEnc;
+  bool      m_saoGreedyMergeEnc;
 #endif
   //====== Motion search ========
   Bool      m_bDisableIntraPUsInInterSlices;
@@ -1064,8 +1064,8 @@ public:
   Bool  getSaoCtuBoundary              ()                            { return m_saoCtuBoundary; }
 
 #if K0238_SAO_GREEDY_MERGE_ENCODING
-  Void  setSaoGreedyMergeEnc           (Bool val)                    { m_saoGreedyMergeEnc = val; }
-  Bool  getSaoGreedyMergeEnc           ()                            { return m_saoGreedyMergeEnc; }
+  void  setSaoGreedyMergeEnc           (bool val)                    { m_saoGreedyMergeEnc = val; }
+  bool  getSaoGreedyMergeEnc           ()                            { return m_saoGreedyMergeEnc; }
 #endif
 #if HEVC_TILES_WPP
   Void  setLFCrossTileBoundaryFlag               ( Bool   val  )     { m_loopFilterAcrossTilesEnabledFlag = val; }

@@ -94,7 +94,7 @@ public:
   Void initCABACEstimator( CABACEncoder* cabacEncoder, CtxCache* ctxCache, Slice* pcSlice );
 #endif
 #if K0238_SAO_GREEDY_MERGE_ENCODING
-  Void SAOProcess(CodingStructure& cs, Bool* sliceEnabled, const Double *lambdas, const Bool bTestSAODisableAtPictureLevel, const Double saoEncodingRate, const Double saoEncodingRateChroma, Bool isPreDBFSamplesUsed, Bool isgreedymergeEncoding);
+  Void SAOProcess(CodingStructure& cs, Bool* sliceEnabled, const Double *lambdas, const Bool bTestSAODisableAtPictureLevel, const Double saoEncodingRate, const Double saoEncodingRateChroma, Bool isPreDBFSamplesUsed, bool isGreedymergeEncoding);
 #else
   Void SAOProcess(CodingStructure& cs, Bool* sliceEnabled, const Double *lambdas, const Bool bTestSAODisableAtPictureLevel, const Double saoEncodingRate, const Double saoEncodingRateChroma, Bool isPreDBFSamplesUsed);
 #endif
@@ -107,7 +107,7 @@ private: //methods
   Void getStatistics(std::vector<SAOStatData**>& blkStats, PelUnitBuf& orgYuv, PelUnitBuf& srcYuv, CodingStructure& cs, Bool isCalculatePreDeblockSamples = false);
   Void decidePicParams(const Slice& slice, Bool* sliceEnabled, const Double saoEncodingRate, const Double saoEncodingRateChroma);
 #if K0238_SAO_GREEDY_MERGE_ENCODING
-  Void decideBlkParams(CodingStructure& cs, Bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, PelUnitBuf& srcYuv, PelUnitBuf& resYuv, SAOBlkParam* reconParams, SAOBlkParam* codedParams, const Bool bTestSAODisableAtPictureLevel, const Double saoEncodingRate, const Double saoEncodingRateChroma, const Bool isgreedymergeEncoding);
+  Void decideBlkParams(CodingStructure& cs, Bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, PelUnitBuf& srcYuv, PelUnitBuf& resYuv, SAOBlkParam* reconParams, SAOBlkParam* codedParams, const Bool bTestSAODisableAtPictureLevel, const Double saoEncodingRate, const Double saoEncodingRateChroma, const bool isGreedymergeEncoding);
 #else
   Void decideBlkParams(CodingStructure& cs, Bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, PelUnitBuf& srcYuv, PelUnitBuf& resYuv, SAOBlkParam* reconParams, SAOBlkParam* codedParams, const Bool bTestSAODisableAtPictureLevel, const Double saoEncodingRate, const Double saoEncodingRateChroma);
 #endif

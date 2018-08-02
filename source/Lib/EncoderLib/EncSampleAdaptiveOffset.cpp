@@ -205,7 +205,7 @@ Void EncSampleAdaptiveOffset::initCABACEstimator( CABACEncoder* cabacEncoder, Ct
 
 
 #if K0238_SAO_GREEDY_MERGE_ENCODING
-Void EncSampleAdaptiveOffset::SAOProcess(CodingStructure& cs, Bool* sliceEnabled, const Double *lambdas, const Bool bTestSAODisableAtPictureLevel, const Double saoEncodingRate, const Double saoEncodingRateChroma, Bool isPreDBFSamplesUsed, Bool isgreedymergeEncoding )
+Void EncSampleAdaptiveOffset::SAOProcess(CodingStructure& cs, Bool* sliceEnabled, const Double *lambdas, const Bool bTestSAODisableAtPictureLevel, const Double saoEncodingRate, const Double saoEncodingRateChroma, Bool isPreDBFSamplesUsed, bool isGreedymergeEncoding )
 #else
 Void EncSampleAdaptiveOffset::SAOProcess(CodingStructure& cs, Bool* sliceEnabled, const Double *lambdas, const Bool bTestSAODisableAtPictureLevel, const Double saoEncodingRate, const Double saoEncodingRateChroma, Bool isPreDBFSamplesUsed )
 #endif
@@ -230,7 +230,7 @@ Void EncSampleAdaptiveOffset::SAOProcess(CodingStructure& cs, Bool* sliceEnabled
   //block on/off
   std::vector<SAOBlkParam> reconParams(cs.pcv->sizeInCtus);
 #if K0238_SAO_GREEDY_MERGE_ENCODING
-  decideBlkParams(cs, sliceEnabled, m_statData, src, res, &reconParams[0], cs.picture->getSAO(), bTestSAODisableAtPictureLevel, saoEncodingRate, saoEncodingRateChroma, isgreedymergeEncoding);
+  decideBlkParams(cs, sliceEnabled, m_statData, src, res, &reconParams[0], cs.picture->getSAO(), bTestSAODisableAtPictureLevel, saoEncodingRate, saoEncodingRateChroma, isGreedymergeEncoding);
 #else
   decideBlkParams(cs, sliceEnabled, m_statData, src, res, &reconParams[0], cs.picture->getSAO(), bTestSAODisableAtPictureLevel, saoEncodingRate, saoEncodingRateChroma);
 #endif
@@ -762,15 +762,14 @@ Void EncSampleAdaptiveOffset::deriveModeMergeRDO(const BitDepths &bitDepths, Int
   }
 }
 
+Void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, Bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, PelUnitBuf& srcYuv, PelUnitBuf& resYuv,
+                                               SAOBlkParam* reconParams, SAOBlkParam* codedParams, const Bool bTestSAODisableAtPictureLevel,
 #if K0238_SAO_GREEDY_MERGE_ENCODING
-Void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, Bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, PelUnitBuf& srcYuv, PelUnitBuf& resYuv,
-                                               SAOBlkParam* reconParams, SAOBlkParam* codedParams, const Bool bTestSAODisableAtPictureLevel,
-                                               const Double saoEncodingRate, const Double saoEncodingRateChroma, const Bool isgreedymergeEncoding)
+                                               const Double saoEncodingRate, const Double saoEncodingRateChroma, const bool isGreedymergeEncoding)
 #else
-Void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, Bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, PelUnitBuf& srcYuv, PelUnitBuf& resYuv,
-                                               SAOBlkParam* reconParams, SAOBlkParam* codedParams, const Bool bTestSAODisableAtPictureLevel,
                                                const Double saoEncodingRate, const Double saoEncodingRateChroma)
 #endif
+
 {
   const PreCalcValues& pcv = *cs.pcv;
   Bool allBlksDisabled = true;
@@ -789,9 +788,9 @@ Void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, Bool* sliceEn
   Double minCost, modeCost;
 
 #if K0238_SAO_GREEDY_MERGE_ENCODING 
-  Double minCost2 = 0;
+  double minCost2 = 0;
   std::vector<SAOStatData**> groupBlkStat;
-  if (isgreedymergeEncoding)
+  if (isGreedymergeEncoding)
   {
     groupBlkStat.resize(cs.pcv->sizeInCtus);
     for (UInt k = 0; k < cs.pcv->sizeInCtus; k++)
@@ -808,9 +807,9 @@ Void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, Bool* sliceEn
   SAOBlkParam* tempMergeList[NUM_SAO_MERGE_TYPES] = { NULL };
   SAOBlkParam* startingMergeList[NUM_SAO_MERGE_TYPES] = { NULL };
 
-  Int     mergeCtuAddr = 1; //Ctu to be merged
-  Int     groupSize = 1;
-  Double  Cost[2] = { 0, 0 };
+  int     mergeCtuAddr = 1; //Ctu to be merged
+  int     groupSize = 1;
+  double  Cost[2] = { 0, 0 };
   TempCtx ctxBeforeMerge(m_CtxCache);
   TempCtx ctxAfterMerge(m_CtxCache);
 #endif
@@ -880,7 +879,7 @@ Void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, Bool* sliceEn
       } //mode
 
 #if K0238_SAO_GREEDY_MERGE_ENCODING
-      if (!isgreedymergeEncoding)
+      if (!isGreedymergeEncoding)
       {
 #endif
       totalCost += minCost;
@@ -896,7 +895,7 @@ Void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, Bool* sliceEn
       reconstructBlkSAOParam(reconParams[ctuRsAddr], mergeList);
 
 #if K0238_SAO_GREEDY_MERGE_ENCODING  
-      if (isgreedymergeEncoding)
+      if (isGreedymergeEncoding)
       {
         if (ctuRsAddr == (mergeCtuAddr - 1))
         {
@@ -908,13 +907,13 @@ Void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, Bool* sliceEn
         {
           Cost[1] = minCost;
           minCost2 = MAX_DOUBLE;
-          for (Int tmp = groupSize; tmp >= 0; tmp--)
+          for (int tmp = groupSize; tmp >= 0; tmp--)
           {
-            for (Int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++)
+            for (int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++)
             {
-              for (Int i = 0; i < NUM_SAO_NEW_TYPES; i++)
+              for (int i = 0; i < NUM_SAO_NEW_TYPES; i++)
               {
-                for (Int j = 0; j < MAX_NUM_SAO_CLASSES; j++)
+                for (int j = 0; j < MAX_NUM_SAO_CLASSES; j++)
                 {
                   if (tmp == groupSize)
                   {
@@ -940,8 +939,8 @@ Void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, Bool* sliceEn
           testBlkParam[COMPONENT_Y].typeIdc = SAO_MERGE_LEFT;
           m_CABACEstimator->resetBits();
           m_CABACEstimator->sao_block_pars(testBlkParam, cs.sps->getBitDepths(), sliceEnabled, true, false, true);
-          Double rate = FracBitsScale * (Double)m_CABACEstimator->getEstFracBits();
-          for (Int i = groupSize; i > 0; i--)
+          double rate = FracBitsScale * (double)m_CABACEstimator->getEstFracBits();
+          for (int i = groupSize; i > 0; i--)
           {
             modeCost += rate;
           }
@@ -956,7 +955,7 @@ Void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, Bool* sliceEn
           // Test merge mode for grouped CTUs
           m_CABACEstimator->getCtx() = SAOCtx(ctxStart);
           deriveModeMergeRDO(cs.sps->getBitDepths(), ctuRsAddr, startingMergeList, sliceEnabled, groupBlkStat, modeParam, modeCost);
-          for (Int i = groupSize; i > 0; i--)
+          for (int i = groupSize; i > 0; i--)
           {
             modeCost += rate;
           }
@@ -976,12 +975,12 @@ Void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, Bool* sliceEn
             //original merge all
             totalCost = totalCost - Cost[0] - Cost[1] + minCost2;
             codedParams[ctuRsAddr - groupSize] = groupParam;
-            for (Int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++)
+            for (int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++)
             {
               codedParams[ctuRsAddr][compIdx].modeIdc = SAO_MODE_MERGE;
               codedParams[ctuRsAddr][compIdx].typeIdc = SAO_MERGE_LEFT;
             }
-            for (Int i = groupSize; i >= 0; i--) //change previous results
+            for (int i = groupSize; i >= 0; i--) //change previous results
             {
               reconParams[ctuRsAddr - i] = codedParams[ctuRsAddr - i];
               getMergeList(cs, ctuRsAddr - i, reconParams, tempMergeList);
@@ -1030,7 +1029,7 @@ Void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, Bool* sliceEn
   }
 #if K0238_SAO_GREEDY_MERGE_ENCODING
   //reconstruct
-  if (isgreedymergeEncoding)
+  if (isGreedymergeEncoding)
   {
     ctuRsAddr = 0;
     for (UInt yPos = 0; yPos < pcv.lumaHeight; yPos += pcv.maxCUHeight)
@@ -1046,6 +1045,16 @@ Void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, Bool* sliceEn
         ctuRsAddr++;
       }
     }
+    //delete memory
+    for (UInt i = 0; i< groupBlkStat.size(); i++)
+    {
+      for (UInt compIdx = 0; compIdx< MAX_NUM_COMPONENT; compIdx++)
+      {
+        delete[] groupBlkStat[i][compIdx];
+      }
+      delete[] groupBlkStat[i];
+    }
+    groupBlkStat.clear();
   }
 #endif
   if (!allBlksDisabled && (totalCost >= 0) && bTestSAODisableAtPictureLevel) //SAO has not beneficial in this case - disable it
