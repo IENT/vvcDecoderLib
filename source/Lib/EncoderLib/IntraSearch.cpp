@@ -587,10 +587,12 @@ Void IntraSearch::estIntraPredLumaQT( CodingUnit &cu, Partitioner &partitioner )
             {
               unsigned mode = parentMode + subModeIdx;
 
+#if JEM_TOOLS
               if (cu.partSize == SIZE_2Nx2N && cu.nsstIdx >= ((mode <= DC_IDX) ? 3 : 4))
               {
                 continue;
               }
+#endif
 
               if (!bSatdChecked[mode])
               {
