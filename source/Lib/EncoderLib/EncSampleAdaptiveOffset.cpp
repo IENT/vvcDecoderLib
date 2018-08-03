@@ -940,11 +940,7 @@ Void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, Bool* sliceEn
           m_CABACEstimator->resetBits();
           m_CABACEstimator->sao_block_pars(testBlkParam, cs.sps->getBitDepths(), sliceEnabled, true, false, true);
           double rate = FracBitsScale * (double)m_CABACEstimator->getEstFracBits();
-          for (int i = groupSize; i > 0; i--)
-          {
-            modeCost += rate;
-          }
-
+          modeCost += rate * groupSize;
           if (modeCost < minCost2)
           {
             groupParam = modeParam;
@@ -955,11 +951,7 @@ Void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, Bool* sliceEn
           // Test merge mode for grouped CTUs
           m_CABACEstimator->getCtx() = SAOCtx(ctxStart);
           deriveModeMergeRDO(cs.sps->getBitDepths(), ctuRsAddr, startingMergeList, sliceEnabled, groupBlkStat, modeParam, modeCost);
-          for (int i = groupSize; i > 0; i--)
-          {
-            modeCost += rate;
-          }
-
+          modeCost += rate * groupSize;
           if (modeCost < minCost2)
           {
             minCost2 = modeCost;
