@@ -261,8 +261,8 @@ Void InterSearch::init( EncCfg*        pcEncCfg,
   m_tmpAffiStorage.create( UnitArea( cform, Area( 0, 0, MAX_CU_SIZE, MAX_CU_SIZE ) ) );
 #if JVET_K0367_AFFINE_FIX_POINT
   m_tmpAffiError = new Pel[MAX_CU_SIZE * MAX_CU_SIZE];
-  m_tmpAffiDeri[0] = new Int[MAX_CU_SIZE * MAX_CU_SIZE];
-  m_tmpAffiDeri[1] = new Int[MAX_CU_SIZE * MAX_CU_SIZE];
+  m_tmpAffiDeri[0] = new int[MAX_CU_SIZE * MAX_CU_SIZE];
+  m_tmpAffiDeri[1] = new int[MAX_CU_SIZE * MAX_CU_SIZE];
 #else
   m_tmpAffiError   = new Int   [MAX_CU_SIZE * MAX_CU_SIZE];
   m_tmpAffiDeri[0] = new Double[MAX_CU_SIZE * MAX_CU_SIZE];
@@ -1395,73 +1395,73 @@ Void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
 #if JVET_K0185_AFFINE_6PARA_ENC
       cu.affineType = AFFINEMODEL_4PARAM;
       Mv acMvAffine4Para[2][33][3];
-      Int iRefIdx4Para[2] = { -1, -1 };
+      int refIdx4Para[2] = { -1, -1 };
 
 #if JVET_K0220_ENC_CTRL
-      xPredAffineInterSearch( pu, origBuf, puIdx, uiLastModeTemp, uiAffineCost, cMvHevcTemp, acMvAffine4Para, iRefIdx4Para );
+      xPredAffineInterSearch( pu, origBuf, puIdx, uiLastModeTemp, uiAffineCost, cMvHevcTemp, acMvAffine4Para, refIdx4Para );
 #else
-      xPredAffineInterSearch( pu, origBuf, puIdx, uiLastModeTemp, uiAffineCost, cMvHevcTemp, bFastSkipBi, acMvAffine4Para, iRefIdx4Para );
+      xPredAffineInterSearch( pu, origBuf, puIdx, uiLastModeTemp, uiAffineCost, cMvHevcTemp, bFastSkipBi, acMvAffine4Para, refIdx4Para );
 #endif
       if ( cu.slice->getSPS()->getSpsNext().getUseAffineType() )
       {
         if ( uiAffineCost < uiHevcCost * 1.05 ) ///< condition for 6 parameter affine ME
         {
           // save 4 parameter results
-          Mv cBestMv[2][3], cBestMvd[2][3];
-          Int iBestMvpIdx[2], iBestMvpNum[2], iBestRefIdx[2];
-          UInt uiBestDir;
+          Mv bestMv[2][3], bestMvd[2][3];
+          int bestMvpIdx[2], bestMvpNum[2], bestRefIdx[2];
+          UChar bestInterDir;
 
-          uiBestDir = pu.interDir;
-          iBestRefIdx[0] = pu.refIdx[0];
-          iBestRefIdx[1] = pu.refIdx[1];
-          iBestMvpIdx[0] = pu.mvpIdx[0];
-          iBestMvpIdx[1] = pu.mvpIdx[1];
-          iBestMvpNum[0] = pu.mvpNum[0];
-          iBestMvpNum[1] = pu.mvpNum[1];
+          bestInterDir = pu.interDir;
+          bestRefIdx[0] = pu.refIdx[0];
+          bestRefIdx[1] = pu.refIdx[1];
+          bestMvpIdx[0] = pu.mvpIdx[0];
+          bestMvpIdx[1] = pu.mvpIdx[1];
+          bestMvpNum[0] = pu.mvpNum[0];
+          bestMvpNum[1] = pu.mvpNum[1];
 
           const CMotionBuf &mb = pu.getMotionBuf();
-          for ( Int refList = 0; refList < 2; refList++ )
+          for ( int refList = 0; refList < 2; refList++ )
           {
-            cBestMv[refList][0] = mb.at( 0, 0 ).mv[refList];
-            cBestMv[refList][1] = mb.at( mb.width - 1, 0 ).mv[refList];
-            cBestMv[refList][2] = mb.at( 0, mb.height - 1 ).mv[refList];
+            bestMv[refList][0] = mb.at( 0, 0 ).mv[refList];
+            bestMv[refList][1] = mb.at( mb.width - 1, 0 ).mv[refList];
+            bestMv[refList][2] = mb.at( 0, mb.height - 1 ).mv[refList];
 
-            cBestMvd[refList][0] = pu.mvdAffi[refList][0];
-            cBestMvd[refList][1] = pu.mvdAffi[refList][1];
-            cBestMvd[refList][2] = pu.mvdAffi[refList][2];
+            bestMvd[refList][0] = pu.mvdAffi[refList][0];
+            bestMvd[refList][1] = pu.mvdAffi[refList][1];
+            bestMvd[refList][2] = pu.mvdAffi[refList][2];
           }
 
-          iRefIdx4Para[0] = iBestRefIdx[0];
-          iRefIdx4Para[1] = iBestRefIdx[1];
+          refIdx4Para[0] = bestRefIdx[0];
+          refIdx4Para[1] = bestRefIdx[1];
 
           Distortion uiAffine6Cost = std::numeric_limits<Distortion>::max();
           cu.affineType = AFFINEMODEL_6PARAM;
 #if JVET_K0220_ENC_CTRL
-          xPredAffineInterSearch( pu, origBuf, puIdx, uiLastModeTemp, uiAffine6Cost, cMvHevcTemp, acMvAffine4Para, iRefIdx4Para );
+          xPredAffineInterSearch( pu, origBuf, puIdx, uiLastModeTemp, uiAffine6Cost, cMvHevcTemp, acMvAffine4Para, refIdx4Para );
 #else
-          xPredAffineInterSearch( pu, origBuf, puIdx, uiLastModeTemp, uiAffine6Cost, cMvHevcTemp, bFastSkipBi, acMvAffine4Para, iRefIdx4Para );
+          xPredAffineInterSearch( pu, origBuf, puIdx, uiLastModeTemp, uiAffine6Cost, cMvHevcTemp, bFastSkipBi, acMvAffine4Para, refIdx4Para );
 #endif
 
           // reset to 4 parameter affine inter mode
           if ( uiAffineCost <= uiAffine6Cost )
           {
             cu.affineType = AFFINEMODEL_4PARAM;
-            pu.interDir = uiBestDir;
-            pu.refIdx[0] = iBestRefIdx[0];
-            pu.refIdx[1] = iBestRefIdx[1];
-            pu.mvpIdx[0] = iBestMvpIdx[0];
-            pu.mvpIdx[1] = iBestMvpIdx[1];
-            pu.mvpNum[0] = iBestMvpNum[0];
-            pu.mvpNum[1] = iBestMvpNum[1];
+            pu.interDir = bestInterDir;
+            pu.refIdx[0] = bestRefIdx[0];
+            pu.refIdx[1] = bestRefIdx[1];
+            pu.mvpIdx[0] = bestMvpIdx[0];
+            pu.mvpIdx[1] = bestMvpIdx[1];
+            pu.mvpNum[0] = bestMvpNum[0];
+            pu.mvpNum[1] = bestMvpNum[1];
 
-            for ( Int iVerIdx = 0; iVerIdx < 3; iVerIdx++ )
+            for ( int verIdx = 0; verIdx < 3; verIdx++ )
             {
-              pu.mvdAffi[REF_PIC_LIST_0][iVerIdx] = cBestMvd[0][iVerIdx];
-              pu.mvdAffi[REF_PIC_LIST_1][iVerIdx] = cBestMvd[1][iVerIdx];
+              pu.mvdAffi[REF_PIC_LIST_0][verIdx] = bestMvd[0][verIdx];
+              pu.mvdAffi[REF_PIC_LIST_1][verIdx] = bestMvd[1][verIdx];
             }
 
-            PU::setAllAffineMv( pu, cBestMv[0][0], cBestMv[0][1], cBestMv[0][2], REF_PIC_LIST_0 );
-            PU::setAllAffineMv( pu, cBestMv[1][0], cBestMv[1][1], cBestMv[1][2], REF_PIC_LIST_1 );
+            PU::setAllAffineMv( pu, bestMv[0][0], bestMv[0][1], bestMv[0][2], REF_PIC_LIST_0 );
+            PU::setAllAffineMv( pu, bestMv[1][0], bestMv[1][1], bestMv[1][2], REF_PIC_LIST_1 );
           }
           else
           {
@@ -2599,14 +2599,14 @@ Void InterSearch::xPatternSearchFracDIF(
 #if JVET_K0367_AFFINE_FIX_POINT
 #if ENABLE_SIMD_OPT_AFFINE_ME
 #ifdef TARGET_SIMD_X86
-static Void simdHorizontalSobelFilter
+static void simdHorizontalSobelFilter
 (
   Pel *const pPred,
-  const Int iPredStride,
-  Int *const piDerivate,
-  const Int iDerivateBufStride,
-  const Int iWidth,
-  const Int iHeight
+  const int predStride,
+  int *const pDerivate,
+  const int derivateBufStride,
+  const int width,
+  const int height
 )
 {
   __m128i mmPred[4];
@@ -2614,23 +2614,23 @@ static Void simdHorizontalSobelFilter
   __m128i mmIntermediates[4];
   __m128i mmDerivate[2];
 
-  assert( !(iHeight % 2) );
-  assert( !(iWidth % 4) );
+  assert( !(height % 2) );
+  assert( !(width % 4) );
 
   /* Derivates of the rows and columns at the boundary are done at the end of this function */
   /* The value of iCol and iRow indicate the columns and rows for which the derivates have already been ccomputed */
-  for ( Int iCol = 1; (iCol + 2) < iWidth; iCol += 2 )
+  for ( int col = 1; (col + 2) < width; col += 2 )
   {
-    mmPred[0] = _mm_loadl_epi64( reinterpret_cast<const __m128i *>(&pPred[0 * iPredStride + iCol - 1]) );
-    mmPred[1] = _mm_loadl_epi64( reinterpret_cast<const __m128i *>(&pPred[1 * iPredStride + iCol - 1]) );
+    mmPred[0] = _mm_loadl_epi64( reinterpret_cast<const __m128i *>(&pPred[0 * predStride + col - 1]) );
+    mmPred[1] = _mm_loadl_epi64( reinterpret_cast<const __m128i *>(&pPred[1 * predStride + col - 1]) );
 
     mmPred[0] = _mm_cvtepi16_epi32( mmPred[0] );
     mmPred[1] = _mm_cvtepi16_epi32( mmPred[1] );
 
-    for ( Int iRow = 1; iRow < (iHeight - 1); iRow += 2 )
+    for ( int row = 1; row < (height - 1); row += 2 )
     {
-      mmPred[2] = _mm_loadl_epi64( reinterpret_cast<const __m128i *>(&pPred[(iRow + 1) * iPredStride + iCol - 1]) );
-      mmPred[3] = _mm_loadl_epi64( reinterpret_cast<const __m128i *>(&pPred[(iRow + 2) * iPredStride + iCol - 1]) );
+      mmPred[2] = _mm_loadl_epi64( reinterpret_cast<const __m128i *>(&pPred[(row + 1) * predStride + col - 1]) );
+      mmPred[3] = _mm_loadl_epi64( reinterpret_cast<const __m128i *>(&pPred[(row + 2) * predStride + col - 1]) );
 
       mmPred[2] = _mm_cvtepi16_epi32( mmPred[2] );
       mmPred[3] = _mm_cvtepi16_epi32( mmPred[3] );
@@ -2653,63 +2653,63 @@ static Void simdHorizontalSobelFilter
       mmDerivate[0] = _mm_sub_epi32( mmIntermediates[1], mmIntermediates[0] );
       mmDerivate[1] = _mm_sub_epi32( mmIntermediates[3], mmIntermediates[2] );
 
-      _mm_storel_epi64( reinterpret_cast<__m128i *> (&piDerivate[iCol + (iRow + 0) * iDerivateBufStride]), mmDerivate[0] );
-      _mm_storel_epi64( reinterpret_cast<__m128i *> (&piDerivate[iCol + (iRow + 1) * iDerivateBufStride]), mmDerivate[1] );
+      _mm_storel_epi64( reinterpret_cast<__m128i *> (&pDerivate[col + (row + 0) * derivateBufStride]), mmDerivate[0] );
+      _mm_storel_epi64( reinterpret_cast<__m128i *> (&pDerivate[col + (row + 1) * derivateBufStride]), mmDerivate[1] );
     }
   }
 
-  for ( Int j = 1; j < (iHeight - 1); j++ )
+  for ( int j = 1; j < (height - 1); j++ )
   {
-    piDerivate[j * iDerivateBufStride] = piDerivate[j * iDerivateBufStride + 1];
-    piDerivate[j * iDerivateBufStride + (iWidth - 1)] = piDerivate[j * iDerivateBufStride + (iWidth - 2)];
+    pDerivate[j * derivateBufStride] = pDerivate[j * derivateBufStride + 1];
+    pDerivate[j * derivateBufStride + (width - 1)] = pDerivate[j * derivateBufStride + (width - 2)];
   }
 
   memcpy
   (
-    piDerivate,
-    piDerivate + iDerivateBufStride,
-    iWidth * sizeof( piDerivate[0] )
+    pDerivate,
+    pDerivate + derivateBufStride,
+    width * sizeof( pDerivate[0] )
   );
 
   memcpy
   (
-    piDerivate + (iHeight - 1) * iDerivateBufStride,
-    piDerivate + (iHeight - 2) * iDerivateBufStride,
-    iWidth * sizeof( piDerivate[0] )
+    pDerivate + (height - 1) * derivateBufStride,
+    pDerivate + (height - 2) * derivateBufStride,
+    width * sizeof( pDerivate[0] )
   );
 }
 
-static Void simdVerticalSobelFilter
+static void simdVerticalSobelFilter
 (
   Pel *const pPred,
-  const Int iPredStride,
-  Int *const piDerivate,
-  const Int iDerivateBufStride,
-  const Int iWidth,
-  const Int iHeight
+  const int predStride,
+  int *const pDerivate,
+  const int derivateBufStride,
+  const int width,
+  const int height
 )
 {
   __m128i mmPred[4];
   __m128i mmIntermediates[6];
   __m128i mmDerivate[2];
 
-  assert( !(iHeight % 2) );
-  assert( !(iWidth % 4) );
+  assert( !(height % 2) );
+  assert( !(width % 4) );
 
   /* Derivates of the rows and columns at the boundary are done at the end of this function */
   /* The value of iCol and iRow indicate the columns and rows for which the derivates have already been ccomputed */
-  for ( Int iCol = 1; iCol < (iWidth - 1); iCol += 2 )
+  for ( int col = 1; col < (width - 1); col += 2 )
   {
-    mmPred[0] = _mm_loadl_epi64( reinterpret_cast<const __m128i *>(&pPred[0 * iPredStride + iCol - 1]) );
-    mmPred[1] = _mm_loadl_epi64( reinterpret_cast<const __m128i *>(&pPred[1 * iPredStride + iCol - 1]) );
+    mmPred[0] = _mm_loadl_epi64( reinterpret_cast<const __m128i *>(&pPred[0 * predStride + col - 1]) );
+    mmPred[1] = _mm_loadl_epi64( reinterpret_cast<const __m128i *>(&pPred[1 * predStride + col - 1]) );
 
     mmPred[0] = _mm_cvtepi16_epi32( mmPred[0] );
     mmPred[1] = _mm_cvtepi16_epi32( mmPred[1] );
 
-    for ( Int iRow = 1; iRow < (iHeight - 1); iRow += 2 )
+    for ( int row = 1; row < (height - 1); row += 2 )
     {
-      mmPred[2] = _mm_loadl_epi64( reinterpret_cast<const __m128i *>(&pPred[(iRow + 1) * iPredStride + iCol - 1]) );
-      mmPred[3] = _mm_loadl_epi64( reinterpret_cast<const __m128i *>(&pPred[(iRow + 2) * iPredStride + iCol - 1]) );
+      mmPred[2] = _mm_loadl_epi64( reinterpret_cast<const __m128i *>(&pPred[(row + 1) * predStride + col - 1]) );
+      mmPred[3] = _mm_loadl_epi64( reinterpret_cast<const __m128i *>(&pPred[(row + 2) * predStride + col - 1]) );
 
       mmPred[2] = _mm_cvtepi16_epi32( mmPred[2] );
       mmPred[3] = _mm_cvtepi16_epi32( mmPred[3] );
@@ -2734,29 +2734,29 @@ static Void simdVerticalSobelFilter
       mmDerivate[0] = _mm_add_epi32( mmIntermediates[0], mmIntermediates[1] );
       mmDerivate[1] = _mm_add_epi32( mmIntermediates[3], mmIntermediates[4] );
 
-      _mm_storel_epi64( reinterpret_cast<__m128i *> (&piDerivate[iCol + (iRow + 0) * iDerivateBufStride]), mmDerivate[0] );
-      _mm_storel_epi64( reinterpret_cast<__m128i *> (&piDerivate[iCol + (iRow + 1) * iDerivateBufStride]), mmDerivate[1] );
+      _mm_storel_epi64( reinterpret_cast<__m128i *> (&pDerivate[col + (row + 0) * derivateBufStride]), mmDerivate[0] );
+      _mm_storel_epi64( reinterpret_cast<__m128i *> (&pDerivate[col + (row + 1) * derivateBufStride]), mmDerivate[1] );
     }
   }
 
-  for ( Int j = 1; j < (iHeight - 1); j++ )
+  for ( int j = 1; j < (height - 1); j++ )
   {
-    piDerivate[j * iDerivateBufStride] = piDerivate[j * iDerivateBufStride + 1];
-    piDerivate[j * iDerivateBufStride + (iWidth - 1)] = piDerivate[j * iDerivateBufStride + (iWidth - 2)];
+    pDerivate[j * derivateBufStride] = pDerivate[j * derivateBufStride + 1];
+    pDerivate[j * derivateBufStride + (width - 1)] = pDerivate[j * derivateBufStride + (width - 2)];
   }
 
   memcpy
   (
-    piDerivate,
-    piDerivate + iDerivateBufStride,
-    iWidth * sizeof( piDerivate[0] )
+    pDerivate,
+    pDerivate + derivateBufStride,
+    width * sizeof( pDerivate[0] )
   );
 
   memcpy
   (
-    piDerivate + (iHeight - 1) * iDerivateBufStride,
-    piDerivate + (iHeight - 2) * iDerivateBufStride,
-    iWidth * sizeof( piDerivate[0] )
+    pDerivate + (height - 1) * derivateBufStride,
+    pDerivate + (height - 2) * derivateBufStride,
+    width * sizeof( pDerivate[0] )
   );
 }
 
@@ -2775,16 +2775,16 @@ inter3 = _mm_add_epi64(inter1, inter3);                                         
 inter3 = _mm_add_epi64(inter0, inter3);                                                                        \
 }
 
-static Void simdEqualCoeffComputer
+static void simdEqualCoeffComputer
 (
   Pel *pResidue,
-  Int iResidueStride,
-  Int **ppiDerivate,
-  Int iDerivateBufStride,
-  Int64( *pi64EqualCoeff )[7],
-  Int iWidth,
-  Int iHeight,
-  Bool b6Param
+  int residueStride,
+  int **ppDerivate,
+  int derivateBufStride,
+  Int64( *pEqualCoeff )[7],
+  int width,
+  int height,
+  bool b6Param
 )
 {
   __m128i mmTwo, mmFour;
@@ -2817,33 +2817,33 @@ static Void simdEqualCoeffComputer
     //  mmC[10] = iC[10][i] | iC[10][i+1] | iC[10][i+2] | iC[10][i+3]
     //  mmC[11] = iC[11][i] | iC[11][i+1] | iC[11][i+2] | iC[11][i+3]
 
-    Int iIdx1 = 0, iIdx2 = 0;
-    iIdx1 = -2 * iDerivateBufStride - 4;
-    iIdx2 = -iDerivateBufStride - 4;
+    int idx1 = 0, idx2 = 0;
+    idx1 = -2 * derivateBufStride - 4;
+    idx2 = -derivateBufStride - 4;
     mmIndxJ[0] = _mm_set1_epi32( -2 );
     mmIndxJ[1] = _mm_set1_epi32( -1 );
 
-    for ( Int j = 0; j < iHeight; j += 2 )
+    for ( int j = 0; j < height; j += 2 )
     {
       mmIndxJ[0] = _mm_add_epi32( mmIndxJ[0], mmTwo );
       mmIndxJ[1] = _mm_add_epi32( mmIndxJ[1], mmTwo );
       mmIndxK = _mm_set_epi32( -1, -2, -3, -4 );
-      iIdx1 += (iDerivateBufStride << 1);
-      iIdx2 += (iDerivateBufStride << 1);
+      idx1 += (derivateBufStride << 1);
+      idx2 += (derivateBufStride << 1);
 
-      for ( Int k = 0; k < iWidth; k += 4 )
+      for ( int k = 0; k < width; k += 4 )
       {
-        iIdx1 += 4;
-        iIdx2 += 4;
+        idx1 += 4;
+        idx2 += 4;
 
         mmIndxK = _mm_add_epi32( mmIndxK, mmFour );
 
         // 1st row
-        mmC[0] = _mm_loadu_si128( (const __m128i*)&ppiDerivate[0][iIdx1] );
-        mmC[2] = _mm_loadu_si128( (const __m128i*)&ppiDerivate[1][iIdx1] );
+        mmC[0] = _mm_loadu_si128( (const __m128i*)&ppDerivate[0][idx1] );
+        mmC[2] = _mm_loadu_si128( (const __m128i*)&ppDerivate[1][idx1] );
         // 2nd row
-        mmC[6] = _mm_loadu_si128( (const __m128i*)&ppiDerivate[0][iIdx2] );
-        mmC[8] = _mm_loadu_si128( (const __m128i*)&ppiDerivate[1][iIdx2] );
+        mmC[6] = _mm_loadu_si128( (const __m128i*)&ppDerivate[0][idx2] );
+        mmC[8] = _mm_loadu_si128( (const __m128i*)&ppDerivate[1][idx2] );
 
         // 1st row
         mmC[1] = _mm_mullo_epi32( mmIndxK, mmC[0] );
@@ -2858,8 +2858,8 @@ static Void simdEqualCoeffComputer
         mmC[11] = _mm_mullo_epi32( mmIndxJ[1], mmC[8] );
 
         // Residue
-        mmResidue[0] = _mm_loadl_epi64( (const __m128i*)&pResidue[iIdx1] );
-        mmResidue[1] = _mm_loadl_epi64( (const __m128i*)&pResidue[iIdx2] );
+        mmResidue[0] = _mm_loadl_epi64( (const __m128i*)&pResidue[idx1] );
+        mmResidue[1] = _mm_loadl_epi64( (const __m128i*)&pResidue[idx2] );
 
         mmResidue[0] = _mm_cvtepi16_epi32( mmResidue[0] );
         mmResidue[1] = _mm_cvtepi16_epi32( mmResidue[1] );
@@ -2875,43 +2875,43 @@ static Void simdEqualCoeffComputer
         mmTmp[0] = _mm_srli_si128( mmC[0], 4 );
         mmTmp[1] = _mm_srli_si128( mmC[6], 4 );
         // 7th col of row
-        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[6], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[1][6] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[1][6], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[6], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[1][6] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[1][6], mmIntermediate[3] );
 
         // 2nd row
         mmTmp[0] = _mm_srli_si128( mmC[1], 4 );
         mmTmp[1] = _mm_srli_si128( mmC[7], 4 );
         // 7th col of row
-        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[7], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[2][6] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[2][6], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[7], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[2][6] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[2][6], mmIntermediate[3] );
 
         // 3rd row
         mmTmp[0] = _mm_srli_si128( mmC[2], 4 );
         mmTmp[1] = _mm_srli_si128( mmC[8], 4 );
         // 7th col of row
-        CALC_EQUAL_COEFF_8PXLS( mmC[2], mmC[8], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[3][6] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[3][6], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[2], mmC[8], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[3][6] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[3][6], mmIntermediate[3] );
 
         // 4th row
         mmTmp[0] = _mm_srli_si128( mmC[3], 4 );
         mmTmp[1] = _mm_srli_si128( mmC[9], 4 );
         // 7th col of row
-        CALC_EQUAL_COEFF_8PXLS( mmC[3], mmC[9], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[4][6] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[4][6], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[3], mmC[9], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[4][6] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[4][6], mmIntermediate[3] );
 
         // 5th row
         mmTmp[0] = _mm_srli_si128( mmC[4], 4 );
         mmTmp[1] = _mm_srli_si128( mmC[10], 4 );
         // 7th col of row
-        CALC_EQUAL_COEFF_8PXLS( mmC[4], mmC[10], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[5][6] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[5][6], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[4], mmC[10], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[5][6] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[5][6], mmIntermediate[3] );
 
         // 6th row
         mmTmp[0] = _mm_srli_si128( mmC[5], 4 );
         mmTmp[1] = _mm_srli_si128( mmC[11], 4 );
         // 7th col of row
-        CALC_EQUAL_COEFF_8PXLS( mmC[5], mmC[11], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[6][6] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[6][6], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[5], mmC[11], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[6][6] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[6][6], mmIntermediate[3] );
 
         //Start calculation of coefficient matrix
         // 1st row
@@ -2919,140 +2919,140 @@ static Void simdEqualCoeffComputer
         mmTmp[1] = _mm_srli_si128( mmC[6], 4 );
 
         // 1st col of row
-        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[6], mmC[0], mmC[6], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[1][0] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[1][0], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[6], mmC[0], mmC[6], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[1][0] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[1][0], mmIntermediate[3] );
         // 2nd col of row and 1st col of 2nd row
         mmTmp[2] = _mm_srli_si128( mmC[1], 4 );
         mmTmp[3] = _mm_srli_si128( mmC[7], 4 );
-        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[6], mmC[1], mmC[7], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[1][1] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[1][1], mmIntermediate[3] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[2][0], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[6], mmC[1], mmC[7], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[1][1] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[1][1], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[2][0], mmIntermediate[3] );
         // 3rd col of row and 1st col of 3rd row
         mmTmp[2] = _mm_srli_si128( mmC[2], 4 );
         mmTmp[3] = _mm_srli_si128( mmC[8], 4 );
-        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[6], mmC[2], mmC[8], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[1][2] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[1][2], mmIntermediate[3] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[3][0], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[6], mmC[2], mmC[8], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[1][2] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[1][2], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[3][0], mmIntermediate[3] );
         // 4th col of row and 1st col of 4th row
         mmTmp[2] = _mm_srli_si128( mmC[3], 4 );
         mmTmp[3] = _mm_srli_si128( mmC[9], 4 );
-        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[6], mmC[3], mmC[9], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[1][3] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[1][3], mmIntermediate[3] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[4][0], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[6], mmC[3], mmC[9], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[1][3] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[1][3], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[4][0], mmIntermediate[3] );
         // 5th col of row and 1st col of the 5th row
         mmTmp[2] = _mm_srli_si128( mmC[4], 4 );
         mmTmp[3] = _mm_srli_si128( mmC[10], 4 );
-        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[6], mmC[4], mmC[10], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[1][4] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[1][4], mmIntermediate[3] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[5][0], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[6], mmC[4], mmC[10], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[1][4] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[1][4], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[5][0], mmIntermediate[3] );
         // 6th col of row and 1st col of the 6th row
         mmTmp[2] = _mm_srli_si128( mmC[5], 4 );
         mmTmp[3] = _mm_srli_si128( mmC[11], 4 );
-        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[6], mmC[5], mmC[11], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[1][5] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[1][5], mmIntermediate[3] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[6][0], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[6], mmC[5], mmC[11], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[1][5] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[1][5], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[6][0], mmIntermediate[3] );
 
         // 2nd row
         mmTmp[0] = _mm_srli_si128( mmC[1], 4 );
         mmTmp[1] = _mm_srli_si128( mmC[7], 4 );
 
         // 2nd col of row
-        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[7], mmC[1], mmC[7], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[2][1] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[2][1], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[7], mmC[1], mmC[7], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[2][1] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[2][1], mmIntermediate[3] );
         // 3rd col of row and 2nd col of 3rd row
         mmTmp[2] = _mm_srli_si128( mmC[2], 4 );
         mmTmp[3] = _mm_srli_si128( mmC[8], 4 );
-        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[7], mmC[2], mmC[8], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[2][2] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[2][2], mmIntermediate[3] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[3][1], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[7], mmC[2], mmC[8], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[2][2] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[2][2], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[3][1], mmIntermediate[3] );
         // 4th col of row and 2nd col of 4th row
         mmTmp[2] = _mm_srli_si128( mmC[3], 4 );
         mmTmp[3] = _mm_srli_si128( mmC[9], 4 );
-        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[7], mmC[3], mmC[9], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[2][3] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[2][3], mmIntermediate[3] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[4][1], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[7], mmC[3], mmC[9], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[2][3] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[2][3], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[4][1], mmIntermediate[3] );
         // 5th col of row and 1st col of the 5th row
         mmTmp[2] = _mm_srli_si128( mmC[4], 4 );
         mmTmp[3] = _mm_srli_si128( mmC[10], 4 );
-        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[7], mmC[4], mmC[10], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[2][4] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[2][4], mmIntermediate[3] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[5][1], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[7], mmC[4], mmC[10], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[2][4] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[2][4], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[5][1], mmIntermediate[3] );
         // 6th col of row and 1st col of the 6th row
         mmTmp[2] = _mm_srli_si128( mmC[5], 4 );
         mmTmp[3] = _mm_srli_si128( mmC[11], 4 );
-        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[7], mmC[5], mmC[11], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[2][5] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[2][5], mmIntermediate[3] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[6][1], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[7], mmC[5], mmC[11], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[2][5] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[2][5], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[6][1], mmIntermediate[3] );
 
         // 3rd row
         mmTmp[0] = _mm_srli_si128( mmC[2], 4 );
         mmTmp[1] = _mm_srli_si128( mmC[8], 4 );
 
         //3rd Col of row
-        CALC_EQUAL_COEFF_8PXLS( mmC[2], mmC[8], mmC[2], mmC[8], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[3][2] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[3][2], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[2], mmC[8], mmC[2], mmC[8], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[3][2] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[3][2], mmIntermediate[3] );
         // 4th col of row and 3rd col of 4th row
         mmTmp[2] = _mm_srli_si128( mmC[3], 4 );
         mmTmp[3] = _mm_srli_si128( mmC[9], 4 );
-        CALC_EQUAL_COEFF_8PXLS( mmC[2], mmC[8], mmC[3], mmC[9], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[3][3] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[3][3], mmIntermediate[3] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[4][2], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[2], mmC[8], mmC[3], mmC[9], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[3][3] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[3][3], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[4][2], mmIntermediate[3] );
         // 5th col of row and 1st col of the 5th row
         mmTmp[2] = _mm_srli_si128( mmC[4], 4 );
         mmTmp[3] = _mm_srli_si128( mmC[10], 4 );
-        CALC_EQUAL_COEFF_8PXLS( mmC[2], mmC[8], mmC[4], mmC[10], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[3][4] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[3][4], mmIntermediate[3] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[5][2], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[2], mmC[8], mmC[4], mmC[10], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[3][4] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[3][4], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[5][2], mmIntermediate[3] );
         // 6th col of row and 1st col of the 6th row
         mmTmp[2] = _mm_srli_si128( mmC[5], 4 );
         mmTmp[3] = _mm_srli_si128( mmC[11], 4 );
-        CALC_EQUAL_COEFF_8PXLS( mmC[2], mmC[8], mmC[5], mmC[11], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[3][5] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[3][5], mmIntermediate[3] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[6][2], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[2], mmC[8], mmC[5], mmC[11], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[3][5] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[3][5], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[6][2], mmIntermediate[3] );
 
         // 4th row
         mmTmp[0] = _mm_srli_si128( mmC[3], 4 );
         mmTmp[1] = _mm_srli_si128( mmC[9], 4 );
 
         // 4th col of row
-        CALC_EQUAL_COEFF_8PXLS( mmC[3], mmC[9], mmC[3], mmC[9], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[4][3] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[4][3], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[3], mmC[9], mmC[3], mmC[9], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[4][3] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[4][3], mmIntermediate[3] );
         // 5th col of row and 1st col of the 5th row
         mmTmp[2] = _mm_srli_si128( mmC[4], 4 );
         mmTmp[3] = _mm_srli_si128( mmC[10], 4 );
-        CALC_EQUAL_COEFF_8PXLS( mmC[3], mmC[9], mmC[4], mmC[10], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[4][4] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[4][4], mmIntermediate[3] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[5][3], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[3], mmC[9], mmC[4], mmC[10], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[4][4] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[4][4], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[5][3], mmIntermediate[3] );
         // 6th col of row and 1st col of the 6th row
         mmTmp[2] = _mm_srli_si128( mmC[5], 4 );
         mmTmp[3] = _mm_srli_si128( mmC[11], 4 );
-        CALC_EQUAL_COEFF_8PXLS( mmC[3], mmC[9], mmC[5], mmC[11], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[4][5] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[4][5], mmIntermediate[3] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[6][3], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[3], mmC[9], mmC[5], mmC[11], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[4][5] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[4][5], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[6][3], mmIntermediate[3] );
 
         // 5th row
         mmTmp[0] = _mm_srli_si128( mmC[4], 4 );
         mmTmp[1] = _mm_srli_si128( mmC[10], 4 );
         // 5th col of row and 1st col of the 5th row
-        CALC_EQUAL_COEFF_8PXLS( mmC[4], mmC[10], mmC[4], mmC[10], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[5][4] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[5][4], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[4], mmC[10], mmC[4], mmC[10], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[5][4] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[5][4], mmIntermediate[3] );
         // 6th col of row and 1st col of the 6th row
         mmTmp[2] = _mm_srli_si128( mmC[5], 4 );
         mmTmp[3] = _mm_srli_si128( mmC[11], 4 );
-        CALC_EQUAL_COEFF_8PXLS( mmC[4], mmC[10], mmC[5], mmC[11], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[5][5] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[5][5], mmIntermediate[3] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[6][4], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[4], mmC[10], mmC[5], mmC[11], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[5][5] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[5][5], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[6][4], mmIntermediate[3] );
 
         // 6th row
         mmTmp[0] = _mm_srli_si128( mmC[5], 4 );
         mmTmp[1] = _mm_srli_si128( mmC[11], 4 );
         // 5th col of row and 1st col of the 5th row
-        CALC_EQUAL_COEFF_8PXLS( mmC[5], mmC[11], mmC[5], mmC[11], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[6][5] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[6][5], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[5], mmC[11], mmC[5], mmC[11], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[6][5] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[6][5], mmIntermediate[3] );
       }
 
-      iIdx1 -= (iWidth);
-      iIdx2 -= (iWidth);
+      idx1 -= (width);
+      idx2 -= (width);
     }
   }
   else
@@ -3069,39 +3069,39 @@ static Void simdEqualCoeffComputer
     //  mmC[5] = iC[1][i] | iC[1][i+1] | iC[1][i+2] | iC[1][i+3]
     //  mmC[6] = iC[2][i] | iC[2][i+1] | iC[2][i+2] | iC[2][i+3]
     //  mmC[7] = iC[3][i] | iC[3][i+1] | iC[3][i+2] | iC[3][i+3]
-    Int iIdx1 = 0, iIdx2 = 0;
-    iIdx1 = -2 * iDerivateBufStride - 4;
-    iIdx2 = -iDerivateBufStride - 4;
+    int idx1 = 0, idx2 = 0;
+    idx1 = -2 * derivateBufStride - 4;
+    idx2 = -derivateBufStride - 4;
     mmIndxJ[0] = _mm_set1_epi32( -2 );
     mmIndxJ[1] = _mm_set1_epi32( -1 );
 
-    for ( Int j = 0; j < iHeight; j += 2 )
+    for ( int j = 0; j < height; j += 2 )
     {
       mmIndxJ[0] = _mm_add_epi32( mmIndxJ[0], mmTwo );
       mmIndxJ[1] = _mm_add_epi32( mmIndxJ[1], mmTwo );
       mmIndxK = _mm_set_epi32( -1, -2, -3, -4 );
-      iIdx1 += (iDerivateBufStride << 1);
-      iIdx2 += (iDerivateBufStride << 1);
+      idx1 += (derivateBufStride << 1);
+      idx2 += (derivateBufStride << 1);
 
-      for ( Int k = 0; k < iWidth; k += 4 )
+      for ( int k = 0; k < width; k += 4 )
       {
-        iIdx1 += 4;
-        iIdx2 += 4;
+        idx1 += 4;
+        idx2 += 4;
 
         mmIndxK = _mm_add_epi32( mmIndxK, mmFour );
 
-        mmC[0] = _mm_loadu_si128( (const __m128i*)&ppiDerivate[0][iIdx1] );
-        mmC[2] = _mm_loadu_si128( (const __m128i*)&ppiDerivate[1][iIdx1] );
-        mmC[4] = _mm_loadu_si128( (const __m128i*)&ppiDerivate[0][iIdx2] );
-        mmC[6] = _mm_loadu_si128( (const __m128i*)&ppiDerivate[1][iIdx2] );
+        mmC[0] = _mm_loadu_si128( (const __m128i*)&ppDerivate[0][idx1] );
+        mmC[2] = _mm_loadu_si128( (const __m128i*)&ppDerivate[1][idx1] );
+        mmC[4] = _mm_loadu_si128( (const __m128i*)&ppDerivate[0][idx2] );
+        mmC[6] = _mm_loadu_si128( (const __m128i*)&ppDerivate[1][idx2] );
 
         mmC[1] = _mm_mullo_epi32( mmIndxK, mmC[0] );
         mmC[3] = _mm_mullo_epi32( mmIndxJ[0], mmC[0] );
         mmC[5] = _mm_mullo_epi32( mmIndxK, mmC[4] );
         mmC[7] = _mm_mullo_epi32( mmIndxJ[1], mmC[4] );
 
-        mmResidue[0] = _mm_loadl_epi64( (const __m128i*)&pResidue[iIdx1] );
-        mmResidue[1] = _mm_loadl_epi64( (const __m128i*)&pResidue[iIdx2] );
+        mmResidue[0] = _mm_loadl_epi64( (const __m128i*)&pResidue[idx1] );
+        mmResidue[1] = _mm_loadl_epi64( (const __m128i*)&pResidue[idx2] );
 
         mmTmp[0] = _mm_mullo_epi32( mmIndxJ[0], mmC[2] );
         mmTmp[1] = _mm_mullo_epi32( mmIndxK, mmC[2] );
@@ -3125,104 +3125,104 @@ static Void simdEqualCoeffComputer
         mmTmp[1] = _mm_srli_si128( mmC[4], 4 );
 
         // 1st col of row
-        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[4], mmC[0], mmC[4], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[1][0] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[1][0], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[4], mmC[0], mmC[4], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[1][0] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[1][0], mmIntermediate[3] );
         // 2nd col of row and 1st col of 2nd row
         mmTmp[2] = _mm_srli_si128( mmC[1], 4 );
         mmTmp[3] = _mm_srli_si128( mmC[5], 4 );
-        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[4], mmC[1], mmC[5], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[1][1] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[1][1], mmIntermediate[3] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[2][0], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[4], mmC[1], mmC[5], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[1][1] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[1][1], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[2][0], mmIntermediate[3] );
         // 3rd col of row and 1st col of 3rd row
         mmTmp[2] = _mm_srli_si128( mmC[2], 4 );
         mmTmp[3] = _mm_srli_si128( mmC[6], 4 );
-        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[4], mmC[2], mmC[6], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[1][2] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[1][2], mmIntermediate[3] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[3][0], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[4], mmC[2], mmC[6], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[1][2] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[1][2], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[3][0], mmIntermediate[3] );
         // 4th col of row and 1st col of 4th row
         mmTmp[2] = _mm_srli_si128( mmC[3], 4 );
         mmTmp[3] = _mm_srli_si128( mmC[7], 4 );
-        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[4], mmC[3], mmC[7], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[1][3] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[1][3], mmIntermediate[3] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[4][0], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[4], mmC[3], mmC[7], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[1][3] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[1][3], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[4][0], mmIntermediate[3] );
         // 5th col of row
         mmTmp[2] = _mm_srli_si128( mmResidue[0], 4 );
         mmTmp[3] = _mm_srli_si128( mmResidue[1], 4 );
-        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[4], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[1][4] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[1][4], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[0], mmC[4], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[1][4] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[1][4], mmIntermediate[3] );
 
         // 2nd row
         mmTmp[0] = _mm_srli_si128( mmC[1], 4 );
         mmTmp[1] = _mm_srli_si128( mmC[5], 4 );
 
         // 2nd col of row
-        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[5], mmC[1], mmC[5], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[2][1] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[2][1], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[5], mmC[1], mmC[5], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[2][1] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[2][1], mmIntermediate[3] );
         // 3rd col of row and 2nd col of 3rd row
         mmTmp[2] = _mm_srli_si128( mmC[2], 4 );
         mmTmp[3] = _mm_srli_si128( mmC[6], 4 );
-        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[5], mmC[2], mmC[6], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[2][2] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[2][2], mmIntermediate[3] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[3][1], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[5], mmC[2], mmC[6], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[2][2] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[2][2], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[3][1], mmIntermediate[3] );
         // 4th col of row and 2nd col of 4th row
         mmTmp[2] = _mm_srli_si128( mmC[3], 4 );
         mmTmp[3] = _mm_srli_si128( mmC[7], 4 );
-        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[5], mmC[3], mmC[7], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[2][3] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[2][3], mmIntermediate[3] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[4][1], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[5], mmC[3], mmC[7], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[2][3] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[2][3], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[4][1], mmIntermediate[3] );
         // 5th col of row
         mmTmp[2] = _mm_srli_si128( mmResidue[0], 4 );
         mmTmp[3] = _mm_srli_si128( mmResidue[1], 4 );
-        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[5], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[2][4] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[2][4], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[1], mmC[5], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[2][4] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[2][4], mmIntermediate[3] );
 
         // 3rd row
         mmTmp[0] = _mm_srli_si128( mmC[2], 4 );
         mmTmp[1] = _mm_srli_si128( mmC[6], 4 );
 
         //3rd Col of row
-        CALC_EQUAL_COEFF_8PXLS( mmC[2], mmC[6], mmC[2], mmC[6], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[3][2] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[3][2], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[2], mmC[6], mmC[2], mmC[6], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[3][2] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[3][2], mmIntermediate[3] );
         // 4th col of row and 3rd col of 4th row
         mmTmp[2] = _mm_srli_si128( mmC[3], 4 );
         mmTmp[3] = _mm_srli_si128( mmC[7], 4 );
-        CALC_EQUAL_COEFF_8PXLS( mmC[2], mmC[6], mmC[3], mmC[7], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[3][3] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[3][3], mmIntermediate[3] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[4][2], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[2], mmC[6], mmC[3], mmC[7], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[3][3] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[3][3], mmIntermediate[3] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[4][2], mmIntermediate[3] );
         // 5th col of row
         mmTmp[2] = _mm_srli_si128( mmResidue[0], 4 );
         mmTmp[3] = _mm_srli_si128( mmResidue[1], 4 );
-        CALC_EQUAL_COEFF_8PXLS( mmC[2], mmC[6], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[3][4] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[3][4], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[2], mmC[6], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[3][4] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[3][4], mmIntermediate[3] );
 
         // 4th row
         mmTmp[0] = _mm_srli_si128( mmC[3], 4 );
         mmTmp[1] = _mm_srli_si128( mmC[7], 4 );
 
         // 4th col of row
-        CALC_EQUAL_COEFF_8PXLS( mmC[3], mmC[7], mmC[3], mmC[7], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[4][3] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[4][3], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[3], mmC[7], mmC[3], mmC[7], mmTmp[0], mmTmp[1], mmTmp[0], mmTmp[1], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[4][3] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[4][3], mmIntermediate[3] );
         // 5th col of row
         mmTmp[2] = _mm_srli_si128( mmResidue[0], 4 );
         mmTmp[3] = _mm_srli_si128( mmResidue[1], 4 );
-        CALC_EQUAL_COEFF_8PXLS( mmC[3], mmC[7], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pi64EqualCoeff[4][4] );
-        _mm_storel_epi64( (__m128i*)&pi64EqualCoeff[4][4], mmIntermediate[3] );
+        CALC_EQUAL_COEFF_8PXLS( mmC[3], mmC[7], mmResidue[0], mmResidue[1], mmTmp[0], mmTmp[1], mmTmp[2], mmTmp[3], mmIntermediate[0], mmIntermediate[1], mmIntermediate[2], mmIntermediate[3], (const __m128i*)&pEqualCoeff[4][4] );
+        _mm_storel_epi64( (__m128i*)&pEqualCoeff[4][4], mmIntermediate[3] );
       }
 
-      iIdx1 -= (iWidth);
-      iIdx2 -= (iWidth);
+      idx1 -= (width);
+      idx2 -= (width);
     }
   }
 }
 
-Void InterSearch::_initAffineMEFunctionX86()
+void InterSearch::_initAffineMEFunctionX86()
 {
   m_HorizontalSobelFilter = simdHorizontalSobelFilter;
   m_VerticalSobelFilter = simdVerticalSobelFilter;
   m_EqualCoeffComputer = simdEqualCoeffComputer;
 }
 
-Void InterSearch::initAffineMEFunctionX86()
+void InterSearch::initAffineMEFunctionX86()
 {
   auto vext = read_x86_extension_flags();
   switch ( vext ) {
@@ -3240,132 +3240,132 @@ Void InterSearch::initAffineMEFunctionX86()
 #endif
 #endif
 
-Void InterSearch::xHorizontalSobelFilter
+void InterSearch::xHorizontalSobelFilter
 (
   Pel *const pPred,
-  const Int iPredStride,
-  Int *const piDerivate,
-  const Int iDerivateBufStride,
-  const Int iWidth,
-  const Int iHeight
+  const int predStride,
+  int *const pDerivate,
+  const int derivateBufStride,
+  const int width,
+  const int height
 )
 {
-  for ( Int j = 1; j < iHeight - 1; j++ )
+  for ( int j = 1; j < height - 1; j++ )
   {
-    for ( Int k = 1; k < iWidth - 1; k++ )
+    for ( int k = 1; k < width - 1; k++ )
     {
-      Int iCenter = j * iPredStride + k;
+      int iCenter = j * predStride + k;
 
-      piDerivate[j * iDerivateBufStride + k] =
-        (pPred[iCenter + 1 - iPredStride] -
-          pPred[iCenter - 1 - iPredStride] +
+      pDerivate[j * derivateBufStride + k] =
+        (pPred[iCenter + 1 - predStride] -
+          pPred[iCenter - 1 - predStride] +
           (pPred[iCenter + 1] << 1) -
           (pPred[iCenter - 1] << 1) +
-          pPred[iCenter + 1 + iPredStride] -
-          pPred[iCenter - 1 + iPredStride]);
+          pPred[iCenter + 1 + predStride] -
+          pPred[iCenter - 1 + predStride]);
     }
 
-    piDerivate[j * iDerivateBufStride] = piDerivate[j * iDerivateBufStride + 1];
-    piDerivate[j * iDerivateBufStride + iWidth - 1] = piDerivate[j * iDerivateBufStride + iWidth - 2];
+    pDerivate[j * derivateBufStride] = pDerivate[j * derivateBufStride + 1];
+    pDerivate[j * derivateBufStride + width - 1] = pDerivate[j * derivateBufStride + width - 2];
   }
 
-  piDerivate[0] = piDerivate[iDerivateBufStride + 1];
-  piDerivate[iWidth - 1] = piDerivate[iDerivateBufStride + iWidth - 2];
-  piDerivate[(iHeight - 1) * iDerivateBufStride] = piDerivate[(iHeight - 2) * iDerivateBufStride + 1];
-  piDerivate[(iHeight - 1) * iDerivateBufStride + iWidth - 1] = piDerivate[(iHeight - 2) * iDerivateBufStride + (iWidth - 2)];
+  pDerivate[0] = pDerivate[derivateBufStride + 1];
+  pDerivate[width - 1] = pDerivate[derivateBufStride + width - 2];
+  pDerivate[(height - 1) * derivateBufStride] = pDerivate[(height - 2) * derivateBufStride + 1];
+  pDerivate[(height - 1) * derivateBufStride + width - 1] = pDerivate[(height - 2) * derivateBufStride + (width - 2)];
 
-  for ( Int j = 1; j < iWidth - 1; j++ )
+  for ( int j = 1; j < width - 1; j++ )
   {
-    piDerivate[j] = piDerivate[iDerivateBufStride + j];
-    piDerivate[(iHeight - 1) * iDerivateBufStride + j] = piDerivate[(iHeight - 2) * iDerivateBufStride + j];
+    pDerivate[j] = pDerivate[derivateBufStride + j];
+    pDerivate[(height - 1) * derivateBufStride + j] = pDerivate[(height - 2) * derivateBufStride + j];
   }
 }
 
-Void InterSearch::xVerticalSobelFilter
+void InterSearch::xVerticalSobelFilter
 (
   Pel *const pPred,
-  const Int iPredStride,
-  Int *const piDerivate,
-  const Int iDerivateBufStride,
-  const Int iWidth,
-  const Int iHeight
+  const int predStride,
+  int *const pDerivate,
+  const int derivateBufStride,
+  const int width,
+  const int height
 )
 {
-  for ( Int k = 1; k < iWidth - 1; k++ )
+  for ( int k = 1; k < width - 1; k++ )
   {
-    for ( Int j = 1; j < iHeight - 1; j++ )
+    for ( int j = 1; j < height - 1; j++ )
     {
-      Int iCenter = j * iPredStride + k;
+      int iCenter = j * predStride + k;
 
-      piDerivate[j * iDerivateBufStride + k] =
-        (pPred[iCenter + iPredStride - 1] -
-          pPred[iCenter - iPredStride - 1] +
-          (pPred[iCenter + iPredStride] << 1) -
-          (pPred[iCenter - iPredStride] << 1) +
-          pPred[iCenter + iPredStride + 1] -
-          pPred[iCenter - iPredStride + 1]);
+      pDerivate[j * derivateBufStride + k] =
+        (pPred[iCenter + predStride - 1] -
+          pPred[iCenter - predStride - 1] +
+          (pPred[iCenter + predStride] << 1) -
+          (pPred[iCenter - predStride] << 1) +
+          pPred[iCenter + predStride + 1] -
+          pPred[iCenter - predStride + 1]);
     }
 
-    piDerivate[k] = piDerivate[iDerivateBufStride + k];
-    piDerivate[(iHeight - 1) * iDerivateBufStride + k] = piDerivate[(iHeight - 2) * iDerivateBufStride + k];
+    pDerivate[k] = pDerivate[derivateBufStride + k];
+    pDerivate[(height - 1) * derivateBufStride + k] = pDerivate[(height - 2) * derivateBufStride + k];
   }
 
-  piDerivate[0] = piDerivate[iDerivateBufStride + 1];
-  piDerivate[iWidth - 1] = piDerivate[iDerivateBufStride + iWidth - 2];
-  piDerivate[(iHeight - 1) * iDerivateBufStride] = piDerivate[(iHeight - 2) * iDerivateBufStride + 1];
-  piDerivate[(iHeight - 1) * iDerivateBufStride + iWidth - 1] = piDerivate[(iHeight - 2) * iDerivateBufStride + (iWidth - 2)];
+  pDerivate[0] = pDerivate[derivateBufStride + 1];
+  pDerivate[width - 1] = pDerivate[derivateBufStride + width - 2];
+  pDerivate[(height - 1) * derivateBufStride] = pDerivate[(height - 2) * derivateBufStride + 1];
+  pDerivate[(height - 1) * derivateBufStride + width - 1] = pDerivate[(height - 2) * derivateBufStride + (width - 2)];
 
-  for ( Int j = 1; j < iHeight - 1; j++ )
+  for ( int j = 1; j < height - 1; j++ )
   {
-    piDerivate[j * iDerivateBufStride] = piDerivate[j * iDerivateBufStride + 1];
-    piDerivate[j * iDerivateBufStride + iWidth - 1] = piDerivate[j * iDerivateBufStride + iWidth - 2];
+    pDerivate[j * derivateBufStride] = pDerivate[j * derivateBufStride + 1];
+    pDerivate[j * derivateBufStride + width - 1] = pDerivate[j * derivateBufStride + width - 2];
   }
 }
 
-Void InterSearch::xEqualCoeffComputer
+void InterSearch::xEqualCoeffComputer
 (
   Pel *pResidue,
-  Int iResidueStride,
-  Int **ppiDerivate,
-  Int iDerivateBufStride,
-  Int64( *pi64EqualCoeff )[7],
-  Int iWidth,
-  Int iHeight,
-  Bool b6Param
+  int residueStride,
+  int **ppDerivate,
+  int derivateBufStride,
+  Int64( *pEqualCoeff )[7],
+  int width,
+  int height,
+  bool b6Param
 )
 {
-  Int iAffineParamNum = b6Param ? 6 : 4;
+  int affineParamNum = b6Param ? 6 : 4;
 
-  for ( Int j = 0; j != iHeight; j++ )
+  for ( int j = 0; j != height; j++ )
   {
-    for ( Int k = 0; k != iWidth; k++ )
+    for ( int k = 0; k != width; k++ )
     {
-      Int iC[6];
+      int iC[6];
 
-      Int iIdx = j * iDerivateBufStride + k;
+      int idx = j * derivateBufStride + k;
       if ( !b6Param )
       {
-        iC[0] = ppiDerivate[0][iIdx];
-        iC[1] = k * ppiDerivate[0][iIdx] + j * ppiDerivate[1][iIdx];
-        iC[2] = ppiDerivate[1][iIdx];
-        iC[3] = j * ppiDerivate[0][iIdx] - k * ppiDerivate[1][iIdx];
+        iC[0] = ppDerivate[0][idx];
+        iC[1] = k * ppDerivate[0][idx] + j * ppDerivate[1][idx];
+        iC[2] = ppDerivate[1][idx];
+        iC[3] = j * ppDerivate[0][idx] - k * ppDerivate[1][idx];
       }
       else
       {
-        iC[0] = ppiDerivate[0][iIdx];
-        iC[1] = k * ppiDerivate[0][iIdx];
-        iC[2] = ppiDerivate[1][iIdx];
-        iC[3] = k * ppiDerivate[1][iIdx];
-        iC[4] = j * ppiDerivate[0][iIdx];
-        iC[5] = j * ppiDerivate[1][iIdx];
+        iC[0] = ppDerivate[0][idx];
+        iC[1] = k * ppDerivate[0][idx];
+        iC[2] = ppDerivate[1][idx];
+        iC[3] = k * ppDerivate[1][idx];
+        iC[4] = j * ppDerivate[0][idx];
+        iC[5] = j * ppDerivate[1][idx];
       }
-      for ( Int col = 0; col < iAffineParamNum; col++ )
+      for ( int col = 0; col < affineParamNum; col++ )
       {
-        for ( Int row = 0; row < iAffineParamNum; row++ )
+        for ( int row = 0; row < affineParamNum; row++ )
         {
-          pi64EqualCoeff[col + 1][row] += (Int64)iC[col] * iC[row];
+          pEqualCoeff[col + 1][row] += (Int64)iC[col] * iC[row];
         }
-        pi64EqualCoeff[col + 1][iAffineParamNum] += ((Int64)iC[col] * pResidue[iIdx]) << 3;
+        pEqualCoeff[col + 1][affineParamNum] += ((Int64)iC[col] * pResidue[idx]) << 3;
       }
     }
   }
@@ -3384,8 +3384,8 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
                                           Bool                  bFastSkipBi
 #endif
 #if JVET_K0185_AFFINE_6PARA_ENC
-                                        , Mv                    acMvAffine4Para[2][33][3]
-                                        , Int                   iRefIdx4Para[2]
+                                        , Mv                    mvAffine4Para[2][33][3]
+                                        , int                   refIdx4Para[2]
 #endif
                                          )
 {
@@ -3404,9 +3404,9 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
   Int       iNumPredDir = slice.isInterP() ? 1 : 2;
 
 #if JVET_K_AFFINE_REFACTOR
-  Int iMvNum = 2;
+  int mvNum = 2;
 #if JVET_K0185_AFFINE_6PARA_ENC
-  iMvNum = pu.cu->affineType ? 3 : 2;
+  mvNum = pu.cu->affineType ? 3 : 2;
 #endif
 #endif
 
@@ -3482,7 +3482,7 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
       aaiMvpIdx[iRefList][iRefIdxTemp] = pu.mvpIdx[eRefPicList];
       aaiMvpNum[iRefList][iRefIdxTemp] = pu.mvpNum[eRefPicList];;
 #if JVET_K0185_AFFINE_6PARA_ENC // reuse refidx of 4-para
-      if ( pu.cu->affineType == AFFINEMODEL_6PARAM && iRefIdx4Para[iRefList] != iRefIdxTemp )
+      if ( pu.cu->affineType == AFFINEMODEL_6PARAM && refIdx4Para[iRefList] != iRefIdxTemp )
       {
         xCopyAffineAMVPInfo( affiAMVPInfoTemp[eRefPicList], aacAffineAMVPInfo[iRefList][iRefIdxTemp] );
         continue;
@@ -3502,12 +3502,12 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
       if ( pu.cu->affineType == AFFINEMODEL_6PARAM )
       {
         Mv mvFour[3];
-        mvFour[0] = acMvAffine4Para[iRefList][iRefIdxTemp][0];
-        mvFour[1] = acMvAffine4Para[iRefList][iRefIdxTemp][1];
+        mvFour[0] = mvAffine4Para[iRefList][iRefIdxTemp][0];
+        mvFour[1] = mvAffine4Para[iRefList][iRefIdxTemp][1];
 
-        Int shift = MAX_CU_DEPTH;
-        Int vx2 = (mvFour[0].getHor() << shift) - ((mvFour[1].getVer() - mvFour[0].getVer()) << (shift + g_aucLog2[pu.lheight()] - g_aucLog2[pu.lwidth()]));
-        Int vy2 = (mvFour[0].getVer() << shift) + ((mvFour[1].getHor() - mvFour[0].getHor()) << (shift + g_aucLog2[pu.lheight()] - g_aucLog2[pu.lwidth()]));
+        int shift = MAX_CU_DEPTH;
+        int vx2 = (mvFour[0].getHor() << shift) - ((mvFour[1].getVer() - mvFour[0].getVer()) << (shift + g_aucLog2[pu.lheight()] - g_aucLog2[pu.lwidth()]));
+        int vy2 = (mvFour[0].getVer() << shift) + ((mvFour[1].getHor() - mvFour[0].getHor()) << (shift + g_aucLog2[pu.lheight()] - g_aucLog2[pu.lwidth()]));
         vx2 >>= shift;
         vy2 >>= shift;
         mvFour[2] = Mv( vx2, vy2, true );
@@ -3517,7 +3517,7 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
         if ( uiCandCostInherit < uiCandCost )
         {
           uiCandCost = uiCandCostInherit;
-          for ( Int i = 0; i < 3; i++ )
+          for ( int i = 0; i < 3; i++ )
           {
             mvHevc[i] = mvFour[i];
           }
@@ -3555,7 +3555,7 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
 
           uiCostTemp -= m_pcRdCost->getCost( uiBitsTempL0[iList1ToList0Idx] );
 #if JVET_K_AFFINE_REFACTOR
-          for (Int iVerIdx = 0; iVerIdx < iMvNum; iVerIdx++)
+          for (Int iVerIdx = 0; iVerIdx < mvNum; iVerIdx++)
 #else
           for ( Int iVerIdx = 0; iVerIdx < ( pu.cs->pcv->rectCUs ? 2 : 3 ); iVerIdx++ )
 #endif
@@ -3621,7 +3621,7 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
 #if JVET_K0185_AFFINE_6PARA_ENC // save 4-parameter UNI-ME results
   if ( pu.cu->affineType == AFFINEMODEL_4PARAM )
   {
-    ::memcpy( acMvAffine4Para, cMvTemp, sizeof( cMvTemp ) );
+    ::memcpy( mvAffine4Para, cMvTemp, sizeof( cMvTemp ) );
   }
 #endif
 
@@ -3740,7 +3740,7 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
       for ( Int iRefIdxTemp = iRefStart; iRefIdxTemp <= iRefEnd; iRefIdxTemp++ )
       {
 #if JVET_K0185_AFFINE_6PARA_ENC // reuse refidx of 4-para
-        if ( pu.cu->affineType == AFFINEMODEL_6PARAM && iRefIdx4Para[iRefList] != iRefIdxTemp )
+        if ( pu.cu->affineType == AFFINEMODEL_6PARAM && refIdx4Para[iRefList] != iRefIdxTemp )
         {
           continue;
         }
@@ -3814,10 +3814,10 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
   pu.mvpNum[REF_PIC_LIST_1] = NOT_VALID;
 
 #if JVET_K_AFFINE_REFACTOR
-  for ( Int iVerIdx = 0; iVerIdx < 3; iVerIdx++ )
+  for ( int verIdx = 0; verIdx < 3; verIdx++ )
   {
-    pu.mvdAffi[REF_PIC_LIST_0][iVerIdx] = cMvZero;
-    pu.mvdAffi[REF_PIC_LIST_1][iVerIdx] = cMvZero;
+    pu.mvdAffi[REF_PIC_LIST_0][verIdx] = cMvZero;
+    pu.mvdAffi[REF_PIC_LIST_1][verIdx] = cMvZero;
   }
 #endif
 
@@ -3839,15 +3839,15 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
     pu.refIdx[REF_PIC_LIST_1] = iRefIdxBi[1];
 
 #if JVET_K_AFFINE_REFACTOR
-    for ( Int iVerIdx = 0; iVerIdx < iMvNum; iVerIdx++ )
+    for ( int verIdx = 0; verIdx < mvNum; verIdx++ )
     {
-      pu.mvdAffi[REF_PIC_LIST_0][iVerIdx] = cMvBi[0][iVerIdx] - cMvPredBi[0][iRefIdxBi[0]][iVerIdx];
-      pu.mvdAffi[REF_PIC_LIST_1][iVerIdx] = cMvBi[1][iVerIdx] - cMvPredBi[1][iRefIdxBi[1]][iVerIdx];
+      pu.mvdAffi[REF_PIC_LIST_0][verIdx] = cMvBi[0][verIdx] - cMvPredBi[0][iRefIdxBi[0]][verIdx];
+      pu.mvdAffi[REF_PIC_LIST_1][verIdx] = cMvBi[1][verIdx] - cMvPredBi[1][iRefIdxBi[1]][verIdx];
 #if JVET_K0337_AFFINE_MVD_PREDICTION
-      if ( iVerIdx != 0 )
+      if ( verIdx != 0 )
       {
-        pu.mvdAffi[0][iVerIdx] = pu.mvdAffi[0][iVerIdx] - pu.mvdAffi[0][0];
-        pu.mvdAffi[1][iVerIdx] = pu.mvdAffi[1][iVerIdx] - pu.mvdAffi[1][0];
+        pu.mvdAffi[0][verIdx] = pu.mvdAffi[0][verIdx] - pu.mvdAffi[0][0];
+        pu.mvdAffi[1][verIdx] = pu.mvdAffi[1][verIdx] - pu.mvdAffi[1][0];
       }
 #endif
     }
@@ -3885,13 +3885,13 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
     pu.refIdx[REF_PIC_LIST_0] = iRefIdx[0];
 
 #if JVET_K_AFFINE_REFACTOR
-    for ( Int iVerIdx = 0; iVerIdx < iMvNum; iVerIdx++ )
+    for ( int verIdx = 0; verIdx < mvNum; verIdx++ )
     {
-      pu.mvdAffi[REF_PIC_LIST_0][iVerIdx] = aacMv[0][iVerIdx] - cMvPred[0][iRefIdx[0]][iVerIdx];
+      pu.mvdAffi[REF_PIC_LIST_0][verIdx] = aacMv[0][verIdx] - cMvPred[0][iRefIdx[0]][verIdx];
 #if JVET_K0337_AFFINE_MVD_PREDICTION
-      if ( iVerIdx != 0 )
+      if ( verIdx != 0 )
       {
-        pu.mvdAffi[0][iVerIdx] = pu.mvdAffi[0][iVerIdx] - pu.mvdAffi[0][0];
+        pu.mvdAffi[0][verIdx] = pu.mvdAffi[0][verIdx] - pu.mvdAffi[0][0];
       }
 #endif
     }
@@ -3922,13 +3922,13 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
     pu.refIdx[REF_PIC_LIST_1] = iRefIdx[1];
 
 #if JVET_K_AFFINE_REFACTOR
-    for ( Int iVerIdx = 0; iVerIdx < iMvNum; iVerIdx++ )
+    for ( int verIdx = 0; verIdx < mvNum; verIdx++ )
     {
-      pu.mvdAffi[REF_PIC_LIST_1][iVerIdx] = aacMv[1][iVerIdx] - cMvPred[1][iRefIdx[1]][iVerIdx];
+      pu.mvdAffi[REF_PIC_LIST_1][verIdx] = aacMv[1][verIdx] - cMvPred[1][iRefIdx[1]][verIdx];
 #if JVET_K0337_AFFINE_MVD_PREDICTION
-      if ( iVerIdx != 0 )
+      if ( verIdx != 0 )
       {
-        pu.mvdAffi[1][iVerIdx] = pu.mvdAffi[1][iVerIdx] - pu.mvdAffi[1][0];
+        pu.mvdAffi[1][verIdx] = pu.mvdAffi[1][verIdx] - pu.mvdAffi[1][0];
       }
 #endif
     }
@@ -3955,7 +3955,7 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
 Void solveEqual( Double** dEqualCoeff, Int iOrder, Double* dAffinePara )
 {
 #if JVET_K_AFFINE_BUG_FIXES
-  for ( Int k = 0; k < iOrder; k++ )
+  for ( int k = 0; k < iOrder; k++ )
   {
     dAffinePara[k] = 0.;
   }
@@ -4039,7 +4039,7 @@ Void InterSearch::xCheckBestAffineMVP( PredictionUnit &pu, AffineAMVPInfo &affin
   }
 
 #if JVET_K0185_AFFINE_6PARA_ENC
-  Int iMvNum = pu.cu->affineType ? 3 : 2;
+  int mvNum = pu.cu->affineType ? 3 : 2;
 #endif
 
   m_pcRdCost->selectMotionLambda( pu.cu->transQuantBypass );
@@ -4050,7 +4050,7 @@ Void InterSearch::xCheckBestAffineMVP( PredictionUnit &pu, AffineAMVPInfo &affin
   // Get origin MV bits
   Int iOrgMvBits = 0;
 #if JVET_K0185_AFFINE_6PARA_ENC
-  for ( Int iVerIdx = 0; iVerIdx < iMvNum; iVerIdx++ )
+  for ( int iVerIdx = 0; iVerIdx < mvNum; iVerIdx++ )
 #else
   for ( Int iVerIdx=0; iVerIdx<2; iVerIdx++ )
 #endif
@@ -4080,7 +4080,7 @@ Void InterSearch::xCheckBestAffineMVP( PredictionUnit &pu, AffineAMVPInfo &affin
 
     Int iMvBits = 0;
 #if JVET_K0185_AFFINE_6PARA_ENC
-    for ( Int iVerIdx = 0; iVerIdx < iMvNum; iVerIdx++ )
+    for ( Int iVerIdx = 0; iVerIdx < mvNum; iVerIdx++ )
 #else
     for ( Int iVerIdx=0; iVerIdx<2; iVerIdx++ )
 #endif
@@ -4174,9 +4174,9 @@ Void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
   // Set delta mv
   // malloc buffer
 #if JVET_K0185_AFFINE_6PARA_ENC
-  Int iParaNum = pu.cu->affineType ? 7 : 5;
-  Int iAffineParaNum = iParaNum - 1;
-  Int iMvNum = pu.cu->affineType ? 3 : 2;
+  int iParaNum = pu.cu->affineType ? 7 : 5;
+  int affineParaNum = iParaNum - 1;
+  int mvNum = pu.cu->affineType ? 3 : 2;
 #else
   static const Int iParaNum = 5;
 #endif
@@ -4226,7 +4226,7 @@ Void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
   uiBitsBest = ruiBits;
   DTRACE( g_trace_ctx, D_COMMON, " (%d) xx uiBitsBest=%d\n", DTRACE_GET_COUNTER(g_trace_ctx,D_COMMON), uiBitsBest );
 #if JVET_K0185_AFFINE_6PARA_ENC
-  for ( Int i = 0; i < iMvNum; i++ )
+  for ( int i = 0; i < mvNum; i++ )
 #else
   for ( Int i=0; i<2; i++ )
 #endif
@@ -4359,7 +4359,7 @@ Void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
 
     // solve delta x and y
 #if JVET_K0367_AFFINE_FIX_POINT
-    for ( Int row = 0; row < iParaNum; row++ )
+    for ( int row = 0; row < iParaNum; row++ )
     {
       memset( &i64EqualCoeff[row][0], 0, iParaNum * sizeof( Int64 ) );
     }
@@ -4372,11 +4372,11 @@ Void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
 #endif
     );
 
-    for ( Int row = 0; row < iParaNum; row++ )
+    for ( int row = 0; row < iParaNum; row++ )
     {
-      for ( Int i = 0; i < iParaNum; i++ )
+      for ( int i = 0; i < iParaNum; i++ )
       {
-        pdEqualCoeff[row][i] = (Double)i64EqualCoeff[row][i];
+        pdEqualCoeff[row][i] = (double)i64EqualCoeff[row][i];
       }
     }
 #else
@@ -4412,13 +4412,13 @@ Void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
           dC[3] = j * pdDerivate[0][iIdx] - k * pdDerivate[1][iIdx];
         }
 
-        for ( Int col = 0; col < iAffineParaNum; col++ )
+        for ( Int col = 0; col < affineParaNum; col++ )
         {
-          for ( Int row = 0; row < iAffineParaNum; row++ )
+          for ( Int row = 0; row < affineParaNum; row++ )
           {
             pdEqualCoeff[col + 1][row] += dC[col] * dC[row];
           }
-          pdEqualCoeff[col + 1][iAffineParaNum] += (Double)(piError[iIdx] * dC[col]);
+          pdEqualCoeff[col + 1][affineParaNum] += (Double)(piError[iIdx] * dC[col]);
         }
 #else
         Double dC[4];
@@ -4441,11 +4441,11 @@ Void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
 #endif
 
 #if JVET_K0185_AFFINE_6PARA_ENC
-    Double dAffinePara[6];
-    Double dDeltaMv[6];
+    double dAffinePara[6];
+    double dDeltaMv[6];
     Mv acDeltaMv[3];
 
-    solveEqual( pdEqualCoeff, iAffineParaNum, dAffinePara );
+    solveEqual( pdEqualCoeff, affineParaNum, dAffinePara );
 
     // convert to delta mv
     dDeltaMv[0] = dAffinePara[0];
@@ -4489,7 +4489,7 @@ Void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
 
     Bool bAllZero = false;
 #if JVET_K0185_AFFINE_6PARA_ENC
-    for ( Int i = 0; i < iMvNum; i++ )
+    for ( int i = 0; i < mvNum; i++ )
 #else
     for ( Int i=0; i<2; i++ )
 #endif
@@ -4507,7 +4507,7 @@ Void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
 
     // do motion compensation with updated mv
 #if JVET_K0185_AFFINE_6PARA_ENC
-    for ( Int i = 0; i < iMvNum; i++ )
+    for ( int i = 0; i < mvNum; i++ )
 #else
     for ( Int i=0; i<2; i++ )
 #endif
@@ -4537,7 +4537,7 @@ Void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
     m_pcRdCost->setCostScale(0);
     UInt uiBitsTemp = ruiBits;
 #if JVET_K0185_AFFINE_6PARA_ENC
-    for ( Int i = 0; i < iMvNum; i++ )
+    for ( int i = 0; i < mvNum; i++ )
 #else
     for ( Int i=0; i<2; i++ )
 #endif

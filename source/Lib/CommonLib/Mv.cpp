@@ -52,7 +52,7 @@ void roundMV( Mv & rMV, unsigned imvShift )
 }
 
 #if JVET_K_AFFINE_BUG_FIXES
-void roundAffineMv( Int& mvx, Int& mvy, Int nShift )
+void roundAffineMv( int& mvx, int& mvy, int nShift )
 {
   const int nOffset = 1 << (nShift - 1);
   mvx = mvx >= 0 ? (mvx + nOffset) >> nShift : -((-mvx + nOffset) >> nShift);

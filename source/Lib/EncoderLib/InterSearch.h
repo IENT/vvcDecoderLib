@@ -77,7 +77,7 @@ private:
   PelStorage      m_tmpAffiStorage;
 #if JVET_K0367_AFFINE_FIX_POINT
   Pel*            m_tmpAffiError;
-  Int*            m_tmpAffiDeri[2];
+  int*            m_tmpAffiDeri[2];
 #else
   Int*            m_tmpAffiError;
   Double*         m_tmpAffiDeri[2];
@@ -161,22 +161,22 @@ public:
 #endif
 
 #if JVET_K0367_AFFINE_FIX_POINT
-  Void ( *m_HorizontalSobelFilter ) (Pel *const pPred, const Int iPredStride, Int *const piDerivate, const Int iDerivateBufStride, const Int iWidth, const Int iHeight);
+  void ( *m_HorizontalSobelFilter ) (Pel *const pPred, const int predStride, int *const pDerivate, const int derivateBufStride, const int width, const int height);
 
-  Void ( *m_VerticalSobelFilter   ) (Pel *const pPred, const Int iPredStride, Int *const piDerivate, const Int iDerivateBufStride, const Int iWidth, const Int iHeight);
+  void( *m_VerticalSobelFilter   ) (Pel *const pPred, const int predStride, int *const pDerivate, const int derivateBufStride, const int width, const int height);
 
-  Void ( *m_EqualCoeffComputer    ) (Pel *pResidue, Int iResidueStride, Int **ppiDerivate, Int iDerivateBufStride, Int64( *pi64EqualCoeff )[7], Int iWidth, Int iHeight, Bool b6Param);
+  void( *m_EqualCoeffComputer    ) (Pel *pResidue, int residueStride, int **ppDerivate, int derivateBufStride, Int64( *pEqualCoeff )[7], int width, int height, bool b6Param);
 
-  static Void xHorizontalSobelFilter (Pel *const pPred, const Int iPredStride, Int *const piDerivate, const Int iDerivateBufStride, const Int iWidth, const Int iHeight);
+  static void xHorizontalSobelFilter (Pel *const pPred, const int predStride, int *const pDerivate, const int derivateBufStride, const int width, const int height );
 
-  static Void xVerticalSobelFilter(Pel *const pPred, const Int iPredStride, Int *const piDerivate, const Int iDerivateBufStride, const Int iWidth, const Int iHeight);
+  static void xVerticalSobelFilter(Pel *const pPred, const int predStride, int *const pDerivate, const int derivateBufStride, const int width, const int height );
 
-  static Void xEqualCoeffComputer (Pel *pResidue, Int iResidueStride, Int **ppiDerivate, Int iDerivateBufStride, Int64( *pi64EqualCoeff )[7], Int iWidth, Int iHeight, Bool b6Param);
+  static void xEqualCoeffComputer (Pel *pResidue, int residueStride, int **ppDerivate, int derivateBufStride, Int64( *pEqualCoeff )[7], int width, int height, bool b6Param);
 
 #if ENABLE_SIMD_OPT_AFFINE_ME
 #ifdef TARGET_SIMD_X86
-  Void initAffineMEFunctionX86();
-  Void _initAffineMEFunctionX86();
+  void initAffineMEFunctionX86();
+  void _initAffineMEFunctionX86();
 #endif
 #endif
 #endif
@@ -378,8 +378,8 @@ protected:
                                     Bool                  bFastSkipBi
 #endif
 #if JVET_K0185_AFFINE_6PARA_ENC
-                                  , Mv                    acMvAffine4Para[2][33][3]
-                                  , Int                   iRefIdx4Para[2]
+                                  , Mv                    mvAffine4Para[2][33][3]
+                                  , int                   refIdx4Para[2]
 #endif
                                   );
 

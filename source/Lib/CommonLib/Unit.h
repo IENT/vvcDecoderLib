@@ -298,7 +298,7 @@ struct CodingUnit : public UnitArea
 #if JEM_TOOLS
   Bool           affine;
 #if JVET_K0337_AFFINE_6PARA
-  Int            affineType;
+  int            affineType;
 #endif
 #endif
   Bool           transQuantBypass;

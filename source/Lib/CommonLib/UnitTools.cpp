@@ -2020,13 +2020,13 @@ void PU::fillMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, const in
 }
 
 #if JVET_K0337_AFFINE_MVP_IMPROVE
-const Int getAvailableAffineNeighbours( const PredictionUnit &pu, const PredictionUnit* npu[] )
+const int getAvailableAffineNeighbours( const PredictionUnit &pu, const PredictionUnit* npu[] )
 {
   const Position posLT = pu.Y().topLeft();
   const Position posRT = pu.Y().topRight();
   const Position posLB = pu.Y().bottomLeft();
 
-  Int num = 0;
+  int num = 0;
   const PredictionUnit* puLeft = pu.cs->getPURestricted( posLB.offset( -1, 0 ), pu, pu.chType );
   if ( puLeft && puLeft->cu->affine )
   {
@@ -2062,18 +2062,18 @@ const Int getAvailableAffineNeighbours( const PredictionUnit &pu, const Predicti
 #endif
 
 #if JVET_K_AFFINE_REFACTOR
-Void PU::xInheritedAffineMv( const PredictionUnit &pu, const PredictionUnit* puNeighbour, RefPicList eRefPicList, Mv rcMv[3] )
+void PU::xInheritedAffineMv( const PredictionUnit &pu, const PredictionUnit* puNeighbour, RefPicList eRefPicList, Mv rcMv[3] )
 {
-  Int pixelNeiX = puNeighbour->Y().pos().x;
-  Int pixelNeiY = puNeighbour->Y().pos().y;
-  Int pixelCurX = pu.Y().pos().x;
-  Int pixelCurY = pu.Y().pos().y;
+  int posNeiX = puNeighbour->Y().pos().x;
+  int posNeiY = puNeighbour->Y().pos().y;
+  int posCurX = pu.Y().pos().x;
+  int posCurY = pu.Y().pos().y;
 
-  Int NeiW = puNeighbour->Y().width;
-  Int CurW = pu.Y().width;
+  int neiW = puNeighbour->Y().width;
+  int curW = pu.Y().width;
 #if JVET_K0337_AFFINE_6PARA || !JVET_K_AFFINE_BUG_FIXES
-  Int NeiH = puNeighbour->Y().height;
-  Int CurH = pu.Y().height;
+  int neiH = puNeighbour->Y().height;
+  int curH = pu.Y().height;
 #endif
   
   Mv mvLT, mvRT, mvLB;
@@ -2085,16 +2085,16 @@ Void PU::xInheritedAffineMv( const PredictionUnit &pu, const PredictionUnit* puN
   mvLB = puNeighbour->getMotionInfo( posLB ).mv[eRefPicList];
 
 #if JVET_K_AFFINE_BUG_FIXES
-  Int shift = MAX_CU_DEPTH;
-  Int iDMvHorX, iDMvHorY, iDMvVerX, iDMvVerY;
+  int shift = MAX_CU_DEPTH;
+  int iDMvHorX, iDMvHorY, iDMvVerX, iDMvVerY;
 
-  iDMvHorX = (mvRT - mvLT).getHor() << (shift - g_aucLog2[NeiW]);
-  iDMvHorY = (mvRT - mvLT).getVer() << (shift - g_aucLog2[NeiW]);
+  iDMvHorX = (mvRT - mvLT).getHor() << (shift - g_aucLog2[neiW]);
+  iDMvHorY = (mvRT - mvLT).getVer() << (shift - g_aucLog2[neiW]);
 #if JVET_K0337_AFFINE_6PARA
   if ( puNeighbour->cu->affineType == AFFINEMODEL_6PARAM )
   {
-    iDMvVerX = (mvLB - mvLT).getHor() << (shift - g_aucLog2[NeiH]);
-    iDMvVerY = (mvLB - mvLT).getVer() << (shift - g_aucLog2[NeiH]);
+    iDMvVerX = (mvLB - mvLT).getHor() << (shift - g_aucLog2[neiH]);
+    iDMvVerY = (mvLB - mvLT).getVer() << (shift - g_aucLog2[neiH]);
   }
   else
 #endif
@@ -2103,19 +2103,19 @@ Void PU::xInheritedAffineMv( const PredictionUnit &pu, const PredictionUnit* puN
     iDMvVerY = iDMvHorX;
   }
 
-  Int iMvScaleHor = mvLT.getHor() << shift;
-  Int iMvScaleVer = mvLT.getVer() << shift;
-  Int horTmp, verTmp;
+  int iMvScaleHor = mvLT.getHor() << shift;
+  int iMvScaleVer = mvLT.getVer() << shift;
+  int horTmp, verTmp;
 
   // v0
-  horTmp = iMvScaleHor + iDMvHorX * (pixelCurX - pixelNeiX) + iDMvVerX * (pixelCurY - pixelNeiY);
-  verTmp = iMvScaleVer + iDMvHorY * (pixelCurX - pixelNeiX) + iDMvVerY * (pixelCurY - pixelNeiY);
+  horTmp = iMvScaleHor + iDMvHorX * (posCurX - posNeiX) + iDMvVerX * (posCurY - posNeiY);
+  verTmp = iMvScaleVer + iDMvHorY * (posCurX - posNeiX) + iDMvVerY * (posCurY - posNeiY);
   roundAffineMv( horTmp, verTmp, shift );
   rcMv[0] = Mv( horTmp, verTmp, true );
 
   // v1
-  horTmp = iMvScaleHor + iDMvHorX * (pixelCurX + CurW - pixelNeiX) + iDMvVerX * (pixelCurY - pixelNeiY);
-  verTmp = iMvScaleVer + iDMvHorY * (pixelCurX + CurW - pixelNeiX) + iDMvVerY * (pixelCurY - pixelNeiY);
+  horTmp = iMvScaleHor + iDMvHorX * (posCurX + curW - posNeiX) + iDMvVerX * (posCurY - posNeiY);
+  verTmp = iMvScaleVer + iDMvHorY * (posCurX + curW - posNeiX) + iDMvVerY * (posCurY - posNeiY);
   roundAffineMv( horTmp, verTmp, shift );
   rcMv[1] = Mv( horTmp, verTmp, true );
 
@@ -2123,19 +2123,19 @@ Void PU::xInheritedAffineMv( const PredictionUnit &pu, const PredictionUnit* puN
 #if JVET_K0337_AFFINE_6PARA
   if ( pu.cu->affineType == AFFINEMODEL_6PARAM )
   {
-    horTmp = iMvScaleHor + iDMvHorX * (pixelCurX - pixelNeiX) + iDMvVerX * (pixelCurY + CurH - pixelNeiY);
-    verTmp = iMvScaleVer + iDMvHorY * (pixelCurX - pixelNeiX) + iDMvVerY * (pixelCurY + CurH - pixelNeiY);
+    horTmp = iMvScaleHor + iDMvHorX * (posCurX - posNeiX) + iDMvVerX * (posCurY + curH - posNeiY);
+    verTmp = iMvScaleVer + iDMvHorY * (posCurX - posNeiX) + iDMvVerY * (posCurY + curH - posNeiY);
     roundAffineMv( horTmp, verTmp, shift );
     rcMv[2] = Mv( horTmp, verTmp, true );
   }
 #endif
 #else
-  rcMv[0].hor = Int( mvLT.hor + 1.0 * (mvRT.hor - mvLT.hor) * (pixelCurX - pixelNeiX) / NeiW + 1.0 * (mvLB.hor - mvLT.hor) * (pixelCurY - pixelNeiY) / NeiH );
-  rcMv[0].ver = Int( mvLT.ver + 1.0 * (mvRT.ver - mvLT.ver) * (pixelCurX - pixelNeiX) / NeiW + 1.0 * (mvLB.ver - mvLT.ver) * (pixelCurY - pixelNeiY) / NeiH );
-  rcMv[1].hor = Int( rcMv[0].hor + 1.0 * (mvRT.hor - mvLT.hor) * CurW / NeiW );
-  rcMv[1].ver = Int( rcMv[0].ver + 1.0 * (mvRT.ver - mvLT.ver) * CurW / NeiW );
-  rcMv[2].hor = Int( rcMv[0].hor + 1.0 * (mvLB.hor - mvLT.hor) * CurH / NeiH );
-  rcMv[2].ver = Int( rcMv[0].ver + 1.0 * (mvLB.ver - mvLT.ver) * CurH / NeiH );
+  rcMv[0].hor = int( mvLT.hor + 1.0 * (mvRT.hor - mvLT.hor) * (posCurX - posNeiX) / neiW + 1.0 * (mvLB.hor - mvLT.hor) * (posCurY - posNeiY) / neiH );
+  rcMv[0].ver = int( mvLT.ver + 1.0 * (mvRT.ver - mvLT.ver) * (posCurX - posNeiX) / neiW + 1.0 * (mvLB.ver - mvLT.ver) * (posCurY - posNeiY) / neiH );
+  rcMv[1].hor = int( rcMv[0].hor + 1.0 * (mvRT.hor - mvLT.hor) * curW / neiW );
+  rcMv[1].ver = int( rcMv[0].ver + 1.0 * (mvRT.ver - mvLT.ver) * curW / neiW );
+  rcMv[2].hor = int( rcMv[0].hor + 1.0 * (mvLB.hor - mvLT.hor) * curH / neiH );
+  rcMv[2].ver = int( rcMv[0].ver + 1.0 * (mvLB.ver - mvLT.ver) * curH / neiH );
 
   rcMv[0].highPrec = true;
   rcMv[1].highPrec = true;
@@ -2185,23 +2185,23 @@ void PU::fillAffineMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, co
   }
 
 #if JVET_K0337_AFFINE_MVP_IMPROVE
-  const Int curWidth = pu.Y().width;
-  const Int curHeight = pu.Y().height;
+  const int curWidth = pu.Y().width;
+  const int curHeight = pu.Y().height;
 
   // insert inherited affine candidates
   Mv outputAffineMv[3];
-  const Int MaxNei = 5;
-  const PredictionUnit* npu[MaxNei];
-  Int numAffNeigh = getAvailableAffineNeighbours( pu, npu );
-  Int targetRefPOC = pu.cu->slice->getRefPOC( eRefPicList, refIdx );
+  const int maxNei = 5;
+  const PredictionUnit* npu[maxNei];
+  int numAffNeigh = getAvailableAffineNeighbours( pu, npu );
+  int targetRefPOC = pu.cu->slice->getRefPOC( eRefPicList, refIdx );
 
-  for ( UInt uiRefPicList = 0; uiRefPicList < 2 && affiAMVPInfo.numCand < AMVP_MAX_NUM_CANDS; uiRefPicList++ )
+  for ( int refPicList = 0; refPicList < 2 && affiAMVPInfo.numCand < AMVP_MAX_NUM_CANDS; refPicList++ )
   {
-    RefPicList eTestRefPicList = (uiRefPicList == 0) ? eRefPicList : RefPicList( 1 - eRefPicList );
+    RefPicList eTestRefPicList = (refPicList == 0) ? eRefPicList : RefPicList( 1 - eRefPicList );
 
-    for ( UInt uiNeighIdx = 0; uiNeighIdx < numAffNeigh && affiAMVPInfo.numCand < AMVP_MAX_NUM_CANDS; uiNeighIdx++ )
+    for ( int neighIdx = 0; neighIdx < numAffNeigh && affiAMVPInfo.numCand < AMVP_MAX_NUM_CANDS; neighIdx++ )
     {
-      const PredictionUnit* puNeighbour = npu[uiNeighIdx];
+      const PredictionUnit* puNeighbour = npu[neighIdx];
 
       if ( ((puNeighbour->interDir & (eTestRefPicList + 1)) == 0) || pu.cu->slice->getRefPOC( eTestRefPicList, puNeighbour->refIdx[eTestRefPicList] ) != targetRefPOC )
       {
@@ -2240,7 +2240,7 @@ void PU::fillAffineMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, co
   }
 
   // insert constructed affine candidates
-  Int iCornerMVPattern = 0;
+  int cornerMVPattern = 0;
   Position posLT = pu.Y().topLeft();
   Position posRT = pu.Y().topRight();
   Position posLB = pu.Y().bottomLeft();
@@ -2259,7 +2259,7 @@ void PU::fillAffineMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, co
   {
     addMVPCandUnscaled( pu, eRefPicList, refIdx, posLT, MD_LEFT, amvpInfo0, true );
   }
-  iCornerMVPattern = iCornerMVPattern | amvpInfo0.numCand;
+  cornerMVPattern = cornerMVPattern | amvpInfo0.numCand;
 
   //-------------------  V1 (START) -------------------//
   AMVPInfo amvpInfo1;
@@ -2271,7 +2271,7 @@ void PU::fillAffineMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, co
   {
     addMVPCandUnscaled( pu, eRefPicList, refIdx, posRT, MD_ABOVE_RIGHT, amvpInfo1, true );
   }
-  iCornerMVPattern = iCornerMVPattern | (amvpInfo1.numCand << 1);
+  cornerMVPattern = cornerMVPattern | (amvpInfo1.numCand << 1);
 
   //-------------------  V2 (START) -------------------//
   AMVPInfo amvpInfo2;
@@ -2283,7 +2283,7 @@ void PU::fillAffineMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, co
   {
     addMVPCandUnscaled( pu, eRefPicList, refIdx, posLB, MD_BELOW_LEFT, amvpInfo2, true );
   }
-  iCornerMVPattern = iCornerMVPattern | (amvpInfo2.numCand << 2);
+  cornerMVPattern = cornerMVPattern | (amvpInfo2.numCand << 2);
 
   outputAffineMv[0] = amvpInfo0.mvCand[0];
   outputAffineMv[1] = amvpInfo1.mvCand[0];
@@ -2297,25 +2297,25 @@ void PU::fillAffineMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, co
   outputAffineMv[1].roundMV2SignalPrecision();
   outputAffineMv[2].roundMV2SignalPrecision();
 
-  if ( iCornerMVPattern == 7 || iCornerMVPattern == 3 || iCornerMVPattern == 5 )
+  if ( cornerMVPattern == 7 || cornerMVPattern == 3 || cornerMVPattern == 5 )
   {
 #if JVET_K0337_AFFINE_6PARA
-    if ( iCornerMVPattern == 3 && pu.cu->affineType == AFFINEMODEL_6PARAM ) // V0 V1 are available, derived V2 for 6-para
+    if ( cornerMVPattern == 3 && pu.cu->affineType == AFFINEMODEL_6PARAM ) // V0 V1 are available, derived V2 for 6-para
     {
-      Int shift = MAX_CU_DEPTH;
-      Int vx2 = (outputAffineMv[0].getHor() << shift) - ((outputAffineMv[1].getVer() - outputAffineMv[0].getVer()) << (shift + g_aucLog2[curHeight] - g_aucLog2[curWidth]));
-      Int vy2 = (outputAffineMv[0].getVer() << shift) + ((outputAffineMv[1].getHor() - outputAffineMv[0].getHor()) << (shift + g_aucLog2[curHeight] - g_aucLog2[curWidth]));
+      int shift = MAX_CU_DEPTH;
+      int vx2 = (outputAffineMv[0].getHor() << shift) - ((outputAffineMv[1].getVer() - outputAffineMv[0].getVer()) << (shift + g_aucLog2[curHeight] - g_aucLog2[curWidth]));
+      int vy2 = (outputAffineMv[0].getVer() << shift) + ((outputAffineMv[1].getHor() - outputAffineMv[0].getHor()) << (shift + g_aucLog2[curHeight] - g_aucLog2[curWidth]));
       roundAffineMv( vx2, vy2, shift );
       outputAffineMv[2].set( vx2, vy2 );
       outputAffineMv[2].roundMV2SignalPrecision();
     }
 #endif
 
-    if ( iCornerMVPattern == 5 ) // V0 V2 are available, derived V1
+    if ( cornerMVPattern == 5 ) // V0 V2 are available, derived V1
     {
-      Int shift = MAX_CU_DEPTH;
-      Int vx1 = (outputAffineMv[0].getHor() << shift) + ((outputAffineMv[2].getVer() - outputAffineMv[0].getVer()) << (shift + g_aucLog2[curWidth] - g_aucLog2[curHeight]));
-      Int vy1 = (outputAffineMv[0].getVer() << shift) - ((outputAffineMv[2].getHor() - outputAffineMv[0].getHor()) << (shift + g_aucLog2[curWidth] - g_aucLog2[curHeight]));
+      int shift = MAX_CU_DEPTH;
+      int vx1 = (outputAffineMv[0].getHor() << shift) + ((outputAffineMv[2].getVer() - outputAffineMv[0].getVer()) << (shift + g_aucLog2[curWidth] - g_aucLog2[curHeight]));
+      int vy1 = (outputAffineMv[0].getVer() << shift) - ((outputAffineMv[2].getHor() - outputAffineMv[0].getHor()) << (shift + g_aucLog2[curWidth] - g_aucLog2[curHeight]));
       roundAffineMv( vx1, vy1, shift );
       outputAffineMv[1].set( vx1, vy1 );
       outputAffineMv[1].roundMV2SignalPrecision();
@@ -3678,7 +3678,7 @@ Void PU::getAffineMergeCand( const PredictionUnit &pu, MvField (*mvFieldNeighbou
   if ( interDirNeighbours != 2 )
   {
     xInheritedAffineMv( pu, puFirstNeighbour, REF_PIC_LIST_0, cMv );
-    for ( Int mvNum = 0; mvNum < 3; mvNum++ )
+    for ( int mvNum = 0; mvNum < 3; mvNum++ )
     {
       mvFieldNeighbours[0][mvNum].setMvField( cMv[mvNum], puFirstNeighbour->refIdx[0] );
     }
@@ -3689,7 +3689,7 @@ Void PU::getAffineMergeCand( const PredictionUnit &pu, MvField (*mvFieldNeighbou
     if ( interDirNeighbours != 1 )
     {
       xInheritedAffineMv( pu, puFirstNeighbour, REF_PIC_LIST_1, cMv );
-      for ( Int mvNum = 0; mvNum < 3; mvNum++ )
+      for ( int mvNum = 0; mvNum < 3; mvNum++ )
       {
         mvFieldNeighbours[1][mvNum].setMvField( cMv[mvNum], puFirstNeighbour->refIdx[1] );
       }
@@ -3787,59 +3787,59 @@ Void PU::setAllAffineMv( PredictionUnit& pu, Mv affLT, Mv affRT, Mv affLB, RefPi
   Int iWidth  = pu.Y().width;
 
 #if JVET_K_AFFINE_REFACTOR // more readable
-  Int shift = MAX_CU_DEPTH;
+  int shift = MAX_CU_DEPTH;
 
   affLT.setHighPrec();
   affRT.setHighPrec();
   affLB.setHighPrec();
-  Int iDMvHorX, iDMvHorY, iDMvVerX, iDMvVerY;
-  iDMvHorX = (affRT - affLT).getHor() << (shift - g_aucLog2[iWidth]);
-  iDMvHorY = (affRT - affLT).getVer() << (shift - g_aucLog2[iWidth]);
+  int deltaMvHorX, deltaMvHorY, deltaMvVerX, deltaMvVerY;
+  deltaMvHorX = (affRT - affLT).getHor() << (shift - g_aucLog2[iWidth]);
+  deltaMvHorY = (affRT - affLT).getVer() << (shift - g_aucLog2[iWidth]);
 #if JVET_K0337_AFFINE_6PARA
-  Int iHeight = pu.Y().height;
+  int iHeight = pu.Y().height;
   if ( pu.cu->affineType == AFFINEMODEL_6PARAM )
   {
-    iDMvVerX = (affLB - affLT).getHor() << (shift - g_aucLog2[iHeight]);
-    iDMvVerY = (affLB - affLT).getVer() << (shift - g_aucLog2[iHeight]);
+    deltaMvVerX = (affLB - affLT).getHor() << (shift - g_aucLog2[iHeight]);
+    deltaMvVerY = (affLB - affLT).getVer() << (shift - g_aucLog2[iHeight]);
   }
   else
   {
-    iDMvVerX = -iDMvHorY;
-    iDMvVerY = iDMvHorX;
+    deltaMvVerX = -deltaMvHorY;
+    deltaMvVerY = deltaMvHorX;
   }
 #else
-  iDMvVerX = -iDMvHorY;
-  iDMvVerY = iDMvHorX;
+  deltaMvVerX = -deltaMvHorY;
+  deltaMvVerY = deltaMvHorX;
 #endif
 
-  Int iMvScaleHor = affLT.getHor() << shift;
-  Int iMvScaleVer = affLT.getVer() << shift;
+  int mvScaleHor = affLT.getHor() << shift;
+  int mvScaleVer = affLT.getVer() << shift;
 
-  Int blockWidth = AFFINE_MIN_BLOCK_SIZE;
-  Int blockHeight = AFFINE_MIN_BLOCK_SIZE;
-  const Int iHalfBW = blockWidth >> 1;
-  const Int iHalfBH = blockHeight >> 1;
+  int blockWidth = AFFINE_MIN_BLOCK_SIZE;
+  int blockHeight = AFFINE_MIN_BLOCK_SIZE;
+  const int halfBW = blockWidth >> 1;
+  const int halfBH = blockHeight >> 1;
 
   MotionBuf mb = pu.getMotionBuf();
-  Int iMvScaleTmpHor, iMvScaleTmpVer;
-  for ( Int h = 0; h < pu.Y().height; h += blockHeight )
+  int mvScaleTmpHor, mvScaleTmpVer;
+  for ( int h = 0; h < pu.Y().height; h += blockHeight )
   {
-    for ( Int w = 0; w < pu.Y().width; w += blockWidth )
+    for ( int w = 0; w < pu.Y().width; w += blockWidth )
     {
-      iMvScaleTmpHor = iMvScaleHor + iDMvHorX * (iHalfBW + w) + iDMvVerX * (iHalfBH + h);
-      iMvScaleTmpVer = iMvScaleVer + iDMvHorY * (iHalfBW + w) + iDMvVerY * (iHalfBH + h);
+      mvScaleTmpHor = mvScaleHor + deltaMvHorX * (halfBW + w) + deltaMvVerX * (halfBH + h);
+      mvScaleTmpVer = mvScaleVer + deltaMvHorY * (halfBW + w) + deltaMvVerY * (halfBH + h);
 #if JVET_K_AFFINE_BUG_FIXES
-      roundAffineMv( iMvScaleTmpHor, iMvScaleTmpVer, shift );
+      roundAffineMv( mvScaleTmpHor, mvScaleTmpVer, shift );
 #else
-      iMvScaleTmpHor >>= shift;
-      iMvScaleTmpVer >>= shift;
+      mvScaleTmpHor >>= shift;
+      mvScaleTmpVer >>= shift;
 #endif
 
-      for ( Int y = (h >> MIN_CU_LOG2); y < ((h + blockHeight) >> MIN_CU_LOG2); y++ )
+      for ( int y = (h >> MIN_CU_LOG2); y < ((h + blockHeight) >> MIN_CU_LOG2); y++ )
       {
-        for ( Int x = (w >> MIN_CU_LOG2); x < ((w + blockHeight) >> MIN_CU_LOG2); x++ )
+        for ( int x = (w >> MIN_CU_LOG2); x < ((w + blockHeight) >> MIN_CU_LOG2); x++ )
         {
-          mb.at( x, y ).mv[eRefList] = Mv( iMvScaleTmpHor, iMvScaleTmpVer, true );
+          mb.at( x, y ).mv[eRefList] = Mv( mvScaleTmpHor, mvScaleTmpVer, true );
         }
       }
     }
