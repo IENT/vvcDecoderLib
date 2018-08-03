@@ -118,6 +118,10 @@
 
 #endif
 
+#define DISTORTION_LAMBDA_BUGFIX                          1   // JVET-K0154 for FULL_NBIT
+#define DISTORTION_TYPE_BUGFIX                            1   // JVET-K0154 for FULL_NBIT
+#define WCG_EXT_BUGFIX                                    1
+
 // ====================================================================================================================
 // NEXT software switches
 // ====================================================================================================================
@@ -282,14 +286,23 @@
 #define FULL_NBIT                                         1 ///< When enabled, use distortion measure derived from all bits of source data, otherwise discard (bitDepth - 8) least-significant bits of distortion
 #define RExt__HIGH_PRECISION_FORWARD_TRANSFORM            1 ///< 0 use original 6-bit transform matrices for both forward and inverse transform, 1 (default) = use original matrices for inverse transform and high precision matrices for forward transform
 #else
-#define FULL_NBIT                                         0 ///< When enabled, use distortion measure derived from all bits of source data, otherwise discard (bitDepth - 8) least-significant bits of distortion
+#define FULL_NBIT                                         1 ///< When enabled, use distortion measure derived from all bits of source data, otherwise discard (bitDepth - 8) least-significant bits of distortion
 #define RExt__HIGH_PRECISION_FORWARD_TRANSFORM            0 ///< 0 (default) use original 6-bit transform matrices for both forward and inverse transform, 1 = use original matrices for inverse transform and high precision matrices for forward transform
 #endif
 
+#if DISTORTION_LAMBDA_BUGFIX
+#if FULL_NBIT
+#define DISTORTION_PRECISION_ADJUSTMENT(x)                0
+#else
+#define DISTORTION_ESTIMATION_BITS                        8
+#define DISTORTION_PRECISION_ADJUSTMENT(x)                ((x>DISTORTION_ESTIMATION_BITS)? ((x)-DISTORTION_ESTIMATION_BITS) : 0)
+#endif
+#else
 #if FULL_NBIT
 # define DISTORTION_PRECISION_ADJUSTMENT(x)  0
 #else
 # define DISTORTION_PRECISION_ADJUSTMENT(x) (x)
+#endif
 #endif
 
 // ====================================================================================================================
@@ -360,10 +373,14 @@ typedef       UInt            Intermediate_UInt; ///< used as intermediate value
 
 typedef       UInt64          SplitSeries;       ///< used to encoded the splits that caused a particular CU size
 
+#if DISTORTION_TYPE_BUGFIX
+typedef       uint64_t        Distortion;        ///< distortion measurement
+#else
 #if FULL_NBIT
 typedef       UInt64          Distortion;        ///< distortion measurement
 #else
 typedef       UInt            Distortion;        ///< distortion measurement
+#endif
 #endif
 
 // ====================================================================================================================

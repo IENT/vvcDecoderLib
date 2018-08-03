@@ -367,12 +367,22 @@ Void EncAdaptiveLoopFilter::ALFProcess(CodingStructure& cs, ALFParam* pcAlfParam
 
   const PelUnitBuf cRecExtBuf = recExtBuf;
   // set min cost
+#if DISTORTION_TYPE_BUGFIX
+  uint64_t uiMinRate = std::numeric_limits<uint64_t>::max();
+  uint64_t uiMinDist = std::numeric_limits<uint64_t>::max();
+#else
   UInt64 uiMinRate = MAX_INT;
   UInt64 uiMinDist = MAX_INT;
-  Double dMinCost  = MAX_DOUBLE;
+#endif
+  Double dMinCost = MAX_DOUBLE;
 
+#if DISTORTION_TYPE_BUGFIX
+  uint64_t ruiBits = std::numeric_limits<uint64_t>::max();
+  uint64_t ruiDist = std::numeric_limits<uint64_t>::max();
+#else
   UInt64 ruiBits = MAX_INT;
   UInt64 ruiDist = MAX_INT;
+#endif
 
   UInt64  uiOrigRate;
   UInt64  uiOrigDist;
@@ -765,7 +775,11 @@ Void EncAdaptiveLoopFilter::xEncALFChroma(UInt64 uiLumaRate, const PelUnitBuf& o
 
   // set min cost
   UInt64 uiMinRate = uiLumaRate;
+#if DISTORTION_TYPE_BUGFIX
+  uint64_t uiMinDist = std::numeric_limits<uint64_t>::max();
+#else
   UInt64 uiMinDist = MAX_INT;
+#endif
   Double dMinCost  = MAX_DOUBLE;
 
   // calc original cost
@@ -2212,8 +2226,13 @@ Double EncAdaptiveLoopFilter::xSolveAndQuant(Double *filterCoeff, Int *filterCoe
     }
   }
 
-  Int max_value = std::min((1<<(3+m_nInputBitDepth + m_nBitIncrement))-1, (1<<14)-1);
-  Int min_value = std::max(-(1<<(3+m_nInputBitDepth + m_nBitIncrement)), -(1<<14));
+#if DISTORTION_LAMBDA_BUGFIX
+  Int max_value = std::min((1 << (3 + m_nInternalBitDepth)) - 1, (1 << 14) - 1);
+  Int min_value = std::max(-(1 << (3 + m_nInternalBitDepth)), -(1 << 14));
+#else
+  Int    max_value = std::min((1 << (3 + m_nInputBitDepth + m_nBitIncrement)) - 1, (1 << 14) - 1);
+  Int    min_value = std::max(-(1 << (3 + m_nInputBitDepth + m_nBitIncrement)), -(1 << 14));
+#endif
   for (i=0; i<sqrFiltLength; i++)
   {
     filterCoeffQuant[i] = std::min( max_value , std::max( min_value , filterCoeffQuant[i] ) );
@@ -2232,8 +2251,13 @@ Double EncAdaptiveLoopFilter::xSolveAndQuant(Double *filterCoeff, Int *filterCoe
     Int centerCoef    = sqrFiltLength-2;
 
     Int *coef = filterCoeffQuant;
-    Int clipTableMax = ( ( m_ALF_HM3_QC_CLIP_RANGE - m_ALF_HM3_QC_CLIP_OFFSET - 1 ) << m_nBitIncrement );
-    Int clipTableMin = ( ( - m_ALF_HM3_QC_CLIP_OFFSET ) << m_nBitIncrement );
+#if DISTORTION_LAMBDA_BUGFIX
+    Int clipTableMax = ((m_ALF_HM3_QC_CLIP_RANGE - m_ALF_HM3_QC_CLIP_OFFSET - 1) << (m_nInternalBitDepth - 8));
+    Int clipTableMin = ((-m_ALF_HM3_QC_CLIP_OFFSET) << (m_nInternalBitDepth - 8));
+#else
+    Int clipTableMax = ((m_ALF_HM3_QC_CLIP_RANGE - m_ALF_HM3_QC_CLIP_OFFSET - 1) << m_nBitIncrement);
+    Int clipTableMin = ((-m_ALF_HM3_QC_CLIP_OFFSET) << m_nBitIncrement);
+#endif
 
     for (i=0; i<centerCoef; i++)
     {
@@ -4197,7 +4221,11 @@ Void EncAdaptiveLoopFilter::xFilteringFrameChroma(  const PelUnitBuf& orgUnitBuf
       for(int i=0; i<N; i++)
         m_pdDoubleAlfCoeff[i] = m_ppdAlfCorr[i][N];
 
+#if DISTORTION_LAMBDA_BUGFIX
+      xQuantFilterCoefChroma(m_pdDoubleAlfCoeff, qh, tap, m_nInternalBitDepth);
+#else
       xQuantFilterCoefChroma(m_pdDoubleAlfCoeff, qh, tap, m_nInputBitDepth + m_nBitIncrement);
+#endif
     }
   }
 
@@ -4576,8 +4604,13 @@ Void EncAdaptiveLoopFilter::xQuantFilterCoefChroma(Double* h, Int* qh, Int tap, 
   }
 
   // DC offset
-  max_value = std::min(  (1<<(3+m_nInputBitDepth + m_nBitIncrement))-1, (1<<14)-1);
-  min_value = std::max( -(1<<(3+m_nInputBitDepth + m_nBitIncrement)),  -(1<<14)  );
+#if DISTORTION_LAMBDA_BUGFIX
+  max_value = std::min((1 << (3 + m_nInternalBitDepth)) - 1, (1 << 14) - 1);
+  min_value = std::max(-(1 << (3 + m_nInternalBitDepth)), -(1 << 14));
+#else
+  max_value = std::min((1 << (3 + m_nInputBitDepth + m_nBitIncrement)) - 1, (1 << 14) - 1);
+  min_value = std::max(-(1 << (3 + m_nInputBitDepth + m_nBitIncrement)), -(1 << 14));
+#endif
 
   qh[N] =  (h[N]>=0.0)? (Int)( h[N]*(1<<(m_ALF_NUM_BIT_SHIFT-bit_depth+8)) + 0.5) : -(Int)(-h[N]*(1<<(m_ALF_NUM_BIT_SHIFT-bit_depth+8)) + 0.5);
   qh[N] = std::max(min_value,std::min(max_value, qh[N]));

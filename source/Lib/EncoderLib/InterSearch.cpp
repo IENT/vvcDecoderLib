@@ -230,7 +230,11 @@ Void InterSearch::init( EncCfg*        pcEncCfg,
       }
       else
       {
+#if DISTORTION_TYPE_BUGFIX
+        m_auiMVPIdxCost[iIdx][iNum] = MAX_UINT;
+#else
         m_auiMVPIdxCost[iIdx][iNum] = MAX_INT;
+#endif
       }
     }
   }
@@ -780,7 +784,11 @@ Void InterSearch::xFRUCMrgEstimation( PredictionUnit& pu, PelUnitBuf& origBuf, D
       Distortion uiCostCand = xGetInterPredictionError( pu, origBuf );
 
       UInt uiBitsCand = 1;
+#if DISTORTION_TYPE_BUGFIX
+      Distortion uiCost = uiCostCand + m_pcRdCost->getCost(uiBitsCand);
+#else
       UInt uiCost = uiCostCand + m_pcRdCost->getCost( uiBitsCand );
+#endif
 
       if( uiCost < ruiMinCost )
       {
@@ -1967,7 +1975,11 @@ Void InterSearch::xTZSearch( const PredictionUnit& pu,
   rcMv.divideByPowerOf2(2);
 
   // init TZSearchStruct
+#if DISTORTION_TYPE_BUGFIX
+  cStruct.uiBestSad = std::numeric_limits<Distortion>::max();
+#else
   cStruct.uiBestSad   = MAX_UINT;
+#endif
 
   //
   m_cDistParam.maximumDistortionForEarlyExit = cStruct.uiBestSad;
@@ -2233,7 +2245,11 @@ Void InterSearch::xTZSearchSelective( const PredictionUnit& pu,
   rcMv.divideByPowerOf2(2);
 
   // init TZSearchStruct
-  cStruct.uiBestSad   = MAX_UINT;
+#if DISTORTION_TYPE_BUGFIX
+  cStruct.uiBestSad = std::numeric_limits<Distortion>::max();
+#else
+  cStruct.uiBestSad = MAX_UINT;
+#endif
   cStruct.iBestX = 0;
   cStruct.iBestY = 0;
 
@@ -2539,7 +2555,11 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
 
   Int           bestBiPRefIdxL1 = 0;
   Int           bestBiPMvpL1 = 0;
+#if DISTORTION_TYPE_BUGFIX
+  Distortion biPDistTemp = std::numeric_limits<Distortion>::max();
+#else
   UInt          biPDistTemp = MAX_INT;
+#endif
 
   Distortion    uiCost[2] = { std::numeric_limits<Distortion>::max(), std::numeric_limits<Distortion>::max() };
   Distortion    uiCostBi  = std::numeric_limits<Distortion>::max();
@@ -2554,12 +2574,20 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
   {
     uiCostTempL0[iNumRef] = std::numeric_limits<Distortion>::max();
   }
+#if DISTORTION_TYPE_BUGFIX
+  UInt uiBitsTempL0[MAX_NUM_REF];
+#else
   Distortion    uiBitsTempL0[MAX_NUM_REF];
+#endif
 
   Mv            mvValidList1[4];
   Int           refIdxValidList1 = 0;
   UInt          bitsValidList1 = MAX_UINT;
+#if DISTORTION_TYPE_BUGFIX
+  Distortion costValidList1 = std::numeric_limits<Distortion>::max();
+#else
   UInt          costValidList1 = MAX_UINT;
+#endif
   Mv            mvHevc[3];
 
   xGetBlkBits( ePartSize, slice.isInterP(), puIdx, lastMode, uiMbBits);
@@ -2597,7 +2625,12 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
       }
       PelUnitBuf predBuf = m_tmpStorageLCU.getBuf( UnitAreaRelative(*pu.cu, pu) );
 
+#if DISTORTION_TYPE_BUGFIX
+      Distortion uiCandCost = xGetAffineTemplateCost(pu, origBuf, predBuf, mvHevc, aaiMvpIdx[iRefList][iRefIdxTemp],
+                                                     AMVP_MAX_NUM_CANDS, eRefPicList, iRefIdxTemp);
+#else
       UInt uiCandCost = xGetAffineTemplateCost( pu, origBuf, predBuf, mvHevc, aaiMvpIdx[iRefList][iRefIdxTemp], AMVP_MAX_NUM_CANDS, eRefPicList, iRefIdxTemp );
+#endif
       if ( uiCandCost < biPDistTemp )
       {
         ::memcpy( cMvTemp[iRefList][iRefIdxTemp], mvHevc, sizeof(Mv)*3 );
