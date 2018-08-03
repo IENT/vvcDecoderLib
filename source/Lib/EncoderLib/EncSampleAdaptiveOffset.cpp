@@ -57,7 +57,21 @@
 //! rounding with IBDI
 inline Double xRoundIbdi2(Int bitDepth, Double x)
 {
+#if DISTORTION_LAMBDA_BUGFIX
+#if FULL_NBIT
+  return ((x) >= 0 ? ((Int)((x) + 0.5)) : ((Int)((x) -0.5)));
+#else
+  if (DISTORTION_PRECISION_ADJUSTMENT(bitDepth) == 0)
+    return ((x) >= 0 ? ((Int)((x) + 0.5)) : ((Int)((x) -0.5)));
+  else
+    return ((x) > 0) ? (Int)(((Int)(x) + (1 << (DISTORTION_PRECISION_ADJUSTMENT(bitDepth) - 1)))
+                             / (1 << DISTORTION_PRECISION_ADJUSTMENT(bitDepth)))
+                     : ((Int)(((Int)(x) - (1 << (DISTORTION_PRECISION_ADJUSTMENT(bitDepth) - 1)))
+                              / (1 << DISTORTION_PRECISION_ADJUSTMENT(bitDepth))));
+#endif
+#else
   return ((x)>0) ? (Int)(((Int)(x)+(1<<(bitDepth-8-1)))/(1<<(bitDepth-8))) : ((Int)(((Int)(x)-(1<<(bitDepth-8-1)))/(1<<(bitDepth-8))));
+#endif
 }
 
 inline Double xRoundIbdi(Int bitDepth, Double x)
@@ -369,7 +383,11 @@ Void EncSampleAdaptiveOffset::decidePicParams(const Slice& slice, Bool* sliceEna
 Int64 EncSampleAdaptiveOffset::getDistortion(const Int channelBitDepth, Int typeIdc, Int typeAuxInfo, Int* invQuantOffset, SAOStatData& statData)
 {
   Int64 dist        = 0;
+#if DISTORTION_LAMBDA_BUGFIX
+  Int shift = 2 * DISTORTION_PRECISION_ADJUSTMENT(channelBitDepth);
+#else
   Int shift         = 2 * DISTORTION_PRECISION_ADJUSTMENT(channelBitDepth - 8);
+#endif
 
   switch(typeIdc)
   {
@@ -444,7 +462,11 @@ inline Int EncSampleAdaptiveOffset::estIterOffset(Int typeIdx, Double lambda, In
 Void EncSampleAdaptiveOffset::deriveOffsets(ComponentID compIdx, const Int channelBitDepth, Int typeIdc, SAOStatData& statData, Int* quantOffsets, Int& typeAuxInfo)
 {
   Int bitDepth = channelBitDepth;
+#if DISTORTION_LAMBDA_BUGFIX
+  Int shift = 2 * DISTORTION_PRECISION_ADJUSTMENT(bitDepth);
+#else
   Int shift    = 2 * DISTORTION_PRECISION_ADJUSTMENT(bitDepth-8);
+#endif
   Int offsetTh = SampleAdaptiveOffset::getMaxOffsetQVal(channelBitDepth);  //inclusive
 
   ::memset(quantOffsets, 0, sizeof(Int)*MAX_NUM_SAO_CLASSES);
@@ -463,10 +485,15 @@ Void EncSampleAdaptiveOffset::deriveOffsets(ComponentID compIdx, const Int chann
       continue; //offset will be zero
     }
 
-    quantOffsets[classIdx] = (Int) xRoundIbdi(bitDepth, (Double)( statData.diff[classIdx]<<(bitDepth-8))
-                                                                  /
-                                                          (Double)( statData.count[classIdx]<< m_offsetStepLog2[compIdx])
-                                               );
+#if DISTORTION_LAMBDA_BUGFIX
+    quantOffsets[classIdx] =
+      (Int) xRoundIbdi(bitDepth, (Double)(statData.diff[classIdx] << DISTORTION_PRECISION_ADJUSTMENT(bitDepth))
+                                   / (Double)(statData.count[classIdx] << m_offsetStepLog2[compIdx]));
+#else
+    quantOffsets[classIdx] =
+      (Int) xRoundIbdi(bitDepth, (Double)(statData.diff[classIdx] << (bitDepth - 8))
+                                   / (Double)(statData.count[classIdx] << m_offsetStepLog2[compIdx]));
+#endif
     quantOffsets[classIdx] = Clip3(-offsetTh, offsetTh, quantOffsets[classIdx]);
   }
 

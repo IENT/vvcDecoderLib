@@ -1165,7 +1165,11 @@ Void AdaptiveLoopFilter::create( const Int iPicWidth, const Int iPicHeight, cons
 {
   m_nInputBitDepth    = nInputBitDepth;
   m_nInternalBitDepth = nInternalBitDepth;
-  m_nBitIncrement     = nInternalBitDepth - 8; // according to ALF on HM-3
+#if DISTORTION_LAMBDA_BUGFIX
+  m_nBitIncrement = DISTORTION_PRECISION_ADJUSTMENT(nInternalBitDepth);
+#else
+  m_nBitIncrement = nInternalBitDepth - 8;   // according to ALF on HM-3
+#endif
   m_nIBDIMax          = ( 1 << m_nInternalBitDepth ) - 1;
 
   m_uiMaxTotalCUDepth = uiMaxCUDepth;
@@ -2179,10 +2183,14 @@ Void AdaptiveLoopFilter::xClassifyByGeoLaplacianBlk(Pel** classes, const CPelBuf
   Int th[16] = { 0, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4 };
   fl = 2;
   Int i, j;
+#if DISTORTION_LAMBDA_BUGFIX
+  Int shift = (11 + m_nInternalBitDepth - 8);
+#else
 #if FULL_NBIT
   Int shift = (11 + m_nBitIncrement + m_nInputBitDepth - 8);
 #else
   Int shift = (11 + m_nBitIncrement);
+#endif
 #endif
   Int flplusOne = fl + 1;
   Int fl2plusTwo = 2 * fl + 2;
@@ -2354,10 +2362,14 @@ Void AdaptiveLoopFilter::xClassifyByLaplacianBlk(Pel** classes, const CPelBuf& s
 
   Int i, j;
   Int *p_imgY_temp;
+#if DISTORTION_LAMBDA_BUGFIX
+  Int shift = (11 + m_nInternalBitDepth - 8);
+#else
 #if FULL_NBIT
   Int shift = (11 + m_nBitIncrement + m_nInputBitDepth - 8);
 #else
   Int shift = (11 + m_nBitIncrement);
+#endif
 #endif
   Int fl2plusOne = (m_VAR_SIZE << 1) + 1; //3
   Int pad_offset = pad_size - fl - 1;
@@ -3061,8 +3073,11 @@ Void AdaptiveLoopFilter::xFrameChromaAlf( ALFParam* pcAlfParam, const PelUnitBuf
   Pel* pRest      = recUnitBuf.get(compID).buf;
   Int iRestStride = recUnitBuf.get(compID).stride;
 
+#if DISTORTION_LAMBDA_BUGFIX
+  Int iShift = m_nInternalBitDepth - 8;
+#else
   Int iShift = m_nInputBitDepth + m_nBitIncrement - 8;
-
+#endif
   Pel* pTmpDec1, *pTmpDec2;
   Pel* pTmpPixSum;
 
