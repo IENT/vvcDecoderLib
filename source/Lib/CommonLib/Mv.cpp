@@ -57,9 +57,6 @@ void roundAffineMv( Int& mvx, Int& mvy, Int nShift )
   const int nOffset = 1 << (nShift - 1);
   mvx = mvx >= 0 ? (mvx + nOffset) >> nShift : -((-mvx + nOffset) >> nShift);
   mvy = mvy >= 0 ? (mvy + nOffset) >> nShift : -((-mvy + nOffset) >> nShift);
-
-  mvx = Clip3( -32768, 32767, mvx );
-  mvy = Clip3( -32768, 32767, mvy );
 }
 #endif
 #endif
