@@ -119,6 +119,7 @@ extern const UChar  g_aucIntraModeNumFast_UseMPM   [MAX_CU_DEPTH];
 extern const UChar  g_aucIntraModeNumFast_NotUseMPM[MAX_CU_DEPTH];
 
 extern const UChar  g_chroma422IntraAngleMappingTable[NUM_INTRA_MODE];
+#if !INTRA67_3MPM
 extern const UChar  g_intraMode65to33AngMapping[NUM_INTRA_MODE];
 
 extern const UChar  g_intraMode33to65AngMapping[36];
@@ -128,6 +129,7 @@ static const unsigned mpmCtx[NUM_INTRA_MODE] =
   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, // HOR domain
   3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3     // VER domain
 };
+#endif
 
 #if JEM_TOOLS
 extern const Int g_intraCubicFilter[32][4];
@@ -285,11 +287,12 @@ extern const Int g_aiNonLMPosThrs[];
 
 extern const UChar g_NonMPM[257];
 
+#if !INTRA67_3MPM
 #if JVET_B0051_NON_MPM_MODE
 extern const Int g_ipred_mode_table[];
 #endif
 #endif
-
+#endif
 
 //! \}
 

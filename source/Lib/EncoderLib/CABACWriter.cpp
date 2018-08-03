@@ -1155,6 +1155,19 @@ void CABACWriter::coding_tree( const CodingStructure& cs, Partitioner& partition
     cuCtx.qp = CU::predictQP( cu, cuCtx.qp );
   }
 
+#if JVET_K0346
+  if (!cs.slice->isIntra() && m_EncCu)
+  {
+    PredictionUnit& pu = *cu.firstPU;
+    if (pu.mergeFlag && (pu.mergeType == MRG_TYPE_SUBPU_ATMVP || pu.mergeType == MRG_TYPE_SUBPU_ATMVP_EXT))
+    {
+      unsigned int layerId = cs.slice->getDepth();
+      m_EncCu->incrementSubMergeBlkSize(layerId, cu.Y().width*cu.Y().height);
+      m_EncCu->incrementSubMergeBlkNum(layerId, 1);
+    }
+  }
+#endif
+
   // coding unit
   coding_unit( cu, partitioner, cuCtx );
 
@@ -1421,8 +1434,10 @@ void CABACWriter::intra_luma_pred_modes( const CodingUnit& cu )
   unsigned ipred_modes [4];
 
   const PredictionUnit* pu = cu.firstPU;
+#if !INTRA67_3MPM
 #if JEM_TOOLS
   const bool use65Ang = cu.cs->sps->getSpsNext().getUseIntra65Ang();
+#endif
 #endif
 
   // prev_intra_luma_pred_flag
@@ -1458,6 +1473,7 @@ void CABACWriter::intra_luma_pred_modes( const CodingUnit& cu )
     const unsigned& mpm_idx = mpm_idxs[k];
     if( mpm_idx < numMPMs )
     {
+#if !INTRA67_3MPM
 #if JEM_TOOLS
       if( use65Ang )
       {
@@ -1470,6 +1486,7 @@ void CABACWriter::intra_luma_pred_modes( const CodingUnit& cu )
         encode_sparse_dt( dt, mpm_idx );
       }
       else
+#endif
 #endif
       {
         m_BinEncoder.encodeBinEP( mpm_idx > 0 );
@@ -1487,6 +1504,7 @@ void CABACWriter::intra_luma_pred_modes( const CodingUnit& cu )
       // sorting of MPMs
       std::sort( mpm_pred, mpm_pred + numMPMs );
 
+#if !INTRA67_3MPM
 #if JEM_TOOLS
       if( use65Ang )
       {
@@ -1518,7 +1536,20 @@ void CABACWriter::intra_luma_pred_modes( const CodingUnit& cu )
       }
       else
 #endif
+#endif
       {
+#if INTRA67_3MPM
+        for (int idx = int(numMPMs) - 1; idx >= 0; idx--)
+        {
+          if (ipred_mode > mpm_pred[idx])
+          {
+            ipred_mode--;
+          }
+        }
+        CHECK(ipred_mode >= 64, "Incorrect mode");
+
+        m_BinEncoder.encodeBinsEP(ipred_mode, 6);
+#else
         CHECK( g_intraMode33to65AngMapping[g_intraMode65to33AngMapping[ipred_mode]] != ipred_mode, "Using an extended intra mode, although not enabled" );
 
         ipred_mode = g_intraMode65to33AngMapping[ipred_mode];
@@ -1533,6 +1564,7 @@ void CABACWriter::intra_luma_pred_modes( const CodingUnit& cu )
         CHECK( ipred_mode >= 32, "Incorrect mode" );
 
         m_BinEncoder.encodeBinsEP( ipred_mode, 5 );
+#endif
       }
     }
 
@@ -1549,9 +1581,11 @@ void CABACWriter::intra_luma_pred_mode( const PredictionUnit& pu )
   unsigned  numMPMs  = pu.cs->pcv->numMPMs;
   unsigned *mpm_pred = ( unsigned* ) alloca( numMPMs * sizeof( unsigned ) );
 
+#if !INTRA67_3MPM
 #if JEM_TOOLS
   const bool use65Ang = pu.cs->sps->getSpsNext().getUseIntra65Ang();
 
+#endif
 #endif
   PU::getIntraMPMs( pu, mpm_pred );
 
@@ -1571,6 +1605,7 @@ void CABACWriter::intra_luma_pred_mode( const PredictionUnit& pu )
   // mpm_idx / rem_intra_luma_pred_mode
   if( mpm_idx < numMPMs )
   {
+#if !INTRA67_3MPM
 #if JEM_TOOLS
     if( use65Ang )
     {
@@ -1584,6 +1619,7 @@ void CABACWriter::intra_luma_pred_mode( const PredictionUnit& pu )
     }
     else
 #endif
+#endif
     {
       m_BinEncoder.encodeBinEP( mpm_idx > 0 );
       if( mpm_idx )
@@ -1595,6 +1631,7 @@ void CABACWriter::intra_luma_pred_mode( const PredictionUnit& pu )
   else
   {
     std::sort( mpm_pred, mpm_pred + numMPMs );
+#if !INTRA67_3MPM
 #if JEM_TOOLS
     if( use65Ang )
     {
@@ -1625,7 +1662,18 @@ void CABACWriter::intra_luma_pred_mode( const PredictionUnit& pu )
     }
     else
 #endif
+#endif
     {
+#if INTRA67_3MPM
+      for (int idx = int(numMPMs) - 1; idx >= 0; idx--)
+      {
+        if (ipred_mode > mpm_pred[idx])
+        {
+          ipred_mode--;
+        }
+      }
+      m_BinEncoder.encodeBinsEP(ipred_mode, 6);
+#else
       CHECK( g_intraMode33to65AngMapping[g_intraMode65to33AngMapping[ipred_mode]] != ipred_mode, "Using an extended intra mode, although not enabled" );
 
       ipred_mode = g_intraMode65to33AngMapping[ipred_mode];
@@ -1638,6 +1686,7 @@ void CABACWriter::intra_luma_pred_mode( const PredictionUnit& pu )
       }
 
       m_BinEncoder.encodeBinsEP( ipred_mode, 5 );
+#endif
     }
   }
 }

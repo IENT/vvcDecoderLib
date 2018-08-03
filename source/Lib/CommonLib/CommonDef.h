@@ -132,7 +132,11 @@ static const Int NOT_VALID =                                       -1;
 
 static const Int AMVP_MAX_NUM_CANDS =                               2; ///< AMVP: advanced motion vector prediction - max number of final candidates
 static const Int AMVP_MAX_NUM_CANDS_MEM =                           3; ///< AMVP: advanced motion vector prediction - max number of candidates
+#if JVET_K0346
+static const int AMVP_DECIMATION_FACTOR =                           2;
+#else
 static const Int AMVP_DECIMATION_FACTOR =                           4;
+#endif
 static const Int MRG_MAX_NUM_CANDS =                                7; ///< MERGE
 
 static const Int MAX_TLAYER =                                       7; ///< Explicit temporal layer QP offset - max number of temporal layer
@@ -220,8 +224,12 @@ static const UInt  EMT_INTRA_MAX_CU_WITH_QTBT =                    64; ///< Max 
 static const UInt  EMT_INTER_MAX_CU_WITH_QTBT =                    64; ///< Max Inter CU size applying EMT, supported values: 8, 16, 32, 64, 128
 
 #endif
-static const Int NUM_MOST_PROBABLE_MODES =                          3;
-static const Int NUM_MOST_PROBABLE_MODES_67 =                       6;
+#if INTRA67_3MPM
+static const int NUM_MOST_PROBABLE_MODES = 3;
+#else
+static const Int NUM_MOST_PROBABLE_MODES = 3;
+static const Int NUM_MOST_PROBABLE_MODES_67 = 6;
+#endif
 #if JEM_TOOLS
 static const Int MMLM_SAMPLE_NEIGHBOR_LINES =                       2;
 static const Int LM_SYMBOL_NUM =                   (1 + NUM_LMC_MODE);
