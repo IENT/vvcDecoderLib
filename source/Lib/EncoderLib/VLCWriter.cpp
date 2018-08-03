@@ -536,7 +536,9 @@ Void HLSWriter::codeSPSNext( const SPSNext& spsNext, const bool usePCM )
 #if JEM_TOOLS
   WRITE_FLAG( spsNext.getUseNSST() ? 1 : 0,                                                     "nsst_enabled_flag" );
   WRITE_FLAG( spsNext.getUseIntra4Tap() ? 1 : 0,                                                "intra_4tap_flag" );
+#if !INTRA67_3MPM
   WRITE_FLAG( spsNext.getUseIntra65Ang() ? 1 : 0,                                               "intra_65ang_flag" );
+#endif
 #endif
   WRITE_FLAG( spsNext.getUseLargeCTU() ? 1 : 0,                                                 "large_ctu_flag" );
 #if JEM_TOOLS
@@ -1395,6 +1397,16 @@ Void HLSWriter::codeSliceHeader         ( Slice* pcSlice )
     }
   }
 
+#if JVET_K0346
+  if (pcSlice->getSPS()->getSpsNext().getUseSubPuMvp() && !pcSlice->isIntra())
+  {
+    WRITE_FLAG(pcSlice->getSubPuMvpSliceSubblkSizeEnable(), "slice_atmvp_subblk_size_enable_flag");
+    if (pcSlice->getSubPuMvpSliceSubblkSizeEnable())
+    {
+      WRITE_CODE(pcSlice->getSubPuMvpSubblkLog2Size() - MIN_CU_LOG2, 3, "log2_slice_sub_pu_tmvp_size_minus2");
+    }
+  }
+#endif
 #endif
   if(pcSlice->getPPS()->getSliceHeaderExtensionPresentFlag())
   {

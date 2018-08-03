@@ -186,7 +186,9 @@ protected:
 
 #if JEM_TOOLS
   bool      m_Intra4Tap;
+#if !INTRA67_3MPM
   bool      m_Intra65Ang;
+#endif
   bool      m_IntraBoundaryFilter;
 #endif
 #if JEM_TOOLS
@@ -658,8 +660,10 @@ public:
   void      setIntra4Tap                    ( bool b )       { m_Intra4Tap = b; }
   bool      getIntra4Tap                    ()         const { return m_Intra4Tap; }
 
+#if !INTRA67_3MPM
   void      setIntra65Ang                   ( bool b )       { m_Intra65Ang = b; }
   bool      getIntra65Ang                   ()         const { return m_Intra65Ang; }
+#endif
 
 #endif
   void      setLargeCTU                     ( bool b )       { m_LargeCTU = b; }
