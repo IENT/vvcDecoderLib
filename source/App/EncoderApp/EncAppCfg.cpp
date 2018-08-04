@@ -803,12 +803,13 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
   ("MaxBTDepthISliceL",                               m_uiMaxBTDepthI,                                     3u, "MaxBTDepthISliceL")
   ("MaxBTDepthISliceC",                               m_uiMaxBTDepthIChroma,                               3u, "MaxBTDepthISliceC")
   ("DualITree",                                       m_dualTree,                                       false, "Use separate QTBT trees for intra slice luma and chroma channel types")
-  ("QtbtDualITree",                                   m_dualTree,                                       false, "Use separate QTBT trees for intra slice luma and chroma channel types")
   ("LargeCTU",                                        m_LargeCTU,                                       false, "Enable large CTU (0:off, 1:on)  [default: off]")
 #if JEM_TOOLS
   ("NSST",                                            m_NSST,                                           false, "Enable NSST (0:off, 1:on)  [default: off]")
   ("Intra4Tap",                                       m_Intra4Tap,                                      false, "Enable 4-tap intra filter (0:off, 1:on)  [default: off]")
+#if !INTRA67_3MPM
   ("Intra65Ang",                                      m_Intra65Ang,                                     false, "Enable 65 intra prediction modes (0:off, 1:on)  [default: off]")
+#endif
   ("IntraBoundaryFilter",                             m_IntraBoundaryFilter,                            false, "Enable Intra boundary filter (0:off, 1:on)  [default: off]")
 #if ENABLE_BMS
   ("SubPuMvp",                                        m_SubPuMvpMode,                                       0, "Enable Sub-PU temporal motion vector prediction (0:off, 1:ATMVP, 2:STMVP, 3:ATMVP+STMVP)  [default: off]")
@@ -1921,7 +1922,9 @@ Bool EncAppCfg::xCheckParameter()
     xConfirmPara( m_QTBT, "QTBT only allowed with NEXT profile" );
 #if JEM_TOOLS
     xConfirmPara( m_NSST, "NSST only allowed with NEXT profile" );
+#if !INTRA67_3MPM
     xConfirmPara( m_Intra65Ang, "Intra 65 Ang only allowed with NEXT profile" );
+#endif
     xConfirmPara( m_Intra4Tap,  "Intra 4 Tap only allowed with NEXT profile" );
     xConfirmPara( m_IntraBoundaryFilter, "Intra boundary filter is only allowed with NEXT profile" );
     xConfirmPara( m_LMChroma, "LMChroma only allowed with NEXT profile" );
@@ -2026,7 +2029,9 @@ Bool EncAppCfg::xCheckParameter()
 #if HEVC_USE_INTRA_SMOOTHING_T32 || HEVC_USE_INTRA_SMOOTHING_T64
     xConfirmPara( (m_IntraPDPC & 2) && m_useStrongIntraSmoothing, "PDPC==2 requires disabling strong intra smoothing" );
 #endif
+#if !INTRA67_3MPM
     xConfirmPara( ( m_LMChroma > 1 ) && !m_Intra65Ang, "ELM (LMChroma > 1) requires Intra65Ang" );
+#endif
 #endif
 #if JEM_TOOLS
     xConfirmPara( m_CIPF > 2, "CIPF must be in range [0:2]" );
@@ -3214,7 +3219,9 @@ Void EncAppCfg::xPrintParameter()
     msg( VERBOSE, "\nNEXT TOOL CFG: " );
 #if JEM_TOOLS
     msg( VERBOSE, "Intra4Tap:%d ", m_Intra4Tap );
+#if !INTRA67_3MPM
     msg( VERBOSE, "Intra65Ang:%d ", m_Intra65Ang );
+#endif
     msg( VERBOSE, "IntraBoundaryFilter:%d ", m_IntraBoundaryFilter );
     msg( VERBOSE, "NSST:%d ", m_NSST );
     msg( VERBOSE, "Affine:%d ", m_Affine );

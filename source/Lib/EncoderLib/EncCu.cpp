@@ -303,6 +303,9 @@ void EncCu::init( EncLib* pcEncLib, const SPS& sps PARL_PARAM( const int tId ) )
   m_pcTrQuant          = pcEncLib->getTrQuant( PARL_PARAM0( tId ) );
   m_pcRdCost           = pcEncLib->getRdCost ( PARL_PARAM0( tId ) );
   m_CABACEstimator     = pcEncLib->getCABACEncoder( PARL_PARAM0( tId ) )->getCABACEstimator( &sps );
+#if JVET_K0346
+  m_CABACEstimator->setEncCu(this);
+#endif
   m_CtxCache           = pcEncLib->getCtxCache( PARL_PARAM0( tId ) );
   m_pcRateCtrl         = pcEncLib->getRateCtrl();
   m_pcSliceEncoder     = pcEncLib->getSliceEncoder();
@@ -320,6 +323,12 @@ void EncCu::init( EncLib* pcEncLib, const SPS& sps PARL_PARAM( const int tId ) )
   m_pcInterSearch->setModeCtrl( m_modeCtrl );
 #if !JVET_K0220_ENC_CTRL
   m_pcIntraSearch->setModeCtrl( m_modeCtrl );
+#endif
+#if JVET_K0346
+  ::memset(m_subMergeBlkSize, 0, sizeof(m_subMergeBlkSize));
+  ::memset(m_subMergeBlkNum, 0, sizeof(m_subMergeBlkNum));
+  m_prevPOC = MAX_UINT;
+  m_clearSubMergeStatic = false;
 #endif
 }
 
@@ -760,8 +769,18 @@ Void EncCu::updateLambda( Slice* slice, Double dQP )
   Int    NumberBFrames = ( m_pcEncCfg->getGOPSize() - 1 );
   Int    SHIFT_QP = 12;
   Double dLambda_scale = 1.0 - Clip3( 0.0, 0.5, 0.05*(Double)(slice->getPic()->fieldPic ? NumberBFrames/2 : NumberBFrames) );
-  
+
+#if DISTORTION_LAMBDA_BUGFIX
+  Int bitdepth_luma_qp_scale = 6
+                               * (slice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA) - 8
+                                  - DISTORTION_PRECISION_ADJUSTMENT(slice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA)));
+#else
+#if FULL_NBIT
+  Int bitdepth_luma_qp_scale = 6 * (slice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA) - 8);
+#else
   Int    bitdepth_luma_qp_scale = 0;
+#endif
+#endif
   Double qp_temp = (Double) dQP + bitdepth_luma_qp_scale - SHIFT_QP;
   
   Double dQPFactor = m_pcEncCfg->getGOPEntry( m_pcSliceEncoder->getGopId() ).m_QPFactor;
@@ -1290,7 +1309,12 @@ void EncCu::xCheckRDCostIntra( CodingStructure *&tempCS, CodingStructure *&bestC
     {
       m_pcIntraSearch->estIntraPredLumaQT( cu, partitioner );
 
-      if( m_pcEncCfg->getUsePbIntraFast() && tempCS->dist == MAX_UINT && tempCS->interHad == 0 )
+#if DISTORTION_TYPE_BUGFIX
+      if (m_pcEncCfg->getUsePbIntraFast() && tempCS->dist == std::numeric_limits<Distortion>::max()
+          && tempCS->interHad == 0)
+#else
+      if (m_pcEncCfg->getUsePbIntraFast() && tempCS->dist == MAX_UINT && tempCS->interHad == 0)
+#endif
       {
         interHad = 0;
         // JEM assumes only perfect reconstructions can from now on beat the inter mode
@@ -1691,7 +1715,11 @@ void EncCu::xCheckRDCostMerge2Nx2N( CodingStructure *&tempCS, CodingStructure *&
           mergeCtx.mvFieldNeighbours[2*uiMergeCand+1].mv = pu.mv[1];
         }
 
-        UInt uiSad      = distParam.distFunc( distParam );
+#if DISTORTION_TYPE_BUGFIX
+        Distortion uiSad = distParam.distFunc(distParam);
+#else
+        UInt uiSad = distParam.distFunc(distParam);
+#endif
         UInt uiBitsCand = uiMergeCand + 1;
         if( uiMergeCand == tempCS->slice->getMaxNumMergeCand() - 1 )
         {
@@ -1983,8 +2011,19 @@ void EncCu::xCheckRDCostInterWoOBMC( CodingStructure *&tempCS, CodingStructure *
     return;
   }
 
-  const UInt    uiSADOBMCOff = m_pcRdCost->getDistPart( tempCS->getOrgBuf( cu->Y() ), m_pPredBufWoOBMC[wIdx][hIdx].Y(), sps.getBitDepth( CHANNEL_TYPE_LUMA ), COMPONENT_Y, DF_SAD_FULL_NBIT );
-  const UInt    uiSADOBMCOn  = m_pcRdCost->getDistPart( tempCS->getOrgBuf( cu->Y() ), CSWoOBMC->getPredBuf( cu->Y() ),  sps.getBitDepth( CHANNEL_TYPE_LUMA ), COMPONENT_Y, DF_SAD_FULL_NBIT );
+#if DISTORTION_TYPE_BUGFIX
+  const Distortion uiSADOBMCOff =
+    m_pcRdCost->getDistPart(tempCS->getOrgBuf(cu->Y()), m_pPredBufWoOBMC[wIdx][hIdx].Y(),
+                            sps.getBitDepth(CHANNEL_TYPE_LUMA), COMPONENT_Y, DF_SAD_FULL_NBIT);
+  const Distortion uiSADOBMCOn =
+    m_pcRdCost->getDistPart(tempCS->getOrgBuf(cu->Y()), CSWoOBMC->getPredBuf(cu->Y()),
+                            sps.getBitDepth(CHANNEL_TYPE_LUMA), COMPONENT_Y, DF_SAD_FULL_NBIT);
+#else
+  const UInt uiSADOBMCOff = m_pcRdCost->getDistPart(tempCS->getOrgBuf(cu->Y()), m_pPredBufWoOBMC[wIdx][hIdx].Y(),
+                                                    sps.getBitDepth(CHANNEL_TYPE_LUMA), COMPONENT_Y, DF_SAD_FULL_NBIT);
+  const UInt uiSADOBMCOn  = m_pcRdCost->getDistPart(tempCS->getOrgBuf(cu->Y()), CSWoOBMC->getPredBuf(cu->Y()),
+                                                   sps.getBitDepth(CHANNEL_TYPE_LUMA), COMPONENT_Y, DF_SAD_FULL_NBIT);
+#endif
   const Double    dOBMCThOff = 1.0;
   const Bool   bCheckOBMCOff = uiSADOBMCOff * dOBMCThOff < uiSADOBMCOn;
 
@@ -2457,7 +2496,11 @@ void EncCu::xReuseCachedResult( CodingStructure *&tempCS, CodingStructure *&best
 #if WCG_EXT
       if( m_pcEncCfg->getLumaLevelToDeltaQPMapping().isEnabled() )
       {
-        const CPelBuf orgLuma = tempCS->getOrgBuf( cs.area.blocks[COMPONENT_Y] );
+#if WCG_EXT_BUGFIX
+        const CPelBuf orgLuma = tempCS->getOrgBuf(tempCS->area.blocks[COMPONENT_Y]);
+#else
+        const CPelBuf orgLuma = tempCS->getOrgBuf(cs.area.blocks[COMPONENT_Y]);
+#endif
         finalDistortion += m_pcRdCost->getDistPart( org, reco, sps.getBitDepth( toChannelType( compID ) ), compID, DF_SSE_WTD, &orgLuma );
       }
       else

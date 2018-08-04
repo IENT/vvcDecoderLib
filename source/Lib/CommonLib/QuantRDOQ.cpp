@@ -505,9 +505,17 @@ Double QuantRDOQ::xGetErrScaleCoeff( SizeType width, SizeType height, Int qp, co
   Double    dTransShift     = (Double)iTransformShift + ( needsSrqt2 ? -0.5 : 0.0 );
   dErrScale                 = dErrScale*pow( 2.0, ( -2.0*dTransShift ) );                     // Compensate for scaling through forward transform
   Int       QStep           = ( needsSrqt2 ? ( ( g_quantScales[qp] * 181 ) >> 7 ) : g_quantScales[qp] );
-  double    finalErrScale   = dErrScale / QStep / QStep / ( 1 << DISTORTION_PRECISION_ADJUSTMENT( 2 * ( channelBitDepth - 8 ) ) );
+#if DISTORTION_LAMBDA_BUGFIX
+  double    finalErrScale = dErrScale / QStep / QStep / (1 << (DISTORTION_PRECISION_ADJUSTMENT(channelBitDepth) << 1));
+#else
+  double finalErrScale = dErrScale / QStep / QStep / (1 << DISTORTION_PRECISION_ADJUSTMENT(2 * (channelBitDepth - 8)));
+#endif
+#else
+#if DISTORTION_LAMBDA_BUGFIX
+  int errShift = SCALE_BITS - ((iTransformShift + DISTORTION_PRECISION_ADJUSTMENT(channelBitDepth)) << 1);
 #else
   int       errShift        = SCALE_BITS - ( ( iTransformShift + DISTORTION_PRECISION_ADJUSTMENT( channelBitDepth - 8 ) ) << 1 );
+#endif
   double    dErrScale       = exp2( double( errShift ) );
   double    finalErrScale   = dErrScale / double( g_quantScales[qp] * g_quantScales[qp] );
 #endif
@@ -548,14 +556,28 @@ Void QuantRDOQ::xSetErrScaleCoeff( UInt list, UInt sizeX, UInt sizeY, Int qp, co
 
   for( i = 0; i < uiMaxNumCoeff; i++ )
   {
+#if DISTORTION_LAMBDA_BUGFIX
+    pdErrScale[i] = dErrScale / piQuantcoeff[i] / piQuantcoeff[i]
+                    / (1 << (DISTORTION_PRECISION_ADJUSTMENT(bitDepths.recon[channelType]) << 1));
+#else
     pdErrScale[i] = dErrScale / piQuantcoeff[i] / piQuantcoeff[i] / ( 1 << DISTORTION_PRECISION_ADJUSTMENT( 2 * ( bitDepths.recon[channelType] - 8 ) ) );
+#endif
   }
 
   Int QStep = ( needsSrqt2 ? ( ( g_quantScales[qp] * 181 ) >> 7 ) : g_quantScales[qp] );
 
+#if DISTORTION_LAMBDA_BUGFIX
+  xGetErrScaleCoeffNoScalingList(list, sizeX, sizeY, qp) =
+    dErrScale / QStep / QStep / (1 << (DISTORTION_PRECISION_ADJUSTMENT(bitDepths.recon[channelType]) << 1));
+#else
   xGetErrScaleCoeffNoScalingList( list, sizeX, sizeY, qp ) = dErrScale / QStep / QStep / ( 1 << DISTORTION_PRECISION_ADJUSTMENT( 2 * ( bitDepths.recon[channelType] - 8 ) ) );
+#endif
+#else
+#if DISTORTION_LAMBDA_BUGFIX
+  int errShift = SCALE_BITS - ((iTransformShift + DISTORTION_PRECISION_ADJUSTMENT(bitDepths.recon[channelType])) << 1);
 #else
   int    errShift = SCALE_BITS - ( ( iTransformShift + DISTORTION_PRECISION_ADJUSTMENT( bitDepths.recon[channelType] - 8 ) ) << 1 );
+#endif
   double dErrScale = exp2( double( errShift ) );
   for( i = 0; i < uiMaxNumCoeff; i++ )
   {
@@ -1288,8 +1310,13 @@ Void QuantRDOQ::xRateDistOptQuant(TransformUnit &tu, const ComponentID &compID, 
   if( cctx.signHiding() && uiAbsSum>=2)
   {
     const Double inverseQuantScale = Double(g_invQuantScales[cQP.rem]);
+#if DISTORTION_LAMBDA_BUGFIX
+    Int64 rdFactor = (Int64)(inverseQuantScale * inverseQuantScale * (1 << (2 * cQP.per)) / m_dLambda / 16
+                               / (1 << (2 * DISTORTION_PRECISION_ADJUSTMENT(channelBitDepth)))
+#else
     Int64 rdFactor = (Int64)(inverseQuantScale * inverseQuantScale * (1 << (2 * cQP.per))
                              / m_dLambda / 16 / (1 << (2 * DISTORTION_PRECISION_ADJUSTMENT(channelBitDepth - 8)))
+#endif
 #if HM_QTBT_AS_IN_JEM_QUANT
 #else
                               * blkErrScale
