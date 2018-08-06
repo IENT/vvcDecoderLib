@@ -392,6 +392,7 @@ bool QTBTPartitioner::canSplit( const PartSplit split, const CodingStructure &cs
   case CU_VERT_SPLIT:
   {
     // don't remove redundancy for intra, as it changes the processing order, which might cause intra gains
+#if JVET_K0351_RELEASE_TT_CENTER_RESTRICTION == 0
     if( !cs.slice->isIntra() && m_partStack.back().idx == 1 && implicitSplit == CU_DONT_SPLIT && ( lastSplit == CU_HORZ_SPLIT || lastSplit == CU_VERT_SPLIT ) )
     {
       if( split == perpSplit && prevSplit == perpSplit && ( ( lastSplit == CU_VERT_SPLIT && m_partStack.back().canQtSplit ) || lastSplit == CU_HORZ_SPLIT ) )
@@ -399,6 +400,7 @@ bool QTBTPartitioner::canSplit( const PartSplit split, const CodingStructure &cs
         return false;
       }
     }
+#endif
     if( ( lastSplit == CU_TRIH_SPLIT || lastSplit == CU_TRIV_SPLIT ) && currPartIdx() == 1 && split == parlSplit )
     {
       return false;
@@ -414,6 +416,7 @@ bool QTBTPartitioner::canSplit( const PartSplit split, const CodingStructure &cs
   case CU_TRIV_SPLIT:
   {
     // don't remove redundancy for intra, as it changes the processing order, which might cause intra gains
+#if JVET_K0351_RELEASE_TT_CENTER_RESTRICTION == 0
     if( !cs.slice->isIntra() && m_partStack.back().idx == 1 && implicitSplit == CU_DONT_SPLIT && ( lastSplit == CU_HORZ_SPLIT || lastSplit == CU_VERT_SPLIT ) )
     {
       if( split == perpTriSp && prevSplit == perpTriSp )
@@ -421,6 +424,7 @@ bool QTBTPartitioner::canSplit( const PartSplit split, const CodingStructure &cs
         return false;
       }
     }
+#endif
 #if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
     if (CS::isDualITree(cs) && (area.width > 64 || area.height > 64))
     {

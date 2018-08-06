@@ -72,6 +72,8 @@
 
 #define JVET_K0346                                        1 // simplifications on ATMVP
 
+#define JVET_K0351_RELEASE_TT_CENTER_RESTRICTION          1 // allowing binary partition for the center block of a tenary partitioned CU
+
 #ifndef JEM_TOOLS
 #define JEM_TOOLS                                         1 // Defines the inclusion of JEM tools into compiled executable
 
