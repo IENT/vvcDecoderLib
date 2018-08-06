@@ -56,8 +56,11 @@ Distortion RdCost::xGetSSE_SIMD( const DistParam &rcDtParam )
   const int iStrideSrc1 = rcDtParam.org.stride;
   const int iStrideSrc2 = rcDtParam.cur.stride;
 
-
+#if DISTORTION_LAMBDA_BUGFIX
+  const UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
+#else
   const UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT( ( rcDtParam.bitDepth-8 ) << 1 );
+#endif
   unsigned int uiRet = 0;
 
   if( vext >= AVX2 && ( iCols & 15 ) == 0 )
@@ -138,8 +141,11 @@ Distortion RdCost::xGetSSE_NxN_SIMD( const DistParam &rcDtParam )
   const int iStrideSrc1 = rcDtParam.org.stride;
   const int iStrideSrc2 = rcDtParam.cur.stride;
 
-
+#if DISTORTION_LAMBDA_BUGFIX
+  const UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
+#else
   const UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT( ( rcDtParam.bitDepth-8 ) << 1 );
+#endif
   unsigned int uiRet = 0;
 
   if( 4 == iWidth )
@@ -296,7 +302,11 @@ Distortion RdCost::xGetSAD_SIMD( const DistParam &rcDtParam )
   }
 
   uiSum <<= iSubShift;
-  return uiSum >> DISTORTION_PRECISION_ADJUSTMENT( rcDtParam.bitDepth - 8 );
+#if DISTORTION_LAMBDA_BUGFIX
+  return uiSum >> DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth);
+#else
+  return uiSum >> DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth - 8);
+#endif
 }
 
 
@@ -414,7 +424,11 @@ Distortion RdCost::xGetSAD_NxN_SIMD( const DistParam &rcDtParam )
   }
 
   uiSum <<= iSubShift;
-  return uiSum >> DISTORTION_PRECISION_ADJUSTMENT( rcDtParam.bitDepth - 8 );
+#if DISTORTION_LAMBDA_BUGFIX
+  return uiSum >> DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth);
+#else
+  return uiSum >> DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth - 8);
+#endif
 }
 
 
@@ -1039,7 +1053,11 @@ static UInt xCalcHAD16x8_SSE( const Torg *piOrg, const Tcur *piCur, const Int iS
 
   UInt sad = _mm_cvtsi128_si32( iSum );
 
+#if DISTORTION_TYPE_BUGFIX
+  sad = (UInt)(sad / sqrt(16.0 * 8) * 2);
+#else
   sad = (Int)(sad / sqrt( 16.0 * 8 ) * 2);
+#endif
 
   return sad;
 }
@@ -1270,7 +1288,11 @@ static UInt xCalcHAD8x16_SSE( const Torg *piOrg, const Tcur *piCur, const Int iS
 
   UInt sad = _mm_cvtsi128_si32( iSum );
 
-  sad = (Int)(sad / sqrt( 16.0 * 8 ) * 2);
+#if DISTORTION_TYPE_BUGFIX
+  sad = (UInt)(sad / sqrt(16.0 * 8) * 2);
+#else
+  sad        = (Int)(sad / sqrt(16.0 * 8) * 2);
+#endif
 
   return sad;
 }
@@ -1413,8 +1435,11 @@ static UInt xCalcHAD8x4_SSE( const Torg *piOrg, const Tcur *piCur, const Int iSt
 
   UInt sad = _mm_cvtsi128_si32( iSum );
   //sad = ((sad + 2) >> 2);
-  sad = (Int)(sad / sqrt( 4.0 * 8 ) * 2);
-
+#if DISTORTION_TYPE_BUGFIX
+  sad = (UInt)(sad / sqrt(4.0 * 8) * 2);
+#else
+  sad        = (Int)(sad / sqrt(4.0 * 8) * 2);
+#endif
   return sad;
 }
 
@@ -1545,7 +1570,11 @@ static UInt xCalcHAD4x8_SSE( const Torg *piOrg, const Tcur *piCur, const Int iSt
   UInt sad = _mm_cvtsi128_si32( iSum );
 
   //sad = ((sad + 2) >> 2);
-  sad = (Int)(sad / sqrt( 4.0 * 8 ) * 2);
+#if DISTORTION_TYPE_BUGFIX
+  sad = (UInt)(sad / sqrt(4.0 * 8) * 2);
+#else
+  sad        = (Int)(sad / sqrt(4.0 * 8) * 2);
+#endif
 
   return sad;
 }
@@ -1935,7 +1964,11 @@ static UInt xCalcHAD16x8_AVX2( const Torg *piOrg, const Tcur *piCur, const Int i
 
     sad = _mm_cvtsi128_si32( _mm256_castsi256_si128( iSum ) );
 
-    sad = (Int)(sad / sqrt( 16.0 * 8 ) * 2);
+#if DISTORTION_TYPE_BUGFIX
+    sad = (UInt)(sad / sqrt(16.0 * 8) * 2);
+#else
+    sad = (Int)(sad / sqrt(16.0 * 8) * 2);
+#endif
   }
 
 #endif //USE_AVX2
@@ -2243,7 +2276,11 @@ static UInt xCalcHAD8x16_AVX2( const Torg *piOrg, const Tcur *piCur, const Int i
 
     int sad2 = _mm_cvtsi128_si32( _mm256_castsi256_si128( iSum ) );
 
-    sad = (Int)(sad2 / sqrt( 16.0 * 8 ) * 2);
+#if DISTORTION_TYPE_BUGFIX
+    sad = (UInt)(sad2 / sqrt(16.0 * 8) * 2);
+#else
+    sad = (Int)(sad2 / sqrt(16.0 * 8) * 2);
+#endif
   }
 
 #endif //USE_AVX2
@@ -2269,7 +2306,11 @@ Distortion RdCost::xGetHADs_SIMD( const DistParam &rcDtParam )
   const Int iBitDepth  = rcDtParam.bitDepth;
 
   Int  x, y;
+#if DISTORTION_TYPE_BUGFIX
+  Distortion uiSum = 0;
+#else
   UInt uiSum = 0;
+#endif
 
   if( rcDtParam.isQtbt && iCols > iRows && ( iCols & 15 ) == 0 && ( iRows & 7 ) == 0 )
   {
@@ -2387,7 +2428,11 @@ Distortion RdCost::xGetHADs_SIMD( const DistParam &rcDtParam )
     THROW( "Unsupported size" );
   }
 
+#if DISTORTION_LAMBDA_BUGFIX
+  return uiSum >> DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth);
+#else
   return uiSum >> DISTORTION_PRECISION_ADJUSTMENT( rcDtParam.bitDepth - 8 );
+#endif
 }
 
 template <X86_VEXT vext>

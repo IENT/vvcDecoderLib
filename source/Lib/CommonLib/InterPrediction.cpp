@@ -2244,11 +2244,21 @@ static const Int FRUC_MERGE_MV_SEARCHPATTERN_SQUARE   = 1;
 static const Int FRUC_MERGE_MV_SEARCHPATTERN_DIAMOND  = 2;
 static const Int FRUC_MERGE_MV_SEARCHPATTERN_HEXAGON  = 3;
 
+#if DISTORTION_TYPE_BUGFIX
+Distortion InterPrediction::xFrucGetTempMatchCost(PredictionUnit &pu, Int nWidth, Int nHeight,
+                                                  RefPicList eCurRefPicList, const MvField &rCurMvField,
+                                                  Distortion uiMVCost)
+#else
 UInt InterPrediction::xFrucGetTempMatchCost( PredictionUnit& pu, Int nWidth, Int nHeight, RefPicList eCurRefPicList, const MvField& rCurMvField, UInt uiMVCost )
+#endif
 {
   const Int nMVUnit = 2;
 
+#if DISTORTION_TYPE_BUGFIX
+  Distortion uiCost = uiMVCost;
+#else
   UInt uiCost = uiMVCost;
+#endif
 
   DistParam cDistParam;
   cDistParam.applyWeight = false;
@@ -2305,9 +2315,20 @@ UInt InterPrediction::xFrucGetTempMatchCost( PredictionUnit& pu, Int nWidth, Int
   return uiCost;
 }
 
-UInt InterPrediction::xFrucGetBilaMatchCost( PredictionUnit& pu, Int nWidth, Int nHeight, RefPicList eCurRefPicList, const MvField& rCurMvField, MvField& rPairMVField, UInt uiMVCost )
+#if DISTORTION_TYPE_BUGFIX
+Distortion InterPrediction::xFrucGetBilaMatchCost(PredictionUnit &pu, Int nWidth, Int nHeight,
+                                                  RefPicList eCurRefPicList, const MvField &rCurMvField,
+                                                  MvField &rPairMVField, Distortion uiMVCost)
+#else
+UInt InterPrediction::xFrucGetBilaMatchCost(PredictionUnit &pu, Int nWidth, Int nHeight, RefPicList eCurRefPicList,
+                                            const MvField &rCurMvField, MvField &rPairMVField, UInt uiMVCost)
+#endif
 {
+#if DISTORTION_TYPE_BUGFIX
+  Distortion uiCost = std::numeric_limits<Distortion>::max();
+#else
   UInt uiCost = MAX_UINT;
+#endif
 
   if( PU::getMvPair( pu, eCurRefPicList , rCurMvField , rPairMVField ) )
   {
@@ -2627,9 +2648,19 @@ Void InterPrediction::xFrucCollectSubBlkStartMv( PredictionUnit& pu, const Merge
   }
 }
 
+#if DISTORTION_TYPE_BUGFIX
+Distortion InterPrediction::xFrucFindBestMvFromList(MvField *pBestMvField, RefPicList &rBestRefPicList,
+                                                    PredictionUnit &pu, const MvField &rMvStart, Int nBlkWidth,
+                                                    Int nBlkHeight, Bool bTM, Bool bMvCost)
+#else
 UInt InterPrediction::xFrucFindBestMvFromList( MvField* pBestMvField, RefPicList& rBestRefPicList, PredictionUnit& pu, const MvField& rMvStart, Int nBlkWidth, Int nBlkHeight, Bool bTM, Bool bMvCost )
+#endif
 {
+#if DISTORTION_TYPE_BUGFIX
+  Distortion uiMinCost = std::numeric_limits<Distortion>::max();
+#else
   UInt uiMinCost = MAX_UINT;
+#endif
 
   Int nRefPicListStart = 0;
   Int nRefPicListEnd = 1;
@@ -2652,7 +2683,11 @@ UInt InterPrediction::xFrucFindBestMvFromList( MvField* pBestMvField, RefPicList
           continue;
       }
 
+#if DISTORTION_TYPE_BUGFIX
+      Distortion uiCost = 0;
+#else
       UInt uiCost = 0;
+#endif
       if( bMvCost )
       {
         uiCost = xFrucGetMvCost( rMvStart.mv , pos->mv, MAX_INT, FRUC_MERGE_REFINE_MVWEIGHT, pu.cs->sps->getSpsNext().getUseHighPrecMv() ? VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : 0 );
@@ -2710,10 +2745,19 @@ Bool InterPrediction::deriveFRUCMV( PredictionUnit &pu )
   return bAvailable;
 }
 
+#if DISTORTION_TYPE_BUGFIX
+Distortion InterPrediction::xFrucGetMvCost(const Mv &rMvStart, const Mv &rMvCur, Int nSearchRange, Int nWeighting,
+                                           UInt precShift)
+#else
 UInt InterPrediction::xFrucGetMvCost( const Mv& rMvStart, const Mv& rMvCur, Int nSearchRange, Int nWeighting, UInt precShift )
+#endif
 {
   Mv mvDist = rMvStart - rMvCur;
+#if DISTORTION_TYPE_BUGFIX
+  Distortion uiCost = std::numeric_limits<Distortion>::max();
+#else
   UInt uiCost = MAX_UINT;
+#endif
   if( mvDist.getAbsHor() <= nSearchRange && mvDist.getAbsVer() <= nSearchRange )
   {
     uiCost = ( mvDist.getAbsHor() + mvDist.getAbsVer() ) * nWeighting;
@@ -2723,7 +2767,13 @@ UInt InterPrediction::xFrucGetMvCost( const Mv& rMvStart, const Mv& rMvCur, Int 
   return uiCost;
 }
 
+#if DISTORTION_TYPE_BUGFIX
+Distortion InterPrediction::xFrucRefineMv(MvField *pBestMvField, RefPicList eCurRefPicList, Distortion uiMinCost,
+                                          Int nSearchMethod, PredictionUnit &pu, const MvField &rMvStart, Int nBlkWidth,
+                                          Int nBlkHeight, Bool bTM, Bool bMvCostZero)
+#else
 UInt InterPrediction::xFrucRefineMv( MvField* pBestMvField, RefPicList eCurRefPicList, UInt uiMinCost, Int nSearchMethod, PredictionUnit& pu, const MvField& rMvStart, Int nBlkWidth, Int nBlkHeight, Bool bTM, Bool bMvCostZero )
+#endif
 {
   Int nSearchStepShift = 0;
   if( pu.cs->sps->getSpsNext().getUseHighPrecMv() )
@@ -2788,8 +2838,16 @@ UInt InterPrediction::xFrucRefineMv( MvField* pBestMvField, RefPicList eCurRefPi
   return uiMinCost;
 }
 
+#if DISTORTION_TYPE_BUGFIX
+template<Int SearchPattern>
+Distortion InterPrediction::xFrucRefineMvSearch(MvField *pBestMvField, RefPicList eCurRefPicList, PredictionUnit &pu,
+                                                const MvField &rMvStart, Int nBlkWidth, Int nBlkHeight,
+                                                Distortion uiMinDist, Bool bTM, Int nSearchStepShift,
+                                                UInt uiMaxSearchRounds, Bool bMvCostZero)
+#else
 template<Int SearchPattern>
 UInt InterPrediction::xFrucRefineMvSearch ( MvField* pBestMvField, RefPicList eCurRefPicList, PredictionUnit& pu, const MvField& rMvStart, Int nBlkWidth, Int nBlkHeight, UInt uiMinDist, Bool bTM, Int nSearchStepShift, UInt uiMaxSearchRounds, Bool bMvCostZero )
+#endif
 {
   const Mv mvSearchOffsetCross  [4] = { Mv(  0 , 1 ) , Mv( 1 , 0 ) , Mv(  0 , -1 ) , Mv( -1 ,  0 ) };
   const Mv mvSearchOffsetSquare [8] = { Mv( -1 , 1 ) , Mv( 0 , 1 ) , Mv(  1 ,  1 ) , Mv(  1 ,  0 ) , Mv(  1 , -1 ) , Mv(  0 , -1 ) , Mv( -1 , -1 ) , Mv( -1 , 0 )  };
@@ -2859,8 +2917,15 @@ UInt InterPrediction::xFrucRefineMvSearch ( MvField* pBestMvField, RefPicList eC
         mvOffset.highPrec = true;
       }
       mvCand.mv += mvOffset;
+#if DISTORTION_TYPE_BUGFIX
+      Distortion uiCost = (Distortion) xFrucGetMvCost(
+        rMvStart.mv, mvCand.mv, rSearchRange, FRUC_MERGE_REFINE_MVWEIGHT,
+        pu.cs->sps->getSpsNext().getUseHighPrecMv() ? VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : 0);
+      if (bMvCostZero && uiCost != std::numeric_limits<Distortion>::max())
+#else
       UInt uiCost = xFrucGetMvCost( rMvStart.mv, mvCand.mv, rSearchRange, FRUC_MERGE_REFINE_MVWEIGHT, pu.cs->sps->getSpsNext().getUseHighPrecMv() ? VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : 0 );
-      if (bMvCostZero && uiCost != MAX_UINT )
+      if (bMvCostZero && uiCost != MAX_UINT)
+#endif
       {
         uiCost = 0;
       }
@@ -2924,7 +2989,12 @@ Bool InterPrediction::frucFindBlkMv4Pred( PredictionUnit& pu, RefPicList eTarget
       // find best start
       xFrucCollectBlkStartMv( pu, mrgCtx, eTargetRefPicList, nTargetRefIdx, pInfo );
       MvField mvStart[2] , mvFinal[2];
+#if DISTORTION_TYPE_BUGFIX
+      Distortion uiMinCost = xFrucFindBestMvFromList(mvStart, eTargetRefPicList, pu, mvStart[eTargetRefPicList], nWidth,
+                                                     nHeight, true, false);
+#else
       UInt uiMinCost = xFrucFindBestMvFromList( mvStart, eTargetRefPicList, pu, mvStart[eTargetRefPicList], nWidth, nHeight, true, false );
+#endif
       if( mvStart[eTargetRefPicList].refIdx >= 0 )
       {
         // refine Mv
@@ -2956,7 +3026,12 @@ Bool InterPrediction::xFrucFindBlkMv( PredictionUnit& pu, const MergeCtx& mergeC
     xFrucCollectBlkStartMv( pu, mergeCtx );
 
     RefPicList eBestRefPicList = REF_PIC_LIST_0;
+#if DISTORTION_TYPE_BUGFIX
+    Distortion uiMinCost =
+      xFrucFindBestMvFromList(mvStart, eBestRefPicList, pu, mvStart[eBestRefPicList], nWidth, nHeight, false, false);
+#else
     UInt uiMinCost = xFrucFindBestMvFromList( mvStart, eBestRefPicList, pu, mvStart[eBestRefPicList], nWidth, nHeight, false, false );
+#endif
 
     if( mvStart[eBestRefPicList].refIdx >= 0 )
     {
@@ -2977,7 +3052,11 @@ Bool InterPrediction::xFrucFindBlkMv( PredictionUnit& pu, const MergeCtx& mergeC
 
     xFrucCollectBlkStartMv( pu, mergeCtx );
 
+#if DISTORTION_TYPE_BUGFIX
+    Distortion uiMinCost[2];
+#else
     UInt uiMinCost[2];
+#endif
     // find the best Mvs from the two lists first and then refine Mvs: try to avoid duplicated Mvs
     for( Int nRefPicList = 0 ; nRefPicList < 2 ; nRefPicList++ )
     {
@@ -2999,7 +3078,11 @@ Bool InterPrediction::xFrucFindBlkMv( PredictionUnit& pu, const MergeCtx& mergeC
     {
       //calculate cost for bi-refinement
       xFrucUpdateTemplate( pu, nWidth, nHeight, REF_PIC_LIST_0, mvFinal[REF_PIC_LIST_0] );
+#if DISTORTION_TYPE_BUGFIX
+      Distortion uiCostBi = xFrucGetTempMatchCost(pu, nWidth, nHeight, REF_PIC_LIST_1, mvFinal[REF_PIC_LIST_1], 0);
+#else
       UInt uiCostBi = xFrucGetTempMatchCost( pu, nWidth, nHeight, REF_PIC_LIST_1, mvFinal[REF_PIC_LIST_1], 0 );
+#endif
 
       if (2 * uiCostBi <= 5 * std::min(uiMinCost[0], uiMinCost[1]) )  // if (uiMinCostBi <= 5/4*2*min(uiMinCost[0], uiMinCost[1]) )
       {
@@ -3083,7 +3166,12 @@ Bool InterPrediction::xFrucRefineSubBlkMv( PredictionUnit& pu, const MergeCtx &m
           {
             RefPicList eCurRefPicList = ( RefPicList )nRefPicList;
             xFrucCollectSubBlkStartMv( subPu, mergeCtx, eCurRefPicList, mvStart[eCurRefPicList], nRefineBlockSize, nRefineBlockSize, puPos );
+#if DISTORTION_TYPE_BUGFIX
+            Distortion uiMinCost = xFrucFindBestMvFromList(mvFinal, eCurRefPicList, subPu, mvStart[eCurRefPicList],
+                                                           nRefineBlockSize, nRefineBlockSize, bTM, true);
+#else
             UInt uiMinCost = xFrucFindBestMvFromList( mvFinal, eCurRefPicList, subPu, mvStart[eCurRefPicList], nRefineBlockSize, nRefineBlockSize, bTM, true );
+#endif
             uiMinCost = xFrucRefineMv( mvFinal, eCurRefPicList, uiMinCost, nSearchMethod, subPu, mvStart[eCurRefPicList], nRefineBlockSize, nRefineBlockSize, bTM );
           }
         }
@@ -3094,7 +3182,12 @@ Bool InterPrediction::xFrucRefineSubBlkMv( PredictionUnit& pu, const MergeCtx &m
         RefPicList eBestRefPicList = m_bilatBestRefPicList;
         xFrucCollectSubBlkStartMv( subPu, mergeCtx, eBestRefPicList, mvStart[eBestRefPicList], nRefineBlockSize, nRefineBlockSize, puPos );
 
+#if DISTORTION_TYPE_BUGFIX
+        Distortion uiMinCost = xFrucFindBestMvFromList(mvFinal, eBestRefPicList, subPu, mvStart[eBestRefPicList],
+                                                       nRefineBlockSize, nRefineBlockSize, bTM, true);
+#else
         UInt uiMinCost = xFrucFindBestMvFromList( mvFinal, eBestRefPicList, subPu, mvStart[eBestRefPicList], nRefineBlockSize, nRefineBlockSize, bTM, true );
+#endif
         uiMinCost = xFrucRefineMv( mvFinal, eBestRefPicList, uiMinCost, nSearchMethod, subPu, mvStart[eBestRefPicList], nRefineBlockSize, nRefineBlockSize, bTM );
       }
 
@@ -3324,7 +3417,12 @@ Void InterPrediction::xFillPredBlckAndBorder( const PredictionUnit& pu, RefPicLi
   xPredInterLines( pu, refPic, mv, cPred, false, pu.cs->slice->clpRng(COMPONENT_Y) );
 }
 
+#if DISTORTION_TYPE_BUGFIX
+Distortion InterPrediction::xDirectMCCost(Int iBitDepth, Pel *pRef, UInt uiRefStride, const Pel *pOrg, UInt uiOrgStride,
+                                          Int iWidth, Int iHeight)
+#else
 UInt InterPrediction::xDirectMCCost( Int iBitDepth, Pel* pRef, UInt uiRefStride, const Pel* pOrg, UInt uiOrgStride, Int iWidth, Int iHeight )
+#endif
 {
   DistParam cDistParam;
   cDistParam.applyWeight = false;
@@ -3332,12 +3430,22 @@ UInt InterPrediction::xDirectMCCost( Int iBitDepth, Pel* pRef, UInt uiRefStride,
 
   m_pcRdCost->setDistParam( cDistParam, pOrg, pRef, uiOrgStride, uiRefStride, iBitDepth, COMPONENT_Y, iWidth, iHeight );
 
+#if DISTORTION_TYPE_BUGFIX
+  Distortion uiCost = cDistParam.distFunc(cDistParam);
+#else
   UInt uiCost = cDistParam.distFunc( cDistParam );
+#endif
 
   return uiCost;
 }
 
+#if DISTORTION_TYPE_BUGFIX
+Void InterPrediction::xBIPMVRefine(PredictionUnit &pu, RefPicList eRefPicList, Int iWidth, Int iHeight,
+                                   const CPelUnitBuf &pcYuvOrg, UInt uiMaxSearchRounds, UInt nSearchStepShift,
+                                   Distortion &uiMinCost, Bool fullPel /*= true*/)
+#else
 Void InterPrediction::xBIPMVRefine( PredictionUnit& pu, RefPicList eRefPicList, Int iWidth, Int iHeight, const CPelUnitBuf &pcYuvOrg, UInt uiMaxSearchRounds, UInt nSearchStepShift, UInt& uiMinCost, Bool fullPel /*= true*/ )
+#endif
 {
   const Mv mvSearchOffsetSquare[8] = { Mv(-1 , 1) , Mv(0 , 1) , Mv(1 , 1) , Mv(1 , 0) , Mv(1 , -1) , Mv(0 , -1) , Mv(-1 , -1) , Mv(-1 , 0) };
 
@@ -3375,7 +3483,11 @@ Void InterPrediction::xBIPMVRefine( PredictionUnit& pu, RefPicList eRefPicList, 
       Mv cMvTemp = cMvCtr;
       cMvTemp += mvOffset;
 
+#if DISTORTION_TYPE_BUGFIX
+      Distortion uiCost;
+#else
       UInt uiCost;
+#endif
 
       if ( fullPel )
       {
@@ -3452,7 +3564,13 @@ Void InterPrediction::xProcessDMVR( PredictionUnit& pu, PelUnitBuf &pcYuvDst, co
   //list 0
   //get init cost
   srcPred0.Y().toLast( clpRngs.comp[COMPONENT_Y] );
+#if DISTORTION_TYPE_BUGFIX
+  Distortion uiMinCost =
+    xDirectMCCost(clpRngs.comp[COMPONENT_Y].bd, pcYuvDst.Y().buf, pcYuvDst.Y().stride, srcPred0.Y().buf,
+                  srcPred0.Y().stride, pu.lumaSize().width, pu.lumaSize().height);
+#else
   UInt uiMinCost = xDirectMCCost( clpRngs.comp[COMPONENT_Y].bd, pcYuvDst.Y().buf, pcYuvDst.Y().stride, srcPred0.Y().buf, srcPred0.Y().stride, pu.lumaSize().width, pu.lumaSize().height );
+#endif
 
   xFillPredBlckAndBorder( pu, REF_PIC_LIST_0, pu.lumaSize().width, pu.lumaSize().height, srcPred0.Y() );
 

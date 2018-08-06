@@ -499,7 +499,11 @@ Void IntraSearch::estIntraPredLumaQT( CodingUnit &cu, Partitioner &partitioner )
             DTRACE( g_trace_ctx, D_INTRA_COST, "IntraHAD: %u, %llu, %f (%d)\n", uiSad, fracModeBits, cost, uiMode );
 
             updateCandList( uiMode, cost,  uiRdModeList, CandCostList, numModesForFullRD + extraModes );
+#if DISTORTION_TYPE_BUGFIX
+            updateCandList(uiMode, (Double) uiSad, uiHadModeList, CandHadList, 3 + extraModes);
+#else
             updateCandList( uiMode, uiSad, uiHadModeList, CandHadList, 3                 + extraModes );
+#endif
           }
 #if JEM_TOOLS
           if( NSSTSaveFlag )
@@ -618,7 +622,7 @@ Void IntraSearch::estIntraPredLumaQT( CodingUnit &cu, Partitioner &partitioner )
                 double cost = (double) sad + (double) fracModeBits * sqrtLambdaForFirstPass;
 
                 updateCandList(mode, cost, uiRdModeList, CandCostList, numModesForFullRD);
-                updateCandList(mode, sad, uiHadModeList, CandHadList, 3);
+                updateCandList(mode, (double)sad, uiHadModeList, CandHadList, 3);
 
                 bSatdChecked[mode] = true;
               }
@@ -670,7 +674,11 @@ Void IntraSearch::estIntraPredLumaQT( CodingUnit &cu, Partitioner &partitioner )
                   Double cost = ( Double ) uiSad + ( Double ) fracModeBits * sqrtLambdaForFirstPass;
 
                   updateCandList( uiMode, cost,  uiRdModeList,  CandCostList, numModesForFullRD );
+#if DISTORTION_TYPE_BUGFIX
+                  updateCandList(uiMode, (Double) uiSad, uiHadModeList, CandHadList, 3);
+#else
                   updateCandList( uiMode, uiSad, uiHadModeList, CandHadList,  3 );
+#endif
 
                   bSatdChecked[uiMode] = true;
                 }
@@ -794,7 +802,11 @@ Void IntraSearch::estIntraPredLumaQT( CodingUnit &cu, Partitioner &partitioner )
       }
       if( CandHadList.size() < 1 || CandHadList[0] > cs.interHad * PBINTRA_RATIO )
       {
-        cs.dist     = MAX_UINT;
+#if DISTORTION_TYPE_BUGFIX
+        cs.dist = std::numeric_limits<Distortion>::max();
+#else
+        cs.dist = MAX_UINT;
+#endif
         cs.interHad = 0;
 
         //===== reset context models =====
@@ -954,10 +966,18 @@ Void IntraSearch::estIntraPredChromaQT(CodingUnit &cu, Partitioner &partitioner)
       }
 #if JEM_TOOLS
 
+#if DISTORTION_TYPE_BUGFIX
+      Distortion auiSATDModeList[LM_FILTER_NUM];
+#else
       UInt auiSATDModeList[LM_FILTER_NUM];
+#endif
       if( pu.cs->pcv->noRQT && pu.cs->sps->getSpsNext().getUseLMChroma() && PU::isMFLMEnabled(pu))
       {
+#if DISTORTION_TYPE_BUGFIX
+        Distortion auiSATDSortedcost[LM_FILTER_NUM];
+#else
         UInt auiSATDSortedcost[LM_FILTER_NUM];
+#endif
         DistParam distParam;
         const Bool bUseHadamard = true;
         Int iCurLMMFIdx = 0;
@@ -970,7 +990,11 @@ Void IntraSearch::estIntraPredChromaQT(CodingUnit &cu, Partitioner &partitioner)
         //SATD checking for LMMF candidates
         for (UInt uiMode = LM_CHROMA_F1_IDX; uiMode < LM_CHROMA_F1_IDX + LM_FILTER_NUM; uiMode++)
         {
+#if DISTORTION_TYPE_BUGFIX
+          Distortion uiSad = 0;
+#else
           UInt uiSad = 0;
+#endif
           CodingStructure& cs = *(pu.cs);
 
           CompArea areaCb = pu.Cb();
@@ -1007,7 +1031,11 @@ Void IntraSearch::estIntraPredChromaQT(CodingUnit &cu, Partitioner &partitioner)
           auiSATDModeList[iCurLMMFIdx] = uiMode;
           for (Int k = iCurLMMFIdx; k > 0 && auiSATDSortedcost[k] < auiSATDSortedcost[k - 1]; k--)
           {
+#if DISTORTION_TYPE_BUGFIX
+            Distortion tmp = auiSATDSortedcost[k];
+#else
             UInt tmp = auiSATDSortedcost[k];
+#endif
             auiSATDSortedcost[k] = auiSATDSortedcost[k - 1];
             auiSATDSortedcost[k - 1] = tmp;
 

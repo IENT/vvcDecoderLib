@@ -2012,7 +2012,18 @@ Void EncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic,
         Double dLambda_scale = 1.0 - Clip3( 0.0, 0.5, 0.05*(Double)NumberBFrames );
         Double dQPFactor     = 0.57*dLambda_scale;
         Int    SHIFT_QP      = 12;
+#if DISTORTION_LAMBDA_BUGFIX
+        Int bitdepth_luma_qp_scale =
+          6
+          * (pcSlice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA) - 8
+             - DISTORTION_PRECISION_ADJUSTMENT(pcSlice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA)));
+#else
+#if FULL_NBIT
+        Int bitdepth_luma_qp_scale = 6 * (pcSlice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA) - 8);
+#else
         Int    bitdepth_luma_qp_scale = 0;
+#endif
+#endif
         Double qp_temp = (Double) sliceQP + bitdepth_luma_qp_scale - SHIFT_QP;
         lambda = dQPFactor*pow( 2.0, qp_temp/3.0 );
       }
@@ -2698,7 +2709,11 @@ UInt64 EncGOP::preLoopFilterPicAndCalcDist( Picture* pcPic )
   for( UInt comp = 0; comp < (UInt)picRec.bufs.size(); comp++)
   {
     const ComponentID compID = ComponentID(comp);
-    const UInt rshift  = 2 * DISTORTION_PRECISION_ADJUSTMENT(cs.sps->getBitDepth(toChannelType(compID)) - 8);
+#if DISTORTION_LAMBDA_BUGFIX
+    const UInt rshift = 2 * DISTORTION_PRECISION_ADJUSTMENT(cs.sps->getBitDepth(toChannelType(compID)));
+#else
+    const UInt rshift = 2 * DISTORTION_PRECISION_ADJUSTMENT(cs.sps->getBitDepth(toChannelType(compID)) - 8);
+#endif
 #if ENABLE_QPA
     CHECK( rshift >= 8, "shifts greater than 7 are not supported." );
 #endif
