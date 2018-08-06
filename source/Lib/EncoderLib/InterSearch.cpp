@@ -118,7 +118,7 @@ InterSearch::InterSearch()
 
   setWpScalingDistParam( -1, REF_PIC_LIST_X, nullptr );
 
-#if JVET_K0367_AFFINE_FIX_POINT
+#if JEM_TOOLS && JVET_K0367_AFFINE_FIX_POINT
   m_HorizontalSobelFilter = xHorizontalSobelFilter;
   m_VerticalSobelFilter   = xVerticalSobelFilter;
   m_EqualCoeffComputer    = xEqualCoeffComputer;

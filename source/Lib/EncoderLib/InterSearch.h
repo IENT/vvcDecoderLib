@@ -160,7 +160,7 @@ public:
   Void copyState                    ( const InterSearch& other );
 #endif
 
-#if JVET_K0367_AFFINE_FIX_POINT
+#if JEM_TOOLS && JVET_K0367_AFFINE_FIX_POINT
   void ( *m_HorizontalSobelFilter ) (Pel *const pPred, const int predStride, int *const pDerivate, const int derivateBufStride, const int width, const int height);
 
   void( *m_VerticalSobelFilter   ) (Pel *const pPred, const int predStride, int *const pDerivate, const int derivateBufStride, const int width, const int height);

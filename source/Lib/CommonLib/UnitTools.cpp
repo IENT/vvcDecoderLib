@@ -2019,6 +2019,8 @@ void PU::fillMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, const in
 #endif
 }
 
+
+#if JEM_TOOLS
 #if JVET_K0337_AFFINE_MVP_IMPROVE
 const int getAvailableAffineNeighbours( const PredictionUnit &pu, const PredictionUnit* npu[] )
 {
@@ -2144,7 +2146,6 @@ void PU::xInheritedAffineMv( const PredictionUnit &pu, const PredictionUnit* puN
 }
 #endif
 
-#if JEM_TOOLS
 #if !JVET_K0337_AFFINE_MVP_IMPROVE
 Bool isValidAffineCandidate( const PredictionUnit &pu, Mv cMv0, Mv cMv1, Mv cMv2, Int& riDV )
 {

@@ -479,7 +479,7 @@ Void InterPrediction::xPredInterUni(const PredictionUnit& pu, const RefPicList& 
   {
     mv[0] = pu.mv[eRefPicList];
   }
-#if JVET_K_AFFINE_BUG_FIXES
+#if JEM_TOOLS && JVET_K_AFFINE_BUG_FIXES
   if ( !pu.cu->affine )
 #endif
   clipMv(mv[0], pu.cu->lumaPos(), sps);

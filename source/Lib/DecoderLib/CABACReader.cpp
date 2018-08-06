@@ -1878,7 +1878,7 @@ void CABACReader::prediction_unit( PredictionUnit& pu, MergeCtx& mrgCtx )
       if( pu.cu->cs->slice->getMvdL1ZeroFlag() && pu.interDir == 3 /* PRED_BI */ )
       {
         pu.mvd[ REF_PIC_LIST_1 ] = Mv();
-#if JVET_K_AFFINE_REFACTOR
+#if JEM_TOOLS && JVET_K_AFFINE_REFACTOR
         pu.mvdAffi[REF_PIC_LIST_1][0] = Mv();
         pu.mvdAffi[REF_PIC_LIST_1][1] = Mv();
         pu.mvdAffi[REF_PIC_LIST_1][2] = Mv();
