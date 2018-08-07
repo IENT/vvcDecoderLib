@@ -256,7 +256,7 @@ static const Int CABAC_INIT_PRESENT_FLAG =                          1;
 
 static const Int LUMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS   = 4;
 static const Int CHROMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS = 8;
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
 static const Int VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE         = 2;   ///< additional precision bit for MV storage
 #endif
 

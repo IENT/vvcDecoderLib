@@ -166,6 +166,9 @@ protected:
   Void xSubblockOBMC            ( const ComponentID eComp, PredictionUnit &pu, PelUnitBuf &pcYuvPredDst, PelUnitBuf &pcYuvPredSrc, Int iDir, Bool bOBMCSimp );
   Void xSubtractOBMC            ( PredictionUnit &pu, PelUnitBuf &pcYuvPredDst, PelUnitBuf &pcYuvPredSrc, Int iDir, Bool bOBMCSimp );
 #endif
+#if !JEM_TOOLS && JVET_K0346
+  Void xSubPuMC(PredictionUnit& pu, PelUnitBuf& predBuf, const RefPicList &eRefPicList = REF_PIC_LIST_X);
+#endif
 #if JEM_TOOLS
   Void xSubBlockMotionCompensation( PredictionUnit &pu, PelUnitBuf &pcYuvPred );
 #endif
@@ -243,6 +246,10 @@ protected:
   Void xPredInterLines          (const PredictionUnit& pu, const Picture* refPic, Mv &mv, PelUnitBuf &dstPic, const Bool &bi, const ClpRng& clpRng );
   Void xFillPredBlckAndBorder   (const PredictionUnit& pu, RefPicList eRefPicList, Int iWidth, Int iHeight, PelBuf &cTmpY );
   Void xProcessDMVR             (      PredictionUnit& pu, PelUnitBuf &pcYuvDst, const ClpRngs &clpRngs, const bool bBIOApplied);
+#endif
+
+#if !JEM_TOOLS && JVET_K0346
+  MotionInfo      m_SubPuMiBuf[(MAX_CU_SIZE * MAX_CU_SIZE) >> (MIN_CU_LOG2 << 1)];
 #endif
 
 public:

@@ -212,7 +212,7 @@ protected:
   bool      m_NSST;
 #endif
   bool      m_LargeCTU;
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
   int       m_SubPuMvpMode;
   unsigned  m_SubPuMvpLog2Size;
 #endif
@@ -227,6 +227,9 @@ protected:
   bool      m_highPrecMv;
   bool      m_Affine;
   bool      m_BIO;
+#endif
+#if !JEM_TOOLS && JVET_K0346
+  bool      m_highPrecMv;
 #endif
   bool      m_DisableMotionCompression;
 #if JEM_TOOLS
@@ -679,6 +682,13 @@ public:
   unsigned  getSubPuMvpLog2Size             ()         const { return m_SubPuMvpLog2Size; }
 #endif
 
+#if !JEM_TOOLS && JVET_K0346
+  void      setSubPuMvpMode(int n)          { m_SubPuMvpMode = n; }
+  bool      getSubPuMvpMode()         const { return m_SubPuMvpMode; }
+  void      setSubPuMvpLog2Size(unsigned n) { m_SubPuMvpLog2Size = n; }
+  unsigned  getSubPuMvpLog2Size()      const { return m_SubPuMvpLog2Size; }
+#endif
+
 #if JEM_TOOLS
   void      setCABACEngineMode              ( UInt mode )    { m_CABACEngineMode = mode; }
   UInt      getCABACEngineMode              ()               { return m_CABACEngineMode; }
@@ -698,6 +708,10 @@ public:
 
   void      setAffine                       ( bool b )       { m_Affine = b; }
   bool      getAffine                       ()         const { return m_Affine; }
+#endif
+#if !JEM_TOOLS && JVET_K0346
+  void      setHighPrecisionMv(bool b) { m_highPrecMv = b; }
+  bool      getHighPrecisionMv()       { return m_highPrecMv; }
 #endif
   void      setDisableMotionCompression     ( bool b )       { m_DisableMotionCompression = b; }
   bool      getDisableMotionCompression     ()         const { return m_DisableMotionCompression; }

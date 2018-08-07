@@ -1597,12 +1597,14 @@ void EncCu::xCheckRDCostMerge2Nx2N( CodingStructure *&tempCS, CodingStructure *&
   MergeCtx mergeCtx;
   const SPS &sps = *tempCS->sps;
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
   if( sps.getSpsNext().getUseSubPuMvp() )
   {
     Size bufSize = g_miScaling.scale( tempCS->area.lumaSize() );
     mergeCtx.subPuMvpMiBuf    = MotionBuf( m_SubPuMiBuf,    bufSize );
+#if JEM_TOOLS
     mergeCtx.subPuMvpExtMiBuf = MotionBuf( m_SubPuExtMiBuf, bufSize );
+#endif
   }
 #endif
 

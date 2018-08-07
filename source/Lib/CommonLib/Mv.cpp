@@ -54,7 +54,7 @@ void roundMV( Mv & rMV, unsigned imvShift )
 
 Void clipMv( Mv& rcMv, const Position& pos, const SPS& sps )
 {
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
   int iMvShift = 2 + ( rcMv.highPrec ? VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : 0 );
 #else
   int iMvShift = 2;

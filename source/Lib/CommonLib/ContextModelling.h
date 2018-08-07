@@ -567,6 +567,10 @@ public:
   MotionBuf     subPuMvpExtMiBuf;
   MotionBuf     subPuFrucMiBuf;
 #endif
+#if !JEM_TOOLS && JVET_K0346
+  MotionBuf     subPuMvpMiBuf;
+  MotionBuf     subPuMvpExtMiBuf;
+#endif
   Void setMergeInfo( PredictionUnit& pu, int candIdx );
 };
 
