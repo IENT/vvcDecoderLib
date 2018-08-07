@@ -49,9 +49,9 @@
 
 #if JEM_TOOLS
 class CABACDataStore;
+#endif
 #if JVET_K0346
 class EncCu;
-#endif
 #endif
 class CABACWriter
 {
@@ -65,13 +65,13 @@ public:
 
 public:
 #if JEM_TOOLS
-#if JVET_K0346
-  void        setEncCu(EncCu* pcEncCu) { m_EncCu = pcEncCu; }
-#endif
   void        initCtxModels             ( const Slice&                  slice,
                                           const CABACDataStore*         cabacDataStore );
 #else
   void        initCtxModels             ( const Slice&                  slice );
+#endif
+#if JVET_K0346
+  void        setEncCu(EncCu* pcEncCu) { m_EncCu = pcEncCu; }
 #endif
   SliceType   getCtxInitId              ( const Slice&                  slice );
   void        initBitstream             ( OutputBitstream*              bitstream )           { m_Bitstream = bitstream; m_BinEncoder.init( m_Bitstream ); }

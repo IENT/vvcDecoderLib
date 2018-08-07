@@ -952,6 +952,9 @@ enum MergeType
   MRG_TYPE_FRUC,                 // 3
   MRG_TYPE_FRUC_SET,             // 4
 #endif
+#if !JEM_TOOLS && JVET_K0346
+  MRG_TYPE_SUBPU_ATMVP,
+#endif
   NUM_MRG_TYPE                   // 5
 };
 
