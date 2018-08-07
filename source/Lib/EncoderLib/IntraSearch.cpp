@@ -622,7 +622,7 @@ Void IntraSearch::estIntraPredLumaQT( CodingUnit &cu, Partitioner &partitioner )
                 double cost = (double) sad + (double) fracModeBits * sqrtLambdaForFirstPass;
 
                 updateCandList(mode, cost, uiRdModeList, CandCostList, numModesForFullRD);
-                updateCandList(mode, sad, uiHadModeList, CandHadList, 3);
+                updateCandList(mode, (double)sad, uiHadModeList, CandHadList, 3);
 
                 bSatdChecked[mode] = true;
               }

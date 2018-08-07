@@ -368,8 +368,8 @@ Void EncAdaptiveLoopFilter::ALFProcess(CodingStructure& cs, ALFParam* pcAlfParam
   const PelUnitBuf cRecExtBuf = recExtBuf;
   // set min cost
 #if DISTORTION_TYPE_BUGFIX
-  uint64_t uiMinRate = std::numeric_limits<uint64_t>::max();
-  uint64_t uiMinDist = std::numeric_limits<uint64_t>::max();
+  UInt64 uiMinRate = std::numeric_limits<UInt64>::max();
+  UInt64 uiMinDist = std::numeric_limits<UInt64>::max();
 #else
   UInt64 uiMinRate = MAX_INT;
   UInt64 uiMinDist = MAX_INT;
@@ -377,8 +377,8 @@ Void EncAdaptiveLoopFilter::ALFProcess(CodingStructure& cs, ALFParam* pcAlfParam
   Double dMinCost = MAX_DOUBLE;
 
 #if DISTORTION_TYPE_BUGFIX
-  uint64_t ruiBits = std::numeric_limits<uint64_t>::max();
-  uint64_t ruiDist = std::numeric_limits<uint64_t>::max();
+  UInt64 ruiBits = std::numeric_limits<UInt64>::max();
+  UInt64 ruiDist = std::numeric_limits<UInt64>::max();
 #else
   UInt64 ruiBits = MAX_INT;
   UInt64 ruiDist = MAX_INT;
@@ -776,7 +776,7 @@ Void EncAdaptiveLoopFilter::xEncALFChroma(UInt64 uiLumaRate, const PelUnitBuf& o
   // set min cost
   UInt64 uiMinRate = uiLumaRate;
 #if DISTORTION_TYPE_BUGFIX
-  uint64_t uiMinDist = std::numeric_limits<uint64_t>::max();
+  UInt64 uiMinDist = std::numeric_limits<UInt64>::max();
 #else
   UInt64 uiMinDist = MAX_INT;
 #endif
