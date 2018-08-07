@@ -338,11 +338,13 @@ bool QTBTPartitioner::canSplit( const PartSplit split, const CodingStructure &cs
   const unsigned maxTrSize      = cs.sps->getMaxTrSize();
 #endif
 
+  const PartSplit lastSplit = m_partStack.back().split;
+  const PartSplit parlSplit = lastSplit == CU_TRIH_SPLIT ? CU_HORZ_SPLIT : CU_VERT_SPLIT;
+#if JVET_K0351_LESS_CONSTRAINT == 0
   const PartSplit prevSplit     = m_partStack.back().firstSubPartSplit;
-  const PartSplit lastSplit     = m_partStack.back().split;
   const PartSplit perpSplit     = lastSplit == CU_HORZ_SPLIT ? CU_VERT_SPLIT : CU_HORZ_SPLIT;
   const PartSplit perpTriSp     = lastSplit == CU_HORZ_SPLIT ? CU_TRIV_SPLIT : CU_TRIH_SPLIT;
-  const PartSplit parlSplit     = lastSplit == CU_TRIH_SPLIT ? CU_HORZ_SPLIT : CU_VERT_SPLIT;
+#endif
 
   if( isNonLog2BlockSize( currArea().Y() ) )
   {
