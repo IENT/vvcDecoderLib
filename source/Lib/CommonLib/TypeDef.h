@@ -72,7 +72,7 @@
 
 #define JVET_K0346                                        1 // simplifications on ATMVP
 
-#define JVET_K0351_LESS_CONSTRAINT                        1 // allow binary split with same orientation in center partition of the ternary split
+#define JVET_K0351_LESS_CONSTRAINT                        1 // Only disallow binary split with same orientation in center partition of the ternary split and release the other constraints in K0351.
 
 #ifndef JEM_TOOLS
 #define JEM_TOOLS                                         1 // Defines the inclusion of JEM tools into compiled executable
