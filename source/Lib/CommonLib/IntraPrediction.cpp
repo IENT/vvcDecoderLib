@@ -237,6 +237,85 @@ void IntraPrediction::predIntraAng( const ComponentID compId, PelBuf &piPred, co
 
   const Int  srcStride = ( iWidth + iHeight + 1 );
 
+#if JVET_K0063_PDPC_SIMP
+  Pel *ptrSrc = getPredictorPtr(compID, useFilteredPredSamples);
+  const ClpRng& clpRng(pu.cu->cs->slice->clpRng(compID));
+
+  switch (uiDirMode)
+  {
+    case(PLANAR_IDX): xPredIntraPlanar(CPelBuf(ptrSrc, srcStride, srcStride), piPred, *pu.cs->sps); break;
+    case(DC_IDX):     xPredIntraDc(CPelBuf(ptrSrc, srcStride, srcStride), piPred, channelType, false); break;
+    default:          xPredIntraAng(CPelBuf(ptrSrc, srcStride, srcStride), piPred, channelType, uiDirMode, clpRng, *pu.cs->sps, false); break;
+  }
+
+  Bool pdpcCondition = (uiDirMode == PLANAR_IDX || uiDirMode == DC_IDX || uiDirMode == HOR_IDX || uiDirMode == VER_IDX);
+  if (pdpcCondition)
+  {
+    const CPelBuf pSrc = CPelBuf(ptrSrc, srcStride, srcStride);
+    PelBuf pDst = piPred;
+    const Int scale = ((g_aucLog2[iWidth] - 2 + g_aucLog2[iHeight] - 2 + 2) >> 2);
+    CHECK(scale < 0 || scale > 31, "PDPC: scale < 0 || scale > 31");
+
+    if (uiDirMode == PLANAR_IDX)
+    {
+      for (Int y = 0; y < iHeight; y++)
+      {
+        Int wT = 32 >> std::min(31, ((y << 1) >> scale));
+        const Pel left = pSrc.at(0, y + 1);
+        for (Int x = 0; x < iWidth; x++)
+        {
+          const Pel top = pSrc.at(x + 1, 0);
+          Int wL = 32 >> std::min(31, ((x << 1) >> scale));
+          pDst.at(x, y) = ClipPel((wL * left + wT * top + (64 - wL - wT) * pDst.at(x, y) + 32) >> 6, clpRng);
+        }
+      }
+    }
+    else if (uiDirMode == DC_IDX)
+    {
+      const Pel topLeft = pSrc.at(0, 0);
+      for (Int y = 0; y < iHeight; y++)
+      {
+        Int wT = 32 >> std::min(31, ((y << 1) >> scale));
+        const Pel left = pSrc.at(0, y + 1);
+        for (Int x = 0; x < iWidth; x++)
+        {
+          const Pel top = pSrc.at(x + 1, 0);
+          Int wL = 32 >> std::min(31, ((x << 1) >> scale));
+          Int wTL = (wL >> 4) + (wT >> 4);
+          pDst.at(x, y) = ClipPel((wL * left + wT * top - wTL * topLeft + (64 - wL - wT + wTL) * pDst.at(x, y) + 32) >> 6, clpRng);
+        }
+      }
+    }
+    else if (uiDirMode == HOR_IDX)
+    {
+      const Pel topLeft = pSrc.at(0, 0);
+      for (Int y = 0; y < iHeight; y++)
+      {
+        Int wT = 32 >> std::min(31, ((y << 1) >> scale));
+        for (Int x = 0; x < iWidth; x++)
+        {
+          const Pel top = pSrc.at(x + 1, 0);
+          Int wTL = wT;
+          pDst.at(x, y) = ClipPel((wT * top - wTL * topLeft + (64 - wT + wTL) * pDst.at(x, y) + 32) >> 6, clpRng);
+        }
+      }
+    }
+    else if (uiDirMode == VER_IDX)
+    {
+      const Pel topLeft = pSrc.at(0, 0);
+      for (Int y = 0; y < iHeight; y++)
+      {
+        const Pel left = pSrc.at(0, y + 1);
+        for (Int x = 0; x < iWidth; x++)
+        {
+          Int wL = 32 >> std::min(31, ((x << 1) >> scale));
+          Int wTL = wL;
+          pDst.at(x, y) = ClipPel((wL * left - wTL * topLeft + (64 - wL + wTL) * pDst.at(x, y) + 32) >> 6, clpRng);
+        }
+      }
+    }
+  }
+#else
 #if HEVC_USE_HOR_VER_PREDFILTERING
   const Bool enableEdgeFilters = !(CU::isRDPCMEnabled( *pu.cu ) && pu.cu->transQuantBypass);
 #endif
@@ -351,6 +430,7 @@ void IntraPrediction::predIntraAng( const ComponentID compId, PelBuf &piPred, co
 #endif
     }
   }
+#endif
 }
 
 #if JEM_TOOLS
@@ -780,6 +860,49 @@ Void IntraPrediction::xPredIntraAng( const CPelBuf &pSrc, PelBuf &pDst, const Ch
           pDsty[x] = refMain[x + deltaInt + 1];
         }
       }
+#if JVET_K0063_PDPC_SIMP
+      const Int Nmodes = 8;
+      const Int scale = ((g_aucLog2[width] - 2 + g_aucLog2[height] - 2 + 2) >> 2);
+      CHECK(scale < 0 || scale > 31, "PDPC: scale < 0 || scale > 31");
+
+      if (dirMode == 2 || dirMode == VDIA_IDX)
+      {
+        Int wT = 16 >> std::min(31, ((y << 1) >> scale));
+
+        for (Int x = 0; x < width; x++)
+        {
+          Int wL = 16 >> std::min(31, ((x << 1) >> scale));
+          if (wT + wL == 0) break;
+
+          Int c = x + y + 1;
+          const Pel left = refSide[c + 1];
+          const Pel top = refMain[c + 1];
+
+          pDsty[x] = ClipPel((wL * left + wT * top + (64 - wL - wT) * pDsty[x] + 32) >> 6, clpRng);
+        }
+      }
+      else if ((dirMode >= VDIA_IDX - Nmodes && dirMode < VDIA_IDX) || (dirMode > 2 && dirMode <= (2 + Nmodes)))
+      {
+        Int invAngleSum0 = 2;
+        for (Int x = 0; x < width; x++)
+        {
+          invAngleSum0 += invAngle;
+          Int deltaPos0 = invAngleSum0 >> 2;
+          Int deltaFrac0 = deltaPos0 & 63;
+          Int deltaInt0 = deltaPos0 >> 6;
+
+          Int deltay = y + deltaInt0 + 1;
+          if (deltay > height + width - 1) break;
+
+          Int wL = 32 >> std::min(31, ((x << 1) >> scale));
+          if (wL == 0) break;
+          Pel *p = refSide + deltay;
+
+          Pel left = (((64 - deltaFrac0) * p[0] + deltaFrac0 * p[1] + 32) >> 6);
+          pDsty[x] = ClipPel((wL * left + (64 - wL) * pDsty[x] + 32) >> 6, clpRng);
+        }
+      }
+#endif
     }
 #if HEVC_USE_HOR_VER_PREDFILTERING
     if( edgeFilter && absAng <= 1 )
@@ -1269,8 +1392,9 @@ bool IntraPrediction::useFilteredIntraRefSamples( const ComponentID &compID, con
   if( sps.getSpsNext().isIntraPDPC() )                                                                   { return false; }
 
   // NSST related conditions
+#if !JVET_K0063_PDPC_SIMP // fix for BMS1.0 RA config (IntraPDPC=2) decoder mismatch
   if( sps.getSpsNext().isPlanarPDPC() && (sps.getSpsNext().getUseNSST() && pu.cu->nsstIdx == 0) )        { return false; }
-
+#endif
 #endif
 
   if( !modeSpecific )                                                                                    { return true; }
@@ -1278,7 +1402,15 @@ bool IntraPrediction::useFilteredIntraRefSamples( const ComponentID &compID, con
   // pred. mode related conditions
   const int dirMode = PU::getFinalIntraMode( pu, chType );
 #if JEM_TOOLS
+#if JVET_K0063_PDPC_SIMP
+  if (dirMode == DC_IDX)                                                                                 { return false; }
+  if (dirMode == PLANAR_IDX)
+  {
+    return tuArea.blocks[compID].width * tuArea.blocks[compID].height > 32 ? true : false;
+  }
+#else
   if( dirMode == DC_IDX || (sps.getSpsNext().isPlanarPDPC() && dirMode == PLANAR_IDX) )                  { return false; }
+#endif
 #else
   if( dirMode == DC_IDX )                                                                                { return false; }
 #endif

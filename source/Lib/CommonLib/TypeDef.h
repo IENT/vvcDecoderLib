@@ -71,6 +71,7 @@
 #define JVET_K0554                                        1 // when adopting, also remove the macro HM_QTBT_ONLY_QT_IMPLICIT (keep the case for value 0)
 
 #define JVET_K0346                                        1 // simplifications on ATMVP
+#define JVET_K0063_PDPC_SIMP                              1 // Simplified PDPC
 
 #ifndef JEM_TOOLS
 #define JEM_TOOLS                                         1 // Defines the inclusion of JEM tools into compiled executable
