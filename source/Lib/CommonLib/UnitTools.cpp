@@ -2084,7 +2084,6 @@ const int getAvailableAffineNeighbours( const PredictionUnit &pu, const Predicti
 }
 #endif
 
-#if JVET_K_AFFINE_REFACTOR
 void PU::xInheritedAffineMv( const PredictionUnit &pu, const PredictionUnit* puNeighbour, RefPicList eRefPicList, Mv rcMv[3] )
 {
   int posNeiX = puNeighbour->Y().pos().x;
@@ -2165,7 +2164,6 @@ void PU::xInheritedAffineMv( const PredictionUnit &pu, const PredictionUnit* puN
   rcMv[2].highPrec = true;
 #endif
 }
-#endif
 
 #if !JVET_K0337_AFFINE_MVP_IMPROVE
 Bool isValidAffineCandidate( const PredictionUnit &pu, Mv cMv0, Mv cMv1, Mv cMv2, Int& riDV )
@@ -3689,7 +3687,6 @@ Void PU::getAffineMergeCand( const PredictionUnit &pu, MvField (*mvFieldNeighbou
     numValidMergeCand = 1;
   }
 
-#if JVET_K_AFFINE_REFACTOR
   // get Inter Dir
   interDirNeighbours = puFirstNeighbour->getMotionInfo().interDir;
 
@@ -3719,76 +3716,6 @@ Void PU::getAffineMergeCand( const PredictionUnit &pu, MvField (*mvFieldNeighbou
       }
     }
   }
-#else
-  Int width  = puFirstNeighbour->Y().width;
-  Int height = puFirstNeighbour->Y().height;
-
-  // list0
-  MvField affineMvField[2][3];
-  const Position posLT = puFirstNeighbour->Y().topLeft();
-  const Position posRT = puFirstNeighbour->Y().topRight();
-  const Position posLB = puFirstNeighbour->Y().bottomLeft();
-
-  MotionInfo miLT = puFirstNeighbour->getMotionInfo( posLT );
-  MotionInfo miRT = puFirstNeighbour->getMotionInfo( posRT );
-  MotionInfo miLB = puFirstNeighbour->getMotionInfo( posLB );
-
-  miLT.mv[0].setHighPrec();
-  miRT.mv[0].setHighPrec();
-  miLB.mv[0].setHighPrec();
-
-  miLT.mv[1].setHighPrec();
-  miRT.mv[1].setHighPrec();
-  miLB.mv[1].setHighPrec();
-
-  affineMvField[0][0].setMvField( miLT.mv[0], miLT.refIdx[0] );
-  affineMvField[0][1].setMvField( miRT.mv[0], miRT.refIdx[0] );
-  affineMvField[0][2].setMvField( miLB.mv[0], miLB.refIdx[0] );
-
-  // list1
-  affineMvField[1][0].setMvField( miLT.mv[1], miLT.refIdx[1] );
-  affineMvField[1][1].setMvField( miRT.mv[1], miRT.refIdx[1] );
-  affineMvField[1][2].setMvField( miLB.mv[1], miLB.refIdx[1] );
-
-  Int pixelOrgX    = puFirstNeighbour->Y().pos().x;
-  Int pixelCurrX   = pu.Y().pos().x;
-  Int pixelOrgY    = puFirstNeighbour->Y().pos().y;
-  Int pixelCurrY   = pu.Y().pos().y;
-
-
-  Int vx0 = Int( affineMvField[0][0].mv.getHor() + 1.0 * ( affineMvField[0][2].mv.getHor() - affineMvField[0][0].mv.getHor() ) * ( pixelCurrY - pixelOrgY ) / height + 1.0 * ( affineMvField[0][1].mv.getHor() - affineMvField[0][0].mv.getHor() ) * ( pixelCurrX - pixelOrgX ) / width );
-  Int vy0 = Int( affineMvField[0][0].mv.getVer() + 1.0 * ( affineMvField[0][2].mv.getVer() - affineMvField[0][0].mv.getVer() ) * ( pixelCurrY - pixelOrgY ) / height + 1.0 * ( affineMvField[0][1].mv.getVer() - affineMvField[0][0].mv.getVer() ) * ( pixelCurrX - pixelOrgX ) / width );
-  mvFieldNeighbours[0][0].setMvField( Mv(vx0, vy0, true), affineMvField[0][0].refIdx );
-  if( pu.cs->slice->isInterB() )
-  {
-    vx0 = Int( affineMvField[1][0].mv.getHor() + 1.0 * ( affineMvField[1][2].mv.getHor() - affineMvField[1][0].mv.getHor() ) * ( pixelCurrY - pixelOrgY ) / height + 1.0 * ( affineMvField[1][1].mv.getHor() - affineMvField[1][0].mv.getHor() ) * ( pixelCurrX - pixelOrgX ) / width );
-    vy0 = Int( affineMvField[1][0].mv.getVer() + 1.0 * ( affineMvField[1][2].mv.getVer() - affineMvField[1][0].mv.getVer() ) * ( pixelCurrY - pixelOrgY ) / height + 1.0 * ( affineMvField[1][1].mv.getVer() - affineMvField[1][0].mv.getVer() ) * ( pixelCurrX - pixelOrgX ) / width );
-    mvFieldNeighbours[1][0].setMvField( Mv(vx0, vy0, true), affineMvField[1][0].refIdx );
-  }
-
-  const Int curWidth  = pu.Y().width;
-  const Int curHeight = pu.Y().height;
-  Int vx1 = Int( 1.0 * ( affineMvField[0][1].mv.getHor() - affineMvField[0][0].mv.getHor() ) * curWidth / width + mvFieldNeighbours[0][0].mv.getHor() );
-  Int vy1 = Int( 1.0 * ( affineMvField[0][1].mv.getVer() - affineMvField[0][0].mv.getVer() ) * curWidth / width + mvFieldNeighbours[0][0].mv.getVer() );
-  mvFieldNeighbours[0][1].setMvField( Mv(vx1, vy1, true), affineMvField[0][0].refIdx );
-  if( pu.cs->slice->isInterB() )
-  {
-    vx1 = Int( 1.0 * ( affineMvField[1][1].mv.getHor() - affineMvField[1][0].mv.getHor() ) * curWidth / width + mvFieldNeighbours[1][0].mv.getHor() );
-    vy1 = Int( 1.0 * ( affineMvField[1][1].mv.getVer() - affineMvField[1][0].mv.getVer() ) * curWidth / width + mvFieldNeighbours[1][0].mv.getVer() );
-    mvFieldNeighbours[1][1].setMvField( Mv(vx1, vy1, true), affineMvField[1][0].refIdx );
-  }
-
-  Int vx2 = Int( 1.0 * ( affineMvField[0][2].mv.getHor() - affineMvField[0][0].mv.getHor() ) * curHeight / height + mvFieldNeighbours[0][0].mv.getHor() );
-  Int vy2 = Int( 1.0 * ( affineMvField[0][2].mv.getVer() - affineMvField[0][0].mv.getVer() ) * curHeight / height + mvFieldNeighbours[0][0].mv.getVer() );
-  mvFieldNeighbours[0][2].setMvField( Mv(vx2, vy2, true), affineMvField[0][0].refIdx );
-  if( pu.cs->slice->isInterB() )
-  {
-    vx2 = Int( 1.0 * ( affineMvField[1][2].mv.getHor() - affineMvField[1][0].mv.getHor() ) * curHeight / height + mvFieldNeighbours[1][0].mv.getHor() );
-    vy2 = Int( 1.0 * ( affineMvField[1][2].mv.getVer() - affineMvField[1][0].mv.getVer() ) * curHeight / height + mvFieldNeighbours[1][0].mv.getVer() );
-    mvFieldNeighbours[1][2].setMvField( Mv(vx2, vy2, true), affineMvField[1][0].refIdx );
-  }
-  interDirNeighbours = puFirstNeighbour->getMotionInfo().interDir;
-#endif
 }
 
 Void PU::setAllAffineMvField( PredictionUnit &pu, MvField *mvField, RefPicList eRefList )
@@ -3808,23 +3735,21 @@ Void PU::setAllAffineMvField( PredictionUnit &pu, MvField *mvField, RefPicList e
 
 Void PU::setAllAffineMv( PredictionUnit& pu, Mv affLT, Mv affRT, Mv affLB, RefPicList eRefList )
 {
-  Int iWidth  = pu.Y().width;
-
-#if JVET_K_AFFINE_REFACTOR // more readable
+  int width  = pu.Y().width;
   int shift = MAX_CU_DEPTH;
 
   affLT.setHighPrec();
   affRT.setHighPrec();
   affLB.setHighPrec();
   int deltaMvHorX, deltaMvHorY, deltaMvVerX, deltaMvVerY;
-  deltaMvHorX = (affRT - affLT).getHor() << (shift - g_aucLog2[iWidth]);
-  deltaMvHorY = (affRT - affLT).getVer() << (shift - g_aucLog2[iWidth]);
+  deltaMvHorX = (affRT - affLT).getHor() << (shift - g_aucLog2[width]);
+  deltaMvHorY = (affRT - affLT).getVer() << (shift - g_aucLog2[width]);
 #if JVET_K0337_AFFINE_6PARA
-  int iHeight = pu.Y().height;
+  int height = pu.Y().height;
   if ( pu.cu->affineType == AFFINEMODEL_6PARAM )
   {
-    deltaMvVerX = (affLB - affLT).getHor() << (shift - g_aucLog2[iHeight]);
-    deltaMvVerY = (affLB - affLT).getVer() << (shift - g_aucLog2[iHeight]);
+    deltaMvVerX = (affLB - affLT).getHor() << (shift - g_aucLog2[height]);
+    deltaMvVerY = (affLB - affLT).getVer() << (shift - g_aucLog2[height]);
   }
   else
   {
@@ -3868,57 +3793,6 @@ Void PU::setAllAffineMv( PredictionUnit& pu, Mv affLT, Mv affRT, Mv affLB, RefPi
       }
     }
   }
-#else
-  const PreCalcValues& pcv = *pu.cs->pcv;
-
-  Int iBit = 6;
-  // convert to 2^(2+iBit) precision
-
-  Int bitMinW = pcv.minCUWidthLog2;
-  Int bitMinH = pcv.minCUHeightLog2;
-
-  affLT.setHighPrec();
-  affRT.setHighPrec();
-  affLB.setHighPrec();
-
-  Int iDMvHorX = ( (affRT - affLT).getHor() << (iBit + bitMinW) ) / iWidth;
-  Int iDMvHorY = ( (affRT - affLT).getVer() << (iBit + bitMinH) ) / iWidth;
-  Int iDMvVerX = -iDMvHorY;
-  Int iDMvVerY =  iDMvHorX;
-
-  Int iMvScaleHor = affLT.getHor() << iBit;
-  Int iMvScaleVer = affLT .getVer() << iBit;
-  Int iMvYHor = iMvScaleHor;
-  Int iMvYVer = iMvScaleVer;
-
-  MotionBuf mb = pu.getMotionBuf();
-  // Calculate Mv for 4x4 Part
-  Int iMvScaleTmpHor, iMvScaleTmpVer;
-  for ( Int y = 0; y < mb.height; y++ )
-  {
-    for ( Int x = 0; x < mb.width; x++ )
-    {
-      iMvScaleTmpHor = iMvScaleHor + ( iDMvHorX >> 1 ) + ( iDMvVerX >> 1 );
-      iMvScaleTmpVer = iMvScaleVer + ( iDMvHorY >> 1 ) + ( iDMvVerY >> 1 );
-
-      // get the MV in hevc define precision
-      Int xHevc, yHevc;
-      xHevc  = iMvScaleTmpHor >> iBit;
-      yHevc  = iMvScaleTmpVer >> iBit;
-      Mv mvHevc(xHevc, yHevc, true);
-
-      mb.at(x,y).mv[eRefList] = mvHevc;
-
-      iMvScaleHor += iDMvHorX;  // switch from x to x+AffineBlockSize, add deltaMvHor
-      iMvScaleVer += iDMvHorY;
-    }
-    iMvYHor += iDMvVerX;        // switch from y to y+AffineBlockSize, add deltaMvVer
-    iMvYVer += iDMvVerY;
-
-    iMvScaleHor = iMvYHor;
-    iMvScaleVer = iMvYVer;
-  }
-#endif
 
   // Set AffineMvField for affine motion compensation LT, RT, LB and RB
 #if !JVET_K_AFFINE_BUG_FIXES
@@ -3938,39 +3812,6 @@ Void PU::setAllAffineMv( PredictionUnit& pu, Mv affLT, Mv affRT, Mv affLB, RefPi
   }
 #endif
 }
-#if !(JVET_K0220_ENC_CTRL || JVET_K_AFFINE_REFACTOR)
-Void PU::setAllAffineMvd( MotionBuf mb, const Mv& affLT, const Mv& affRT, RefPicList eRefList, Bool rectCUs )
-{
-  // Set all partitions (possibly unnecessarily set)
-  Mv mvd;
-  if( rectCUs )
-  {
-    mvd = affLT + affRT;
-  }
-  else
-  {
-    mvd = affRT;
-  }
-  mvd.setHighPrec();
-  mvd >>= 1;
-  for (UInt y = 0; y < mb.height; y++)
-  {
-    for (UInt x = 0; x < mb.width; x++)
-    {
-      mb.at(x,y).mvdAffi[eRefList] = mvd;
-    }
-  }
-
-  // Overwrite corner partitions
-  mb.at(          0, 0 ).mvdAffi[eRefList] = affLT;
-  mb.at( mb.width-1, 0 ).mvdAffi[eRefList] = affRT;
-  if( !rectCUs )
-  {
-    mb.at(          0, mb.height-1 ).mvdAffi[eRefList] = Mv( 0, 0 );
-    mb.at( mb.width-1, mb.height-1 ).mvdAffi[eRefList] = affRT - affLT;
-  }
-}
-#endif
 #endif
 
 #if !JEM_TOOLS && JVET_K0346

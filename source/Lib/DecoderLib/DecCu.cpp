@@ -551,17 +551,10 @@ Void DecCu::xDeriveCUMV( CodingUnit &cu )
               //    Mv mv[3];
               CHECK( pu.refIdx[eRefList] < 0, "Unexpected negative refIdx." );
 
-#if JVET_K0220_ENC_CTRL || JVET_K_AFFINE_REFACTOR
               Mv mvLT = affineAMVPInfo.mvCandLT[mvp_idx] + pu.mvdAffi[eRefList][0];
               Mv mvRT = affineAMVPInfo.mvCandRT[mvp_idx] + pu.mvdAffi[eRefList][1];
 #if JVET_K0337_AFFINE_MVD_PREDICTION
               mvRT += pu.mvdAffi[eRefList][0];
-#endif
-#else
-              Position posLT = pu.Y().topLeft();
-              Position posRT = pu.Y().topRight();
-              Mv mvLT = affineAMVPInfo.mvCandLT[mvp_idx] + pu.getMotionInfo( posLT ).mvdAffi[eRefList];
-              Mv mvRT = affineAMVPInfo.mvCandRT[mvp_idx] + pu.getMotionInfo( posRT ).mvdAffi[eRefList];
 #endif
 
               CHECK( !mvLT.highPrec, "unexpected lp mv" );

@@ -1843,22 +1843,13 @@ void CABACReader::prediction_unit( PredictionUnit& pu, MergeCtx& mrgCtx )
 #if JEM_TOOLS || JVET_K_AFFINE
       if( pu.cu->affine )
       {
-#if JVET_K_AFFINE_REFACTOR || JVET_K0220_ENC_CTRL
         mvd_coding( pu.mvdAffi[REF_PIC_LIST_0][0] );
         mvd_coding( pu.mvdAffi[REF_PIC_LIST_0][1] );
-
 #if JVET_K0337_AFFINE_6PARA
         if ( pu.cu->affineType == AFFINEMODEL_6PARAM )
         {
           mvd_coding( pu.mvdAffi[REF_PIC_LIST_0][2] );
         }
-#endif
-#else
-        Mv affLT, affRT;
-        mvd_coding( affLT );
-        mvd_coding( affRT );
-
-        PU::setAllAffineMvd( pu.getMotionBuf(), affLT, affRT, REF_PIC_LIST_0, pu.cs->pcv->rectCUs );
 #endif
       }
       else
@@ -1868,12 +1859,6 @@ void CABACReader::prediction_unit( PredictionUnit& pu, MergeCtx& mrgCtx )
       }
       mvp_flag    ( pu, REF_PIC_LIST_0 );
     }
-#if JEM_TOOLS && !JVET_K_AFFINE_REFACTOR
-    else if( pu.cu->affine )
-    {
-      PU::setAllAffineMv( pu, Mv(), Mv(), Mv(), REF_PIC_LIST_0 ); // done in JEM, but maybe unnecessary
-    }
-#endif
 
     if( pu.interDir != 1 /* PRED_L0 */ )
     {
@@ -1890,22 +1875,13 @@ void CABACReader::prediction_unit( PredictionUnit& pu, MergeCtx& mrgCtx )
 #if JEM_TOOLS || JVET_K_AFFINE
       else if( pu.cu->affine )
       {
-#if JVET_K_AFFINE_REFACTOR || JVET_K0220_ENC_CTRL
         mvd_coding( pu.mvdAffi[REF_PIC_LIST_1][0] );
         mvd_coding( pu.mvdAffi[REF_PIC_LIST_1][1] );
-
 #if JVET_K0337_AFFINE_6PARA
         if ( pu.cu->affineType == AFFINEMODEL_6PARAM )
         {
           mvd_coding( pu.mvdAffi[REF_PIC_LIST_1][2] );
         }
-#endif
-#else
-        Mv affLT, affRT;
-        mvd_coding( affLT );
-        mvd_coding( affRT );
-
-        PU::setAllAffineMvd( pu.getMotionBuf(), affLT, affRT, REF_PIC_LIST_1, pu.cs->pcv->rectCUs );
 #endif
       }
 #endif
@@ -1915,12 +1891,6 @@ void CABACReader::prediction_unit( PredictionUnit& pu, MergeCtx& mrgCtx )
       }
       mvp_flag    ( pu, REF_PIC_LIST_1 );
     }
-#if JEM_TOOLS && !JVET_K_AFFINE_REFACTOR
-    else if( pu.cu->affine )
-    {
-      PU::setAllAffineMv( pu, Mv(), Mv(), Mv(), REF_PIC_LIST_1 ); // done in JEM, but maybe not necessary
-    }
-#endif
   }
   if( pu.interDir == 3 /* PRED_BI */ && PU::isBipredRestriction(pu) )
   {

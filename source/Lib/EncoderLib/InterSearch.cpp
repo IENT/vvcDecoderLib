@@ -3440,20 +3440,15 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
   affineCost = std::numeric_limits<Distortion>::max();
 
   Mv        cMvZero;
-#if !JVET_K_AFFINE_REFACTOR
-  Mv        aacMvd[2][3];
-#endif
   Mv        aacMv[2][3];
   Mv        cMvBi[2][3];
   Mv        cMvTemp[2][33][3];
 
   Int       iNumPredDir = slice.isInterP() ? 1 : 2;
 
-#if JVET_K_AFFINE_REFACTOR
   int mvNum = 2;
 #if JVET_K0185_AFFINE_6PARA_ENC
   mvNum = pu.cu->affineType ? 3 : 2;
-#endif
 #endif
 
   // Mvp
@@ -3616,11 +3611,7 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
           uiCostTemp = uiCostTempL0[iList1ToList0Idx];
 
           uiCostTemp -= m_pcRdCost->getCost( uiBitsTempL0[iList1ToList0Idx] );
-#if JVET_K_AFFINE_REFACTOR
           for (Int iVerIdx = 0; iVerIdx < mvNum; iVerIdx++)
-#else
-          for ( Int iVerIdx = 0; iVerIdx < ( pu.cs->pcv->rectCUs ? 2 : 3 ); iVerIdx++ )
-#endif
           {
             m_pcRdCost->setPredictor( cMvPred[iRefList][iRefIdxTemp][iVerIdx] );
             const int shift = cMvTemp[1][iRefIdxTemp][iVerIdx].highPrec ? VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : 0;
@@ -3879,13 +3870,11 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
   pu.mvpNum[REF_PIC_LIST_0] = NOT_VALID;
   pu.mvpNum[REF_PIC_LIST_1] = NOT_VALID;
 
-#if JVET_K_AFFINE_REFACTOR
   for ( int verIdx = 0; verIdx < 3; verIdx++ )
   {
     pu.mvdAffi[REF_PIC_LIST_0][verIdx] = cMvZero;
     pu.mvdAffi[REF_PIC_LIST_1][verIdx] = cMvZero;
   }
-#endif
 
   // Set Motion Field
   memcpy( aacMv[1], mvValidList1, sizeof(Mv)*3 );
@@ -3904,7 +3893,6 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
     pu.refIdx[REF_PIC_LIST_0] = iRefIdxBi[0];
     pu.refIdx[REF_PIC_LIST_1] = iRefIdxBi[1];
 
-#if JVET_K_AFFINE_REFACTOR
     for ( int verIdx = 0; verIdx < mvNum; verIdx++ )
     {
       pu.mvdAffi[REF_PIC_LIST_0][verIdx] = cMvBi[0][verIdx] - cMvPredBi[0][iRefIdxBi[0]][verIdx];
@@ -3917,23 +3905,6 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
       }
 #endif
     }
-#else
-    for ( Int iVerIdx=0; iVerIdx<2; iVerIdx++ )
-    {
-      aacMvd[0][iVerIdx] = cMvBi[0][iVerIdx] - cMvPredBi[0][iRefIdxBi[0]][iVerIdx];
-      aacMvd[1][iVerIdx] = cMvBi[1][iVerIdx] - cMvPredBi[1][iRefIdxBi[1]][iVerIdx];
-    }
-
-#if JVET_K0220_ENC_CTRL
-    pu.mvdAffi[REF_PIC_LIST_0][0] = aacMvd[0][0];
-    pu.mvdAffi[REF_PIC_LIST_0][1] = aacMvd[0][1];
-    pu.mvdAffi[REF_PIC_LIST_1][0] = aacMvd[1][0];
-    pu.mvdAffi[REF_PIC_LIST_1][1] = aacMvd[1][1];
-#else
-    PU::setAllAffineMvd( pu.getMotionBuf(), aacMvd[0][0], aacMvd[0][1], REF_PIC_LIST_0, pu.cs->pcv->rectCUs );
-    PU::setAllAffineMvd( pu.getMotionBuf(), aacMvd[1][0], aacMvd[1][1], REF_PIC_LIST_1, pu.cs->pcv->rectCUs );
-#endif
-#endif
 
     pu.interDir = 3;
 
@@ -3950,7 +3921,6 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
     PU::setAllAffineMv( pu, aacMv[0][0], aacMv[0][1], aacMv[0][2], REF_PIC_LIST_0 );
     pu.refIdx[REF_PIC_LIST_0] = iRefIdx[0];
 
-#if JVET_K_AFFINE_REFACTOR
     for ( int verIdx = 0; verIdx < mvNum; verIdx++ )
     {
       pu.mvdAffi[REF_PIC_LIST_0][verIdx] = aacMv[0][verIdx] - cMvPred[0][iRefIdx[0]][verIdx];
@@ -3961,19 +3931,6 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
       }
 #endif
     }
-#else
-    for ( Int iVerIdx=0; iVerIdx<2; iVerIdx++ )
-    {
-      aacMvd[0][iVerIdx] = aacMv[0][iVerIdx] - cMvPred[0][iRefIdx[0]][iVerIdx];
-    }
-
-#if JVET_K0220_ENC_CTRL
-    pu.mvdAffi[REF_PIC_LIST_0][0] = aacMvd[0][0];
-    pu.mvdAffi[REF_PIC_LIST_0][1] = aacMvd[0][1];
-#else
-    PU::setAllAffineMvd( pu.getMotionBuf(), aacMvd[0][0], aacMvd[0][1], REF_PIC_LIST_0, pu.cs->pcv->rectCUs );
-#endif
-#endif
     pu.interDir = 1;
 
     pu.mvpIdx[REF_PIC_LIST_0] = aaiMvpIdx[0][iRefIdx[0]];
@@ -3987,7 +3944,6 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
     PU::setAllAffineMv( pu, aacMv[1][0], aacMv[1][1], aacMv[1][2], REF_PIC_LIST_1 );
     pu.refIdx[REF_PIC_LIST_1] = iRefIdx[1];
 
-#if JVET_K_AFFINE_REFACTOR
     for ( int verIdx = 0; verIdx < mvNum; verIdx++ )
     {
       pu.mvdAffi[REF_PIC_LIST_1][verIdx] = aacMv[1][verIdx] - cMvPred[1][iRefIdx[1]][verIdx];
@@ -3998,19 +3954,6 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
       }
 #endif
     }
-#else
-    for ( Int iVerIdx=0; iVerIdx<2; iVerIdx++ )
-    {
-      aacMvd[1][iVerIdx] = aacMv[1][iVerIdx] - cMvPred[1][iRefIdx[1]][iVerIdx];
-    }
-
-#if JVET_K0220_ENC_CTRL
-    pu.mvdAffi[REF_PIC_LIST_1][0] = aacMvd[1][0];
-    pu.mvdAffi[REF_PIC_LIST_1][1] = aacMvd[1][1];
-#else
-    PU::setAllAffineMvd( pu.getMotionBuf(), aacMvd[1][0], aacMvd[1][1], REF_PIC_LIST_1, pu.cs->pcv->rectCUs );
-#endif
-#endif
     pu.interDir = 2;
 
     pu.mvpIdx[REF_PIC_LIST_1] = aaiMvpIdx[1][iRefIdx[1]];

@@ -373,7 +373,7 @@ struct InterPredictionData
   UChar     frucMrgMode;
   Bool      mvRefine;
 #endif
-#if JVET_K0220_ENC_CTRL || JVET_K_AFFINE_REFACTOR
+#if JEM_TOOLS || JVET_K_AFFINE
   Mv        mvdAffi [NUM_REF_PIC_LIST_01][3];
 #endif
 };

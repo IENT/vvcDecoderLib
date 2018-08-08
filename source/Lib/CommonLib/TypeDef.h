@@ -78,11 +78,10 @@
 
 #define JVET_K0351_LESS_CONSTRAINT                        1 // Only disallow binary split with same orientation in center partition of the ternary split and release the other constraints in K0351.
 
-#define JVET_K_AFFINE                                     1
-#define JVET_K_AFFINE_REFACTOR                            1 // bit-exact AFFINE refactor, suggest to remove this macro when adopted
-#define JVET_K0367_AFFINE_FIX_POINT                       1 // bit-exact SIMD optimization for affine ME
 
-#if JVET_K_AFFINE_REFACTOR
+#define JVET_K_AFFINE                                     1
+#if JVET_K_AFFINE
+#define JVET_K0367_AFFINE_FIX_POINT                       1 // bit-exact SIMD optimization for affine ME
 #define JVET_K_AFFINE_BUG_FIXES                           1 // several affine bug fixes from JVET-K0052, JVET-K0103, JVET-K0367
 
 #define JVET_K0184_AFFINE_4X4                             1 // CE4.1.1 fixed 4x4 sub-block size

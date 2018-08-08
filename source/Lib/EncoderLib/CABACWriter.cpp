@@ -2002,7 +2002,6 @@ void CABACWriter::prediction_unit( const PredictionUnit& pu )
 #if JEM_TOOLS
       if( pu.cu->affine )
       {
-#if JVET_K0220_ENC_CTRL || JVET_K_AFFINE_REFACTOR
         mvd_coding( pu.mvdAffi[REF_PIC_LIST_0][0], 0 );
         mvd_coding( pu.mvdAffi[REF_PIC_LIST_0][1], 0 );
 #if JVET_K0337_AFFINE_6PARA
@@ -2010,11 +2009,6 @@ void CABACWriter::prediction_unit( const PredictionUnit& pu )
         {
           mvd_coding( pu.mvdAffi[REF_PIC_LIST_0][2], 0 );
         }
-#endif
-#else
-        CMotionBuf mb = pu.getMotionBuf();
-        mvd_coding( mb.at(          0, 0 ).mvdAffi[REF_PIC_LIST_0], 0 );
-        mvd_coding( mb.at( mb.width-1, 0 ).mvdAffi[REF_PIC_LIST_0], 0 );
 #endif
       }
       else
@@ -2049,7 +2043,6 @@ void CABACWriter::prediction_unit( const PredictionUnit& pu )
 #if JEM_TOOLS
         if( pu.cu->affine )
         {
-#if JVET_K0220_ENC_CTRL || JVET_K_AFFINE_REFACTOR
           mvd_coding( pu.mvdAffi[REF_PIC_LIST_1][0], 0 );
           mvd_coding( pu.mvdAffi[REF_PIC_LIST_1][1], 0 );
 #if JVET_K0337_AFFINE_6PARA
@@ -2057,11 +2050,6 @@ void CABACWriter::prediction_unit( const PredictionUnit& pu )
           {
             mvd_coding( pu.mvdAffi[REF_PIC_LIST_1][2], 0 );
           }
-#endif
-#else
-          CMotionBuf mb = pu.getMotionBuf();
-          mvd_coding( mb.at(          0, 0 ).mvdAffi[REF_PIC_LIST_1], 0 );
-          mvd_coding( mb.at( mb.width-1, 0 ).mvdAffi[REF_PIC_LIST_1], 0 );
 #endif
         }
         else

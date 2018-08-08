@@ -899,8 +899,6 @@ Void InterPrediction::xPredAffineBlk( const ComponentID& compID, const Predictio
   const Int iHalfBW  = blockWidth  >> 1;
   const Int iHalfBH  = blockHeight >> 1;
 
-  
-#if JVET_K_AFFINE_REFACTOR
   const Int iBit = MAX_CU_DEPTH;
   Int iDMvHorX, iDMvHorY, iDMvVerX, iDMvVerY;
   iDMvHorX = (mvRT - mvLT).getHor() << (iBit - g_aucLog2[cxWidth]);
@@ -920,21 +918,9 @@ Void InterPrediction::xPredAffineBlk( const ComponentID& compID, const Predictio
   iDMvVerX = -iDMvHorY;
   iDMvVerY = iDMvHorX;
 #endif
-#else
-  // convert to 2^(storeBit + iBit) precision
-  const Int iBit = 8;
-  const Int iDMvHorX = ( (mvRT - mvLT).getHor() << iBit ) / cxWidth;    // deltaMvHor
-  const Int iDMvHorY = ( (mvRT - mvLT).getVer() << iBit ) / cxWidth;
-  const Int iDMvVerX = -iDMvHorY;                                       // deltaMvVer
-  const Int iDMvVerY = iDMvHorX;
-#endif
 
   Int iMvScaleHor = mvLT.getHor() << iBit;
   Int iMvScaleVer = mvLT.getVer() << iBit;
-#if !JVET_K_AFFINE_REFACTOR
-  Int iMvYHor = iMvScaleHor;
-  Int iMvYVer = iMvScaleVer;
-#endif
   const SPS &sps    = *pu.cs->sps;
   const Int iMvShift = 4;
   const Int iOffset  = 8;
@@ -953,7 +939,6 @@ Void InterPrediction::xPredAffineBlk( const ComponentID& compID, const Predictio
   {
     for ( Int w = 0; w < cxWidth; w += blockWidth )
     {
-#if JVET_K_AFFINE_REFACTOR
       Int iMvScaleTmpHor = iMvScaleHor + iDMvHorX * (iHalfBW + w) + iDMvVerX * (iHalfBH + h);
       Int iMvScaleTmpVer = iMvScaleVer + iDMvHorY * (iHalfBW + w) + iDMvVerY * (iHalfBH + h);
 #if JVET_K_AFFINE_BUG_FIXES
@@ -961,10 +946,6 @@ Void InterPrediction::xPredAffineBlk( const ComponentID& compID, const Predictio
 #else
       iMvScaleTmpHor >>= shift;
       iMvScaleTmpVer >>= shift;
-#endif
-#else
-      Int iMvScaleTmpHor = ( iMvScaleHor + iDMvHorX * iHalfBW + iDMvVerX * iHalfBH ) >> shift;
-      Int iMvScaleTmpVer = ( iMvScaleVer + iDMvHorY * iHalfBW + iDMvVerY * iHalfBH ) >> shift;
 #endif
 
       // clip and scale
@@ -1013,21 +994,7 @@ Void InterPrediction::xPredAffineBlk( const ComponentID& compID, const Predictio
         m_if.filterVer( compID, tmpBuf.buf + ((vFilterSize>>1) -1)*tmpBuf.stride, tmpBuf.stride, dstBuf.buf + w + h * dstBuf.stride, dstBuf.stride, blockWidth, blockHeight, yFrac, false, !bi, chFmt, clpRng);
         JVET_J0090_SET_CACHE_ENABLE( true );
       }
-#if !JVET_K_AFFINE_REFACTOR
-      // switch from x to x+AffineBlockSize, add deltaMvHor
-      iMvScaleHor += (iDMvHorX*blockWidth);
-      iMvScaleVer += (iDMvHorY*blockWidth);
-#endif
     }
-
-#if !JVET_K_AFFINE_REFACTOR
-    // switch from y to y+AffineBlockSize add deltaMvVer
-    iMvYHor += (iDMvVerX*blockHeight);
-    iMvYVer += (iDMvVerY*blockHeight);
-
-    iMvScaleHor = iMvYHor;
-    iMvScaleVer = iMvYVer;
-#endif
   }
 }
 #endif
