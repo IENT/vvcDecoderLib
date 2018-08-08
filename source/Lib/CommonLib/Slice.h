@@ -840,7 +840,11 @@ private:
   bool              m_LICEnabled;                 // 14
   bool              m_IntraPDPC;                  // 15
   bool              m_ALFEnabled;                 // 16
+#endif
+#if JEM_TOOLS||JVET_K0190
   bool              m_LMChroma;                   // 17
+#endif
+#if JEM_TOOLS
   bool              m_IntraEMT;                   // 18
   bool              m_InterEMT;                   // 19
 #endif
@@ -913,8 +917,10 @@ private:
   unsigned    m_AClipQuant;
 #endif
 
-#if JEM_TOOLS
+#if JEM_TOOLS&&!JVET_K0190
   int         m_ELMMode;
+#endif
+#if JEM_TOOLS
   int         m_IntraPDPCMode;
 #endif
 #if JEM_TOOLS
@@ -1003,9 +1009,11 @@ public:
   void      setGALFEnabled        ( bool b )                                        { m_GALFEnabled = b; }
   bool      getGALFEnabled        ()                                      const     { return m_GALFEnabled; }
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS||JVET_K0190
   void      setUseLMChroma        ( bool b )                                        { m_LMChroma = b; }
   bool      getUseLMChroma        ()                                      const     { return m_LMChroma; }
+#endif
+#if JEM_TOOLS
   void      setUseIntraEMT        ( bool b )                                        { m_IntraEMT = b; }
   bool      getUseIntraEMT        ()                                      const     { return m_IntraEMT; }
   void      setUseInterEMT        ( bool b )                                        { m_InterEMT = b; }
@@ -1109,11 +1117,13 @@ public:
   unsigned  getAClipQuant         ()                                      const     { return m_AClipQuant; }
 #endif
 #if JEM_TOOLS
+#if !JVET_K0190
   void      setELMMode            ( int m )                                         { m_ELMMode = m; }
   int       getELMMode()                                                  const     { return m_ELMMode; }
   bool      isELMModeMMLM()                                               const     { return 0 != (m_ELMMode & 1); }
   bool      isELMModeMFLM()                                               const     { return 0 != (m_ELMMode & 2); }
   int       getRealNumIntraMode()                                         const     { return 68 + (m_ELMMode & 1) + ((m_ELMMode & 2) << 1); }
+#endif
 #endif
 #if JEM_TOOLS
   void      setIntraPDPCMode      ( int n )                                         { m_IntraPDPCMode = n; }

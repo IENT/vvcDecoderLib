@@ -1760,7 +1760,11 @@ SPSNext::SPSNext( SPS& sps )
   , m_LICEnabled                ( false )
   , m_IntraPDPC                 ( false )
   , m_ALFEnabled                ( false )
+#endif
+#if JEM_TOOLS||JVET_K0190
   , m_LMChroma                  ( false )
+#endif
+#if JEM_TOOLS
   , m_IntraEMT                  ( false )
   , m_InterEMT                  ( false )
 #endif
@@ -1815,7 +1819,9 @@ SPSNext::SPSNext( SPS& sps )
   , m_FRUCSmallBlkRefineDepth   ( 3 )
 #endif
 #if JEM_TOOLS
+#if !JVET_K0190
   , m_ELMMode                   ( 0 )
+#endif
   , m_IntraPDPCMode             ( 0 )
 #endif
 #if JEM_TOOLS

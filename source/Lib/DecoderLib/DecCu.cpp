@@ -135,7 +135,7 @@ Void DecCu::xIntraRecBlk( TransformUnit& tu, const ComponentID compID )
         PelBuf piPred       = cs.getPredBuf( area );
 
   const PredictionUnit &pu  = *tu.cs->getPU( area.pos(), chType );
-#if JEM_TOOLS
+#if JEM_TOOLS||JVET_K0190
   const UInt uiChFinalMode  = PU::getFinalIntraMode( pu, chType );
 #endif
 
@@ -145,7 +145,7 @@ Void DecCu::xIntraRecBlk( TransformUnit& tu, const ComponentID compID )
   m_pcIntraPred->initIntraPatternChType( *tu.cu, area, bUseFilteredPredictions );
 
   //===== get prediction signal =====
-#if JEM_TOOLS
+#if JEM_TOOLS||JVET_K0190
   if( compID != COMPONENT_Y && PU::isLMCMode( uiChFinalMode ) )
   {
     const PredictionUnit& pu = cs.pcv->noRQT && cs.pcv->only2Nx2N ? *tu.cu->firstPU : *tu.cs->getPU( tu.block( compID ), CHANNEL_TYPE_CHROMA );
@@ -156,14 +156,12 @@ Void DecCu::xIntraRecBlk( TransformUnit& tu, const ComponentID compID )
 #endif
   {
     m_pcIntraPred->predIntraAng( compID, piPred, pu, bUseFilteredPredictions );
-#if JEM_TOOLS
-#if !JVET_K0190_CCLM_ONLY
+#if JEM_TOOLS&& !JVET_K0190
     if( compID == COMPONENT_Cr && sps.getSpsNext().getUseLMChroma() )
     {
       const CPelBuf pResiCb = cs.getResiBuf( tu.Cb() );
       m_pcIntraPred->addCrossColorResi( compID, piPred, tu, pResiCb );
     }
-#endif
 #endif
   }
 

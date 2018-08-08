@@ -277,16 +277,20 @@ extern const UInt g_scalingListSizeX[SCALING_LIST_SIZE_NUM];
 
 extern MsgLevel g_verbosity;
 
+
 #if JEM_TOOLS
+
 extern Int g_aiLMDivTableLow[];
 extern Int g_aiLMDivTableHigh[];
 
 extern const Int g_aiMFLM_MinSize[];
 extern const Int g_aiMMLM_MinSize[];
+#endif
+#if JEM_TOOLS||JVET_K0190
 extern const Int g_aiNonLMPosThrs[];
-
+#endif
+#if JEM_TOOLS
 extern const UChar g_NonMPM[257];
-
 #if !INTRA67_3MPM
 #if JVET_B0051_NON_MPM_MODE
 extern const Int g_ipred_mode_table[];

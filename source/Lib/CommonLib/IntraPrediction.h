@@ -72,15 +72,16 @@ private:
 
   static const UChar m_aucIntraFilter[MAX_NUM_CHANNEL_TYPE][MAX_INTRA_FILTER_DEPTHS];
 
-#if JEM_TOOLS
+#if JEM_TOOLS||JVET_K0190
   unsigned m_auShiftLM[32]; // Table for substituting division operation by multiplication
 
 #endif
   Pel* m_piTemp;
+#if !JVET_K0190
 #if JEM_TOOLS
   Pel*   m_pLumaRecBufferMul[LM_FILTER_NUM];
 #endif
-
+#endif
 #if JEM_TOOLS
   // copy unfiltered ref. samples to line buffer
   Pel                    m_piTempRef[4 * MAX_CU_SIZE + 1];
@@ -119,6 +120,7 @@ protected:
   Void destroy                    ();
 
   Void xFilterGroup               ( Pel* pMulDst[], Int i, Pel const* const piSrc, Int iRecStride, Bool bAboveAvaillable, Bool bLeftAvaillable);
+#if !JVET_K0190
 #if JEM_TOOLS
 
   struct MMLM_parameter
@@ -136,6 +138,9 @@ protected:
   Void xGetLMParameters           (const PredictionUnit &pu, const ComponentID compID, const CompArea& chromaArea, Int iPredType, Int& a, Int& b, Int& iShift);
 
 #endif
+#else
+  Void xGetLMParameters(const PredictionUnit &pu, const ComponentID compID, const CompArea& chromaArea, Int& a, Int& b, Int& iShift);
+#endif
 public:
   IntraPrediction();
   virtual ~IntraPrediction();
@@ -145,11 +150,15 @@ public:
   // Angular Intra
   void predIntraAng               ( const ComponentID compId, PelBuf &piPred, const PredictionUnit &pu, const bool useFilteredPredSamples );
   Pel*  getPredictorPtr           (const ComponentID compID, const Bool bUseFilteredPredictions = false) { return m_piYuvExt[compID][bUseFilteredPredictions?PRED_BUF_FILTERED:PRED_BUF_UNFILTERED]; }
+#if JVET_K0190
+  // Cross-component Chroma
+  Void predIntraChromaLM(const ComponentID compID, PelBuf &piPred, const PredictionUnit &pu, const CompArea& chromaArea, Int intraDir);
+  Void xGetLumaRecPixels(const PredictionUnit &pu, CompArea chromaArea);
+#else
 #if JEM_TOOLS
   // Cross-component Chroma
   Void predIntraChromaLM          (const ComponentID compID, PelBuf &piPred, const PredictionUnit &pu, const CompArea& chromaArea, Int intraDir);
   Void xGetLumaRecPixels          (const PredictionUnit &pu, CompArea chromaArea);
-#if !JVET_K0190_CCLM_ONLY
   Void addCrossColorResi          (const ComponentID compID, PelBuf &piPred, const TransformUnit &tu, const CPelBuf &pResiCb);
 #endif
 #endif

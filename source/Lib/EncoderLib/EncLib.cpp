@@ -874,9 +874,11 @@ Void EncLib::xInitSPS(SPS &sps)
   sps.getSpsNext().setLICMode               ( m_LICMode );
 #endif
   sps.getSpsNext().setMTTMode               ( m_MTTMode );
-#if JEM_TOOLS
+#if JEM_TOOLS||JVET_K0190
   sps.getSpsNext().setUseLMChroma           ( m_LMChroma ? true : false );
+#if !JVET_K0190
   sps.getSpsNext().setELMMode               ( m_LMChroma > 1 ? m_LMChroma - 1 : 0 );
+#endif
 #endif
 #if ENABLE_WPP_PARALLELISM
   sps.getSpsNext().setUseNextDQP            ( m_AltDQPCoding );

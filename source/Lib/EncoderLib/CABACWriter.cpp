@@ -1708,11 +1708,11 @@ void CABACWriter::intra_chroma_pred_modes( const CodingUnit& cu )
   intra_chroma_pred_mode( *pu );
 }
 
-#if JEM_TOOLS
+#if JEM_TOOLS||JVET_K0190
 void CABACWriter::intra_chroma_lmc_mode( const PredictionUnit& pu )
 {
   const unsigned intraDir = pu.intraDir[1];
-
+#if JEM_TOOLS&&!JVET_K0190
   if ( pu.cs->sps->getSpsNext().getUseMDMS() )
   {
     m_BinEncoder.encodeBin( PU::isLMCMode( intraDir ) ? 0 : 1, Ctx::IPredMode[1]( 0 ) );
@@ -1740,6 +1740,7 @@ void CABACWriter::intra_chroma_lmc_mode( const PredictionUnit& pu )
   }
   else
   {
+#endif
     int lmModeList[10];
     int maxSymbol = PU::getLMSymbolList( pu, lmModeList );
     int symbol    = -1;
@@ -1754,9 +1755,12 @@ void CABACWriter::intra_chroma_lmc_mode( const PredictionUnit& pu )
     CHECK( symbol < 0, "invalid symbol found" );
 
     unary_max_symbol( symbol, Ctx::IPredMode[1]( 2 ), Ctx::IPredMode[1]( 3 ), maxSymbol - 1 );
+#if JEM_TOOLS&&!JVET_K0190
   }
+#endif
 }
 #endif
+
 
 void CABACWriter::intra_chroma_pred_mode( const PredictionUnit& pu )
 {
@@ -1778,7 +1782,7 @@ void CABACWriter::intra_chroma_pred_mode( const PredictionUnit& pu )
     m_BinEncoder.encodeBin( 1, Ctx::IPredMode[1]( 1 ) );
   }
 
-#if JEM_TOOLS
+#if JEM_TOOLS||JVET_K0190
   // LM chroma mode
   if( pu.cs->sps->getSpsNext().getUseLMChroma() )
   {

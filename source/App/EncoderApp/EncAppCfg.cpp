@@ -855,12 +855,22 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
 #if JEM_TOOLS
   ("IntraPDPC",                                       m_IntraPDPC,                                          0, "Intra PDPC (0:off, 1:on Intra_PDPC, 2: on Planar_PDPC)  [default: off]\n")
   ("ALF",                                             m_ALF,                                                0, "ALF (0:off, 1:ALF, 2:GALF)\n")
-  ("LMChroma",                                        m_LMChroma,                                           0, " LMChroma prediction "
+#endif
+#if JVET_K0190
+  ("LMChroma",                                        m_LMChroma,                                           1, " LMChroma prediction "
                                                                                                                "\t0:  Disable LMChroma\n"
-                                                                                                               "\t1:  Enable LMChroma\n"
-                                                                                                               "\t2:  Enable LMChroma+ ELM (MMLM)\n"
-                                                                                                               "\t3:  Enable LMChroma+ ELM (MFLM)\n"
-                                                                                                               "\t4:  Enable LMChroma+ ELM (MMLM+MFLM)\n")
+                                                                                                               "\t1:  Enable LMChroma\n")
+#else
+#if JEM_TOOLS
+    ("LMChroma", m_LMChroma, 0, " LMChroma prediction "
+      "\t0:  Disable LMChroma\n"
+      "\t1:  Enable LMChroma\n"
+      "\t2:  Enable LMChroma+ ELM (MMLM)\n"
+      "\t3:  Enable LMChroma+ ELM (MFLM)\n"
+      "\t4:  Enable LMChroma+ ELM (MMLM+MFLM)\n")
+#endif
+#endif
+#if JEM_TOOLS
   ("EMT,-emt",                                        m_EMT,                                                0, "Enhanced Multiple Transform (EMT)\n"
     "\t0:  Disable EMT\n"
     "\t1:  Enable only Intra EMT\n"
@@ -1936,6 +1946,8 @@ Bool EncAppCfg::xCheckParameter()
 #endif
     xConfirmPara( m_Intra4Tap,  "Intra 4 Tap only allowed with NEXT profile" );
     xConfirmPara( m_IntraBoundaryFilter, "Intra boundary filter is only allowed with NEXT profile" );
+#endif
+#if JEM_TOOLS||JVET_K0190
     xConfirmPara( m_LMChroma, "LMChroma only allowed with NEXT profile" );
 #endif
     xConfirmPara( m_LargeCTU, "Large CTU is only allowed with NEXT profile" );
@@ -2995,9 +3007,12 @@ Bool EncAppCfg::xCheckParameter()
 #endif
   xConfirmPara( m_decodeBitstreams[0] == m_bitstreamFileName, "Debug bitstream and the output bitstream cannot be equal.\n" );
   xConfirmPara( m_decodeBitstreams[1] == m_bitstreamFileName, "Decode2 bitstream and the output bitstream cannot be equal.\n" );
+#if JVET_K0190
+  xConfirmPara(unsigned(m_LMChroma) > 1, "LMMode exceeds range (0 to 1)");
+#else
 #if JEM_TOOLS
   xConfirmPara(unsigned(m_LMChroma) > 4, "ELMMode exceeds range (0 to 4)");
-
+#endif
 #endif
 #if EXTENSION_360_VIDEO
   check_failed |= m_ext360.verifyParameters();
@@ -3284,7 +3299,11 @@ Void EncAppCfg::xPrintParameter()
 #if JEM_TOOLS
     msg( VERBOSE, "IntraPDPC:%d ", m_IntraPDPC );
     msg( VERBOSE, "ALF:%d ", m_ALF );
+#endif
+#if JVET_K0190
     msg( VERBOSE, "LMChroma:%d ", m_LMChroma );
+#endif
+#if JEM_TOOLS
     msg( VERBOSE, "EMT: %1d(intra) %1d(inter) ", m_EMT & 1, ( m_EMT >> 1 ) & 1 );
 #endif
 #if JEM_TOOLS
