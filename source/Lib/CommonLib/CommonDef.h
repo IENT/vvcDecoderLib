@@ -132,7 +132,11 @@ static const Int NOT_VALID =                                       -1;
 
 static const Int AMVP_MAX_NUM_CANDS =                               2; ///< AMVP: advanced motion vector prediction - max number of final candidates
 static const Int AMVP_MAX_NUM_CANDS_MEM =                           3; ///< AMVP: advanced motion vector prediction - max number of candidates
+#if JVET_K0346
+static const int AMVP_DECIMATION_FACTOR =                           2;
+#else
 static const Int AMVP_DECIMATION_FACTOR =                           4;
+#endif
 static const Int MRG_MAX_NUM_CANDS =                                7; ///< MERGE
 
 static const Int MAX_TLAYER =                                       7; ///< Explicit temporal layer QP offset - max number of temporal layer
@@ -220,8 +224,12 @@ static const UInt  EMT_INTRA_MAX_CU_WITH_QTBT =                    64; ///< Max 
 static const UInt  EMT_INTER_MAX_CU_WITH_QTBT =                    64; ///< Max Inter CU size applying EMT, supported values: 8, 16, 32, 64, 128
 
 #endif
-static const Int NUM_MOST_PROBABLE_MODES =                          3;
-static const Int NUM_MOST_PROBABLE_MODES_67 =                       6;
+#if INTRA67_3MPM
+static const int NUM_MOST_PROBABLE_MODES = 3;
+#else
+static const Int NUM_MOST_PROBABLE_MODES = 3;
+static const Int NUM_MOST_PROBABLE_MODES_67 = 6;
+#endif
 #if JEM_TOOLS
 static const Int MMLM_SAMPLE_NEIGHBOR_LINES =                       2;
 static const Int LM_SYMBOL_NUM =                   (1 + NUM_LMC_MODE);
@@ -248,7 +256,7 @@ static const Int CABAC_INIT_PRESENT_FLAG =                          1;
 
 static const Int LUMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS   = 4;
 static const Int CHROMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS = 8;
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
 static const Int VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE         = 2;   ///< additional precision bit for MV storage
 #endif
 
@@ -349,7 +357,11 @@ static const Int    MAX_BT_DEPTH_C      =                           0;      ///<
 static const Int    MAX_BT_SIZE_C       =                          64;      ///< [1<<MIN_QT_SIZE_C, 1<<CTU_LOG2], in luma samples
 static const Int    MIN_BT_SIZE_C       =                           4;      ///< can be set down to 4, in luma samples
 
-static const Int    MAX_TT_SIZE_INTER  =                          128;      ///< for initialization, [1<<MIN_BT_SIZE_INTER, 1<<CTU_LOG2]
+#if JVET_K0556_MAX_TT_SIZE_64
+static const Int    MAX_TT_SIZE_INTER  =                           64;      ///< for initialization, [1<<MIN_CU_LOG2, 64]
+#else
+static const Int    MAX_TT_SIZE_INTER  =                          128;      ///< for initialization, [1<<MIN_CU_LOG2, 1<<CTU_LOG2]
+#endif
 static const Int    MIN_TT_SIZE_INTER  =                            4;      ///<
 
 static const SplitSeries SPLIT_BITS         =                       5;

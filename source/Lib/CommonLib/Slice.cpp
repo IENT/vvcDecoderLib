@@ -128,6 +128,10 @@ Slice::Slice()
 , m_temporalLayerNonReferenceFlag ( false )
 , m_LFCrossSliceBoundaryFlag      ( false )
 , m_enableTMVPFlag                ( true )
+#if JVET_K0346
+, m_subPuMvpSubBlkSizeSliceEnable(false)
+, m_subPuMvpSubBlkLog2Size       (2)
+#endif
 , m_encCABACTableIdx              (I_SLICE)
 , m_iProcessingStartTime          ( 0 )
 , m_dProcessingTime               ( 0 )
@@ -220,7 +224,10 @@ Void Slice::initSlice()
   m_cabacInitFlag        = false;
   m_cabacWinUpdateMode   = 0;
   m_enableTMVPFlag       = true;
-
+#if JVET_K0346
+  m_subPuMvpSubBlkSizeSliceEnable = false;
+  m_subPuMvpSubBlkLog2Size        = 2;
+#endif
 }
 
 Void Slice::setDefaultClpRng( const SPS& sps )
@@ -843,6 +850,10 @@ Void Slice::copySliceInfo(Slice *pSrc, bool cpyAlmostAll)
   m_bLMvdL1Zero                   = pSrc->m_bLMvdL1Zero;
   m_LFCrossSliceBoundaryFlag      = pSrc->m_LFCrossSliceBoundaryFlag;
   m_enableTMVPFlag                = pSrc->m_enableTMVPFlag;
+#if JVET_K0346
+  m_subPuMvpSubBlkSizeSliceEnable = pSrc->m_subPuMvpSubBlkSizeSliceEnable;
+  m_subPuMvpSubBlkLog2Size        = pSrc->m_subPuMvpSubBlkLog2Size;
+#endif
   m_maxNumMergeCand               = pSrc->m_maxNumMergeCand;
   if( cpyAlmostAll ) m_encCABACTableIdx  = pSrc->m_encCABACTableIdx;
   m_uiMaxBTSize                   = pSrc->m_uiMaxBTSize;
@@ -1713,11 +1724,16 @@ SPSNext::SPSNext( SPS& sps )
 #if JEM_TOOLS
   , m_NSST                      ( false )
   , m_Intra4Tap                 ( false )
+#if !INTRA67_3MPM
   , m_Intra65Ang                ( false )
+#endif
 #endif
   , m_LargeCTU                  ( false )
 #if JEM_TOOLS
   , m_IntraBoundaryFilter       ( false )
+  , m_SubPuMvp                  ( false )
+#endif
+#if !JEM_TOOLS && JVET_K0346
   , m_SubPuMvp                  ( false )
 #endif
 #if JEM_TOOLS
@@ -1735,6 +1751,9 @@ SPSNext::SPSNext( SPS& sps )
 #if JEM_TOOLS
   , m_highPrecMv                ( false )
   , m_BIO                       ( false )
+#endif
+#if !JEM_TOOLS && JVET_K0346
+  , m_highPrecMv                ( false )
 #endif
   , m_DisableMotionCompression  ( false )
 #if JEM_TOOLS
@@ -1769,7 +1788,7 @@ SPSNext::SPSNext( SPS& sps )
   , m_minQT                     { 0, 0 }
   , m_maxBTDepth                { MAX_BT_DEPTH, MAX_BT_DEPTH_INTER, MAX_BT_DEPTH_C }
   , m_maxBTSize                 { MAX_BT_SIZE,  MAX_BT_SIZE_INTER,  MAX_BT_SIZE_C }
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
   , m_subPuLog2Size             ( 0 )
   , m_subPuMrgMode              ( 0 )
 #endif

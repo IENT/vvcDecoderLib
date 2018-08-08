@@ -304,8 +304,10 @@ Void EncLib::init( Bool isFieldCoding, AUWriterIf* auWriterIf )
 #endif
                           true,
                           m_useTransformSkipFast
+#if !INTRA67_3MPM
 #if JEM_TOOLS
                           , m_Intra65Ang
+#endif
 #endif
                           , m_QTBT
     );
@@ -352,8 +354,10 @@ Void EncLib::init( Bool isFieldCoding, AUWriterIf* auWriterIf )
 #endif
                    true,
                    m_useTransformSkipFast
+#if !INTRA67_3MPM
 #if JEM_TOOLS
                    , m_Intra65Ang
+#endif
 #endif
                    , m_QTBT
   );
@@ -832,10 +836,16 @@ Void EncLib::xInitSPS(SPS &sps)
 #if JEM_TOOLS
   sps.getSpsNext().setUseNSST               ( m_NSST );
   sps.getSpsNext().setUseIntra4Tap          ( m_Intra4Tap );
+#if !INTRA67_3MPM
   sps.getSpsNext().setUseIntra65Ang         ( m_Intra65Ang );
+#endif
   sps.getSpsNext().setUseIntraBoundaryFilter( m_IntraBoundaryFilter );
   sps.getSpsNext().setSubPuMvpMode          ( m_SubPuMvpMode );
   sps.getSpsNext().setSubPuMvpLog2Size      ( m_SubPuMvpLog2Size );
+#endif
+#if !JEM_TOOLS && JVET_K0346
+  sps.getSpsNext().setSubPuMvpMode(m_SubPuMvpMode);
+  sps.getSpsNext().setSubPuMvpLog2Size(m_SubPuMvpLog2Size);
 #endif
 #if JEM_TOOLS
   sps.getSpsNext().setCABACEngineMode       ( m_CABACEngineMode );
@@ -855,6 +865,9 @@ Void EncLib::xInitSPS(SPS &sps)
   sps.getSpsNext().setUseHighPrecMv         ( m_highPrecMv );
   sps.getSpsNext().setUseAffine             ( m_Affine );
   sps.getSpsNext().setUseBIO                ( m_BIO );
+#endif
+#if !JEM_TOOLS && JVET_K0346
+  sps.getSpsNext().setUseHighPrecMv(m_highPrecMv);
 #endif
   sps.getSpsNext().setDisableMotCompress    ( m_DisableMotionCompression );
 #if JEM_TOOLS

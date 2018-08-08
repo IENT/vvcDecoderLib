@@ -219,11 +219,13 @@ Void EncApp::xInitLibCfg()
 #if JEM_TOOLS
   m_cEncLib.setNSST                                              ( m_NSST );
   m_cEncLib.setIntra4Tap                                         ( m_Intra4Tap );
+#if !INTRA67_3MPM
   m_cEncLib.setIntra65Ang                                        ( m_Intra65Ang );
+#endif
   m_cEncLib.setUseIntraBoundaryFilter                            ( m_IntraBoundaryFilter);
 #endif
   m_cEncLib.setLargeCTU                                          ( m_LargeCTU );
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
 #if ENABLE_BMS
   m_cEncLib.setSubPuMvpMode                                      ( m_SubPuMvpMode );
 #else
@@ -242,6 +244,9 @@ Void EncApp::xInitLibCfg()
   m_cEncLib.setHighPrecisionMv                                   ( m_highPrecisionMv );
   m_cEncLib.setAffine                                            ( m_Affine );
   m_cEncLib.setBIO                                               ( m_BIO );
+#endif
+#if !JEM_TOOLS && JVET_K0346
+  m_cEncLib.setHighPrecisionMv                                   (m_highPrecisionMv);
 #endif
   m_cEncLib.setDisableMotionCompression                          ( m_DisableMotionCompression );
 #if JEM_TOOLS

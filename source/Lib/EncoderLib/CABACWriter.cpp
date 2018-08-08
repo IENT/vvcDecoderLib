@@ -271,8 +271,27 @@ void CABACWriter::coding_tree_unit( CodingStructure& cs, const UnitArea& area, i
   {
     sao( *cs.slice, ctuRsAddr );
   }
+
+#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
+  if (CS::isDualITree(cs) && cs.pcv->chrFormat != CHROMA_400)
+  {
+    CUCtx chromaCuCtx(qps[CH_C]);
+    Partitioner *chromaPartitioner = PartitionerFactory::get(*cs.slice);
+    chromaPartitioner->initCtu(area, CH_C, *cs.slice);
+    coding_tree(cs, *partitioner, cuCtx, chromaPartitioner, &chromaCuCtx);
+    qps[CH_L] = cuCtx.qp;
+    qps[CH_C] = chromaCuCtx.qp;
+
+    delete chromaPartitioner;
+  }
+  else
+  {
+#endif
   coding_tree( cs, *partitioner, cuCtx );
   qps[CH_L] = cuCtx.qp;
+#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
+  }
+#else
   if( CS::isDualITree( cs ) && cs.pcv->chrFormat != CHROMA_400 )
   {
     CUCtx cuCtxChroma( qps[CH_C] );
@@ -280,6 +299,7 @@ void CABACWriter::coding_tree_unit( CodingStructure& cs, const UnitArea& area, i
     coding_tree( cs, *partitioner, cuCtxChroma );
     qps[CH_C] = cuCtxChroma.qp;
   }
+#endif
 
   delete partitioner;
 }
@@ -970,7 +990,11 @@ Void CABACWriter::alf_chroma( const ALFParam& alfParam )
 //    void  split_cu_mode_mt  ( split, cs, partitioner )
 //================================================================================
 
+#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
+void CABACWriter::coding_tree(const CodingStructure& cs, Partitioner& partitioner, CUCtx& cuCtx, Partitioner* pPartitionerChroma, CUCtx* pCuCtxChroma)
+#else
 void CABACWriter::coding_tree( const CodingStructure& cs, Partitioner& partitioner, CUCtx& cuCtx )
+#endif
 {
   const PPS      &pps         = *cs.pps;
   const UnitArea &currArea    = partitioner.currArea();
@@ -985,6 +1009,20 @@ void CABACWriter::coding_tree( const CodingStructure& cs, Partitioner& partition
   {
     cuCtx.isChromaQpAdjCoded  = false;
   }
+#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
+  // Reset delta QP coding flag and ChromaQPAdjustemt coding flag
+  if (CS::isDualITree(cs) && pPartitionerChroma != nullptr)
+  {
+    if (pps.getUseDQP() && pPartitionerChroma->currDepth <= pps.getMaxCuDQPDepth())
+    {
+      pCuCtxChroma->isDQPCoded = false;
+    }
+    if (cs.slice->getUseChromaQpAdj() && pPartitionerChroma->currDepth <= pps.getPpsRangeExtension().getDiffCuChromaQpOffsetDepth())
+    {
+      pCuCtxChroma->isChromaQpAdjCoded = false;
+    }
+  }
+#endif
 
   const PartSplit implicitSplit = partitioner.getImplicitSplit( cs );
 
@@ -1005,6 +1043,52 @@ void CABACWriter::coding_tree( const CodingStructure& cs, Partitioner& partition
     // quad-tree split
     if( qtSplit )
     {
+#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
+      if (CS::isDualITree(cs) && pPartitionerChroma != nullptr && (partitioner.currArea().lwidth() >= 64 || partitioner.currArea().lheight() >= 64))
+      {
+        partitioner.splitCurrArea(CU_QUAD_SPLIT, cs);
+        pPartitionerChroma->splitCurrArea(CU_QUAD_SPLIT, cs);
+        bool beContinue = true;
+        bool lumaContinue = true;
+        bool chromaContinue = true;
+
+        while (beContinue)
+        {
+          if (partitioner.currArea().lwidth() > 64 || partitioner.currArea().lheight() > 64)
+          {
+            if (cs.picture->blocks[partitioner.chType].contains(partitioner.currArea().blocks[partitioner.chType].pos()))
+            {
+              coding_tree(cs, partitioner, cuCtx, pPartitionerChroma, pCuCtxChroma);
+            }
+            lumaContinue = partitioner.nextPart(cs);
+            chromaContinue = pPartitionerChroma->nextPart(cs);
+            CHECK(lumaContinue != chromaContinue, "luma chroma partition should be matched");
+            beContinue = lumaContinue;
+          }
+          else
+          {
+            //dual tree coding under 64x64 block
+            if (cs.picture->blocks[partitioner.chType].contains(partitioner.currArea().blocks[partitioner.chType].pos()))
+            {
+              coding_tree(cs, partitioner, cuCtx);
+            }
+            lumaContinue = partitioner.nextPart(cs);
+            if (cs.picture->blocks[pPartitionerChroma->chType].contains(pPartitionerChroma->currArea().blocks[pPartitionerChroma->chType].pos()))
+            {
+              coding_tree(cs, *pPartitionerChroma, *pCuCtxChroma);
+            }
+            chromaContinue = pPartitionerChroma->nextPart(cs);
+            CHECK(lumaContinue != chromaContinue, "luma chroma partition should be matched");
+            beContinue = lumaContinue;
+          }
+        }
+        partitioner.exitCurrSplit();
+        pPartitionerChroma->exitCurrSplit();
+
+      }
+      else
+      {
+#endif
       partitioner.splitCurrArea( CU_QUAD_SPLIT, cs );
 
       do
@@ -1016,6 +1100,9 @@ void CABACWriter::coding_tree( const CodingStructure& cs, Partitioner& partition
       } while( partitioner.nextPart( cs ) );
 
       partitioner.exitCurrSplit();
+#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
+      }
+#endif
       return;
     }
   }
@@ -1068,13 +1155,29 @@ void CABACWriter::coding_tree( const CodingStructure& cs, Partitioner& partition
     cuCtx.qp = CU::predictQP( cu, cuCtx.qp );
   }
 
+#if JVET_K0346
+  if (!cs.slice->isIntra() && m_EncCu)
+  {
+    PredictionUnit& pu = *cu.firstPU;
+#if JEM_TOOLS
+    if (pu.mergeFlag && (pu.mergeType == MRG_TYPE_SUBPU_ATMVP || pu.mergeType == MRG_TYPE_SUBPU_ATMVP_EXT))
+#else
+    if (pu.mergeFlag && (pu.mergeType == MRG_TYPE_SUBPU_ATMVP))
+#endif
+    {
+      unsigned int layerId = cs.slice->getDepth();
+      m_EncCu->incrementSubMergeBlkSize(layerId, cu.Y().width*cu.Y().height);
+      m_EncCu->incrementSubMergeBlkNum(layerId, 1);
+    }
+  }
+#endif
+
   // coding unit
   coding_unit( cu, partitioner, cuCtx );
 
   DTRACE_COND( ( isEncoding() ), g_trace_ctx, D_QP, "x=%d, y=%d, w=%d, h=%d, qp=%d\n", cu.Y().x, cu.Y().y, cu.Y().width, cu.Y().height, cu.qp );
   DTRACE_BLOCK_REC_COND( ( !isEncoding() ), cs.picture->getRecoBuf( cu ), cu, cu.predMode );
 }
-
 
 void CABACWriter::split_cu_flag( bool split, const CodingStructure& cs, Partitioner& partitioner )
 {
@@ -1335,8 +1438,10 @@ void CABACWriter::intra_luma_pred_modes( const CodingUnit& cu )
   unsigned ipred_modes [4];
 
   const PredictionUnit* pu = cu.firstPU;
+#if !INTRA67_3MPM
 #if JEM_TOOLS
   const bool use65Ang = cu.cs->sps->getSpsNext().getUseIntra65Ang();
+#endif
 #endif
 
   // prev_intra_luma_pred_flag
@@ -1372,6 +1477,7 @@ void CABACWriter::intra_luma_pred_modes( const CodingUnit& cu )
     const unsigned& mpm_idx = mpm_idxs[k];
     if( mpm_idx < numMPMs )
     {
+#if !INTRA67_3MPM
 #if JEM_TOOLS
       if( use65Ang )
       {
@@ -1384,6 +1490,7 @@ void CABACWriter::intra_luma_pred_modes( const CodingUnit& cu )
         encode_sparse_dt( dt, mpm_idx );
       }
       else
+#endif
 #endif
       {
         m_BinEncoder.encodeBinEP( mpm_idx > 0 );
@@ -1401,6 +1508,7 @@ void CABACWriter::intra_luma_pred_modes( const CodingUnit& cu )
       // sorting of MPMs
       std::sort( mpm_pred, mpm_pred + numMPMs );
 
+#if !INTRA67_3MPM
 #if JEM_TOOLS
       if( use65Ang )
       {
@@ -1432,7 +1540,20 @@ void CABACWriter::intra_luma_pred_modes( const CodingUnit& cu )
       }
       else
 #endif
+#endif
       {
+#if INTRA67_3MPM
+        for (int idx = int(numMPMs) - 1; idx >= 0; idx--)
+        {
+          if (ipred_mode > mpm_pred[idx])
+          {
+            ipred_mode--;
+          }
+        }
+        CHECK(ipred_mode >= 64, "Incorrect mode");
+
+        m_BinEncoder.encodeBinsEP(ipred_mode, 6);
+#else
         CHECK( g_intraMode33to65AngMapping[g_intraMode65to33AngMapping[ipred_mode]] != ipred_mode, "Using an extended intra mode, although not enabled" );
 
         ipred_mode = g_intraMode65to33AngMapping[ipred_mode];
@@ -1447,6 +1568,7 @@ void CABACWriter::intra_luma_pred_modes( const CodingUnit& cu )
         CHECK( ipred_mode >= 32, "Incorrect mode" );
 
         m_BinEncoder.encodeBinsEP( ipred_mode, 5 );
+#endif
       }
     }
 
@@ -1463,9 +1585,11 @@ void CABACWriter::intra_luma_pred_mode( const PredictionUnit& pu )
   unsigned  numMPMs  = pu.cs->pcv->numMPMs;
   unsigned *mpm_pred = ( unsigned* ) alloca( numMPMs * sizeof( unsigned ) );
 
+#if !INTRA67_3MPM
 #if JEM_TOOLS
   const bool use65Ang = pu.cs->sps->getSpsNext().getUseIntra65Ang();
 
+#endif
 #endif
   PU::getIntraMPMs( pu, mpm_pred );
 
@@ -1485,6 +1609,7 @@ void CABACWriter::intra_luma_pred_mode( const PredictionUnit& pu )
   // mpm_idx / rem_intra_luma_pred_mode
   if( mpm_idx < numMPMs )
   {
+#if !INTRA67_3MPM
 #if JEM_TOOLS
     if( use65Ang )
     {
@@ -1498,6 +1623,7 @@ void CABACWriter::intra_luma_pred_mode( const PredictionUnit& pu )
     }
     else
 #endif
+#endif
     {
       m_BinEncoder.encodeBinEP( mpm_idx > 0 );
       if( mpm_idx )
@@ -1509,6 +1635,7 @@ void CABACWriter::intra_luma_pred_mode( const PredictionUnit& pu )
   else
   {
     std::sort( mpm_pred, mpm_pred + numMPMs );
+#if !INTRA67_3MPM
 #if JEM_TOOLS
     if( use65Ang )
     {
@@ -1539,7 +1666,18 @@ void CABACWriter::intra_luma_pred_mode( const PredictionUnit& pu )
     }
     else
 #endif
+#endif
     {
+#if INTRA67_3MPM
+      for (int idx = int(numMPMs) - 1; idx >= 0; idx--)
+      {
+        if (ipred_mode > mpm_pred[idx])
+        {
+          ipred_mode--;
+        }
+      }
+      m_BinEncoder.encodeBinsEP(ipred_mode, 6);
+#else
       CHECK( g_intraMode33to65AngMapping[g_intraMode65to33AngMapping[ipred_mode]] != ipred_mode, "Using an extended intra mode, although not enabled" );
 
       ipred_mode = g_intraMode65to33AngMapping[ipred_mode];
@@ -1552,6 +1690,7 @@ void CABACWriter::intra_luma_pred_mode( const PredictionUnit& pu )
       }
 
       m_BinEncoder.encodeBinsEP( ipred_mode, 5 );
+#endif
     }
   }
 }
@@ -1997,13 +2136,13 @@ void CABACWriter::merge_idx( const PredictionUnit& pu )
     }
     else
     {
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
       bool useExtCtx = pu.cs->sps->getSpsNext().getUseSubPuMvp();
 #endif
       m_BinEncoder.encodeBin( 1, Ctx::MergeIdx() );
       for( unsigned idx = 1; idx < numCandminus1; idx++ )
       {
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
         if( useExtCtx )
         {
           m_BinEncoder.encodeBin( pu.mergeIdx == idx ? 0 : 1, Ctx::MergeIdx( std::min<int>( idx, NUM_MERGE_IDX_EXT_CTX - 1 ) ) );
@@ -2029,7 +2168,7 @@ void CABACWriter::inter_pred_idc( const PredictionUnit& pu )
   {
     return;
   }
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
   if( pu.cu->partSize == SIZE_2Nx2N || pu.cs->sps->getSpsNext().getUseSubPuMvp() || pu.cu->lumaSize().width != 8 )
 #else
   if( pu.cu->partSize == SIZE_2Nx2N || pu.cu->lumaSize().width != 8 )
@@ -2400,7 +2539,7 @@ void CABACWriter::mvd_coding( const Mv &rMvd )
   unsigned  horAbs  = unsigned( horMvd < 0 ? -horMvd : horMvd );
   unsigned  verAbs  = unsigned( verMvd < 0 ? -verMvd : verMvd );
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
   if( rMvd.highPrec )
   {
     CHECK( horAbs & ((1<<VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE)-1), "mvd-x has high precision fractional part." );

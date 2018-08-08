@@ -804,12 +804,17 @@ private:
 #if JEM_TOOLS
   bool              m_NSST;                       // 2
   bool              m_Intra4Tap;                  // 3
+#if !INTRA67_3MPM
   bool              m_Intra65Ang;                 // 4
+#endif
 #endif
   bool              m_LargeCTU;                   // 5
 #if JEM_TOOLS
   bool              m_IntraBoundaryFilter;        // 6
   bool              m_SubPuMvp;                   // 7
+#endif
+#if !JEM_TOOLS && JVET_K0346
+  bool              m_SubPuMvp;
 #endif
 #if JEM_TOOLS
   bool              m_ModifiedCABACEngine;        // 8
@@ -826,6 +831,9 @@ private:
 #if JEM_TOOLS
   bool              m_highPrecMv;                 // 11
   bool              m_BIO;                        // 12
+#endif
+#if !JEM_TOOLS && JVET_K0346
+  bool              m_highPrecMv;
 #endif
   bool              m_DisableMotionCompression;   // 13
 #if JEM_TOOLS
@@ -868,7 +876,7 @@ private:
   unsigned    m_maxBTDepth[3];
   unsigned    m_maxBTSize[3];
   unsigned    m_dualITree;
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
   // sub-pu merging
   unsigned    m_subPuLog2Size;
   int         m_subPuMrgMode;
@@ -930,8 +938,10 @@ public:
   bool      getUseNSST            ()                                      const     { return m_NSST; }
   void      setUseIntra4Tap       ( bool b )                                        { m_Intra4Tap = b; }
   bool      getUseIntra4Tap       ()                                      const     { return m_Intra4Tap; }
+#if !INTRA67_3MPM
   void      setUseIntra65Ang      ( bool b )                                        { m_Intra65Ang = b; }
   bool      getUseIntra65Ang      ()                                      const     { return m_Intra65Ang; }
+#endif
 #endif
   void      setUseLargeCTU        ( bool b )                                        { m_LargeCTU = b; }
   bool      getUseLargeCTU        ()                                      const     { return m_LargeCTU; }
@@ -943,6 +953,11 @@ public:
   void      setSubPuMvpMode       ( int n )                                         { m_subPuMrgMode = n; m_SubPuMvp = n != 0; }
   bool      getUseATMVP           ()                                      const     { return ( m_subPuMrgMode & 1 ) == 1; }
   bool      getUseSTMVP           ()                                      const     { return ( m_subPuMrgMode & 2 ) == 2; }
+#endif
+#if !JEM_TOOLS && JVET_K0346
+  bool      getUseSubPuMvp()                                   const { return m_SubPuMvp; }
+  void      setSubPuMvpMode(int n)                             { m_subPuMrgMode = n; m_SubPuMvp = n != 0; }
+  bool      getUseATMVP()                                      const { return (m_subPuMrgMode & 1) == 1; }
 #endif
 #if JEM_TOOLS
   bool      getModifiedCABACEngine()                                      const     { return m_ModifiedCABACEngine; }
@@ -965,6 +980,10 @@ public:
   bool      getUseHighPrecMv      ()                                      const     { return m_highPrecMv; }
   void      setUseBIO             ( bool b )                                        { m_BIO = b; }
   bool      getUseBIO             ()                                      const     { return m_BIO; }
+#endif
+#if !JEM_TOOLS && JVET_K0346
+  void      setUseHighPrecMv(bool b) { m_highPrecMv = b; }
+  bool      getUseHighPrecMv()                                      const { return m_highPrecMv; }
 #endif
   void      setDisableMotCompress ( bool b )                                        { m_DisableMotionCompression = b; }
   bool      getDisableMotCompress ()                                      const     { return m_DisableMotionCompression; }
@@ -1041,7 +1060,7 @@ public:
   void      setUseDualITree       ( bool b )                                        { m_dualITree = b; }
   bool      getUseDualITree       ()                                      const     { return m_dualITree; }
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
   // sub pu tmvp
   void      setSubPuMvpLog2Size   ( unsigned    log2Size )                          { m_subPuLog2Size = log2Size; }
   unsigned  getSubPuMvpLog2Size   ()                                      const     { return m_subPuLog2Size; }
@@ -1744,6 +1763,11 @@ private:
 
   Bool                       m_enableTMVPFlag;
 
+#if JVET_K0346
+  bool                       m_subPuMvpSubBlkSizeSliceEnable;
+  int                        m_subPuMvpSubBlkLog2Size;
+#endif
+
   SliceType                  m_encCABACTableIdx;           // Used to transmit table selection across slices.
 
   clock_t                    m_iProcessingStartTime;
@@ -1999,6 +2023,13 @@ public:
   Void                        setEncCABACTableIdx( SliceType idx )                   { m_encCABACTableIdx = idx;                                     }
   SliceType                   getEncCABACTableIdx() const                            { return m_encCABACTableIdx;                                    }
 
+#if JVET_K0346
+  void                        setSubPuMvpSliceSubblkSizeEnable(bool b) { m_subPuMvpSubBlkSizeSliceEnable = b; }
+  bool                        getSubPuMvpSliceSubblkSizeEnable()                  const { return m_subPuMvpSubBlkSizeSliceEnable; }
+  void                        setSubPuMvpSubblkLog2Size(int n) { m_subPuMvpSubBlkLog2Size = n; }
+  int                         getSubPuMvpSubblkLog2Size()                         const { return m_subPuMvpSubBlkLog2Size; }
+#endif
+
   Void                        setSliceQpBase( Int i )                                { m_iSliceQpBase = i;                                           }
   Int                         getSliceQpBase()                                 const { return m_iSliceQpBase;                                        }
 
@@ -2227,7 +2258,7 @@ public:
   PreCalcValues( const SPS& sps, const PPS& pps, bool _isEncoder )
     : chrFormat           ( sps.getChromaFormatIdc() )
     , multiBlock422       ( chrFormat == CHROMA_422 && !sps.getSpsNext().getUseQTBT() )
-#if JEM_TOOLS
+#if JEM_TOOLS && !JVET_K0346
     , noMotComp           ( sps.getSpsNext().getDisableMotCompress() || sps.getSpsNext().getUseSubPuMvp() )
 #else
     , noMotComp           ( sps.getSpsNext().getDisableMotCompress() )
@@ -2251,10 +2282,14 @@ public:
     , lumaWidth           ( sps.getPicWidthInLumaSamples() )
     , lumaHeight          ( sps.getPicHeightInLumaSamples() )
     , fastDeltaQPCuMaxSize( Clip3(sps.getMaxCUHeight() >> (sps.getLog2DiffMaxMinCodingBlockSize()), sps.getMaxCUHeight(), 32u) )
+#if INTRA67_3MPM
+    , numMPMs             (NUM_MOST_PROBABLE_MODES)
+#else
 #if JEM_TOOLS
     , numMPMs             ( sps.getSpsNext().getUseIntra65Ang() ? NUM_MOST_PROBABLE_MODES_67 : NUM_MOST_PROBABLE_MODES )
 #else
     , numMPMs             ( NUM_MOST_PROBABLE_MODES )
+#endif
 #endif
     , noRQT               (  sps.getSpsNext().getUseQTBT() )
     , rectCUs             (  sps.getSpsNext().getUseQTBT() )

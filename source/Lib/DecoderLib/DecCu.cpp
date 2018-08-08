@@ -429,7 +429,7 @@ Void DecCu::xDecodeInterTexture(CodingUnit &cu)
   }
 }
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
 Void DecCu::xDeriveCUMV( CodingUnit &cu )
 {
   for( auto &pu : CU::traversePUs( cu ) )
@@ -438,6 +438,7 @@ Void DecCu::xDeriveCUMV( CodingUnit &cu )
 
     if( pu.mergeFlag )
     {
+#if JEM_TOOLS
       if( pu.frucMrgMode )
       {
         pu.mergeType = MRG_TYPE_FRUC;
@@ -448,7 +449,9 @@ Void DecCu::xDeriveCUMV( CodingUnit &cu )
         //normal merge data should be set already, to be checked
       }
       else
+#endif
       {
+#if JEM_TOOLS
         if( pu.cu->affine )
         {
           pu.mergeIdx = 0;
@@ -472,12 +475,15 @@ Void DecCu::xDeriveCUMV( CodingUnit &cu )
           PU::spanMotionInfo( pu, mrgCtx );
         }
         else
+#endif
         {
           if( pu.cs->sps->getSpsNext().getUseSubPuMvp() )
           {
             Size bufSize = g_miScaling.scale( pu.lumaSize() );
             mrgCtx.subPuMvpMiBuf    = MotionBuf( m_SubPuMiBuf,    bufSize );
+#if JEM_TOOLS
             mrgCtx.subPuMvpExtMiBuf = MotionBuf( m_SubPuExtMiBuf, bufSize );
+#endif
           }
 
           if( cu.cs->pps->getLog2ParallelMergeLevelMinus2() && cu.partSize != SIZE_2Nx2N && cu.lumaSize().width <= 8 )
@@ -514,6 +520,7 @@ Void DecCu::xDeriveCUMV( CodingUnit &cu )
     }
     else
     {
+#if JEM_TOOLS
 #if REUSE_CU_RESULTS
       if( cu.imv && !cu.cs->pcv->isEncoder )
 #else
@@ -523,7 +530,9 @@ Void DecCu::xDeriveCUMV( CodingUnit &cu )
         PU::applyImv( pu, mrgCtx, m_pcInterPred );
       }
       else
+#endif
       {
+#if JEM_TOOLS
         if( pu.cu->affine )
         {
           for ( UInt uiRefListIdx = 0; uiRefListIdx < 2; uiRefListIdx++ )
@@ -570,6 +579,7 @@ Void DecCu::xDeriveCUMV( CodingUnit &cu )
           }
         }
         else
+#endif
         {
           for ( UInt uiRefListIdx = 0; uiRefListIdx < 2; uiRefListIdx++ )
           {
@@ -577,14 +587,20 @@ Void DecCu::xDeriveCUMV( CodingUnit &cu )
             if ( pu.cs->slice->getNumRefIdx( eRefList ) > 0 && ( pu.interDir & ( 1 << uiRefListIdx ) ) )
             {
               AMVPInfo amvpInfo;
+#if JEM_TOOLS              
               PU::fillMvpCand( pu, eRefList, pu.refIdx[eRefList], amvpInfo, m_pcInterPred );
+#else
+              PU::fillMvpCand(pu, eRefList, pu.refIdx[eRefList], amvpInfo);
+#endif
               pu.mvpNum [eRefList] = amvpInfo.numCand;
               pu.mv     [eRefList] = amvpInfo.mvCand[pu.mvpIdx [eRefList]] + pu.mvd[eRefList];
 
+#if JEM_TOOLS
               if( pu.cs->sps->getSpsNext().getUseAffine() )
               {
                 pu.mv[eRefList].setHighPrec();
               }
+#endif
             }
           }
         }

@@ -338,11 +338,13 @@ bool QTBTPartitioner::canSplit( const PartSplit split, const CodingStructure &cs
   const unsigned maxTrSize      = cs.sps->getMaxTrSize();
 #endif
 
+  const PartSplit lastSplit = m_partStack.back().split;
+  const PartSplit parlSplit = lastSplit == CU_TRIH_SPLIT ? CU_HORZ_SPLIT : CU_VERT_SPLIT;
+#if JVET_K0351_LESS_CONSTRAINT == 0
   const PartSplit prevSplit     = m_partStack.back().firstSubPartSplit;
-  const PartSplit lastSplit     = m_partStack.back().split;
   const PartSplit perpSplit     = lastSplit == CU_HORZ_SPLIT ? CU_VERT_SPLIT : CU_HORZ_SPLIT;
   const PartSplit perpTriSp     = lastSplit == CU_HORZ_SPLIT ? CU_TRIV_SPLIT : CU_TRIH_SPLIT;
-  const PartSplit parlSplit     = lastSplit == CU_TRIH_SPLIT ? CU_HORZ_SPLIT : CU_VERT_SPLIT;
+#endif
 
   if( isNonLog2BlockSize( currArea().Y() ) )
   {
@@ -391,6 +393,7 @@ bool QTBTPartitioner::canSplit( const PartSplit split, const CodingStructure &cs
   case CU_HORZ_SPLIT:
   case CU_VERT_SPLIT:
   {
+#if JVET_K0351_LESS_CONSTRAINT == 0
     // don't remove redundancy for intra, as it changes the processing order, which might cause intra gains
     if( !cs.slice->isIntra() && m_partStack.back().idx == 1 && implicitSplit == CU_DONT_SPLIT && ( lastSplit == CU_HORZ_SPLIT || lastSplit == CU_VERT_SPLIT ) )
     {
@@ -399,14 +402,22 @@ bool QTBTPartitioner::canSplit( const PartSplit split, const CodingStructure &cs
         return false;
       }
     }
+#endif
     if( ( lastSplit == CU_TRIH_SPLIT || lastSplit == CU_TRIV_SPLIT ) && currPartIdx() == 1 && split == parlSplit )
     {
       return false;
     }
+#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
+    if (CS::isDualITree(cs) && (area.width > 64 || area.height > 64))
+    {
+      return false;
+    }
+#endif
   }
   case CU_TRIH_SPLIT:
   case CU_TRIV_SPLIT:
   {
+#if JVET_K0351_LESS_CONSTRAINT == 0
     // don't remove redundancy for intra, as it changes the processing order, which might cause intra gains
     if( !cs.slice->isIntra() && m_partStack.back().idx == 1 && implicitSplit == CU_DONT_SPLIT && ( lastSplit == CU_HORZ_SPLIT || lastSplit == CU_VERT_SPLIT ) )
     {
@@ -415,6 +426,13 @@ bool QTBTPartitioner::canSplit( const PartSplit split, const CodingStructure &cs
         return false;
       }
     }
+#endif
+#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
+    if (CS::isDualITree(cs) && (area.width > 64 || area.height > 64))
+    {
+      return false;
+    }
+#endif
   }
 #if !HM_QTBT_ONLY_QT_IMPLICIT || JVET_K0554
     if( implicitSplit == split )                                   return true;
@@ -429,6 +447,12 @@ bool QTBTPartitioner::canSplit( const PartSplit split, const CodingStructure &cs
         && ( ( area.width <= minTtSize && area.height <= minTtSize ) || cs.sps->getSpsNext().getMTTMode() == 0 ) ) return false;
     if(      ( area.width > maxBtSize || area.height > maxBtSize )
         && ( ( area.width > maxTtSize || area.height > maxTtSize ) || cs.sps->getSpsNext().getMTTMode() == 0 ) ) return false;
+#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
+    if (CS::isDualITree(cs) && (area.width > 64 || area.height > 64))
+    {
+      return false;
+    }
+#endif
   }
   break;
   default:
@@ -516,6 +540,12 @@ PartSplit QTBTPartitioner::getImplicitSplit( const CodingStructure &cs )
       split = CU_VERT_SPLIT;
     }
     else if( !isBlInPic || !isTrInPic )
+    {
+      split = CU_QUAD_SPLIT;
+    }
+#endif
+#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
+    if (CS::isDualITree(cs) && (currArea().Y().width > 64 || currArea().Y().height > 64))
     {
       split = CU_QUAD_SPLIT;
     }

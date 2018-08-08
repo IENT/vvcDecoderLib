@@ -50,9 +50,18 @@
 #include <assert.h>
 #include <cassert>
 
+#define DEBLOCKING_GRID_8x8                               1
+#define DB_TU_FIX                                         1 // fix in JVET_K0307, JVET-K0237, JVET-K0369, JVET-K0232, JVET-K0315
+
+#ifndef INTRA67_3MPM  // JVET-K0529
+#define INTRA67_3MPM                                      1
+#endif
 
 #define JVET_K0190_CCLM_ONLY                     1 //JVET-K0190, Test4.1.8. (turn off Cb-to-Cr residual prediction)
 #define JVET_K0072                                        1
+
+#define JVET_K0122                                        1 // CE3-related: Alternative techniques for DC mode without division
+                                                            // Test 2: Samples are taken only along with a longer side
 
 #define JVET_K0220_ENC_CTRL                               1 // remove HM_NO_ADDITIONAL_SPEEDUPS when adopting
 #if JVET_K0220_ENC_CTRL
@@ -60,8 +69,15 @@
 #endif
 
 #define JVET_K0352_MERGE_ENCOPT                           1 // encoder optimization for merge
+#define JVET_K0556_MAX_TT_SIZE_64                         1 // Maximum TT size is set to 64x64 for P/B-slice
 
+#define JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK     1 // Dual coding tree is enabled under 64x64 block level instead of CTU level
 #define JVET_K0554                                        1 // when adopting, also remove the macro HM_QTBT_ONLY_QT_IMPLICIT (keep the case for value 0)
+
+#define JVET_K0346                                        1 // simplifications on ATMVP
+#define JVET_K0063_PDPC_SIMP                              1 // Simplified PDPC
+
+#define JVET_K0351_LESS_CONSTRAINT                        1 // Only disallow binary split with same orientation in center partition of the ternary split and release the other constraints in K0351.
 
 #ifndef JEM_TOOLS
 #define JEM_TOOLS                                         1 // Defines the inclusion of JEM tools into compiled executable
@@ -108,6 +124,10 @@
 #define NUM_SPLIT_THREADS_IF_MSVC                         4
 
 #endif
+
+#define DISTORTION_LAMBDA_BUGFIX                          1   // JVET-K0154 for FULL_NBIT
+#define DISTORTION_TYPE_BUGFIX                            1   // JVET-K0154 for FULL_NBIT
+#define WCG_EXT_BUGFIX                                    1
 
 // ====================================================================================================================
 // NEXT software switches
@@ -273,14 +293,23 @@
 #define FULL_NBIT                                         1 ///< When enabled, use distortion measure derived from all bits of source data, otherwise discard (bitDepth - 8) least-significant bits of distortion
 #define RExt__HIGH_PRECISION_FORWARD_TRANSFORM            1 ///< 0 use original 6-bit transform matrices for both forward and inverse transform, 1 (default) = use original matrices for inverse transform and high precision matrices for forward transform
 #else
-#define FULL_NBIT                                         0 ///< When enabled, use distortion measure derived from all bits of source data, otherwise discard (bitDepth - 8) least-significant bits of distortion
+#define FULL_NBIT                                         1 ///< When enabled, use distortion measure derived from all bits of source data, otherwise discard (bitDepth - 8) least-significant bits of distortion
 #define RExt__HIGH_PRECISION_FORWARD_TRANSFORM            0 ///< 0 (default) use original 6-bit transform matrices for both forward and inverse transform, 1 = use original matrices for inverse transform and high precision matrices for forward transform
 #endif
 
+#if DISTORTION_LAMBDA_BUGFIX
+#if FULL_NBIT
+#define DISTORTION_PRECISION_ADJUSTMENT(x)                0
+#else
+#define DISTORTION_ESTIMATION_BITS                        8
+#define DISTORTION_PRECISION_ADJUSTMENT(x)                ((x>DISTORTION_ESTIMATION_BITS)? ((x)-DISTORTION_ESTIMATION_BITS) : 0)
+#endif
+#else
 #if FULL_NBIT
 # define DISTORTION_PRECISION_ADJUSTMENT(x)  0
 #else
 # define DISTORTION_PRECISION_ADJUSTMENT(x) (x)
+#endif
 #endif
 
 // ====================================================================================================================
@@ -351,10 +380,14 @@ typedef       UInt            Intermediate_UInt; ///< used as intermediate value
 
 typedef       UInt64          SplitSeries;       ///< used to encoded the splits that caused a particular CU size
 
+#if DISTORTION_TYPE_BUGFIX
+typedef       uint64_t        Distortion;        ///< distortion measurement
+#else
 #if FULL_NBIT
 typedef       UInt64          Distortion;        ///< distortion measurement
 #else
 typedef       UInt            Distortion;        ///< distortion measurement
+#endif
 #endif
 
 // ====================================================================================================================
@@ -925,6 +958,9 @@ enum MergeType
   MRG_TYPE_SUBPU_ATMVP_EXT,      // 2
   MRG_TYPE_FRUC,                 // 3
   MRG_TYPE_FRUC_SET,             // 4
+#endif
+#if !JEM_TOOLS && JVET_K0346
+  MRG_TYPE_SUBPU_ATMVP,
 #endif
   NUM_MRG_TYPE                   // 5
 };

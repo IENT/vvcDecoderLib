@@ -322,10 +322,17 @@ Void EncSlice::initEncSlice( Picture* pcPic, const Int pocLast, const Int pocCur
     Int    NumberBFrames = ( m_pcCfg->getGOPSize() - 1 );
     Int    SHIFT_QP = 12;
 
+#if DISTORTION_LAMBDA_BUGFIX
+    Int    bitdepth_luma_qp_scale =
+      6
+      * (rpcSlice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA) - 8
+         - DISTORTION_PRECISION_ADJUSTMENT(rpcSlice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA)));
+#else
 #if FULL_NBIT
     Int    bitdepth_luma_qp_scale = 6 * (rpcSlice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA) - 8);
 #else
     Int    bitdepth_luma_qp_scale = 0;
+#endif
 #endif
     Double qp_temp = (Double) dQP + bitdepth_luma_qp_scale - SHIFT_QP;
 #if FULL_NBIT
@@ -567,10 +574,16 @@ Double EncSlice::calculateLambda( const Slice*     slice,
   const std::vector<Double> &intraLambdaModifiers=m_pcCfg->getIntraLambdaModifier();
 #endif
 
+#if DISTORTION_LAMBDA_BUGFIX
+  Int bitdepth_luma_qp_scale = 6
+                               * (slice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA) - 8
+                                  - DISTORTION_PRECISION_ADJUSTMENT(slice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA)));
+#else
 #if FULL_NBIT
   Int    bitdepth_luma_qp_scale = 6 * (slice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA) - 8);
 #else
   Int    bitdepth_luma_qp_scale = 0;
+#endif
 #endif
   Double qp_temp = dQP + bitdepth_luma_qp_scale - SHIFT_QP;
   // Case #1: I or P-slices (key-frame)
@@ -613,12 +626,17 @@ Double EncSlice::calculateLambda( const Slice*     slice,
   if ( depth>0 )
 #endif
   {
+#if DISTORTION_LAMBDA_BUGFIX
+    Double qp_temp_ref = refQP + bitdepth_luma_qp_scale - SHIFT_QP;
+    dLambda *= Clip3(2.00, 4.00, (qp_temp_ref / 6.0));   // (j == B_SLICE && p_cur_frm->layer != 0 )
+#else
 #if FULL_NBIT
       Double qp_temp_ref_orig = refQP - SHIFT_QP;
       dLambda *= Clip3( 2.00, 4.00, (qp_temp_ref_orig / 6.0) ); // (j == B_SLICE && p_cur_frm->layer != 0 )
 #else
       Double qp_temp_ref = refQP + bitdepth_luma_qp_scale - SHIFT_QP;
       dLambda *= Clip3( 2.00, 4.00, (qp_temp_ref / 6.0) ); // (j == B_SLICE && p_cur_frm->layer != 0 )
+#endif
 #endif
   }
 
@@ -975,10 +993,17 @@ Void EncSlice::precompressSlice( Picture* pcPic )
   UInt       uiQpIdxBest = 0;
 
   Double dFrameLambda;
+#if DISTORTION_LAMBDA_BUGFIX
+  Int SHIFT_QP = 12
+                 + 6
+                     * (pcSlice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA) - 8
+                        - DISTORTION_PRECISION_ADJUSTMENT(pcSlice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA)));
+#else
 #if FULL_NBIT
   Int    SHIFT_QP = 12 + 6 * (pcSlice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA) - 8);
 #else
   Int    SHIFT_QP = 12;
+#endif
 #endif
 
   // set frame lambda
@@ -1127,6 +1152,58 @@ Void EncSlice::compressSlice( Picture* pcPic, const Bool bCompressEntireSlice, c
 
 #endif
   m_pcCuEncoder->getModeCtrl()->setFastDeltaQp(bFastDeltaQP);
+
+#if JVET_K0346
+  if (pcSlice->getSPS()->getSpsNext().getUseSubPuMvp())
+  {
+    if (!pcSlice->isIntra())
+    {
+      if (pcSlice->getPOC() > m_pcCuEncoder->getPrevPOC() && m_pcCuEncoder->getClearSubMergeStatic())
+      {
+        m_pcCuEncoder->clearSubMergeStatics();
+        m_pcCuEncoder->setClearSubMergeStatic(false);
+      }
+
+      unsigned int layer = pcSlice->getDepth();
+      unsigned int subMergeBlkSize = m_pcCuEncoder->getSubMergeBlkSize(layer);
+      unsigned int subMergeBlkNum = m_pcCuEncoder->getSubMergeBlkNum(layer);
+
+      if (subMergeBlkNum > 0)
+      {
+        unsigned int subMergeBlkSizeTh = pcSlice->getCheckLDC() ? 75 : 27;
+        unsigned int aveBlkSize = subMergeBlkSize / subMergeBlkNum;
+        if (aveBlkSize < (subMergeBlkSizeTh*subMergeBlkSizeTh))
+        {
+          pcSlice->setSubPuMvpSubblkLog2Size(2);
+        }
+        else
+        {
+          pcSlice->setSubPuMvpSubblkLog2Size(3);
+        }
+        m_pcCuEncoder->clearOneTLayerSubMergeStatics(layer);
+      }
+      else
+      {
+        pcSlice->setSubPuMvpSubblkLog2Size(pcSlice->getSPS()->getSpsNext().getSubPuMvpLog2Size());
+        CHECK(subMergeBlkSize != 0, "subMerge blksize should be 0");
+      }
+
+      if (pcSlice->getSubPuMvpSubblkLog2Size() == pcSlice->getSPS()->getSpsNext().getSubPuMvpLog2Size())
+      {
+        pcSlice->setSubPuMvpSliceSubblkSizeEnable(false);
+      }
+      else
+      {
+        pcSlice->setSubPuMvpSliceSubblkSizeEnable(true);
+      }
+    }
+    else
+    {
+      m_pcCuEncoder->setPrevPOC(pcSlice->getPOC());
+      m_pcCuEncoder->setClearSubMergeStatic(true);
+    }
+  }
+#endif
 
   //------------------------------------------------------------------------------
   //  Weighted Prediction parameters estimation.

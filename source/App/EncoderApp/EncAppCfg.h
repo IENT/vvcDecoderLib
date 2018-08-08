@@ -205,11 +205,13 @@ protected:
 #if JEM_TOOLS
   bool      m_NSST;
   bool      m_Intra4Tap;
+#if !INTRA67_3MPM
   bool      m_Intra65Ang;
+#endif
   bool      m_IntraBoundaryFilter;                            ///< Indicates whether intra boundary filter is used
 #endif
   bool      m_LargeCTU;
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
   int       m_SubPuMvpMode;
   unsigned  m_SubPuMvpLog2Size;
 #endif
@@ -224,6 +226,9 @@ protected:
   bool      m_highPrecisionMv;
   bool      m_Affine;
   bool      m_BIO;
+#endif
+#if !JEM_TOOLS && JVET_K0346
+  bool      m_highPrecisionMv;
 #endif
   bool      m_DisableMotionCompression;
 #if JEM_TOOLS

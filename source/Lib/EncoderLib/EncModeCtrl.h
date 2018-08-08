@@ -208,7 +208,11 @@ struct ComprCUCtx
     , skipSecondEMTPass
                     ( false   )
 #endif
+#if DISTORTION_TYPE_BUGFIX
+    , interHad      (std::numeric_limits<Distortion>::max())
+#else
     , interHad      ( MAX_UINT   )
+#endif
 #if ENABLE_SPLIT_PARALLELISM
     , isLevelSplitParallel
                     ( false )

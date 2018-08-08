@@ -116,9 +116,17 @@ private:
 
   PelStorage            m_acMergeBuffer[MRG_MAX_NUM_CANDS];
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
   MotionInfo            m_SubPuMiBuf      [( MAX_CU_SIZE * MAX_CU_SIZE ) >> ( MIN_CU_LOG2 << 1 )];
+#if JEM_TOOLS
   MotionInfo            m_SubPuExtMiBuf   [( MAX_CU_SIZE * MAX_CU_SIZE ) >> ( MIN_CU_LOG2 << 1 )];
+#endif
+#endif
+#if JVET_K0346
+  unsigned int          m_subMergeBlkSize[10];
+  unsigned int          m_subMergeBlkNum[10];
+  unsigned int          m_prevPOC;
+  bool                  m_clearSubMergeStatic;
 #endif
 #if JEM_TOOLS
   MotionInfo            m_SubPuFrucBuf    [( MAX_CU_SIZE * MAX_CU_SIZE ) >> ( MIN_CU_LOG2 << 1 )];
@@ -148,6 +156,28 @@ public:
   int   updateCtuDataISlice ( const CPelBuf buf );
 
   EncModeCtrl* getModeCtrl  () { return m_modeCtrl; }
+
+#if JVET_K0346
+  void clearSubMergeStatics()
+  {
+    ::memset(m_subMergeBlkSize, 0, sizeof(m_subMergeBlkSize));
+    ::memset(m_subMergeBlkNum, 0, sizeof(m_subMergeBlkNum));
+  }
+
+  void clearOneTLayerSubMergeStatics(unsigned int layer)
+  {
+    m_subMergeBlkSize[layer] = 0;
+    m_subMergeBlkNum[layer] = 0;
+  }
+  unsigned int getSubMergeBlkSize(unsigned int layer) { return m_subMergeBlkSize[layer]; }
+  unsigned int getSubMergeBlkNum(unsigned int layer) { return m_subMergeBlkNum[layer]; }
+  void incrementSubMergeBlkSize(unsigned int layer, unsigned int inc) { m_subMergeBlkSize[layer] += inc; }
+  void incrementSubMergeBlkNum(unsigned int layer, unsigned int inc) { m_subMergeBlkNum[layer] += inc; }
+  void setPrevPOC(unsigned int poc) { m_prevPOC = poc; }
+  unsigned int getPrevPOC() { return m_prevPOC; }
+  void setClearSubMergeStatic(bool b) { m_clearSubMergeStatic = b; }
+  bool getClearSubMergeStatic() { return m_clearSubMergeStatic; }
+#endif
 
   ~EncCu();
 

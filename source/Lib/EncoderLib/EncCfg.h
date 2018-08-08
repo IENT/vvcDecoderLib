@@ -186,7 +186,9 @@ protected:
 
 #if JEM_TOOLS
   bool      m_Intra4Tap;
+#if !INTRA67_3MPM
   bool      m_Intra65Ang;
+#endif
   bool      m_IntraBoundaryFilter;
 #endif
 #if JEM_TOOLS
@@ -210,7 +212,7 @@ protected:
   bool      m_NSST;
 #endif
   bool      m_LargeCTU;
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
   int       m_SubPuMvpMode;
   unsigned  m_SubPuMvpLog2Size;
 #endif
@@ -225,6 +227,9 @@ protected:
   bool      m_highPrecMv;
   bool      m_Affine;
   bool      m_BIO;
+#endif
+#if !JEM_TOOLS && JVET_K0346
+  bool      m_highPrecMv;
 #endif
   bool      m_DisableMotionCompression;
 #if JEM_TOOLS
@@ -655,8 +660,10 @@ public:
   void      setIntra4Tap                    ( bool b )       { m_Intra4Tap = b; }
   bool      getIntra4Tap                    ()         const { return m_Intra4Tap; }
 
+#if !INTRA67_3MPM
   void      setIntra65Ang                   ( bool b )       { m_Intra65Ang = b; }
   bool      getIntra65Ang                   ()         const { return m_Intra65Ang; }
+#endif
 
 #endif
   void      setLargeCTU                     ( bool b )       { m_LargeCTU = b; }
@@ -673,6 +680,13 @@ public:
   bool      getSubPuMvpMode                 ()         const { return m_SubPuMvpMode; }
   void      setSubPuMvpLog2Size             ( unsigned n )   { m_SubPuMvpLog2Size = n; }
   unsigned  getSubPuMvpLog2Size             ()         const { return m_SubPuMvpLog2Size; }
+#endif
+
+#if !JEM_TOOLS && JVET_K0346
+  void      setSubPuMvpMode(int n)          { m_SubPuMvpMode = n; }
+  bool      getSubPuMvpMode()         const { return m_SubPuMvpMode; }
+  void      setSubPuMvpLog2Size(unsigned n) { m_SubPuMvpLog2Size = n; }
+  unsigned  getSubPuMvpLog2Size()      const { return m_SubPuMvpLog2Size; }
 #endif
 
 #if JEM_TOOLS
@@ -694,6 +708,10 @@ public:
 
   void      setAffine                       ( bool b )       { m_Affine = b; }
   bool      getAffine                       ()         const { return m_Affine; }
+#endif
+#if !JEM_TOOLS && JVET_K0346
+  void      setHighPrecisionMv(bool b) { m_highPrecMv = b; }
+  bool      getHighPrecisionMv()       { return m_highPrecMv; }
 #endif
   void      setDisableMotionCompression     ( bool b )       { m_DisableMotionCompression = b; }
   bool      getDisableMotionCompression     ()         const { return m_DisableMotionCompression; }

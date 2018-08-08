@@ -50,10 +50,17 @@
 #if JEM_TOOLS
 class CABACDataStore;
 #endif
+#if JVET_K0346
+class EncCu;
+#endif
 class CABACWriter
 {
 public:
+#if JVET_K0346
+  CABACWriter(BinEncIf& binEncoder)   : m_BinEncoder(binEncoder), m_Bitstream(0) { m_TestCtx = m_BinEncoder.getCtx(); m_EncCu = NULL; }
+#else
   CABACWriter( BinEncIf& binEncoder ) : m_BinEncoder( binEncoder ), m_Bitstream( 0 ) { m_TestCtx = m_BinEncoder.getCtx(); }
+#endif
   virtual ~CABACWriter() {}
 
 public:
@@ -62,6 +69,9 @@ public:
                                           const CABACDataStore*         cabacDataStore );
 #else
   void        initCtxModels             ( const Slice&                  slice );
+#endif
+#if JVET_K0346
+  void        setEncCu(EncCu* pcEncCu) { m_EncCu = pcEncCu; }
 #endif
   SliceType   getCtxInitId              ( const Slice&                  slice );
   void        initBitstream             ( OutputBitstream*              bitstream )           { m_Bitstream = bitstream; m_BinEncoder.init( m_Bitstream ); }
@@ -98,7 +108,11 @@ public:
 
 #endif
   // coding (quad)tree (clause 7.3.8.4)
+#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
+  void        coding_tree               ( const CodingStructure&        cs,       Partitioner&      pm,         CUCtx& cuCtx, Partitioner* pPartitionerChroma = nullptr, CUCtx* pCuCtxChroma = nullptr);
+#else
   void        coding_tree               ( const CodingStructure&        cs,       Partitioner&      pm,         CUCtx& cuCtx );
+#endif
   void        split_cu_flag             ( bool                          split,    const CodingStructure& cs,    Partitioner& pm );
   void        split_cu_mode_mt          ( const PartSplit               split,    const CodingStructure& cs,    Partitioner& pm );
 
@@ -234,6 +248,9 @@ private:
   BinEncIf&         m_BinEncoder;
   OutputBitstream*  m_Bitstream;
   Ctx               m_TestCtx;
+#if JVET_K0346
+  EncCu*            m_EncCu;
+#endif
 };
 
 
