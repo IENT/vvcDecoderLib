@@ -92,6 +92,11 @@ protected:
 
   ChromaFormat  m_currChromaFormat;
 
+#if JVET_K0500_WAIP
+  int m_topRefLength;
+  int m_leftRefLength;
+#endif
+
   // prediction
   Void xPredIntraPlanar           ( const CPelBuf &pSrc, PelBuf &pDst,                                                                                                         const SPS& sps );
   Void xPredIntraDc               ( const CPelBuf &pSrc, PelBuf &pDst, const ChannelType channelType,                                                                                          const bool enableBoundaryFilter = true );
@@ -115,7 +120,15 @@ protected:
   // dc filtering
   Void xDCPredFiltering           ( const CPelBuf &pSrc, PelBuf &pDst, const ChannelType &channelType );
 #endif
-  Void xReferenceFilter           ( const int doubleSize, const int origWeight, const int filterOrder, Pel *piRefVector, Pel *piLowPassRef );
+#if JVET_K0500_WAIP
+  static int getWideAngle         ( int width, int height, int predMode );
+  void setReferenceArrayLengths   ( const CompArea &area );
+#endif
+  Void xReferenceFilter           (
+#if JVET_K0500_WAIP
+    const int doubleHSize,
+#endif
+    const int doubleSize, const int origWeight, const int filterOrder, Pel *piRefVector, Pel *piLowPassRef );
 
   Void destroy                    ();
 

@@ -184,6 +184,7 @@ static const Int ADJ_DEQUANT_SHIFT =            ( ADJ_QUANT_SHIFT + 1 );
 
 static const Int RVM_VCEGAM10_M =                                   4;
 
+
 static const Int NUM_LUMA_MODE =                                   67; ///< Planar + DC + 65 directional mode (4*16 + 1)
 #if JVET_K0190
 static const Int NUM_LMC_MODE = 1; ///< LMC
