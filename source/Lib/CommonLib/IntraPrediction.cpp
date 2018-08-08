@@ -204,40 +204,39 @@ Pel IntraPrediction::xGetPredValDc( const CPelBuf &pSrc, const Size &dstSize )
 {
   CHECK( dstSize.width == 0 || dstSize.height == 0, "Empty area provided" );
 
-  Int iInd, iSum = 0;
-  Pel pDcVal;
+  int idx, sum = 0;
+  Pel dcVal;
   const int width  = dstSize.width;
   const int height = dstSize.height;
 #if JVET_K0122
-  const int iState      = (width == height) ? 0            : ((width > height) ? 1     : -1);
-  const SizeType iDenom = (width == height) ? (width << 1) : ((width > height) ? width : height);
-  const Int iDivShift   = g_aucLog2[iDenom];
-  const Int iDivOffset  = (iDenom >> 1);
+  const auto denom     = (width == height) ? (width << 1) : std::max(width,height);
+  const auto divShift  = g_aucLog2[denom];
+  const auto divOffset = (denom >> 1);
 
-  if (iState >= 0) //width is a larger side or a block is square
+  if ( width >= height )
   {
 #endif
-  for( iInd = 0; iInd < width; iInd++ )
+  for( idx = 0; idx < width; idx++ )
   {
-    iSum += pSrc.at( 1 + iInd, 0 );
+    sum += pSrc.at( 1 + idx, 0 );
   }
 #if JVET_K0122
   }
-  if (iState <= 0) //height is a larger side or a block is square
+  if ( width <= height )
   {   
 #endif
-  for( iInd = 0; iInd < height; iInd++ )
+  for( idx = 0; idx < height; idx++ )
   {
-    iSum += pSrc.at( 0, 1 + iInd );
+    sum += pSrc.at( 0, 1 + idx );
   }  
 #if JVET_K0122
   }
 
-  pDcVal = (iSum + iDivOffset) >> iDivShift;
+  dcVal = (sum + divOffset) >> divShift;
 #else
-  pDcVal = ( iSum + ( ( width + height ) >> 1 ) ) / ( width + height );
+  dcVal = ( sum + ( ( width + height ) >> 1 ) ) / ( width + height );
 #endif
-  return pDcVal;
+  return dcVal;
 }
 
 void IntraPrediction::predIntraAng( const ComponentID compId, PelBuf &piPred, const PredictionUnit &pu, const bool useFilteredPredSamples )
