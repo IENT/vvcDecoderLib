@@ -545,6 +545,9 @@ Void HLSWriter::codeSPSNext( const SPSNext& spsNext, const bool usePCM )
   WRITE_FLAG( spsNext.getUseIntraBoundaryFilter() ? 1 : 0,                                      "intra_boundary_filter_enabled_flag" );
   WRITE_FLAG( spsNext.getUseSubPuMvp() ? 1: 0,                                                  "subpu_tmvp_flag" );
 #endif
+#if !JEM_TOOLS && JVET_K0346
+  WRITE_FLAG(spsNext.getUseSubPuMvp() ? 1 : 0,                                                  "subpu_tmvp_flag");
+#endif
 #if JEM_TOOLS
   WRITE_FLAG( spsNext.getModifiedCABACEngine() ? 1 : 0,                                         "modified_cabac_engine_flag" );
 #endif
@@ -560,6 +563,9 @@ Void HLSWriter::codeSPSNext( const SPSNext& spsNext, const bool usePCM )
 #if JEM_TOOLS
   WRITE_FLAG( spsNext.getUseHighPrecMv() ? 1 : 0,                                               "high_precision_motion_vectors" );
   WRITE_FLAG( spsNext.getUseBIO() ? 1 : 0,                                                      "bio_enable_flag" );
+#endif
+#if !JEM_TOOLS && JVET_K0346
+  WRITE_FLAG(spsNext.getUseHighPrecMv() ? 1 : 0,                                                "high_precision_motion_vectors");
 #endif
   WRITE_FLAG( spsNext.getDisableMotCompress() ? 1 : 0,                                          "disable_motion_compression_flag" );
 #if JEM_TOOLS
@@ -619,14 +625,15 @@ Void HLSWriter::codeSPSNext( const SPSNext& spsNext, const bool usePCM )
     }
   }
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
   if( spsNext.getUseSubPuMvp() )
   {
     WRITE_CODE( spsNext.getSubPuMvpLog2Size() - MIN_CU_LOG2, 3,                                 "log2_sub_pu_tmvp_size_minus2" );
 #if ENABLE_BMS
-
-    WRITE_FLAG( spsNext.getUseATMVP(),                                                          "use_atmvp" );
+#if JEM_TOOLS
+    WRITE_FLAG(spsNext.getUseATMVP(),                                                           "use_atmvp");
     WRITE_FLAG( spsNext.getUseSTMVP(),                                                          "use_stmvp" );
+#endif
 #endif
   }
 #endif
@@ -1304,7 +1311,7 @@ Void HLSWriter::codeSliceHeader         ( Slice* pcSlice )
     }
     if( !pcSlice->isIntra() )
     {
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
       CHECK( pcSlice->getMaxNumMergeCand() > ( MRG_MAX_NUM_CANDS - ( pcSlice->getSPS()->getSpsNext().getUseSubPuMvp() ? 0 : 2 ) ), "More merge candidates signalled than supported" );
       WRITE_UVLC( MRG_MAX_NUM_CANDS - pcSlice->getMaxNumMergeCand() - ( pcSlice->getSPS()->getSpsNext().getUseSubPuMvp() ? 0 : 2 ), pcSlice->getSPS()->getSpsNext().getUseSubPuMvp() ? "seven_minus_max_num_merge_cand" : "five_minus_max_num_merge_cand" );
 #else
@@ -1396,7 +1403,7 @@ Void HLSWriter::codeSliceHeader         ( Slice* pcSlice )
       }
     }
   }
-
+#endif
 #if JVET_K0346
   if (pcSlice->getSPS()->getSpsNext().getUseSubPuMvp() && !pcSlice->isIntra())
   {
@@ -1406,7 +1413,6 @@ Void HLSWriter::codeSliceHeader         ( Slice* pcSlice )
       WRITE_CODE(pcSlice->getSubPuMvpSubblkLog2Size() - MIN_CU_LOG2, 3, "log2_slice_sub_pu_tmvp_size_minus2");
     }
   }
-#endif
 #endif
   if(pcSlice->getPPS()->getSliceHeaderExtensionPresentFlag())
   {

@@ -2004,13 +2004,13 @@ void CABACReader::merge_idx( PredictionUnit& pu )
   {
     if( m_BinDecoder.decodeBin( Ctx::MergeIdx() ) )
     {
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
       bool useExtCtx = pu.cs->sps->getSpsNext().getUseSubPuMvp();
 #endif
       pu.mergeIdx++;
       for( ; pu.mergeIdx < numCandminus1; pu.mergeIdx++ )
       {
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
         if( useExtCtx )
         {
           if( !m_BinDecoder.decodeBin( Ctx::MergeIdx( std::min<int>( pu.mergeIdx, NUM_MERGE_IDX_EXT_CTX - 1 ) ) ) )
@@ -2042,7 +2042,7 @@ void CABACReader::inter_pred_idc( PredictionUnit& pu )
     pu.interDir = 1;
     return;
   }
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
   if( pu.cu->partSize == SIZE_2Nx2N || pu.cs->sps->getSpsNext().getUseSubPuMvp() || pu.cu->lumaSize().width != 8 )
 #else
   if( pu.cu->partSize == SIZE_2Nx2N || pu.cu->lumaSize().width != 8 )

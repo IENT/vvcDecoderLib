@@ -331,7 +331,7 @@ Bool InterPrediction::xCheckIdenticalMotion( const PredictionUnit &pu )
   return false;
 }
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
 Void InterPrediction::xSubPuMC( PredictionUnit& pu, PelUnitBuf& predBuf, const RefPicList &eRefPicList /*= REF_PIC_LIST_X*/ )
 {
 #if !JVET_K0346
@@ -347,6 +347,7 @@ Void InterPrediction::xSubPuMC( PredictionUnit& pu, PelUnitBuf& predBuf, const R
 #else
   int iNumPartLine, iNumPartCol, iPUHeight, iPUWidth;
 #endif
+#if JEM_TOOLS
   if( pu.mergeType == MRG_TYPE_FRUC )
   {
     UInt nRefineBlockSize = xFrucGetSubBlkSize( pu, puSize.width, puSize.height );
@@ -360,6 +361,7 @@ Void InterPrediction::xSubPuMC( PredictionUnit& pu, PelUnitBuf& predBuf, const R
 #endif
   }
   else
+#endif
   {
 #if JVET_K0346
     const Slice& slice = *pu.cs->slice;
@@ -422,7 +424,9 @@ Void InterPrediction::xSubPuMC( PredictionUnit& pu, PelUnitBuf& predBuf, const R
       subPu = curMi;
       PelUnitBuf subPredBuf = predBuf.subBuf(UnitAreaRelative(pu, subPu));
 
+#if JEM_TOOLS
       subPu.mvRefine = false;
+#endif
       motionCompensation(subPu, subPredBuf, eRefPicList);
       secDim = later - secStep;
     }
@@ -441,7 +445,9 @@ Void InterPrediction::xSubPuMC( PredictionUnit& pu, PelUnitBuf& predBuf, const R
       subPu                   = curMi;
       PelUnitBuf subPredBuf   = predBuf.subBuf( UnitAreaRelative( pu, subPu ) );
 
+#if JEM_TOOLS
       subPu.mvRefine = false;
+#endif
       motionCompensation( subPu, subPredBuf, eRefPicList );
     }
   }
@@ -681,6 +687,30 @@ Void InterPrediction::xPredInterBlk ( const ComponentID& compID, const Predictio
 
   CHECKD( !pu.cs->sps->getSpsNext().getUseHighPrecMv() && ( ( xFrac & 3 ) != 0 ), "Invalid fraction" );
   CHECKD( !pu.cs->sps->getSpsNext().getUseHighPrecMv() && ( ( yFrac & 3 ) != 0 ), "Invalid fraction" );
+#elif JVET_K0346
+  const ChromaFormat  chFmt = pu.chromaFormat;
+  const bool          rndRes = !bi;
+
+  int iAddPrecShift = 0;
+
+  if (_mv.highPrec)
+  {
+    CHECKD(!pu.cs->sps->getSpsNext().getUseHighPrecMv(), "Found a high-precision motion vector, but the high-precision MV extension is disabled!");
+
+    iAddPrecShift = VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  }
+
+  int shiftHor = 2 + iAddPrecShift + ::getComponentScaleX(compID, chFmt);
+  int shiftVer = 2 + iAddPrecShift + ::getComponentScaleY(compID, chFmt);
+
+  int xFrac = _mv.hor & ((1 << shiftHor) - 1);
+  int yFrac = _mv.ver & ((1 << shiftVer) - 1);
+
+  xFrac <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE - iAddPrecShift;
+  yFrac <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE - iAddPrecShift;
+
+  CHECKD(!pu.cs->sps->getSpsNext().getUseHighPrecMv() && ((xFrac & 3) != 0), "Invalid fraction");
+  CHECKD(!pu.cs->sps->getSpsNext().getUseHighPrecMv() && ((yFrac & 3) != 0), "Invalid fraction");
 #else
   const ChromaFormat  chFmt  = pu.chromaFormat;
   const bool          rndRes = !bi;
@@ -1357,7 +1387,7 @@ Void InterPrediction::motionCompensation( PredictionUnit &pu, PelUnitBuf &predBu
   }
   else
   {
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
     if( pu.mergeType != MRG_TYPE_DEFAULT_N )
     {
       xSubPuMC( pu, predBuf, eRefPicList );

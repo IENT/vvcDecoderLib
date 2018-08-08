@@ -59,6 +59,9 @@
 
 #define JVET_K0072                                        1
 
+#define JVET_K0122                                        1 // CE3-related: Alternative techniques for DC mode without division
+                                                            // Test 2: Samples are taken only along with a longer side
+
 #define JVET_K0220_ENC_CTRL                               1 // remove HM_NO_ADDITIONAL_SPEEDUPS when adopting
 #if JVET_K0220_ENC_CTRL
 #define REUSE_CU_RESULTS                                  1
@@ -71,6 +74,9 @@
 #define JVET_K0554                                        1 // when adopting, also remove the macro HM_QTBT_ONLY_QT_IMPLICIT (keep the case for value 0)
 
 #define JVET_K0346                                        1 // simplifications on ATMVP
+#define JVET_K0063_PDPC_SIMP                              1 // Simplified PDPC
+
+#define JVET_K0351_LESS_CONSTRAINT                        1 // Only disallow binary split with same orientation in center partition of the ternary split and release the other constraints in K0351.
 
 #define JVET_K_AFFINE_REFACTOR                            1 // bit-exact AFFINE refactor, suggest to remove this macro when adopted
 #define JVET_K0367_AFFINE_FIX_POINT                       1 // bit-exact SIMD optimization for affine ME
@@ -969,6 +975,9 @@ enum MergeType
   MRG_TYPE_SUBPU_ATMVP_EXT,      // 2
   MRG_TYPE_FRUC,                 // 3
   MRG_TYPE_FRUC_SET,             // 4
+#endif
+#if !JEM_TOOLS && JVET_K0346
+  MRG_TYPE_SUBPU_ATMVP,
 #endif
   NUM_MRG_TYPE                   // 5
 };

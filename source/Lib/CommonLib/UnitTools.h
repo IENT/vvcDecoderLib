@@ -160,6 +160,10 @@ namespace PU
 #endif
   bool isBIOLDB                       (const PredictionUnit &pu);
 #endif
+#if !JEM_TOOLS && JVET_K0346
+  bool getInterMergeSubPuMvpCand(const PredictionUnit &pu, MergeCtx &mrgCtx, bool& LICFlag, const int count);
+  bool getInterMergeSubPuRecurCand(const PredictionUnit &pu, MergeCtx &mrgCtx, const int count);
+#endif
   bool isBiPredFromDifferentDir       (const PredictionUnit &pu);
   void restrictBiPredMergeCands       (const PredictionUnit &pu, MergeCtx& mrgCtx);
 #if JEM_TOOLS

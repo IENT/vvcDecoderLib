@@ -1733,6 +1733,9 @@ SPSNext::SPSNext( SPS& sps )
   , m_IntraBoundaryFilter       ( false )
   , m_SubPuMvp                  ( false )
 #endif
+#if !JEM_TOOLS && JVET_K0346
+  , m_SubPuMvp                  ( false )
+#endif
 #if JEM_TOOLS
   , m_ModifiedCABACEngine       ( false )
 #endif
@@ -1748,6 +1751,9 @@ SPSNext::SPSNext( SPS& sps )
 #if JEM_TOOLS
   , m_highPrecMv                ( false )
   , m_BIO                       ( false )
+#endif
+#if !JEM_TOOLS && JVET_K0346
+  , m_highPrecMv                ( false )
 #endif
   , m_DisableMotionCompression  ( false )
 #if JEM_TOOLS
@@ -1785,7 +1791,7 @@ SPSNext::SPSNext( SPS& sps )
   , m_minQT                     { 0, 0 }
   , m_maxBTDepth                { MAX_BT_DEPTH, MAX_BT_DEPTH_INTER, MAX_BT_DEPTH_C }
   , m_maxBTSize                 { MAX_BT_SIZE,  MAX_BT_SIZE_INTER,  MAX_BT_SIZE_C }
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
   , m_subPuLog2Size             ( 0 )
   , m_subPuMrgMode              ( 0 )
 #endif

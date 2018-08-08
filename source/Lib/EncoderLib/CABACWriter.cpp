@@ -1159,7 +1159,11 @@ void CABACWriter::coding_tree( const CodingStructure& cs, Partitioner& partition
   if (!cs.slice->isIntra() && m_EncCu)
   {
     PredictionUnit& pu = *cu.firstPU;
+#if JEM_TOOLS
     if (pu.mergeFlag && (pu.mergeType == MRG_TYPE_SUBPU_ATMVP || pu.mergeType == MRG_TYPE_SUBPU_ATMVP_EXT))
+#else
+    if (pu.mergeFlag && (pu.mergeType == MRG_TYPE_SUBPU_ATMVP))
+#endif
     {
       unsigned int layerId = cs.slice->getDepth();
       m_EncCu->incrementSubMergeBlkSize(layerId, cu.Y().width*cu.Y().height);
@@ -2155,13 +2159,13 @@ void CABACWriter::merge_idx( const PredictionUnit& pu )
     }
     else
     {
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
       bool useExtCtx = pu.cs->sps->getSpsNext().getUseSubPuMvp();
 #endif
       m_BinEncoder.encodeBin( 1, Ctx::MergeIdx() );
       for( unsigned idx = 1; idx < numCandminus1; idx++ )
       {
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
         if( useExtCtx )
         {
           m_BinEncoder.encodeBin( pu.mergeIdx == idx ? 0 : 1, Ctx::MergeIdx( std::min<int>( idx, NUM_MERGE_IDX_EXT_CTX - 1 ) ) );
@@ -2187,7 +2191,7 @@ void CABACWriter::inter_pred_idc( const PredictionUnit& pu )
   {
     return;
   }
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
   if( pu.cu->partSize == SIZE_2Nx2N || pu.cs->sps->getSpsNext().getUseSubPuMvp() || pu.cu->lumaSize().width != 8 )
 #else
   if( pu.cu->partSize == SIZE_2Nx2N || pu.cu->lumaSize().width != 8 )
@@ -2558,7 +2562,7 @@ void CABACWriter::mvd_coding( const Mv &rMvd )
   unsigned  horAbs  = unsigned( horMvd < 0 ? -horMvd : horMvd );
   unsigned  verAbs  = unsigned( verMvd < 0 ? -verMvd : verMvd );
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
   if( rMvd.highPrec )
   {
     CHECK( horAbs & ((1<<VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE)-1), "mvd-x has high precision fractional part." );

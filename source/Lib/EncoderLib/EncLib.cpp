@@ -843,6 +843,10 @@ Void EncLib::xInitSPS(SPS &sps)
   sps.getSpsNext().setSubPuMvpMode          ( m_SubPuMvpMode );
   sps.getSpsNext().setSubPuMvpLog2Size      ( m_SubPuMvpLog2Size );
 #endif
+#if !JEM_TOOLS && JVET_K0346
+  sps.getSpsNext().setSubPuMvpMode(m_SubPuMvpMode);
+  sps.getSpsNext().setSubPuMvpLog2Size(m_SubPuMvpLog2Size);
+#endif
 #if JEM_TOOLS
   sps.getSpsNext().setCABACEngineMode       ( m_CABACEngineMode );
 #endif
@@ -864,6 +868,9 @@ Void EncLib::xInitSPS(SPS &sps)
   sps.getSpsNext().setUseAffineType         ( m_AffineType );
 #endif
   sps.getSpsNext().setUseBIO                ( m_BIO );
+#endif
+#if !JEM_TOOLS && JVET_K0346
+  sps.getSpsNext().setUseHighPrecMv(m_highPrecMv);
 #endif
   sps.getSpsNext().setDisableMotCompress    ( m_DisableMotionCompression );
 #if JEM_TOOLS
