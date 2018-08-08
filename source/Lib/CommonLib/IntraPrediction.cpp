@@ -209,12 +209,12 @@ Pel IntraPrediction::xGetPredValDc( const CPelBuf &pSrc, const Size &dstSize )
   const int width  = dstSize.width;
   const int height = dstSize.height;
 #if JVET_K0122
-  const int iState      = (width == height) ? 0            : ((width > height) ? 1     : -1);
-  const SizeType iDenom = (width == height) ? (width << 1) : ((width > height) ? width : height);
-  const Int iDivShift   = g_aucLog2[iDenom];
-  const Int iDivOffset  = (iDenom >> 1);
+  const auto rectState  = (width == height) ? 0            : ((width > height) ? 1     : -1);
+  const auto denom      = (width == height) ? (width << 1) : ((width > height) ? width : height);
+  const auto divShift  = g_aucLog2[denom];
+  const auto divOffset = (denom >> 1);
 
-  if (iState >= 0) //width is a larger side or a block is square
+  if (rectState >= 0) //width is a larger side or a block is square
   {
 #endif
   for( iInd = 0; iInd < width; iInd++ )
@@ -223,7 +223,7 @@ Pel IntraPrediction::xGetPredValDc( const CPelBuf &pSrc, const Size &dstSize )
   }
 #if JVET_K0122
   }
-  if (iState <= 0) //height is a larger side or a block is square
+  if (rectState <= 0) //height is a larger side or a block is square
   {   
 #endif
   for( iInd = 0; iInd < height; iInd++ )
@@ -233,7 +233,7 @@ Pel IntraPrediction::xGetPredValDc( const CPelBuf &pSrc, const Size &dstSize )
 #if JVET_K0122
   }
 
-  pDcVal = (iSum + iDivOffset) >> iDivShift;
+  pDcVal = (iSum + divOffset) >> divShift;
 #else
   pDcVal = ( iSum + ( ( width + height ) >> 1 ) ) / ( width + height );
 #endif
