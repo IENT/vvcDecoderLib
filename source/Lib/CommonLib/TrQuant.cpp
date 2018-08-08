@@ -55,6 +55,9 @@
 #include "DepQuant.h"
 #endif
 
+#if RExt__DECODER_DEBUG_TOOL_STATISTICS
+#include "CommonLib/CodingStatistics.h"
+#endif
 
 struct coeffGroupRDStats
 {
@@ -726,6 +729,10 @@ Void TrQuant::xInvNsst( const TransformUnit &tu, const ComponentID compID )
 
     if( uiNSSTIdx < ( uiIntraMode <= DC_IDX ? 3 : 4 ) )
     {
+#if RExt__DECODER_DEBUG_TOOL_STATISTICS
+      CodingStatistics::IncrementStatisticTool(CodingStatisticsClassType{ STATS__TOOL_NSST, tu.Y().width, tu.Y().height, compID });
+#endif
+
 #if ENABLE_BMS
       const Int iSbSize     = 4;
       const Int iSubGrpXMax = 1;
@@ -1032,6 +1039,10 @@ void TrQuant::xT( const TransformUnit &tu, const ComponentID &compID, const CPel
 
   if( ucTrIdx != DCT2_HEVC )
   {
+#if RExt__DECODER_DEBUG_TOOL_STATISTICS
+    CodingStatistics::IncrementStatisticTool(CodingStatisticsClassType{ STATS__TOOL_EMT, UInt(iWidth), UInt(iHeight), compID });
+#endif
+
 #if INTRA67_3MPM
 #if HEVC_USE_4x4_DSTVII
     xTrMxN_EMT(channelBitDepth, resi.buf, resi.stride, dstCoeff.buf, iWidth, iHeight, useDST, maxLog2TrDynamicRange, ucMode, ucTrIdx

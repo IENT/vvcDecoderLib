@@ -112,6 +112,13 @@ enum CodingStatisticsType
 #endif
   STATS__CABAC_BITS__OTHER,
   STATS__CABAC_BITS__INVALID,
+  STATS__TOOL_TOTAL_FRAME,// This is a special case and is not included in the report.
+#if JEM_TOOLS
+  STATS__TOOL_AFF,
+  STATS__TOOL_NSST,
+  STATS__TOOL_EMT,
+#endif
+  STATS__TOOL_TOTAL,
   STATS__NUM_STATS
 };
 
@@ -184,7 +191,14 @@ static inline const TChar* getName(CodingStatisticsType name)
     "CABAC_BITS__EMT_TU_INDX",
 #endif
     "CABAC_BITS__OTHER",
-    "CABAC_BITS__INVALID"
+    "CABAC_BITS__INVALID",
+    "TOOL_FRAME",
+#if JEM_TOOLS
+    "TOOL_AFF",
+    "TOOL_NSST",
+    "TOOL_EMT",
+#endif
+    "TOOL_TOTAL"
   };
   CHECK( STATS__NUM_STATS != sizeof( statNames ) / sizeof( TChar* ) || name >= STATS__NUM_STATS, "stats out of range" );
   return statNames[name];
@@ -296,11 +310,28 @@ public:
     }
   };
 
+  struct StatTool
+  {
+    StatTool() : count( 0 ), pixels( 0 ), classCount( 0 ) { }
+
+    Int64 count;
+    Int64 pixels;
+    Int64 classCount;
+
+    Void clear() { count = 0; pixels = 0; classCount = 0; }
+
+    StatTool &operator+=( const StatTool &src )
+    {
+      count += src.count; pixels += src.pixels; classCount += src.classCount; return *this;
+    }
+  };
+
   class CodingStatisticsData
   {
   private:
-    SStat statistics    [STATS__NUM_STATS + 1][CODING_STATS_NUM_SUBCLASSES];
-    SStat statistics_ep [STATS__NUM_STATS + 1][CODING_STATS_NUM_SUBCLASSES];
+    SStat statistics         [STATS__NUM_STATS + 1][CODING_STATS_NUM_SUBCLASSES];
+    SStat statistics_ep      [STATS__NUM_STATS + 1][CODING_STATS_NUM_SUBCLASSES];
+    StatTool statistics_tool [STATS__NUM_STATS + 1][CODING_STATS_NUM_SUBCLASSES];
     std::map<std::string, SStat> mappings_ep;
     friend class CodingStatistics;
   };
@@ -355,6 +386,22 @@ private:
     printf( "%c%-45s%c  %6s %6s %6s          -/- %12s %12s %12s %9s-/- %12lld %12lld %12lld %12lld (%12lld)%c\n",
             sep == '~' ? '[' : ' ', pName, sep, pWidthString, pHeightString, pSubClassStr,
             "", "", "", "", sEP.count, sEP.sum, sEP.bits, sEP.bits, ( sEP.bits ) / 8, sep == '~' ? ']' : ' ' );
+  }
+
+  static Void OutputLine( const TChar *pName, const TChar sep, const TChar *pWidthString, const TChar *pHeightString, const TChar *pSubClassStr, const StatTool &sTool, UInt64 totalPixels )
+  {
+    const Double ratio = 100.0 * sTool.pixels / ( Double ) totalPixels;
+    printf( "%c%-45s%c  %6s %6s %6s %12lld     %12lld       %11.2f%%%c\n",
+            sep == '~' ? '[' : ' ', pName, sep, pWidthString, pHeightString, pSubClassStr,
+            sTool.count, sTool.pixels, ratio, sep == '~' ? ']' : ' ' );
+  }
+
+  static Void OutputLine( const TChar *pName, const TChar sep, UInt wIdx, UInt hIdx, const TChar *pSubClassStr, const StatTool &sTool, UInt64 totalPixels )
+  {
+    const Double ratio = 100.0 * sTool.pixels / ( Double ) totalPixels;
+    printf( "%c%-45s%c  %6d %6d %6s %12lld     %12lld       %11.2f%%%c\n",
+            sep == '~' ? '[' : ' ', pName, sep, gp_sizeIdxInfo->sizeFrom( wIdx ), gp_sizeIdxInfo->sizeFrom( hIdx ), pSubClassStr,
+            sTool.count, sTool.pixels, ratio, sep == '~' ? ']' : ' ' );
   }
 
   static Void OutputDashedLine( const TChar *pText )
@@ -556,9 +603,70 @@ public:
     OutputDashedLine( "GRAND TOTAL" );
     epTotalBits += cavlcTotalBits;
     OutputLine      ( "TOTAL",                  '~', "~~GT~~", "~~GT~~", "~~GT~~", cabacTotalBits, epTotalBits );
+
+#if JEM_TOOLS
+    printf("\n");
+    printf( " %-45s-   Width Height   Type        Count  Impacted pixels  %% Impacted pixels\n", "Tools statistics" );
+    OutputDashedLine( "" );
+
+    const UInt64 toolCount = STATS__TOOL_TOTAL - (STATS__TOOL_TOTAL_FRAME + 1);
+    StatTool subTotalTool[toolCount];
+    StatTool statTotalTool[toolCount][CODING_STATS_NUM_SUBCLASSES];
+    UInt64 totalPixels = GetStatisticTool( STATS__TOOL_TOTAL_FRAME ).pixels;
+    for( Int i = 0; i < toolCount; i++ )
+    {
+      const Int type = i + (STATS__TOOL_TOTAL_FRAME + 1);
+      const TChar *pName = getName( CodingStatisticsType( type ) );
+
+      for( UInt c = 0; c < CODING_STATS_NUM_SUBCLASSES; c++ )
+      {
+        StatTool &sTool   = data.statistics_tool[type][c];
+        if( sTool.count == 0 )
+        {
+          continue;
+        }
+
+        UInt wIdx = CodingStatisticsClassType::GetSubClassWidth( c );
+        UInt hIdx = CodingStatisticsClassType::GetSubClassHeight( c );
+        OutputLine( pName, ':', wIdx, hIdx, CodingStatisticsClassType::GetSubClassString( c ), sTool, totalPixels );
+
+        statTotalTool[i][c] += sTool;
+        subTotalTool[i] += sTool;
+      }
+
+      if (subTotalTool[i].count != 0)
+      {
+        OutputLine( pName, '~', "~~ST~~", "~~ST~~", "~~ST~~", subTotalTool[i], totalPixels );
+      }
+    }
+
+    for( Int i = 0; i < toolCount; i++ )
+    {
+      const Int type = i + (STATS__TOOL_TOTAL_FRAME + 1);
+      const TChar *pName = getName( CodingStatisticsType( type ) );
+
+      if (subTotalTool[i].count != 0)
+        OutputDashedLine( "Break down by tool/Channel type" );
+
+      for( UInt c = 0; c < CODING_STATS_NUM_SUBCLASSES; c += CODING_STATS_NUM_SIZES )
+      {
+        StatTool typeTotalTool;
+        for( UInt w = 0; w < CODING_STATS_NUM_WIDTHS; w++ )
+        {
+          for( UInt h = 0; h < CODING_STATS_NUM_HEIGHTS; h++ )
+            typeTotalTool += statTotalTool[i][c + h * CODING_STATS_NUM_WIDTHS + w];
+        }
+
+        if( typeTotalTool.count != 0 )
+        {
+          OutputLine( pName, '=', "-", "-", CodingStatisticsClassType::GetSubClassString( c ), typeTotalTool, totalPixels );
+        }
+      }
+    }
+#endif
   }
 
-  static CodingStatistics& GetSingletonInstance()
+   static CodingStatistics& GetSingletonInstance()
   {
     static CodingStatistics* inst = nullptr;
     if( !inst )
@@ -584,6 +692,8 @@ public:
   static SStat &GetStatisticEP    ( const std::string &str )                { return GetSingletonInstance().data.mappings_ep[str]; }
 
   static SStat &GetStatisticEP    ( const TChar *pKey )                     { return GetStatisticEP( std::string( pKey ) ); }
+
+  static StatTool &GetStatisticTool ( const CodingStatisticsClassType &stat ) { return GetSingletonInstance().data.statistics_tool[stat.type][stat.subClass]; }
 
   static int getNumOnes( Int bins )
   {
@@ -622,6 +732,20 @@ public:
     s.count++;
     s.sum   += getNumOnes( value );
   }
+
+#if JEM_TOOLS
+  static Void IncrementStatisticTool( const CodingStatisticsClassType &stat )
+  {
+    CHECK( stat.type < STATS__TOOL_AFF || stat.type >= STATS__TOOL_TOTAL, "Should never be used." );
+    StatTool &s = GetStatisticTool( stat );
+    s.count++;
+
+    UInt wIdx = CodingStatisticsClassType::GetSubClassWidth( stat.subClass );
+    UInt hIdx = CodingStatisticsClassType::GetSubClassHeight( stat.subClass );
+
+    s.pixels = s.count * gp_sizeIdxInfo->sizeFrom( wIdx ) * gp_sizeIdxInfo->sizeFrom( hIdx );
+  }
+#endif
 
   StatLogValue values;
 

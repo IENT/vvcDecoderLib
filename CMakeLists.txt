@@ -130,6 +130,7 @@ endif()
 
 # add needed subdirectories
 add_subdirectory( "source/Lib/CommonLib" )
+add_subdirectory( "source/Lib/CommonAnalyserLib" )
 if( EXTENSION_360_VIDEO )
   add_subdirectory( "source/Lib/Lib360" )
   add_subdirectory( "source/Lib/AppEncHelper360" )

@@ -15,6 +15,7 @@ endif()
 # library
 add_library( ${LIB_NAME} STATIC ${SRC_FILES} ${INC_FILES} ${NATVIS_FILES} )
 target_compile_definitions( ${LIB_NAME} PUBLIC RExt__DECODER_DEBUG_BIT_STATISTICS=1 )
+target_compile_definitions( ${LIB_NAME} PUBLIC RExt__DECODER_DEBUG_TOOL_STATISTICS=1 )
 
 if( EXTENSION_360_VIDEO )
   target_compile_definitions( ${LIB_NAME} PUBLIC EXTENSION_360_VIDEO=1 )
@@ -49,7 +50,7 @@ else()
 endif()
 
 target_include_directories( ${LIB_NAME} PUBLIC ../DecoderLib )
-target_link_libraries( ${LIB_NAME} CommonLib Threads::Threads )
+target_link_libraries( ${LIB_NAME} CommonAnalyserLib Threads::Threads )
 
 # example: place header files in different folders
 source_group( "Natvis Files" FILES ${NATVIS_FILES} )

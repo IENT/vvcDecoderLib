@@ -49,6 +49,10 @@
 #include "AnnexBread.h"
 #include "NALread.h"
 
+#if RExt__DECODER_DEBUG_TOOL_STATISTICS
+#include "CommonLib/CodingStatistics.h"
+#endif
+
 bool tryDecodePicture( Picture* pcEncPic, const int expectedPoc, const std::string& bitstreamFileName, bool bDecodeUntilPocFound /* = false */ )
 {
   int      poc;
@@ -552,6 +556,12 @@ Void DecLib::finishPictureLight(Int& poc, PicList*& rpcListPic )
 
 Void DecLib::finishPicture(Int& poc, PicList*& rpcListPic, MsgLevel msgl )
 {
+#if RExt__DECODER_DEBUG_TOOL_STATISTICS
+  CodingStatistics::StatTool& s = CodingStatistics::GetStatisticTool( STATS__TOOL_TOTAL_FRAME );
+  s.count++;
+  s.pixels = s.count * m_pcPic->Y().width * m_pcPic->Y().height;
+#endif
+
   Slice*  pcSlice = m_pcPic->cs->slice;
 #if JEM_TOOLS
   if( m_pcPic->cs->sps->getSpsNext().getALFEnabled() )
