@@ -91,8 +91,11 @@ extern const TMatrixCoeff g_aiT128[TRANSFORM_NUMBER_OF_DIRECTIONS][128][128];
 // ====================================================================================================================
 // Luma QP to Chroma QP mapping
 // ====================================================================================================================
-
+#if JVET_K0251_QP_EXT
+static const Int chromaQPMappingTableSize = (MAX_QP + 7);
+#else
 static const Int chromaQPMappingTableSize = 58;
+#endif
 
 extern const UChar  g_aucChromaScale[NUM_CHROMA_FORMAT][chromaQPMappingTableSize];
 
