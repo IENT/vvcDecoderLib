@@ -204,7 +204,7 @@ Pel IntraPrediction::xGetPredValDc( const CPelBuf &pSrc, const Size &dstSize )
 {
   CHECK( dstSize.width == 0 || dstSize.height == 0, "Empty area provided" );
 
-  Int iInd, iSum = 0;
+  int idx, iSum = 0;
   Pel pDcVal;
   const int width  = dstSize.width;
   const int height = dstSize.height;
@@ -217,18 +217,18 @@ Pel IntraPrediction::xGetPredValDc( const CPelBuf &pSrc, const Size &dstSize )
   if (rectState >= 0) //width is a larger side or a block is square
   {
 #endif
-  for( iInd = 0; iInd < width; iInd++ )
+  for( idx = 0; idx < width; idx++ )
   {
-    iSum += pSrc.at( 1 + iInd, 0 );
+    iSum += pSrc.at( 1 + idx, 0 );
   }
 #if JVET_K0122
   }
   if (rectState <= 0) //height is a larger side or a block is square
   {   
 #endif
-  for( iInd = 0; iInd < height; iInd++ )
+  for( idx = 0; idx < height; idx++ )
   {
-    iSum += pSrc.at( 0, 1 + iInd );
+    iSum += pSrc.at( 0, 1 + idx );
   }  
 #if JVET_K0122
   }
