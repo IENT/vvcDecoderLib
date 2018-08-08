@@ -964,8 +964,8 @@ Void IntraSearch::estIntraPredChromaQT(CodingUnit &cu, Partitioner &partitioner)
           orgTUs.push_back( ptu );
         }
       }
-#if JEM_TOOLS
 
+#if JEM_TOOLS&&!JVET_K0190
 #if DISTORTION_TYPE_BUGFIX
       Distortion auiSATDModeList[LM_FILTER_NUM];
 #else
@@ -1054,8 +1054,7 @@ Void IntraSearch::estIntraPredChromaQT(CodingUnit &cu, Partitioner &partitioner)
       for (UInt uiMode = uiMinMode; uiMode < uiMaxMode; uiMode++)
       {
         const int chromaIntraMode = chromaCandModes[uiMode];
-#if JEM_TOOLS
-
+#if JEM_TOOLS||JVET_K0190
         if( PU::isLMCMode( chromaIntraMode ) && ! PU::isLMCModeEnabled( pu, chromaIntraMode ) )
         {
           continue;
@@ -1084,7 +1083,7 @@ Void IntraSearch::estIntraPredChromaQT(CodingUnit &cu, Partitioner &partitioner)
           }
         }
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS&&!JVET_K0190
         if( pu.cs->pcv->noRQT && pu.cs->sps->getSpsNext().isELMModeMFLM())
         {
           if( chromaIntraMode >= LM_CHROMA_F1_IDX &&  chromaIntraMode < LM_CHROMA_F1_IDX + LM_FILTER_NUM)
@@ -1495,7 +1494,7 @@ Void IntraSearch::xIntraCodingTUBlock(TransformUnit &tu, const ComponentID &comp
   PelBuf         piReco                     = cs.getRecoBuf   (area);
 
   const PredictionUnit &pu                  = *cs.getPU(area.pos(), chType);
-#if JEM_TOOLS || ENABLE_TRACING
+#if JEM_TOOLS || ENABLE_TRACING||JVET_K0190
   const UInt           uiChFinalMode        = PU::getFinalIntraMode(pu, chType);
 
 #endif
@@ -1524,7 +1523,7 @@ Void IntraSearch::xIntraCodingTUBlock(TransformUnit &tu, const ComponentID &comp
     initIntraPatternChType( *tu.cu, area, bUseFilteredPredictions );
 
     //===== get prediction signal =====
-#if JEM_TOOLS
+#if JEM_TOOLS||JVET_K0190
     if( compID != COMPONENT_Y && PU::isLMCMode( uiChFinalMode ) )
     {
 #if !ENABLE_BMS
@@ -1539,7 +1538,7 @@ Void IntraSearch::xIntraCodingTUBlock(TransformUnit &tu, const ComponentID &comp
 #endif
     {
       predIntraAng( compID, piPred, pu, bUseFilteredPredictions );
-#if JEM_TOOLS
+#if JEM_TOOLS&&!JVET_K0190
       if( compID == COMPONENT_Cr && sps.getSpsNext().getUseLMChroma() )
       {
         const CPelBuf pResiCb = cs.getResiBuf( tu.Cb() );
@@ -1593,8 +1592,8 @@ Void IntraSearch::xIntraCodingTUBlock(TransformUnit &tu, const ComponentID &comp
 #if RDOQ_CHROMA_LAMBDA
   m_pcTrQuant->selectLambda(compID);
 #endif
-#if JEM_TOOLS
 
+#if JEM_TOOLS||JVET_K0190
   if( ! PU::isLMCMode(uiChFinalMode) && sps.getSpsNext().getUseLMChroma() )
   {
     if( compID == COMPONENT_Cb )
@@ -2032,7 +2031,7 @@ Void IntraSearch::xRecurIntraCodingLumaQT( CodingStructure &cs, Partitioner &par
 ChromaCbfs IntraSearch::xRecurIntraChromaCodingQT(CodingStructure &cs, Partitioner& partitioner)
 {
   UnitArea currArea                   = partitioner.currArea();
-#if JEM_TOOLS
+#if JEM_TOOLS||JVET_K0190
   const bool keepResi                 = cs.sps->getSpsNext().getUseLMChroma() || KEEP_PRED_AND_RESI_SIGNALS;
 #else
   const bool keepResi                 = KEEP_PRED_AND_RESI_SIGNALS;

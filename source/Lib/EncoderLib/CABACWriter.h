@@ -134,7 +134,7 @@ public:
   void        intra_luma_pred_modes     ( const CodingUnit&             cu );
   void        intra_luma_pred_mode      ( const PredictionUnit&         pu );
   void        intra_chroma_pred_modes   ( const CodingUnit&             cu );
-#if JEM_TOOLS
+#if JEM_TOOLS||JVET_K0190
   void        intra_chroma_lmc_mode     ( const PredictionUnit&         pu );
 #endif
   void        intra_chroma_pred_mode    ( const PredictionUnit&         pu );

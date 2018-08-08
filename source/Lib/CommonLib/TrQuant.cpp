@@ -715,12 +715,11 @@ Void TrQuant::xInvNsst( const TransformUnit &tu, const ComponentID compID )
 #endif
     UInt uiIntraMode        = PU::getFinalIntraMode( *tu.cs->getPU( area.pos(), toChannelType( compID ) ), toChannelType( compID ) );
 
-#if JEM_TOOLS
+#if JEM_TOOLS||JVET_K0190
     if( PU::isLMCMode( tu.cs->getPU( area.pos(), toChannelType( compID ) )->intraDir[ toChannelType( compID ) ] ) )
     {
       uiIntraMode = PLANAR_IDX;
     }
-
 #endif
     CHECK( uiIntraMode >= NUM_INTRA_MODE - 1, "Invalid intra mode" );
 
@@ -820,7 +819,7 @@ Void TrQuant::xFwdNsst( const TransformUnit &tu, const ComponentID compID )
 #endif
     UInt uiIntraMode        = PU::getFinalIntraMode( *tu.cs->getPU( area.pos(), toChannelType( compID ) ), toChannelType( compID ) );
 
-#if JEM_TOOLS
+#if JEM_TOOLS||JVET_K0190
     if( PU::isLMCMode( tu.cs->getPU( area.pos(), toChannelType( compID ) )->intraDir[ toChannelType( compID ) ] ) )
     {
       uiIntraMode = PLANAR_IDX;

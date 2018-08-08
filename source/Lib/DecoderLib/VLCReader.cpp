@@ -837,7 +837,11 @@ void HLSyntaxReader::parseSPSNext( SPSNext& spsNext, const bool usePCM )
   READ_FLAG( symbol,    "lic_enabled_flag" );                       spsNext.setLICMode                ( symbol );
   READ_FLAG( symbol,    "intra_pdpc_enable_flag" );                 spsNext.setUseIntraPDPC           ( symbol != 0 );
   READ_FLAG( symbol,    "alf_enabled_flag" );                       spsNext.setALFEnabled             ( symbol );
+#endif
+#if JEM_TOOLS||JVET_K0190
   READ_FLAG( symbol,    "lm_chroma_enabled_flag" );                 spsNext.setUseLMChroma            ( symbol != 0 );
+#endif
+#if JEM_TOOLS
   READ_FLAG( symbol,    "emt_intra_enabled_flag" );                 spsNext.setUseIntraEMT            ( symbol != 0 );
   READ_FLAG( symbol,    "emt_inter_enabled_flag" );                 spsNext.setUseInterEMT            ( symbol != 0 );
   READ_FLAG( symbol,    "obmc_flag" );                              spsNext.setUseOBMC                ( symbol != 0 );
@@ -960,12 +964,12 @@ void HLSyntaxReader::parseSPSNext( SPSNext& spsNext, const bool usePCM )
   {
     READ_CODE( 2, symbol, "aclip_quant" );                          spsNext.setAClipQuant( symbol * 2 );
   }
-
+#if !JVET_K0190
   if( spsNext.getUseLMChroma() )
   {
     READ_UVLC( symbol, "elm_mode_minus1" );                         spsNext.setELMMode( symbol );
   }
-
+#endif
   if( spsNext.getUseIntraPDPC() )
   {
     READ_FLAG( symbol, "planar_pdpc_flag" );                        spsNext.setIntraPDPCMode( symbol + 1 );
