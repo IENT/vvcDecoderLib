@@ -1777,7 +1777,7 @@ bool PU::getColocatedMVP(const PredictionUnit &pu, const RefPicList &eRefPicList
     }
     else
     {
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
       if( pu.cs->sps->getSpsNext().getUseHighPrecMv() )
       {
         // allow extended precision for temporal scaling
@@ -2002,7 +2002,7 @@ void PU::fillMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, const in
 
   while (pInfo->numCand < AMVP_MAX_NUM_CANDS)
   {
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
     const Bool prec = pInfo->mvCand[pInfo->numCand].highPrec;
     pInfo->mvCand[pInfo->numCand] = Mv( 0, 0, prec );
 #else
@@ -2029,7 +2029,7 @@ void PU::fillMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, const in
     }
   }
 #endif
-#if !JEM_TOOLS && JVET_K0346
+#if !JEM_TOOLS && JVET_K0346 || JVET_K_AFFINE
   if (pu.cs->sps->getSpsNext().getUseHighPrecMv())
   {
     for (Mv &mv : pInfo->mvCand)
@@ -2041,7 +2041,7 @@ void PU::fillMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, const in
 }
 
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
 #if JVET_K0337_AFFINE_MVP_IMPROVE
 const int getAvailableAffineNeighbours( const PredictionUnit &pu, const PredictionUnit* npu[] )
 {
@@ -2527,7 +2527,7 @@ void PU::fillAffineMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, co
 }
 #endif
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
 bool PU::addMVPCandUnscaled( const PredictionUnit &pu, const RefPicList &eRefPicList, const int &iRefIdx, const Position &pos, const MvpDir &eDir, AMVPInfo &info, bool affine )
 #else
 bool PU::addMVPCandUnscaled( const PredictionUnit &pu, const RefPicList &eRefPicList, const int &iRefIdx, const Position &pos, const MvpDir &eDir, AMVPInfo &info )
@@ -2577,7 +2577,7 @@ bool PU::addMVPCandUnscaled( const PredictionUnit &pu, const RefPicList &eRefPic
 
     if( neibRefIdx >= 0 && currRefPOC == cs.slice->getRefPOC( eRefPicListIndex, neibRefIdx ) )
     {
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
       if( affine )
       {
         Int i = 0;
@@ -2618,7 +2618,7 @@ bool PU::addMVPCandUnscaled( const PredictionUnit &pu, const RefPicList &eRefPic
 * \param eDir
 * \returns Bool
 */
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
 bool PU::addMVPCandWithScaling( const PredictionUnit &pu, const RefPicList &eRefPicList, const int &iRefIdx, const Position &pos, const MvpDir &eDir, AMVPInfo &info, bool affine )
 #else
 bool PU::addMVPCandWithScaling( const PredictionUnit &pu, const RefPicList &eRefPicList, const int &iRefIdx, const Position &pos, const MvpDir &eDir, AMVPInfo &info )
@@ -2685,7 +2685,7 @@ bool PU::addMVPCandWithScaling( const PredictionUnit &pu, const RefPicList &eRef
 
           if( scale != 4096 )
           {
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
             if( slice.getSPS()->getSpsNext().getUseHighPrecMv() )
             {
               cMv.setHighPrec();
@@ -2695,7 +2695,7 @@ bool PU::addMVPCandWithScaling( const PredictionUnit &pu, const RefPicList &eRef
           }
         }
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
         if( affine )
         {
           Int i;
@@ -3620,7 +3620,9 @@ bool PU::getInterMergeSubPuRecurCand( const PredictionUnit &pu, MergeCtx& mrgCtx
 
   return bAtmvpExtAva;
 }
+#endif
 
+#if JEM_TOOLS || JVET_K_AFFINE
 const PredictionUnit* getFirstAvailableAffineNeighbour( const PredictionUnit &pu )
 {
   const Position posLT = pu.Y().topLeft();
@@ -4421,7 +4423,7 @@ void PU::spanMotionInfo( PredictionUnit &pu, const MergeCtx &mrgCtx )
       }
     }
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
     if( pu.cu->affine )
     {
       for( int y = 0; y < mb.height; y++ )

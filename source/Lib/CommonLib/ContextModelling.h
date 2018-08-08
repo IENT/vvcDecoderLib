@@ -600,6 +600,9 @@ unsigned CtxAffineFlag( const CodingUnit& cu );
 unsigned CtxFrucFlag  ( const PredictionUnit& pu );
 unsigned CtxFrucMode  ( const PredictionUnit& pu );
 #endif
+#if !JEM_TOOLS && JVET_K_AFFINE
+unsigned CtxAffineFlag( const CodingUnit& cu );
+#endif
 }
 
 #endif // __CONTEXTMODELLING__

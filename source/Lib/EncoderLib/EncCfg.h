@@ -231,7 +231,13 @@ protected:
 #endif
   bool      m_BIO;
 #endif
-#if !JEM_TOOLS && JVET_K0346
+#if !JEM_TOOLS && JVET_K_AFFINE
+  bool      m_Affine;
+#if JVET_K0337_AFFINE_6PARA
+  bool      m_AffineType;
+#endif
+#endif
+#if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
   bool      m_highPrecMv;
 #endif
   bool      m_DisableMotionCompression;
@@ -716,7 +722,15 @@ public:
   bool      getAffineType()                            const { return m_AffineType; }
 #endif
 #endif
-#if !JEM_TOOLS && JVET_K0346
+#if !JEM_TOOLS && JVET_K_AFFINE
+  void      setAffine                       ( bool b )       { m_Affine = b; }
+  bool      getAffine                       ()         const { return m_Affine; }
+#if JVET_K0337_AFFINE_6PARA
+  void      setAffineType( bool b )                          { m_AffineType = b; }
+  bool      getAffineType()                            const { return m_AffineType; }
+#endif
+#endif
+#if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
   void      setHighPrecisionMv(bool b) { m_highPrecMv = b; }
   bool      getHighPrecisionMv()       { return m_highPrecMv; }
 #endif

@@ -118,7 +118,7 @@ InterSearch::InterSearch()
 
   setWpScalingDistParam( -1, REF_PIC_LIST_X, nullptr );
 
-#if JEM_TOOLS && JVET_K0367_AFFINE_FIX_POINT
+#if JVET_K0367_AFFINE_FIX_POINT
   m_HorizontalSobelFilter = xHorizontalSobelFilter;
   m_VerticalSobelFilter   = xVerticalSobelFilter;
   m_EqualCoeffComputer    = xEqualCoeffComputer;
@@ -843,7 +843,7 @@ Void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
   Mv           cMv[2];
   Mv           cMvBi[2];
   Mv           cMvTemp[2][33];
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
   Mv           cMvHevcTemp[2][33];
 #endif
   Int          iNumPredDir = cs.slice->isInterP() ? 1 : 2;
@@ -864,7 +864,7 @@ Void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
   UInt         uiMbBits[3] = {1, 1, 0};
 
   UInt         uiLastMode = 0;
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
   UInt         uiLastModeTemp = 0;
 #endif
   Int          iRefStart, iRefEnd;
@@ -919,6 +919,10 @@ Void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
     Distortion   uiHevcCost   = std::numeric_limits<Distortion>::max();
     Distortion   uiAffineCost = std::numeric_limits<Distortion>::max();
 #endif
+#if !JEM_TOOLS && JVET_K_AFFINE
+    Distortion   uiHevcCost = std::numeric_limits<Distortion>::max();
+    Distortion   uiAffineCost = std::numeric_limits<Distortion>::max();
+#endif
     Distortion   uiCost[2] = { std::numeric_limits<Distortion>::max(), std::numeric_limits<Distortion>::max() };
     Distortion   uiCostBi  =   std::numeric_limits<Distortion>::max();
     Distortion   uiCostTemp;
@@ -957,7 +961,7 @@ Void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
     }
 
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
 #if !JVET_K0220_ENC_CTRL
     Bool bFastSkipAffine = false;
     if( pu.cs->sps->getSpsNext().getUseQTBT() && m_pcEncCfg->getUseSaveLoadEncInfo() )
@@ -965,9 +969,10 @@ Void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
       SaveLoadEncInfoCtrl* modeCtrl = dynamic_cast<SaveLoadEncInfoCtrl*>( m_modeCtrl );
       bFastSkipAffine = modeCtrl && LOAD_ENC_INFO == modeCtrl->getSaveLoadTag( pu ) && !modeCtrl->getSaveLoadAffineFlag( pu );
     }
-
 #endif
+#if JEM_TOOLS
     unsigned imvShift = pu.cu->imv << 1;
+#endif
 #endif
 
       //  Uni-directional prediction
@@ -1066,6 +1071,16 @@ Void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
       if( cu.Y().width > 8 && cu.Y().height > 8 && cu.partSize == SIZE_2Nx2N && cu.slice->getSPS()->getSpsNext().getUseAffine() && !cu.LICFlag && cu.imv == 0 )
 #else
       if( cu.Y().width > 8 && cu.Y().height > 8 && cu.partSize == SIZE_2Nx2N && cu.slice->getSPS()->getSpsNext().getUseAffine() && !cu.LICFlag && cu.imv == 0 && !bFastSkipAffine )
+#endif
+      {
+        ::memcpy( cMvHevcTemp, cMvTemp, sizeof( cMvTemp ) );
+      }
+#endif
+#if !JEM_TOOLS && JVET_K_AFFINE
+#if JVET_K0220_ENC_CTRL
+      if ( cu.Y().width > 8 && cu.Y().height > 8 && cu.partSize == SIZE_2Nx2N && cu.slice->getSPS()->getSpsNext().getUseAffine() )
+#else
+      if ( cu.Y().width > 8 && cu.Y().height > 8 && cu.partSize == SIZE_2Nx2N && cu.slice->getSPS()->getSpsNext().getUseAffine() && !bFastSkipAffine )
 #endif
       {
         ::memcpy( cMvHevcTemp, cMvTemp, sizeof( cMvTemp ) );
@@ -1271,7 +1286,7 @@ Void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
     uiBits [1] = bitsValidList1;
     uiCost [1] = costValidList1;
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
       uiLastModeTemp = uiLastMode;
 #endif
       if ( uiCostBi <= uiCost[0] && uiCostBi <= uiCost[1])
@@ -1370,22 +1385,30 @@ Void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
       {
         pu = savedPU;
       }
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
       uiHevcCost = ( uiMRGCost < uiMECost ) ? uiMRGCost : uiMECost;
 #endif
     }
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
     if( cu.cs->pcv->only2Nx2N || cu.partSize == SIZE_2Nx2N )
     {
       uiHevcCost = ( uiCostBi <= uiCost[0] && uiCostBi <= uiCost[1] ) ? uiCostBi : ( ( uiCost[0] <= uiCost[1] ) ? uiCost[0] : uiCost[1] );
     }
 #endif
     CHECK( !( !cu.cs->pcv->only2Nx2N || cu.partSize == SIZE_2Nx2N ), "Unexpected part size for QTBT." );
+#if JEM_TOOLS || JVET_K_AFFINE
 #if JEM_TOOLS
 #if JVET_K0220_ENC_CTRL
-    if( cu.Y().width > 8 && cu.Y().height > 8 && cu.partSize == SIZE_2Nx2N && cu.slice->getSPS()->getSpsNext().getUseAffine() && !cu.LICFlag && cu.imv == 0 )
+    if ( cu.Y().width > 8 && cu.Y().height > 8 && cu.partSize == SIZE_2Nx2N && cu.slice->getSPS()->getSpsNext().getUseAffine() && !cu.LICFlag && cu.imv == 0 )
 #else
-    if( cu.Y().width > 8 && cu.Y().height > 8 && cu.partSize == SIZE_2Nx2N && cu.slice->getSPS()->getSpsNext().getUseAffine() && !cu.LICFlag && cu.imv == 0 && !bFastSkipAffine )
+    if ( cu.Y().width > 8 && cu.Y().height > 8 && cu.partSize == SIZE_2Nx2N && cu.slice->getSPS()->getSpsNext().getUseAffine() && !cu.LICFlag && cu.imv == 0 && !bFastSkipAffine )
+#endif
+#else
+#if JVET_K0220_ENC_CTRL
+    if( cu.Y().width > 8 && cu.Y().height > 8 && cu.partSize == SIZE_2Nx2N && cu.slice->getSPS()->getSpsNext().getUseAffine() )
+#else
+    if( cu.Y().width > 8 && cu.Y().height > 8 && cu.partSize == SIZE_2Nx2N && cu.slice->getSPS()->getSpsNext().getUseAffine() && !bFastSkipAffine )
+#endif
 #endif
     {
       // save normal hevc result
@@ -1755,7 +1778,7 @@ Distortion InterSearch::xGetTemplateCost( const PredictionUnit& pu,
   return uiCost;
 }
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
 Distortion InterSearch::xGetAffineTemplateCost( PredictionUnit& pu, PelUnitBuf& origBuf, PelUnitBuf& predBuf, Mv acMvCand[3], Int iMVPIdx, Int iMVPNum, RefPicList eRefPicList, Int iRefIdx )
 {
   Distortion uiCost = std::numeric_limits<Distortion>::max();
@@ -1934,7 +1957,7 @@ Void InterSearch::xSetSearchRange ( const PredictionUnit& pu,
                                     const Int iSrchRng,
                                     SearchRange& sr )
 {
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
   const Int iMvShift = cMvPred.highPrec ? 4 : 2;
 #else
   const Int iMvShift = 2;
@@ -1942,7 +1965,7 @@ Void InterSearch::xSetSearchRange ( const PredictionUnit& pu,
   Mv cFPMvPred = cMvPred;
   clipMv( cFPMvPred, pu.cu->lumaPos(), *pu.cs->sps );
 
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
   Mv mvTL( cFPMvPred.getHor() - ( iSrchRng << iMvShift ), cFPMvPred.getVer() - ( iSrchRng << iMvShift ), cFPMvPred.highPrec );
   Mv mvBR( cFPMvPred.getHor() + ( iSrchRng << iMvShift ), cFPMvPred.getVer() + ( iSrchRng << iMvShift ), cFPMvPred.highPrec );
 #else
@@ -2005,7 +2028,7 @@ Void InterSearch::xPatternSearch( IntTZSearchStruct&    cStruct,
     piRef += cStruct.iRefStride;
   }
 
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
   CHECK( rcMv.highPrec, "Unexpected high precision MV." );
 #endif
   rcMv.set( iBestX, iBestY );
@@ -2315,7 +2338,7 @@ Void InterSearch::xTZSearch( const PredictionUnit& pu,
   }
 
   // write out best match
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
   CHECK( rcMv.highPrec, "Unexpected high precision MV." );
 #endif
   rcMv.set( cStruct.iBestX, cStruct.iBestY );
@@ -2464,7 +2487,7 @@ Void InterSearch::xTZSearchSelective( const PredictionUnit& pu,
   }
 
   // write out best match
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
   CHECK( rcMv.highPrec, "Unexpected high precision MV." );
 #endif
   rcMv.set( cStruct.iBestX, cStruct.iBestY );
@@ -2618,7 +2641,7 @@ Void InterSearch::xPatternSearchFracDIF(
   ruiCost = xPatternRefinement( cStruct.pcPatternKey, baseRefMv, 1, rcMvQter, !bIsLosslessCoded );
 }
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
 #if JVET_K0367_AFFINE_FIX_POINT
 #if ENABLE_SIMD_OPT_AFFINE_ME
 #ifdef TARGET_SIMD_X86
@@ -3609,7 +3632,11 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
               m_pcRdCost->setPredictor( secondPred );
             }
 #endif
+#if JEM_TOOLS
             uiBitsTemp += m_pcRdCost->getBitsOfVectorWithPredictor( cMvTemp[1][iRefIdxTemp][iVerIdx].getHor()>>shift, cMvTemp[1][iRefIdxTemp][iVerIdx].getVer()>>shift, 0 );
+#else
+            uiBitsTemp += m_pcRdCost->getBitsOfVectorWithPredictor( cMvTemp[1][iRefIdxTemp][iVerIdx].getHor() >> shift, cMvTemp[1][iRefIdxTemp][iVerIdx].getVer() >> shift );
+#endif
           }
           /*calculate the correct cost*/
           uiCostTemp += m_pcRdCost->getCost( uiBitsTemp );
@@ -4105,7 +4132,11 @@ Void InterSearch::xCheckBestAffineMVP( PredictionUnit &pu, AffineAMVPInfo &affin
       m_pcRdCost->setPredictor( secondPred );
     }
 #endif
+#if JEM_TOOLS
     iOrgMvBits += m_pcRdCost->getBitsOfVectorWithPredictor( acMv[iVerIdx].getHor()>>shift, acMv[iVerIdx].getVer()>>shift, 0 );
+#else
+    iOrgMvBits += m_pcRdCost->getBitsOfVectorWithPredictor( acMv[iVerIdx].getHor() >> shift, acMv[iVerIdx].getVer() >> shift );
+#endif
   }
   iOrgMvBits += m_auiMVPIdxCost[riMVPIdx][AMVP_MAX_NUM_CANDS];
 
@@ -4144,7 +4175,11 @@ Void InterSearch::xCheckBestAffineMVP( PredictionUnit &pu, AffineAMVPInfo &affin
         m_pcRdCost->setPredictor( secondPred );
       }
 #endif
+#if JEM_TOOLS
       iMvBits += m_pcRdCost->getBitsOfVectorWithPredictor( acMv[iVerIdx].getHor()>>shift, acMv[iVerIdx].getVer()>>shift, 0 );
+#else
+      iMvBits += m_pcRdCost->getBitsOfVectorWithPredictor( acMv[iVerIdx].getHor() >> shift, acMv[iVerIdx].getVer() >> shift );
+#endif
     }
     iMvBits += m_auiMVPIdxCost[iMVPIdx][AMVP_MAX_NUM_CANDS];
 
@@ -4283,7 +4318,11 @@ Void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
       m_pcRdCost->setPredictor( secondPred );
     }
 #endif
+#if JEM_TOOLS
     uiBitsBest += m_pcRdCost->getBitsOfVectorWithPredictor( acMvTemp[i].getHor()>>shift, acMvTemp[i].getVer()>>shift, 0 );
+#else
+    uiBitsBest += m_pcRdCost->getBitsOfVectorWithPredictor( acMvTemp[i].getHor() >> shift, acMvTemp[i].getVer() >> shift );
+#endif
     DTRACE( g_trace_ctx, D_COMMON, " (%d) yy uiBitsBest=%d\n", DTRACE_GET_COUNTER(g_trace_ctx,D_COMMON), uiBitsBest );
   }
   uiCostBest = (UInt)( floor( fWeight * (Double)uiCostBest ) + (Double)m_pcRdCost->getCost( uiBitsBest ) );
@@ -4591,7 +4630,11 @@ Void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
         m_pcRdCost->setPredictor( secondPred );
       }
 #endif
+#if JEM_TOOLS
       uiBitsTemp += m_pcRdCost->getBitsOfVectorWithPredictor( acMvTemp[i].getHor()>>shift, acMvTemp[i].getVer()>>shift, 0 );
+#else
+      uiBitsTemp += m_pcRdCost->getBitsOfVectorWithPredictor( acMvTemp[i].getHor() >> shift, acMvTemp[i].getVer() >> shift );
+#endif
     }
 
     uiCostTemp = (UInt)( floor( fWeight * (Double)uiCostTemp ) + (Double)m_pcRdCost->getCost( uiBitsTemp ) );
@@ -4701,7 +4744,7 @@ Void InterSearch::xExtDIFUpSamplingH( CPelBuf* pattern )
 
   const ChromaFormat chFmt = m_currChromaFormat;
 
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
   m_if.filterHor(COMPONENT_Y, srcPtr, srcStride, m_filteredBlockTmp[0][0], intStride, width + 1, height + filterSize, 0 << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, false, chFmt, clpRng);
   m_if.filterHor(COMPONENT_Y, srcPtr, srcStride, m_filteredBlockTmp[2][0], intStride, width + 1, height + filterSize, 2 << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, false, chFmt, clpRng);
 
@@ -4784,7 +4827,7 @@ Void InterSearch::xExtDIFUpSamplingQ( CPelBuf* pattern, Mv halfPelRef )
   {
     srcPtr += 1;
   }
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
   m_if.filterHor(COMPONENT_Y, srcPtr, srcStride, intPtr, intStride, width, extHeight, 1 << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, false, chFmt, clpRng);
 #else
   m_if.filterHor(COMPONENT_Y, srcPtr, srcStride, intPtr, intStride, width, extHeight, 1, false, chFmt, clpRng);
@@ -4801,7 +4844,7 @@ Void InterSearch::xExtDIFUpSamplingQ( CPelBuf* pattern, Mv halfPelRef )
   {
     srcPtr += 1;
   }
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
   m_if.filterHor(COMPONENT_Y, srcPtr, srcStride, intPtr, intStride, width, extHeight, 3 << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, false, chFmt, clpRng);
 #else
   m_if.filterHor(COMPONENT_Y, srcPtr, srcStride, intPtr, intStride, width, extHeight, 3, false, chFmt, clpRng);
@@ -4814,7 +4857,7 @@ Void InterSearch::xExtDIFUpSamplingQ( CPelBuf* pattern, Mv halfPelRef )
   {
     intPtr += intStride;
   }
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
   m_if.filterVer(COMPONENT_Y, intPtr, intStride, dstPtr, dstStride, width, height, 1 << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, false, true, chFmt, clpRng);
 #else
   m_if.filterVer(COMPONENT_Y, intPtr, intStride, dstPtr, dstStride, width, height, 1, false, true, chFmt, clpRng);
@@ -4823,7 +4866,7 @@ Void InterSearch::xExtDIFUpSamplingQ( CPelBuf* pattern, Mv halfPelRef )
   // Generate @ 3,1
   intPtr = m_filteredBlockTmp[1][0] + (halfFilterSize-1) * intStride;
   dstPtr = m_filteredBlock[3][1][0];
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
   m_if.filterVer(COMPONENT_Y, intPtr, intStride, dstPtr, dstStride, width, height, 3 << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, false, true, chFmt, clpRng);
 #else
   m_if.filterVer(COMPONENT_Y, intPtr, intStride, dstPtr, dstStride, width, height, 3, false, true, chFmt, clpRng);
@@ -4838,7 +4881,7 @@ Void InterSearch::xExtDIFUpSamplingQ( CPelBuf* pattern, Mv halfPelRef )
     {
       intPtr += intStride;
     }
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
     m_if.filterVer(COMPONENT_Y, intPtr, intStride, dstPtr, dstStride, width, height, 2 << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, false, true, chFmt, clpRng);
 #else
     m_if.filterVer(COMPONENT_Y, intPtr, intStride, dstPtr, dstStride, width, height, 2, false, true, chFmt, clpRng);
@@ -4851,7 +4894,7 @@ Void InterSearch::xExtDIFUpSamplingQ( CPelBuf* pattern, Mv halfPelRef )
     {
       intPtr += intStride;
     }
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
     m_if.filterVer(COMPONENT_Y, intPtr, intStride, dstPtr, dstStride, width, height, 2 << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, false, true, chFmt, clpRng);
 #else
     m_if.filterVer(COMPONENT_Y, intPtr, intStride, dstPtr, dstStride, width, height, 2, false, true, chFmt, clpRng);
@@ -4862,7 +4905,7 @@ Void InterSearch::xExtDIFUpSamplingQ( CPelBuf* pattern, Mv halfPelRef )
     // Generate @ 0,1
     intPtr = m_filteredBlockTmp[1][0] + halfFilterSize * intStride;
     dstPtr = m_filteredBlock[0][1][0];
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
     m_if.filterVer(COMPONENT_Y, intPtr, intStride, dstPtr, dstStride, width, height, 0 << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, false, true, chFmt, clpRng);
 #else
     m_if.filterVer(COMPONENT_Y, intPtr, intStride, dstPtr, dstStride, width, height, 0, false, true, chFmt, clpRng);
@@ -4871,7 +4914,7 @@ Void InterSearch::xExtDIFUpSamplingQ( CPelBuf* pattern, Mv halfPelRef )
     // Generate @ 0,3
     intPtr = m_filteredBlockTmp[3][0] + halfFilterSize * intStride;
     dstPtr = m_filteredBlock[0][3][0];
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
     m_if.filterVer(COMPONENT_Y, intPtr, intStride, dstPtr, dstStride, width, height, 0 << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, false, true, chFmt, clpRng);
 #else
     m_if.filterVer(COMPONENT_Y, intPtr, intStride, dstPtr, dstStride, width, height, 0, false, true, chFmt, clpRng);
@@ -4891,7 +4934,7 @@ Void InterSearch::xExtDIFUpSamplingQ( CPelBuf* pattern, Mv halfPelRef )
     {
       intPtr += intStride;
     }
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
     m_if.filterVer(COMPONENT_Y, intPtr, intStride, dstPtr, dstStride, width, height, 1 << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, false, true, chFmt, clpRng);
 #else
     m_if.filterVer(COMPONENT_Y, intPtr, intStride, dstPtr, dstStride, width, height, 1, false, true, chFmt, clpRng);
@@ -4908,7 +4951,7 @@ Void InterSearch::xExtDIFUpSamplingQ( CPelBuf* pattern, Mv halfPelRef )
     {
       intPtr += intStride;
     }
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
     m_if.filterVer(COMPONENT_Y, intPtr, intStride, dstPtr, dstStride, width, height, 3 << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, false, true, chFmt, clpRng);
 #else
     m_if.filterVer(COMPONENT_Y, intPtr, intStride, dstPtr, dstStride, width, height, 3, false, true, chFmt, clpRng);
@@ -4923,7 +4966,7 @@ Void InterSearch::xExtDIFUpSamplingQ( CPelBuf* pattern, Mv halfPelRef )
     {
       intPtr += intStride;
     }
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
     m_if.filterVer(COMPONENT_Y, intPtr, intStride, dstPtr, dstStride, width, height, 1 << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, false, true, chFmt, clpRng);
 #else
     m_if.filterVer(COMPONENT_Y, intPtr, intStride, dstPtr, dstStride, width, height, 1, false, true, chFmt, clpRng);
@@ -4936,7 +4979,7 @@ Void InterSearch::xExtDIFUpSamplingQ( CPelBuf* pattern, Mv halfPelRef )
     {
       intPtr += intStride;
     }
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
     m_if.filterVer(COMPONENT_Y, intPtr, intStride, dstPtr, dstStride, width, height, 3 << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, false, true, chFmt, clpRng);
 #else
     m_if.filterVer(COMPONENT_Y, intPtr, intStride, dstPtr, dstStride, width, height, 3, false, true, chFmt, clpRng);
@@ -4950,7 +4993,7 @@ Void InterSearch::xExtDIFUpSamplingQ( CPelBuf* pattern, Mv halfPelRef )
   {
     intPtr += intStride;
   }
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
   m_if.filterVer(COMPONENT_Y, intPtr, intStride, dstPtr, dstStride, width, height, 1 << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, false, true, chFmt, clpRng);
 #else
   m_if.filterVer(COMPONENT_Y, intPtr, intStride, dstPtr, dstStride, width, height, 1, false, true, chFmt, clpRng);
@@ -4959,7 +5002,7 @@ Void InterSearch::xExtDIFUpSamplingQ( CPelBuf* pattern, Mv halfPelRef )
   // Generate @ 3,3
   intPtr = m_filteredBlockTmp[3][0] + (halfFilterSize - 1) * intStride;
   dstPtr = m_filteredBlock[3][3][0];
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
   m_if.filterVer(COMPONENT_Y, intPtr, intStride, dstPtr, dstStride, width, height, 3 << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, false, true, chFmt, clpRng);
 #else
   m_if.filterVer(COMPONENT_Y, intPtr, intStride, dstPtr, dstStride, width, height, 3, false, true, chFmt, clpRng);
@@ -5705,6 +5748,9 @@ Void InterSearch::encodeResAndCalcRdInterCU(CodingStructure &cs, Partitioner &pa
     m_CABACEstimator->fruc_mrg_mode ( pu );
     m_CABACEstimator->affine_flag   ( cu );
 #endif
+#if !JEM_TOOLS && JVET_K_AFFINE
+    m_CABACEstimator->affine_flag( cu );
+#endif
     m_CABACEstimator->merge_idx     ( pu );
 #if !HM_LIC_MERGE_SKIP_AS_IN_JEM && JEM_TOOLS
     m_CABACEstimator->cu_lic_flag   ( cu );
@@ -5844,6 +5890,9 @@ UInt64 InterSearch::xGetSymbolFracBitsInter(CodingStructure &cs, Partitioner &pa
     m_CABACEstimator->cu_skip_flag  ( cu );
 #if JEM_TOOLS
     m_CABACEstimator->fruc_mrg_mode ( *cu.firstPU );
+    m_CABACEstimator->affine_flag   ( cu );
+#endif
+#if !JEM_TOOLS && JVET_K_AFFINE
     m_CABACEstimator->affine_flag   ( cu );
 #endif
     m_CABACEstimator->merge_idx     ( *cu.firstPU );

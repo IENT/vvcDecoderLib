@@ -1000,7 +1000,7 @@ const CtxSet ContextSetCfg::RefPic = ContextSetCfg::addCtxSet
   {  CNU, CNU,},
 });
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
 const CtxSet ContextSetCfg::AffineFlag = ContextSetCfg::addCtxSet
 ({
   {  197, 185, 201,},

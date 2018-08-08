@@ -56,7 +56,7 @@ struct AMVPInfo
   unsigned numCand;                       ///< number of motion vector predictor candidates
 };
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
 struct AffineAMVPInfo
 {
   Mv       mvCandLT[ AMVP_MAX_NUM_CANDS_MEM ];  ///< array of affine motion vector predictor candidates for left-top corner

@@ -829,7 +829,7 @@ void HLSyntaxReader::parseSPSNext( SPSNext& spsNext, const bool usePCM )
   READ_FLAG( symbol,    "high_precision_motion_vectors" );          spsNext.setUseHighPrecMv          ( symbol != 0 );
   READ_FLAG( symbol,    "bio_enable_flag" );                        spsNext.setUseBIO                 ( symbol != 0 );
 #endif
-#if !JEM_TOOLS && JVET_K0346
+#if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
   READ_FLAG( symbol,    "high_precision_motion_vectors"    );       spsNext.setUseHighPrecMv(symbol != 0);
 #endif
   READ_FLAG( symbol,    "disable_motion_compression_flag" );        spsNext.setDisableMotCompress     ( symbol != 0 );
@@ -850,6 +850,15 @@ void HLSyntaxReader::parseSPSNext( SPSNext& spsNext, const bool usePCM )
   }
 #endif
   READ_FLAG( symbol,    "adaptive_clipping_flag" );                 spsNext.setUseAClip               ( symbol != 0 );
+#endif
+#if !JEM_TOOLS && JVET_K_AFFINE
+  READ_FLAG( symbol,    "affine_flag" );                            spsNext.setUseAffine              ( symbol != 0 );
+#if JVET_K0337_AFFINE_6PARA
+  if ( spsNext.getUseAffine() )
+  {
+    READ_FLAG( symbol,  "affine_type_flag" );                       spsNext.setUseAffineType          ( symbol != 0 );
+  }
+#endif
 #endif
 #if JEM_TOOLS
   READ_FLAG( symbol,    "cipf_enabled_flag" );                      spsNext.setCIPFMode               ( symbol );

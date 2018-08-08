@@ -832,7 +832,7 @@ private:
   bool              m_highPrecMv;                 // 11
   bool              m_BIO;                        // 12
 #endif
-#if !JEM_TOOLS && JVET_K0346
+#if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
   bool              m_highPrecMv;
 #endif
   bool              m_DisableMotionCompression;   // 13
@@ -852,6 +852,12 @@ private:
   bool              m_AffineType;
 #endif
   bool              m_AClip;                      // 23
+#endif
+#if !JEM_TOOLS && JVET_K_AFFINE
+  bool              m_Affine;
+#if JVET_K0337_AFFINE_6PARA
+  bool              m_AffineType;
+#endif
 #endif
 #if JEM_TOOLS
   bool              m_CIPFEnabled;                // 24
@@ -975,6 +981,14 @@ public:
   bool      getUseAffineType      ()                                      const     { return m_AffineType; }
 #endif
 #endif
+#if !JEM_TOOLS && JVET_K_AFFINE
+  void      setUseAffine          ( bool b )                                        { m_Affine = b; }
+  bool      getUseAffine          ()                                      const     { return m_Affine; }
+#if JVET_K0337_AFFINE_6PARA
+  void      setUseAffineType      ( bool b )                                        { m_AffineType = b; }
+  bool      getUseAffineType      ()                                      const     { return m_AffineType; }
+#endif
+#endif
 #if JVET_K0072
 #else
 #if JEM_TOOLS
@@ -988,7 +1002,7 @@ public:
   void      setUseBIO             ( bool b )                                        { m_BIO = b; }
   bool      getUseBIO             ()                                      const     { return m_BIO; }
 #endif
-#if !JEM_TOOLS && JVET_K0346
+#if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
   void      setUseHighPrecMv(bool b) { m_highPrecMv = b; }
   bool      getUseHighPrecMv()                                      const { return m_highPrecMv; }
 #endif

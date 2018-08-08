@@ -332,7 +332,7 @@ public:
   static const CtxSet   DeltaQP;
   static const CtxSet   InterDir;
   static const CtxSet   RefPic;
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
   static const CtxSet   AffineFlag;
 #if JVET_K0337_AFFINE_6PARA
   static const CtxSet   AffineType;

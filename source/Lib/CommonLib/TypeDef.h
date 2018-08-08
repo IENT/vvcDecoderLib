@@ -78,6 +78,7 @@
 
 #define JVET_K0351_LESS_CONSTRAINT                        1 // Only disallow binary split with same orientation in center partition of the ternary split and release the other constraints in K0351.
 
+#define JVET_K_AFFINE                                     1
 #define JVET_K_AFFINE_REFACTOR                            1 // bit-exact AFFINE refactor, suggest to remove this macro when adopted
 #define JVET_K0367_AFFINE_FIX_POINT                       1 // bit-exact SIMD optimization for affine ME
 

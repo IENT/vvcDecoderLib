@@ -564,7 +564,7 @@ Void HLSWriter::codeSPSNext( const SPSNext& spsNext, const bool usePCM )
   WRITE_FLAG( spsNext.getUseHighPrecMv() ? 1 : 0,                                               "high_precision_motion_vectors" );
   WRITE_FLAG( spsNext.getUseBIO() ? 1 : 0,                                                      "bio_enable_flag" );
 #endif
-#if !JEM_TOOLS && JVET_K0346
+#if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
   WRITE_FLAG(spsNext.getUseHighPrecMv() ? 1 : 0,                                                "high_precision_motion_vectors");
 #endif
   WRITE_FLAG( spsNext.getDisableMotCompress() ? 1 : 0,                                          "disable_motion_compression_flag" );
@@ -587,6 +587,15 @@ Void HLSWriter::codeSPSNext( const SPSNext& spsNext, const bool usePCM )
   }
 #endif
   WRITE_FLAG( spsNext.getUseAClip() ? 1 : 0,                                                    "adaptive_clipping_flag" );
+#endif
+#if !JEM_TOOLS && JVET_K_AFFINE
+  WRITE_FLAG( spsNext.getUseAffine() ? 1 : 0,                                                   "affine_flag" );
+#if JVET_K0337_AFFINE_6PARA
+  if ( spsNext.getUseAffine() )
+  {
+    WRITE_FLAG( spsNext.getUseAffineType() ? 1 : 0,                                             "affine_type_flag" );
+  }
+#endif
 #endif
 #if JEM_TOOLS
   WRITE_FLAG( spsNext.getCIPFMode() ? 1 : 0,                                                    "cipf_enabled_flag" );

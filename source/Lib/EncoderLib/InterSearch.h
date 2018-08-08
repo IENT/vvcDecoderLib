@@ -160,7 +160,7 @@ public:
   Void copyState                    ( const InterSearch& other );
 #endif
 
-#if JEM_TOOLS && JVET_K0367_AFFINE_FIX_POINT
+#if JVET_K0367_AFFINE_FIX_POINT
   void ( *m_HorizontalSobelFilter ) (Pel *const pPred, const int predStride, int *const pDerivate, const int derivateBufStride, const int width, const int height);
 
   void( *m_VerticalSobelFilter   ) (Pel *const pPred, const int predStride, int *const pDerivate, const int derivateBufStride, const int width, const int height);
@@ -365,7 +365,7 @@ protected:
                                     Distortion&           ruiCost
                                   );
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
   Void xPredAffineInterSearch     ( PredictionUnit&       pu,
                                     PelUnitBuf&           origBuf,
                                     Int                   puIdx,

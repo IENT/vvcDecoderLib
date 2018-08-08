@@ -1752,7 +1752,7 @@ SPSNext::SPSNext( SPS& sps )
   , m_highPrecMv                ( false )
   , m_BIO                       ( false )
 #endif
-#if !JEM_TOOLS && JVET_K0346
+#if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
   , m_highPrecMv                ( false )
 #endif
   , m_DisableMotionCompression  ( false )
@@ -1772,6 +1772,12 @@ SPSNext::SPSNext( SPS& sps )
   , m_AffineType                ( false )
 #endif
   , m_AClip                     ( false )
+#endif
+#if !JEM_TOOLS && JVET_K_AFFINE
+  , m_Affine                    ( false )
+#if JVET_K0337_AFFINE_6PARA
+  , m_AffineType                ( false )
+#endif
 #endif
 #if JEM_TOOLS
   , m_CIPFEnabled               ( false )

@@ -226,7 +226,7 @@ Void InterPrediction::init( RdCost* pcRdCost, ChromaFormat chromaFormatIDC )
 #endif
 }
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
 Bool checkIdenticalMotion( const PredictionUnit &pu, bool checkAffine )
 #else
 Bool checkIdenticalMotion( const PredictionUnit &pu )
@@ -243,7 +243,7 @@ Bool checkIdenticalMotion( const PredictionUnit &pu )
 
       if( RefPOCL0 == RefPOCL1 )
       {
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
         if( !pu.cu->affine )
 #endif
         {
@@ -252,7 +252,7 @@ Bool checkIdenticalMotion( const PredictionUnit &pu )
             return true;
           }
         }
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
         else
         {
           CHECK( !checkAffine, "In this case, checkAffine should be on." );
@@ -296,7 +296,7 @@ Bool InterPrediction::xCheckIdenticalMotion( const PredictionUnit &pu )
 
       if( RefPOCL0 == RefPOCL1 )
       {
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
         if( !pu.cu->affine )
 #endif
         {
@@ -305,7 +305,7 @@ Bool InterPrediction::xCheckIdenticalMotion( const PredictionUnit &pu )
             return true;
           }
         }
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
         else
         {
           const CMotionBuf &mb = pu.getMotionBuf();
@@ -466,7 +466,7 @@ Void InterPrediction::xPredInterUni(const PredictionUnit& pu, const RefPicList& 
   Int iRefIdx = pu.refIdx[eRefPicList];
   Mv mv[3];
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
   if( pu.cu->affine )
   {
     CHECK( iRefIdx < 0, "iRefIdx incorrect." );
@@ -485,7 +485,7 @@ Void InterPrediction::xPredInterUni(const PredictionUnit& pu, const RefPicList& 
   {
     mv[0] = pu.mv[eRefPicList];
   }
-#if JEM_TOOLS && JVET_K_AFFINE_BUG_FIXES
+#if (JEM_TOOLS || JVET_K_AFFINE) && JVET_K_AFFINE_BUG_FIXES
   if ( !pu.cu->affine )
 #endif
   clipMv(mv[0], pu.cu->lumaPos(), sps);
@@ -499,6 +499,12 @@ Void InterPrediction::xPredInterUni(const PredictionUnit& pu, const RefPicList& 
     if( pu.cu->affine )
     {
       xPredAffineBlk( compID, pu, pu.cu->slice->getRefPic(eRefPicList, iRefIdx), mv, pcYuvPred, bi, pu.cu->slice->clpRng( compID ), bBIOApplied );
+    }
+    else
+#elif JVET_K_AFFINE
+    if ( pu.cu->affine )
+    {
+      xPredAffineBlk( compID, pu, pu.cu->slice->getRefPic( eRefPicList, iRefIdx ), mv, pcYuvPred, bi, pu.cu->slice->clpRng( compID ) );
     }
     else
 #endif
@@ -687,7 +693,7 @@ Void InterPrediction::xPredInterBlk ( const ComponentID& compID, const Predictio
 
   CHECKD( !pu.cs->sps->getSpsNext().getUseHighPrecMv() && ( ( xFrac & 3 ) != 0 ), "Invalid fraction" );
   CHECKD( !pu.cs->sps->getSpsNext().getUseHighPrecMv() && ( ( yFrac & 3 ) != 0 ), "Invalid fraction" );
-#elif JVET_K0346
+#elif JVET_K0346 || JVET_K_AFFINE
   const ChromaFormat  chFmt = pu.chromaFormat;
   const bool          rndRes = !bi;
 
@@ -805,8 +811,12 @@ Void InterPrediction::xPredInterBlk ( const ComponentID& compID, const Predictio
 #endif
 }
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
+#if !JEM_TOOLS
+Void InterPrediction::xPredAffineBlk( const ComponentID& compID, const PredictionUnit& pu, const Picture* refPic, const Mv* _mv, PelUnitBuf& dstPic, const Bool& bi, const ClpRng& clpRng )
+#else
 Void InterPrediction::xPredAffineBlk( const ComponentID& compID, const PredictionUnit& pu, const Picture* refPic, const Mv* _mv, PelUnitBuf& dstPic, const Bool& bi, const ClpRng& clpRng, const Bool& bBIOApplied /*= false*/ )
+#endif
 {
 #if JVET_K0337_AFFINE_6PARA
   if ( (pu.cu->affineType == AFFINEMODEL_6PARAM && _mv[0] == _mv[1] && _mv[0] == _mv[2])
@@ -819,9 +829,17 @@ Void InterPrediction::xPredAffineBlk( const ComponentID& compID, const Predictio
 #if JVET_K_AFFINE_BUG_FIXES
     Mv mvTemp = _mv[0];
     clipMv( mvTemp, pu.cu->lumaPos(), *pu.cs->sps );
+#if !JEM_TOOLS
+    xPredInterBlk( compID, pu, refPic, mvTemp, dstPic, bi, clpRng );
+#else
     xPredInterBlk( compID, pu, refPic, mvTemp, dstPic, bi, clpRng, bBIOApplied, false, FRUC_MERGE_OFF, true );
+#endif
+#else
+#if !JEM_TOOLS
+    xPredInterBlk( compID, pu, refPic, _mv[0], dstPic, bi, clpRng );
 #else
     xPredInterBlk( compID, pu, refPic, _mv[0], dstPic, bi, clpRng, bBIOApplied, false, FRUC_MERGE_OFF, true );
+#endif
 #endif
     return;
   }

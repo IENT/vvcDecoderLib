@@ -428,7 +428,7 @@ Void DecCu::xDecodeInterTexture(CodingUnit &cu)
   }
 }
 
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
 Void DecCu::xDeriveCUMV( CodingUnit &cu )
 {
   for( auto &pu : CU::traversePUs( cu ) )
@@ -450,7 +450,7 @@ Void DecCu::xDeriveCUMV( CodingUnit &cu )
       else
 #endif
       {
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
         if( pu.cu->affine )
         {
           pu.mergeIdx = 0;
@@ -476,6 +476,7 @@ Void DecCu::xDeriveCUMV( CodingUnit &cu )
         else
 #endif
         {
+#if JVET_K0346
           if( pu.cs->sps->getSpsNext().getUseSubPuMvp() )
           {
             Size bufSize = g_miScaling.scale( pu.lumaSize() );
@@ -484,6 +485,7 @@ Void DecCu::xDeriveCUMV( CodingUnit &cu )
             mrgCtx.subPuMvpExtMiBuf = MotionBuf( m_SubPuExtMiBuf, bufSize );
 #endif
           }
+#endif
 
           if( cu.cs->pps->getLog2ParallelMergeLevelMinus2() && cu.partSize != SIZE_2Nx2N && cu.lumaSize().width <= 8 )
           {
@@ -531,7 +533,7 @@ Void DecCu::xDeriveCUMV( CodingUnit &cu )
       else
 #endif
       {
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
         if( pu.cu->affine )
         {
           for ( UInt uiRefListIdx = 0; uiRefListIdx < 2; uiRefListIdx++ )
@@ -602,7 +604,7 @@ Void DecCu::xDeriveCUMV( CodingUnit &cu )
             if ( pu.cs->slice->getNumRefIdx( eRefList ) > 0 && ( pu.interDir & ( 1 << uiRefListIdx ) ) )
             {
               AMVPInfo amvpInfo;
-#if JEM_TOOLS              
+#if JEM_TOOLS
               PU::fillMvpCand( pu, eRefList, pu.refIdx[eRefList], amvpInfo, m_pcInterPred );
 #else
               PU::fillMvpCand(pu, eRefList, pu.refIdx[eRefList], amvpInfo);
@@ -610,7 +612,7 @@ Void DecCu::xDeriveCUMV( CodingUnit &cu )
               pu.mvpNum [eRefList] = amvpInfo.numCand;
               pu.mv     [eRefList] = amvpInfo.mvCand[pu.mvpIdx [eRefList]] + pu.mvd[eRefList];
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
               if( pu.cs->sps->getSpsNext().getUseAffine() )
               {
                 pu.mv[eRefList].setHighPrec();

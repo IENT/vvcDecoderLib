@@ -253,7 +253,7 @@ CodingUnit& CodingUnit::operator=( const CodingUnit& other )
   mtDepth           = other.mtDepth;
   splitSeries       = other.splitSeries;
   skip              = other.skip;
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
   affine            = other.affine;
 #if JVET_K0337_AFFINE_6PARA
   affineType        = other.affineType;
@@ -296,7 +296,7 @@ Void CodingUnit::initData()
   mtDepth           = 0;
   splitSeries       = 0;
   skip              = false;
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
   affine            = false;
 #if JVET_K0337_AFFINE_6PARA
   affineType        = 0;
@@ -357,7 +357,7 @@ Void PredictionUnit::initData()
     refIdx[i] = -1;
     mv[i]     .setZero();
     mvd[i]    .setZero();
-#if JEM_TOOLS && (JVET_K0220_ENC_CTRL || JVET_K_AFFINE_REFACTOR)
+#if JEM_TOOLS && (JVET_K0220_ENC_CTRL || JVET_K_AFFINE_REFACTOR) || JVET_K_AFFINE
     for( UInt j = 0; j < 3; j++ )
     {
       mvdAffi[i][j].setZero();
@@ -393,7 +393,7 @@ PredictionUnit& PredictionUnit::operator=(const InterPredictionData& predData)
     mv[i]       = predData.mv[i];
     mvd[i]      = predData.mvd[i];
     refIdx[i]   = predData.refIdx[i];
-#if JEM_TOOLS && (JVET_K0220_ENC_CTRL || JVET_K_AFFINE_REFACTOR)
+#if JEM_TOOLS && (JVET_K0220_ENC_CTRL || JVET_K_AFFINE_REFACTOR) || JVET_K_AFFINE
     for( UInt j = 0; j < 3; j++ )
     {
       mvdAffi[i][j] = predData.mvdAffi[i][j];
@@ -426,7 +426,7 @@ PredictionUnit& PredictionUnit::operator=( const PredictionUnit& other )
     mv[i]       = other.mv[i];
     mvd[i]      = other.mvd[i];
     refIdx[i]   = other.refIdx[i];
-#if JEM_TOOLS && (JVET_K0220_ENC_CTRL || JVET_K_AFFINE_REFACTOR)
+#if JEM_TOOLS && (JVET_K0220_ENC_CTRL || JVET_K_AFFINE_REFACTOR) || JVET_K_AFFINE
     for( UInt j = 0; j < 3; j++ )
     {
       mvdAffi[i][j] = other.mvdAffi[i][j];
