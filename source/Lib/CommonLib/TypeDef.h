@@ -59,6 +59,8 @@
 #define INTRA67_3MPM                                      1
 #endif
 
+#define JVET_K0500_WAIP                                   1 // Wide-Angle Intra Prediction
+
 #define JVET_K0072                                        1
 
 #define JVET_K0122                                        1 // CE3-related: Alternative techniques for DC mode without division
