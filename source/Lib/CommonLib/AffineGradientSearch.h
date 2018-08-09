@@ -31,106 +31,44 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*
- * \ingroup CommonLib
- * \file    InitX86.cpp
- * \brief   Initialize encoder SIMD functions.
+/**
+ * \file
+ * \brief Declaration of AffineGradientSearch class
  */
 
+#ifndef __AFFINEGRADIENTSEARCH__
+#define __AFFINEGRADIENTSEARCH__
 
-#include "CommonLib/CommonDef.h"
-#include "CommonLib/InterpolationFilter.h"
-#include "CommonLib/TrQuant.h"
-#include "CommonLib/RdCost.h"
-#include "CommonLib/Buffer.h"
+#include "CommonDef.h"
 
-#if JVET_K0367_AFFINE_FIX_POINT
-#include "CommonLib/AffineGradientSearch.h"
-#endif
+//! \ingroup CommonLib
+//! \{
+
+class AffineGradientSearch
+{
+public:
+  void( *m_HorizontalSobelFilter ) (Pel *const pPred, const int predStride, int *const pDerivate, const int derivateBufStride, const int width, const int height);
+
+  void( *m_VerticalSobelFilter ) (Pel *const pPred, const int predStride, int *const pDerivate, const int derivateBufStride, const int width, const int height);
+
+  void( *m_EqualCoeffComputer ) (Pel *pResidue, int residueStride, int **ppDerivate, int derivateBufStride, Int64( *pEqualCoeff )[7], int width, int height, bool b6Param);
+
+  static void xHorizontalSobelFilter( Pel *const pPred, const int predStride, int *const pDerivate, const int derivateBufStride, const int width, const int height );
+
+  static void xVerticalSobelFilter( Pel *const pPred, const int predStride, int *const pDerivate, const int derivateBufStride, const int width, const int height );
+
+  static void xEqualCoeffComputer( Pel *pResidue, int residueStride, int **ppDerivate, int derivateBufStride, Int64( *pEqualCoeff )[7], int width, int height, bool b6Param );
+
+  AffineGradientSearch();
+  ~AffineGradientSearch() {}
 
 #ifdef TARGET_SIMD_X86
-
-
-#if ENABLE_SIMD_OPT_MCIF
-Void InterpolationFilter::initInterpolationFilterX86( /*Int iBitDepthY, Int iBitDepthC*/ )
-{
-  auto vext = read_x86_extension_flags();
-  switch (vext){
-  case AVX512:
-  case AVX2:
-    _initInterpolationFilterX86<AVX2>(/*iBitDepthY, iBitDepthC*/);
-    break;
-  case AVX:
-  case SSE42:
-  case SSE41:
-    _initInterpolationFilterX86<SSE41>(/*iBitDepthY, iBitDepthC*/);
-    break;
-  default:
-    break;
-  }
-}
+  void initAffineGradientSearchX86();
+  template <X86_VEXT vext>
+  void _initAffineGradientSearchX86();
 #endif
+};
 
-#if ENABLE_SIMD_OPT_BUFFER
-Void PelBufferOps::initPelBufOpsX86()
-{
-  auto vext = read_x86_extension_flags();
-  switch (vext){
-    case AVX512:
-    case AVX2:
-      _initPelBufOpsX86<AVX2>();
-      break;
-    case AVX:
-    case SSE42:
-    case SSE41:
-      _initPelBufOpsX86<SSE41>();
-      break;
-    default:
-      break;
-  }
-}
-#endif
-
-
-
-
-#if ENABLE_SIMD_OPT_DIST
-Void RdCost::initRdCostX86()
-{
-  auto vext = read_x86_extension_flags();
-  switch (vext){
-    case AVX512:
-    case AVX2:
-      _initRdCostX86<AVX2>();
-      break;
-    case AVX:
-    case SSE42:
-    case SSE41:
-      _initRdCostX86<SSE41>();
-      break;
-    default:
-      break;
-  }
-}
-#endif
-
-#if ENABLE_SIMD_OPT_AFFINE_ME
-void AffineGradientSearch::initAffineGradientSearchX86()
-{
-  auto vext = read_x86_extension_flags();
-  switch ( vext ) {
-  case AVX512:
-  case AVX2:
-  case AVX:
-  case SSE42:
-  case SSE41:
-    _initAffineGradientSearchX86<SSE41>();
-    break;
-  default:
-    break;
-  }
-}
-#endif
+//! \}
 
 #endif
-

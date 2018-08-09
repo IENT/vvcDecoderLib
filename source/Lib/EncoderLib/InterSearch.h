@@ -53,6 +53,10 @@
 #include "CommonLib/BilateralFilter.h"
 #endif
 
+#if JVET_K0367_AFFINE_FIX_POINT
+#include "CommonLib/AffineGradientSearch.h"
+#endif
+
 //! \ingroup EncoderLib
 //! \{
 
@@ -67,7 +71,11 @@ static const UInt NUM_MV_PREDICTORS         = 3;
 class EncModeCtrl;
 
 /// encoder search class
+#if JVET_K0367_AFFINE_FIX_POINT
+class InterSearch : public InterPrediction, CrossComponentPrediction, AffineGradientSearch
+#else
 class InterSearch : public InterPrediction, CrossComponentPrediction
+#endif
 {
 private:
   EncModeCtrl     *m_modeCtrl;
@@ -158,27 +166,6 @@ public:
 
 #if ENABLE_SPLIT_PARALLELISM
   Void copyState                    ( const InterSearch& other );
-#endif
-
-#if JVET_K0367_AFFINE_FIX_POINT
-  void ( *m_HorizontalSobelFilter ) (Pel *const pPred, const int predStride, int *const pDerivate, const int derivateBufStride, const int width, const int height);
-
-  void( *m_VerticalSobelFilter   ) (Pel *const pPred, const int predStride, int *const pDerivate, const int derivateBufStride, const int width, const int height);
-
-  void( *m_EqualCoeffComputer    ) (Pel *pResidue, int residueStride, int **ppDerivate, int derivateBufStride, Int64( *pEqualCoeff )[7], int width, int height, bool b6Param);
-
-  static void xHorizontalSobelFilter (Pel *const pPred, const int predStride, int *const pDerivate, const int derivateBufStride, const int width, const int height );
-
-  static void xVerticalSobelFilter(Pel *const pPred, const int predStride, int *const pDerivate, const int derivateBufStride, const int width, const int height );
-
-  static void xEqualCoeffComputer (Pel *pResidue, int residueStride, int **ppDerivate, int derivateBufStride, Int64( *pEqualCoeff )[7], int width, int height, bool b6Param);
-
-#if ENABLE_SIMD_OPT_AFFINE_ME
-#ifdef TARGET_SIMD_X86
-  void initAffineMEFunctionX86();
-  void _initAffineMEFunctionX86();
-#endif
-#endif
 #endif
 
 protected:
