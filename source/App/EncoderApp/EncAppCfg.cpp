@@ -870,7 +870,7 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
       "\t4:  Enable LMChroma+ ELM (MMLM+MFLM)\n")
 #endif
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   ("EMT,-emt",                                        m_EMT,                                                0, "Enhanced Multiple Transform (EMT)\n"
     "\t0:  Disable EMT\n"
     "\t1:  Enable only Intra EMT\n"
@@ -1988,12 +1988,12 @@ Bool EncAppCfg::xCheckParameter()
     xConfirmPara( m_useSaveLoadEncInfo, "Encoder decision saving can only be applied when encoding with NEXT profile" );
     xConfirmPara( m_useSaveLoadSplitDecision, "Encoder split decision saving can only be applied when encoding with NEXT profile" );
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
     xConfirmPara( m_EMT, "EMT only allowed with NEXT profile" );
     xConfirmPara( m_FastEMT, "EMT only allowed with NEXT profile" );
-    xConfirmPara( m_FRUC, "FRUC is only allowed with NEXT profile" );
 #endif
 #if JEM_TOOLS
+    xConfirmPara( m_FRUC, "FRUC is only allowed with NEXT profile" );
     xConfirmPara( m_CIPF > 0, "CIPF is only allowed with NEXT profile" );
 #endif
 #if JEM_TOOLS
@@ -2419,10 +2419,9 @@ Bool EncAppCfg::xCheckParameter()
   {
     xConfirmPara( m_maxNumMergeCand > 5, "MaxNumMergeCand must be 5 or smaller." );
   }
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   xConfirmPara( m_EMT < 0 || m_EMT >3, "EMT must be 0, 1, 2 or 3" );
   xConfirmPara( m_FastEMT < 0 || m_FastEMT >3, "FEMT must be 0, 1, 2 or 3" );
-
 #endif
   if( m_usePCM)
   {
@@ -3306,7 +3305,7 @@ Void EncAppCfg::xPrintParameter()
 #if JVET_K0190
     msg( VERBOSE, "LMChroma:%d ", m_LMChroma );
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
     msg( VERBOSE, "EMT: %1d(intra) %1d(inter) ", m_EMT & 1, ( m_EMT >> 1 ) & 1 );
 #endif
 #if JEM_TOOLS
@@ -3351,6 +3350,8 @@ Void EncAppCfg::xPrintParameter()
 #if JEM_TOOLS
   if( m_LICMode > 0 ) msg( VERBOSE, "FastPicLevelLIC:%d ", m_FastPicLevelLIC );
   if( m_ImvMode == 2 ) msg( VERBOSE, "IMV4PelFast:%d ", m_Imv4PelFast );
+#endif
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   if( m_EMT ) msg( VERBOSE, "EMTFast: %1d(intra) %1d(inter) ", ( m_FastEMT & m_EMT & 1 ), ( m_FastEMT >> 1 ) & ( m_EMT >> 1 ) & 1 );
 #endif
   if( m_QTBT ) msg( VERBOSE, "AMaxBT:%d ", m_useAMaxBT );

@@ -372,7 +372,7 @@ public:
 #endif
   static const CtxSet   RdpcmFlag;
   static const CtxSet   RdpcmDir;
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   static const CtxSet   EMTTuIndex;
   static const CtxSet   EMTCuFlag;
 #endif

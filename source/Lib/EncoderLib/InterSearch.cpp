@@ -3951,7 +3951,7 @@ Void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &par
 #if ENABLE_BMS
     tu.depth          = currDepth;
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
     tu.emtIdx         = 0;
 #endif
 
@@ -3990,7 +3990,7 @@ Void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &par
       }
 
       checkTransformSkip[compID] = pps.getUseTransformSkip() && TU::hasTransformSkipFlag( *tu.cs, tu.blocks[compID] ) && !cs.isLossless;
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
       if( isLuma(compID) )
       {
         checkTransformSkip[compID]  &= !tu.cu->emtFlag;
@@ -4009,7 +4009,7 @@ Void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &par
       }
 
       const Int crossCPredictionModesToTest = preCalcAlpha != 0 ? 2 : 1;
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
       const Int numEmtTransformCandidates   = isLuma(compID) && tu.cu->emtFlag && sps.getSpsNext().getUseInterEMT() ? 4 : 1;
       const int numTransformCandidates      = checkTransformSkip[compID] ? ( numEmtTransformCandidates + 1 ) : numEmtTransformCandidates;
 #else
@@ -4033,7 +4033,7 @@ Void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &par
           m_CABACEstimator->getCtx() = ctxStart;
           m_CABACEstimator->resetBits();
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
           if( isLuma( compID ) ) tu.emtIdx = transformMode;
 #endif
           tu.transformSkip[compID]  = checkTransformSkip[compID] && transformMode == lastTransformModeIndex;
@@ -4318,7 +4318,7 @@ Void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &par
       xEstimateInterResidualQT(*csSplit, partitioner, bCheckFull ? nullptr : puiZeroDist);
 
       csSplit->cost = m_pcRdCost->calcRdCost( csSplit->fracBits, csSplit->dist );
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
       if( csFull && csSplit->cost >= csFull->cost && m_pcEncCfg->getFastInterEMT() )
       {
         break;
@@ -4331,7 +4331,7 @@ Void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &par
     unsigned        anyCbfSet   =   0;
     unsigned        compCbf[3]  = { 0, 0, 0 };
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
     bool isSplit = bCheckFull ? false : true;
     if( !bCheckFull || ( csSplit->cost < csFull->cost && m_pcEncCfg->getFastInterEMT() ) || !m_pcEncCfg->getFastInterEMT() )
 #else
@@ -4389,7 +4389,7 @@ Void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &par
       }
     }
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
     if( ( !isSplit && m_pcEncCfg->getFastInterEMT() ) || ( !m_pcEncCfg->getFastInterEMT() && !( !bCheckFull || ( anyCbfSet && csSplit->cost < csFull->cost ) ) ) )
 #else
     if( !( !bCheckFull || ( anyCbfSet && csSplit->cost < csFull->cost ) ) )

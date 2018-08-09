@@ -234,13 +234,19 @@ static const Int NUM_CHROMA_MODE =                                  5; ///< tota
 static const Int DM_CHROMA_IDX =                       NUM_INTRA_MODE; ///< chroma mode index for derived from luma intra mode
 
 static const UChar INTER_MODE_IDX =                               255; ///< index for inter modes
-#if JEM_TOOLS
+
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
 static const UInt  EMT_INTRA_MAX_CU =                              32; ///< Max Intra CU size applying EMT, supported values: 8, 16, 32, 64, 128
 static const UInt  EMT_INTER_MAX_CU =                              32; ///< Max Inter CU size applying EMT, supported values: 8, 16, 32, 64, 128
+#if JVET_K1000_SIMPLIFIED_EMT
+static const UInt  EMT_INTRA_MAX_CU_WITH_QTBT =                    32; ///< Max Intra CU size applying EMT, supported values: 8, 16, 32, 64, 128
+static const UInt  EMT_INTER_MAX_CU_WITH_QTBT =                    32; ///< Max Inter CU size applying EMT, supported values: 8, 16, 32, 64, 128
+#else
 static const UInt  EMT_INTRA_MAX_CU_WITH_QTBT =                    64; ///< Max Intra CU size applying EMT, supported values: 8, 16, 32, 64, 128
 static const UInt  EMT_INTER_MAX_CU_WITH_QTBT =                    64; ///< Max Inter CU size applying EMT, supported values: 8, 16, 32, 64, 128
-
 #endif
+#endif
+
 #if INTRA67_3MPM
 static const int NUM_MOST_PROBABLE_MODES = 3;
 #else
@@ -354,10 +360,10 @@ static const Int MAX_ENCODER_DEBLOCKING_QUALITY_LAYERS =           8 ;
 static const UInt LUMA_LEVEL_TO_DQP_LUT_MAXSIZE =                1024; ///< max LUT size for QP offset based on luma
 
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
 static const Int NUM_EMT_CU_FLAG_CTX =                              6;      ///< number of context models for EMT CU-level flag
-
 #endif
+
 //QTBT high level parameters
 //for I slice luma CTB configuration para.
 static const Int    MAX_BT_DEPTH  =                                 4;      ///<  <=7

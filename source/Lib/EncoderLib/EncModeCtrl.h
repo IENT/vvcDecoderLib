@@ -202,7 +202,7 @@ struct ComprCUCtx
     , extraFeatures (            )
     , extraFeaturesd(            )
     , bestInterCost ( MAX_DOUBLE )
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
     , bestEmtSize2Nx2N1stPass
                     ( MAX_DOUBLE )
     , skipSecondEMTPass
@@ -240,7 +240,7 @@ struct ComprCUCtx
   static_vector<Int64,  30>         extraFeatures;
   static_vector<double, 30>         extraFeaturesd;
   double                            bestInterCost;
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   double                            bestEmtSize2Nx2N1stPass;
   bool                              skipSecondEMTPass;
 #endif
@@ -327,7 +327,7 @@ public:
   double getBestInterCost             ()                  const { return m_ComprCUCtxList.back().bestInterCost;           }
   Distortion getInterHad              ()                  const { return m_ComprCUCtxList.back().interHad;                }
   void enforceInterHad                ( Distortion had )        {        m_ComprCUCtxList.back().interHad = had;          }
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   double getEmtSize2Nx2NFirstPassCost ()                  const { return m_ComprCUCtxList.back().bestEmtSize2Nx2N1stPass; }
   bool getSkipSecondEMTPass           ()                  const { return m_ComprCUCtxList.back().skipSecondEMTPass;       }
   void setSkipSecondEMTPass           ( bool b )                {        m_ComprCUCtxList.back().skipSecondEMTPass = b;   }

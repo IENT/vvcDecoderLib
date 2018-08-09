@@ -304,7 +304,7 @@ CoeffCodingContext::CoeffCodingContext(const TransformUnit& tu, ComponentID comp
   , m_altResiCompId             ( tu.cs->sps->getSpsNext().getAltResiCompId() )
 #endif
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   , m_emtNumSigCoeff            (0)
 #endif
 {

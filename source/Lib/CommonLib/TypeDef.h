@@ -50,10 +50,12 @@
 #include <assert.h>
 #include <cassert>
 
+#define JVET_K1000_SIMPLIFIED_EMT                         1 // EMT with only DCT-2, DCT-8 and DST-7
+
 #define DEBLOCKING_GRID_8x8                               1
 #define DB_TU_FIX                                         1 // fix in JVET_K0307, JVET-K0237, JVET-K0369, JVET-K0232, JVET-K0315
 
-#define JVET_K0190                                           1//Only Keep CCLM
+#define JVET_K0190                                        1 //Only Keep CCLM
 
 #ifndef INTRA67_3MPM  // JVET-K0529
 #define INTRA67_3MPM                                      1
@@ -410,6 +412,12 @@ enum QuantFlags
 enum TransType
 {
   DCT2 = 0,
+#if JVET_K1000_SIMPLIFIED_EMT
+  DCT8 = 1,
+  DST7 = 2,
+  NUM_TRANS_TYPE = 3,
+  DCT2_EMT = 4
+#else
   DCT5 = 1,
   DCT8 = 2,
   DST1 = 3,
@@ -417,6 +425,7 @@ enum TransType
   NUM_TRANS_TYPE = 5,
   DCT2_HEVC = 6,
   DCT2_EMT = 7
+#endif
 };
 
 enum RDPCMMode

@@ -2008,7 +2008,7 @@ Bool EncModeCtrlMTnoRQT::tryMode( const EncTestMode& encTestmode, const CodingSt
 #endif
         }
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
         sls.emtCuFlag  = bestCU->emtFlag;
         sls.emtTuIndex = bestCU->firstTU->emtIdx; //since this is the QTBT path, there is only one TU
 #endif
@@ -2051,7 +2051,7 @@ Bool EncModeCtrlMTnoRQT::useModeResult( const EncTestMode& encTestmode, CodingSt
   {
     cuECtx.set( BEST_TRIV_SPLIT_COST, tempCS->cost );
   }
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   else if( encTestmode.type == ETM_INTRA && encTestmode.partSize == SIZE_2Nx2N )
   {
     const CodingUnit cu = *tempCS->getCU( partitioner.chType );

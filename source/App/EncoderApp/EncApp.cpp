@@ -263,6 +263,8 @@ Void EncApp::xInitLibCfg()
 #if JEM_TOOLS
   m_cEncLib.setIntraPDPC                                         ( m_IntraPDPC );
   m_cEncLib.setALF                                               ( m_ALF );
+#endif
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   m_cEncLib.setIntraEMT                                          ( m_EMT & 1 );
   m_cEncLib.setFastIntraEMT                                      ( m_FastEMT & m_EMT & 1 );
   m_cEncLib.setInterEMT                                          ( ( m_EMT >> 1 ) & 1 );

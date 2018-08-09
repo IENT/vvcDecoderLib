@@ -193,7 +193,7 @@ public:
 #endif
   void        cu_qp_delta               ( const CodingUnit&             cu,       int               predQP, const SChar qp );
   void        cu_chroma_qp_offset       ( const CodingUnit&             cu );
-#if JEM_TOOLS && !HM_EMT_NSST_AS_IN_JEM
+#if (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT) && !HM_EMT_NSST_AS_IN_JEM
   void        cu_emt_pertu_idx          ( const CodingUnit&             cu );
 #endif
 
@@ -202,6 +202,8 @@ public:
   void        transform_skip_flag       ( const TransformUnit&          tu,       ComponentID       compID );
 #if JEM_TOOLS
   void        residual_nsst_mode        ( const CodingUnit&             cu,       CUCtx&            cuCtx  );
+#endif
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   void        emt_tu_index              ( const TransformUnit&          tu );
   void        emt_cu_flag               ( const CodingUnit&             cu );
 #endif
