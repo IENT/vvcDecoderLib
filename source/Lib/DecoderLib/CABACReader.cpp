@@ -2629,7 +2629,11 @@ void CABACReader::cu_qp_delta( CodingUnit& cu, int predQP, SChar& qp )
       DQp = -DQp;
     }
     int     qpBdOffsetY = cu.cs->sps->getQpBDOffset( CHANNEL_TYPE_LUMA );
+#if JVET_K0251_QP_EXT
+    qpY = ( (predQP + DQp + (MAX_QP + 1) + 2 * qpBdOffsetY) % ((MAX_QP + 1) + qpBdOffsetY)) - qpBdOffsetY;
+#else
     qpY = ( ( predQP + DQp + 52 + 2*qpBdOffsetY ) % (52 + qpBdOffsetY) ) - qpBdOffsetY;
+#endif
   }
   qp = (SChar)qpY;
 
