@@ -96,7 +96,6 @@ protected:
   int m_topRefLength;
   int m_leftRefLength;
 #endif
-
   // prediction
   Void xPredIntraPlanar           ( const CPelBuf &pSrc, PelBuf &pDst,                                                                                                         const SPS& sps );
   Void xPredIntraDc               ( const CPelBuf &pSrc, PelBuf &pDst, const ChannelType channelType,                                                                                          const bool enableBoundaryFilter = true );

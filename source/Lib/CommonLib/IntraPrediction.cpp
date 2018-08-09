@@ -152,8 +152,6 @@ Void IntraPrediction::init(ChromaFormat chromaFormatIDC, const unsigned bitDepth
 
   m_currChromaFormat = chromaFormatIDC;
 
-
-
   if (m_piYuvExt[COMPONENT_Y][PRED_BUF_UNFILTERED] == nullptr) // check if first is null (in which case, nothing initialised yet)
   {
     m_iYuvExtSize = (MAX_CU_SIZE * 2 + 1) * (MAX_CU_SIZE * 2 + 1);
