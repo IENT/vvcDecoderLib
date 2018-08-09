@@ -824,6 +824,15 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
 #endif
 #else
 #endif
+#if !JEM_TOOLS && JVET_K0346
+#if ENABLE_BMS
+  ("SubPuMvp",                                       m_SubPuMvpMode,                                       0, "Enable Sub-PU temporal motion vector prediction (0:off, 1:ATMVP, 2:STMVP, 3:ATMVP+STMVP)  [default: off]")
+#else
+  ("SubPuMvp",                                       m_SubPuMvpMode,                                       0, "Enable Sub-PU temporal motion vector prediction (0:off, 1:on)  [default: off]")
+#endif
+  ("SubPuMvpLog2Size",                               m_SubPuMvpLog2Size,                                   2u, "Sub-PU TMVP size index: 2^n")
+  ("HighPrecMv",                                     m_highPrecisionMv,                                 false, "High precision motion vectors for temporal merging (0:off, 1:on)  [default: off]")
+#endif
 #if JEM_TOOLS
   ("HighPrecMv",                                      m_highPrecisionMv,                                false, "High precision motion vectors for temporal merging (0:off, 1:on)  [default: off]")
   ("Affine",                                          m_Affine,                                         false, "Enable affine prediction (0:off, 1:on)  [default: off]")
@@ -846,12 +855,22 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
 #if JEM_TOOLS
   ("IntraPDPC",                                       m_IntraPDPC,                                          0, "Intra PDPC (0:off, 1:on Intra_PDPC, 2: on Planar_PDPC)  [default: off]\n")
   ("ALF",                                             m_ALF,                                                0, "ALF (0:off, 1:ALF, 2:GALF)\n")
-  ("LMChroma",                                        m_LMChroma,                                           0, " LMChroma prediction "
+#endif
+#if JVET_K0190
+  ("LMChroma",                                        m_LMChroma,                                           1, " LMChroma prediction "
                                                                                                                "\t0:  Disable LMChroma\n"
-                                                                                                               "\t1:  Enable LMChroma\n"
-                                                                                                               "\t2:  Enable LMChroma+ ELM (MMLM)\n"
-                                                                                                               "\t3:  Enable LMChroma+ ELM (MFLM)\n"
-                                                                                                               "\t4:  Enable LMChroma+ ELM (MMLM+MFLM)\n")
+                                                                                                               "\t1:  Enable LMChroma\n")
+#else
+#if JEM_TOOLS
+    ("LMChroma", m_LMChroma, 0, " LMChroma prediction "
+      "\t0:  Disable LMChroma\n"
+      "\t1:  Enable LMChroma\n"
+      "\t2:  Enable LMChroma+ ELM (MMLM)\n"
+      "\t3:  Enable LMChroma+ ELM (MFLM)\n"
+      "\t4:  Enable LMChroma+ ELM (MMLM+MFLM)\n")
+#endif
+#endif
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   ("EMT,-emt",                                        m_EMT,                                                0, "Enhanced Multiple Transform (EMT)\n"
     "\t0:  Disable EMT\n"
     "\t1:  Enable only Intra EMT\n"
@@ -1927,10 +1946,12 @@ Bool EncAppCfg::xCheckParameter()
 #endif
     xConfirmPara( m_Intra4Tap,  "Intra 4 Tap only allowed with NEXT profile" );
     xConfirmPara( m_IntraBoundaryFilter, "Intra boundary filter is only allowed with NEXT profile" );
+#endif
+#if JEM_TOOLS||JVET_K0190
     xConfirmPara( m_LMChroma, "LMChroma only allowed with NEXT profile" );
 #endif
     xConfirmPara( m_LargeCTU, "Large CTU is only allowed with NEXT profile" );
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
     xConfirmPara( m_SubPuMvpMode != 0, "Sub-PU motion vector prediction is only allowed with NEXT profile" );
 #endif
 #if JEM_TOOLS
@@ -1945,6 +1966,9 @@ Bool EncAppCfg::xCheckParameter()
     xConfirmPara( m_highPrecisionMv, "High precision MV for temporal merging can only be used with NEXT profile" );
     xConfirmPara( m_Affine, "Affine is only allowed with NEXT profile" );
     xConfirmPara( m_BIO, "BIO only allowed with NEXT profile" );
+#endif
+#if !JEM_TOOLS && JVET_K0346
+    xConfirmPara(m_highPrecisionMv, "High precision MV for temporal merging can only be used with NEXT profile");
 #endif
     xConfirmPara( m_DisableMotionCompression, "Disable motion data compression only allowed with NEXT profile" );
 #if JEM_TOOLS
@@ -1964,12 +1988,12 @@ Bool EncAppCfg::xCheckParameter()
     xConfirmPara( m_useSaveLoadEncInfo, "Encoder decision saving can only be applied when encoding with NEXT profile" );
     xConfirmPara( m_useSaveLoadSplitDecision, "Encoder split decision saving can only be applied when encoding with NEXT profile" );
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
     xConfirmPara( m_EMT, "EMT only allowed with NEXT profile" );
     xConfirmPara( m_FastEMT, "EMT only allowed with NEXT profile" );
-    xConfirmPara( m_FRUC, "FRUC is only allowed with NEXT profile" );
 #endif
 #if JEM_TOOLS
+    xConfirmPara( m_FRUC, "FRUC is only allowed with NEXT profile" );
     xConfirmPara( m_CIPF > 0, "CIPF is only allowed with NEXT profile" );
 #endif
 #if JEM_TOOLS
@@ -1986,7 +2010,7 @@ Bool EncAppCfg::xCheckParameter()
 #if ENABLE_WPP_PARALLELISM
     xConfirmPara( !m_AltDQPCoding && ( m_numWppThreads + m_numWppExtraLines ) > 1, "Wavefront parallel encoding only supported with AltDQPCoding" );
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
     xConfirmPara( m_SubPuMvpLog2Size < MIN_CU_LOG2,      "SubPuMvpLog2Size must be 2 or greater." );
     xConfirmPara( m_SubPuMvpLog2Size > 6,                "SubPuMvpLog2Size must be 6 or smaller." );
 #endif
@@ -2282,7 +2306,7 @@ Bool EncAppCfg::xCheckParameter()
   }
 
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
   if( m_SubPuMvpMode == 3 && m_maxNumMergeCand < 7 )
   {
     msg( WARNING, "****************************************************************************\n" );
@@ -2298,8 +2322,11 @@ Bool EncAppCfg::xCheckParameter()
     msg( WARNING, "****************************************************************************\n" );
   }
 #endif
-
+#if  JVET_K0251_QP_EXT
+  xConfirmPara( m_iQP < -6 * (m_internalBitDepth[CHANNEL_TYPE_LUMA] - 8) || m_iQP > MAX_QP, "QP exceeds supported range (-QpBDOffsety to 63)" );
+#else
   xConfirmPara( m_iQP < -6 * (m_internalBitDepth[CHANNEL_TYPE_LUMA] - 8) || m_iQP > MAX_QP, "QP exceeds supported range (-QpBDOffsety to 51)" );
+#endif
 #if W0038_DB_OPT
   xConfirmPara( m_deblockingFilterMetric!=0 && (m_bLoopFilterDisable || m_loopFilterOffsetInPPS), "If DeblockingFilterMetric is non-zero then both LoopFilterDisable and LoopFilterOffsetInPPS must be 0");
 #else
@@ -2382,7 +2409,7 @@ Bool EncAppCfg::xCheckParameter()
   xConfirmPara( m_uiMaxCUWidth < ( 1 << (m_quadtreeTULog2MinSize + m_uiQuadtreeTUMaxDepthIntra - 1) ), "QuadtreeTUMaxDepthInter must be less than or equal to the difference between log2(maxCUSize) and QuadtreeTULog2MinSize plus 1" );
 
   xConfirmPara(  m_maxNumMergeCand < 1,  "MaxNumMergeCand must be 1 or greater.");
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
   if( m_SubPuMvpMode != 0 )
   {
     xConfirmPara( m_maxNumMergeCand > 7, "MaxNumMergeCand must be 7 or smaller." );
@@ -2392,10 +2419,9 @@ Bool EncAppCfg::xCheckParameter()
   {
     xConfirmPara( m_maxNumMergeCand > 5, "MaxNumMergeCand must be 5 or smaller." );
   }
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   xConfirmPara( m_EMT < 0 || m_EMT >3, "EMT must be 0, 1, 2 or 3" );
   xConfirmPara( m_FastEMT < 0 || m_FastEMT >3, "FEMT must be 0, 1, 2 or 3" );
-
 #endif
   if( m_usePCM)
   {
@@ -2983,9 +3009,12 @@ Bool EncAppCfg::xCheckParameter()
 #endif
   xConfirmPara( m_decodeBitstreams[0] == m_bitstreamFileName, "Debug bitstream and the output bitstream cannot be equal.\n" );
   xConfirmPara( m_decodeBitstreams[1] == m_bitstreamFileName, "Decode2 bitstream and the output bitstream cannot be equal.\n" );
+#if JVET_K0190
+  xConfirmPara(unsigned(m_LMChroma) > 1, "LMMode exceeds range (0 to 1)");
+#else
 #if JEM_TOOLS
   xConfirmPara(unsigned(m_LMChroma) > 4, "ELMMode exceeds range (0 to 4)");
-
+#endif
 #endif
 #if EXTENSION_360_VIDEO
   check_failed |= m_ext360.verifyParameters();
@@ -3231,6 +3260,13 @@ Void EncAppCfg::xPrintParameter()
       msg( VERBOSE, "SubPuMvpLog2Size:%d ", m_SubPuMvpLog2Size );
     }
 #endif
+#if !JEM_TOOLS && JVET_K0346
+    msg(VERBOSE, "SubPuMvp:%d+%d ", m_SubPuMvpMode & 1, (m_SubPuMvpMode & 2) == 2);
+    if (m_SubPuMvpMode != 0)
+    {
+      msg(VERBOSE, "SubPuMvpLog2Size:%d ", m_SubPuMvpLog2Size);
+  }
+#endif
 #if JEM_TOOLS
     msg( VERBOSE, "CABACEngine:%d ", m_CABACEngineMode );
 #endif
@@ -3251,6 +3287,9 @@ Void EncAppCfg::xPrintParameter()
     msg( VERBOSE, "HighPrecMv:%d ", m_highPrecisionMv );
     msg( VERBOSE, "BIO:%d ", m_BIO );
 #endif
+#if !JEM_TOOLS && JVET_K0346
+    msg(VERBOSE, "HighPrecMv:%d ", m_highPrecisionMv);
+#endif
     msg( VERBOSE, "DisMDC:%d ", m_DisableMotionCompression );
 #if JEM_TOOLS
     msg( VERBOSE, "LICMode:%d ", m_LICMode );
@@ -3262,7 +3301,11 @@ Void EncAppCfg::xPrintParameter()
 #if JEM_TOOLS
     msg( VERBOSE, "IntraPDPC:%d ", m_IntraPDPC );
     msg( VERBOSE, "ALF:%d ", m_ALF );
+#endif
+#if JVET_K0190
     msg( VERBOSE, "LMChroma:%d ", m_LMChroma );
+#endif
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
     msg( VERBOSE, "EMT: %1d(intra) %1d(inter) ", m_EMT & 1, ( m_EMT >> 1 ) & 1 );
 #endif
 #if JEM_TOOLS
@@ -3307,6 +3350,8 @@ Void EncAppCfg::xPrintParameter()
 #if JEM_TOOLS
   if( m_LICMode > 0 ) msg( VERBOSE, "FastPicLevelLIC:%d ", m_FastPicLevelLIC );
   if( m_ImvMode == 2 ) msg( VERBOSE, "IMV4PelFast:%d ", m_Imv4PelFast );
+#endif
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   if( m_EMT ) msg( VERBOSE, "EMTFast: %1d(intra) %1d(inter) ", ( m_FastEMT & m_EMT & 1 ), ( m_FastEMT >> 1 ) & ( m_EMT >> 1 ) & 1 );
 #endif
   if( m_QTBT ) msg( VERBOSE, "AMaxBT:%d ", m_useAMaxBT );

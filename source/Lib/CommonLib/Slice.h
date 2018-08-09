@@ -813,6 +813,9 @@ private:
   bool              m_IntraBoundaryFilter;        // 6
   bool              m_SubPuMvp;                   // 7
 #endif
+#if !JEM_TOOLS && JVET_K0346
+  bool              m_SubPuMvp;
+#endif
 #if JEM_TOOLS
   bool              m_ModifiedCABACEngine;        // 8
 #endif
@@ -829,12 +832,19 @@ private:
   bool              m_highPrecMv;                 // 11
   bool              m_BIO;                        // 12
 #endif
+#if !JEM_TOOLS && JVET_K0346
+  bool              m_highPrecMv;
+#endif
   bool              m_DisableMotionCompression;   // 13
 #if JEM_TOOLS
   bool              m_LICEnabled;                 // 14
   bool              m_IntraPDPC;                  // 15
   bool              m_ALFEnabled;                 // 16
+#endif
+#if JEM_TOOLS||JVET_K0190
   bool              m_LMChroma;                   // 17
+#endif
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   bool              m_IntraEMT;                   // 18
   bool              m_InterEMT;                   // 19
 #endif
@@ -870,7 +880,7 @@ private:
   unsigned    m_maxBTDepth[3];
   unsigned    m_maxBTSize[3];
   unsigned    m_dualITree;
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
   // sub-pu merging
   unsigned    m_subPuLog2Size;
   int         m_subPuMrgMode;
@@ -907,8 +917,10 @@ private:
   unsigned    m_AClipQuant;
 #endif
 
-#if JEM_TOOLS
+#if JEM_TOOLS&&!JVET_K0190
   int         m_ELMMode;
+#endif
+#if JEM_TOOLS
   int         m_IntraPDPCMode;
 #endif
 #if JEM_TOOLS
@@ -948,6 +960,11 @@ public:
   bool      getUseATMVP           ()                                      const     { return ( m_subPuMrgMode & 1 ) == 1; }
   bool      getUseSTMVP           ()                                      const     { return ( m_subPuMrgMode & 2 ) == 2; }
 #endif
+#if !JEM_TOOLS && JVET_K0346
+  bool      getUseSubPuMvp()                                   const { return m_SubPuMvp; }
+  void      setSubPuMvpMode(int n)                             { m_subPuMrgMode = n; m_SubPuMvp = n != 0; }
+  bool      getUseATMVP()                                      const { return (m_subPuMrgMode & 1) == 1; }
+#endif
 #if JEM_TOOLS
   bool      getModifiedCABACEngine()                                      const     { return m_ModifiedCABACEngine; }
 #endif
@@ -970,6 +987,10 @@ public:
   void      setUseBIO             ( bool b )                                        { m_BIO = b; }
   bool      getUseBIO             ()                                      const     { return m_BIO; }
 #endif
+#if !JEM_TOOLS && JVET_K0346
+  void      setUseHighPrecMv(bool b) { m_highPrecMv = b; }
+  bool      getUseHighPrecMv()                                      const { return m_highPrecMv; }
+#endif
   void      setDisableMotCompress ( bool b )                                        { m_DisableMotionCompression = b; }
   bool      getDisableMotCompress ()                                      const     { return m_DisableMotionCompression; }
 #if JEM_TOOLS
@@ -988,9 +1009,11 @@ public:
   void      setGALFEnabled        ( bool b )                                        { m_GALFEnabled = b; }
   bool      getGALFEnabled        ()                                      const     { return m_GALFEnabled; }
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS||JVET_K0190
   void      setUseLMChroma        ( bool b )                                        { m_LMChroma = b; }
   bool      getUseLMChroma        ()                                      const     { return m_LMChroma; }
+#endif
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   void      setUseIntraEMT        ( bool b )                                        { m_IntraEMT = b; }
   bool      getUseIntraEMT        ()                                      const     { return m_IntraEMT; }
   void      setUseInterEMT        ( bool b )                                        { m_InterEMT = b; }
@@ -1045,7 +1068,7 @@ public:
   void      setUseDualITree       ( bool b )                                        { m_dualITree = b; }
   bool      getUseDualITree       ()                                      const     { return m_dualITree; }
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
   // sub pu tmvp
   void      setSubPuMvpLog2Size   ( unsigned    log2Size )                          { m_subPuLog2Size = log2Size; }
   unsigned  getSubPuMvpLog2Size   ()                                      const     { return m_subPuLog2Size; }
@@ -1094,11 +1117,13 @@ public:
   unsigned  getAClipQuant         ()                                      const     { return m_AClipQuant; }
 #endif
 #if JEM_TOOLS
+#if !JVET_K0190
   void      setELMMode            ( int m )                                         { m_ELMMode = m; }
   int       getELMMode()                                                  const     { return m_ELMMode; }
   bool      isELMModeMMLM()                                               const     { return 0 != (m_ELMMode & 1); }
   bool      isELMModeMFLM()                                               const     { return 0 != (m_ELMMode & 2); }
   int       getRealNumIntraMode()                                         const     { return 68 + (m_ELMMode & 1) + ((m_ELMMode & 2) << 1); }
+#endif
 #endif
 #if JEM_TOOLS
   void      setIntraPDPCMode      ( int n )                                         { m_IntraPDPCMode = n; }

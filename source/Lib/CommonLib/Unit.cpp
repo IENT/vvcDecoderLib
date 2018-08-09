@@ -264,11 +264,11 @@ CodingUnit& CodingUnit::operator=( const CodingUnit& other )
   qp                = other.qp;
   chromaQpAdj       = other.chromaQpAdj;
   rootCbf           = other.rootCbf;
-#if JEM_TOOLS
-  nsstIdx           = other.nsstIdx;
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   emtFlag           = other.emtFlag;
 #endif
 #if JEM_TOOLS
+  nsstIdx           = other.nsstIdx;
   LICFlag           = other.LICFlag;
 #endif
 #if HEVC_TILES_WPP
@@ -304,11 +304,11 @@ Void CodingUnit::initData()
   qp                = 0;
   chromaQpAdj       = 0;
   rootCbf           = true;
-#if JEM_TOOLS
-  nsstIdx           = 0;
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   emtFlag           = 0;
 #endif
 #if JEM_TOOLS
+  nsstIdx           = 0;
   LICFlag           = false;
 #endif
 #if HEVC_TILES_WPP
@@ -524,7 +524,7 @@ Void TransformUnit::initData()
 #if ENABLE_BMS
   depth              = 0;
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   emtIdx             = 0;
 #endif
 
@@ -563,7 +563,7 @@ TransformUnit& TransformUnit::operator=(const TransformUnit& other)
 #if ENABLE_BMS
   depth              = other.depth;
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   emtIdx             = other.emtIdx;
 #endif
   return *this;
@@ -591,7 +591,7 @@ Void TransformUnit::copyComponentFrom(const TransformUnit& other, const Componen
 #endif
   if( isLuma( i ) )
   {
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
     emtIdx         = other.emtIdx;
 #endif
   }
