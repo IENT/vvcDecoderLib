@@ -1568,10 +1568,10 @@ void CABACReader::intra_chroma_pred_modes( CodingUnit& cu )
     intra_chroma_pred_mode( *pu );
   }
 }
-
-#if JEM_TOOLS
+#if JEM_TOOLS||JVET_K0190
 bool CABACReader::intra_chroma_lmc_mode( PredictionUnit& pu )
 {
+#if JEM_TOOLS&&!JVET_K0190
   if ( pu.cs->sps->getSpsNext().getUseMDMS() )
   {
     if ( m_BinDecoder.decodeBin( Ctx::IPredMode[1]( 0 ) ) == 0 )
@@ -1603,6 +1603,7 @@ bool CABACReader::intra_chroma_lmc_mode( PredictionUnit& pu )
   }
   else
   {
+#endif
     int lmModeList[10];
     int maxSymbol = PU::getLMSymbolList(pu, lmModeList);
     int symbol    = unary_max_symbol( Ctx::IPredMode[1]( 2 ), Ctx::IPredMode[1]( 3 ), maxSymbol - 1 );
@@ -1611,12 +1612,13 @@ bool CABACReader::intra_chroma_lmc_mode( PredictionUnit& pu )
       pu.intraDir[1] = lmModeList[ symbol ];
       return true;
     }
+#if JEM_TOOLS&&!JVET_K0190
   }
-
+#endif
   return false;
 }
-
 #endif
+
 void CABACReader::intra_chroma_pred_mode( PredictionUnit& pu )
 {
   RExt__DECODER_DEBUG_BIT_STATISTICS_CREATE_SET_SIZE2( STATS__CABAC_BITS__INTRA_DIR_ANG, pu.cu->blocks[pu.chType].lumaSize(), CHANNEL_TYPE_CHROMA );
@@ -1636,7 +1638,7 @@ void CABACReader::intra_chroma_pred_mode( PredictionUnit& pu )
     }
   }
 
-#if JEM_TOOLS
+#if JEM_TOOLS||JVET_K0190
   // LM chroma mode
   if( pu.cs->sps->getSpsNext().getUseLMChroma() )
   {
@@ -1645,7 +1647,8 @@ void CABACReader::intra_chroma_pred_mode( PredictionUnit& pu )
       return;
     }
   }
-
+#endif
+#if JEM_TOOLS
   // chroma candidate index
   unsigned candId = 0;
   if( pu.cs->sps->getSpsNext().getUseMDMS() )
@@ -1675,7 +1678,7 @@ void CABACReader::intra_chroma_pred_mode( PredictionUnit& pu )
   PU::getIntraChromaCandModes( pu, chromaCandModes );
 
   CHECK( candId >= NUM_CHROMA_MODE, "Chroma prediction mode index out of bounds" );
-#if JEM_TOOLS
+#if JEM_TOOLS||JVET_K0190
   CHECK( PU::isLMCMode( chromaCandModes[ candId ] ), "The intra dir cannot be LM_CHROMA for this path" );
 #endif
   CHECK( chromaCandModes[ candId ] == DM_CHROMA_IDX, "The intra dir cannot be DM_CHROMA for this path" );
@@ -2641,7 +2644,11 @@ void CABACReader::cu_qp_delta( CodingUnit& cu, int predQP, SChar& qp )
       DQp = -DQp;
     }
     int     qpBdOffsetY = cu.cs->sps->getQpBDOffset( CHANNEL_TYPE_LUMA );
+#if JVET_K0251_QP_EXT
+    qpY = ( (predQP + DQp + (MAX_QP + 1) + 2 * qpBdOffsetY) % ((MAX_QP + 1) + qpBdOffsetY)) - qpBdOffsetY;
+#else
     qpY = ( ( predQP + DQp + 52 + 2*qpBdOffsetY ) % (52 + qpBdOffsetY) ) - qpBdOffsetY;
+#endif
   }
   qp = (SChar)qpY;
 

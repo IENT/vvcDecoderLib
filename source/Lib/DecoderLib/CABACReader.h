@@ -104,7 +104,7 @@ public:
 #endif
   void        intra_luma_pred_modes     ( CodingUnit&                   cu );
   void        intra_chroma_pred_modes   ( CodingUnit&                   cu );
-#if JEM_TOOLS
+#if JEM_TOOLS||JVET_K0190
   bool        intra_chroma_lmc_mode     ( PredictionUnit&               pu );
 #endif
   void        intra_chroma_pred_mode    ( PredictionUnit&               pu );

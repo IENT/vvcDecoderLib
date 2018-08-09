@@ -136,7 +136,11 @@ static const Double MAX_DOUBLE =                             1.7e+308; ///< max.
 static const Int MAX_GOP =                                         64; ///< max. value of hierarchical GOP size
 static const Int MAX_NUM_REF_PICS =                                16; ///< max. number of pictures used for reference
 static const Int MAX_NUM_REF =                                     16; ///< max. number of entries in picture reference list
+#if JVET_K0251_QP_EXT
+static const Int MAX_QP =                                          63;
+#else
 static const Int MAX_QP =                                          51;
+#endif
 static const Int NOT_VALID =                                       -1;
 
 static const Int AMVP_MAX_NUM_CANDS =                               2; ///< AMVP: advanced motion vector prediction - max number of final candidates
@@ -194,12 +198,17 @@ static const Int ADJ_DEQUANT_SHIFT =            ( ADJ_QUANT_SHIFT + 1 );
 static const Int RVM_VCEGAM10_M =                                   4;
 
 static const Int NUM_LUMA_MODE =                                   67; ///< Planar + DC + 65 directional mode (4*16 + 1)
+#if JVET_K0190
+static const Int NUM_LMC_MODE = 1; ///< LMC
+static const Int NUM_INTRA_MODE = (NUM_LUMA_MODE + NUM_LMC_MODE);
+#else
 #if JEM_TOOLS
 static const Int LM_FILTER_NUM =                                    4;
 static const Int NUM_LMC_MODE =                   (2 + LM_FILTER_NUM); ///< LMC + MMLM + MFLM(4)
 static const Int NUM_INTRA_MODE =      (NUM_LUMA_MODE + NUM_LMC_MODE);
 #else
 static const Int NUM_INTRA_MODE =                   NUM_LUMA_MODE + 1;
+#endif
 #endif
 
 static const Int NUM_DIR =           (((NUM_LUMA_MODE - 3) >> 2) + 1);
@@ -211,6 +220,13 @@ static const Int VER_IDX =                    (3 * (NUM_DIR - 1) + 2); ///< inde
 static const Int VDIA_IDX =                   (4 * (NUM_DIR - 1) + 2); ///< index for intra VDIAGONAL  mode
 static const Int NOMODE_IDX =                               MAX_UCHAR; ///< indicating uninitialized elements
 
+#if JVET_K0190
+static const Int NUM_CHROMA_MODE = (5 + NUM_LMC_MODE); ///< total number of chroma modes
+#if JEM_TOOLS
+static const Int NUM_DM_MODES = 5; ///< total number of chroma DM modes
+#endif
+static const Int LM_CHROMA_IDX = NUM_LUMA_MODE; ///< chroma mode index for derived from LM mode
+#else
 #if JEM_TOOLS
 static const Int NUM_CHROMA_MODE =                 (5 + NUM_LMC_MODE); ///< total number of chroma modes
 static const Int NUM_DM_MODES =                                     5; ///< total number of chroma DM modes
@@ -222,6 +238,7 @@ static const Int LM_CHROMA_F3_IDX =                 LM_CHROMA_IDX + 4;
 static const Int LM_CHROMA_F4_IDX =                 LM_CHROMA_IDX + 5;
 #else
 static const Int NUM_CHROMA_MODE =                                  5; ///< total number of chroma modes
+#endif
 #endif
 static const Int DM_CHROMA_IDX =                       NUM_INTRA_MODE; ///< chroma mode index for derived from luma intra mode
 
@@ -239,9 +256,13 @@ static const int NUM_MOST_PROBABLE_MODES = 3;
 static const Int NUM_MOST_PROBABLE_MODES = 3;
 static const Int NUM_MOST_PROBABLE_MODES_67 = 6;
 #endif
+#if JVET_K0190
+static const Int LM_SYMBOL_NUM = (1 + NUM_LMC_MODE);
+#else
 #if JEM_TOOLS
 static const Int MMLM_SAMPLE_NEIGHBOR_LINES =                       2;
 static const Int LM_SYMBOL_NUM =                   (1 + NUM_LMC_MODE);
+#endif
 #endif
 
 static const Int FAST_UDI_MAX_RDMODE_NUM =              NUM_LUMA_MODE; ///< maximum number of RD comparison in fast-UDI estimation loop

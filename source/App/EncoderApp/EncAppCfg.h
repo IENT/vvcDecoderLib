@@ -251,7 +251,11 @@ protected:
 #if JEM_TOOLS
   int       m_IntraPDPC;
   int       m_ALF;
+#endif
+#if JEM_TOOLS||JVET_K0190
   int       m_LMChroma;
+#endif
+#if JEM_TOOLS
   int       m_EMT;                                            ///< XZ: Enhanced Multiple Transform
   int       m_FastEMT;                                        ///< XZ: Fast Methods of Enhanced Multiple Transform
   bool      m_OBMC;
@@ -261,6 +265,7 @@ protected:
   unsigned  m_FRUCRefineRange;
   unsigned  m_FRUCSmallBlkRefineDepth;
 #endif
+
 #if JEM_TOOLS
   unsigned  m_CIPF;
 #endif

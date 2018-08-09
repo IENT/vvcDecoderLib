@@ -572,7 +572,11 @@ Void HLSWriter::codeSPSNext( const SPSNext& spsNext, const bool usePCM )
   WRITE_FLAG( spsNext.getLICEnabled() ? 1 : 0,                                                  "lic_enabled_flag" );
   WRITE_FLAG( spsNext.getUseIntraPDPC() ? 1 : 0,                                                "intra_pdpc_enable_flag" );
   WRITE_FLAG( spsNext.getALFEnabled() ? 1 : 0,                                                  "alf_enabled_flag" );
+#endif
+#if JEM_TOOLS||JVET_K0190
   WRITE_FLAG( spsNext.getUseLMChroma() ? 1 : 0,                                                 "lm_chroma_enabled_flag" );
+#endif
+#if JEM_TOOLS
   WRITE_FLAG( spsNext.getUseIntraEMT() ? 1 : 0,                                                 "emt_intra_enabled_flag" );
   WRITE_FLAG( spsNext.getUseInterEMT() ? 1 : 0,                                                 "emt_inter_enabled_flag" );
 #endif
@@ -694,12 +698,12 @@ Void HLSWriter::codeSPSNext( const SPSNext& spsNext, const bool usePCM )
   {
     WRITE_CODE( spsNext.getAClipQuant() / 2, 2,                                                 "aclip_quant" );
   }
-
+#if !JVET_K0190
   if( spsNext.getUseLMChroma() )
   {
     WRITE_UVLC( spsNext.getELMMode(),                                                           "elm_mode" );
   }
-
+#endif
   if( spsNext.getUseIntraPDPC() )
   {
     WRITE_FLAG( spsNext.getIntraPDPCMode() - 1,                                                 "planar_pdpc_flag" );

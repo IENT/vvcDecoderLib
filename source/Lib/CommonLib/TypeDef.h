@@ -53,9 +53,13 @@
 #define DEBLOCKING_GRID_8x8                               1
 #define DB_TU_FIX                                         1 // fix in JVET_K0307, JVET-K0237, JVET-K0369, JVET-K0232, JVET-K0315
 
+#define JVET_K0190                                           1//Only Keep CCLM
+
 #ifndef INTRA67_3MPM  // JVET-K0529
 #define INTRA67_3MPM                                      1
 #endif
+
+#define JVET_K0500_WAIP                                   1 // Wide-Angle Intra Prediction
 
 #define JVET_K0072                                        1
 
@@ -78,6 +82,7 @@
 
 #define JVET_K0351_LESS_CONSTRAINT                        1 // Only disallow binary split with same orientation in center partition of the ternary split and release the other constraints in K0351.
 
+#define JVET_K0251_QP_EXT                                 1 // Extending the QP parameter value range for coarse quantization 
 
 #define JVET_K_AFFINE                                     1
 #if JVET_K_AFFINE

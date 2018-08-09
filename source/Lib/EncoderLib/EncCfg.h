@@ -191,7 +191,7 @@ protected:
 #endif
   bool      m_IntraBoundaryFilter;
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS||JVET_K0190
   int       m_LMChroma;
 #endif
 #if JEM_TOOLS
@@ -681,10 +681,12 @@ public:
 #if JEM_TOOLS
   void      setUseIntraBoundaryFilter       ( bool b )       { m_IntraBoundaryFilter = b; }
   bool      getUseIntraBoundaryFilter       ()         const { return m_IntraBoundaryFilter; }
-
+#endif
+#if JEM_TOOLS||JVET_K0190
   void      setUseLMChroma                  ( int n )        { m_LMChroma = n; }
   int       getUseLMChroma()                           const { return m_LMChroma; }
-
+#endif
+#if JEM_TOOLS
   void      setSubPuMvpMode                 ( int n )       { m_SubPuMvpMode = n; }
   bool      getSubPuMvpMode                 ()         const { return m_SubPuMvpMode; }
   void      setSubPuMvpLog2Size             ( unsigned n )   { m_SubPuMvpLog2Size = n; }

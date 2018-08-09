@@ -43,9 +43,11 @@
 const int BilateralFilter::SpatialSigmaValue = 62;
 
 const int BilateralFilter::spatialSigmaBlockLengthOffsets[] = {20, 10, -10, 0, -10};
-
+#if JVET_K0251_QP_EXT
+const unsigned short maxPosList[46] = {6, 12, 18, 23, 29, 35, 41, 46, 52, 58, 64, 69, 75, 81, 87, 92, 98, 104, 110, 115, 121, 127, 133, 138, 144, 150, 156, 161, 167, 173, 179, 184, 190, 196, 202, 207, 213, 219, 225, 230, 236, 242, 248, 253, 259, 265 };
+#else
 const unsigned short maxPosList[34] = {6, 12, 18, 23, 29, 35, 41, 46, 52, 58, 64, 69, 75, 81, 87, 92, 98, 104, 110, 115, 121, 127, 133, 138, 144, 150, 156, 161, 167, 173, 179, 184, 190, 196};
-
+#endif
 BilateralFilter::BilateralFilter()
 {
   int numQP = MAX_QP-18+1;

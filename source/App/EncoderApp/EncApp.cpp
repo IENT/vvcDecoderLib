@@ -263,7 +263,7 @@ Void EncApp::xInitLibCfg()
   m_cEncLib.setFastPicLevelLIC                                   ( m_LICMode ? m_FastPicLevelLIC : false );
 #endif
   m_cEncLib.setMTTMode                                           ( m_MTT );
-#if JEM_TOOLS
+#if JEM_TOOLS||JVET_K0190
   m_cEncLib.setUseLMChroma                                       ( m_LMChroma );
 #endif
 #if ENABLE_WPP_PARALLELISM
