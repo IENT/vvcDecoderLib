@@ -82,7 +82,7 @@ private:
   Pel*   m_pLumaRecBufferMul[LM_FILTER_NUM];
 #endif
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS && !JVET_K0063_PDPC_SIMP
   // copy unfiltered ref. samples to line buffer
   Pel                    m_piTempRef[4 * MAX_CU_SIZE + 1];
   Pel                    m_piFiltRef[4 * MAX_CU_SIZE + 1];
