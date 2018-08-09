@@ -1764,7 +1764,7 @@ SPSNext::SPSNext( SPS& sps )
 #if JEM_TOOLS||JVET_K0190
   , m_LMChroma                  ( false )
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   , m_IntraEMT                  ( false )
   , m_InterEMT                  ( false )
 #endif

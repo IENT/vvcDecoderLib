@@ -65,8 +65,22 @@ struct coeffGroupRDStats
   Double d64SigCost_0;
 };
 
-#if JEM_TOOLS
-FwdTrans *fastFwdTrans[5][7] =
+#if JVET_K1000_SIMPLIFIED_EMT
+FwdTrans *fastFwdTrans[NUM_TRANS_TYPE][g_numTransformMatrixSizes] =
+{
+  { fastForwardDCT2_B2, fastForwardDCT2_B4, fastForwardDCT2_B8, fastForwardDCT2_B16, fastForwardDCT2_B32, fastForwardDCT2_B64 },
+  { nullptr,            fastForwardDCT8_B4, fastForwardDCT8_B8, fastForwardDCT8_B16, fastForwardDCT8_B32, nullptr },
+  { nullptr,            fastForwardDST7_B4, fastForwardDST7_B8, fastForwardDST7_B16, fastForwardDST7_B32, nullptr },
+};
+
+InvTrans *fastInvTrans[NUM_TRANS_TYPE][g_numTransformMatrixSizes] =
+{
+  { fastInverseDCT2_B2, fastInverseDCT2_B4, fastInverseDCT2_B8, fastInverseDCT2_B16, fastInverseDCT2_B32, fastInverseDCT2_B64 },
+  { nullptr,            fastInverseDCT8_B4, fastInverseDCT8_B8, fastInverseDCT8_B16, fastInverseDCT8_B32, nullptr },
+  { nullptr,            fastInverseDST7_B4, fastInverseDST7_B8, fastInverseDST7_B16, fastInverseDST7_B32, nullptr },
+};
+#elif JEM_TOOLS
+FwdTrans *fastFwdTrans[NUM_TRANS_TYPE][g_numTransformMatrixSizes] =
 {
   { fastForwardDCT2_B2, fastForwardDCT2_B4, fastForwardDCT2_B8, fastForwardDCT2_B16, fastForwardDCT2_B32, fastForwardDCT2_B64, fastForwardDCT2_B128 },
   { NULL,               fastForwardDCT5_B4, fastForwardDCT5_B8, fastForwardDCT5_B16, fastForwardDCT5_B32, fastForwardDCT5_B64, fastForwardDCT5_B128 },
@@ -75,7 +89,7 @@ FwdTrans *fastFwdTrans[5][7] =
   { NULL,               fastForwardDST7_B4, fastForwardDST7_B8, fastForwardDST7_B16, fastForwardDST7_B32, fastForwardDST7_B64, fastForwardDST7_B128 },
 };
 
-InvTrans *fastInvTrans[5][7] =
+InvTrans *fastInvTrans[NUM_TRANS_TYPE][g_numTransformMatrixSizes] =
 {
   { fastInverseDCT2_B2, fastInverseDCT2_B4, fastInverseDCT2_B8, fastInverseDCT2_B16, fastInverseDCT2_B32, fastInverseDCT2_B64, fastInverseDCT2_B128 },
   { NULL,               fastInverseDCT5_B4, fastInverseDCT5_B8, fastInverseDCT5_B16, fastInverseDCT5_B32, fastInverseDCT5_B64, fastInverseDCT5_B128 },
@@ -101,7 +115,11 @@ void xITrMxN( const int bitDepth, const TCoeff *coeff, Pel *residual, size_t str
 #endif
 
 
+#if JVET_K1000_SIMPLIFIED_EMT
+TrQuant::TrQuant() : m_quant( nullptr )
+#else
 TrQuant::TrQuant() : m_quant( nullptr ), m_fTr( xTrMxN ), m_fITr( xITrMxN )
+#endif
 {
   // allocate temporary buffers
   m_plTempCoeff   = (TCoeff*) xMalloc( TCoeff, MAX_CU_SIZE * MAX_CU_SIZE );
@@ -132,7 +150,7 @@ void TrQuant::copyState( const TrQuant& other )
 }
 #endif
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT 
 #if HEVC_USE_4x4_DSTVII
 void xTrMxN_EMT( const Int bitDepth, const Pel *residual, size_t stride, TCoeff *coeff, Int iWidth, Int iHeight, bool useDST, const int maxLog2TrDynamicRange,
 #else
@@ -207,8 +225,13 @@ void xTrMxN_EMT( const Int bitDepth, const Pel *residual, size_t stride, TCoeff 
     nTrIdxVer = g_aiTrSubsetInter[ucTrIdx >> 1];
   }
 
+#if JVET_K1000_SIMPLIFIED_EMT
+  fastFwdTrans[nTrIdxHor][transformWidthIndex](block, tmp, shift_1st, iHeight, 0, iSkipWidth);
+  fastFwdTrans[nTrIdxVer][transformHeightIndex](tmp, coeff, shift_2nd, iWidth, iSkipWidth, iSkipHeight);
+#else
   fastFwdTrans[nTrIdxHor][transformWidthIndex](block, tmp, shift_1st, iHeight, 0, iSkipWidth, 1);
   fastFwdTrans[nTrIdxVer][transformHeightIndex](tmp, coeff, shift_2nd, iWidth, iSkipWidth, iSkipHeight, 1);
+#endif
 }
 
 /** MxN inverse transform (2D)
@@ -283,8 +306,13 @@ void xITrMxN_EMT( const Int bitDepth, const TCoeff *coeff, Pel *residual, size_t
     nTrIdxVer = g_aiTrSubsetInter[ucTrIdx >> 1];
   }
 
+#if JVET_K1000_SIMPLIFIED_EMT
+  fastInvTrans[nTrIdxVer][transformHeightIndex](coeff, tmp, shift_1st, iWidth, uiSkipWidth, uiSkipHeight, clipMinimum, clipMaximum);
+  fastInvTrans[nTrIdxHor][transformWidthIndex](tmp, block, shift_2nd, iHeight, 0, uiSkipWidth, clipMinimum, clipMaximum);
+#else
   fastInvTrans[nTrIdxVer][transformHeightIndex](coeff, tmp, shift_1st, iWidth, uiSkipWidth, uiSkipHeight, 1, clipMinimum, clipMaximum);
   fastInvTrans[nTrIdxHor][transformWidthIndex](tmp, block, shift_2nd, iHeight, 0, uiSkipWidth, 1, clipMinimum, clipMaximum);
+#endif
 
   for( Int y = 0; y < iHeight; y++ )
   {
@@ -295,6 +323,8 @@ void xITrMxN_EMT( const Int bitDepth, const TCoeff *coeff, Pel *residual, size_t
   }
 }
 #endif
+
+#if !JVET_K1000_SIMPLIFIED_EMT
 
 /** MxN forward transform (2D)
 *  \param bitDepth              [in]  bit depth
@@ -503,6 +533,7 @@ void xITrMxN( const int bitDepth, const TCoeff *coeff, Pel *residual, size_t str
   }
 }
 
+#endif // !JVET_K1000_SIMPLIFIED_EMT
 
 
 Void TrQuant::xDeQuant(const TransformUnit &tu,
@@ -1025,6 +1056,29 @@ void TrQuant::xT( const TransformUnit &tu, const ComponentID &compID, const CPel
 #if HEVC_USE_4x4_DSTVII
   const bool     useDST          = TU::useDST( tu, compID );
 #endif
+
+#if JVET_K1000_SIMPLIFIED_EMT
+  const unsigned ucMode          = getEmtMode ( tu, compID );
+  const unsigned ucTrIdx         = getEmtTrIdx( tu, compID );
+
+#if INTRA67_3MPM
+#if HEVC_USE_4x4_DSTVII
+  xTrMxN_EMT(channelBitDepth, resi.buf, resi.stride, dstCoeff.buf, iWidth, iHeight, useDST, maxLog2TrDynamicRange, ucMode, ucTrIdx
+#else
+  xTrMxN_EMT(channelBitDepth, resi.buf, resi.stride, dstCoeff.buf, iWidth, iHeight, maxLog2TrDynamicRange, ucMode, ucTrIdx
+#endif
+#else
+#if HEVC_USE_4x4_DSTVII
+  xTrMxN_EMT( channelBitDepth, resi.buf, resi.stride, dstCoeff.buf, iWidth, iHeight, useDST, maxLog2TrDynamicRange, ucMode, ucTrIdx, m_use65IntraModes
+#else
+  xTrMxN_EMT( channelBitDepth, resi.buf, resi.stride, dstCoeff.buf, iWidth, iHeight, maxLog2TrDynamicRange, ucMode, ucTrIdx, m_use65IntraModes
+#endif
+#endif
+    , m_rectTUs
+    );
+
+#else
+
 #if JEM_TOOLS
   const unsigned ucMode          = getEmtMode ( tu, compID );
   const unsigned ucTrIdx         = getEmtTrIdx( tu, compID );
@@ -1056,6 +1110,7 @@ void TrQuant::xT( const TransformUnit &tu, const ComponentID &compID, const CPel
     m_fTr     ( channelBitDepth, resi.buf, resi.stride, dstCoeff.buf, iWidth, iHeight, maxLog2TrDynamicRange );
 #endif
   }
+#endif
 }
 
 /** Wrapper function between HM interface and core NxN inverse transform (2D)
@@ -1067,6 +1122,38 @@ void TrQuant::xIT( const TransformUnit &tu, const ComponentID &compID, const CCo
 #if HEVC_USE_4x4_DSTVII
   const bool     useDST          = TU::useDST( tu, compID );
 #endif
+
+#if JVET_K1000_SIMPLIFIED_EMT
+  const unsigned ucMode          = getEmtMode ( tu, compID );
+  const unsigned ucTrIdx         = getEmtTrIdx( tu, compID );
+
+  Int iSkipWidth = 0, iSkipHeight = 0;
+
+  if( m_rectTUs )
+  {
+    iSkipWidth  = ( pCoeff.width  > JVET_C0024_ZERO_OUT_TH ? pCoeff.width  - JVET_C0024_ZERO_OUT_TH : 0 );
+    iSkipHeight = ( pCoeff.height > JVET_C0024_ZERO_OUT_TH ? pCoeff.height - JVET_C0024_ZERO_OUT_TH : 0 );
+  }
+  else if( ( ( ucMode == INTER_MODE_IDX || pCoeff.width == 64 ) && ucTrIdx != DCT2_EMT && pCoeff.width >= JVET_C0024_ZERO_OUT_TH ) || ( ucTrIdx == DCT2_EMT && pCoeff.width == 64 ) )
+  {
+    iSkipWidth  = pCoeff.width  >> 1;
+    iSkipHeight = pCoeff.height >> 1;
+  }
+#if INTRA67_3MPM
+#if HEVC_USE_4x4_DSTVII
+  xITrMxN_EMT(channelBitDepth, pCoeff.buf, pResidual.buf, pResidual.stride, pCoeff.width, pCoeff.height, iSkipWidth, iSkipHeight, useDST, maxLog2TrDynamicRange, ucMode, ucTrIdx );
+#else
+  xITrMxN_EMT(channelBitDepth, pCoeff.buf, pResidual.buf, pResidual.stride, pCoeff.width, pCoeff.height, iSkipWidth, iSkipHeight, maxLog2TrDynamicRange, ucMode, ucTrIdx );
+#endif
+#else
+#if HEVC_USE_4x4_DSTVII
+  xITrMxN_EMT( channelBitDepth, pCoeff.buf, pResidual.buf, pResidual.stride, pCoeff.width, pCoeff.height, iSkipWidth, iSkipHeight, useDST, maxLog2TrDynamicRange, ucMode, ucTrIdx, m_use65IntraModes );
+#else
+  xITrMxN_EMT( channelBitDepth, pCoeff.buf, pResidual.buf, pResidual.stride, pCoeff.width, pCoeff.height, iSkipWidth, iSkipHeight, maxLog2TrDynamicRange, ucMode, ucTrIdx, m_use65IntraModes );
+#endif
+#endif
+
+#else
 
 #if JEM_TOOLS
   const unsigned ucMode          = getEmtMode ( tu, compID );
@@ -1109,6 +1196,7 @@ void TrQuant::xIT( const TransformUnit &tu, const ComponentID &compID, const CCo
     m_fITr     ( channelBitDepth, pCoeff.buf, pResidual.buf, pResidual.stride, pCoeff.width, pCoeff.height,                          maxLog2TrDynamicRange );
 #endif
   }
+#endif
 }
 
 /** Wrapper function between HM interface and core NxN transform skipping
@@ -1172,10 +1260,14 @@ Void TrQuant::xQuant(TransformUnit &tu, const ComponentID &compID, const CCoeffB
   m_quant->quant( tu, compID, pSrc, uiAbsSum, cQP, ctx );
 }
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
 UChar TrQuant::getEmtTrIdx(TransformUnit tu, const ComponentID compID)
 {
+#if JVET_K1000_SIMPLIFIED_EMT
+  UChar ucTrIdx = DCT2_EMT;
+#else
   UChar ucTrIdx = DCT2_HEVC;
+#endif
 
   if( compID == COMPONENT_Y )
   {

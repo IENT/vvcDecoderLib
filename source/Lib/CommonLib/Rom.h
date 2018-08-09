@@ -74,6 +74,11 @@ extern       UInt   g_auiCoefTopLeftDiagScan8x8[ MAX_CU_SIZE / 2 + 1 ][64];
 extern const Int g_quantScales   [SCALING_LIST_REM_NUM];          // Q(QP%6)
 extern const Int g_invQuantScales[SCALING_LIST_REM_NUM];          // IQ(QP%6)
 
+#if JVET_K1000_SIMPLIFIED_EMT
+static const Int g_numTransformMatrixSizes = 6;
+static const Int g_transformMatrixShift[TRANSFORM_NUMBER_OF_DIRECTIONS] = {  6, 6 };
+#else
+static const Int g_numTransformMatrixSizes = 7;
 #if RExt__HIGH_PRECISION_FORWARD_TRANSFORM
 static const Int g_transformMatrixShift[TRANSFORM_NUMBER_OF_DIRECTIONS] = { 14, 6 };
 #else
@@ -87,6 +92,8 @@ extern const TMatrixCoeff g_aiT16 [TRANSFORM_NUMBER_OF_DIRECTIONS][ 16][ 16];
 extern const TMatrixCoeff g_aiT32 [TRANSFORM_NUMBER_OF_DIRECTIONS][ 32][ 32];
 extern const TMatrixCoeff g_aiT64 [TRANSFORM_NUMBER_OF_DIRECTIONS][ 64][ 64];
 extern const TMatrixCoeff g_aiT128[TRANSFORM_NUMBER_OF_DIRECTIONS][128][128];
+#endif
+
 
 // ====================================================================================================================
 // Luma QP to Chroma QP mapping
@@ -149,9 +156,9 @@ extern const int g_pdpcParam[5][6];
 
 #if HEVC_USE_4x4_DSTVII
 extern const TMatrixCoeff g_as_DST_MAT_4 [TRANSFORM_NUMBER_OF_DIRECTIONS][4][4];
-
 #endif
-#if JEM_TOOLS
+
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
 extern const Int g_aiTrSubsetIntra[3][2];
 extern const Int g_aiTrSubsetInter[4];
 
@@ -162,15 +169,18 @@ extern const UChar g_aucTrSetVert35[35];
 extern const UChar g_aucTrSetHorz35[35];
 
 extern const UInt g_EmtSigNumThr;
-
 #endif
+
 extern TMatrixCoeff g_aiTr2   [NUM_TRANS_TYPE][  2][  2];
 extern TMatrixCoeff g_aiTr4   [NUM_TRANS_TYPE][  4][  4];
 extern TMatrixCoeff g_aiTr8   [NUM_TRANS_TYPE][  8][  8];
 extern TMatrixCoeff g_aiTr16  [NUM_TRANS_TYPE][ 16][ 16];
 extern TMatrixCoeff g_aiTr32  [NUM_TRANS_TYPE][ 32][ 32];
 extern TMatrixCoeff g_aiTr64  [NUM_TRANS_TYPE][ 64][ 64];
+#if !JVET_K1000_SIMPLIFIED_EMT
 extern TMatrixCoeff g_aiTr128 [NUM_TRANS_TYPE][128][128];
+#endif
+
 #if JEM_TOOLS
 extern const UChar  g_NsstLut           [NUM_INTRA_MODE-1];
 struct tabSinCos { Int c, s; };

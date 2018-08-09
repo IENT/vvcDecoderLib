@@ -107,6 +107,8 @@ enum CodingStatisticsType
 #if JEM_TOOLS
   STATS__CABAC_BITS__OBMC_FLAG,
   STATS__CABAC_BITS__IMV_FLAG,
+#endif
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   STATS__CABAC_BITS__EMT_CU_FLAG,
   STATS__CABAC_BITS__EMT_TU_INDEX,
 #endif
@@ -180,6 +182,8 @@ static inline const TChar* getName(CodingStatisticsType name)
 #if JEM_TOOLS
     "CABAC_BITS__OBMC_FLAG",
     "CABAC_BITS__IMV_FLAG",
+#endif
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
     "CABAC_BITS__EMT_CU_FLAG",
     "CABAC_BITS__EMT_TU_INDX",
 #endif

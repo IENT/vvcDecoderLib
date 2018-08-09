@@ -844,7 +844,7 @@ private:
 #if JEM_TOOLS||JVET_K0190
   bool              m_LMChroma;                   // 17
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   bool              m_IntraEMT;                   // 18
   bool              m_InterEMT;                   // 19
 #endif
@@ -1013,7 +1013,7 @@ public:
   void      setUseLMChroma        ( bool b )                                        { m_LMChroma = b; }
   bool      getUseLMChroma        ()                                      const     { return m_LMChroma; }
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   void      setUseIntraEMT        ( bool b )                                        { m_IntraEMT = b; }
   bool      getUseIntraEMT        ()                                      const     { return m_IntraEMT; }
   void      setUseInterEMT        ( bool b )                                        { m_InterEMT = b; }

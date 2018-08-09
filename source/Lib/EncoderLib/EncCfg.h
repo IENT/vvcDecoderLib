@@ -204,11 +204,13 @@ protected:
 #if JEM_TOOLS
   bool      m_MDMS;
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   int       m_IntraEMT;
   int       m_InterEMT;
   int       m_FastIntraEMT;
   int       m_FastInterEMT;
+#endif
+#if JEM_TOOLS
   bool      m_NSST;
 #endif
   bool      m_LargeCTU;
@@ -737,7 +739,9 @@ public:
 
   void      setALF                          ( int i )        { m_ALF = i; }
   int       getALF                          ()         const { return m_ALF; }
+#endif
 
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   void      setFastIntraEMT                 ( bool b )       { m_FastIntraEMT = b; }
   bool      getFastIntraEMT                 ()         const { return m_FastIntraEMT; }
   void      setFastInterEMT                 ( bool b )       { m_FastInterEMT = b; }

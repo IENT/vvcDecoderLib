@@ -1721,14 +1721,14 @@ void CABACReader::cu_residual( CodingUnit& cu, Partitioner &partitioner, CUCtx& 
 
 #if JEM_TOOLS
   residual_nsst_mode( cu );
-
-#if !HM_EMT_NSST_AS_IN_JEM
-  cu_emt_pertu_idx( cu );
 #endif
+
+#if (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT) && !HM_EMT_NSST_AS_IN_JEM
+  cu_emt_pertu_idx( cu );
 #endif
 }
 
-#if JEM_TOOLS && !HM_EMT_NSST_AS_IN_JEM
+#if (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT) && !HM_EMT_NSST_AS_IN_JEM
 void CABACReader::cu_emt_pertu_idx( CodingUnit& cu )
 {
   bool anyCbf = false, anyNonTs = false;
@@ -2235,7 +2235,7 @@ void CABACReader::transform_tree( CodingStructure &cs, Partitioner &partitioner,
   if( split )
   {
     {
-#if JEM_TOOLS && HM_EMT_NSST_AS_IN_JEM
+#if (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT) && HM_EMT_NSST_AS_IN_JEM
       if( trDepth == 0 ) emt_cu_flag( cu );
 #endif
 
@@ -2350,7 +2350,7 @@ void CABACReader::transform_tree( CodingStructure &cs, Partitioner &partitioner,
 #endif
     }
 
-#if JEM_TOOLS && HM_EMT_NSST_AS_IN_JEM
+#if (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT) && HM_EMT_NSST_AS_IN_JEM
 #if ENABLE_BMS
     if( trDepth == 0 && TU::getCbfAtDepth( tu, COMPONENT_Y, 0 ) ) emt_cu_flag( cu );
 #else
@@ -2587,7 +2587,7 @@ void CABACReader::transform_unit_qtbt( TransformUnit& tu, CUCtx& cuCtx, ChromaCb
 
   if( tu.cbf[0] )
   {
-#if JEM_TOOLS && HM_EMT_NSST_AS_IN_JEM
+#if (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT) && HM_EMT_NSST_AS_IN_JEM
     emt_cu_flag    ( cu );
 #endif
     residual_coding( tu, COMPONENT_Y );
@@ -2714,7 +2714,7 @@ void CABACReader::residual_coding( TransformUnit& tu, ComponentID compID )
 #else
   unsigned&           GRStats = m_BinDecoder.getCtx().getGRAdaptStats( TU::getGolombRiceStatisticsIndex( tu, compID ) );
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   unsigned            numSig  = 0;
 #endif
 
@@ -2729,7 +2729,7 @@ void CABACReader::residual_coding( TransformUnit& tu, ComponentID compID )
   cctx.setGoRiceStats( GRStats );
 #endif
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   bool useEmt = ( cu.cs->sps->getSpsNext().getUseIntraEMT() && cu.predMode == MODE_INTRA ) || ( cu.cs->sps->getSpsNext().getUseInterEMT() && cu.predMode != MODE_INTRA );
   useEmt = useEmt && isLuma(compID);
 #endif
@@ -2742,7 +2742,7 @@ void CABACReader::residual_coding( TransformUnit& tu, ComponentID compID )
 #else
       residual_coding_subblock( cctx, coeff );
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
       if (useEmt)
       {
         numSig += cctx.emtNumSigCoeff();
@@ -2756,7 +2756,7 @@ void CABACReader::residual_coding( TransformUnit& tu, ComponentID compID )
     GRStats = cctx.currGoRiceStats();
 #endif
 
-#if JEM_TOOLS && HM_EMT_NSST_AS_IN_JEM
+#if (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT) && HM_EMT_NSST_AS_IN_JEM
   if( useEmt && !tu.transformSkip[compID] && compID == COMPONENT_Y && tu.cu->emtFlag )
   {
     if( CU::isIntra( *tu.cu ) )
@@ -2783,7 +2783,7 @@ void CABACReader::residual_coding( TransformUnit& tu, ComponentID compID )
 void CABACReader::transform_skip_flag( TransformUnit& tu, ComponentID compID )
 {
 
-#if HM_EMT_NSST_AS_IN_JEM && JEM_TOOLS
+#if HM_EMT_NSST_AS_IN_JEM && (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT)
   if( !tu.cu->cs->pps->getUseTransformSkip() || tu.cu->transQuantBypass || !TU::hasTransformSkipFlag( *tu.cs, tu.blocks[compID] ) || ( isLuma( compID ) && tu.cu->emtFlag ) )
 #else
   if( !tu.cu->cs->pps->getUseTransformSkip() || tu.cu->transQuantBypass || !TU::hasTransformSkipFlag( *tu.cs, tu.blocks[compID] ) )
@@ -2799,7 +2799,7 @@ void CABACReader::transform_skip_flag( TransformUnit& tu, ComponentID compID )
   tu.transformSkip[compID] = tskip;
 }
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
 Void CABACReader::emt_tu_index( TransformUnit& tu )
 {
   int maxSizeEmtIntra, maxSizeEmtInter;
@@ -2838,9 +2838,7 @@ Void CABACReader::emt_tu_index( TransformUnit& tu )
 
   tu.emtIdx = trIdx;
 }
-#endif
 
-#if JEM_TOOLS
 Void CABACReader::emt_cu_flag( CodingUnit& cu )
 {
   const CodingStructure &cs = *cu.cs;
@@ -3207,7 +3205,7 @@ void CABACReader::residual_coding_subblock( CoeffCodingContext& cctx, TCoeff* co
     coeff[ sigBlkPos[k] ] = ( sumAbs & 1 ? -AbsCoeff : AbsCoeff );
   }
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   cctx.setEmtNumSigCoeff( numNonZero );
 #endif
 }
@@ -3618,8 +3616,7 @@ void CABACReader::residual_coding_subblock( CoeffCodingContext& cctx, TCoeff* co
       coeff[ sigBlkPos[k] ] = ( sumAbs & 1 ? -AbsCoeff : AbsCoeff );
     }
 #endif
-#if JEM_TOOLS
-
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
     cctx.setEmtNumSigCoeff( numNonZero );
 #endif
   }

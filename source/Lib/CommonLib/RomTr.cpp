@@ -37,6 +37,8 @@
 
 #include "Rom.h"
 
+#if !JVET_K1000_SIMPLIFIED_EMT
+
 //--------------------------------------------------------------------------------------------------
 // Transformations
 
@@ -451,5 +453,7 @@ const TMatrixCoeff g_as_DST_MAT_4[TRANSFORM_NUMBER_OF_DIRECTIONS][4][4] =
 #undef DEFINE_DCT32x32_MATRIX
 #undef DEFINE_DCT64x64_MATRIX
 #undef DEFINE_DCT128x128_MATRIX
+
+#endif // !JVET_K1000_SIMPLIFIED_EMT
 
 //--------------------------------------------------------------------------------------------------

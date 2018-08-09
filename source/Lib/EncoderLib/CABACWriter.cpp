@@ -1865,14 +1865,14 @@ void CABACWriter::cu_residual( const CodingUnit& cu, Partitioner& partitioner, C
   transform_tree( *cu.cs, partitioner, cuCtx, chromaCbfs );
 #if JEM_TOOLS
   residual_nsst_mode( cu, cuCtx );
-
-#if !HM_EMT_NSST_AS_IN_JEM
-  cu_emt_pertu_idx( cu );
 #endif
+
+#if (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT) && !HM_EMT_NSST_AS_IN_JEM
+  cu_emt_pertu_idx( cu );
 #endif
 }
 
-#if JEM_TOOLS && !HM_EMT_NSST_AS_IN_JEM
+#if (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT) && !HM_EMT_NSST_AS_IN_JEM
 void CABACWriter::cu_emt_pertu_idx( const CodingUnit& cu )
 {
   bool anyCbf = false, anyNonTs = false;
@@ -2404,7 +2404,7 @@ void CABACWriter::transform_tree( const CodingStructure& cs, Partitioner& partit
       chromaCbfs.Cb        = TU::getCbfAtDepth( tu, COMPONENT_Cb,  trDepth );
       chromaCbfs.Cr        = TU::getCbfAtDepth( tu, COMPONENT_Cr,  trDepth );
     }
-#if JEM_TOOLS && HM_EMT_NSST_AS_IN_JEM
+#if (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT) && HM_EMT_NSST_AS_IN_JEM
     if( trDepth == 0 ) emt_cu_flag( cu );
 #endif
 
@@ -2462,7 +2462,7 @@ void CABACWriter::transform_tree( const CodingStructure& cs, Partitioner& partit
       }
     }
 
-#if JEM_TOOLS && HM_EMT_NSST_AS_IN_JEM
+#if (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT) && HM_EMT_NSST_AS_IN_JEM
 #if ENABLE_BMS
     if( trDepth == 0 && TU::getCbfAtDepth( tu, COMPONENT_Y, 0 ) ) emt_cu_flag( cu );
 #else
@@ -2716,7 +2716,7 @@ void CABACWriter::transform_unit_qtbt( const TransformUnit& tu, CUCtx& cuCtx, Ch
 
     if( tu.cbf[0] )
     {
-#if JEM_TOOLS && HM_EMT_NSST_AS_IN_JEM
+#if (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT) && HM_EMT_NSST_AS_IN_JEM
       emt_cu_flag( cu );
 #endif
       residual_coding( tu, COMPONENT_Y );
@@ -2841,7 +2841,7 @@ void CABACWriter::residual_coding( const TransformUnit& tu, ComponentID compID )
 #else
   unsigned&           GRStats = m_BinEncoder.getCtx().getGRAdaptStats( TU::getGolombRiceStatisticsIndex( tu, compID ) );
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   unsigned            numSig  = 0;
 #endif
 
@@ -2870,7 +2870,7 @@ void CABACWriter::residual_coding( const TransformUnit& tu, ComponentID compID )
 #else
   cctx.setGoRiceStats( GRStats );
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   bool useEmt = ( cu.cs->sps->getSpsNext().getUseIntraEMT() && cu.predMode == MODE_INTRA ) || ( cu.cs->sps->getSpsNext().getUseInterEMT() && cu.predMode != MODE_INTRA );
   useEmt = useEmt && isLuma(compID);
 #endif
@@ -2884,7 +2884,7 @@ void CABACWriter::residual_coding( const TransformUnit& tu, ComponentID compID )
     residual_coding_subblock( cctx, coeff );
 #endif
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
     if (useEmt)
     {
       numSig += cctx.emtNumSigCoeff();
@@ -2898,7 +2898,7 @@ void CABACWriter::residual_coding( const TransformUnit& tu, ComponentID compID )
   GRStats = cctx.currGoRiceStats();
 #endif
 
-#if JEM_TOOLS && HM_EMT_NSST_AS_IN_JEM
+#if (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT) && HM_EMT_NSST_AS_IN_JEM
   if( useEmt && !tu.transformSkip[compID] && compID == COMPONENT_Y && tu.cu->emtFlag )
   {
     if( CU::isIntra( *tu.cu ) )
@@ -2923,7 +2923,7 @@ void CABACWriter::residual_coding( const TransformUnit& tu, ComponentID compID )
 
 void CABACWriter::transform_skip_flag( const TransformUnit& tu, ComponentID compID )
 {
-#if HM_EMT_NSST_AS_IN_JEM && JEM_TOOLS
+#if HM_EMT_NSST_AS_IN_JEM && (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT)
   if( !tu.cu->cs->pps->getUseTransformSkip() || tu.cu->transQuantBypass || !TU::hasTransformSkipFlag( *tu.cs, tu.blocks[compID] ) || ( isLuma( compID ) && tu.cu->emtFlag ) )
 #else
   if( !tu.cu->cs->pps->getUseTransformSkip() || tu.cu->transQuantBypass || !TU::hasTransformSkipFlag( *tu.cs, tu.blocks[compID] ) )
@@ -2936,7 +2936,7 @@ void CABACWriter::transform_skip_flag( const TransformUnit& tu, ComponentID comp
   DTRACE( g_trace_ctx, D_SYNTAX, "transform_skip_flag() etype=%d pos=(%d,%d) trSkip=%d\n", compID, tu.blocks[compID].x, tu.blocks[compID].y, (int)tu.transformSkip[compID] );
 }
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
 Void CABACWriter::emt_tu_index( const TransformUnit& tu )
 {
   int maxSizeEmtIntra, maxSizeEmtInter;

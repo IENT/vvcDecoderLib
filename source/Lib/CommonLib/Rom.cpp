@@ -269,51 +269,55 @@ Void initROM()
 
   const Double PI = 3.14159265358979323846;
 
-  for (i = 0; i < 7; i++)
+  for (i = 0; i < g_numTransformMatrixSizes; i++)
   {
     TMatrixCoeff *iT = NULL;
     const Double s = sqrt((Double)c) * (64 << COM16_C806_TRANS_PREC);
 
     switch (i)
     {
-    case 0: iT = g_aiTr2[0][0]; break;
-    case 1: iT = g_aiTr4[0][0]; break;
-    case 2: iT = g_aiTr8[0][0]; break;
-    case 3: iT = g_aiTr16[0][0]; break;
-    case 4: iT = g_aiTr32[0][0]; break;
-    case 5: iT = g_aiTr64[0][0]; break;
-    case 6: iT = g_aiTr128[0][0]; break;
-    case 7: exit(0); break;
+      case 0: iT = g_aiTr2[0][0]; break;
+      case 1: iT = g_aiTr4[0][0]; break;
+      case 2: iT = g_aiTr8[0][0]; break;
+      case 3: iT = g_aiTr16[0][0]; break;
+      case 4: iT = g_aiTr32[0][0]; break;
+      case 5: iT = g_aiTr64[0][0]; break;
+#if !JVET_K1000_SIMPLIFIED_EMT
+      case 6: iT = g_aiTr128[0][0]; break;
+#endif
+      default: exit(0); break;
     }
 
     for (Int k = 0; k < c; k++)
     {
       for (Int n = 0; n < c; n++)
       {
-        Double w0, w1, v;
+        Double w0, v;
 
         // DCT-II
         w0 = k == 0 ? sqrt(0.5) : 1;
         v = cos(PI*(n + 0.5)*k / c) * w0 * sqrt(2.0 / c);
         iT[DCT2*c*c + k*c + n] = (Short)(s * v + (v > 0 ? 0.5 : -0.5));
 
-        // DCT-V
-        w0 = (k == 0) ? sqrt(0.5) : 1.0;
-        w1 = (n == 0) ? sqrt(0.5) : 1.0;
-        v = cos(PI*n*k / (c - 0.5)) * w0 * w1 * sqrt(2.0 / (c - 0.5));
-        iT[DCT5*c*c + k*c + n] = (Short)(s * v + (v > 0 ? 0.5 : -0.5));
-
         // DCT-VIII
         v = cos(PI*(k + 0.5)*(n + 0.5) / (c + 0.5)) * sqrt(2.0 / (c + 0.5));
         iT[DCT8*c*c + k*c + n] = (Short)(s * v + (v > 0 ? 0.5 : -0.5));
 
-        // DST-I
-        v = sin(PI*(n + 1)*(k + 1) / (c + 1)) * sqrt(2.0 / (c + 1));
-        iT[DST1*c*c + k*c + n] = (Short)(s * v + (v > 0 ? 0.5 : -0.5));
-
         // DST-VII
         v = sin(PI*(k + 0.5)*(n + 1) / (c + 0.5)) * sqrt(2.0 / (c + 0.5));
         iT[DST7*c*c + k*c + n] = (Short)(s * v + (v > 0 ? 0.5 : -0.5));
+
+#if !JVET_K1000_SIMPLIFIED_EMT
+        // DCT-V
+        w0 = (k == 0) ? sqrt(0.5) : 1.0;
+        Double w1 = (n == 0) ? sqrt(0.5) : 1.0;
+        v = cos(PI*n*k / (c - 0.5)) * w0 * w1 * sqrt(2.0 / (c - 0.5));
+        iT[DCT5*c*c + k*c + n] = (Short)(s * v + (v > 0 ? 0.5 : -0.5));
+
+        // DST-I
+        v = sin(PI*(n + 1)*(k + 1) / (c + 1)) * sqrt(2.0 / (c + 1));
+        iT[DST1*c*c + k*c + n] = (Short)(s * v + (v > 0 ? 0.5 : -0.5));
+#endif
       }
     }
     c <<= 1;
@@ -528,9 +532,13 @@ const Int g_invQuantScales[SCALING_LIST_REM_NUM] =
 
 //--------------------------------------------------------------------------------------------------
 //structures
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
 //EMT transform sets
+#if JVET_K1000_SIMPLIFIED_EMT
+const Int g_aiTrSubsetIntra[3][2] = { { DST7, DCT8 }, { DST7, DCT8 }, { DST7, DCT8 } };
+#else
 const Int g_aiTrSubsetIntra[3][2] = { { DST7, DCT8 }, { DST7, DST1 }, { DST7, DCT5 } };
+#endif
 const Int g_aiTrSubsetInter[4] = { DCT8, DST7 };
 
 const UChar g_aucTrSetVert[NUM_INTRA_MODE - 1] =
@@ -554,6 +562,7 @@ const UChar g_aucTrSetHorz35[35] =
 const UInt g_EmtSigNumThr = 2;
 
 #endif
+
 //EMT transform coeficient variable
 TMatrixCoeff g_aiTr2  [NUM_TRANS_TYPE][  2][  2];
 TMatrixCoeff g_aiTr4  [NUM_TRANS_TYPE][  4][  4];
@@ -561,8 +570,9 @@ TMatrixCoeff g_aiTr8  [NUM_TRANS_TYPE][  8][  8];
 TMatrixCoeff g_aiTr16 [NUM_TRANS_TYPE][ 16][ 16];
 TMatrixCoeff g_aiTr32 [NUM_TRANS_TYPE][ 32][ 32];
 TMatrixCoeff g_aiTr64 [NUM_TRANS_TYPE][ 64][ 64];
+#if !JVET_K1000_SIMPLIFIED_EMT
 TMatrixCoeff g_aiTr128[NUM_TRANS_TYPE][128][128];
-
+#endif
 
 //--------------------------------------------------------------------------------------------------
 //coefficients

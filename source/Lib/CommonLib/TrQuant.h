@@ -50,8 +50,13 @@
 //! \ingroup CommonLib
 //! \{
 
+#if JVET_K1000_SIMPLIFIED_EMT
+typedef void FwdTrans(const TCoeff*, TCoeff*, Int, Int, Int, Int);
+typedef void InvTrans(const TCoeff*, TCoeff*, Int, Int, Int, Int, const TCoeff, const TCoeff);
+#else
 typedef void FwdTrans(const TCoeff*, TCoeff*, Int, Int, Int, Int, Int);
 typedef void InvTrans(const TCoeff*, TCoeff*, Int, Int, Int, Int, Int, const TCoeff, const TCoeff);
+#endif
 
 // ====================================================================================================================
 // Class definition
@@ -90,10 +95,12 @@ public:
                     const bool rectTUs              = false
   );
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   UChar getEmtTrIdx( TransformUnit tu, const ComponentID compID );
   UChar getEmtMode ( TransformUnit tu, const ComponentID compID );
+#endif
 
+#if JEM_TOOLS
   Void FwdNsstNxN( Int* src, const UInt uiMode, const UInt uiIndex, const UInt uiSize );
   Void InvNsstNxN( Int* src, const UInt uiMode, const UInt uiIndex, const UInt uiSize );
 #endif
@@ -161,6 +168,7 @@ private:
   // forward Transform
   void xT        ( const TransformUnit &tu, const ComponentID &compID, const CPelBuf &resi, CoeffBuf &dstCoeff, const int iWidth, const int iHeight );
 
+#if !JVET_K1000_SIMPLIFIED_EMT
 #if HEVC_USE_4x4_DSTVII
   void (*m_fTr ) ( const int bitDepth, const Pel *residual, size_t stride, TCoeff *coeff, size_t width, size_t height, bool useDST, const int maxLog2TrDynamicRange );
   void (*m_fITr) ( const int bitDepth, const TCoeff *coeff, Pel *residual, size_t stride, size_t width, size_t height, bool useDST, const int maxLog2TrDynamicRange );
@@ -168,7 +176,7 @@ private:
   void (*m_fTr ) ( const int bitDepth, const Pel *residual, size_t stride, TCoeff *coeff, size_t width, size_t height, const int maxLog2TrDynamicRange );
   void (*m_fITr) ( const int bitDepth, const TCoeff *coeff, Pel *residual, size_t stride, size_t width, size_t height, const int maxLog2TrDynamicRange );
 #endif
-
+#endif
 
   // skipping Transform
   Void xTransformSkip   (const TransformUnit &tu, const ComponentID &compID, const CPelBuf &resi, TCoeff* psCoeff);
