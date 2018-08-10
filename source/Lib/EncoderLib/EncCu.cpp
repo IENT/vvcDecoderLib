@@ -684,7 +684,7 @@ void EncCu::xCompressCU( CodingStructure *&tempCS, CodingStructure *&bestCS, Par
       }
 #endif
     }
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
     else if( currTestMode.type == ETM_AFFINE )
     {
       xCheckRDCostAffineMerge2Nx2N( tempCS, bestCS, partitioner, currTestMode );
@@ -1855,7 +1855,7 @@ void EncCu::xCheckRDCostMerge2Nx2N( CodingStructure *&tempCS, CodingStructure *&
   }
 }
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
 void EncCu::xCheckRDCostAffineMerge2Nx2N( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode )
 {
   if( m_modeCtrl->getFastDeltaQp() )
@@ -1863,7 +1863,11 @@ void EncCu::xCheckRDCostAffineMerge2Nx2N( CodingStructure *&tempCS, CodingStruct
     return;
   }
 
+#if JVET_K_AFFINE_BUG_FIXES
+  if ( bestCS->area.lumaSize().width < 8 || bestCS->area.lumaSize().height < 8 )
+#else
   if( tempCS->pcv->rectCUs && bestCS->area.lumaSize().area() < 64 )
+#endif
   {
     return;
   }
@@ -1873,7 +1877,9 @@ void EncCu::xCheckRDCostAffineMerge2Nx2N( CodingStructure *&tempCS, CodingStruct
   int           numValidMergeCand;
   bool          hasNoResidual = false;
 
+#if JEM_TOOLS
   const SPS &sps       = *tempCS->sps;
+#endif
 
   tempCS->initStructData( encTestMode.qp, encTestMode.lossless );
 
@@ -1888,11 +1894,15 @@ void EncCu::xCheckRDCostAffineMerge2Nx2N( CodingStructure *&tempCS, CodingStruct
   cu.partSize         = encTestMode.partSize;
   cu.affine           = true;
   cu.predMode         = MODE_INTER;
+#if JEM_TOOLS
   cu.LICFlag          = false;
+#endif
   cu.transQuantBypass = encTestMode.lossless;
   cu.chromaQpAdj      = cu.transQuantBypass ? 0 : m_cuChromaQpOffsetIdxPlus1;
   cu.qp               = encTestMode.qp;
+#if JEM_TOOLS
   cu.obmcFlag         = sps.getSpsNext().getUseOBMC();
+#endif
 
   CU::addPUs( cu );
 
@@ -1912,17 +1922,23 @@ void EncCu::xCheckRDCostAffineMerge2Nx2N( CodingStructure *&tempCS, CodingStruct
   PU::spanMotionInfo( *cu.firstPU );
 
   m_pcInterSearch->motionCompensation( cu );
+#if JEM_TOOLS
   m_pcInterSearch->subBlockOBMC      ( cu );
-
   xEncodeInterResidual( tempCS, bestCS, partitioner, encTestMode, 0, NULL, true, &hasNoResidual );
+#else
+  xEncodeInterResidual( tempCS, bestCS, partitioner, encTestMode, 0, &hasNoResidual );
+#endif
 
   if( ! (encTestMode.lossless || hasNoResidual) )
   {
     tempCS->initStructData( encTestMode.qp, encTestMode.lossless );
     tempCS->copyStructure( *bestCS, partitioner.chType );
     tempCS->getPredBuf().copyFrom( bestCS->getPredBuf() );
-
+#if JEM_TOOLS
     xEncodeInterResidual( tempCS, bestCS, partitioner, encTestMode, 1, NULL, true, &hasNoResidual );
+#else
+    xEncodeInterResidual( tempCS, bestCS, partitioner, encTestMode, 1, &hasNoResidual );
+#endif
   }
 }
 #endif

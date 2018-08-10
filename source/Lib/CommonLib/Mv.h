@@ -53,7 +53,7 @@ class Mv
 public:
   int   hor;     ///< horizontal component of motion vector
   int   ver;     ///< vertical component of motion vector
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
   bool  highPrec;///< true if the vector is high precision
 #endif
 
@@ -61,7 +61,7 @@ public:
   // constructors
   // ------------------------------------------------------------------------------------------------------------------
 
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
   Mv(                                            ) : hor( 0    ), ver( 0    ), highPrec( false     ) {}
   Mv( int iHor, int iVer, bool _highPrec = false ) : hor( iHor ), ver( iVer ), highPrec( _highPrec ) {}
 #else
@@ -93,7 +93,7 @@ public:
 
   const Mv& operator += (const Mv& _rcMv)
   {
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
     if( highPrec == _rcMv.highPrec )
     {
       hor += _rcMv.hor;
@@ -104,7 +104,7 @@ public:
     {
       Mv rcMv = _rcMv;
 
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
       if( highPrec && !rcMv.highPrec ) rcMv.setHighPrec();
       if( !highPrec && rcMv.highPrec )      setHighPrec();
 #endif
@@ -116,7 +116,7 @@ public:
 
   const Mv& operator-= (const Mv& _rcMv)
   {
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
     if( highPrec == _rcMv.highPrec )
     {
       hor -= _rcMv.hor;
@@ -127,7 +127,7 @@ public:
     {
       Mv rcMv = _rcMv;
 
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
       if( highPrec && !rcMv.highPrec ) rcMv.setHighPrec();
       if( !highPrec && rcMv.highPrec )      setHighPrec();
 #endif
@@ -166,7 +166,7 @@ public:
 
   const Mv operator - ( const Mv& rcMv ) const
   {
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
     if( rcMv.highPrec == highPrec )
     {
       return Mv( hor - rcMv.hor, ver - rcMv.ver, highPrec );
@@ -185,7 +185,7 @@ public:
 
   const Mv operator + ( const Mv& rcMv ) const
   {
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
     if( rcMv.highPrec == highPrec )
     {
       return Mv( hor + rcMv.hor, ver + rcMv.ver, highPrec );
@@ -204,7 +204,7 @@ public:
 
   bool operator== ( const Mv& rcMv ) const
   {
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
     if( rcMv.highPrec == highPrec )
     {
       return ( hor == rcMv.hor && ver == rcMv.ver );
@@ -231,14 +231,14 @@ public:
   {
     const int mvx = Clip3( -32768, 32767, (iScale * getHor() + 127 + (iScale * getHor() < 0)) >> 8 );
     const int mvy = Clip3( -32768, 32767, (iScale * getVer() + 127 + (iScale * getVer() < 0)) >> 8 );
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
     return Mv( mvx, mvy, highPrec );
 #else
     return Mv( mvx, mvy );
 #endif
   }
 
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
   void roundMV2SignalPrecision()
   {
     const bool isHP = highPrec;
@@ -270,6 +270,10 @@ public:
 void roundMV( Mv& rcMv, unsigned imvShift );
 #endif
 void clipMv ( Mv& rcMv, const struct Position& pos, const class SPS& sps );
+
+#if JVET_K_AFFINE_BUG_FIXES
+void roundAffineMv( int& mvx, int& mvy, int nShift );
+#endif
 
 //! \}
 

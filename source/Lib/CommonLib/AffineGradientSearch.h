@@ -31,52 +31,44 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** \file     Mv.cpp
-    \brief    motion vector class
-*/
+/**
+ * \file
+ * \brief Declaration of AffineGradientSearch class
+ */
 
-#include "Mv.h"
+#ifndef __AFFINEGRADIENTSEARCH__
+#define __AFFINEGRADIENTSEARCH__
 
-#include "Common.h"
-#include "Slice.h"
+#include "CommonDef.h"
 
-#if JEM_TOOLS
-void roundMV( Mv & rMV, unsigned imvShift )
+//! \ingroup CommonLib
+//! \{
+
+class AffineGradientSearch
 {
-  CHECK( imvShift == 0, "roundMV called for imvShift=0" );
-  if( rMV.highPrec ) imvShift += VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
-  int offset = 1 << ( imvShift - 1 );
+public:
+  void( *m_HorizontalSobelFilter ) (Pel *const pPred, const int predStride, int *const pDerivate, const int derivateBufStride, const int width, const int height);
 
-  rMV.setHor( ( ( rMV.getHor() + offset ) >> imvShift ) << imvShift );
-  rMV.setVer( ( ( rMV.getVer() + offset ) >> imvShift ) << imvShift );
-}
+  void( *m_VerticalSobelFilter ) (Pel *const pPred, const int predStride, int *const pDerivate, const int derivateBufStride, const int width, const int height);
+
+  void( *m_EqualCoeffComputer ) (Pel *pResidue, int residueStride, int **ppDerivate, int derivateBufStride, Int64( *pEqualCoeff )[7], int width, int height, bool b6Param);
+
+  static void xHorizontalSobelFilter( Pel *const pPred, const int predStride, int *const pDerivate, const int derivateBufStride, const int width, const int height );
+
+  static void xVerticalSobelFilter( Pel *const pPred, const int predStride, int *const pDerivate, const int derivateBufStride, const int width, const int height );
+
+  static void xEqualCoeffComputer( Pel *pResidue, int residueStride, int **ppDerivate, int derivateBufStride, Int64( *pEqualCoeff )[7], int width, int height, bool b6Param );
+
+  AffineGradientSearch();
+  ~AffineGradientSearch() {}
+
+#ifdef TARGET_SIMD_X86
+  void initAffineGradientSearchX86();
+  template <X86_VEXT vext>
+  void _initAffineGradientSearchX86();
 #endif
-
-#if JVET_K_AFFINE_BUG_FIXES
-void roundAffineMv( int& mvx, int& mvy, int nShift )
-{
-  const int nOffset = 1 << (nShift - 1);
-  mvx = mvx >= 0 ? (mvx + nOffset) >> nShift : -((-mvx + nOffset) >> nShift);
-  mvy = mvy >= 0 ? (mvy + nOffset) >> nShift : -((-mvy + nOffset) >> nShift);
-}
-#endif
-
-Void clipMv( Mv& rcMv, const Position& pos, const SPS& sps )
-{
-#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
-  int iMvShift = 2 + ( rcMv.highPrec ? VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : 0 );
-#else
-  int iMvShift = 2;
-#endif
-  int iOffset = 8;
-  int iHorMax = ( sps.getPicWidthInLumaSamples() + iOffset - ( int ) pos.x - 1 ) << iMvShift;
-  int iHorMin = ( -( int ) sps.getMaxCUWidth()   - iOffset - ( int ) pos.x + 1 ) << iMvShift;
-
-  int iVerMax = ( sps.getPicHeightInLumaSamples() + iOffset - ( int ) pos.y - 1 ) << iMvShift;
-  int iVerMin = ( -( int ) sps.getMaxCUHeight()   - iOffset - ( int ) pos.y + 1 ) << iMvShift;
-
-  rcMv.setHor( std::min( iHorMax, std::max( iHorMin, rcMv.getHor() ) ) );
-  rcMv.setVer( std::min( iVerMax, std::max( iVerMin, rcMv.getVer() ) ) );
-}
+};
 
 //! \}
+
+#endif

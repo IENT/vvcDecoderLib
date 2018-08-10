@@ -225,9 +225,18 @@ protected:
 #if JEM_TOOLS
   bool      m_highPrecisionMv;
   bool      m_Affine;
+#if JVET_K0337_AFFINE_6PARA
+  bool      m_AffineType;
+#endif
   bool      m_BIO;
 #endif
-#if !JEM_TOOLS && JVET_K0346
+#if !JEM_TOOLS && JVET_K_AFFINE
+  bool      m_Affine;
+#if JVET_K0337_AFFINE_6PARA
+  bool      m_AffineType;
+#endif
+#endif
+#if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
   bool      m_highPrecisionMv;
 #endif
   bool      m_DisableMotionCompression;

@@ -44,6 +44,10 @@
 #include "CommonLib/RdCost.h"
 #include "CommonLib/Buffer.h"
 
+#if JVET_K0367_AFFINE_FIX_POINT
+#include "CommonLib/AffineGradientSearch.h"
+#endif
+
 #ifdef TARGET_SIMD_X86
 
 
@@ -57,6 +61,8 @@ Void InterpolationFilter::initInterpolationFilterX86( /*Int iBitDepthY, Int iBit
     _initInterpolationFilterX86<AVX2>(/*iBitDepthY, iBitDepthC*/);
     break;
   case AVX:
+    _initInterpolationFilterX86<AVX>(/*iBitDepthY, iBitDepthC*/);
+    break;
   case SSE42:
   case SSE41:
     _initInterpolationFilterX86<SSE41>(/*iBitDepthY, iBitDepthC*/);
@@ -77,6 +83,8 @@ Void PelBufferOps::initPelBufOpsX86()
       _initPelBufOpsX86<AVX2>();
       break;
     case AVX:
+      _initPelBufOpsX86<AVX>();
+      break;
     case SSE42:
     case SSE41:
       _initPelBufOpsX86<SSE41>();
@@ -100,12 +108,36 @@ Void RdCost::initRdCostX86()
       _initRdCostX86<AVX2>();
       break;
     case AVX:
+      _initRdCostX86<AVX>();
+      break;
     case SSE42:
     case SSE41:
       _initRdCostX86<SSE41>();
       break;
     default:
       break;
+  }
+}
+#endif
+
+#if ENABLE_SIMD_OPT_AFFINE_ME
+void AffineGradientSearch::initAffineGradientSearchX86()
+{
+  auto vext = read_x86_extension_flags();
+  switch ( vext ) {
+  case AVX512:
+  case AVX2:
+    _initAffineGradientSearchX86<AVX2>();
+    break;
+  case AVX:
+    _initAffineGradientSearchX86<AVX>();
+    break;
+  case SSE42:
+  case SSE41:
+    _initAffineGradientSearchX86<SSE41>();
+    break;
+  default:
+    break;
   }
 }
 #endif

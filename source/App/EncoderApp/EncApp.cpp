@@ -243,9 +243,18 @@ Void EncApp::xInitLibCfg()
 #if JEM_TOOLS
   m_cEncLib.setHighPrecisionMv                                   ( m_highPrecisionMv );
   m_cEncLib.setAffine                                            ( m_Affine );
+#if JVET_K0337_AFFINE_6PARA
+  m_cEncLib.setAffineType                                        ( m_AffineType );
+#endif
   m_cEncLib.setBIO                                               ( m_BIO );
 #endif
-#if !JEM_TOOLS && JVET_K0346
+#if !JEM_TOOLS && JVET_K_AFFINE
+  m_cEncLib.setAffine                                            ( m_Affine );
+#if JVET_K0337_AFFINE_6PARA
+  m_cEncLib.setAffineType                                        ( m_AffineType );
+#endif
+#endif
+#if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
   m_cEncLib.setHighPrecisionMv                                   (m_highPrecisionMv);
 #endif
   m_cEncLib.setDisableMotionCompression                          ( m_DisableMotionCompression );

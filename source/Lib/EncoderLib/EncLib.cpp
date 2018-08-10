@@ -861,12 +861,17 @@ Void EncLib::xInitSPS(SPS &sps)
   sps.getSpsNext().setAltResiCompId         ( m_altResiCompId );
 #endif
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
   sps.getSpsNext().setUseHighPrecMv         ( m_highPrecMv );
   sps.getSpsNext().setUseAffine             ( m_Affine );
+#if JVET_K0337_AFFINE_6PARA
+  sps.getSpsNext().setUseAffineType         ( m_AffineType );
+#endif
+#endif
+#if JEM_TOOLS
   sps.getSpsNext().setUseBIO                ( m_BIO );
 #endif
-#if !JEM_TOOLS && JVET_K0346
+#if !JEM_TOOLS && JVET_K0346 && !JVET_K_AFFINE
   sps.getSpsNext().setUseHighPrecMv(m_highPrecMv);
 #endif
   sps.getSpsNext().setDisableMotCompress    ( m_DisableMotionCompression );

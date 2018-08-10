@@ -59,7 +59,7 @@ enum EncTestModeType
   ETM_MERGE_FRUC,
 #endif
   ETM_INTER_ME,
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
   ETM_AFFINE,
 #endif
   ETM_INTRA,
@@ -153,6 +153,9 @@ inline bool isModeInter( const EncTestMode& encTestmode ) // perhaps remove
           || encTestmode.type == ETM_MERGE_SKIP
 #if JEM_TOOLS
           || encTestmode.type == ETM_MERGE_FRUC
+          || encTestmode.type == ETM_AFFINE
+#endif
+#if !JEM_TOOLS && JVET_K_AFFINE
           || encTestmode.type == ETM_AFFINE
 #endif
          );
@@ -362,6 +365,9 @@ struct SaveLoadStruct
   unsigned        emtTuIndex;
   unsigned        emtCuFlag;
   unsigned        frucMode;
+  bool            affineFlag;
+#endif
+#if !JEM_TOOLS && JVET_K_AFFINE
   bool            affineFlag;
 #endif
 };
