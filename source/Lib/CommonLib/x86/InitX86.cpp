@@ -121,7 +121,11 @@ void AffineGradientSearch::initAffineGradientSearchX86()
   switch ( vext ) {
   case AVX512:
   case AVX2:
+    _initAffineGradientSearchX86<AVX2>();
+    break;
   case AVX:
+    _initAffineGradientSearchX86<AVX>();
+    break;
   case SSE42:
   case SSE41:
     _initAffineGradientSearchX86<SSE41>();
