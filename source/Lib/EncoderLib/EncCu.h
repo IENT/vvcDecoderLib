@@ -116,15 +116,17 @@ private:
 
   PelStorage            m_acMergeBuffer[MRG_MAX_NUM_CANDS];
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
   MotionInfo            m_SubPuMiBuf      [( MAX_CU_SIZE * MAX_CU_SIZE ) >> ( MIN_CU_LOG2 << 1 )];
+#if JEM_TOOLS
   MotionInfo            m_SubPuExtMiBuf   [( MAX_CU_SIZE * MAX_CU_SIZE ) >> ( MIN_CU_LOG2 << 1 )];
+#endif
+#endif
 #if JVET_K0346
   unsigned int          m_subMergeBlkSize[10];
   unsigned int          m_subMergeBlkNum[10];
   unsigned int          m_prevPOC;
   bool                  m_clearSubMergeStatic;
-#endif
 #endif
 #if JEM_TOOLS
   MotionInfo            m_SubPuFrucBuf    [( MAX_CU_SIZE * MAX_CU_SIZE ) >> ( MIN_CU_LOG2 << 1 )];
@@ -197,7 +199,7 @@ protected:
   void xCheckDQP              ( CodingStructure& cs, Partitioner& partitioner, bool bKeepCtx = false);
   void xFillPCMBuffer         ( CodingUnit &cu);
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
   void xCheckRDCostAffineMerge2Nx2N
                               ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode );
 #endif

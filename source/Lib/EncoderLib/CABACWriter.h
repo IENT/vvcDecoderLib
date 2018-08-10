@@ -49,9 +49,9 @@
 
 #if JEM_TOOLS
 class CABACDataStore;
+#endif
 #if JVET_K0346
 class EncCu;
-#endif
 #endif
 class CABACWriter
 {
@@ -65,13 +65,13 @@ public:
 
 public:
 #if JEM_TOOLS
-#if JVET_K0346
-  void        setEncCu(EncCu* pcEncCu) { m_EncCu = pcEncCu; }
-#endif
   void        initCtxModels             ( const Slice&                  slice,
                                           const CABACDataStore*         cabacDataStore );
 #else
   void        initCtxModels             ( const Slice&                  slice );
+#endif
+#if JVET_K0346
+  void        setEncCu(EncCu* pcEncCu) { m_EncCu = pcEncCu; }
 #endif
   SliceType   getCtxInitId              ( const Slice&                  slice );
   void        initBitstream             ( OutputBitstream*              bitstream )           { m_Bitstream = bitstream; m_BinEncoder.init( m_Bitstream ); }
@@ -134,7 +134,7 @@ public:
   void        intra_luma_pred_modes     ( const CodingUnit&             cu );
   void        intra_luma_pred_mode      ( const PredictionUnit&         pu );
   void        intra_chroma_pred_modes   ( const CodingUnit&             cu );
-#if JEM_TOOLS
+#if JEM_TOOLS||JVET_K0190
   void        intra_chroma_lmc_mode     ( const PredictionUnit&         pu );
 #endif
   void        intra_chroma_pred_mode    ( const PredictionUnit&         pu );
@@ -145,7 +145,7 @@ public:
   // prediction unit (clause 7.3.8.6)
   void        prediction_unit           ( const PredictionUnit&         pu );
   void        merge_flag                ( const PredictionUnit&         pu );
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
   void        affine_flag               ( const CodingUnit&             cu );
 #endif
   void        merge_idx                 ( const PredictionUnit&         pu );
@@ -193,7 +193,7 @@ public:
 #endif
   void        cu_qp_delta               ( const CodingUnit&             cu,       int               predQP, const SChar qp );
   void        cu_chroma_qp_offset       ( const CodingUnit&             cu );
-#if JEM_TOOLS && !HM_EMT_NSST_AS_IN_JEM
+#if (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT) && !HM_EMT_NSST_AS_IN_JEM
   void        cu_emt_pertu_idx          ( const CodingUnit&             cu );
 #endif
 
@@ -202,6 +202,8 @@ public:
   void        transform_skip_flag       ( const TransformUnit&          tu,       ComponentID       compID );
 #if JEM_TOOLS
   void        residual_nsst_mode        ( const CodingUnit&             cu,       CUCtx&            cuCtx  );
+#endif
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   void        emt_tu_index              ( const TransformUnit&          tu );
   void        emt_cu_flag               ( const CodingUnit&             cu );
 #endif

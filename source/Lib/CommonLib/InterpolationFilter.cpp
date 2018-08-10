@@ -55,13 +55,13 @@ CacheModel* InterpolationFilter::m_cacheModel;
 // Tables
 // ====================================================================================================================
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
 const TFilterCoeff InterpolationFilter::m_lumaFilter[LUMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE][NTAPS_LUMA] =
 #else
 const TFilterCoeff InterpolationFilter::m_lumaFilter[LUMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS][NTAPS_LUMA] =
 #endif
 {
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
   {  0, 0,   0, 64,  0,   0,  0,  0 },
   {  0, 1,  -3, 63,  4,  -2,  1,  0 },
   { -1, 2,  -5, 62,  8,  -3,  1,  0 },
@@ -86,13 +86,13 @@ const TFilterCoeff InterpolationFilter::m_lumaFilter[LUMA_INTERPOLATION_FILTER_S
 #endif
 };
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
 const TFilterCoeff InterpolationFilter::m_chromaFilter[CHROMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE][NTAPS_CHROMA] =
 #else
 const TFilterCoeff InterpolationFilter::m_chromaFilter[CHROMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS][NTAPS_CHROMA] =
 #endif
 {
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
   {  0, 64,  0,  0 },
   { -1, 63,  2,  0 },
   { -2, 62,  4,  0 },
@@ -502,7 +502,7 @@ Void InterpolationFilter::filterHor( const ComponentID compID, Pel const *src, I
   }
   else if( isLuma( compID ) )
   {
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
     CHECK( frac < 0 || frac >= ( LUMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE ), "Invalid fraction" );
 #else
     CHECK( frac < 0 || frac >= ( LUMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS ), "Invalid fraction" );
@@ -521,7 +521,7 @@ Void InterpolationFilter::filterHor( const ComponentID compID, Pel const *src, I
   else
   {
     const UInt csx = getComponentScaleX( compID, fmt );
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
     CHECK( frac < 0 || csx >= 2 || ( frac << ( 1 - csx ) ) >= ( CHROMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE ), "Invalid fraction" );
 #else
     CHECK( frac < 0 || csx >= 2 || ( frac << ( 1 - csx ) ) >= ( CHROMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS ), "Invalid fraction" );
@@ -559,7 +559,7 @@ Void InterpolationFilter::filterVer( const ComponentID compID, Pel const *src, I
   }
   else if( isLuma( compID ) )
   {
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
     CHECK( frac < 0 || frac >= ( LUMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE ), "Invalid fraction" );
 #else
     CHECK( frac < 0 || frac >= ( LUMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS ), "Invalid fraction" );
@@ -578,7 +578,7 @@ Void InterpolationFilter::filterVer( const ComponentID compID, Pel const *src, I
   else
   {
     const UInt csy = getComponentScaleY( compID, fmt );
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
     CHECK( frac < 0 || csy >= 2 || ( frac << ( 1 - csy ) ) >= ( CHROMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE ), "Invalid fraction" );
 #else
     CHECK( frac < 0 || csy >= 2 || ( frac << ( 1 - csy ) ) >= ( CHROMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS ), "Invalid fraction" );

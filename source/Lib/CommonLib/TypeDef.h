@@ -50,8 +50,9 @@
 #include <assert.h>
 #include <cassert>
 
-#define JVET_K0371_ALF                                    1
+#define JVET_K1000_SIMPLIFIED_EMT                         1 // EMT with only DCT-2, DCT-8 and DST-7
 
+#define JVET_K0371_ALF                                    1
 #if JVET_K0371_ALF
 #define ALF_USE_SIMD                                      1
 #endif
@@ -59,11 +60,18 @@
 #define DEBLOCKING_GRID_8x8                               1
 #define DB_TU_FIX                                         1 // fix in JVET_K0307, JVET-K0237, JVET-K0369, JVET-K0232, JVET-K0315
 
+#define JVET_K0190                                        1 //Only Keep CCLM
+
 #ifndef INTRA67_3MPM  // JVET-K0529
 #define INTRA67_3MPM                                      1
 #endif
 
+#define JVET_K0500_WAIP                                   1 // Wide-Angle Intra Prediction
+
 #define JVET_K0072                                        1
+
+#define JVET_K0122                                        1 // CE3-related: Alternative techniques for DC mode without division
+                                                            // Test 2: Samples are taken only along with a longer side
 
 #define JVET_K0220_ENC_CTRL                               1 // remove HM_NO_ADDITIONAL_SPEEDUPS when adopting
 #if JVET_K0220_ENC_CTRL
@@ -77,6 +85,25 @@
 #define JVET_K0554                                        1 // when adopting, also remove the macro HM_QTBT_ONLY_QT_IMPLICIT (keep the case for value 0)
 
 #define JVET_K0346                                        1 // simplifications on ATMVP
+#define JVET_K0063_PDPC_SIMP                              1 // Simplified PDPC
+
+#define JVET_K0351_LESS_CONSTRAINT                        1 // Only disallow binary split with same orientation in center partition of the ternary split and release the other constraints in K0351.
+
+#define JVET_K0251_QP_EXT                                 1 // Extending the QP parameter value range for coarse quantization 
+
+#define JVET_K_AFFINE                                     1
+#if JVET_K_AFFINE
+#define JVET_K0367_AFFINE_FIX_POINT                       1 // bit-exact SIMD optimization for affine ME
+#define JVET_K_AFFINE_BUG_FIXES                           1 // several affine bug fixes from JVET-K0052, JVET-K0103, JVET-K0367
+
+#define JVET_K0184_AFFINE_4X4                             1 // CE4.1.1 fixed 4x4 sub-block size
+#define JVET_K0337_AFFINE_MVP_IMPROVE                     1 // CE4.1.3 Affine MVP construction
+#define JVET_K0337_AFFINE_MVD_PREDICTION                  1 // CE4.1.3 Affine MVD prediction
+#define JVET_K0337_AFFINE_6PARA                           1 // CE4.1.3 CU level 4-para/6-para switching
+#if JVET_K0337_AFFINE_6PARA
+#define JVET_K0185_AFFINE_6PARA_ENC                       1 // CE4.1.5 Affine 6-para encoder
+#endif
+#endif
 
 #ifndef JEM_TOOLS
 #define JEM_TOOLS                                         1 // Defines the inclusion of JEM tools into compiled executable
@@ -245,6 +272,9 @@
 #define ENABLE_SIMD_OPT_MCIF                            ( 1 && ENABLE_SIMD_OPT )                            ///< SIMD optimization for the interpolation filter, no impact on RD performance
 #define ENABLE_SIMD_OPT_BUFFER                          ( 1 && ENABLE_SIMD_OPT )                            ///< SIMD optimization for the buffer operations, no impact on RD performance
 #define ENABLE_SIMD_OPT_DIST                            ( 1 && ENABLE_SIMD_OPT )                            ///< SIMD optimization for the distortion calculations(SAD,SSE,HADAMARD), no impact on RD performance
+#if JVET_K0367_AFFINE_FIX_POINT
+#define ENABLE_SIMD_OPT_AFFINE_ME                       ( 1 && ENABLE_SIMD_OPT )                            ///< SIMD optimization for affine ME, no impact on RD performance
+#endif
 // End of SIMD optimizations
 
 
@@ -404,6 +434,12 @@ enum QuantFlags
 enum TransType
 {
   DCT2 = 0,
+#if JVET_K1000_SIMPLIFIED_EMT
+  DCT8 = 1,
+  DST7 = 2,
+  NUM_TRANS_TYPE = 3,
+  DCT2_EMT = 4
+#else
   DCT5 = 1,
   DCT8 = 2,
   DST1 = 3,
@@ -411,6 +447,7 @@ enum TransType
   NUM_TRANS_TYPE = 5,
   DCT2_HEVC = 6,
   DCT2_EMT = 7
+#endif
 };
 
 enum RDPCMMode
@@ -957,6 +994,9 @@ enum MergeType
   MRG_TYPE_SUBPU_ATMVP_EXT,      // 2
   MRG_TYPE_FRUC,                 // 3
   MRG_TYPE_FRUC_SET,             // 4
+#endif
+#if !JEM_TOOLS && JVET_K0346
+  MRG_TYPE_SUBPU_ATMVP,
 #endif
   NUM_MRG_TYPE                   // 5
 };

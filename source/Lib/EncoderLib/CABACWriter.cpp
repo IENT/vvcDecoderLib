@@ -1169,7 +1169,11 @@ void CABACWriter::coding_tree( const CodingStructure& cs, Partitioner& partition
   if (!cs.slice->isIntra() && m_EncCu)
   {
     PredictionUnit& pu = *cu.firstPU;
+#if JEM_TOOLS
     if (pu.mergeFlag && (pu.mergeType == MRG_TYPE_SUBPU_ATMVP || pu.mergeType == MRG_TYPE_SUBPU_ATMVP_EXT))
+#else
+    if (pu.mergeFlag && (pu.mergeType == MRG_TYPE_SUBPU_ATMVP))
+#endif
     {
       unsigned int layerId = cs.slice->getDepth();
       m_EncCu->incrementSubMergeBlkSize(layerId, cu.Y().width*cu.Y().height);
@@ -1714,11 +1718,11 @@ void CABACWriter::intra_chroma_pred_modes( const CodingUnit& cu )
   intra_chroma_pred_mode( *pu );
 }
 
-#if JEM_TOOLS
+#if JEM_TOOLS||JVET_K0190
 void CABACWriter::intra_chroma_lmc_mode( const PredictionUnit& pu )
 {
   const unsigned intraDir = pu.intraDir[1];
-
+#if JEM_TOOLS&&!JVET_K0190
   if ( pu.cs->sps->getSpsNext().getUseMDMS() )
   {
     m_BinEncoder.encodeBin( PU::isLMCMode( intraDir ) ? 0 : 1, Ctx::IPredMode[1]( 0 ) );
@@ -1746,6 +1750,7 @@ void CABACWriter::intra_chroma_lmc_mode( const PredictionUnit& pu )
   }
   else
   {
+#endif
     int lmModeList[10];
     int maxSymbol = PU::getLMSymbolList( pu, lmModeList );
     int symbol    = -1;
@@ -1760,9 +1765,12 @@ void CABACWriter::intra_chroma_lmc_mode( const PredictionUnit& pu )
     CHECK( symbol < 0, "invalid symbol found" );
 
     unary_max_symbol( symbol, Ctx::IPredMode[1]( 2 ), Ctx::IPredMode[1]( 3 ), maxSymbol - 1 );
+#if JEM_TOOLS&&!JVET_K0190
   }
+#endif
 }
 #endif
+
 
 void CABACWriter::intra_chroma_pred_mode( const PredictionUnit& pu )
 {
@@ -1784,7 +1792,7 @@ void CABACWriter::intra_chroma_pred_mode( const PredictionUnit& pu )
     m_BinEncoder.encodeBin( 1, Ctx::IPredMode[1]( 1 ) );
   }
 
-#if JEM_TOOLS
+#if JEM_TOOLS||JVET_K0190
   // LM chroma mode
   if( pu.cs->sps->getSpsNext().getUseLMChroma() )
   {
@@ -1867,14 +1875,14 @@ void CABACWriter::cu_residual( const CodingUnit& cu, Partitioner& partitioner, C
   transform_tree( *cu.cs, partitioner, cuCtx, chromaCbfs );
 #if JEM_TOOLS
   residual_nsst_mode( cu, cuCtx );
-
-#if !HM_EMT_NSST_AS_IN_JEM
-  cu_emt_pertu_idx( cu );
 #endif
+
+#if (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT) && !HM_EMT_NSST_AS_IN_JEM
+  cu_emt_pertu_idx( cu );
 #endif
 }
 
-#if JEM_TOOLS && !HM_EMT_NSST_AS_IN_JEM
+#if (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT) && !HM_EMT_NSST_AS_IN_JEM
 void CABACWriter::cu_emt_pertu_idx( const CodingUnit& cu )
 {
   bool anyCbf = false, anyNonTs = false;
@@ -1991,12 +1999,15 @@ void CABACWriter::prediction_unit( const PredictionUnit& pu )
     fruc_mrg_mode( pu );
     affine_flag  ( *pu.cu );
 #endif
+#if !JEM_TOOLS && JVET_K_AFFINE
+    affine_flag  ( *pu.cu );
+#endif
     merge_idx    ( pu );
   }
   else
   {
     inter_pred_idc( pu );
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
     affine_flag   ( *pu.cu );
 #endif
     if( pu.interDir != 2 /* PRED_L1 */ )
@@ -2005,13 +2016,26 @@ void CABACWriter::prediction_unit( const PredictionUnit& pu )
 #if JEM_TOOLS
       if( pu.cu->affine )
       {
-#if JVET_K0220_ENC_CTRL
         mvd_coding( pu.mvdAffi[REF_PIC_LIST_0][0], 0 );
         mvd_coding( pu.mvdAffi[REF_PIC_LIST_0][1], 0 );
-#else
-        CMotionBuf mb = pu.getMotionBuf();
-        mvd_coding( mb.at(          0, 0 ).mvdAffi[REF_PIC_LIST_0], 0 );
-        mvd_coding( mb.at( mb.width-1, 0 ).mvdAffi[REF_PIC_LIST_0], 0 );
+#if JVET_K0337_AFFINE_6PARA
+        if ( pu.cu->affineType == AFFINEMODEL_6PARAM )
+        {
+          mvd_coding( pu.mvdAffi[REF_PIC_LIST_0][2], 0 );
+        }
+#endif
+      }
+      else
+#elif JVET_K_AFFINE
+      if ( pu.cu->affine )
+      {
+        mvd_coding( pu.mvdAffi[REF_PIC_LIST_0][0] );
+        mvd_coding( pu.mvdAffi[REF_PIC_LIST_0][1] );
+#if JVET_K0337_AFFINE_6PARA
+        if ( pu.cu->affineType == AFFINEMODEL_6PARAM )
+        {
+          mvd_coding( pu.mvdAffi[REF_PIC_LIST_0][2] );
+        }
 #endif
       }
       else
@@ -2033,13 +2057,26 @@ void CABACWriter::prediction_unit( const PredictionUnit& pu )
 #if JEM_TOOLS
         if( pu.cu->affine )
         {
-#if JVET_K0220_ENC_CTRL
           mvd_coding( pu.mvdAffi[REF_PIC_LIST_1][0], 0 );
           mvd_coding( pu.mvdAffi[REF_PIC_LIST_1][1], 0 );
-#else
-          CMotionBuf mb = pu.getMotionBuf();
-          mvd_coding( mb.at(          0, 0 ).mvdAffi[REF_PIC_LIST_1], 0 );
-          mvd_coding( mb.at( mb.width-1, 0 ).mvdAffi[REF_PIC_LIST_1], 0 );
+#if JVET_K0337_AFFINE_6PARA
+          if ( pu.cu->affineType == AFFINEMODEL_6PARAM )
+          {
+            mvd_coding( pu.mvdAffi[REF_PIC_LIST_1][2], 0 );
+          }
+#endif
+        }
+        else
+#elif JVET_K_AFFINE
+        if ( pu.cu->affine )
+        {
+          mvd_coding( pu.mvdAffi[REF_PIC_LIST_1][0] );
+          mvd_coding( pu.mvdAffi[REF_PIC_LIST_1][1] );
+#if JVET_K0337_AFFINE_6PARA
+          if ( pu.cu->affineType == AFFINEMODEL_6PARAM )
+          {
+            mvd_coding( pu.mvdAffi[REF_PIC_LIST_1][2] );
+          }
 #endif
         }
         else
@@ -2057,10 +2094,14 @@ void CABACWriter::prediction_unit( const PredictionUnit& pu )
   }
 }
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
 void CABACWriter::affine_flag( const CodingUnit& cu )
 {
+#if JEM_TOOLS
   if( cu.cs->slice->isIntra() || !cu.cs->sps->getSpsNext().getUseAffine() || cu.partSize != SIZE_2Nx2N || cu.firstPU->frucMrgMode )
+#else
+  if( cu.cs->slice->isIntra() || !cu.cs->sps->getSpsNext().getUseAffine() || cu.partSize != SIZE_2Nx2N )
+#endif
   {
     return;
   }
@@ -2082,6 +2123,17 @@ void CABACWriter::affine_flag( const CodingUnit& cu )
   DTRACE( g_trace_ctx, D_COMMON, " (%d) affine_flag() affine=%d\n", DTRACE_GET_COUNTER(g_trace_ctx, D_COMMON), cu.affine ? 1 : 0 );
 
   DTRACE( g_trace_ctx, D_SYNTAX, "affine_flag() affine=%d ctx=%d pos=(%d,%d)\n", cu.affine ? 1 : 0, ctxId, cu.Y().x, cu.Y().y );
+
+#if JVET_K0337_AFFINE_6PARA
+  if ( cu.affine && !cu.firstPU->mergeFlag && cu.cs->sps->getSpsNext().getUseAffineType() )
+  {
+    unsigned ctxId = 0;
+    m_BinEncoder.encodeBin( cu.affineType, Ctx::AffineType( ctxId ) );
+
+    DTRACE( g_trace_ctx, D_COMMON, " (%d) affine_type() affine_type=%d\n", DTRACE_GET_COUNTER( g_trace_ctx, D_COMMON ), cu.affineType ? 1 : 0 );
+    DTRACE( g_trace_ctx, D_SYNTAX, "affine_type() affine_type=%d ctx=%d pos=(%d,%d)\n", cu.affineType ? 1 : 0, ctxId, cu.Y().x, cu.Y().y );
+  }
+#endif
 }
 #endif
 
@@ -2130,6 +2182,12 @@ void CABACWriter::merge_idx( const PredictionUnit& pu )
     return;
   }
 #endif
+#if !JEM_TOOLS && JVET_K_AFFINE
+  if ( pu.cu->affine )
+  {
+    return;
+  }
+#endif
 
   int numCandminus1 = int( pu.cs->slice->getMaxNumMergeCand() ) - 1;
   if( numCandminus1 > 0 )
@@ -2142,13 +2200,13 @@ void CABACWriter::merge_idx( const PredictionUnit& pu )
     }
     else
     {
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
       bool useExtCtx = pu.cs->sps->getSpsNext().getUseSubPuMvp();
 #endif
       m_BinEncoder.encodeBin( 1, Ctx::MergeIdx() );
       for( unsigned idx = 1; idx < numCandminus1; idx++ )
       {
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
         if( useExtCtx )
         {
           m_BinEncoder.encodeBin( pu.mergeIdx == idx ? 0 : 1, Ctx::MergeIdx( std::min<int>( idx, NUM_MERGE_IDX_EXT_CTX - 1 ) ) );
@@ -2174,7 +2232,7 @@ void CABACWriter::inter_pred_idc( const PredictionUnit& pu )
   {
     return;
   }
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
   if( pu.cu->partSize == SIZE_2Nx2N || pu.cs->sps->getSpsNext().getUseSubPuMvp() || pu.cu->lumaSize().width != 8 )
 #else
   if( pu.cu->partSize == SIZE_2Nx2N || pu.cu->lumaSize().width != 8 )
@@ -2406,7 +2464,7 @@ void CABACWriter::transform_tree( const CodingStructure& cs, Partitioner& partit
       chromaCbfs.Cb        = TU::getCbfAtDepth( tu, COMPONENT_Cb,  trDepth );
       chromaCbfs.Cr        = TU::getCbfAtDepth( tu, COMPONENT_Cr,  trDepth );
     }
-#if JEM_TOOLS && HM_EMT_NSST_AS_IN_JEM
+#if (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT) && HM_EMT_NSST_AS_IN_JEM
     if( trDepth == 0 ) emt_cu_flag( cu );
 #endif
 
@@ -2464,7 +2522,7 @@ void CABACWriter::transform_tree( const CodingStructure& cs, Partitioner& partit
       }
     }
 
-#if JEM_TOOLS && HM_EMT_NSST_AS_IN_JEM
+#if (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT) && HM_EMT_NSST_AS_IN_JEM
 #if ENABLE_BMS
     if( trDepth == 0 && TU::getCbfAtDepth( tu, COMPONENT_Y, 0 ) ) emt_cu_flag( cu );
 #else
@@ -2545,7 +2603,7 @@ void CABACWriter::mvd_coding( const Mv &rMvd )
   unsigned  horAbs  = unsigned( horMvd < 0 ? -horMvd : horMvd );
   unsigned  verAbs  = unsigned( verMvd < 0 ? -verMvd : verMvd );
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
   if( rMvd.highPrec )
   {
     CHECK( horAbs & ((1<<VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE)-1), "mvd-x has high precision fractional part." );
@@ -2718,7 +2776,7 @@ void CABACWriter::transform_unit_qtbt( const TransformUnit& tu, CUCtx& cuCtx, Ch
 
     if( tu.cbf[0] )
     {
-#if JEM_TOOLS && HM_EMT_NSST_AS_IN_JEM
+#if (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT) && HM_EMT_NSST_AS_IN_JEM
       emt_cu_flag( cu );
 #endif
       residual_coding( tu, COMPONENT_Y );
@@ -2748,7 +2806,11 @@ void CABACWriter::cu_qp_delta( const CodingUnit& cu, int predQP, const SChar qp 
   CHECK(!( predQP != std::numeric_limits<int>::max()), "Unspecified error");
   int       DQp         = qp - predQP;
   int       qpBdOffsetY = cu.cs->sps->getQpBDOffset( CHANNEL_TYPE_LUMA );
+#if JVET_K0251_QP_EXT
+  DQp                   = ( DQp + (MAX_QP + 1) + (MAX_QP + 1) / 2 + qpBdOffsetY + (qpBdOffsetY / 2)) % ((MAX_QP + 1) + qpBdOffsetY) - (MAX_QP + 1) / 2 - (qpBdOffsetY / 2);
+#else
   DQp                   = ( DQp + 78 + qpBdOffsetY + ( qpBdOffsetY / 2 ) ) % ( 52 + qpBdOffsetY ) - 26 - ( qpBdOffsetY / 2 );
+#endif
   unsigned  absDQP      = unsigned( DQp < 0 ? -DQp : DQp );
   unsigned  unaryDQP    = std::min<unsigned>( absDQP, CU_DQP_TU_CMAX );
 
@@ -2839,7 +2901,7 @@ void CABACWriter::residual_coding( const TransformUnit& tu, ComponentID compID )
 #else
   unsigned&           GRStats = m_BinEncoder.getCtx().getGRAdaptStats( TU::getGolombRiceStatisticsIndex( tu, compID ) );
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   unsigned            numSig  = 0;
 #endif
 
@@ -2868,7 +2930,7 @@ void CABACWriter::residual_coding( const TransformUnit& tu, ComponentID compID )
 #else
   cctx.setGoRiceStats( GRStats );
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   bool useEmt = ( cu.cs->sps->getSpsNext().getUseIntraEMT() && cu.predMode == MODE_INTRA ) || ( cu.cs->sps->getSpsNext().getUseInterEMT() && cu.predMode != MODE_INTRA );
   useEmt = useEmt && isLuma(compID);
 #endif
@@ -2882,7 +2944,7 @@ void CABACWriter::residual_coding( const TransformUnit& tu, ComponentID compID )
     residual_coding_subblock( cctx, coeff );
 #endif
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
     if (useEmt)
     {
       numSig += cctx.emtNumSigCoeff();
@@ -2896,7 +2958,7 @@ void CABACWriter::residual_coding( const TransformUnit& tu, ComponentID compID )
   GRStats = cctx.currGoRiceStats();
 #endif
 
-#if JEM_TOOLS && HM_EMT_NSST_AS_IN_JEM
+#if (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT) && HM_EMT_NSST_AS_IN_JEM
   if( useEmt && !tu.transformSkip[compID] && compID == COMPONENT_Y && tu.cu->emtFlag )
   {
     if( CU::isIntra( *tu.cu ) )
@@ -2921,7 +2983,7 @@ void CABACWriter::residual_coding( const TransformUnit& tu, ComponentID compID )
 
 void CABACWriter::transform_skip_flag( const TransformUnit& tu, ComponentID compID )
 {
-#if HM_EMT_NSST_AS_IN_JEM && JEM_TOOLS
+#if HM_EMT_NSST_AS_IN_JEM && (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT)
   if( !tu.cu->cs->pps->getUseTransformSkip() || tu.cu->transQuantBypass || !TU::hasTransformSkipFlag( *tu.cs, tu.blocks[compID] ) || ( isLuma( compID ) && tu.cu->emtFlag ) )
 #else
   if( !tu.cu->cs->pps->getUseTransformSkip() || tu.cu->transQuantBypass || !TU::hasTransformSkipFlag( *tu.cs, tu.blocks[compID] ) )
@@ -2934,7 +2996,7 @@ void CABACWriter::transform_skip_flag( const TransformUnit& tu, ComponentID comp
   DTRACE( g_trace_ctx, D_SYNTAX, "transform_skip_flag() etype=%d pos=(%d,%d) trSkip=%d\n", compID, tu.blocks[compID].x, tu.blocks[compID].y, (int)tu.transformSkip[compID] );
 }
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
 Void CABACWriter::emt_tu_index( const TransformUnit& tu )
 {
   int maxSizeEmtIntra, maxSizeEmtInter;

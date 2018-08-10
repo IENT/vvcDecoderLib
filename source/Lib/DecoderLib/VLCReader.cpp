@@ -812,6 +812,9 @@ void HLSyntaxReader::parseSPSNext( SPSNext& spsNext, const bool usePCM )
   READ_FLAG( symbol,    "intra_boundary_filter_enabled_flag" );     spsNext.setUseIntraBoundaryFilter ( symbol != 0 );
   READ_FLAG( symbol,    "subpu_tmvp_flag" );                        spsNext.setSubPuMvpMode           ( symbol );
 #endif
+#if !JEM_TOOLS && JVET_K0346
+  READ_FLAG( symbol,    "subpu_tmvp_flag" );                        spsNext.setSubPuMvpMode           (symbol);
+#endif
 #if JEM_TOOLS
   READ_FLAG( symbol,    "modified_cabac_engine_flag" );             spsNext.setCABACEngineMode        ( symbol );
 #endif
@@ -828,6 +831,9 @@ void HLSyntaxReader::parseSPSNext( SPSNext& spsNext, const bool usePCM )
   READ_FLAG( symbol,    "high_precision_motion_vectors" );          spsNext.setUseHighPrecMv          ( symbol != 0 );
   READ_FLAG( symbol,    "bio_enable_flag" );                        spsNext.setUseBIO                 ( symbol != 0 );
 #endif
+#if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
+  READ_FLAG( symbol,    "high_precision_motion_vectors"    );       spsNext.setUseHighPrecMv(symbol != 0);
+#endif
   READ_FLAG( symbol,    "disable_motion_compression_flag" );        spsNext.setDisableMotCompress     ( symbol != 0 );
 #if JEM_TOOLS
   READ_FLAG( symbol,    "lic_enabled_flag" );                       spsNext.setLICMode                ( symbol );
@@ -835,13 +841,34 @@ void HLSyntaxReader::parseSPSNext( SPSNext& spsNext, const bool usePCM )
 #if !JVET_K0371_ALF
   READ_FLAG( symbol,    "alf_enabled_flag" );                       spsNext.setALFEnabled             ( symbol );
 #endif
+#endif
+#if JEM_TOOLS||JVET_K0190
   READ_FLAG( symbol,    "lm_chroma_enabled_flag" );                 spsNext.setUseLMChroma            ( symbol != 0 );
+#endif
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   READ_FLAG( symbol,    "emt_intra_enabled_flag" );                 spsNext.setUseIntraEMT            ( symbol != 0 );
   READ_FLAG( symbol,    "emt_inter_enabled_flag" );                 spsNext.setUseInterEMT            ( symbol != 0 );
+#endif
+#if JEM_TOOLS
   READ_FLAG( symbol,    "obmc_flag" );                              spsNext.setUseOBMC                ( symbol != 0 );
   READ_FLAG( symbol,    "fruc_merge_flag" );                        spsNext.setUseFRUCMrgMode         ( symbol != 0 );
   READ_FLAG( symbol,    "affine_flag" );                            spsNext.setUseAffine              ( symbol != 0 );
+#if JVET_K0337_AFFINE_6PARA
+  if ( spsNext.getUseAffine() )
+  {
+    READ_FLAG( symbol,  "affine_type_flag" );                       spsNext.setUseAffineType          ( symbol != 0 );
+  }
+#endif
   READ_FLAG( symbol,    "adaptive_clipping_flag" );                 spsNext.setUseAClip               ( symbol != 0 );
+#endif
+#if !JEM_TOOLS && JVET_K_AFFINE
+  READ_FLAG( symbol,    "affine_flag" );                            spsNext.setUseAffine              ( symbol != 0 );
+#if JVET_K0337_AFFINE_6PARA
+  if ( spsNext.getUseAffine() )
+  {
+    READ_FLAG( symbol,  "affine_type_flag" );                       spsNext.setUseAffineType          ( symbol != 0 );
+  }
+#endif
 #endif
 #if JEM_TOOLS
   READ_FLAG( symbol,    "cipf_enabled_flag" );                      spsNext.setCIPFMode               ( symbol );
@@ -888,16 +915,19 @@ void HLSyntaxReader::parseSPSNext( SPSNext& spsNext, const bool usePCM )
     spsNext.setMaxBTDepth( maxBTD[0], maxBTD[1], maxBTD[2] );
   }
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
   if( spsNext.getUseSubPuMvp() )
   {
     READ_CODE( 3, symbol, "log2_sub_pu_tmvp_size_minus2" );         spsNext.setSubPuMvpLog2Size( symbol + MIN_CU_LOG2 );
 
 #if ENABLE_BMS
+#if JEM_TOOLS
     int subPuMode = 0;
-    READ_FLAG( symbol,  "use_atmvp" );                              subPuMode += symbol;
+    READ_FLAG(symbol, "use_atmvp");                              subPuMode += symbol;
     READ_FLAG( symbol,  "use_stmvp" );                              subPuMode += ( symbol << 1 );
-
+#else
+    int subPuMode = 1;
+#endif
     spsNext.setSubPuMvpMode( subPuMode );
 #else
     spsNext.setSubPuMvpMode( 3 );
@@ -955,12 +985,12 @@ void HLSyntaxReader::parseSPSNext( SPSNext& spsNext, const bool usePCM )
   {
     READ_CODE( 2, symbol, "aclip_quant" );                          spsNext.setAClipQuant( symbol * 2 );
   }
-
+#if !JVET_K0190
   if( spsNext.getUseLMChroma() )
   {
     READ_UVLC( symbol, "elm_mode_minus1" );                         spsNext.setELMMode( symbol );
   }
-
+#endif
   if( spsNext.getUseIntraPDPC() )
   {
     READ_FLAG( symbol, "planar_pdpc_flag" );                        spsNext.setIntraPDPCMode( symbol + 1 );
@@ -1799,7 +1829,7 @@ Void HLSyntaxReader::parseSliceHeader (Slice* pcSlice, ParameterSetManager *para
     }
     if (!pcSlice->isIntra())
     {
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
       READ_UVLC( uiCode, sps->getSpsNext().getUseSubPuMvp() ? "seven_minus_max_num_merge_cand" : "five_minus_max_num_merge_cand");
       pcSlice->setMaxNumMergeCand(MRG_MAX_NUM_CANDS - uiCode - ( sps->getSpsNext().getUseSubPuMvp() ? 0 : 2 ) );
 #else
@@ -1937,6 +1967,7 @@ Void HLSyntaxReader::parseSliceHeader (Slice* pcSlice, ParameterSetManager *para
         }
       }
     }
+#endif
 #if JVET_K0346
     if (sps->getSpsNext().getUseSubPuMvp() && !pcSlice->isIntra())
     {
@@ -1952,7 +1983,6 @@ Void HLSyntaxReader::parseSliceHeader (Slice* pcSlice, ParameterSetManager *para
         pcSlice->setSubPuMvpSubblkLog2Size(sps->getSpsNext().getSubPuMvpLog2Size());
       }
     }
-#endif
 #endif
   }
 

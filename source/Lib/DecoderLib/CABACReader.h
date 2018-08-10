@@ -104,7 +104,7 @@ public:
 #endif
   void        intra_luma_pred_modes     ( CodingUnit&                   cu );
   void        intra_chroma_pred_modes   ( CodingUnit&                   cu );
-#if JEM_TOOLS
+#if JEM_TOOLS||JVET_K0190
   bool        intra_chroma_lmc_mode     ( PredictionUnit&               pu );
 #endif
   void        intra_chroma_pred_mode    ( PredictionUnit&               pu );
@@ -116,7 +116,7 @@ public:
   void        prediction_unit           ( PredictionUnit&               pu,     MergeCtx&       mrgCtx );
   void        merge_flag                ( PredictionUnit&               pu );
   void        merge_data                ( PredictionUnit&               pu );
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
   void        affine_flag               ( CodingUnit&                   cu );
 #endif
   void        merge_idx                 ( PredictionUnit&               pu );
@@ -159,7 +159,7 @@ public:
 #endif
   void        cu_qp_delta               ( CodingUnit&                   cu,     int             predQP, SChar& qp );
   void        cu_chroma_qp_offset       ( CodingUnit&                   cu );
-#if JEM_TOOLS && !HM_EMT_NSST_AS_IN_JEM
+#if (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT) && !HM_EMT_NSST_AS_IN_JEM
   void        cu_emt_pertu_idx          ( CodingUnit&                   cu );
 #endif
 
@@ -168,6 +168,8 @@ public:
   void        transform_skip_flag       ( TransformUnit&                tu,     ComponentID     compID );
 #if JEM_TOOLS
   void        residual_nsst_mode        ( CodingUnit&                   cu );
+#endif
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   void        emt_tu_index              ( TransformUnit&                tu );
   void        emt_cu_flag               ( CodingUnit&                   cu );
 #endif

@@ -253,8 +253,11 @@ CodingUnit& CodingUnit::operator=( const CodingUnit& other )
   mtDepth           = other.mtDepth;
   splitSeries       = other.splitSeries;
   skip              = other.skip;
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
   affine            = other.affine;
+#if JVET_K0337_AFFINE_6PARA
+  affineType        = other.affineType;
+#endif
 #endif
   transQuantBypass  = other.transQuantBypass;
 #if JEM_TOOLS
@@ -264,11 +267,11 @@ CodingUnit& CodingUnit::operator=( const CodingUnit& other )
   qp                = other.qp;
   chromaQpAdj       = other.chromaQpAdj;
   rootCbf           = other.rootCbf;
-#if JEM_TOOLS
-  nsstIdx           = other.nsstIdx;
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   emtFlag           = other.emtFlag;
 #endif
 #if JEM_TOOLS
+  nsstIdx           = other.nsstIdx;
   LICFlag           = other.LICFlag;
 #endif
 #if HEVC_TILES_WPP
@@ -293,8 +296,11 @@ Void CodingUnit::initData()
   mtDepth           = 0;
   splitSeries       = 0;
   skip              = false;
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
   affine            = false;
+#if JVET_K0337_AFFINE_6PARA
+  affineType        = 0;
+#endif
 #endif
   transQuantBypass  = false;
 #if JEM_TOOLS
@@ -304,11 +310,11 @@ Void CodingUnit::initData()
   qp                = 0;
   chromaQpAdj       = 0;
   rootCbf           = true;
-#if JEM_TOOLS
-  nsstIdx           = 0;
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   emtFlag           = 0;
 #endif
 #if JEM_TOOLS
+  nsstIdx           = 0;
   LICFlag           = false;
 #endif
 #if HEVC_TILES_WPP
@@ -351,9 +357,8 @@ Void PredictionUnit::initData()
     refIdx[i] = -1;
     mv[i]     .setZero();
     mvd[i]    .setZero();
-#if JEM_TOOLS && JVET_K0220_ENC_CTRL
-
-    for( UInt j = 0; j < 2; j++ )
+#if JEM_TOOLS || JVET_K_AFFINE
+    for( UInt j = 0; j < 3; j++ )
     {
       mvdAffi[i][j].setZero();
     }
@@ -388,9 +393,8 @@ PredictionUnit& PredictionUnit::operator=(const InterPredictionData& predData)
     mv[i]       = predData.mv[i];
     mvd[i]      = predData.mvd[i];
     refIdx[i]   = predData.refIdx[i];
-#if JEM_TOOLS && JVET_K0220_ENC_CTRL
-
-    for( UInt j = 0; j < 2; j++ )
+#if JEM_TOOLS || JVET_K_AFFINE
+    for( UInt j = 0; j < 3; j++ )
     {
       mvdAffi[i][j] = predData.mvdAffi[i][j];
     }
@@ -422,9 +426,8 @@ PredictionUnit& PredictionUnit::operator=( const PredictionUnit& other )
     mv[i]       = other.mv[i];
     mvd[i]      = other.mvd[i];
     refIdx[i]   = other.refIdx[i];
-#if JEM_TOOLS && JVET_K0220_ENC_CTRL
-
-    for( UInt j = 0; j < 2; j++ )
+#if JEM_TOOLS || JVET_K_AFFINE
+    for( UInt j = 0; j < 3; j++ )
     {
       mvdAffi[i][j] = other.mvdAffi[i][j];
     }
@@ -524,7 +527,7 @@ Void TransformUnit::initData()
 #if ENABLE_BMS
   depth              = 0;
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   emtIdx             = 0;
 #endif
 
@@ -563,7 +566,7 @@ TransformUnit& TransformUnit::operator=(const TransformUnit& other)
 #if ENABLE_BMS
   depth              = other.depth;
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   emtIdx             = other.emtIdx;
 #endif
   return *this;
@@ -591,7 +594,7 @@ Void TransformUnit::copyComponentFrom(const TransformUnit& other, const Componen
 #endif
   if( isLuma( i ) )
   {
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
     emtIdx         = other.emtIdx;
 #endif
   }

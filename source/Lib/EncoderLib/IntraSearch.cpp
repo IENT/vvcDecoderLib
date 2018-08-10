@@ -339,13 +339,10 @@ Void IntraSearch::estIntraPredLumaQT( CodingUnit &cu, Partitioner &partitioner )
 #endif
 
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   const int width   = partitioner.currArea().lwidth();
   const int height  = partitioner.currArea().lheight();
-#endif
 
-
-#if JEM_TOOLS
   // Marking EMT usage for faster EMT
   // 0: EMT is either not applicable for current CU (cuWidth > EMT_INTRA_MAX_CU or cuHeight > EMT_INTRA_MAX_CU), not active in the config file or the fast decision algorithm is not used in this case
   // 1: EMT fast algorithm can be applied for the current CU, and the DCT2 is being checked
@@ -385,7 +382,7 @@ Void IntraSearch::estIntraPredLumaQT( CodingUnit &cu, Partitioner &partitioner )
   static_vector<Double, FAST_UDI_MAX_RDMODE_NUM> CandHadList;
 
   auto &pu = *cu.firstPU;
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   int puIndex = 0;
 #endif
   {
@@ -424,7 +421,7 @@ Void IntraSearch::estIntraPredLumaQT( CodingUnit &cu, Partitioner &partitioner )
 #endif
 
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
     if( emtUsageFlag != 2 )
 #endif
     {
@@ -727,7 +724,7 @@ Void IntraSearch::estIntraPredLumaQT( CodingUnit &cu, Partitioner &partitioner )
           uiRdModeList.push_back( i );
         }
       }
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
       if( emtUsageFlag == 1 )
       {
         // Store the modes to be checked with RD
@@ -736,7 +733,7 @@ Void IntraSearch::estIntraPredLumaQT( CodingUnit &cu, Partitioner &partitioner )
       }
 #endif
     }
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
     else //emtUsage = 2 (here we potentially reduce the number of modes that will be full-RD checked)
     {
       if( isAllIntra && m_pcEncCfg->getFastIntraEMT() )
@@ -849,7 +846,7 @@ Void IntraSearch::estIntraPredLumaQT( CodingUnit &cu, Partitioner &partitioner )
 
       xRecurIntraCodingLumaQT( *csTemp, partitioner );
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
       if( emtUsageFlag == 1 && m_pcEncCfg->getFastIntraEMT() )
       {
         m_modeCostStore[puIndex][uiMode] = csTemp->cost; //cs.cost;
@@ -871,7 +868,7 @@ Void IntraSearch::estIntraPredLumaQT( CodingUnit &cu, Partitioner &partitioner )
 #endif
         uiBestPUMode  = uiOrgMode;
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
         if( ( emtUsageFlag == 1 ) && m_pcEncCfg->getFastIntraEMT() )
         {
           m_bestModeCostStore[puIndex] = csBest->cost; //cs.cost;
@@ -964,8 +961,8 @@ Void IntraSearch::estIntraPredChromaQT(CodingUnit &cu, Partitioner &partitioner)
           orgTUs.push_back( ptu );
         }
       }
-#if JEM_TOOLS
 
+#if JEM_TOOLS&&!JVET_K0190
 #if DISTORTION_TYPE_BUGFIX
       Distortion auiSATDModeList[LM_FILTER_NUM];
 #else
@@ -1054,8 +1051,7 @@ Void IntraSearch::estIntraPredChromaQT(CodingUnit &cu, Partitioner &partitioner)
       for (UInt uiMode = uiMinMode; uiMode < uiMaxMode; uiMode++)
       {
         const int chromaIntraMode = chromaCandModes[uiMode];
-#if JEM_TOOLS
-
+#if JEM_TOOLS||JVET_K0190
         if( PU::isLMCMode( chromaIntraMode ) && ! PU::isLMCModeEnabled( pu, chromaIntraMode ) )
         {
           continue;
@@ -1084,7 +1080,7 @@ Void IntraSearch::estIntraPredChromaQT(CodingUnit &cu, Partitioner &partitioner)
           }
         }
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS&&!JVET_K0190
         if( pu.cs->pcv->noRQT && pu.cs->sps->getSpsNext().isELMModeMFLM())
         {
           if( chromaIntraMode >= LM_CHROMA_F1_IDX &&  chromaIntraMode < LM_CHROMA_F1_IDX + LM_FILTER_NUM)
@@ -1495,16 +1491,17 @@ Void IntraSearch::xIntraCodingTUBlock(TransformUnit &tu, const ComponentID &comp
   PelBuf         piReco                     = cs.getRecoBuf   (area);
 
   const PredictionUnit &pu                  = *cs.getPU(area.pos(), chType);
-#if JEM_TOOLS || ENABLE_TRACING
+#if JEM_TOOLS || ENABLE_TRACING||JVET_K0190
   const UInt           uiChFinalMode        = PU::getFinalIntraMode(pu, chType);
 
 #endif
   const Bool           bUseCrossCPrediction = pps.getPpsRangeExtension().getCrossComponentPredictionEnabledFlag() && isChroma( compID ) && PU::isChromaIntraModeCrossCheckMode( pu ) && checkCrossCPrediction;
   const Bool           ccUseRecoResi        = m_pcEncCfg->getUseReconBasedCrossCPredictionEstimate();
 
-#if JEM_TOOLS
+#if JVET_K1000_SIMPLIFIED_EMT
+  const UChar          transformIndex       = tu.cu->emtFlag && compID == COMPONENT_Y ? tu.emtIdx : DCT2_EMT ;
+#elif JEM_TOOLS
   const UChar          transformIndex       = tu.cu->emtFlag && compID == COMPONENT_Y ? tu.emtIdx : ( tu.cu->cs->sps->getSpsNext().getUseIntraEMT() ? DCT2_EMT : DCT2_HEVC );
-#else
 #endif
 
   //===== init availability pattern =====
@@ -1524,7 +1521,7 @@ Void IntraSearch::xIntraCodingTUBlock(TransformUnit &tu, const ComponentID &comp
     initIntraPatternChType( *tu.cu, area, bUseFilteredPredictions );
 
     //===== get prediction signal =====
-#if JEM_TOOLS
+#if JEM_TOOLS||JVET_K0190
     if( compID != COMPONENT_Y && PU::isLMCMode( uiChFinalMode ) )
     {
 #if !ENABLE_BMS
@@ -1539,7 +1536,7 @@ Void IntraSearch::xIntraCodingTUBlock(TransformUnit &tu, const ComponentID &comp
 #endif
     {
       predIntraAng( compID, piPred, pu, bUseFilteredPredictions );
-#if JEM_TOOLS
+#if JEM_TOOLS&&!JVET_K0190
       if( compID == COMPONENT_Cr && sps.getSpsNext().getUseLMChroma() )
       {
         const CPelBuf pResiCb = cs.getResiBuf( tu.Cb() );
@@ -1593,8 +1590,8 @@ Void IntraSearch::xIntraCodingTUBlock(TransformUnit &tu, const ComponentID &comp
 #if RDOQ_CHROMA_LAMBDA
   m_pcTrQuant->selectLambda(compID);
 #endif
-#if JEM_TOOLS
 
+#if JEM_TOOLS||JVET_K0190
   if( ! PU::isLMCMode(uiChFinalMode) && sps.getSpsNext().getUseLMChroma() )
   {
     if( compID == COMPONENT_Cb )
@@ -1617,8 +1614,12 @@ Void IntraSearch::xIntraCodingTUBlock(TransformUnit &tu, const ComponentID &comp
 #endif
   m_pcTrQuant->transformNxN(tu, compID, cQP, uiAbsSum, m_CABACEstimator->getCtx());
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
+#if JVET_K1000_SIMPLIFIED_EMT
+  if( transformIndex != DCT2_EMT && ( !tu.transformSkip[COMPONENT_Y] ) ) //this can only be true if compID is luma
+#else
   if( transformIndex != DCT2_EMT && transformIndex != DCT2_HEVC && ( !tu.transformSkip[COMPONENT_Y] ) ) //this can only be true if compID is luma
+#endif
   {
     *numSig = 0;
     TCoeff* coeffBuffer = tu.getCoeffs(compID).buf;
@@ -2032,7 +2033,7 @@ Void IntraSearch::xRecurIntraCodingLumaQT( CodingStructure &cs, Partitioner &par
 ChromaCbfs IntraSearch::xRecurIntraChromaCodingQT(CodingStructure &cs, Partitioner& partitioner)
 {
   UnitArea currArea                   = partitioner.currArea();
-#if JEM_TOOLS
+#if JEM_TOOLS||JVET_K0190
   const bool keepResi                 = cs.sps->getSpsNext().getUseLMChroma() || KEEP_PRED_AND_RESI_SIGNALS;
 #else
   const bool keepResi                 = KEEP_PRED_AND_RESI_SIGNALS;
@@ -2297,8 +2298,13 @@ void IntraSearch::encPredIntraDPCM( const ComponentID &compID, PelBuf &pOrg, Pel
 {
   CHECK( pOrg.buf == 0, "Encoder DPCM called without original buffer" );
 
+#if JVET_K0500_WAIP
+  const int srcStride = m_topRefLength + 1;
+  CPelBuf   pSrc = CPelBuf(getPredictorPtr(compID), srcStride, m_leftRefLength + 1);
+#else
   const int srcStride = (pDst.width + pDst.height + 1);
   CPelBuf   pSrc      = CPelBuf( getPredictorPtr( compID ), srcStride, srcStride );
+#endif
 
   // Sample Adaptive intra-Prediction (SAP)
   if( uiDirMode == HOR_IDX )

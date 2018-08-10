@@ -1733,6 +1733,9 @@ SPSNext::SPSNext( SPS& sps )
   , m_IntraBoundaryFilter       ( false )
   , m_SubPuMvp                  ( false )
 #endif
+#if !JEM_TOOLS && JVET_K0346
+  , m_SubPuMvp                  ( false )
+#endif
 #if JEM_TOOLS
   , m_ModifiedCABACEngine       ( false )
 #endif
@@ -1749,14 +1752,21 @@ SPSNext::SPSNext( SPS& sps )
   , m_highPrecMv                ( false )
   , m_BIO                       ( false )
 #endif
+#if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
+  , m_highPrecMv                ( false )
+#endif
   , m_DisableMotionCompression  ( false )
 #if JEM_TOOLS
   , m_LICEnabled                ( false )
   , m_IntraPDPC                 ( false )
+#endif
 #if !JVET_K0371_ALF
   , m_ALFEnabled                ( false )
 #endif
+#if JEM_TOOLS||JVET_K0190
   , m_LMChroma                  ( false )
+#endif
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   , m_IntraEMT                  ( false )
   , m_InterEMT                  ( false )
 #endif
@@ -1764,7 +1774,16 @@ SPSNext::SPSNext( SPS& sps )
   , m_OBMC                      ( false )
   , m_FRUC                      ( false )
   , m_Affine                    ( false )
+#if JVET_K0337_AFFINE_6PARA
+  , m_AffineType                ( false )
+#endif
   , m_AClip                     ( false )
+#endif
+#if !JEM_TOOLS && JVET_K_AFFINE
+  , m_Affine                    ( false )
+#if JVET_K0337_AFFINE_6PARA
+  , m_AffineType                ( false )
+#endif
 #endif
 #if JEM_TOOLS
   , m_CIPFEnabled               ( false )
@@ -1784,7 +1803,7 @@ SPSNext::SPSNext( SPS& sps )
   , m_minQT                     { 0, 0 }
   , m_maxBTDepth                { MAX_BT_DEPTH, MAX_BT_DEPTH_INTER, MAX_BT_DEPTH_C }
   , m_maxBTSize                 { MAX_BT_SIZE,  MAX_BT_SIZE_INTER,  MAX_BT_SIZE_C }
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
   , m_subPuLog2Size             ( 0 )
   , m_subPuMrgMode              ( 0 )
 #endif
@@ -1811,7 +1830,9 @@ SPSNext::SPSNext( SPS& sps )
   , m_FRUCSmallBlkRefineDepth   ( 3 )
 #endif
 #if JEM_TOOLS
+#if !JVET_K0190
   , m_ELMMode                   ( 0 )
+#endif
   , m_IntraPDPCMode             ( 0 )
 #endif
 #if JEM_TOOLS

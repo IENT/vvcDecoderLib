@@ -53,6 +53,10 @@
 #include "CommonLib/BilateralFilter.h"
 #endif
 
+#if JVET_K0367_AFFINE_FIX_POINT
+#include "CommonLib/AffineGradientSearch.h"
+#endif
+
 //! \ingroup EncoderLib
 //! \{
 
@@ -67,7 +71,11 @@ static const UInt NUM_MV_PREDICTORS         = 3;
 class EncModeCtrl;
 
 /// encoder search class
+#if JVET_K0367_AFFINE_FIX_POINT
+class InterSearch : public InterPrediction, CrossComponentPrediction, AffineGradientSearch
+#else
 class InterSearch : public InterPrediction, CrossComponentPrediction
+#endif
 {
 private:
   EncModeCtrl     *m_modeCtrl;
@@ -75,8 +83,13 @@ private:
   PelStorage      m_tmpPredStorage              [NUM_REF_PIC_LIST_01];
   PelStorage      m_tmpStorageLCU;
   PelStorage      m_tmpAffiStorage;
+#if JVET_K0367_AFFINE_FIX_POINT
+  Pel*            m_tmpAffiError;
+  int*            m_tmpAffiDeri[2];
+#else
   Int*            m_tmpAffiError;
   Double*         m_tmpAffiDeri[2];
+#endif
 
   CodingStructure ****m_pSplitCS;
   CodingStructure ****m_pFullCS;
@@ -339,7 +352,7 @@ protected:
                                     Distortion&           ruiCost
                                   );
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
   Void xPredAffineInterSearch     ( PredictionUnit&       pu,
                                     PelUnitBuf&           origBuf,
                                     Int                   puIdx,
@@ -350,6 +363,10 @@ protected:
 #else
                                     Mv                    hevcMv[2][33],
                                     Bool                  bFastSkipBi
+#endif
+#if JVET_K0185_AFFINE_6PARA_ENC
+                                  , Mv                    mvAffine4Para[2][33][3]
+                                  , int                   refIdx4Para[2]
 #endif
                                   );
 

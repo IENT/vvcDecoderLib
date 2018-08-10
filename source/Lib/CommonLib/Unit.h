@@ -295,8 +295,11 @@ struct CodingUnit : public UnitArea
   SChar          qp;
   SplitSeries    splitSeries;
   Bool           skip;
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
   Bool           affine;
+#if JVET_K0337_AFFINE_6PARA
+  int            affineType;
+#endif
 #endif
   Bool           transQuantBypass;
 #if JEM_TOOLS
@@ -310,9 +313,11 @@ struct CodingUnit : public UnitArea
 #if HEVC_TILES_WPP
   UInt           tileIdx;
 #endif
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
+  UChar          emtFlag;
+#endif
 #if JEM_TOOLS
   UInt           nsstIdx;
-  UChar          emtFlag;
 #endif
 #if JEM_TOOLS
   Bool           LICFlag;
@@ -369,9 +374,9 @@ struct InterPredictionData
 #if JEM_TOOLS
   UChar     frucMrgMode;
   Bool      mvRefine;
-#if JVET_K0220_ENC_CTRL
-  Mv        mvdAffi [NUM_REF_PIC_LIST_01][2];
 #endif
+#if JEM_TOOLS || JVET_K_AFFINE
+  Mv        mvdAffi [NUM_REF_PIC_LIST_01][3];
 #endif
 };
 
@@ -427,7 +432,7 @@ struct TransformUnit : public UnitArea
 #if ENABLE_BMS
   UChar        depth;
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   UChar        emtIdx;
 #endif
   UChar        cbf          [ MAX_NUM_TBLOCKS ];

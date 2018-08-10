@@ -304,7 +304,7 @@ CoeffCodingContext::CoeffCodingContext(const TransformUnit& tu, ComponentID comp
   , m_altResiCompId             ( tu.cs->sps->getSpsNext().getAltResiCompId() )
 #endif
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   , m_emtNumSigCoeff            (0)
 #endif
 {
@@ -635,7 +635,7 @@ unsigned DeriveCtx::CtxInterDir( const PredictionUnit& pu )
   return pu.cu->qtDepth;
 }
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
 unsigned DeriveCtx::CtxAffineFlag( const CodingUnit& cu )
 {
   const CodingStructure *cs = cu.cs;

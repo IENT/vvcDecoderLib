@@ -727,7 +727,10 @@ bool BestEncInfoCache::setFromCs( const CodingStructure& cs, const Partitioner& 
   encInfo.tu.repositionTo( *cs.tus.front() );
   encInfo.cu             = *cs.cus.front();
   encInfo.pu             = *cs.pus.front();
-  encInfo.tu             = *cs.tus.front();
+  for( auto &blk : cs.tus.front()->blocks )
+  {
+    if( blk.valid() ) encInfo.tu.copyComponentFrom( *cs.tus.front(), blk.compID );
+  }
   encInfo.testMode       = getCSEncMode( cs );
 
   return true;
@@ -762,9 +765,9 @@ bool BestEncInfoCache::setCsFrom( CodingStructure& cs, EncTestMode& testMode, co
     return false;
   }
 
-  CodingUnit     &cu = cs.addCU( cs.area, partitioner.chType );
-  PredictionUnit &pu = cs.addPU( cs.area, partitioner.chType );
-  TransformUnit  &tu = cs.addTU( cs.area, partitioner.chType );
+  CodingUnit     &cu = cs.addCU( CS::getArea( cs, cs.area, partitioner.chType ), partitioner.chType );
+  PredictionUnit &pu = cs.addPU( CS::getArea( cs, cs.area, partitioner.chType ), partitioner.chType );
+  TransformUnit  &tu = cs.addTU( CS::getArea( cs, cs.area, partitioner.chType ), partitioner.chType );
 
   cu          .repositionTo( encInfo.cu );
   pu          .repositionTo( encInfo.pu );
@@ -772,7 +775,10 @@ bool BestEncInfoCache::setCsFrom( CodingStructure& cs, EncTestMode& testMode, co
 
   cu          = encInfo.cu;
   pu          = encInfo.pu;
-  tu          = encInfo.tu;
+  for( auto &blk : tu.blocks )
+  {
+    if( blk.valid() ) tu.copyComponentFrom( encInfo.tu, blk.compID );
+  }
 
   testMode    = encInfo.testMode;
 
@@ -896,7 +902,9 @@ unsigned SaveLoadEncInfoCtrl::getSaveLoadFrucMode( const UnitArea& area )
 
   return m_saveLoadInfo[idx3][idx4].frucMode;
 }
+#endif
 
+#if JEM_TOOLS || JVET_K_AFFINE
 unsigned SaveLoadEncInfoCtrl::getSaveLoadAffineFlag( const UnitArea& area )
 {
   unsigned idx1, idx2, idx3, idx4;
@@ -1272,7 +1280,7 @@ void EncModeCtrlMTnoRQT::initCULevel( Partitioner &partitioner, const CodingStru
         }
 #endif
         m_ComprCUCtxList.back().testModes.push_back( { ETM_MERGE_SKIP,  SIZE_2Nx2N, ETO_STANDARD, qp, lossless } );
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
         if( cs.sps->getSpsNext().getUseAffine() )
         {
           m_ComprCUCtxList.back().testModes.push_back( { ETM_AFFINE,      SIZE_2Nx2N, ETO_STANDARD, qp, lossless } );
@@ -1291,7 +1299,7 @@ void EncModeCtrlMTnoRQT::initCULevel( Partitioner &partitioner, const CodingStru
         }
 #endif
         m_ComprCUCtxList.back().testModes.push_back( { ETM_MERGE_SKIP,  SIZE_2Nx2N, ETO_STANDARD, qp, lossless } );
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
         if( cs.sps->getSpsNext().getUseAffine() )
         {
           m_ComprCUCtxList.back().testModes.push_back( { ETM_AFFINE,      SIZE_2Nx2N, ETO_STANDARD, qp, lossless } );
@@ -1678,6 +1686,16 @@ Bool EncModeCtrlMTnoRQT::tryMode( const EncTestMode& encTestmode, const CodingSt
       }
     }
 #endif
+#if !JEM_TOOLS && JVET_K_AFFINE
+#if JVET_K0220_ENC_CTRL
+    if ( encTestmode.type == ETM_AFFINE && relatedCU.isIntra )
+#else
+    if ( encTestmode.type == ETM_AFFINE && ((saveLoadTag == LOAD_ENC_INFO && !sls.affineFlag) || relatedCU.isIntra) )
+#endif
+    {
+      return false;
+    }
+#endif
     return true;
   }
   else if( isModeSplit( encTestmode ) )
@@ -1999,6 +2017,9 @@ Bool EncModeCtrlMTnoRQT::tryMode( const EncTestMode& encTestmode, const CodingSt
           sls.frucMode   = bestCU->firstPU->frucMrgMode;
           sls.affineFlag = bestCU->affine;
 #endif
+#if !JEM_TOOLS && JVET_K_AFFINE
+          sls.affineFlag = bestCU->affine;
+#endif
         }
         else
         {
@@ -2008,7 +2029,7 @@ Bool EncModeCtrlMTnoRQT::tryMode( const EncTestMode& encTestmode, const CodingSt
 #endif
         }
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
         sls.emtCuFlag  = bestCU->emtFlag;
         sls.emtTuIndex = bestCU->firstTU->emtIdx; //since this is the QTBT path, there is only one TU
 #endif
@@ -2051,7 +2072,7 @@ Bool EncModeCtrlMTnoRQT::useModeResult( const EncTestMode& encTestmode, CodingSt
   {
     cuECtx.set( BEST_TRIV_SPLIT_COST, tempCS->cost );
   }
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   else if( encTestmode.type == ETM_INTRA && encTestmode.partSize == SIZE_2Nx2N )
   {
     const CodingUnit cu = *tempCS->getCU( partitioner.chType );

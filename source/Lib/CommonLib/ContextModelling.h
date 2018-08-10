@@ -434,11 +434,11 @@ public:
   }
 #endif
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   unsigned        emtNumSigCoeff()                          const { return m_emtNumSigCoeff; }
   void            setEmtNumSigCoeff( unsigned val )               { m_emtNumSigCoeff = val; }
-
 #endif
+
 private:
   // constant
   const ComponentID         m_compID;
@@ -526,7 +526,7 @@ private:
   unsigned                  m_altResiCompId;
 #endif
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   unsigned                  m_emtNumSigCoeff;
 #endif
 };
@@ -567,6 +567,10 @@ public:
   MotionBuf     subPuMvpExtMiBuf;
   MotionBuf     subPuFrucMiBuf;
 #endif
+#if !JEM_TOOLS && JVET_K0346
+  MotionBuf     subPuMvpMiBuf;
+  MotionBuf     subPuMvpExtMiBuf;
+#endif
   Void setMergeInfo( PredictionUnit& pu, int candIdx );
 };
 
@@ -595,6 +599,9 @@ unsigned CtxIMVFlag   ( const CodingUnit& cu );
 unsigned CtxAffineFlag( const CodingUnit& cu );
 unsigned CtxFrucFlag  ( const PredictionUnit& pu );
 unsigned CtxFrucMode  ( const PredictionUnit& pu );
+#endif
+#if !JEM_TOOLS && JVET_K_AFFINE
+unsigned CtxAffineFlag( const CodingUnit& cu );
 #endif
 }
 

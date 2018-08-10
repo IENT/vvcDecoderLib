@@ -854,6 +854,10 @@ Void EncLib::xInitSPS(SPS &sps)
   sps.getSpsNext().setSubPuMvpMode          ( m_SubPuMvpMode );
   sps.getSpsNext().setSubPuMvpLog2Size      ( m_SubPuMvpLog2Size );
 #endif
+#if !JEM_TOOLS && JVET_K0346
+  sps.getSpsNext().setSubPuMvpMode(m_SubPuMvpMode);
+  sps.getSpsNext().setSubPuMvpLog2Size(m_SubPuMvpLog2Size);
+#endif
 #if JEM_TOOLS
   sps.getSpsNext().setCABACEngineMode       ( m_CABACEngineMode );
 #endif
@@ -868,19 +872,29 @@ Void EncLib::xInitSPS(SPS &sps)
   sps.getSpsNext().setAltResiCompId         ( m_altResiCompId );
 #endif
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
   sps.getSpsNext().setUseHighPrecMv         ( m_highPrecMv );
   sps.getSpsNext().setUseAffine             ( m_Affine );
+#if JVET_K0337_AFFINE_6PARA
+  sps.getSpsNext().setUseAffineType         ( m_AffineType );
+#endif
+#endif
+#if JEM_TOOLS
   sps.getSpsNext().setUseBIO                ( m_BIO );
+#endif
+#if !JEM_TOOLS && JVET_K0346 && !JVET_K_AFFINE
+  sps.getSpsNext().setUseHighPrecMv(m_highPrecMv);
 #endif
   sps.getSpsNext().setDisableMotCompress    ( m_DisableMotionCompression );
 #if JEM_TOOLS
   sps.getSpsNext().setLICMode               ( m_LICMode );
 #endif
   sps.getSpsNext().setMTTMode               ( m_MTTMode );
-#if JEM_TOOLS
+#if JEM_TOOLS||JVET_K0190
   sps.getSpsNext().setUseLMChroma           ( m_LMChroma ? true : false );
+#if !JVET_K0190
   sps.getSpsNext().setELMMode               ( m_LMChroma > 1 ? m_LMChroma - 1 : 0 );
+#endif
 #endif
 #if ENABLE_WPP_PARALLELISM
   sps.getSpsNext().setUseNextDQP            ( m_AltDQPCoding );

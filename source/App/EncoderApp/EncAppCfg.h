@@ -211,7 +211,7 @@ protected:
   bool      m_IntraBoundaryFilter;                            ///< Indicates whether intra boundary filter is used
 #endif
   bool      m_LargeCTU;
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
   int       m_SubPuMvpMode;
   unsigned  m_SubPuMvpLog2Size;
 #endif
@@ -225,7 +225,19 @@ protected:
 #if JEM_TOOLS
   bool      m_highPrecisionMv;
   bool      m_Affine;
+#if JVET_K0337_AFFINE_6PARA
+  bool      m_AffineType;
+#endif
   bool      m_BIO;
+#endif
+#if !JEM_TOOLS && JVET_K_AFFINE
+  bool      m_Affine;
+#if JVET_K0337_AFFINE_6PARA
+  bool      m_AffineType;
+#endif
+#endif
+#if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
+  bool      m_highPrecisionMv;
 #endif
   bool      m_DisableMotionCompression;
 #if JEM_TOOLS
@@ -241,9 +253,15 @@ protected:
 #if !JVET_K0371_ALF
   int       m_ALF;
 #endif
+#endif
+#if JEM_TOOLS||JVET_K0190
   int       m_LMChroma;
+#endif
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   int       m_EMT;                                            ///< XZ: Enhanced Multiple Transform
   int       m_FastEMT;                                        ///< XZ: Fast Methods of Enhanced Multiple Transform
+#endif
+#if JEM_TOOLS
   bool      m_OBMC;
   int       m_OBMCBlkSize;
   bool      m_FRUC;
@@ -251,6 +269,7 @@ protected:
   unsigned  m_FRUCRefineRange;
   unsigned  m_FRUCSmallBlkRefineDepth;
 #endif
+
 #if JEM_TOOLS
   unsigned  m_CIPF;
 #endif
