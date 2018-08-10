@@ -225,7 +225,7 @@ Void EncApp::xInitLibCfg()
   m_cEncLib.setUseIntraBoundaryFilter                            ( m_IntraBoundaryFilter);
 #endif
   m_cEncLib.setLargeCTU                                          ( m_LargeCTU );
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
 #if ENABLE_BMS
   m_cEncLib.setSubPuMvpMode                                      ( m_SubPuMvpMode );
 #else
@@ -245,13 +245,16 @@ Void EncApp::xInitLibCfg()
   m_cEncLib.setAffine                                            ( m_Affine );
   m_cEncLib.setBIO                                               ( m_BIO );
 #endif
+#if !JEM_TOOLS && JVET_K0346
+  m_cEncLib.setHighPrecisionMv                                   (m_highPrecisionMv);
+#endif
   m_cEncLib.setDisableMotionCompression                          ( m_DisableMotionCompression );
 #if JEM_TOOLS
   m_cEncLib.setLICMode                                           ( m_LICMode );
   m_cEncLib.setFastPicLevelLIC                                   ( m_LICMode ? m_FastPicLevelLIC : false );
 #endif
   m_cEncLib.setMTTMode                                           ( m_MTT );
-#if JEM_TOOLS
+#if JEM_TOOLS||JVET_K0190
   m_cEncLib.setUseLMChroma                                       ( m_LMChroma );
 #endif
 #if ENABLE_WPP_PARALLELISM
@@ -260,6 +263,8 @@ Void EncApp::xInitLibCfg()
 #if JEM_TOOLS
   m_cEncLib.setIntraPDPC                                         ( m_IntraPDPC );
   m_cEncLib.setALF                                               ( m_ALF );
+#endif
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   m_cEncLib.setIntraEMT                                          ( m_EMT & 1 );
   m_cEncLib.setFastIntraEMT                                      ( m_FastEMT & m_EMT & 1 );
   m_cEncLib.setInterEMT                                          ( ( m_EMT >> 1 ) & 1 );

@@ -114,12 +114,22 @@ namespace CU
 // PU tools
 namespace PU
 {
+#if JVET_K0190
+  int  getLMSymbolList(const PredictionUnit &pu, Int *pModeList);
+#if JEM_TOOLS
+  int  getIntraMPMs(const PredictionUnit &pu, unsigned *mpm, const ChannelType &channelType = CHANNEL_TYPE_LUMA, const bool isChromaMDMS = false, const unsigned startIdx = 0);  
+  int  getDMModes(const PredictionUnit &pu, unsigned *modeList);
+#else
+  int  getIntraMPMs(const PredictionUnit &pu, unsigned *mpm, const ChannelType &channelType = CHANNEL_TYPE_LUMA);
+#endif
+#else
 #if JEM_TOOLS
   int  getIntraMPMs                   (const PredictionUnit &pu, unsigned *mpm, const ChannelType &channelType = CHANNEL_TYPE_LUMA, const bool isChromaMDMS = false, const unsigned startIdx = 0 );
   int  getLMSymbolList                (const PredictionUnit &pu, Int *pModeList);
   int  getDMModes                     (const PredictionUnit &pu, unsigned *modeList);
 #else
   int  getIntraMPMs                   (const PredictionUnit &pu, unsigned *mpm, const ChannelType &channelType = CHANNEL_TYPE_LUMA);
+#endif
 #endif
   void getIntraChromaCandModes        (const PredictionUnit &pu, unsigned modeList[NUM_CHROMA_MODE]);
   UInt getFinalIntraMode              (const PredictionUnit &pu, const ChannelType &chType);
@@ -155,6 +165,10 @@ namespace PU
 #endif
   bool isBIOLDB                       (const PredictionUnit &pu);
 #endif
+#if !JEM_TOOLS && JVET_K0346
+  bool getInterMergeSubPuMvpCand(const PredictionUnit &pu, MergeCtx &mrgCtx, bool& LICFlag, const int count);
+  bool getInterMergeSubPuRecurCand(const PredictionUnit &pu, MergeCtx &mrgCtx, const int count);
+#endif
   bool isBiPredFromDifferentDir       (const PredictionUnit &pu);
   void restrictBiPredMergeCands       (const PredictionUnit &pu, MergeCtx& mrgCtx);
 #if JEM_TOOLS
@@ -163,10 +177,15 @@ namespace PU
   bool isSameMVField                  (const PredictionUnit &pu, RefPicList eListA, MvField &rMVFieldA, RefPicList eListB, MvField &rMVFieldB);
   Mv   scaleMv                        (const Mv &rColMV, Int iCurrPOC, Int iCurrRefPOC, Int iColPOC, Int iColRefPOC, Slice *slice);
 #endif
-#if JEM_TOOLS
+
+#if JEM_TOOLS||JVET_K0190
   bool isLMCMode                      (                          unsigned mode);
+#endif
+#if JEM_TOOLS
   bool isMMLMEnabled                  (const PredictionUnit &pu);
   bool isMFLMEnabled                  (const PredictionUnit &pu);
+#endif
+#if JEM_TOOLS||JVET_K0190
   bool isLMCModeEnabled               (const PredictionUnit &pu, unsigned mode);
 #endif
   bool isChromaIntraModeCrossCheckMode(const PredictionUnit &pu);

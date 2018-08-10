@@ -127,7 +127,11 @@ static const Double MAX_DOUBLE =                             1.7e+308; ///< max.
 static const Int MAX_GOP =                                         64; ///< max. value of hierarchical GOP size
 static const Int MAX_NUM_REF_PICS =                                16; ///< max. number of pictures used for reference
 static const Int MAX_NUM_REF =                                     16; ///< max. number of entries in picture reference list
+#if JVET_K0251_QP_EXT
+static const Int MAX_QP =                                          63;
+#else
 static const Int MAX_QP =                                          51;
+#endif
 static const Int NOT_VALID =                                       -1;
 
 static const Int AMVP_MAX_NUM_CANDS =                               2; ///< AMVP: advanced motion vector prediction - max number of final candidates
@@ -185,12 +189,17 @@ static const Int ADJ_DEQUANT_SHIFT =            ( ADJ_QUANT_SHIFT + 1 );
 static const Int RVM_VCEGAM10_M =                                   4;
 
 static const Int NUM_LUMA_MODE =                                   67; ///< Planar + DC + 65 directional mode (4*16 + 1)
+#if JVET_K0190
+static const Int NUM_LMC_MODE = 1; ///< LMC
+static const Int NUM_INTRA_MODE = (NUM_LUMA_MODE + NUM_LMC_MODE);
+#else
 #if JEM_TOOLS
 static const Int LM_FILTER_NUM =                                    4;
 static const Int NUM_LMC_MODE =                   (2 + LM_FILTER_NUM); ///< LMC + MMLM + MFLM(4)
 static const Int NUM_INTRA_MODE =      (NUM_LUMA_MODE + NUM_LMC_MODE);
 #else
 static const Int NUM_INTRA_MODE =                   NUM_LUMA_MODE + 1;
+#endif
 #endif
 
 static const Int NUM_DIR =           (((NUM_LUMA_MODE - 3) >> 2) + 1);
@@ -202,6 +211,13 @@ static const Int VER_IDX =                    (3 * (NUM_DIR - 1) + 2); ///< inde
 static const Int VDIA_IDX =                   (4 * (NUM_DIR - 1) + 2); ///< index for intra VDIAGONAL  mode
 static const Int NOMODE_IDX =                               MAX_UCHAR; ///< indicating uninitialized elements
 
+#if JVET_K0190
+static const Int NUM_CHROMA_MODE = (5 + NUM_LMC_MODE); ///< total number of chroma modes
+#if JEM_TOOLS
+static const Int NUM_DM_MODES = 5; ///< total number of chroma DM modes
+#endif
+static const Int LM_CHROMA_IDX = NUM_LUMA_MODE; ///< chroma mode index for derived from LM mode
+#else
 #if JEM_TOOLS
 static const Int NUM_CHROMA_MODE =                 (5 + NUM_LMC_MODE); ///< total number of chroma modes
 static const Int NUM_DM_MODES =                                     5; ///< total number of chroma DM modes
@@ -214,25 +230,36 @@ static const Int LM_CHROMA_F4_IDX =                 LM_CHROMA_IDX + 5;
 #else
 static const Int NUM_CHROMA_MODE =                                  5; ///< total number of chroma modes
 #endif
+#endif
 static const Int DM_CHROMA_IDX =                       NUM_INTRA_MODE; ///< chroma mode index for derived from luma intra mode
 
 static const UChar INTER_MODE_IDX =                               255; ///< index for inter modes
-#if JEM_TOOLS
+
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
 static const UInt  EMT_INTRA_MAX_CU =                              32; ///< Max Intra CU size applying EMT, supported values: 8, 16, 32, 64, 128
 static const UInt  EMT_INTER_MAX_CU =                              32; ///< Max Inter CU size applying EMT, supported values: 8, 16, 32, 64, 128
+#if JVET_K1000_SIMPLIFIED_EMT
+static const UInt  EMT_INTRA_MAX_CU_WITH_QTBT =                    32; ///< Max Intra CU size applying EMT, supported values: 8, 16, 32, 64, 128
+static const UInt  EMT_INTER_MAX_CU_WITH_QTBT =                    32; ///< Max Inter CU size applying EMT, supported values: 8, 16, 32, 64, 128
+#else
 static const UInt  EMT_INTRA_MAX_CU_WITH_QTBT =                    64; ///< Max Intra CU size applying EMT, supported values: 8, 16, 32, 64, 128
 static const UInt  EMT_INTER_MAX_CU_WITH_QTBT =                    64; ///< Max Inter CU size applying EMT, supported values: 8, 16, 32, 64, 128
-
 #endif
+#endif
+
 #if INTRA67_3MPM
 static const int NUM_MOST_PROBABLE_MODES = 3;
 #else
 static const Int NUM_MOST_PROBABLE_MODES = 3;
 static const Int NUM_MOST_PROBABLE_MODES_67 = 6;
 #endif
+#if JVET_K0190
+static const Int LM_SYMBOL_NUM = (1 + NUM_LMC_MODE);
+#else
 #if JEM_TOOLS
 static const Int MMLM_SAMPLE_NEIGHBOR_LINES =                       2;
 static const Int LM_SYMBOL_NUM =                   (1 + NUM_LMC_MODE);
+#endif
 #endif
 
 static const Int FAST_UDI_MAX_RDMODE_NUM =              NUM_LUMA_MODE; ///< maximum number of RD comparison in fast-UDI estimation loop
@@ -256,7 +283,7 @@ static const Int CABAC_INIT_PRESENT_FLAG =                          1;
 
 static const Int LUMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS   = 4;
 static const Int CHROMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS = 8;
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
 static const Int VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE         = 2;   ///< additional precision bit for MV storage
 #endif
 
@@ -333,10 +360,10 @@ static const Int MAX_ENCODER_DEBLOCKING_QUALITY_LAYERS =           8 ;
 static const UInt LUMA_LEVEL_TO_DQP_LUT_MAXSIZE =                1024; ///< max LUT size for QP offset based on luma
 
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
 static const Int NUM_EMT_CU_FLAG_CTX =                              6;      ///< number of context models for EMT CU-level flag
-
 #endif
+
 //QTBT high level parameters
 //for I slice luma CTB configuration para.
 static const Int    MAX_BT_DEPTH  =                                 4;      ///<  <=7

@@ -72,16 +72,17 @@ private:
 
   static const UChar m_aucIntraFilter[MAX_NUM_CHANNEL_TYPE][MAX_INTRA_FILTER_DEPTHS];
 
-#if JEM_TOOLS
+#if JEM_TOOLS||JVET_K0190
   unsigned m_auShiftLM[32]; // Table for substituting division operation by multiplication
 
 #endif
   Pel* m_piTemp;
+#if !JVET_K0190
 #if JEM_TOOLS
   Pel*   m_pLumaRecBufferMul[LM_FILTER_NUM];
 #endif
-
-#if JEM_TOOLS
+#endif
+#if JEM_TOOLS && !JVET_K0063_PDPC_SIMP
   // copy unfiltered ref. samples to line buffer
   Pel                    m_piTempRef[4 * MAX_CU_SIZE + 1];
   Pel                    m_piFiltRef[4 * MAX_CU_SIZE + 1];
@@ -91,6 +92,10 @@ protected:
 
   ChromaFormat  m_currChromaFormat;
 
+#if JVET_K0500_WAIP
+  int m_topRefLength;
+  int m_leftRefLength;
+#endif
   // prediction
   Void xPredIntraPlanar           ( const CPelBuf &pSrc, PelBuf &pDst,                                                                                                         const SPS& sps );
   Void xPredIntraDc               ( const CPelBuf &pSrc, PelBuf &pDst, const ChannelType channelType,                                                                                          const bool enableBoundaryFilter = true );
@@ -114,11 +119,20 @@ protected:
   // dc filtering
   Void xDCPredFiltering           ( const CPelBuf &pSrc, PelBuf &pDst, const ChannelType &channelType );
 #endif
-  Void xReferenceFilter           ( const int doubleSize, const int origWeight, const int filterOrder, Pel *piRefVector, Pel *piLowPassRef );
+#if JVET_K0500_WAIP
+  static int getWideAngle         ( int width, int height, int predMode );
+  void setReferenceArrayLengths   ( const CompArea &area );
+#endif
+  Void xReferenceFilter           (
+#if JVET_K0500_WAIP
+    const int doubleHSize,
+#endif
+    const int doubleSize, const int origWeight, const int filterOrder, Pel *piRefVector, Pel *piLowPassRef );
 
   Void destroy                    ();
 
   Void xFilterGroup               ( Pel* pMulDst[], Int i, Pel const* const piSrc, Int iRecStride, Bool bAboveAvaillable, Bool bLeftAvaillable);
+#if !JVET_K0190
 #if JEM_TOOLS
 
   struct MMLM_parameter
@@ -136,6 +150,9 @@ protected:
   Void xGetLMParameters           (const PredictionUnit &pu, const ComponentID compID, const CompArea& chromaArea, Int iPredType, Int& a, Int& b, Int& iShift);
 
 #endif
+#else
+  Void xGetLMParameters(const PredictionUnit &pu, const ComponentID compID, const CompArea& chromaArea, Int& a, Int& b, Int& iShift);
+#endif
 public:
   IntraPrediction();
   virtual ~IntraPrediction();
@@ -145,12 +162,17 @@ public:
   // Angular Intra
   void predIntraAng               ( const ComponentID compId, PelBuf &piPred, const PredictionUnit &pu, const bool useFilteredPredSamples );
   Pel*  getPredictorPtr           (const ComponentID compID, const Bool bUseFilteredPredictions = false) { return m_piYuvExt[compID][bUseFilteredPredictions?PRED_BUF_FILTERED:PRED_BUF_UNFILTERED]; }
+#if JVET_K0190
+  // Cross-component Chroma
+  Void predIntraChromaLM(const ComponentID compID, PelBuf &piPred, const PredictionUnit &pu, const CompArea& chromaArea, Int intraDir);
+  Void xGetLumaRecPixels(const PredictionUnit &pu, CompArea chromaArea);
+#else
 #if JEM_TOOLS
   // Cross-component Chroma
   Void predIntraChromaLM          (const ComponentID compID, PelBuf &piPred, const PredictionUnit &pu, const CompArea& chromaArea, Int intraDir);
   Void xGetLumaRecPixels          (const PredictionUnit &pu, CompArea chromaArea);
   Void addCrossColorResi          (const ComponentID compID, PelBuf &piPred, const TransformUnit &tu, const CPelBuf &pResiCb);
-
+#endif
 #endif
   /// set parameters from CU data for accessing intra data
   Void initIntraPatternChType     (const CodingUnit &cu, const CompArea &area, const Bool bFilterRefSamples = false );

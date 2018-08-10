@@ -310,9 +310,11 @@ struct CodingUnit : public UnitArea
 #if HEVC_TILES_WPP
   UInt           tileIdx;
 #endif
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
+  UChar          emtFlag;
+#endif
 #if JEM_TOOLS
   UInt           nsstIdx;
-  UChar          emtFlag;
 #endif
 #if JEM_TOOLS
   Bool           LICFlag;
@@ -427,7 +429,7 @@ struct TransformUnit : public UnitArea
 #if ENABLE_BMS
   UChar        depth;
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   UChar        emtIdx;
 #endif
   UChar        cbf          [ MAX_NUM_TBLOCKS ];

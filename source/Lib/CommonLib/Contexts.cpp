@@ -1364,7 +1364,7 @@ const CtxSet ContextSetCfg::RdpcmDir = ContextSetCfg::addCtxSet
   {  CNU, CNU,},
 });
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
 const CtxSet ContextSetCfg::EMTTuIndex = ContextSetCfg::addCtxSet
 ({
   {  CNU, CNU, CNU, CNU,},
@@ -1378,8 +1378,8 @@ const CtxSet ContextSetCfg::EMTCuFlag = ContextSetCfg::addCtxSet
   {  CNU, CNU, CNU, CNU, CNU, CNU,},
   {  CNU, CNU, CNU, CNU, CNU, CNU,},
 });
-
 #endif
+
 const CtxSet ContextSetCfg::CrossCompPred = ContextSetCfg::addCtxSet
 ({
   {  154, 154, 154, 154, 154, 154, 154, 154, 154, 154,},

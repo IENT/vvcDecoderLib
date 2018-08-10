@@ -1206,21 +1206,17 @@ void EncCu::xCheckModeSplit(CodingStructure *&tempCS, CodingStructure *&bestCS, 
 
 void EncCu::xCheckRDCostIntra( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode )
 {
-#if JEM_TOOLS
-  double bestInterCost        = m_modeCtrl->getBestInterCost();
-#endif
-#if JEM_TOOLS
-#endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
+  double bestInterCost             = m_modeCtrl->getBestInterCost();
   double costSize2Nx2NemtFirstPass = m_modeCtrl->getEmtSize2Nx2NFirstPassCost();
   double costSizeNxNemtFirstPass   = MAX_DOUBLE;
   bool skipSecondEmtPass           = m_modeCtrl->getSkipSecondEMTPass();
+  const SPS &sps                   = *tempCS->sps;
 #endif
 #if JEM_TOOLS
 #if !JVET_K0220_ENC_CTRL
   auto slsCtrl                = dynamic_cast<SaveLoadEncInfoCtrl*>( m_modeCtrl );
 #endif
-  const SPS &sps              = *tempCS->sps;
 #endif
   const PPS &pps              = *tempCS->pps;
   const CodingUnit *bestCU    = bestCS->getCU( partitioner.chType );
@@ -1230,16 +1226,17 @@ void EncCu::xCheckRDCostIntra( CodingStructure *&tempCS, CodingStructure *&bestC
 #if JEM_TOOLS
   const bool usePDPC          = ( encTestMode.opts & ETO_PDPC ) != 0;
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   const int maxSizeEMT        = pps.pcv->noRQT ? EMT_INTRA_MAX_CU_WITH_QTBT : EMT_INTRA_MAX_CU;
 #endif
-#if JEM_TOOLS
-
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
 #if HM_EMT_NSST_AS_IN_JEM
   UChar considerEmtSecondPass = ( sps.getSpsNext().getUseIntraEMT() && isLuma( partitioner.chType ) && partitioner.currArea().lwidth() <= maxSizeEMT && partitioner.currArea().lheight() <= maxSizeEMT ) ? 1 : 0;
 #else
   UChar considerEmtSecondPass = ( sps.getSpsNext().getUseIntraEMT() && isLuma( partitioner.chType ) && partitioner.currArea().lwidth() <= maxSizeEMT && partitioner.currArea().lheight() <= maxSizeEMT && nsstIdx == 0 ) ? 1 : 0;
 #endif
+#endif
+#if JEM_TOOLS
   CHECK( usePDPC && sps.getSpsNext().isPlanarPDPC(), "PDPC cannot be on with Planar-PDPC" );
 #endif
 
@@ -1247,13 +1244,13 @@ void EncCu::xCheckRDCostIntra( CodingStructure *&tempCS, CodingStructure *&bestC
 
 
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   for( UChar emtCuFlag = 0; emtCuFlag <= considerEmtSecondPass; emtCuFlag++ )
 #else
   for( UChar numPasses = 0; numPasses < 1; numPasses++ )
 #endif
   {
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
     //Possible early EMT tests interruptions
 #if !JVET_K0220_ENC_CTRL
     //1) saveLoadTag code for EMT
@@ -1298,6 +1295,8 @@ void EncCu::xCheckRDCostIntra( CodingStructure *&tempCS, CodingStructure *&bestC
   //cu.ipcm             = false;
 #if JEM_TOOLS
     cu.nsstIdx          = nsstIdx;
+#endif
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
     cu.emtFlag          = emtCuFlag;
 #endif
 
@@ -1400,7 +1399,7 @@ void EncCu::xCheckRDCostIntra( CodingStructure *&tempCS, CodingStructure *&bestC
     }
 #endif
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
     // we save the cost of the modes for the first EMT pass
     if( !emtCuFlag ) static_cast< double& >( cu.partSize == SIZE_2Nx2N ? costSize2Nx2NemtFirstPass : costSizeNxNemtFirstPass ) = tempCS->cost;
 #endif
@@ -1413,7 +1412,7 @@ void EncCu::xCheckRDCostIntra( CodingStructure *&tempCS, CodingStructure *&bestC
     xCheckBestMode( tempCS, bestCS, partitioner, encTestMode );
 
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
     //now we check whether the second pass of SIZE_2Nx2N and the whole Intra SIZE_NxN should be skipped or not
 #if JVET_K0220_ENC_CTRL
     if( !emtCuFlag && !tempCS->slice->isIntra() && bestCU && bestCU->predMode != MODE_INTRA && cu.partSize == SIZE_2Nx2N && m_pcEncCfg->getFastInterEMT() )
@@ -1597,12 +1596,14 @@ void EncCu::xCheckRDCostMerge2Nx2N( CodingStructure *&tempCS, CodingStructure *&
   MergeCtx mergeCtx;
   const SPS &sps = *tempCS->sps;
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0346
   if( sps.getSpsNext().getUseSubPuMvp() )
   {
     Size bufSize = g_miScaling.scale( tempCS->area.lumaSize() );
     mergeCtx.subPuMvpMiBuf    = MotionBuf( m_SubPuMiBuf,    bufSize );
+#if JEM_TOOLS
     mergeCtx.subPuMvpExtMiBuf = MotionBuf( m_SubPuExtMiBuf, bufSize );
+#endif
   }
 #endif
 

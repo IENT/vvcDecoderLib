@@ -50,14 +50,23 @@
 #include <assert.h>
 #include <cassert>
 
+#define JVET_K1000_SIMPLIFIED_EMT                         1 // EMT with only DCT-2, DCT-8 and DST-7
+
 #define DEBLOCKING_GRID_8x8                               1
 #define DB_TU_FIX                                         1 // fix in JVET_K0307, JVET-K0237, JVET-K0369, JVET-K0232, JVET-K0315
+
+#define JVET_K0190                                        1 //Only Keep CCLM
 
 #ifndef INTRA67_3MPM  // JVET-K0529
 #define INTRA67_3MPM                                      1
 #endif
 
+#define JVET_K0500_WAIP                                   1 // Wide-Angle Intra Prediction
+
 #define JVET_K0072                                        1
+
+#define JVET_K0122                                        1 // CE3-related: Alternative techniques for DC mode without division
+                                                            // Test 2: Samples are taken only along with a longer side
 
 #define JVET_K0220_ENC_CTRL                               1 // remove HM_NO_ADDITIONAL_SPEEDUPS when adopting
 #if JVET_K0220_ENC_CTRL
@@ -71,6 +80,11 @@
 #define JVET_K0554                                        1 // when adopting, also remove the macro HM_QTBT_ONLY_QT_IMPLICIT (keep the case for value 0)
 
 #define JVET_K0346                                        1 // simplifications on ATMVP
+#define JVET_K0063_PDPC_SIMP                              1 // Simplified PDPC
+
+#define JVET_K0351_LESS_CONSTRAINT                        1 // Only disallow binary split with same orientation in center partition of the ternary split and release the other constraints in K0351.
+
+#define JVET_K0251_QP_EXT                                 1 // Extending the QP parameter value range for coarse quantization 
 
 #ifndef JEM_TOOLS
 #define JEM_TOOLS                                         1 // Defines the inclusion of JEM tools into compiled executable
@@ -398,6 +412,12 @@ enum QuantFlags
 enum TransType
 {
   DCT2 = 0,
+#if JVET_K1000_SIMPLIFIED_EMT
+  DCT8 = 1,
+  DST7 = 2,
+  NUM_TRANS_TYPE = 3,
+  DCT2_EMT = 4
+#else
   DCT5 = 1,
   DCT8 = 2,
   DST1 = 3,
@@ -405,6 +425,7 @@ enum TransType
   NUM_TRANS_TYPE = 5,
   DCT2_HEVC = 6,
   DCT2_EMT = 7
+#endif
 };
 
 enum RDPCMMode
@@ -951,6 +972,9 @@ enum MergeType
   MRG_TYPE_SUBPU_ATMVP_EXT,      // 2
   MRG_TYPE_FRUC,                 // 3
   MRG_TYPE_FRUC_SET,             // 4
+#endif
+#if !JEM_TOOLS && JVET_K0346
+  MRG_TYPE_SUBPU_ATMVP,
 #endif
   NUM_MRG_TYPE                   // 5
 };
