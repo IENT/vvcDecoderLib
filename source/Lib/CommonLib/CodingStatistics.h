@@ -422,6 +422,7 @@ public:
 
   ~CodingStatistics()
   {
+#if RExt__DECODER_DEBUG_BIT_STATISTICS
     const Int64 es = CODINGSTATISTICS_ENTROPYSCALE;
 
     Int64 countTotal = 0;
@@ -603,7 +604,9 @@ public:
     OutputDashedLine( "GRAND TOTAL" );
     epTotalBits += cavlcTotalBits;
     OutputLine      ( "TOTAL",                  '~', "~~GT~~", "~~GT~~", "~~GT~~", cabacTotalBits, epTotalBits );
+#endif //RExt__DECODER_DEBUG_BIT_STATISTICS
 
+#ifdef RExt__DECODER_DEBUG_TOOL_STATISTICS
 #if JEM_TOOLS
     printf("\n");
     printf( " %-45s-   Width Height   Type        Count  Impacted pixels  %% Impacted pixels\n", "Tools statistics" );
@@ -663,7 +666,8 @@ public:
         }
       }
     }
-#endif
+#endif //JEM_TOOLS
+#endif //RExt__DECODER_DEBUG_TOOL_STATISTICS
   }
 
    static CodingStatistics& GetSingletonInstance()
