@@ -57,6 +57,8 @@ Void InterpolationFilter::initInterpolationFilterX86( /*Int iBitDepthY, Int iBit
     _initInterpolationFilterX86<AVX2>(/*iBitDepthY, iBitDepthC*/);
     break;
   case AVX:
+    _initInterpolationFilterX86<AVX>(/*iBitDepthY, iBitDepthC*/);
+    break;
   case SSE42:
   case SSE41:
     _initInterpolationFilterX86<SSE41>(/*iBitDepthY, iBitDepthC*/);
@@ -77,6 +79,8 @@ Void PelBufferOps::initPelBufOpsX86()
       _initPelBufOpsX86<AVX2>();
       break;
     case AVX:
+      _initPelBufOpsX86<AVX>();
+      break;
     case SSE42:
     case SSE41:
       _initPelBufOpsX86<SSE41>();
@@ -100,6 +104,8 @@ Void RdCost::initRdCostX86()
       _initRdCostX86<AVX2>();
       break;
     case AVX:
+      _initRdCostX86<AVX>();
+      break;
     case SSE42:
     case SSE41:
       _initRdCostX86<SSE41>();
