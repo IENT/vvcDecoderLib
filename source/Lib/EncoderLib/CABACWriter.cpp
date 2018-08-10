@@ -1989,12 +1989,15 @@ void CABACWriter::prediction_unit( const PredictionUnit& pu )
     fruc_mrg_mode( pu );
     affine_flag  ( *pu.cu );
 #endif
+#if !JEM_TOOLS && JVET_K_AFFINE
+    affine_flag  ( *pu.cu );
+#endif
     merge_idx    ( pu );
   }
   else
   {
     inter_pred_idc( pu );
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
     affine_flag   ( *pu.cu );
 #endif
     if( pu.interDir != 2 /* PRED_L1 */ )
@@ -2003,13 +2006,26 @@ void CABACWriter::prediction_unit( const PredictionUnit& pu )
 #if JEM_TOOLS
       if( pu.cu->affine )
       {
-#if JVET_K0220_ENC_CTRL
         mvd_coding( pu.mvdAffi[REF_PIC_LIST_0][0], 0 );
         mvd_coding( pu.mvdAffi[REF_PIC_LIST_0][1], 0 );
-#else
-        CMotionBuf mb = pu.getMotionBuf();
-        mvd_coding( mb.at(          0, 0 ).mvdAffi[REF_PIC_LIST_0], 0 );
-        mvd_coding( mb.at( mb.width-1, 0 ).mvdAffi[REF_PIC_LIST_0], 0 );
+#if JVET_K0337_AFFINE_6PARA
+        if ( pu.cu->affineType == AFFINEMODEL_6PARAM )
+        {
+          mvd_coding( pu.mvdAffi[REF_PIC_LIST_0][2], 0 );
+        }
+#endif
+      }
+      else
+#elif JVET_K_AFFINE
+      if ( pu.cu->affine )
+      {
+        mvd_coding( pu.mvdAffi[REF_PIC_LIST_0][0] );
+        mvd_coding( pu.mvdAffi[REF_PIC_LIST_0][1] );
+#if JVET_K0337_AFFINE_6PARA
+        if ( pu.cu->affineType == AFFINEMODEL_6PARAM )
+        {
+          mvd_coding( pu.mvdAffi[REF_PIC_LIST_0][2] );
+        }
 #endif
       }
       else
@@ -2031,13 +2047,26 @@ void CABACWriter::prediction_unit( const PredictionUnit& pu )
 #if JEM_TOOLS
         if( pu.cu->affine )
         {
-#if JVET_K0220_ENC_CTRL
           mvd_coding( pu.mvdAffi[REF_PIC_LIST_1][0], 0 );
           mvd_coding( pu.mvdAffi[REF_PIC_LIST_1][1], 0 );
-#else
-          CMotionBuf mb = pu.getMotionBuf();
-          mvd_coding( mb.at(          0, 0 ).mvdAffi[REF_PIC_LIST_1], 0 );
-          mvd_coding( mb.at( mb.width-1, 0 ).mvdAffi[REF_PIC_LIST_1], 0 );
+#if JVET_K0337_AFFINE_6PARA
+          if ( pu.cu->affineType == AFFINEMODEL_6PARAM )
+          {
+            mvd_coding( pu.mvdAffi[REF_PIC_LIST_1][2], 0 );
+          }
+#endif
+        }
+        else
+#elif JVET_K_AFFINE
+        if ( pu.cu->affine )
+        {
+          mvd_coding( pu.mvdAffi[REF_PIC_LIST_1][0] );
+          mvd_coding( pu.mvdAffi[REF_PIC_LIST_1][1] );
+#if JVET_K0337_AFFINE_6PARA
+          if ( pu.cu->affineType == AFFINEMODEL_6PARAM )
+          {
+            mvd_coding( pu.mvdAffi[REF_PIC_LIST_1][2] );
+          }
 #endif
         }
         else
@@ -2055,10 +2084,14 @@ void CABACWriter::prediction_unit( const PredictionUnit& pu )
   }
 }
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
 void CABACWriter::affine_flag( const CodingUnit& cu )
 {
+#if JEM_TOOLS
   if( cu.cs->slice->isIntra() || !cu.cs->sps->getSpsNext().getUseAffine() || cu.partSize != SIZE_2Nx2N || cu.firstPU->frucMrgMode )
+#else
+  if( cu.cs->slice->isIntra() || !cu.cs->sps->getSpsNext().getUseAffine() || cu.partSize != SIZE_2Nx2N )
+#endif
   {
     return;
   }
@@ -2080,6 +2113,17 @@ void CABACWriter::affine_flag( const CodingUnit& cu )
   DTRACE( g_trace_ctx, D_COMMON, " (%d) affine_flag() affine=%d\n", DTRACE_GET_COUNTER(g_trace_ctx, D_COMMON), cu.affine ? 1 : 0 );
 
   DTRACE( g_trace_ctx, D_SYNTAX, "affine_flag() affine=%d ctx=%d pos=(%d,%d)\n", cu.affine ? 1 : 0, ctxId, cu.Y().x, cu.Y().y );
+
+#if JVET_K0337_AFFINE_6PARA
+  if ( cu.affine && !cu.firstPU->mergeFlag && cu.cs->sps->getSpsNext().getUseAffineType() )
+  {
+    unsigned ctxId = 0;
+    m_BinEncoder.encodeBin( cu.affineType, Ctx::AffineType( ctxId ) );
+
+    DTRACE( g_trace_ctx, D_COMMON, " (%d) affine_type() affine_type=%d\n", DTRACE_GET_COUNTER( g_trace_ctx, D_COMMON ), cu.affineType ? 1 : 0 );
+    DTRACE( g_trace_ctx, D_SYNTAX, "affine_type() affine_type=%d ctx=%d pos=(%d,%d)\n", cu.affineType ? 1 : 0, ctxId, cu.Y().x, cu.Y().y );
+  }
+#endif
 }
 #endif
 
@@ -2124,6 +2168,12 @@ void CABACWriter::merge_idx( const PredictionUnit& pu )
 {
 #if JEM_TOOLS
   if( pu.frucMrgMode || pu.cu->affine )
+  {
+    return;
+  }
+#endif
+#if !JEM_TOOLS && JVET_K_AFFINE
+  if ( pu.cu->affine )
   {
     return;
   }
@@ -2543,7 +2593,7 @@ void CABACWriter::mvd_coding( const Mv &rMvd )
   unsigned  horAbs  = unsigned( horMvd < 0 ? -horMvd : horMvd );
   unsigned  verAbs  = unsigned( verMvd < 0 ? -verMvd : verMvd );
 
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
   if( rMvd.highPrec )
   {
     CHECK( horAbs & ((1<<VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE)-1), "mvd-x has high precision fractional part." );

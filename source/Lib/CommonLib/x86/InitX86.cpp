@@ -44,6 +44,10 @@
 #include "CommonLib/RdCost.h"
 #include "CommonLib/Buffer.h"
 
+#if JVET_K0367_AFFINE_FIX_POINT
+#include "CommonLib/AffineGradientSearch.h"
+#endif
+
 #ifdef TARGET_SIMD_X86
 
 
@@ -112,6 +116,28 @@ Void RdCost::initRdCostX86()
       break;
     default:
       break;
+  }
+}
+#endif
+
+#if ENABLE_SIMD_OPT_AFFINE_ME
+void AffineGradientSearch::initAffineGradientSearchX86()
+{
+  auto vext = read_x86_extension_flags();
+  switch ( vext ) {
+  case AVX512:
+  case AVX2:
+    _initAffineGradientSearchX86<AVX2>();
+    break;
+  case AVX:
+    _initAffineGradientSearchX86<AVX>();
+    break;
+  case SSE42:
+  case SSE41:
+    _initAffineGradientSearchX86<SSE41>();
+    break;
+  default:
+    break;
   }
 }
 #endif

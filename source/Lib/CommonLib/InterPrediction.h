@@ -158,6 +158,9 @@ protected:
 #else
   Void xWeightedAverage         ( const PredictionUnit& pu, const CPelUnitBuf& pcYuvSrc0, const CPelUnitBuf& pcYuvSrc1, PelUnitBuf& pcYuvDst, const BitDepths& clipBitDepths, const ClpRngs& clpRngs );
 #endif
+#if !JEM_TOOLS && JVET_K_AFFINE
+  Void xPredAffineBlk( const ComponentID& compID, const PredictionUnit& pu, const Picture* refPic, const Mv* _mv, PelUnitBuf& dstPic, const Bool& bi, const ClpRng& clpRng );
+#endif
 
   static Bool xCheckIdenticalMotion( const PredictionUnit& pu );
 

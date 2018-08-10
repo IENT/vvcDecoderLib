@@ -295,8 +295,11 @@ struct CodingUnit : public UnitArea
   SChar          qp;
   SplitSeries    splitSeries;
   Bool           skip;
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
   Bool           affine;
+#if JVET_K0337_AFFINE_6PARA
+  int            affineType;
+#endif
 #endif
   Bool           transQuantBypass;
 #if JEM_TOOLS
@@ -371,9 +374,9 @@ struct InterPredictionData
 #if JEM_TOOLS
   UChar     frucMrgMode;
   Bool      mvRefine;
-#if JVET_K0220_ENC_CTRL
-  Mv        mvdAffi [NUM_REF_PIC_LIST_01][2];
 #endif
+#if JEM_TOOLS || JVET_K_AFFINE
+  Mv        mvdAffi [NUM_REF_PIC_LIST_01][3];
 #endif
 };
 
