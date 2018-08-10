@@ -259,7 +259,9 @@ Void EncApp::xInitLibCfg()
 #endif
 #if JEM_TOOLS
   m_cEncLib.setIntraPDPC                                         ( m_IntraPDPC );
+#if !JVET_K0371_ALF
   m_cEncLib.setALF                                               ( m_ALF );
+#endif
   m_cEncLib.setIntraEMT                                          ( m_EMT & 1 );
   m_cEncLib.setFastIntraEMT                                      ( m_FastEMT & m_EMT & 1 );
   m_cEncLib.setInterEMT                                          ( ( m_EMT >> 1 ) & 1 );
@@ -565,6 +567,9 @@ Void EncApp::xInitLibCfg()
   m_cEncLib.setNumWppExtraLines                                  ( m_numWppExtraLines );
   m_cEncLib.setEnsureWppBitEqual                                 ( m_ensureWppBitEqual );
 
+#endif
+#if JVET_K0371_ALF
+  m_cEncLib.setUseALF                                            ( m_alf );
 #endif
 }
 

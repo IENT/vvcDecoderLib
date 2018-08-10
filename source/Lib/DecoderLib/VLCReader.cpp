@@ -45,7 +45,9 @@
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
 #include "CommonLib/CodingStatistics.h"
 #endif
-
+#if JVET_K0371_ALF
+#include "CommonLib/AdaptiveLoopFilter.h"
+#endif
 
 
 #if ENABLE_TRACING
@@ -830,7 +832,9 @@ void HLSyntaxReader::parseSPSNext( SPSNext& spsNext, const bool usePCM )
 #if JEM_TOOLS
   READ_FLAG( symbol,    "lic_enabled_flag" );                       spsNext.setLICMode                ( symbol );
   READ_FLAG( symbol,    "intra_pdpc_enable_flag" );                 spsNext.setUseIntraPDPC           ( symbol != 0 );
+#if !JVET_K0371_ALF
   READ_FLAG( symbol,    "alf_enabled_flag" );                       spsNext.setALFEnabled             ( symbol );
+#endif
   READ_FLAG( symbol,    "lm_chroma_enabled_flag" );                 spsNext.setUseLMChroma            ( symbol != 0 );
   READ_FLAG( symbol,    "emt_intra_enabled_flag" );                 spsNext.setUseIntraEMT            ( symbol != 0 );
   READ_FLAG( symbol,    "emt_inter_enabled_flag" );                 spsNext.setUseInterEMT            ( symbol != 0 );
@@ -962,6 +966,7 @@ void HLSyntaxReader::parseSPSNext( SPSNext& spsNext, const bool usePCM )
     READ_FLAG( symbol, "planar_pdpc_flag" );                        spsNext.setIntraPDPCMode( symbol + 1 );
   }
 
+#if !JVET_K0371_ALF
   if( spsNext.getALFEnabled() )
   {
     READ_FLAG( symbol, "galf_enabled_flag" );                       spsNext.setGALFEnabled( symbol != 0 );
@@ -971,6 +976,7 @@ void HLSyntaxReader::parseSPSNext( SPSNext& spsNext, const bool usePCM )
     CHECK( true == spsNext.getGALFEnabled(),  "currently no support of ALF=2 with GALF disabled" );
 #endif
   }
+#endif
 #endif
   // ADD_NEW_TOOL : (sps extension parser) read tool enabling flags and associated parameters here
 }
@@ -1087,6 +1093,10 @@ Void HLSyntaxReader::parseSPS(SPS* pcSPS)
 
   Int addCuDepth = std::max (0, log2MinCUSize - (Int)pcSPS->getQuadtreeTULog2MinSize() );
   pcSPS->setMaxCodingDepth( maxCUDepthDelta + addCuDepth );
+
+#if JVET_K0371_ALF
+  READ_FLAG( uiCode, "sps_alf_enable_flag" ); pcSPS->setUseALF( uiCode );
+#endif
 
 #if HEVC_USE_SCALING_LISTS
   READ_FLAG( uiCode, "scaling_list_enabled_flag" );                 pcSPS->setScalingListFlag ( uiCode );
@@ -1586,6 +1596,13 @@ Void HLSyntaxReader::parseSliceHeader (Slice* pcSlice, ParameterSetManager *para
         READ_FLAG(uiCode, "slice_sao_chroma_flag");  pcSlice->setSaoEnabledFlag(CHANNEL_TYPE_CHROMA, (Bool)uiCode);
       }
     }
+
+#if JVET_K0371_ALF
+    if( sps->getUseALF() )
+    {
+      alf( pcSlice->getAlfSliceParam() );
+    }
+#endif
 
     if (pcSlice->getIdrPicFlag())
     {
@@ -2466,6 +2483,227 @@ Bool HLSyntaxReader::xMoreRbspData()
   // we have more data, if cnt is not zero
   return (cnt>0);
 }
+
+#if JVET_K0371_ALF
+Void HLSyntaxReader::alf( AlfSliceParam& alfSliceParam )
+{
+  UInt code;
+  READ_FLAG( code, "alf_slice_enable_flag" );
+  alfSliceParam.enabledFlag[COMPONENT_Y] = code ? true : false;
+
+  if( !code )
+  {
+    alfSliceParam.enabledFlag[COMPONENT_Cb] = alfSliceParam.enabledFlag[COMPONENT_Cr] = false;
+    return;
+  }
+
+  Int alfChromaIdc = unary_max_eqprob( 3 );        //alf_chroma_idc
+  alfSliceParam.enabledFlag[COMPONENT_Cb] = alfChromaIdc >> 1;
+  alfSliceParam.enabledFlag[COMPONENT_Cr] = alfChromaIdc & 1;
+
+  xReadTruncBinCode( code, MAX_NUM_ALF_CLASSES );  //number_of_filters_minus1
+  alfSliceParam.numLumaFilters = code + 1;
+
+  READ_FLAG( code, "filter_type_flag" );
+  alfSliceParam.lumaFilterType = code ? ALF_FILTER_5 : ALF_FILTER_7;
+
+  if( alfSliceParam.numLumaFilters > 1 )
+  {
+    for( Int i = 0; i < MAX_NUM_ALF_CLASSES; i++ )
+    {
+      xReadTruncBinCode( code, alfSliceParam.numLumaFilters );
+      alfSliceParam.filterCoeffDeltaIdx[i] = code;
+    }
+  }
+  else
+  {
+    memset( alfSliceParam.filterCoeffDeltaIdx, 0, sizeof( alfSliceParam.filterCoeffDeltaIdx ) );
+  }
+
+  alf_filter( alfSliceParam, false );
+
+  if( alfChromaIdc )
+  {
+    READ_FLAG( code, "alf_chroma_ctb_present_flag" );
+    alfSliceParam.chromaCtbPresentFlag = code ? true : false;
+    alf_filter( alfSliceParam, true );
+  }
+}
+
+Int HLSyntaxReader::alfGolombDecode( Int k )
+{
+  UInt uiSymbol;
+  Int q = -1;
+  Int nr = 0;
+  Int m = (Int)pow( 2.0, k );
+  Int a;
+
+  uiSymbol = 1;
+  while( uiSymbol )
+  {
+#if RExt__DECODER_DEBUG_BIT_STATISTICS
+    xReadFlag( uiSymbol, "" );
+#else
+    xReadFlag( uiSymbol );
+#endif
+    q++;
+  }
+  for( a = 0; a < k; ++a )          // read out the sequential log2(M) bits
+  {
+#if RExt__DECODER_DEBUG_BIT_STATISTICS
+    xReadFlag( uiSymbol, "" );
+#else
+    xReadFlag( uiSymbol );
+#endif
+    if( uiSymbol )
+      nr += 1 << a;
+  }
+  nr += q * m;                    // add the bits and the multiple of M
+  if( nr != 0 )
+  {
+#if RExt__DECODER_DEBUG_BIT_STATISTICS
+    xReadFlag( uiSymbol, "" );
+#else
+    xReadFlag( uiSymbol );
+#endif
+    nr = ( uiSymbol ) ? nr : -nr;
+  }
+  return nr;
+}
+
+Void HLSyntaxReader::alf_filter( AlfSliceParam& alfSliceParam, Bool isChroma )
+{
+  UInt code;
+  if( !isChroma )
+  {
+    READ_FLAG( code, "alf_coefficients_delta_flag" );
+    alfSliceParam.coeffDeltaFlag = code;
+
+    if( !alfSliceParam.coeffDeltaFlag )
+    {
+      std::memset( alfSliceParam.filterCoeffFlag, true, sizeof( alfSliceParam.filterCoeffFlag ) );
+
+      if( alfSliceParam.numLumaFilters > 1 )
+      {
+        READ_FLAG( code, "coeff_delta_pred_mode_flag" );
+        alfSliceParam.coeffDeltaPredModeFlag = code;
+      }
+      else
+      {
+        alfSliceParam.coeffDeltaPredModeFlag = 0;
+      }
+    }
+    else
+    {
+      alfSliceParam.coeffDeltaPredModeFlag = 0;
+    }
+  }
+
+  // derive maxGolombIdx
+  AlfFilterShape alfShape( isChroma ? 5 : ( alfSliceParam.lumaFilterType == ALF_FILTER_5 ? 5 : 7 ) );
+  const Int maxGolombIdx = AdaptiveLoopFilter::getMaxGolombIdx( alfShape.filterType );
+  READ_UVLC( code, "min_golomb_order" );
+
+  Int kMin = code + 1;
+  static Int kMinTab[MAX_NUM_ALF_COEFF];
+  const Int numFilters = isChroma ? 1 : alfSliceParam.numLumaFilters;
+  Short* coeff = isChroma ? alfSliceParam.chromaCoeff : alfSliceParam.lumaCoeff;
+
+  for( Int idx = 0; idx < maxGolombIdx; idx++ )
+  {
+    READ_FLAG( code, "golomb_order_increase_flag" );
+    CHECK( code > 1, "Wrong golomb_order_increase_flag" );
+    kMinTab[idx] = kMin + code;
+    kMin = kMinTab[idx];
+  }
+
+  if( !isChroma )
+  {
+    if( alfSliceParam.coeffDeltaFlag )
+    {
+      for( Int ind = 0; ind < alfSliceParam.numLumaFilters; ++ind )
+      {
+        READ_FLAG( code, "filter_coefficient_flag[i]" );
+        alfSliceParam.filterCoeffFlag[ind] = code;
+      }
+    }
+  }
+
+  // Filter coefficients
+  for( Int ind = 0; ind < numFilters; ++ind )
+  {
+    if( !isChroma && !alfSliceParam.filterCoeffFlag[ind] && alfSliceParam.coeffDeltaFlag )
+    {
+      memset( coeff + ind * MAX_NUM_ALF_LUMA_COEFF, 0, sizeof( *coeff ) * alfShape.numCoeff );
+      continue;
+    }
+
+    for( Int i = 0; i < alfShape.numCoeff - 1; i++ )
+    {
+      coeff[ind * MAX_NUM_ALF_LUMA_COEFF + i] = alfGolombDecode( kMinTab[alfShape.golombIdx[i]] );
+    }
+  }
+}
+
+UInt HLSyntaxReader::unary_max_eqprob( UInt maxSymbol )
+{
+  for( UInt k = 0; k < maxSymbol; k++ )
+  {
+    UInt symbol;
+#if RExt__DECODER_DEBUG_BIT_STATISTICS
+    xReadFlag( symbol, "" );
+#else
+    xReadFlag( symbol );
+#endif
+
+    if( !symbol )
+    {
+      return k;
+    }
+  }
+  return maxSymbol;
+}
+
+Void HLSyntaxReader::xReadTruncBinCode( UInt& ruiSymbol, UInt uiMaxSymbol )
+{
+  UInt uiThresh;
+  if( uiMaxSymbol > 256 )
+  {
+    UInt uiThreshVal = 1 << 8;
+    uiThresh = 8;
+    while( uiThreshVal <= uiMaxSymbol )
+    {
+      uiThresh++;
+      uiThreshVal <<= 1;
+    }
+    uiThresh--;
+  }
+  else
+  {
+    uiThresh = g_tbMax[uiMaxSymbol];
+  }
+
+  UInt uiVal = 1 << uiThresh;
+  UInt b = uiMaxSymbol - uiVal;
+#if RExt__DECODER_DEBUG_BIT_STATISTICS
+  xReadCode( uiThresh, ruiSymbol, "" );
+#else
+  xReadCode( uiThresh, ruiSymbol );
+#endif
+  if( ruiSymbol >= uiVal - b )
+  {
+    UInt uiSymbol;
+#if RExt__DECODER_DEBUG_BIT_STATISTICS
+    xReadFlag( uiSymbol, "" );
+#else
+    xReadFlag( uiSymbol );
+#endif
+    ruiSymbol <<= 1;
+    ruiSymbol += uiSymbol;
+    ruiSymbol -= ( uiVal - b );
+  }
+}
+#endif
 
 //! \}
 

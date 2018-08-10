@@ -167,6 +167,16 @@ public:
   Void  decodeScalingList   ( ScalingList *scalingList, UInt sizeId, UInt listId);
 #endif
 
+#if JVET_K0371_ALF
+  Void alf( AlfSliceParam& alfSliceParam );
+  Void alf_filter( AlfSliceParam& alfSliceParam, Bool isChroma );
+
+private:
+  UInt unary_max_eqprob( UInt maxSymbol );
+  Void xReadTruncBinCode( UInt& ruiSymbol, UInt uiMaxSymbol );
+  Int  alfGolombDecode( Int k );
+#endif
+
 protected:
   Bool  xMoreRbspData();
 #if JEM_TOOLS

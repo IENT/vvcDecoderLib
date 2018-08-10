@@ -1924,7 +1924,7 @@ Void EncSlice::encodeSlice   ( Picture* pcPic, OutputBitstream* pcSubstreams, UI
       m_CABACDataStore->loadCtxStates( pcSlice, m_CABACWriter->getCtx(), cipf.ctxId );
     }
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS && !JVET_K0371_ALF
     if( ctuRsAddr == 0 )
     {
       ALFParam& alfParam = cs.picture->getALFParam();

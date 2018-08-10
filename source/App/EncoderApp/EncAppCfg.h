@@ -238,7 +238,9 @@ protected:
 #endif
 #if JEM_TOOLS
   int       m_IntraPDPC;
+#if !JVET_K0371_ALF
   int       m_ALF;
+#endif
   int       m_LMChroma;
   int       m_EMT;                                            ///< XZ: Enhanced Multiple Transform
   int       m_FastEMT;                                        ///< XZ: Fast Methods of Enhanced Multiple Transform
@@ -546,6 +548,10 @@ protected:
   bool        m_stopAfterFFtoPOC;
   bool        m_bs2ModPOCAndType;
   bool        m_forceDecodeBitstream1;
+
+#if JVET_K0371_ALF
+  Bool        m_alf;                                          ///> Adaptive Loop Filter
+#endif
 
 #if EXTENSION_360_VIDEO
   TExt360AppEncCfg m_ext360;

@@ -191,6 +191,7 @@ private:
 
 #if JEM_TOOLS
   // neeeds clean up
+#if !JVET_K0371_ALF
   void        alf_aux                   ( ALFParam&               alfParam, bool isGALF );
   void        alf_filter                ( ALFParam&               alfParam, bool isGALF, bool bChroma = false );
   void        alf_chroma                ( ALFParam& alfParam );
@@ -198,6 +199,7 @@ private:
   UInt        parseAlfUvlc();
   Int         parseAlfSvlc();
   Int         alfGolombDecode(Int k);
+#endif
 
   Void        xReadTruncBinCode   ( UInt& ruiSymbol, UInt uiMaxSymbol );
   UInt        xReadEpExGolomb     ( UInt uiCount );

@@ -1753,7 +1753,9 @@ SPSNext::SPSNext( SPS& sps )
 #if JEM_TOOLS
   , m_LICEnabled                ( false )
   , m_IntraPDPC                 ( false )
+#if !JVET_K0371_ALF
   , m_ALFEnabled                ( false )
+#endif
   , m_LMChroma                  ( false )
   , m_IntraEMT                  ( false )
   , m_InterEMT                  ( false )

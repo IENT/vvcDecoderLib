@@ -46,7 +46,7 @@
 #include "CommonLib/LoopFilter.h"
 #include "CommonLib/NAL.h"
 #include "EncSampleAdaptiveOffset.h"
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0371_ALF
 #include "EncAdaptiveLoopFilter.h"
 #endif
 #include "EncSlice.h"
@@ -133,7 +133,7 @@ private:
 
   //--Adaptive Loop filter
   EncSampleAdaptiveOffset*  m_pcSAO;
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0371_ALF
   EncAdaptiveLoopFilter*    m_pcALF;
 #endif
   RateCtrl*                 m_pcRateCtrl;

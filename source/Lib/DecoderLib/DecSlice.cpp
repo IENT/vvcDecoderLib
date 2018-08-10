@@ -113,6 +113,10 @@ Void DecSlice::decompressSlice( Slice* slice, InputBitstream* bitstream )
 
   cs.picture->resizeSAO(cs.pcv->sizeInCtus, 0);
 
+#if JVET_K0371_ALF
+  cs.picture->resizeAlfCtuEnableFlag( cs.pcv->sizeInCtus );
+#endif
+
   const unsigned numSubstreams = slice->getNumberOfSubstreamSizes() + 1;
 
   // init each couple {EntropyDecoder, Substream}
@@ -260,7 +264,7 @@ Void DecSlice::decompressSlice( Slice* slice, InputBitstream* bitstream )
       m_CABACDataStore->loadCtxStates( slice, cabacReader.getCtx(), cipf.ctxId );
     }
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS && !JVET_K0371_ALF
 
     if( ctuRsAddr == 0 )
     {

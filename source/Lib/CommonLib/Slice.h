@@ -833,7 +833,9 @@ private:
 #if JEM_TOOLS
   bool              m_LICEnabled;                 // 14
   bool              m_IntraPDPC;                  // 15
+#if !JVET_K0371_ALF
   bool              m_ALFEnabled;                 // 16
+#endif
   bool              m_LMChroma;                   // 17
   bool              m_IntraEMT;                   // 18
   bool              m_InterEMT;                   // 19
@@ -983,10 +985,12 @@ public:
 #if JEM_TOOLS
   void      setUseIntraPDPC       ( bool b )                                        { m_IntraPDPC = b; }
   bool      getUseIntraPDPC       ()                                      const     { return m_IntraPDPC; }
+#if !JVET_K0371_ALF
   void      setALFEnabled         ( bool b )                                        { m_ALFEnabled = b; }
   bool      getALFEnabled         ()                                      const     { return m_ALFEnabled; }
   void      setGALFEnabled        ( bool b )                                        { m_GALFEnabled = b; }
   bool      getGALFEnabled        ()                                      const     { return m_GALFEnabled; }
+#endif
 #endif
 #if JEM_TOOLS
   void      setUseLMChroma        ( bool b )                                        { m_LMChroma = b; }
@@ -1189,6 +1193,10 @@ private:
   static const Int  m_winUnitY[NUM_CHROMA_FORMAT];
   PTL               m_pcPTL;
 
+#if JVET_K0371_ALF
+  Bool              m_useALF;
+#endif
+
 public:
 
   SPS();
@@ -1320,6 +1328,11 @@ public:
 
   const SPSNext&          getSpsNext() const                                                              { return m_spsNextExtension;                                           }
   SPSNext&                getSpsNext()                                                                    { return m_spsNextExtension;                                           }
+
+#if JVET_K0371_ALF
+  Bool                    getUseALF() const { return m_useALF; }
+  Void                    setUseALF( Bool b ) { m_useALF = b; }
+#endif
 };
 
 
@@ -1759,6 +1772,9 @@ private:
   Double                     m_dProcessingTime;
   UInt                       m_uiMaxBTSize;
 
+#if JVET_K0371_ALF
+  AlfSliceParam              m_alfSliceParam;
+#endif
 
 public:
                               Slice();
@@ -2027,6 +2043,11 @@ public:
   void stopProcessingTimer();
   void resetProcessingTime()       { m_dProcessingTime = m_iProcessingStartTime = 0; }
   double getProcessingTime() const { return m_dProcessingTime; }
+
+#if JVET_K0371_ALF
+  Void                        setAlfSliceParam( AlfSliceParam& alfSliceParam ) { m_alfSliceParam = alfSliceParam; }
+  AlfSliceParam&              getAlfSliceParam() { return m_alfSliceParam; }
+#endif
 
 protected:
   Picture*              xGetRefPic        (PicList& rcListPic, Int poc);

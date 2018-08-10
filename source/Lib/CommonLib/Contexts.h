@@ -361,7 +361,7 @@ public:
   static const CtxSet   MVPIdx;
   static const CtxSet   SaoMergeFlag;
   static const CtxSet   SaoTypeIdx;
-#if JEM_TOOLS
+#if JEM_TOOLS && !JVET_K0371_ALF
   static const CtxSet   AlfCUCtrlFlags;
   static const CtxSet   AlfUvlcSCModel;
 #endif
@@ -385,6 +385,9 @@ public:
   static const CtxSet   ObmcFlag;
   static const CtxSet   FrucFlag;
   static const CtxSet   FrucMode;
+#endif
+#if JVET_K0371_ALF
+  static const CtxSet   ctbAlfFlag;
 #endif
   static const unsigned NumberOfContexts;
 

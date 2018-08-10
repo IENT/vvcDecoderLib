@@ -40,7 +40,206 @@
 
 #include "CommonLib/AdaptiveLoopFilter.h"
 
+#if JVET_K0371_ALF
+#include "CABACWriter.h"
+
+struct AlfCovariance
+{
+  Int numCoeff;
+  Double *y;
+  Double **E;
+  Double pixAcc;
+
+  AlfCovariance() {}
+  ~AlfCovariance() {}
+
+  Void create( Int size )
+  {
+    numCoeff = size;
+
+    y = new Double[numCoeff];
+    E = new Double*[numCoeff];
+
+    for( Int i = 0; i < numCoeff; i++ )
+    {
+      E[i] = new Double[numCoeff];
+    }
+  }
+
+  Void destroy()
+  {
+    for( Int i = 0; i < numCoeff; i++ )
+    {
+      delete[] E[i];
+      E[i] = nullptr;
+    }
+
+    delete[] E;
+    E = nullptr;
+
+    delete[] y;
+    y = nullptr;
+  }
+
+  Void reset()
+  {
+    pixAcc = 0;
+    std::memset( y, 0, sizeof( *y ) * numCoeff );
+    for( Int i = 0; i < numCoeff; i++ )
+    {
+      std::memset( E[i], 0, sizeof( *E[i] ) * numCoeff );
+    }
+  }
+
+  const AlfCovariance& operator=( const AlfCovariance& src )
+  {
+    for( Int i = 0; i < numCoeff; i++ )
+    {
+      std::memcpy( E[i], src.E[i], sizeof( *E[i] ) * numCoeff );
+    }
+    std::memcpy( y, src.y, sizeof( *y ) * numCoeff );
+    pixAcc = src.pixAcc;
+
+    return *this;
+  }
+
+  Void add( const AlfCovariance& lhs, const AlfCovariance& rhs )
+  {
+    for( Int j = 0; j < numCoeff; j++ )
+    {
+      for( Int i = 0; i < numCoeff; i++ )
+      {
+        E[j][i] = lhs.E[j][i] + rhs.E[j][i];
+      }
+      y[j] = lhs.y[j] + rhs.y[j];
+    }
+    pixAcc = lhs.pixAcc + rhs.pixAcc;
+  }
+
+  const AlfCovariance& operator+= ( const AlfCovariance& src )
+  {
+    for( Int j = 0; j < numCoeff; j++ )
+    {
+      for( Int i = 0; i < numCoeff; i++ )
+      {
+        E[j][i] += src.E[j][i];
+      }
+      y[j] += src.y[j];
+    }
+    pixAcc += src.pixAcc;
+
+    return *this;
+  }
+
+  const AlfCovariance& operator-= ( const AlfCovariance& src )
+  {
+    for( Int j = 0; j < numCoeff; j++ )
+    {
+      for( Int i = 0; i < numCoeff; i++ )
+      {
+        E[j][i] -= src.E[j][i];
+      }
+      y[j] -= src.y[j];
+    }
+    pixAcc -= src.pixAcc;
+
+    return *this;
+  }
+};
+
+class EncAdaptiveLoopFilter : public AdaptiveLoopFilter
+{
+public:
+  static constexpr Int   m_MAX_SCAN_VAL = 11;
+  static constexpr Int   m_MAX_EXP_GOLOMB = 16;
+
+private:
+  AlfCovariance***       m_alfCovariance[MAX_NUM_COMPONENT];          // [compIdx][shapeIdx][ctbAddr][classIdx]
+  AlfCovariance**        m_alfCovarianceFrame[MAX_NUM_CHANNEL_TYPE];   // [CHANNEL][shapeIdx][classIdx]
+  UChar*                 m_ctuEnableFlagTmp[MAX_NUM_COMPONENT];
+
+  //for RDO
+  AlfSliceParam          m_alfSliceParamTemp;
+  AlfCovariance          m_alfCovarianceMerged[ALF_NUM_OF_FILTER_TYPES][MAX_NUM_ALF_CLASSES + 1];
+  CABACWriter*           m_CABACEstimator;
+  CtxCache*              m_CtxCache;
+  Double                 m_lambda[MAX_NUM_COMPONENT];
+  const Double           FracBitsScale = 1.0 / Double( 1 << SCALE_BITS );
+
+  Int*                   m_filterCoeffQuant;
+  Int**                  m_filterCoeffSet;
+  Int**                  m_diffFilterCoeff;
+  Int                    m_kMinTab[MAX_NUM_ALF_LUMA_COEFF];
+  Int                    m_bitsCoeffScan[m_MAX_SCAN_VAL][m_MAX_EXP_GOLOMB];
+  Short                  m_filterIndices[MAX_NUM_ALF_CLASSES][MAX_NUM_ALF_CLASSES];
+
+public:
+  EncAdaptiveLoopFilter();
+  virtual ~EncAdaptiveLoopFilter() {}
+
+  Void ALFProcess( CodingStructure& cs, const Double *lambdas, AlfSliceParam& alfSliceParam );
 #if JEM_TOOLS
+  Void initCABACEstimator( CABACDataStore* cabacDataStore, CABACEncoder* cabacEncoder, CtxCache* ctxCache, Slice* pcSlice );
+#else
+  Void initCABACEstimator( CABACEncoder* cabacEncoder, CtxCache* ctxCache, Slice* pcSlice );
+#endif
+  Void create( const Int picWidth, const Int picHeight, const ChromaFormat chromaFormatIDC, const Int maxCUWidth, const UInt maxCUHeight, const UInt maxCUDepth, const Int inputBitDepth[MAX_NUM_CHANNEL_TYPE], const Int internalBitDepth[MAX_NUM_CHANNEL_TYPE] );
+  Void destroy();
+  static Int lengthGolomb( Int coeffVal, Int k );
+  static Int getGolombKMin( AlfFilterShape& alfShape, const Int numFilters, Int kMinTab[MAX_NUM_ALF_LUMA_COEFF], Int bitsCoeffScan[m_MAX_SCAN_VAL][m_MAX_EXP_GOLOMB] );
+
+private:
+  Void   alfEncoder( CodingStructure& cs, AlfSliceParam& alfSliceParam, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, const PelUnitBuf& recBuf, const ChannelType channel );
+
+  Void   copyAlfSliceParam( AlfSliceParam& alfSliceParamDst, AlfSliceParam& alfSliceParamSrc, ChannelType channel );
+  Double mergeFiltersAndCost( AlfSliceParam& alfSliceParam, AlfFilterShape& alfShape, AlfCovariance* covFrame, AlfCovariance* covMerged, UInt& uiCoeffBits );
+
+  Void   getFrameStats( ChannelType channel, Int iShapeIdx );
+  Void   getFrameStat( AlfCovariance* frameCov, AlfCovariance** ctbCov, UChar* ctbEnableFlags, const Int numClasses );
+  Void   deriveStatsForFiltering( PelUnitBuf& orgYuv, PelUnitBuf& recYuv );
+  Void   getBlkStats( AlfCovariance* alfCovariace, const AlfFilterShape& shape, AlfClassifier** classifier, Pel* org, Int orgStride, Pel* rec, Int recStride, const CompArea& area );
+  Void   calcCovariance( Int *ELocal, const Pel *rec, const Int stride, const Int *filterPattern, const Int halfFilterLength, const Int transposeIdx );
+  Void   mergeClasses( AlfCovariance* cov, AlfCovariance* covMerged, const Int numClasses, Short filterIndices[MAX_NUM_ALF_CLASSES][MAX_NUM_ALF_CLASSES] );
+
+  Double calculateError( AlfCovariance& cov );
+  Double calcErrorForCoeffs( Double **E, Double *y, Int *coeff, const Int numCoeff, const Int bitDepth );
+  Double getFilterCoeffAndCost( CodingStructure& cs, Double distUnfilter, ChannelType channel, Bool bReCollectStat, Int iShapeIdx, UInt& uiCoeffBits );
+  Double deriveFilterCoeffs( AlfCovariance* cov, AlfCovariance* covMerged, AlfFilterShape& alfShape, Short* filterIndices, Int numFilters, Double errorTabForce0Coeff[MAX_NUM_ALF_CLASSES][2] );
+  Int    deriveFilterCoefficientsPredictionMode( AlfFilterShape& alfShape, Int **filterSet, Int** filterCoeffDiff, const Int numFilters, Int& predMode );
+  Double deriveCoeffQuant( Int *filterCoeffQuant, Double **E, Double *y, const Int numCoeff, std::vector<Int>& weights, const Int bitDepth, const Bool bChroma = false );
+  Double deriveCtbAlfEnableFlags( CodingStructure& cs, const Int iShapeIdx, ChannelType channel, const Int numClasses, const Int numCoeff, Double& distUnfilter );
+  Void   roundFiltCoeff( Int *filterCoeffQuant, Double *filterCoeff, const Int numCoeff, const Int factor );
+
+  Double getDistCoeffForce0( Bool* codedVarBins, Double errorForce0CoeffTab[MAX_NUM_ALF_CLASSES][2], Int* bitsVarBin, const Int numFilters );
+  Int    len_unary_max_eqprob( UInt symbol, UInt maxSymbol );
+  Int    lengthUvlc( UInt uiCode );
+  Int    getNonFilterCoeffRate( AlfSliceParam& alfSliceParam );
+  Int    getTBlength( UInt uiSymbol, const UInt uiMaxSymbol );
+
+  Int    getCostFilterCoeffForce0( AlfFilterShape& alfShape, Int **pDiffQFilterCoeffIntPP, const Int numFilters, Bool* codedVarBins );
+  Int    getCostFilterCoeff( AlfFilterShape& alfShape, Int **pDiffQFilterCoeffIntPP, const Int numFilters );
+  Int    lengthFilterCoeffs( AlfFilterShape& alfShape, const Int numFilters, Int **FilterCoeff, Int* kMinTab );
+  Double getDistForce0( AlfFilterShape& alfShape, const Int numFilters, Double errorTabForce0Coeff[MAX_NUM_ALF_CLASSES][2], Bool* codedVarBins );
+  Int    getCoeffRate( AlfSliceParam& alfSliceParam, Bool isChroma );
+
+  Double getUnfilteredDistortion( AlfCovariance* cov, ChannelType channel );
+  Double getUnfilteredDistortion( AlfCovariance* cov, const Int numClasses );
+  Double getFilteredDistortion( AlfCovariance* cov, const Int numClasses, const Int numFiltersMinus1, const Int numCoeff );
+
+  // Cholesky decomposition
+  Int  gnsSolveByChol( Double **LHS, Double *rhs, Double *x, Int numEq );
+  Void gnsBacksubstitution( Double R[MAX_NUM_ALF_COEFF][MAX_NUM_ALF_COEFF], Double* z, Int size, Double* A );
+  Void gnsTransposeBacksubstitution( Double U[MAX_NUM_ALF_COEFF][MAX_NUM_ALF_COEFF], Double* rhs, Double* x, Int order );
+  Int  gnsCholeskyDec( Double **inpMatr, Double outMatr[MAX_NUM_ALF_COEFF][MAX_NUM_ALF_COEFF], Int numEq );
+
+  Void setEnableFlag( AlfSliceParam& alfSlicePara, ChannelType channel, Bool val );
+  Void setEnableFlag( AlfSliceParam& alfSlicePara, ChannelType channel, UChar** ctuFlags );
+  Void setCtuEnableFlag( UChar** ctuFlags, ChannelType channel, UChar val );
+  Void copyCtuEnableFlag( UChar** ctuFlagsDst, UChar** ctuFlagsSrc, ChannelType channel );
+};
+
+
+#elif JEM_TOOLS
 
 #include "CABACWriter.h"
 
