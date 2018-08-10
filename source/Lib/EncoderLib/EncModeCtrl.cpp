@@ -727,7 +727,10 @@ bool BestEncInfoCache::setFromCs( const CodingStructure& cs, const Partitioner& 
   encInfo.tu.repositionTo( *cs.tus.front() );
   encInfo.cu             = *cs.cus.front();
   encInfo.pu             = *cs.pus.front();
-  encInfo.tu             = *cs.tus.front();
+  for( auto &blk : cs.tus.front()->blocks )
+  {
+    if( blk.valid() ) encInfo.tu.copyComponentFrom( *cs.tus.front(), blk.compID );
+  }
   encInfo.testMode       = getCSEncMode( cs );
 
   return true;
@@ -762,9 +765,9 @@ bool BestEncInfoCache::setCsFrom( CodingStructure& cs, EncTestMode& testMode, co
     return false;
   }
 
-  CodingUnit     &cu = cs.addCU( cs.area, partitioner.chType );
-  PredictionUnit &pu = cs.addPU( cs.area, partitioner.chType );
-  TransformUnit  &tu = cs.addTU( cs.area, partitioner.chType );
+  CodingUnit     &cu = cs.addCU( CS::getArea( cs, cs.area, partitioner.chType ), partitioner.chType );
+  PredictionUnit &pu = cs.addPU( CS::getArea( cs, cs.area, partitioner.chType ), partitioner.chType );
+  TransformUnit  &tu = cs.addTU( CS::getArea( cs, cs.area, partitioner.chType ), partitioner.chType );
 
   cu          .repositionTo( encInfo.cu );
   pu          .repositionTo( encInfo.pu );
@@ -772,7 +775,10 @@ bool BestEncInfoCache::setCsFrom( CodingStructure& cs, EncTestMode& testMode, co
 
   cu          = encInfo.cu;
   pu          = encInfo.pu;
-  tu          = encInfo.tu;
+  for( auto &blk : tu.blocks )
+  {
+    if( blk.valid() ) tu.copyComponentFrom( encInfo.tu, blk.compID );
+  }
 
   testMode    = encInfo.testMode;
 
