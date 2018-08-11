@@ -120,7 +120,7 @@ public:
   void        affine_flag               ( CodingUnit&                   cu );
 #endif
   void        merge_idx                 ( PredictionUnit&               pu );
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   void        imv_mode                  ( CodingUnit&                   cu,     MergeCtx&       mrgCtx );
 #endif
   void        inter_pred_idc            ( PredictionUnit&               pu );

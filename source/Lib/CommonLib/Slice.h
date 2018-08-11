@@ -819,7 +819,7 @@ private:
 #if JEM_TOOLS
   bool              m_ModifiedCABACEngine;        // 8
 #endif
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   bool              m_IMV;                        // 9
 #endif
 #if JVET_K0072
@@ -900,7 +900,7 @@ private:
   // cabac engine
   unsigned    m_CABACEngineMode;
 #endif
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   //imv
   ImvMode     m_ImvMode;
 #endif
@@ -979,9 +979,11 @@ public:
 #if JEM_TOOLS
   bool      getModifiedCABACEngine()                                      const     { return m_ModifiedCABACEngine; }
 #endif
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   void      setUseIMV             ( bool b )                                        { m_IMV = b; }
   bool      getUseIMV             ()                                      const     { return m_IMV; }
+#endif
+#if JEM_TOOLS
   void      setUseAffine          ( bool b )                                        { m_Affine = b; }
   bool      getUseAffine          ()                                      const     { return m_Affine; }
 #if JVET_K0337_AFFINE_6PARA
@@ -1103,7 +1105,7 @@ public:
   unsigned  getCABACEngineMode    ()                                      const     { return m_CABACEngineMode; }
   void      setCABACEngineMode    ( unsigned    mode )                              { m_CABACEngineMode = mode; m_ModifiedCABACEngine = ( m_CABACEngineMode != 0 ); }
 #endif
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   void      setImvMode(ImvMode m) { m_ImvMode = m; m_IMV = m != 0;  }
   ImvMode   getImvMode            ()                                      const     { return m_ImvMode; }
 #endif

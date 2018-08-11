@@ -109,6 +109,8 @@ enum CodingStatisticsType
   STATS__CABAC_BITS__ALIGNED_ESCAPE_BITS,
 #if JEM_TOOLS
   STATS__CABAC_BITS__OBMC_FLAG,
+#endif
+#if JVET_K0357_AMVR
   STATS__CABAC_BITS__IMV_FLAG,
 #endif
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
@@ -187,6 +189,8 @@ static inline const TChar* getName(CodingStatisticsType name)
     "CABAC_BITS__ALIGNED_ESCAPE_BITS",
 #if JEM_TOOLS
     "CABAC_BITS__OBMC_FLAG",
+#endif
+#if JVET_K0357_AMVR
     "CABAC_BITS__IMV_FLAG",
 #endif
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT

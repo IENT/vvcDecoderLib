@@ -818,7 +818,7 @@ void HLSyntaxReader::parseSPSNext( SPSNext& spsNext, const bool usePCM )
 #if JEM_TOOLS
   READ_FLAG( symbol,    "modified_cabac_engine_flag" );             spsNext.setCABACEngineMode        ( symbol );
 #endif
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   READ_FLAG( symbol,    "imv_enable_flag" );                        spsNext.setUseIMV                 ( symbol != 0 );
 #endif
 #if JVET_K0072
@@ -942,12 +942,13 @@ void HLSyntaxReader::parseSPSNext( SPSNext& spsNext, const bool usePCM )
   }
 #endif
 
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   if( spsNext.getUseIMV() )
   {
     READ_UVLC( symbol, "imv_mode_minus1" );                         spsNext.setImvMode( ImvMode( symbol + 1 ) );
   }
-
+#endif
+#if JEM_TOOLS
   if( spsNext.getLICEnabled() )
   {
     READ_UVLC( symbol,  "lic_mode_minus1" );                        spsNext.setLICMode( symbol + 1 );

@@ -1739,7 +1739,7 @@ SPSNext::SPSNext( SPS& sps )
 #if JEM_TOOLS
   , m_ModifiedCABACEngine       ( false )
 #endif
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   , m_IMV                       ( false )
 #endif
 #if JVET_K0072
@@ -1810,7 +1810,7 @@ SPSNext::SPSNext( SPS& sps )
 #if JEM_TOOLS
   , m_CABACEngineMode           ( 0 )
 #endif
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   , m_ImvMode                   ( IMV_OFF )
 #endif
 #if JVET_K0072

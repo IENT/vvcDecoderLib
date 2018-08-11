@@ -103,7 +103,7 @@ namespace CU
   cPUTraverser traversePUs            (const CodingUnit& cu);
   cTUTraverser traverseTUs            (const CodingUnit& cu);
 
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   bool  hasSubCUNonZeroMVd            (const CodingUnit& cu);
   int   getMaxNeighboriMVCandNum      (const CodingStructure& cs, const Position& pos);
   void  resetMVDandMV2Int             (      CodingUnit& cu, InterPrediction *interPred );
@@ -163,7 +163,11 @@ namespace PU
 
   bool getInterMergeSubPuMvpCand      (const PredictionUnit &pu, MergeCtx &mrgCtx, bool& LICFlag, const int count );
   bool getInterMergeSubPuRecurCand    (const PredictionUnit &pu, MergeCtx &mrgCtx, const int count );
+#endif
+#if JVET_K0357_AMVR
   void applyImv                       (      PredictionUnit &pu, MergeCtx &mrgCtx, InterPrediction *interPred = NULL );
+#endif
+#if JEM_TOOLS
   bool isAffineMrgFlagCoded           (const PredictionUnit &pu );
   void getAffineMergeCand             (const PredictionUnit &pu, MvField (*mvFieldNeighbours)[3], unsigned char &interDirNeighbours, int &numValidMergeCand );
   void setAllAffineMvField            (      PredictionUnit &pu, MvField *mvField, RefPicList eRefList );

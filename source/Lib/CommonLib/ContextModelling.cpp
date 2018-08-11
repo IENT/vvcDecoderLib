@@ -667,7 +667,7 @@ unsigned DeriveCtx::CtxSkipFlag( const CodingUnit& cu )
 }
 
 
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
 unsigned DeriveCtx::CtxIMVFlag( const CodingUnit& cu )
 {
   const CodingStructure *cs = cu.cs;
