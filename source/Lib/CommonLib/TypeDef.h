@@ -103,7 +103,7 @@
 #define JVET_K0357_AMVR                                   1 // Adaptive motion vector resolution separated from JEM_TOOLS macro
 
 #ifndef JEM_TOOLS
-#define JEM_TOOLS                                         0 // Defines the inclusion of JEM tools into compiled executable
+#define JEM_TOOLS                                         1 // Defines the inclusion of JEM tools into compiled executable
 
 #endif
 #ifndef JVET_B0051_NON_MPM_MODE
