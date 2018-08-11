@@ -847,7 +847,9 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
 #if JEM_TOOLS
   ("LICMode",                                         m_LICMode,                                           0u, "Local illumination compensation [LIC] (0:disabled, 1:enabled, 2:enabled for certain modes)  [default: 0]")
   ("FastPicLevelLIC",                                 m_FastPicLevelLIC,                                false, "Fast picture level LIC decision (0:disabled, 1:enabled)  [default: 0]")
-  ("IMV",                                             m_ImvMode,                                            0, "Adaptive MV precision Mode (IMV)\n"
+#endif
+#if JVET_K0357_AMVR
+  ("IMV",                                             m_ImvMode,                                            2, "Adaptive MV precision Mode (IMV)\n"
                                                                                                                "\t0: disabled IMV\n"
                                                                                                                "\t1: IMV default (Full-Pel)\n"
                                                                                                                "\t2: IMV Full-Pel and 4-PEL\n")
@@ -1982,7 +1984,7 @@ Bool EncAppCfg::xCheckParameter()
     xConfirmPara( m_LICMode, "LICMode > 0 is only allowed with NEXT profile" );
 #endif
     xConfirmPara( m_MTT, "Multi type tree is only allowed with NEXT profile" );
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
     xConfirmPara( m_ImvMode, "IMV is only allowed with NEXT profile" );
 #endif
 #if JEM_TOOLS
@@ -3013,7 +3015,7 @@ Bool EncAppCfg::xCheckParameter()
 #if U0033_ALTERNATIVE_TRANSFER_CHARACTERISTICS_SEI
   xConfirmPara(m_preferredTransferCharacteristics > 255, "transfer_characteristics_idc should not be greater than 255.");
 #endif
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   xConfirmPara( unsigned(m_ImvMode) > 2, "ImvMode exceeds range (0 to 2)" );
 #endif
   xConfirmPara( m_decodeBitstreams[0] == m_bitstreamFileName, "Debug bitstream and the output bitstream cannot be equal.\n" );
@@ -3297,7 +3299,7 @@ Void EncAppCfg::xPrintParameter()
     msg( VERBOSE, "QTBT:%d ", m_QTBT );
     if( m_QTBT ) msg( VERBOSE, "DualITree:%d ", m_dualTree );
     msg( VERBOSE, "LargeCTU:%d ", m_LargeCTU );
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
     msg( VERBOSE, "IMV:%d ", m_ImvMode );
     if( !m_QTBT ) msg( VERBOSE, "IMVMaxCand:%d ", m_ImvMaxCand );
 #endif
@@ -3373,6 +3375,8 @@ Void EncAppCfg::xPrintParameter()
   msg( VERBOSE, "PBIntraFast:%d ", m_usePbIntraFast );
 #if JEM_TOOLS
   if( m_LICMode > 0 ) msg( VERBOSE, "FastPicLevelLIC:%d ", m_FastPicLevelLIC );
+#endif
+#if JVET_K0357_AMVR
   if( m_ImvMode == 2 ) msg( VERBOSE, "IMV4PelFast:%d ", m_Imv4PelFast );
 #endif
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT

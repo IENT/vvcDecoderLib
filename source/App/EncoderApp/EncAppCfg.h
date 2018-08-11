@@ -545,7 +545,7 @@ protected:
   Int       m_maxBitsPerMinCuDenom;                           ///< Indicates an upper bound for the number of bits of coding_unit() data
   Int       m_log2MaxMvLengthHorizontal;                      ///< Indicate the maximum absolute value of a decoded horizontal MV component in quarter-pel luma units
   Int       m_log2MaxMvLengthVertical;                        ///< Indicate the maximum absolute value of a decoded vertical MV component in quarter-pel luma units
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   Int       m_ImvMode;                                        ///< imv mode
   Int       m_Imv4PelFast;                                    ///< imv 4-Pel fast mode
   Int       m_ImvMaxCand;                                     ///< imv max num cand for test (QTBT off only)

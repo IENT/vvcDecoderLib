@@ -1925,7 +1925,7 @@ void PU::fillMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, const in
     }
   }
 
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   if( pu.cu->imv != 0)
   {
     unsigned imvShift = pu.cu->imv << 1;
@@ -2038,7 +2038,8 @@ void PU::fillMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, const in
       if( mv.highPrec ) mv.setLowPrec();
     }
   }
-
+#endif
+#if JVET_K0357_AMVR
   if (pu.cu->imv != 0)
   {
     unsigned imvShift = pu.cu->imv << 1;
@@ -4374,7 +4375,8 @@ void PU::spanLICFlags( PredictionUnit &pu, const bool LICFlag )
     }
   }
 }
-
+#endif
+#if JVET_K0357_AMVR
 Void PU::applyImv( PredictionUnit& pu, MergeCtx &mrgCtx, InterPrediction *interPred )
 {
   if( !pu.mergeFlag )
@@ -4389,7 +4391,11 @@ Void PU::applyImv( PredictionUnit& pu, MergeCtx &mrgCtx, InterPrediction *interP
       }
       unsigned mvp_idx = pu.mvpIdx[0];
       AMVPInfo amvpInfo;
-      PU::fillMvpCand( pu, REF_PIC_LIST_0, pu.refIdx[0], amvpInfo, interPred );
+#if JEM_TOOLS
+      PU::fillMvpCand(pu, REF_PIC_LIST_0, pu.refIdx[0], amvpInfo, interPred);
+#else
+      PU::fillMvpCand(pu, REF_PIC_LIST_0, pu.refIdx[0], amvpInfo);
+#endif
       pu.mvpNum[0] = amvpInfo.numCand;
       pu.mvpIdx[0] = mvp_idx;
       pu.mv    [0] = amvpInfo.mvCand[mvp_idx] + pu.mvd[0];
@@ -4404,7 +4410,11 @@ Void PU::applyImv( PredictionUnit& pu, MergeCtx &mrgCtx, InterPrediction *interP
       }
       unsigned mvp_idx = pu.mvpIdx[1];
       AMVPInfo amvpInfo;
-      PU::fillMvpCand( pu, REF_PIC_LIST_1, pu.refIdx[1], amvpInfo, interPred );
+#if JEM_TOOLS
+      PU::fillMvpCand(pu, REF_PIC_LIST_1, pu.refIdx[1], amvpInfo, interPred);
+#else
+      PU::fillMvpCand(pu, REF_PIC_LIST_1, pu.refIdx[1], amvpInfo);
+#endif
       pu.mvpNum[1] = amvpInfo.numCand;
       pu.mvpIdx[1] = mvp_idx;
       pu.mv    [1] = amvpInfo.mvCand[mvp_idx] + pu.mvd[1];
@@ -4422,8 +4432,8 @@ Void PU::applyImv( PredictionUnit& pu, MergeCtx &mrgCtx, InterPrediction *interP
 
   PU::spanMotionInfo( pu, mrgCtx );
 }
-
-
+#endif
+#if JEM_TOOLS
 bool PU::isBIOLDB( const PredictionUnit& pu )
 {
   const Slice&  slice   = *pu.cs->slice;
@@ -4487,7 +4497,7 @@ void PU::restrictBiPredMergeCands( const PredictionUnit &pu, MergeCtx& mergeCtx 
   }
 }
 
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
 void CU::resetMVDandMV2Int( CodingUnit& cu, InterPrediction *interPred )
 {
   for( auto &pu : CU::traversePUs( cu ) )
@@ -4502,7 +4512,11 @@ void CU::resetMVDandMV2Int( CodingUnit& cu, InterPrediction *interPred )
         Mv mv        = pu.mv[0];
         Mv mvPred;
         AMVPInfo amvpInfo;
-        PU::fillMvpCand( pu, REF_PIC_LIST_0, pu.refIdx[0], amvpInfo, interPred );
+#if JEM_TOOLS
+        PU::fillMvpCand(pu, REF_PIC_LIST_0, pu.refIdx[0], amvpInfo, interPred);
+#else
+        PU::fillMvpCand(pu, REF_PIC_LIST_0, pu.refIdx[0], amvpInfo);
+#endif
         pu.mvpNum[0] = amvpInfo.numCand;
 
         mvPred       = amvpInfo.mvCand[pu.mvpIdx[0]];
@@ -4516,7 +4530,11 @@ void CU::resetMVDandMV2Int( CodingUnit& cu, InterPrediction *interPred )
         Mv mv        = pu.mv[1];
         Mv mvPred;
         AMVPInfo amvpInfo;
-        PU::fillMvpCand( pu, REF_PIC_LIST_1, pu.refIdx[1], amvpInfo, interPred );
+#if JEM_TOOLS
+        PU::fillMvpCand(pu, REF_PIC_LIST_1, pu.refIdx[1], amvpInfo, interPred);
+#else
+        PU::fillMvpCand(pu, REF_PIC_LIST_1, pu.refIdx[1], amvpInfo);
+#endif
         pu.mvpNum[1] = amvpInfo.numCand;
 
         mvPred       = amvpInfo.mvCand[pu.mvpIdx[1]];
@@ -4538,6 +4556,7 @@ void CU::resetMVDandMV2Int( CodingUnit& cu, InterPrediction *interPred )
     }
     else
     {
+#if JEM_TOOLS
       if( pu.frucMrgMode )
       {
         Bool avail = interPred->deriveFRUCMV( pu );
@@ -4554,12 +4573,14 @@ void CU::resetMVDandMV2Int( CodingUnit& cu, InterPrediction *interPred )
           mrgCtx.subPuMvpMiBuf    = MotionBuf( ( MotionInfo* ) alloca( bufSize.area() * sizeof( MotionInfo ) ), bufSize );
           mrgCtx.subPuMvpExtMiBuf = MotionBuf( ( MotionInfo* ) alloca( bufSize.area() * sizeof( MotionInfo ) ), bufSize );
         }
-
+#endif
         PU::getInterMergeCandidates ( pu, mrgCtx );
         PU::restrictBiPredMergeCands( pu, mrgCtx );
 
         mrgCtx.setMergeInfo( pu, pu.mergeIdx );
-      }
+#if JEM_TOOLS
+    }
+#endif  
     }
 
     PU::spanMotionInfo( pu, mrgCtx );

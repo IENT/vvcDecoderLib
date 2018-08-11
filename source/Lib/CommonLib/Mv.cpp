@@ -40,7 +40,7 @@
 #include "Common.h"
 #include "Slice.h"
 
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
 void roundMV( Mv & rMV, unsigned imvShift )
 {
   CHECK( imvShift == 0, "roundMV called for imvShift=0" );

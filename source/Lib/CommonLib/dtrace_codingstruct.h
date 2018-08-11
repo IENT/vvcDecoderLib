@@ -123,7 +123,11 @@ inline void dtraceModeCost(CodingStructure &cs, double lambda)
     cs.pus[0]->frucMrgMode,
     cs.cus[0]->obmcFlag,
     cs.cus[0]->LICFlag,
+#if JVET_K0357_AMVR
     cs.cus[0]->imv,
+#else
+    0,
+#endif
     cs.cus[0]->affine,
     intraModeL, intraModeC,
     tempCost, tempBits, tempDist );
@@ -139,7 +143,13 @@ inline void dtraceModeCost(CodingStructure &cs, double lambda)
     cs.cus[0]->partSize,
     cs.cus[0]->skip,
     cs.pus[0]->mergeFlag,
-    0, 0, 0, 0, 0,
+    0, 0, 
+#if JVET_K0357_AMVR
+    cs.cus[0]->imv,
+#else
+    0,
+#endif
+    0, 0,
           intraModeL, intraModeC,
           tempCost, tempBits, tempDist );
 #endif

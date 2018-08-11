@@ -557,7 +557,7 @@ Void EncApp::xInitLibCfg()
   m_cEncLib.setSummaryOutFilename                                ( m_summaryOutFilename );
   m_cEncLib.setSummaryPicFilenameBase                            ( m_summaryPicFilenameBase );
   m_cEncLib.setSummaryVerboseness                                ( m_summaryVerboseness );
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   m_cEncLib.setIMV                                               ( m_ImvMode );
   m_cEncLib.setIMV4PelFast                                       ( m_Imv4PelFast );
   m_cEncLib.setIMVMaxCand                                        ( m_ImvMaxCand );

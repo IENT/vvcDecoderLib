@@ -1282,7 +1282,7 @@ void CABACReader::cu_skip_flag( CodingUnit& cu )
   }
 }
 
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
 void CABACReader::imv_mode( CodingUnit& cu, MergeCtx& mrgCtx )
 {
   RExt__DECODER_DEBUG_BIT_STATISTICS_CREATE_SET( STATS__CABAC_BITS__OTHER );
@@ -1375,8 +1375,10 @@ void CABACReader::cu_pred_data( CodingUnit &cu )
     prediction_unit( pu, mrgCtx );
   }
 
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   imv_mode   ( cu, mrgCtx );
+#endif
+#if JEM_TOOLS
   obmc_flag  ( cu );
   cu_lic_flag( cu ); // local illumination compensation
 

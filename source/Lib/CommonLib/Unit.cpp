@@ -277,9 +277,11 @@ CodingUnit& CodingUnit::operator=( const CodingUnit& other )
 #if HEVC_TILES_WPP
   tileIdx           = other.tileIdx;
 #endif
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   imv               = other.imv;
   imvNumCand        = other.imvNumCand;
+#endif
+#if JEM_TOOLS
   obmcFlag          = other.obmcFlag;
 #endif
 
@@ -320,9 +322,11 @@ Void CodingUnit::initData()
 #if HEVC_TILES_WPP
   tileIdx           = 0;
 #endif
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   imv               = 0;
   imvNumCand        = 0;
+#endif
+#if JEM_TOOLS
   obmcFlag          = false;
 #endif
 }

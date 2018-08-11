@@ -149,7 +149,7 @@ public:
   void        affine_flag               ( const CodingUnit&             cu );
 #endif
   void        merge_idx                 ( const PredictionUnit&         pu );
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   void        imv_mode                  ( const CodingUnit&             cu );
 #endif
   void        inter_pred_idc            ( const PredictionUnit&         pu );
@@ -179,7 +179,7 @@ public:
 #endif
 #endif
 
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   // mvd coding (clause 7.3.8.9)
   void        mvd_coding                ( const Mv &rMvd, UChar imv );
 #else

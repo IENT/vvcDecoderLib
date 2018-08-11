@@ -1053,9 +1053,11 @@ void EncModeCtrlMTnoRQT::initCULevel( Partitioner &partitioner, const CodingStru
   cuECtx.set( SAVE_LOAD_TAG,        sls.partIdx == cuECtx.partIdx  ? sls.tag  : SAVE_LOAD_INIT );
   cuECtx.set( HISTORY_NEED_TO_SAVE, m_pcEncCfg->getUseSaveLoadEncInfo() && cs.area.lwidth() > ( 1 << MIN_CU_LOG2 ) && cs.area.lheight() > ( 1 << MIN_CU_LOG2 ) );
 #endif
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   cuECtx.set( BEST_IMV_COST,        MAX_DOUBLE * .5 );
   cuECtx.set( BEST_NO_IMV_COST,     MAX_DOUBLE * .5 );
+#endif
+#if JEM_TOOLS
   cuECtx.set( LAST_NSST_IDX,        0 );
   cuECtx.set( SKIP_OTHER_NSST,      false );
 #endif
@@ -1238,27 +1240,32 @@ void EncModeCtrlMTnoRQT::initCULevel( Partitioner &partitioner, const CodingStru
       const int  qp       = std::max( qpLoop, lowestQP );
       const bool lossless = useLossless && qpLoop == minQP;
 
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
       if( m_pcEncCfg->getIMV() )
       {
         if( m_pcEncCfg->getIMV() == IMV_4PEL )
         {
           Int imv = m_pcEncCfg->getIMV4PelFast() ? 3 : 2;
+#if JEM_TOOLS
           // inter with imv and illumination compensation
           if( m_slice->getUseLIC() )
           {
             m_ComprCUCtxList.back().testModes.push_back( { ETM_INTER_ME, SIZE_2Nx2N, EncTestModeOpts( ( imv << ETO_IMV_SHIFT ) | ETO_LIC ), qp, lossless } );
           }
+#endif
           m_ComprCUCtxList.back().testModes.push_back( { ETM_INTER_ME, SIZE_2Nx2N, EncTestModeOpts( imv << ETO_IMV_SHIFT ), qp, lossless } );
         }
+#if JEM_TOOLS
         // inter with imv and illumination compensation
         if( m_slice->getUseLIC() )
         {
           m_ComprCUCtxList.back().testModes.push_back( { ETM_INTER_ME, SIZE_2Nx2N, EncTestModeOpts( ( 1 << ETO_IMV_SHIFT ) | ETO_LIC ), qp, lossless } );
         }
+#endif
         m_ComprCUCtxList.back().testModes.push_back( { ETM_INTER_ME, SIZE_2Nx2N, EncTestModeOpts( 1 << ETO_IMV_SHIFT ), qp, lossless } );
       }
-
+#endif
+#if JEM_TOOLS
       // inter with illumination compensation
       if( m_slice->getUseLIC() )
       {
@@ -1647,7 +1654,7 @@ Bool EncModeCtrlMTnoRQT::tryMode( const EncTestMode& encTestmode, const CodingSt
         return false;
       }
 #endif
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
       else if( ( encTestmode.opts & ETO_IMV ) != 0 )
       {
         int imvOpt = ( encTestmode.opts & ETO_IMV ) >> ETO_IMV_SHIFT;
@@ -2013,7 +2020,11 @@ Bool EncModeCtrlMTnoRQT::tryMode( const EncTestMode& encTestmode, const CodingSt
           sls.interDir   = bestCU->firstPU->interDir;
 #if JEM_TOOLS
           sls.LICFlag    = bestCU->LICFlag;
+#endif
+#if JVET_K0357_AMVR
           sls.imv        = bestCU->imv;
+#endif
+#if JEM_TOOLS
           sls.frucMode   = bestCU->firstPU->frucMrgMode;
           sls.affineFlag = bestCU->affine;
 #endif
@@ -2084,7 +2095,7 @@ Bool EncModeCtrlMTnoRQT::useModeResult( const EncTestMode& encTestmode, CodingSt
   }
 #endif
 
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   if( m_pcEncCfg->getIMV4PelFast() && m_pcEncCfg->getIMV() && encTestmode.type == ETM_INTER_ME )
   {
     int imvMode = ( encTestmode.opts & ETO_IMV ) >> ETO_IMV_SHIFT;
