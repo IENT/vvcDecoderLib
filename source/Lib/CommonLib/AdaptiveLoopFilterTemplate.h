@@ -31,14 +31,14 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
- /** \file     AdaptiveLoopFilter.hpp
+ /** \file     AdaptiveLoopFilterTemplate.h
      \brief    adaptive loop filter class
  */
 
 template<AlfFilterType filtType>
-Void AdaptiveLoopFilter::filterBlk( const PelUnitBuf &recDst, const CPelUnitBuf& recSrc, const Area& blk, const ComponentID compId, Short* filterSet )
+void AdaptiveLoopFilter::filterBlk( const PelUnitBuf &recDst, const CPelUnitBuf& recSrc, const Area& blk, const ComponentID compId, short* filterSet )
 {
-  const Bool bChroma = isChroma( compId );
+  const bool bChroma = isChroma( compId );
   if( bChroma )
   {
     CHECK( filtType != 0, "Chroma needs to have filtType == 0" );
@@ -47,13 +47,13 @@ Void AdaptiveLoopFilter::filterBlk( const PelUnitBuf &recDst, const CPelUnitBuf&
   const CPelBuf srcLuma = recSrc.get( compId );
   PelBuf dstLuma = recDst.get( compId );
 
-  const Int srcStride = srcLuma.stride;
-  const Int dstStride = dstLuma.stride;
+  const int srcStride = srcLuma.stride;
+  const int dstStride = dstLuma.stride;
 
-  const Int startHeight = blk.y;
-  const Int endHeight = blk.y + blk.height;
-  const Int startWidth = blk.x;
-  const Int endWidth = blk.x + blk.width;
+  const int startHeight = blk.y;
+  const int endHeight = blk.y + blk.height;
+  const int startWidth = blk.x;
+  const int endWidth = blk.x + blk.width;
 
   const Pel* src = srcLuma.buf;
   Pel* dst = dstLuma.buf + startHeight * dstStride;
@@ -61,14 +61,14 @@ Void AdaptiveLoopFilter::filterBlk( const PelUnitBuf &recDst, const CPelUnitBuf&
   const Pel *pImgYPad0, *pImgYPad1, *pImgYPad2, *pImgYPad3, *pImgYPad4, *pImgYPad5, *pImgYPad6;
   const Pel *pImg0, *pImg1, *pImg2, *pImg3, *pImg4, *pImg5, *pImg6;
 
-  Short *coef = filterSet;
+  short *coef = filterSet;
 
-  const Int shift = 9;
-  const Int offset = 1 << ( shift - 1 );
+  const int shift = 9;
+  const int offset = 1 << ( shift - 1 );
 
-  Int transposeIdx = 0;
-  const Int clsSizeY = 4;
-  const Int clsSizeX = 4;
+  int transposeIdx = 0;
+  const int clsSizeY = 4;
+  const int clsSizeX = 4;
 
   CHECK( startHeight % clsSizeY, "Wrong startHeight in filtering" );
   CHECK( startWidth % clsSizeX, "Wrong startWidth in filtering" );
@@ -79,8 +79,8 @@ Void AdaptiveLoopFilter::filterBlk( const PelUnitBuf &recDst, const CPelUnitBuf&
 
   AlfClassifier *pClass = nullptr;
 
-  Int dstStride2 = dstStride * clsSizeY;
-  Int srcStride2 = srcStride * clsSizeY;
+  int dstStride2 = dstStride * clsSizeY;
+  int srcStride2 = srcStride * clsSizeY;
 
   std::vector<Pel> filterCoeff( MAX_NUM_ALF_LUMA_COEFF );
 
@@ -95,14 +95,14 @@ Void AdaptiveLoopFilter::filterBlk( const PelUnitBuf &recDst, const CPelUnitBuf&
   Pel* pRec0 = dst + startWidth;
   Pel* pRec1 = pRec0 + dstStride;
 
-  for( Int i = 0; i < endHeight - startHeight; i += clsSizeY )
+  for( int i = 0; i < endHeight - startHeight; i += clsSizeY )
   {
     if( !bChroma )
     {
       pClass = m_classifier[startHeight + i] + startWidth;
     }
 
-    for( Int j = 0; j < endWidth - startWidth; j += clsSizeX )
+    for( int j = 0; j < endWidth - startWidth; j += clsSizeX )
     {
       if( !bChroma )
       {
@@ -150,7 +150,7 @@ Void AdaptiveLoopFilter::filterBlk( const PelUnitBuf &recDst, const CPelUnitBuf&
         }
       }
 
-      for( Int ii = 0; ii < clsSizeY; ii++ )
+      for( int ii = 0; ii < clsSizeY; ii++ )
       {
         pImg0 = pImgYPad0 + j + ii * srcStride;
         pImg1 = pImgYPad1 + j + ii * srcStride;
@@ -162,9 +162,9 @@ Void AdaptiveLoopFilter::filterBlk( const PelUnitBuf &recDst, const CPelUnitBuf&
 
         pRec1 = pRec0 + j + ii * dstStride;
 
-        for( Int jj = 0; jj < clsSizeX; jj++ )
+        for( int jj = 0; jj < clsSizeX; jj++ )
         {
-          Int sum = 0;
+          int sum = 0;
           if( filtType == ALF_FILTER_7 )
           {
             sum += filterCoeff[0] * ( pImg5[0] + pImg6[0] );

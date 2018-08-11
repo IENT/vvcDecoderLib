@@ -175,7 +175,7 @@ bool tryDecodePicture( Picture* pcEncPic, const int expectedPoc, const std::stri
 #if JVET_K0371_ALF
                 if( pic->cs->sps->getUseALF() )
                 {
-                  for( Int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++ )
+                  for( int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++ )
                   {
                     std::copy( pic->getAlfCtuEnableFlag()[compIdx].begin(), pic->getAlfCtuEnableFlag()[compIdx].end(), pcEncPic->getAlfCtuEnableFlag()[compIdx].begin() );
                   }

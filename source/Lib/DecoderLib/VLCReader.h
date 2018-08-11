@@ -168,13 +168,13 @@ public:
 #endif
 
 #if JVET_K0371_ALF
-  Void alf( AlfSliceParam& alfSliceParam );
-  Void alf_filter( AlfSliceParam& alfSliceParam, Bool isChroma );
+  void alf( AlfSliceParam& alfSliceParam );
+  void alfFilter( AlfSliceParam& alfSliceParam, const bool isChroma );
 
 private:
-  UInt unary_max_eqprob( UInt maxSymbol );
-  Void xReadTruncBinCode( UInt& ruiSymbol, UInt uiMaxSymbol );
-  Int  alfGolombDecode( Int k );
+  int truncatedUnaryEqProb( const int maxSymbol );
+  void xReadTruncBinCode( UInt& ruiSymbol, const int uiMaxSymbol );
+  int  alfGolombDecode( const int k );
 #endif
 
 protected:

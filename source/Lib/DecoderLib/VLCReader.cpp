@@ -2515,7 +2515,7 @@ Bool HLSyntaxReader::xMoreRbspData()
 }
 
 #if JVET_K0371_ALF
-Void HLSyntaxReader::alf( AlfSliceParam& alfSliceParam )
+void HLSyntaxReader::alf( AlfSliceParam& alfSliceParam )
 {
   UInt code;
   READ_FLAG( code, "alf_slice_enable_flag" );
@@ -2527,7 +2527,7 @@ Void HLSyntaxReader::alf( AlfSliceParam& alfSliceParam )
     return;
   }
 
-  Int alfChromaIdc = unary_max_eqprob( 3 );        //alf_chroma_idc
+  int alfChromaIdc = truncatedUnaryEqProb( 3 );        //alf_chroma_idc
   alfSliceParam.enabledFlag[COMPONENT_Cb] = alfChromaIdc >> 1;
   alfSliceParam.enabledFlag[COMPONENT_Cr] = alfChromaIdc & 1;
 
@@ -2539,7 +2539,7 @@ Void HLSyntaxReader::alf( AlfSliceParam& alfSliceParam )
 
   if( alfSliceParam.numLumaFilters > 1 )
   {
-    for( Int i = 0; i < MAX_NUM_ALF_CLASSES; i++ )
+    for( int i = 0; i < MAX_NUM_ALF_CLASSES; i++ )
     {
       xReadTruncBinCode( code, alfSliceParam.numLumaFilters );
       alfSliceParam.filterCoeffDeltaIdx[i] = code;
@@ -2550,23 +2550,23 @@ Void HLSyntaxReader::alf( AlfSliceParam& alfSliceParam )
     memset( alfSliceParam.filterCoeffDeltaIdx, 0, sizeof( alfSliceParam.filterCoeffDeltaIdx ) );
   }
 
-  alf_filter( alfSliceParam, false );
+  alfFilter( alfSliceParam, false );
 
   if( alfChromaIdc )
   {
     READ_FLAG( code, "alf_chroma_ctb_present_flag" );
     alfSliceParam.chromaCtbPresentFlag = code ? true : false;
-    alf_filter( alfSliceParam, true );
+    alfFilter( alfSliceParam, true );
   }
 }
 
-Int HLSyntaxReader::alfGolombDecode( Int k )
+int HLSyntaxReader::alfGolombDecode( const int k )
 {
   UInt uiSymbol;
-  Int q = -1;
-  Int nr = 0;
-  Int m = (Int)pow( 2.0, k );
-  Int a;
+  int q = -1;
+  int nr = 0;
+  int m = (Int)pow( 2.0, k );
+  int a;
 
   uiSymbol = 1;
   while( uiSymbol )
@@ -2578,6 +2578,7 @@ Int HLSyntaxReader::alfGolombDecode( Int k )
 #endif
     q++;
   }
+
   for( a = 0; a < k; ++a )          // read out the sequential log2(M) bits
   {
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
@@ -2586,7 +2587,9 @@ Int HLSyntaxReader::alfGolombDecode( Int k )
     xReadFlag( uiSymbol );
 #endif
     if( uiSymbol )
+    {
       nr += 1 << a;
+    }
   }
   nr += q * m;                    // add the bits and the multiple of M
   if( nr != 0 )
@@ -2601,7 +2604,7 @@ Int HLSyntaxReader::alfGolombDecode( Int k )
   return nr;
 }
 
-Void HLSyntaxReader::alf_filter( AlfSliceParam& alfSliceParam, Bool isChroma )
+void HLSyntaxReader::alfFilter( AlfSliceParam& alfSliceParam, const bool isChroma )
 {
   UInt code;
   if( !isChroma )
@@ -2631,15 +2634,15 @@ Void HLSyntaxReader::alf_filter( AlfSliceParam& alfSliceParam, Bool isChroma )
 
   // derive maxGolombIdx
   AlfFilterShape alfShape( isChroma ? 5 : ( alfSliceParam.lumaFilterType == ALF_FILTER_5 ? 5 : 7 ) );
-  const Int maxGolombIdx = AdaptiveLoopFilter::getMaxGolombIdx( alfShape.filterType );
+  const int maxGolombIdx = AdaptiveLoopFilter::getMaxGolombIdx( alfShape.filterType );
   READ_UVLC( code, "min_golomb_order" );
 
-  Int kMin = code + 1;
-  static Int kMinTab[MAX_NUM_ALF_COEFF];
-  const Int numFilters = isChroma ? 1 : alfSliceParam.numLumaFilters;
-  Short* coeff = isChroma ? alfSliceParam.chromaCoeff : alfSliceParam.lumaCoeff;
+  int kMin = code + 1;
+  static int kMinTab[MAX_NUM_ALF_COEFF];
+  const int numFilters = isChroma ? 1 : alfSliceParam.numLumaFilters;
+  short* coeff = isChroma ? alfSliceParam.chromaCoeff : alfSliceParam.lumaCoeff;
 
-  for( Int idx = 0; idx < maxGolombIdx; idx++ )
+  for( int idx = 0; idx < maxGolombIdx; idx++ )
   {
     READ_FLAG( code, "golomb_order_increase_flag" );
     CHECK( code > 1, "Wrong golomb_order_increase_flag" );
@@ -2651,7 +2654,7 @@ Void HLSyntaxReader::alf_filter( AlfSliceParam& alfSliceParam, Bool isChroma )
   {
     if( alfSliceParam.coeffDeltaFlag )
     {
-      for( Int ind = 0; ind < alfSliceParam.numLumaFilters; ++ind )
+      for( int ind = 0; ind < alfSliceParam.numLumaFilters; ++ind )
       {
         READ_FLAG( code, "filter_coefficient_flag[i]" );
         alfSliceParam.filterCoeffFlag[ind] = code;
@@ -2660,7 +2663,7 @@ Void HLSyntaxReader::alf_filter( AlfSliceParam& alfSliceParam, Bool isChroma )
   }
 
   // Filter coefficients
-  for( Int ind = 0; ind < numFilters; ++ind )
+  for( int ind = 0; ind < numFilters; ++ind )
   {
     if( !isChroma && !alfSliceParam.filterCoeffFlag[ind] && alfSliceParam.coeffDeltaFlag )
     {
@@ -2668,16 +2671,16 @@ Void HLSyntaxReader::alf_filter( AlfSliceParam& alfSliceParam, Bool isChroma )
       continue;
     }
 
-    for( Int i = 0; i < alfShape.numCoeff - 1; i++ )
+    for( int i = 0; i < alfShape.numCoeff - 1; i++ )
     {
       coeff[ind * MAX_NUM_ALF_LUMA_COEFF + i] = alfGolombDecode( kMinTab[alfShape.golombIdx[i]] );
     }
   }
 }
 
-UInt HLSyntaxReader::unary_max_eqprob( UInt maxSymbol )
+int HLSyntaxReader::truncatedUnaryEqProb( const int maxSymbol )
 {
-  for( UInt k = 0; k < maxSymbol; k++ )
+  for( int k = 0; k < maxSymbol; k++ )
   {
     UInt symbol;
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
@@ -2694,12 +2697,12 @@ UInt HLSyntaxReader::unary_max_eqprob( UInt maxSymbol )
   return maxSymbol;
 }
 
-Void HLSyntaxReader::xReadTruncBinCode( UInt& ruiSymbol, UInt uiMaxSymbol )
+void HLSyntaxReader::xReadTruncBinCode( UInt& ruiSymbol, const int uiMaxSymbol )
 {
-  UInt uiThresh;
+  int uiThresh;
   if( uiMaxSymbol > 256 )
   {
-    UInt uiThreshVal = 1 << 8;
+    int uiThreshVal = 1 << 8;
     uiThresh = 8;
     while( uiThreshVal <= uiMaxSymbol )
     {
@@ -2713,8 +2716,8 @@ Void HLSyntaxReader::xReadTruncBinCode( UInt& ruiSymbol, UInt uiMaxSymbol )
     uiThresh = g_tbMax[uiMaxSymbol];
   }
 
-  UInt uiVal = 1 << uiThresh;
-  UInt b = uiMaxSymbol - uiVal;
+  int uiVal = 1 << uiThresh;
+  int b = uiMaxSymbol - uiVal;
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
   xReadCode( uiThresh, ruiSymbol, "" );
 #else

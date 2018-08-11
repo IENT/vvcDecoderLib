@@ -1835,7 +1835,7 @@ Bool HLSWriter::xFindMatchingLTRP(Slice* pcSlice, UInt *ltrpsIndex, Int ltrpPOC,
 }
 
 #if JVET_K0371_ALF
-Void HLSWriter::alf( const AlfSliceParam& alfSliceParam )
+void HLSWriter::alf( const AlfSliceParam& alfSliceParam )
 {
   WRITE_FLAG( alfSliceParam.enabledFlag[COMPONENT_Y], "alf_slice_enable_flag" );
   if( !alfSliceParam.enabledFlag[COMPONENT_Y] )
@@ -1843,44 +1843,44 @@ Void HLSWriter::alf( const AlfSliceParam& alfSliceParam )
     return;
   }
 
-  const Int alfChromaIdc = alfSliceParam.enabledFlag[COMPONENT_Cb] * 2 + alfSliceParam.enabledFlag[COMPONENT_Cr];
-  unary_max_eqprob( alfChromaIdc, 3 );   // alf_chroma_idc
+  const int alfChromaIdc = alfSliceParam.enabledFlag[COMPONENT_Cb] * 2 + alfSliceParam.enabledFlag[COMPONENT_Cr];
+  truncatedUnaryEqProb( alfChromaIdc, 3 );   // alf_chroma_idc
 
   xWriteTruncBinCode( alfSliceParam.numLumaFilters - 1, MAX_NUM_ALF_CLASSES );  //number_of_filters_minus1
   WRITE_FLAG( alfSliceParam.lumaFilterType == ALF_FILTER_5 ? 1 : 0, "filter_type_flag" );
 
   if( alfSliceParam.numLumaFilters > 1 )
   {
-    for( Int i = 0; i < MAX_NUM_ALF_CLASSES; i++ )
+    for( int i = 0; i < MAX_NUM_ALF_CLASSES; i++ )
     {
-      xWriteTruncBinCode( (UInt)alfSliceParam.filterCoeffDeltaIdx[i], (UInt)alfSliceParam.numLumaFilters );  //filter_coeff_delta[i]
+      xWriteTruncBinCode( (UInt)alfSliceParam.filterCoeffDeltaIdx[i], alfSliceParam.numLumaFilters );  //filter_coeff_delta[i]
     }
   }
 
-  alf_filter( alfSliceParam, false );
+  alfFilter( alfSliceParam, false );
 
   if( alfChromaIdc )
   {
     WRITE_FLAG( alfSliceParam.chromaCtbPresentFlag, "alf_chroma_ctb_present_flag" );
-    alf_filter( alfSliceParam, true );
+    alfFilter( alfSliceParam, true );
   }
 }
 
-Void HLSWriter::alfGolombEncode( Int coeff, Int k )
+void HLSWriter::alfGolombEncode( int coeff, int k )
 {
-  Int symbol = abs( coeff );
+  int symbol = abs( coeff );
 
-  Int m = (int)pow( 2.0, k );
-  Int q = symbol / m;
+  int m = (int)pow( 2.0, k );
+  int q = symbol / m;
 
-  for( Int i = 0; i < q; i++ )
+  for( int i = 0; i < q; i++ )
   {
     xWriteFlag( 1 );
   }
   xWriteFlag( 0 );
   // write one zero
 
-  for( Int i = 0; i < k; i++ )
+  for( int i = 0; i < k; i++ )
   {
     xWriteFlag( symbol & 0x01 );
     symbol >>= 1;
@@ -1888,12 +1888,12 @@ Void HLSWriter::alfGolombEncode( Int coeff, Int k )
 
   if( coeff != 0 )
   {
-    Int sign = ( coeff > 0 ) ? 1 : 0;
+    int sign = ( coeff > 0 ) ? 1 : 0;
     xWriteFlag( sign );
   }
 }
 
-Void HLSWriter::alf_filter( const AlfSliceParam& alfSliceParam, Bool isChroma )
+void HLSWriter::alfFilter( const AlfSliceParam& alfSliceParam, const bool isChroma )
 {
   if( !isChroma )
   {
@@ -1907,23 +1907,23 @@ Void HLSWriter::alf_filter( const AlfSliceParam& alfSliceParam, Bool isChroma )
     }
   }
 
-  static Int bitsCoeffScan[EncAdaptiveLoopFilter::m_MAX_SCAN_VAL][EncAdaptiveLoopFilter::m_MAX_EXP_GOLOMB];
+  static int bitsCoeffScan[EncAdaptiveLoopFilter::m_MAX_SCAN_VAL][EncAdaptiveLoopFilter::m_MAX_EXP_GOLOMB];
   memset( bitsCoeffScan, 0, sizeof( bitsCoeffScan ) );
   AlfFilterShape alfShape( isChroma ? 5 : ( alfSliceParam.lumaFilterType == ALF_FILTER_5 ? 5 : 7 ) );
-  const Int maxGolombIdx = AdaptiveLoopFilter::getMaxGolombIdx( alfShape.filterType );
-  const Short* coeff = isChroma ? alfSliceParam.chromaCoeff : alfSliceParam.lumaCoeff;
-  const Int numFilters = isChroma ? 1 : alfSliceParam.numLumaFilters;
+  const int maxGolombIdx = AdaptiveLoopFilter::getMaxGolombIdx( alfShape.filterType );
+  const short* coeff = isChroma ? alfSliceParam.chromaCoeff : alfSliceParam.lumaCoeff;
+  const int numFilters = isChroma ? 1 : alfSliceParam.numLumaFilters;
 
   // vlc for all
-  for( Int ind = 0; ind < numFilters; ++ind )
+  for( int ind = 0; ind < numFilters; ++ind )
   {
     if( isChroma || !alfSliceParam.coeffDeltaFlag || alfSliceParam.filterCoeffFlag[ind] )
     {
-      for( Int i = 0; i < alfShape.numCoeff - 1; i++ )
+      for( int i = 0; i < alfShape.numCoeff - 1; i++ )
       {
-        Int coeffVal = abs( coeff[ind * MAX_NUM_ALF_LUMA_COEFF + i] );
+        int coeffVal = abs( coeff[ind * MAX_NUM_ALF_LUMA_COEFF + i] );
 
-        for( Int k = 1; k < 15; k++ )
+        for( int k = 1; k < 15; k++ )
         {
           bitsCoeffScan[alfShape.golombIdx[i]][k] += EncAdaptiveLoopFilter::lengthGolomb( coeffVal, k );
         }
@@ -1931,15 +1931,15 @@ Void HLSWriter::alf_filter( const AlfSliceParam& alfSliceParam, Bool isChroma )
     }
   }
 
-  static Int kMinTab[MAX_NUM_ALF_COEFF];
-  Int kMin = EncAdaptiveLoopFilter::getGolombKMin( alfShape, numFilters, kMinTab, bitsCoeffScan );
+  static int kMinTab[MAX_NUM_ALF_COEFF];
+  int kMin = EncAdaptiveLoopFilter::getGolombKMin( alfShape, numFilters, kMinTab, bitsCoeffScan );
 
   // Golomb parameters
   WRITE_UVLC( kMin - 1, "min_golomb_order" );
 
-  for( Int idx = 0; idx < maxGolombIdx; idx++ )
+  for( int idx = 0; idx < maxGolombIdx; idx++ )
   {
-    Bool golombOrderIncreaseFlag = ( kMinTab[idx] != kMin ) ? true : false;
+    bool golombOrderIncreaseFlag = ( kMinTab[idx] != kMin ) ? true : false;
     CHECK( !( kMinTab[idx] <= kMin + 1 ), "ALF Golomb parameter not consistent" );
     WRITE_FLAG( golombOrderIncreaseFlag, "golomb_order_increase_flag" );
     kMin = kMinTab[idx];
@@ -1949,7 +1949,7 @@ Void HLSWriter::alf_filter( const AlfSliceParam& alfSliceParam, Bool isChroma )
   {
     if( alfSliceParam.coeffDeltaFlag )
     {
-      for( Int ind = 0; ind < numFilters; ++ind )
+      for( int ind = 0; ind < numFilters; ++ind )
       {
         WRITE_FLAG( alfSliceParam.filterCoeffFlag[ind], "filter_coefficient_flag[i]" );
       }
@@ -1957,26 +1957,26 @@ Void HLSWriter::alf_filter( const AlfSliceParam& alfSliceParam, Bool isChroma )
   }
 
   // Filter coefficients
-  for( Int ind = 0; ind < numFilters; ++ind )
+  for( int ind = 0; ind < numFilters; ++ind )
   {
     if( !isChroma && !alfSliceParam.filterCoeffFlag[ind] && alfSliceParam.coeffDeltaFlag )
     {
       continue;
     }
 
-    for( Int i = 0; i < alfShape.numCoeff - 1; i++ )
+    for( int i = 0; i < alfShape.numCoeff - 1; i++ )
     {
       alfGolombEncode( coeff[ind* MAX_NUM_ALF_LUMA_COEFF + i], kMinTab[alfShape.golombIdx[i]] );  // alf_coeff_chroma[i], alf_coeff_luma_delta[i][j]
     }
   }
 }
 
-Void HLSWriter::xWriteTruncBinCode( UInt uiSymbol, const UInt uiMaxSymbol )
+void HLSWriter::xWriteTruncBinCode( UInt uiSymbol, const int uiMaxSymbol )
 {
-  UInt uiThresh;
+  int uiThresh;
   if( uiMaxSymbol > 256 )
   {
-    UInt uiThreshVal = 1 << 8;
+    int uiThreshVal = 1 << 8;
     uiThresh = 8;
     while( uiThreshVal <= uiMaxSymbol )
     {
@@ -1990,11 +1990,11 @@ Void HLSWriter::xWriteTruncBinCode( UInt uiSymbol, const UInt uiMaxSymbol )
     uiThresh = g_tbMax[uiMaxSymbol];
   }
 
-  UInt uiVal = 1 << uiThresh;
+  int uiVal = 1 << uiThresh;
   assert( uiVal <= uiMaxSymbol );
   assert( ( uiVal << 1 ) > uiMaxSymbol );
   assert( uiSymbol < uiMaxSymbol );
-  UInt b = uiMaxSymbol - uiVal;
+  int b = uiMaxSymbol - uiVal;
   assert( b < uiVal );
   if( uiSymbol < uiVal - b )
   {
@@ -2009,15 +2009,17 @@ Void HLSWriter::xWriteTruncBinCode( UInt uiSymbol, const UInt uiMaxSymbol )
   }
 }
 
-Void HLSWriter::unary_max_eqprob( UInt symbol, UInt maxSymbol )
+void HLSWriter::truncatedUnaryEqProb( int symbol, const int maxSymbol )
 {
   if( maxSymbol == 0 )
   {
     return;
   }
-  Bool     codeLast = ( maxSymbol > symbol );
-  UInt bins = 0;
-  UInt numBins = 0;
+
+  bool codeLast = ( maxSymbol > symbol );
+  int bins = 0;
+  int numBins = 0;
+
   while( symbol-- )
   {
     bins <<= 1;

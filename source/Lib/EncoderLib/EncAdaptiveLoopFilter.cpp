@@ -45,11 +45,11 @@
 EncAdaptiveLoopFilter::EncAdaptiveLoopFilter()
   : m_CABACEstimator( nullptr )
 {
-  for( Int i = 0; i < MAX_NUM_COMPONENT; i++ )
+  for( int i = 0; i < MAX_NUM_COMPONENT; i++ )
   {
     m_alfCovariance[i] = nullptr;
   }
-  for( Int i = 0; i < MAX_NUM_CHANNEL_TYPE; i++ )
+  for( int i = 0; i < MAX_NUM_CHANNEL_TYPE; i++ )
   {
     m_alfCovarianceFrame[i] = nullptr;
   }
@@ -58,40 +58,40 @@ EncAdaptiveLoopFilter::EncAdaptiveLoopFilter()
   m_diffFilterCoeff = nullptr;
 }
 
-Void EncAdaptiveLoopFilter::create( const Int picWidth, const Int picHeight, const ChromaFormat chromaFormatIDC, const Int maxCUWidth, const UInt maxCUHeight, const UInt maxCUDepth, const Int inputBitDepth[MAX_NUM_CHANNEL_TYPE], const Int internalBitDepth[MAX_NUM_CHANNEL_TYPE] )
+void EncAdaptiveLoopFilter::create( const int picWidth, const int picHeight, const ChromaFormat chromaFormatIDC, const int maxCUWidth, const int maxCUHeight, const int maxCUDepth, const int inputBitDepth[MAX_NUM_CHANNEL_TYPE], const int internalBitDepth[MAX_NUM_CHANNEL_TYPE] )
 {
   AdaptiveLoopFilter::create( picWidth, picHeight, chromaFormatIDC, maxCUWidth, maxCUHeight, maxCUDepth, inputBitDepth );
 
-  for( Int channelIdx = 0; channelIdx < MAX_NUM_CHANNEL_TYPE; channelIdx++ )
+  for( int channelIdx = 0; channelIdx < MAX_NUM_CHANNEL_TYPE; channelIdx++ )
   {
     ChannelType chType = (ChannelType)channelIdx;
-    Int numClasses = channelIdx ? 1 : MAX_NUM_ALF_CLASSES;
+    int numClasses = channelIdx ? 1 : MAX_NUM_ALF_CLASSES;
     m_alfCovarianceFrame[chType] = new AlfCovariance*[m_filterShapes[chType].size()];
-    for( Int i = 0; i != m_filterShapes[chType].size(); i++ )
+    for( int i = 0; i != m_filterShapes[chType].size(); i++ )
     {
       m_alfCovarianceFrame[chType][i] = new AlfCovariance[numClasses];
-      for( Int k = 0; k < numClasses; k++ )
+      for( int k = 0; k < numClasses; k++ )
       {
         m_alfCovarianceFrame[chType][i][k].create( m_filterShapes[chType][i].numCoeff );
       }
     }
   }
 
-  for( Int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++ )
+  for( int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++ )
   {
     m_ctuEnableFlagTmp[compIdx] = new UChar[m_numCTUsInPic];
     ChannelType chType = toChannelType( ComponentID( compIdx ) );
-    Int numClasses = compIdx ? 1 : MAX_NUM_ALF_CLASSES;
+    int numClasses = compIdx ? 1 : MAX_NUM_ALF_CLASSES;
 
     m_alfCovariance[compIdx] = new AlfCovariance**[m_filterShapes[chType].size()];
 
-    for( Int i = 0; i != m_filterShapes[chType].size(); i++ )
+    for( int i = 0; i != m_filterShapes[chType].size(); i++ )
     {
       m_alfCovariance[compIdx][i] = new AlfCovariance*[m_numCTUsInPic];
-      for( Int j = 0; j < m_numCTUsInPic; j++ )
+      for( int j = 0; j < m_numCTUsInPic; j++ )
       {
         m_alfCovariance[compIdx][i][j] = new AlfCovariance[numClasses];
-        for( Int k = 0; k < numClasses; k++ )
+        for( int k = 0; k < numClasses; k++ )
         {
           m_alfCovariance[compIdx][i][j][k].create( m_filterShapes[chType][i].numCoeff );
         }
@@ -99,36 +99,36 @@ Void EncAdaptiveLoopFilter::create( const Int picWidth, const Int picHeight, con
     }
   }
 
-  for( Int i = 0; i != m_filterShapes[COMPONENT_Y].size(); i++ )
+  for( int i = 0; i != m_filterShapes[COMPONENT_Y].size(); i++ )
   {
-    for( Int j = 0; j <= MAX_NUM_ALF_CLASSES; j++ )
+    for( int j = 0; j <= MAX_NUM_ALF_CLASSES; j++ )
     {
       m_alfCovarianceMerged[i][j].create( m_filterShapes[COMPONENT_Y][i].numCoeff );
     }
   }
 
-  m_filterCoeffQuant = new Int[MAX_NUM_ALF_LUMA_COEFF];
-  m_filterCoeffSet = new Int*[MAX_NUM_ALF_CLASSES];
-  m_diffFilterCoeff = new Int*[MAX_NUM_ALF_CLASSES];
+  m_filterCoeffQuant = new int[MAX_NUM_ALF_LUMA_COEFF];
+  m_filterCoeffSet = new int*[MAX_NUM_ALF_CLASSES];
+  m_diffFilterCoeff = new int*[MAX_NUM_ALF_CLASSES];
 
-  for( Int i = 0; i < MAX_NUM_ALF_CLASSES; i++ )
+  for( int i = 0; i < MAX_NUM_ALF_CLASSES; i++ )
   {
-    m_filterCoeffSet[i] = new Int[MAX_NUM_ALF_LUMA_COEFF];
-    m_diffFilterCoeff[i] = new Int[MAX_NUM_ALF_LUMA_COEFF];
+    m_filterCoeffSet[i] = new int[MAX_NUM_ALF_LUMA_COEFF];
+    m_diffFilterCoeff[i] = new int[MAX_NUM_ALF_LUMA_COEFF];
   }
 }
 
-Void EncAdaptiveLoopFilter::destroy()
+void EncAdaptiveLoopFilter::destroy()
 {
-  for( Int channelIdx = 0; channelIdx < MAX_NUM_CHANNEL_TYPE; channelIdx++ )
+  for( int channelIdx = 0; channelIdx < MAX_NUM_CHANNEL_TYPE; channelIdx++ )
   {
     if( m_alfCovarianceFrame[channelIdx] )
     {
       ChannelType chType = (ChannelType)channelIdx;
-      Int numClasses = channelIdx ? 1 : MAX_NUM_ALF_CLASSES;
-      for( Int i = 0; i != m_filterShapes[chType].size(); i++ )
+      int numClasses = channelIdx ? 1 : MAX_NUM_ALF_CLASSES;
+      for( int i = 0; i != m_filterShapes[chType].size(); i++ )
       {
-        for( Int k = 0; k < numClasses; k++ )
+        for( int k = 0; k < numClasses; k++ )
         {
           m_alfCovarianceFrame[channelIdx][i][k].destroy();
         }
@@ -140,7 +140,7 @@ Void EncAdaptiveLoopFilter::destroy()
     }
   }
 
-  for( Int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++ )
+  for( int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++ )
   {
     if( m_ctuEnableFlagTmp[compIdx] )
     {
@@ -151,13 +151,13 @@ Void EncAdaptiveLoopFilter::destroy()
     if( m_alfCovariance[compIdx] )
     {
       ChannelType chType = toChannelType( ComponentID( compIdx ) );
-      Int numClasses = compIdx ? 1 : MAX_NUM_ALF_CLASSES;
+      int numClasses = compIdx ? 1 : MAX_NUM_ALF_CLASSES;
 
-      for( Int i = 0; i != m_filterShapes[chType].size(); i++ )
+      for( int i = 0; i != m_filterShapes[chType].size(); i++ )
       {
-        for( Int j = 0; j < m_numCTUsInPic; j++ )
+        for( int j = 0; j < m_numCTUsInPic; j++ )
         {
-          for( Int k = 0; k < numClasses; k++ )
+          for( int k = 0; k < numClasses; k++ )
           {
             m_alfCovariance[compIdx][i][j][k].destroy();
           }
@@ -176,9 +176,9 @@ Void EncAdaptiveLoopFilter::destroy()
 
   if( m_alfCovarianceMerged )
   {
-    for( Int i = 0; i != m_filterShapes[COMPONENT_Y].size(); i++ )
+    for( int i = 0; i != m_filterShapes[COMPONENT_Y].size(); i++ )
     {
-      for( Int j = 0; j <= MAX_NUM_ALF_CLASSES; j++ )
+      for( int j = 0; j <= MAX_NUM_ALF_CLASSES; j++ )
       {
         m_alfCovarianceMerged[i][j].destroy();
       }
@@ -187,7 +187,7 @@ Void EncAdaptiveLoopFilter::destroy()
 
   if( m_filterCoeffSet )
   {
-    for( Int i = 0; i < MAX_NUM_ALF_CLASSES; i++ )
+    for( int i = 0; i < MAX_NUM_ALF_CLASSES; i++ )
     {
       delete[] m_filterCoeffSet[i];
       m_filterCoeffSet[i] = nullptr;
@@ -198,7 +198,7 @@ Void EncAdaptiveLoopFilter::destroy()
 
   if( m_diffFilterCoeff )
   {
-    for( Int i = 0; i < MAX_NUM_ALF_CLASSES; i++ )
+    for( int i = 0; i < MAX_NUM_ALF_CLASSES; i++ )
     {
       delete[] m_diffFilterCoeff[i];
       m_diffFilterCoeff[i] = nullptr;
@@ -214,9 +214,9 @@ Void EncAdaptiveLoopFilter::destroy()
 }
 
 #if JEM_TOOLS
-Void EncAdaptiveLoopFilter::initCABACEstimator( CABACDataStore* cabacDataStore, CABACEncoder* cabacEncoder, CtxCache* ctxCache, Slice* pcSlice )
+void EncAdaptiveLoopFilter::initCABACEstimator( CABACDataStore* cabacDataStore, CABACEncoder* cabacEncoder, CtxCache* ctxCache, Slice* pcSlice )
 #else
-Void EncAdaptiveLoopFilter::initCABACEstimator( CABACEncoder* cabacEncoder, CtxCache* ctxCache, Slice* pcSlice )
+void EncAdaptiveLoopFilter::initCABACEstimator( CABACEncoder* cabacEncoder, CtxCache* ctxCache, Slice* pcSlice )
 #endif
 {
   m_CABACEstimator = cabacEncoder->getCABACEstimator( pcSlice->getSPS() );
@@ -229,7 +229,7 @@ Void EncAdaptiveLoopFilter::initCABACEstimator( CABACEncoder* cabacEncoder, CtxC
   m_CABACEstimator->resetBits();
 }
 
-Void EncAdaptiveLoopFilter::ALFProcess( CodingStructure& cs, const Double *lambdas, AlfSliceParam& alfSliceParam )
+void EncAdaptiveLoopFilter::ALFProcess( CodingStructure& cs, const double *lambdas, AlfSliceParam& alfSliceParam )
 {
   // set available filter shapes
   alfSliceParam.filterShapes = m_filterShapes;
@@ -238,7 +238,7 @@ Void EncAdaptiveLoopFilter::ALFProcess( CodingStructure& cs, const Double *lambd
   m_clpRngs = cs.slice->getClpRngs();
 
   // set CTU ALF enable flags, it was already reset before ALF process
-  for( Int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++ )
+  for( int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++ )
   {
     m_ctuEnableFlag[compIdx] = cs.picture->getAlfCtuEnableFlag( compIdx );
   }
@@ -246,15 +246,15 @@ Void EncAdaptiveLoopFilter::ALFProcess( CodingStructure& cs, const Double *lambd
   // reset ALF parameters
   alfSliceParam.reset();
 #if DISTORTION_LAMBDA_BUGFIX
-  Int shiftLuma = 2 * DISTORTION_PRECISION_ADJUSTMENT(m_inputBitDepth[CHANNEL_TYPE_LUMA]);
-  Int shiftChroma = 2 * DISTORTION_PRECISION_ADJUSTMENT(m_inputBitDepth[CHANNEL_TYPE_CHROMA]);
+  int shiftLuma = 2 * DISTORTION_PRECISION_ADJUSTMENT(m_inputBitDepth[CHANNEL_TYPE_LUMA]);
+  int shiftChroma = 2 * DISTORTION_PRECISION_ADJUSTMENT(m_inputBitDepth[CHANNEL_TYPE_CHROMA]);
 #else
-  Int shiftLuma = 2 * DISTORTION_PRECISION_ADJUSTMENT(m_inputBitDepth[CHANNEL_TYPE_LUMA] - 8);
-  Int shiftChroma = 2 * DISTORTION_PRECISION_ADJUSTMENT(m_inputBitDepth[CHANNEL_TYPE_CHROMA] - 8);
+  int shiftLuma = 2 * DISTORTION_PRECISION_ADJUSTMENT(m_inputBitDepth[CHANNEL_TYPE_LUMA] - 8);
+  int shiftChroma = 2 * DISTORTION_PRECISION_ADJUSTMENT(m_inputBitDepth[CHANNEL_TYPE_CHROMA] - 8);
 #endif
-  m_lambda[COMPONENT_Y] = lambdas[COMPONENT_Y] * Double(1 << shiftLuma);
-  m_lambda[COMPONENT_Cb] = lambdas[COMPONENT_Cb] * Double(1 << shiftChroma);
-  m_lambda[COMPONENT_Cr] = lambdas[COMPONENT_Cr] * Double(1 << shiftChroma);
+  m_lambda[COMPONENT_Y] = lambdas[COMPONENT_Y] * double(1 << shiftLuma);
+  m_lambda[COMPONENT_Cb] = lambdas[COMPONENT_Cb] * double(1 << shiftChroma);
+  m_lambda[COMPONENT_Cr] = lambdas[COMPONENT_Cr] * double(1 << shiftChroma);
 
   PelUnitBuf orgYuv = cs.getOrgBuf();
 
@@ -280,39 +280,41 @@ Void EncAdaptiveLoopFilter::ALFProcess( CodingStructure& cs, const Double *lambd
   }
 }
 
-Double EncAdaptiveLoopFilter::deriveCtbAlfEnableFlags( CodingStructure& cs, const Int iShapeIdx, ChannelType channel, const Int numClasses, const Int numCoeff, Double& distUnfilter )
+double EncAdaptiveLoopFilter::deriveCtbAlfEnableFlags( CodingStructure& cs, const int iShapeIdx, ChannelType channel, const int numClasses, const int numCoeff, double& distUnfilter )
 {
   TempCtx        ctxTempStart( m_CtxCache );
   TempCtx        ctxTempBest( m_CtxCache );
   const ComponentID compIDFirst = isLuma( channel ) ? COMPONENT_Y : COMPONENT_Cb;
   const ComponentID compIDLast = isLuma( channel ) ? COMPONENT_Y : COMPONENT_Cr;
 
-  Double cost = 0;
+  double cost = 0;
   distUnfilter = 0;
 
   setEnableFlag(m_alfSliceParamTemp, channel, true);
-  if ( isChroma(channel) )
-    m_alfSliceParamTemp.chromaCtbPresentFlag = false;
-
-  for( Int ctuIdx = 0; ctuIdx < m_numCTUsInPic; ctuIdx++ )
+  if( isChroma( channel ) )
   {
-    for( Int compID = compIDFirst; compID <= compIDLast; compID++ )
+    m_alfSliceParamTemp.chromaCtbPresentFlag = false;
+  }
+
+  for( int ctuIdx = 0; ctuIdx < m_numCTUsInPic; ctuIdx++ )
+  {
+    for( int compID = compIDFirst; compID <= compIDLast; compID++ )
     {
-      Double distUnfilterCtu = getUnfilteredDistortion( m_alfCovariance[compID][iShapeIdx][ctuIdx], numClasses );
+      double distUnfilterCtu = getUnfilteredDistortion( m_alfCovariance[compID][iShapeIdx][ctuIdx], numClasses );
 
       ctxTempStart = AlfCtx( m_CABACEstimator->getCtx() );
       m_CABACEstimator->resetBits();
       m_ctuEnableFlag[compID][ctuIdx] = 1;
       m_CABACEstimator->codeAlfCtuEnableFlag( cs, ctuIdx, compID, &m_alfSliceParamTemp );
-      Double costOn = distUnfilterCtu + getFilteredDistortion( m_alfCovariance[compID][iShapeIdx][ctuIdx], numClasses, m_alfSliceParamTemp.numLumaFilters - 1, numCoeff );
-      costOn += m_lambda[compID] * FracBitsScale*(Double)m_CABACEstimator->getEstFracBits();
+      double costOn = distUnfilterCtu + getFilteredDistortion( m_alfCovariance[compID][iShapeIdx][ctuIdx], numClasses, m_alfSliceParamTemp.numLumaFilters - 1, numCoeff );
+      costOn += m_lambda[compID] * FracBitsScale*(double)m_CABACEstimator->getEstFracBits();
       ctxTempBest = AlfCtx( m_CABACEstimator->getCtx() );
 
       m_CABACEstimator->getCtx() = AlfCtx( ctxTempStart );
       m_CABACEstimator->resetBits();
       m_ctuEnableFlag[compID][ctuIdx] = 0;
       m_CABACEstimator->codeAlfCtuEnableFlag( cs, ctuIdx, compID, &m_alfSliceParamTemp);
-      Double costOff = distUnfilterCtu + m_lambda[compID] * FracBitsScale*(Double)m_CABACEstimator->getEstFracBits();
+      double costOff = distUnfilterCtu + m_lambda[compID] * FracBitsScale*(double)m_CABACEstimator->getEstFracBits();
 
       if( costOn < costOff )
       {
@@ -329,30 +331,30 @@ Double EncAdaptiveLoopFilter::deriveCtbAlfEnableFlags( CodingStructure& cs, cons
     }
   }
 
-  if (isChroma(channel))
+  if( isChroma( channel ) )
   {
     setEnableFlag(m_alfSliceParamTemp, channel, m_ctuEnableFlag);
-    const Int alfChromaIdc = m_alfSliceParamTemp.enabledFlag[COMPONENT_Cb] * 2 + m_alfSliceParamTemp.enabledFlag[COMPONENT_Cr];
-    cost += len_unary_max_eqprob(alfChromaIdc, 3) * m_lambda[channel];
+    const int alfChromaIdc = m_alfSliceParamTemp.enabledFlag[COMPONENT_Cb] * 2 + m_alfSliceParamTemp.enabledFlag[COMPONENT_Cr];
+    cost += lengthTruncatedUnary(alfChromaIdc, 3) * m_lambda[channel];
   }
 
   return cost;
 }
 
-Void EncAdaptiveLoopFilter::alfEncoder( CodingStructure& cs, AlfSliceParam& alfSliceParam, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, const PelUnitBuf& recBuf, const ChannelType channel )
+void EncAdaptiveLoopFilter::alfEncoder( CodingStructure& cs, AlfSliceParam& alfSliceParam, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, const PelUnitBuf& recBuf, const ChannelType channel )
 {
   const TempCtx  ctxStart( m_CtxCache, AlfCtx( m_CABACEstimator->getCtx() ) );
   TempCtx        ctxBest( m_CtxCache );
 
-  Double costMin = MAX_DOUBLE;
+  double costMin = MAX_DOUBLE;
 
   std::vector<AlfFilterShape>& alfFilterShape = alfSliceParam.filterShapes[channel];
   const ComponentID compIDFirst = isLuma( channel ) ? COMPONENT_Y : COMPONENT_Cb;
   const ComponentID compIDLast = isLuma( channel ) ? COMPONENT_Y : COMPONENT_Cr;
-  const Int numClasses = isLuma( channel ) ? MAX_NUM_ALF_CLASSES : 1;
-  UInt uiCoeffBits = 0;
+  const int numClasses = isLuma( channel ) ? MAX_NUM_ALF_CLASSES : 1;
+  int uiCoeffBits = 0;
 
-  for( Int iShapeIdx = 0; iShapeIdx < alfFilterShape.size(); iShapeIdx++ )
+  for( int iShapeIdx = 0; iShapeIdx < alfFilterShape.size(); iShapeIdx++ )
   {
     m_alfSliceParamTemp = alfSliceParam;
     if( isLuma( channel ) )
@@ -361,7 +363,7 @@ Void EncAdaptiveLoopFilter::alfEncoder( CodingStructure& cs, AlfSliceParam& alfS
     }
 
     //1. get unfiltered distortion
-    Double cost = getUnfilteredDistortion( m_alfCovarianceFrame[channel][iShapeIdx], channel );
+    double cost = getUnfilteredDistortion( m_alfCovarianceFrame[channel][iShapeIdx], channel );
     cost /= 1.001; // slight preference for unfiltered choice
 
     if( cost < costMin )
@@ -396,10 +398,10 @@ Void EncAdaptiveLoopFilter::alfEncoder( CodingStructure& cs, AlfSliceParam& alfS
     }
 
     //3. CTU decision
-    Double distUnfilter = 0;
-    const Int iterNum = 2 * 2 + 1;
+    double distUnfilter = 0;
+    const int iterNum = 2 * 2 + 1;
 
-    for (Int iter = 0; iter < iterNum; iter++)
+    for( int iter = 0; iter < iterNum; iter++ )
     {
       if ((iter & 0x01) == 0)
       {
@@ -427,43 +429,49 @@ Void EncAdaptiveLoopFilter::alfEncoder( CodingStructure& cs, AlfSliceParam& alfS
   //filtering
   reconstructCoeff( alfSliceParam, channel, isLuma( channel ) );
 
-  for( Int compIdx = compIDFirst; compIdx <= compIDLast; compIdx++ )
+  for( int compIdx = compIDFirst; compIdx <= compIDLast; compIdx++ )
   {
     ComponentID compID = (ComponentID)compIdx;
     if( alfSliceParam.enabledFlag[compID] )
     {
       const PreCalcValues& pcv = *cs.pcv;
-      Int ctuIdx = 0;
-      const UInt chromaScaleX = getComponentScaleX( compID, recBuf.chromaFormat );
-      const UInt chromaScaleY = getComponentScaleY( compID, recBuf.chromaFormat );
+      int ctuIdx = 0;
+      const int chromaScaleX = getComponentScaleX( compID, recBuf.chromaFormat );
+      const int chromaScaleY = getComponentScaleY( compID, recBuf.chromaFormat );
       AlfFilterType filterType = isLuma( compID ) ? alfSliceParam.lumaFilterType : ALF_FILTER_5;
-      Short* coeff = isLuma( compID ) ? m_coeffFinal : alfSliceParam.chromaCoeff;
+      short* coeff = isLuma( compID ) ? m_coeffFinal : alfSliceParam.chromaCoeff;
 
-      for( UInt yPos = 0; yPos < pcv.lumaHeight; yPos += pcv.maxCUHeight )
+      for( int yPos = 0; yPos < pcv.lumaHeight; yPos += pcv.maxCUHeight )
       {
-        for( UInt xPos = 0; xPos < pcv.lumaWidth; xPos += pcv.maxCUWidth )
+        for( int xPos = 0; xPos < pcv.lumaWidth; xPos += pcv.maxCUWidth )
         {
-          const UInt width = ( xPos + pcv.maxCUWidth > pcv.lumaWidth ) ? ( pcv.lumaWidth - xPos ) : pcv.maxCUWidth;
-          const UInt height = ( yPos + pcv.maxCUHeight > pcv.lumaHeight ) ? ( pcv.lumaHeight - yPos ) : pcv.maxCUHeight;
+          const int width = ( xPos + pcv.maxCUWidth > pcv.lumaWidth ) ? ( pcv.lumaWidth - xPos ) : pcv.maxCUWidth;
+          const int height = ( yPos + pcv.maxCUHeight > pcv.lumaHeight ) ? ( pcv.lumaHeight - yPos ) : pcv.maxCUHeight;
           Area blk( xPos >> chromaScaleX, yPos >> chromaScaleY, width >> chromaScaleX, height >> chromaScaleY );
 
           if( m_ctuEnableFlag[compID][ctuIdx] )
           {
             if( filterType == ALF_FILTER_5 )
             {
-#if ALF_USE_SIMD
-              filter5x5BlkSIMD(recBuf, recExtBuf, blk, compID, coeff);
-#else
-              filterBlk<ALF_FILTER_5>( recBuf, recExtBuf, blk, compID, coeff );
+#if ENABLE_SIMD_OPT_ALF
+              if( m_useSIMD )
+              {
+                filter5x5BlkSIMD( recBuf, recExtBuf, blk, compID, coeff );
+              }
+              else
 #endif
+              filterBlk<ALF_FILTER_5>( recBuf, recExtBuf, blk, compID, coeff );
             }
             else if( filterType == ALF_FILTER_7 )
             {
-#if ALF_USE_SIMD
-              filter7x7BlkSIMD(recBuf, recExtBuf, blk, compID, coeff);
-#else
-              filterBlk<ALF_FILTER_7>( recBuf, recExtBuf, blk, compID, coeff );
+#if ENABLE_SIMD_OPT_ALF
+              if( m_useSIMD )
+              {
+                filter7x7BlkSIMD( recBuf, recExtBuf, blk, compID, coeff );
+              }
+              else
 #endif
+              filterBlk<ALF_FILTER_7>( recBuf, recExtBuf, blk, compID, coeff );
             }
             else
             {
@@ -491,7 +499,7 @@ Void EncAdaptiveLoopFilter::copyAlfSliceParam( AlfSliceParam& alfSliceParamDst, 
     memcpy( alfSliceParamDst.chromaCoeff, alfSliceParamSrc.chromaCoeff, sizeof( alfSliceParamDst.chromaCoeff ) );
   }
 }
-Double EncAdaptiveLoopFilter::getFilterCoeffAndCost( CodingStructure& cs, Double distUnfilter, ChannelType channel, Bool bReCollectStat, Int iShapeIdx, UInt& uiCoeffBits )
+double EncAdaptiveLoopFilter::getFilterCoeffAndCost( CodingStructure& cs, double distUnfilter, ChannelType channel, bool bReCollectStat, int iShapeIdx, int& uiCoeffBits )
 {
   //collect stat based on CTU decision
   if( bReCollectStat )
@@ -499,9 +507,9 @@ Double EncAdaptiveLoopFilter::getFilterCoeffAndCost( CodingStructure& cs, Double
     getFrameStats( channel, iShapeIdx );
   }
 
-  Double dist = distUnfilter;
+  double dist = distUnfilter;
   uiCoeffBits = 0;
-  UInt uiSliceFlag = 0;
+  int uiSliceFlag = 0;
   AlfFilterShape& alfFilterShape = m_alfSliceParamTemp.filterShapes[channel][iShapeIdx];
   //get filter coeff
   if( isLuma( channel ) )
@@ -515,16 +523,16 @@ Double EncAdaptiveLoopFilter::getFilterCoeffAndCost( CodingStructure& cs, Double
     dist += m_alfCovarianceFrame[channel][iShapeIdx][0].pixAcc + deriveCoeffQuant( m_filterCoeffQuant, m_alfCovarianceFrame[channel][iShapeIdx][0].E, m_alfCovarianceFrame[channel][iShapeIdx][0].y, alfFilterShape.numCoeff, alfFilterShape.weights, m_NUM_BITS, true );
     memcpy( m_filterCoeffSet[0], m_filterCoeffQuant, sizeof( *m_filterCoeffQuant ) * alfFilterShape.numCoeff );
     //setEnableFlag( m_alfSliceParamTemp, channel, m_ctuEnableFlag );
-    const Int alfChromaIdc = m_alfSliceParamTemp.enabledFlag[COMPONENT_Cb] * 2 + m_alfSliceParamTemp.enabledFlag[COMPONENT_Cr];
-    for( Int i = 0; i < MAX_NUM_ALF_CHROMA_COEFF; i++ )
+    const int alfChromaIdc = m_alfSliceParamTemp.enabledFlag[COMPONENT_Cb] * 2 + m_alfSliceParamTemp.enabledFlag[COMPONENT_Cr];
+    for( int i = 0; i < MAX_NUM_ALF_CHROMA_COEFF; i++ )
     {
       m_alfSliceParamTemp.chromaCoeff[i] = m_filterCoeffQuant[i];
     }
     uiCoeffBits += getCoeffRate( m_alfSliceParamTemp, true );
-    uiSliceFlag = len_unary_max_eqprob(alfChromaIdc, 3);
+    uiSliceFlag = lengthTruncatedUnary(alfChromaIdc, 3);
   }
 
-  Double rate = uiCoeffBits + uiSliceFlag;
+  double rate = uiCoeffBits + uiSliceFlag;
   if (isLuma(channel) || (!m_alfSliceParamTemp.chromaCtbPresentFlag))
   {
     if (isChroma(channel))
@@ -537,14 +545,14 @@ Double EncAdaptiveLoopFilter::getFilterCoeffAndCost( CodingStructure& cs, Double
     }
     m_CABACEstimator->resetBits();
     m_CABACEstimator->codeAlfCtuEnableFlags( cs, channel, &m_alfSliceParamTemp);
-    rate += FracBitsScale * (Double)m_CABACEstimator->getEstFracBits();
+    rate += FracBitsScale * (double)m_CABACEstimator->getEstFracBits();
   }
   return dist + m_lambda[channel] * rate;
 }
 
-Int EncAdaptiveLoopFilter::getCoeffRate( AlfSliceParam& alfSliceParam, Bool isChroma )
+int EncAdaptiveLoopFilter::getCoeffRate( AlfSliceParam& alfSliceParam, bool isChroma )
 {
-  Int iBits = 0;
+  int iBits = 0;
   if( !isChroma )
   {
     iBits++;                                               // alf_coefficients_delta_flag
@@ -559,20 +567,20 @@ Int EncAdaptiveLoopFilter::getCoeffRate( AlfSliceParam& alfSliceParam, Bool isCh
 
   memset( m_bitsCoeffScan, 0, sizeof( m_bitsCoeffScan ) );
   AlfFilterShape alfShape( isChroma ? 5 : ( alfSliceParam.lumaFilterType == ALF_FILTER_5 ? 5 : 7 ) );
-  const Int maxGolombIdx = AdaptiveLoopFilter::getMaxGolombIdx( alfShape.filterType );
-  const Short* coeff = isChroma ? alfSliceParam.chromaCoeff : alfSliceParam.lumaCoeff;
-  const Int numFilters = isChroma ? 1 : alfSliceParam.numLumaFilters;
+  const int maxGolombIdx = AdaptiveLoopFilter::getMaxGolombIdx( alfShape.filterType );
+  const short* coeff = isChroma ? alfSliceParam.chromaCoeff : alfSliceParam.lumaCoeff;
+  const int numFilters = isChroma ? 1 : alfSliceParam.numLumaFilters;
 
   // vlc for all
-  for( Int ind = 0; ind < numFilters; ++ind )
+  for( int ind = 0; ind < numFilters; ++ind )
   {
     if( isChroma || !alfSliceParam.coeffDeltaFlag || alfSliceParam.filterCoeffFlag[ind] )
     {
-      for( Int i = 0; i < alfShape.numCoeff - 1; i++ )
+      for( int i = 0; i < alfShape.numCoeff - 1; i++ )
       {
-        Int coeffVal = abs( coeff[ind * MAX_NUM_ALF_LUMA_COEFF + i] );
+        int coeffVal = abs( coeff[ind * MAX_NUM_ALF_LUMA_COEFF + i] );
 
-        for( Int k = 1; k < 15; k++ )
+        for( int k = 1; k < 15; k++ )
         {
           m_bitsCoeffScan[alfShape.golombIdx[i]][k] += lengthGolomb( coeffVal, k );
         }
@@ -580,13 +588,13 @@ Int EncAdaptiveLoopFilter::getCoeffRate( AlfSliceParam& alfSliceParam, Bool isCh
     }
   }
 
-  Int kMin = getGolombKMin( alfShape, numFilters, m_kMinTab, m_bitsCoeffScan );
+  int kMin = getGolombKMin( alfShape, numFilters, m_kMinTab, m_bitsCoeffScan );
 
   // Golomb parameters
   iBits += lengthUvlc( kMin - 1 );  // "min_golomb_order"
-  Int golombOrderIncreaseFlag = 0;
+  int golombOrderIncreaseFlag = 0;
 
-  for( Int idx = 0; idx < maxGolombIdx; idx++ )
+  for( int idx = 0; idx < maxGolombIdx; idx++ )
   {
     golombOrderIncreaseFlag = ( m_kMinTab[idx] != kMin ) ? 1 : 0;
     CHECK( !( m_kMinTab[idx] <= kMin + 1 ), "ALF Golomb parameter not consistent" );
@@ -603,14 +611,14 @@ Int EncAdaptiveLoopFilter::getCoeffRate( AlfSliceParam& alfSliceParam, Bool isCh
   }
 
   // Filter coefficients
-  for( Int ind = 0; ind < numFilters; ++ind )
+  for( int ind = 0; ind < numFilters; ++ind )
   {
     if( !isChroma && !alfSliceParam.filterCoeffFlag[ind] && alfSliceParam.coeffDeltaFlag )
     {
       continue;
     }
 
-    for( Int i = 0; i < alfShape.numCoeff - 1; i++ )
+    for( int i = 0; i < alfShape.numCoeff - 1; i++ )
     {
       iBits += lengthGolomb( coeff[ind* MAX_NUM_ALF_LUMA_COEFF + i], m_kMinTab[alfShape.golombIdx[i]] );  // alf_coeff_chroma[i], alf_coeff_luma_delta[i][j]
     }
@@ -618,52 +626,52 @@ Int EncAdaptiveLoopFilter::getCoeffRate( AlfSliceParam& alfSliceParam, Bool isCh
   return iBits;
 }
 
-Double EncAdaptiveLoopFilter::getUnfilteredDistortion( AlfCovariance* cov, ChannelType channel )
+double EncAdaptiveLoopFilter::getUnfilteredDistortion( AlfCovariance* cov, ChannelType channel )
 {
-  Double dist = 0;
+  double dist = 0;
   if( isLuma( channel ) )
   {
     dist = getUnfilteredDistortion( cov, MAX_NUM_ALF_CLASSES );
   }
   else
   {
-    dist = getUnfilteredDistortion( cov, 1 ) + len_unary_max_eqprob( 0, 3 ) * m_lambda[COMPONENT_Cb];
+    dist = getUnfilteredDistortion( cov, 1 ) + lengthTruncatedUnary( 0, 3 ) * m_lambda[COMPONENT_Cb];
   }
   return dist;
 }
 
-Double EncAdaptiveLoopFilter::getUnfilteredDistortion( AlfCovariance* cov, const Int numClasses )
+double EncAdaptiveLoopFilter::getUnfilteredDistortion( AlfCovariance* cov, const int numClasses )
 {
-  Double dist = 0;
-  for( Int classIdx = 0; classIdx < numClasses; classIdx++ )
+  double dist = 0;
+  for( int classIdx = 0; classIdx < numClasses; classIdx++ )
   {
     dist += cov[classIdx].pixAcc;
   }
   return dist;
 }
 
-Double EncAdaptiveLoopFilter::getFilteredDistortion( AlfCovariance* cov, const Int numClasses, const Int numFiltersMinus1, const Int numCoeff )
+double EncAdaptiveLoopFilter::getFilteredDistortion( AlfCovariance* cov, const int numClasses, const int numFiltersMinus1, const int numCoeff )
 {
-  Double dist = 0;
+  double dist = 0;
 
-  for( Int classIdx = 0; classIdx < numClasses; classIdx++ )
+  for( int classIdx = 0; classIdx < numClasses; classIdx++ )
   {
-    Int filterIdx = numClasses == 1 ? 0 : m_filterIndices[numFiltersMinus1][classIdx];
+    int filterIdx = numClasses == 1 ? 0 : m_filterIndices[numFiltersMinus1][classIdx];
     dist += calcErrorForCoeffs( cov[classIdx].E, cov[classIdx].y, m_filterCoeffSet[filterIdx], numCoeff, m_NUM_BITS );
   }
 
   return dist;
 }
 
-Double EncAdaptiveLoopFilter::mergeFiltersAndCost( AlfSliceParam& alfSliceParam, AlfFilterShape& alfShape, AlfCovariance* covFrame, AlfCovariance* covMerged, UInt& uiCoeffBits )
+double EncAdaptiveLoopFilter::mergeFiltersAndCost( AlfSliceParam& alfSliceParam, AlfFilterShape& alfShape, AlfCovariance* covFrame, AlfCovariance* covMerged, int& uiCoeffBits )
 {
-  Int numFiltersBest = 0;
-  Int numFilters = MAX_NUM_ALF_CLASSES;
-  static Bool codedVarBins[MAX_NUM_ALF_CLASSES];
-  static Double errorForce0CoeffTab[MAX_NUM_ALF_CLASSES][2];
+  int numFiltersBest = 0;
+  int numFilters = MAX_NUM_ALF_CLASSES;
+  static bool codedVarBins[MAX_NUM_ALF_CLASSES];
+  static double errorForce0CoeffTab[MAX_NUM_ALF_CLASSES][2];
 
-  Double cost, cost0, dist, distForce0, costMin = MAX_DOUBLE;
-  Int predMode = 0, bestPredMode = 0, coeffBits, coeffBitsForce0;
+  double cost, cost0, dist, distForce0, costMin = MAX_DOUBLE;
+  int predMode = 0, bestPredMode = 0, coeffBits, coeffBitsForce0;
 
   mergeClasses( covFrame, covMerged, MAX_NUM_ALF_CLASSES, m_filterIndices );
 
@@ -701,7 +709,7 @@ Double EncAdaptiveLoopFilter::mergeFiltersAndCost( AlfSliceParam& alfSliceParam,
   cost0 = distForce0 + m_lambda[COMPONENT_Y] * coeffBitsForce0;
 
   alfSliceParam.numLumaFilters = numFiltersBest;
-  Double distReturn;
+  double distReturn;
   if (cost <= cost0)
   {
     distReturn = dist;
@@ -717,18 +725,18 @@ Double EncAdaptiveLoopFilter::mergeFiltersAndCost( AlfSliceParam& alfSliceParam,
     memcpy( alfSliceParam.filterCoeffFlag, codedVarBins, sizeof( codedVarBins ) );
     alfSliceParam.coeffDeltaPredModeFlag = 0;
 
-    for( Int varInd = 0; varInd < numFiltersBest; varInd++ )
+    for( int varInd = 0; varInd < numFiltersBest; varInd++ )
     {
       if( codedVarBins[varInd] == 0 )
       {
-        memset( m_filterCoeffSet[varInd], 0, sizeof( Int )*MAX_NUM_ALF_LUMA_COEFF );
+        memset( m_filterCoeffSet[varInd], 0, sizeof( int )*MAX_NUM_ALF_LUMA_COEFF );
       }
     }
   }
 
-  for( Int ind = 0; ind < alfSliceParam.numLumaFilters; ++ind )
+  for( int ind = 0; ind < alfSliceParam.numLumaFilters; ++ind )
   {
-    for( Int i = 0; i < alfShape.numCoeff; i++ )
+    for( int i = 0; i < alfShape.numCoeff; i++ )
     {
       if( alfSliceParam.coeffDeltaPredModeFlag )
       {
@@ -741,38 +749,38 @@ Double EncAdaptiveLoopFilter::mergeFiltersAndCost( AlfSliceParam& alfSliceParam,
     }
   }
 
-  memcpy( alfSliceParam.filterCoeffDeltaIdx, m_filterIndices[numFiltersBest - 1], sizeof( Short ) * MAX_NUM_ALF_CLASSES );
+  memcpy( alfSliceParam.filterCoeffDeltaIdx, m_filterIndices[numFiltersBest - 1], sizeof( short ) * MAX_NUM_ALF_CLASSES );
   uiCoeffBits += getNonFilterCoeffRate( alfSliceParam );
   return distReturn;
 }
 
-Int EncAdaptiveLoopFilter::getNonFilterCoeffRate( AlfSliceParam& alfSliceParam )
+int EncAdaptiveLoopFilter::getNonFilterCoeffRate( AlfSliceParam& alfSliceParam )
 {
-  Int len = 1   // filter_type
-    	  + 1   // alf_coefficients_delta_flag
-    	  + len_unary_max_eqprob( 0, 3 )    // chroma_idc = 0, it is signalled when ALF is enabled for luma
-    	  + getTBlength( alfSliceParam.numLumaFilters - 1, MAX_NUM_ALF_CLASSES );   //numLumaFilters
+  int len = 1   // filter_type
+    	    + 1   // alf_coefficients_delta_flag
+    	    + lengthTruncatedUnary( 0, 3 )    // chroma_idc = 0, it is signalled when ALF is enabled for luma
+    	    + getTBlength( alfSliceParam.numLumaFilters - 1, MAX_NUM_ALF_CLASSES );   //numLumaFilters
 
   if( alfSliceParam.numLumaFilters > 1 )
   {
-    for( Int i = 0; i < MAX_NUM_ALF_CLASSES; i++ )
+    for( int i = 0; i < MAX_NUM_ALF_CLASSES; i++ )
     {
-      len += getTBlength( (UInt)alfSliceParam.filterCoeffDeltaIdx[i], (UInt)alfSliceParam.numLumaFilters );  //filter_coeff_delta[i]
+      len += getTBlength( (int)alfSliceParam.filterCoeffDeltaIdx[i], alfSliceParam.numLumaFilters );  //filter_coeff_delta[i]
     }
   }
   return len;
 }
 
-Int EncAdaptiveLoopFilter::len_unary_max_eqprob( UInt symbol, UInt maxSymbol )
+int EncAdaptiveLoopFilter::lengthTruncatedUnary( int symbol, int maxSymbol )
 {
   if( maxSymbol == 0 )
   {
     return 0;
   }
 
-  Bool     codeLast = ( maxSymbol > symbol );
-  UInt bins = 0;
-  UInt numBins = 0;
+  bool codeLast = ( maxSymbol > symbol );
+  int bins = 0;
+  int numBins = 0;
   while( symbol-- )
   {
     bins <<= 1;
@@ -788,12 +796,12 @@ Int EncAdaptiveLoopFilter::len_unary_max_eqprob( UInt symbol, UInt maxSymbol )
   return numBins;
 }
 
-Int EncAdaptiveLoopFilter::getTBlength( UInt uiSymbol, const UInt uiMaxSymbol )
+int EncAdaptiveLoopFilter::getTBlength( int uiSymbol, const int uiMaxSymbol )
 {
-  UInt uiThresh;
+  int uiThresh;
   if( uiMaxSymbol > 256 )
   {
-    UInt uiThreshVal = 1 << 8;
+    int uiThreshVal = 1 << 8;
     uiThresh = 8;
     while( uiThreshVal <= uiMaxSymbol )
     {
@@ -807,11 +815,11 @@ Int EncAdaptiveLoopFilter::getTBlength( UInt uiSymbol, const UInt uiMaxSymbol )
     uiThresh = g_tbMax[uiMaxSymbol];
   }
 
-  UInt uiVal = 1 << uiThresh;
+  int uiVal = 1 << uiThresh;
   assert( uiVal <= uiMaxSymbol );
   assert( ( uiVal << 1 ) > uiMaxSymbol );
   assert( uiSymbol < uiMaxSymbol );
-  UInt b = uiMaxSymbol - uiVal;
+  int b = uiMaxSymbol - uiVal;
   assert( b < uiVal );
   if( uiSymbol < uiVal - b )
   {
@@ -823,40 +831,40 @@ Int EncAdaptiveLoopFilter::getTBlength( UInt uiSymbol, const UInt uiMaxSymbol )
   }
 }
 
-Int EncAdaptiveLoopFilter::getCostFilterCoeffForce0( AlfFilterShape& alfShape, Int **pDiffQFilterCoeffIntPP, const Int numFilters, Bool* codedVarBins )
+int EncAdaptiveLoopFilter::getCostFilterCoeffForce0( AlfFilterShape& alfShape, int **pDiffQFilterCoeffIntPP, const int numFilters, bool* codedVarBins )
 {
-  const Int maxGolombIdx = getMaxGolombIdx( alfShape.filterType );
+  const int maxGolombIdx = getMaxGolombIdx( alfShape.filterType );
   memset( m_bitsCoeffScan, 0, sizeof( m_bitsCoeffScan ) );
 
-  for( Int ind = 0; ind < numFilters; ++ind )
+  for( int ind = 0; ind < numFilters; ++ind )
   {
     if( !codedVarBins[ind] )
     {
       continue;
     }
-    for( Int i = 0; i < alfShape.numCoeff - 1; i++ )
+    for( int i = 0; i < alfShape.numCoeff - 1; i++ )
     {
-      Int coeffVal = abs( pDiffQFilterCoeffIntPP[ind][i] );
-      for( Int k = 1; k < 15; k++ )
+      int coeffVal = abs( pDiffQFilterCoeffIntPP[ind][i] );
+      for( int k = 1; k < 15; k++ )
       {
         m_bitsCoeffScan[alfShape.golombIdx[i]][k] += lengthGolomb( coeffVal, k );
       }
     }
   }
 
-  Int kMin = getGolombKMin( alfShape, numFilters, m_kMinTab, m_bitsCoeffScan );
+  int kMin = getGolombKMin( alfShape, numFilters, m_kMinTab, m_bitsCoeffScan );
 
   // Coding parameters
-  Int len = kMin           //min_golomb_order
-    	  + maxGolombIdx   //golomb_order_increase_flag
-    	  + numFilters;    //filter_coefficient_flag[i]
+  int len = kMin           //min_golomb_order
+    	    + maxGolombIdx   //golomb_order_increase_flag
+    	    + numFilters;    //filter_coefficient_flag[i]
 
   // Filter coefficients
-  for( Int ind = 0; ind < numFilters; ++ind )
+  for( int ind = 0; ind < numFilters; ++ind )
   {
     if( codedVarBins[ind] )
     {
-      for( Int i = 0; i < alfShape.numCoeff - 1; i++ )
+      for( int i = 0; i < alfShape.numCoeff - 1; i++ )
       {
         len += lengthGolomb( abs( pDiffQFilterCoeffIntPP[ind][i] ), m_kMinTab[alfShape.golombIdx[i]] ); // alf_coeff_luma_delta[i][j]
       }
@@ -866,25 +874,26 @@ Int EncAdaptiveLoopFilter::getCostFilterCoeffForce0( AlfFilterShape& alfShape, I
   return len;
 }
 
-Int EncAdaptiveLoopFilter::deriveFilterCoefficientsPredictionMode( AlfFilterShape& alfShape, Int **filterSet, Int** filterCoeffDiff, const Int numFilters, Int& predMode )
+int EncAdaptiveLoopFilter::deriveFilterCoefficientsPredictionMode( AlfFilterShape& alfShape, int **filterSet, int** filterCoeffDiff, const int numFilters, int& predMode )
 {
-  Int ratePredMode0 = getCostFilterCoeff( alfShape, filterSet, numFilters );
+  int ratePredMode0 = getCostFilterCoeff( alfShape, filterSet, numFilters );
 
-  for( Int ind = 0; ind < numFilters; ++ind )
+  for( int ind = 0; ind < numFilters; ++ind )
   {
     if( ind == 0 )
     {
-      memcpy( filterCoeffDiff[ind], filterSet[ind], sizeof( Int ) * alfShape.numCoeff );
+      memcpy( filterCoeffDiff[ind], filterSet[ind], sizeof( int ) * alfShape.numCoeff );
     }
     else
     {
-      for( Int i = 0; i < alfShape.numCoeff; i++ )
+      for( int i = 0; i < alfShape.numCoeff; i++ )
       {
         filterCoeffDiff[ind][i] = filterSet[ind][i] - filterSet[ind - 1][i];
       }
     }
   }
-  Int ratePredMode1 = getCostFilterCoeff( alfShape, filterCoeffDiff, numFilters );
+
+  int ratePredMode1 = getCostFilterCoeff( alfShape, filterCoeffDiff, numFilters );
 
   predMode = ( ratePredMode1 < ratePredMode0 && numFilters > 1 ) ? 1 : 0;
 
@@ -892,28 +901,28 @@ Int EncAdaptiveLoopFilter::deriveFilterCoefficientsPredictionMode( AlfFilterShap
        + ( predMode ? ratePredMode1 : ratePredMode0 ); // min_golomb_order, golomb_order_increase_flag, alf_coeff_luma_delta
 }
 
-Int EncAdaptiveLoopFilter::getCostFilterCoeff( AlfFilterShape& alfShape, Int **pDiffQFilterCoeffIntPP, const Int numFilters )
+int EncAdaptiveLoopFilter::getCostFilterCoeff( AlfFilterShape& alfShape, int **pDiffQFilterCoeffIntPP, const int numFilters )
 {
-  const Int maxGolombIdx = getMaxGolombIdx( alfShape.filterType );
+  const int maxGolombIdx = getMaxGolombIdx( alfShape.filterType );
 
   memset( m_bitsCoeffScan, 0, sizeof( m_bitsCoeffScan ) );
 
-  for( Int ind = 0; ind < numFilters; ++ind )
+  for( int ind = 0; ind < numFilters; ++ind )
   {
-    for( Int i = 0; i < alfShape.numCoeff - 1; i++ )
+    for( int i = 0; i < alfShape.numCoeff - 1; i++ )
     {
-      Int coeffVal = abs( pDiffQFilterCoeffIntPP[ind][i] );
-      for( Int k = 1; k < 15; k++ )
+      int coeffVal = abs( pDiffQFilterCoeffIntPP[ind][i] );
+      for( int k = 1; k < 15; k++ )
       {
         m_bitsCoeffScan[alfShape.golombIdx[i]][k] += lengthGolomb( coeffVal, k );
       }
     }
   }
 
-  Int kMin = getGolombKMin( alfShape, numFilters, m_kMinTab, m_bitsCoeffScan );
+  int kMin = getGolombKMin( alfShape, numFilters, m_kMinTab, m_bitsCoeffScan );
 
   // Coding parameters
-  Int len = kMin           //min_golomb_order
+  int len = kMin           //min_golomb_order
           + maxGolombIdx;  //golomb_order_increase_flag
 
   // Filter coefficients
@@ -922,13 +931,13 @@ Int EncAdaptiveLoopFilter::getCostFilterCoeff( AlfFilterShape& alfShape, Int **p
   return len;
 }
 
-Int EncAdaptiveLoopFilter::lengthFilterCoeffs( AlfFilterShape& alfShape, const Int numFilters, Int **FilterCoeff, Int* kMinTab )
+int EncAdaptiveLoopFilter::lengthFilterCoeffs( AlfFilterShape& alfShape, const int numFilters, int **FilterCoeff, int* kMinTab )
 {
-  Int bitCnt = 0;
+  int bitCnt = 0;
 
-  for( Int ind = 0; ind < numFilters; ++ind )
+  for( int ind = 0; ind < numFilters; ++ind )
   {
-    for( Int i = 0; i < alfShape.numCoeff - 1; i++ )
+    for( int i = 0; i < alfShape.numCoeff - 1; i++ )
     {
       bitCnt += lengthGolomb( abs( FilterCoeff[ind][i] ), kMinTab[alfShape.golombIdx[i]] );
     }
@@ -936,17 +945,17 @@ Int EncAdaptiveLoopFilter::lengthFilterCoeffs( AlfFilterShape& alfShape, const I
   return bitCnt;
 }
 
-Double EncAdaptiveLoopFilter::getDistForce0( AlfFilterShape& alfShape, const Int numFilters, Double errorTabForce0Coeff[MAX_NUM_ALF_CLASSES][2], Bool* codedVarBins )
+double EncAdaptiveLoopFilter::getDistForce0( AlfFilterShape& alfShape, const int numFilters, double errorTabForce0Coeff[MAX_NUM_ALF_CLASSES][2], bool* codedVarBins )
 {
-  static Int bitsVarBin[MAX_NUM_ALF_CLASSES];
+  static int bitsVarBin[MAX_NUM_ALF_CLASSES];
 
   memset( m_bitsCoeffScan, 0, sizeof( m_bitsCoeffScan ) );
-  for( Int ind = 0; ind < numFilters; ++ind )
+  for( int ind = 0; ind < numFilters; ++ind )
   {
-    for( Int i = 0; i < alfShape.numCoeff - 1; i++ )
+    for( int i = 0; i < alfShape.numCoeff - 1; i++ )
     {
-      Int coeffVal = abs( m_filterCoeffSet[ind][i] );
-      for( Int k = 1; k < 15; k++ )
+      int coeffVal = abs( m_filterCoeffSet[ind][i] );
+      for( int k = 1; k < 15; k++ )
       {
         m_bitsCoeffScan[alfShape.golombIdx[i]][k] += lengthGolomb( coeffVal, k );
       }
@@ -955,35 +964,35 @@ Double EncAdaptiveLoopFilter::getDistForce0( AlfFilterShape& alfShape, const Int
 
   getGolombKMin( alfShape, numFilters, m_kMinTab, m_bitsCoeffScan );
 
-  for( Int ind = 0; ind < numFilters; ++ind )
+  for( int ind = 0; ind < numFilters; ++ind )
   {
     bitsVarBin[ind] = 0;
-    for( Int i = 0; i < alfShape.numCoeff - 1; i++ )
+    for( int i = 0; i < alfShape.numCoeff - 1; i++ )
     {
       bitsVarBin[ind] += lengthGolomb( abs( m_filterCoeffSet[ind][i] ), m_kMinTab[alfShape.golombIdx[i]] );
     }
   }
 
-  Double distForce0 = getDistCoeffForce0( codedVarBins, errorTabForce0Coeff, bitsVarBin, numFilters );
+  double distForce0 = getDistCoeffForce0( codedVarBins, errorTabForce0Coeff, bitsVarBin, numFilters );
 
   return distForce0;
 }
 
-Int EncAdaptiveLoopFilter::getGolombKMin( AlfFilterShape& alfShape, const Int numFilters, Int kMinTab[MAX_NUM_ALF_LUMA_COEFF], Int bitsCoeffScan[m_MAX_SCAN_VAL][m_MAX_EXP_GOLOMB] )
+int EncAdaptiveLoopFilter::getGolombKMin( AlfFilterShape& alfShape, const int numFilters, int kMinTab[MAX_NUM_ALF_LUMA_COEFF], int bitsCoeffScan[m_MAX_SCAN_VAL][m_MAX_EXP_GOLOMB] )
 {
-  Int kStart;
-  const Int maxGolombIdx = getMaxGolombIdx( alfShape.filterType );
+  int kStart;
+  const int maxGolombIdx = getMaxGolombIdx( alfShape.filterType );
 
-  Int minBitsKStart = MAX_INT;
-  Int minKStart = -1;
+  int minBitsKStart = MAX_INT;
+  int minKStart = -1;
 
-  for( Int k = 1; k < 8; k++ )
+  for( int k = 1; k < 8; k++ )
   {
-    Int bitsKStart = 0; kStart = k;
-    for( Int scanPos = 0; scanPos < maxGolombIdx; scanPos++ )
+    int bitsKStart = 0; kStart = k;
+    for( int scanPos = 0; scanPos < maxGolombIdx; scanPos++ )
     {
-      Int kMin = kStart;
-      Int minBits = bitsCoeffScan[scanPos][kMin];
+      int kMin = kStart;
+      int minBits = bitsCoeffScan[scanPos][kMin];
 
       if( bitsCoeffScan[scanPos][kStart + 1] < minBits )
       {
@@ -1001,10 +1010,10 @@ Int EncAdaptiveLoopFilter::getGolombKMin( AlfFilterShape& alfShape, const Int nu
   }
 
   kStart = minKStart;
-  for( Int scanPos = 0; scanPos < maxGolombIdx; scanPos++ )
+  for( int scanPos = 0; scanPos < maxGolombIdx; scanPos++ )
   {
-    Int kMin = kStart;
-    Int minBits = bitsCoeffScan[scanPos][kMin];
+    int kMin = kStart;
+    int minBits = bitsCoeffScan[scanPos][kMin];
 
     if( bitsCoeffScan[scanPos][kStart + 1] < minBits )
     {
@@ -1019,14 +1028,14 @@ Int EncAdaptiveLoopFilter::getGolombKMin( AlfFilterShape& alfShape, const Int nu
   return minKStart;
 }
 
-Double EncAdaptiveLoopFilter::getDistCoeffForce0( Bool* codedVarBins, Double errorForce0CoeffTab[MAX_NUM_ALF_CLASSES][2], Int* bitsVarBin, const Int numFilters )
+double EncAdaptiveLoopFilter::getDistCoeffForce0( bool* codedVarBins, double errorForce0CoeffTab[MAX_NUM_ALF_CLASSES][2], int* bitsVarBin, const int numFilters )
 {
-  Double distForce0 = 0;
+  double distForce0 = 0;
   std::memset( codedVarBins, 0, sizeof( *codedVarBins ) * MAX_NUM_ALF_CLASSES );
 
-  for( Int filtIdx = 0; filtIdx < numFilters; filtIdx++ )
+  for( int filtIdx = 0; filtIdx < numFilters; filtIdx++ )
   {
-    Double costDiff = errorForce0CoeffTab[filtIdx][0] - ( errorForce0CoeffTab[filtIdx][1] + m_lambda[COMPONENT_Y] * bitsVarBin[filtIdx] );
+    double costDiff = errorForce0CoeffTab[filtIdx][0] - ( errorForce0CoeffTab[filtIdx][1] + m_lambda[COMPONENT_Y] * bitsVarBin[filtIdx] );
     codedVarBins[filtIdx] = costDiff > 0 ? true : false;
     distForce0 += errorForce0CoeffTab[filtIdx][codedVarBins[filtIdx] ? 1 : 0];
   }
@@ -1034,10 +1043,10 @@ Double EncAdaptiveLoopFilter::getDistCoeffForce0( Bool* codedVarBins, Double err
   return distForce0;
 }
 
-Int EncAdaptiveLoopFilter::lengthUvlc( UInt uiCode )
+int EncAdaptiveLoopFilter::lengthUvlc( int uiCode )
 {
-  UInt uiLength = 1;
-  UInt uiTemp = ++uiCode;
+  int uiLength = 1;
+  int uiTemp = ++uiCode;
 
   CHECK( !uiTemp, "Integer overflow" );
 
@@ -1050,10 +1059,10 @@ Int EncAdaptiveLoopFilter::lengthUvlc( UInt uiCode )
   return ( uiLength >> 1 ) + ( ( uiLength + 1 ) >> 1 );
 }
 
-Int EncAdaptiveLoopFilter::lengthGolomb( Int coeffVal, Int k )
+int EncAdaptiveLoopFilter::lengthGolomb( int coeffVal, int k )
 {
-  Int m = 2 << ( k - 1 );
-  Int q = coeffVal / m;
+  int m = 2 << ( k - 1 );
+  int q = coeffVal / m;
   if( coeffVal != 0 )
   {
     return q + 2 + k;
@@ -1064,14 +1073,14 @@ Int EncAdaptiveLoopFilter::lengthGolomb( Int coeffVal, Int k )
   }
 }
 
-Double EncAdaptiveLoopFilter::deriveFilterCoeffs( AlfCovariance* cov, AlfCovariance* covMerged, AlfFilterShape& alfShape, Short* filterIndices, Int numFilters, Double errorTabForce0Coeff[MAX_NUM_ALF_CLASSES][2] )
+double EncAdaptiveLoopFilter::deriveFilterCoeffs( AlfCovariance* cov, AlfCovariance* covMerged, AlfFilterShape& alfShape, short* filterIndices, int numFilters, double errorTabForce0Coeff[MAX_NUM_ALF_CLASSES][2] )
 {
-  Double error = 0.0;
+  double error = 0.0;
   AlfCovariance& tmpCov = covMerged[MAX_NUM_ALF_CLASSES];
-  for( Int filtIdx = 0; filtIdx < numFilters; filtIdx++ )
+  for( int filtIdx = 0; filtIdx < numFilters; filtIdx++ )
   {
     tmpCov.reset();
-    for( Int classIdx = 0; classIdx < MAX_NUM_ALF_CLASSES; classIdx++ )
+    for( int classIdx = 0; classIdx < MAX_NUM_ALF_CLASSES; classIdx++ )
     {
       if( filterIndices[classIdx] == filtIdx )
       {
@@ -1085,43 +1094,43 @@ Double EncAdaptiveLoopFilter::deriveFilterCoeffs( AlfCovariance* cov, AlfCovaria
     error += errorTabForce0Coeff[filtIdx][1];
 
     // store coeff
-    memcpy( m_filterCoeffSet[filtIdx], m_filterCoeffQuant, sizeof( Int )*alfShape.numCoeff );
+    memcpy( m_filterCoeffSet[filtIdx], m_filterCoeffQuant, sizeof( int )*alfShape.numCoeff );
   }
   return error;
 }
 
-Double EncAdaptiveLoopFilter::deriveCoeffQuant( Int *filterCoeffQuant, Double **E, Double *y, const Int numCoeff, std::vector<Int>& weights, const Int bitDepth, const Bool bChroma )
+double EncAdaptiveLoopFilter::deriveCoeffQuant( int *filterCoeffQuant, double **E, double *y, const int numCoeff, std::vector<int>& weights, const int bitDepth, const bool bChroma )
 {
-  const Int factor = 1 << ( bitDepth - 1 );
-  static Int filterCoeffQuantMod[MAX_NUM_ALF_LUMA_COEFF];
-  static Double filterCoeff[MAX_NUM_ALF_LUMA_COEFF];
+  const int factor = 1 << ( bitDepth - 1 );
+  static int filterCoeffQuantMod[MAX_NUM_ALF_LUMA_COEFF];
+  static double filterCoeff[MAX_NUM_ALF_LUMA_COEFF];
 
   gnsSolveByChol( E, y, filterCoeff, numCoeff );
   roundFiltCoeff( filterCoeffQuant, filterCoeff, numCoeff, factor );
-  const Int targetCoeffSumInt = 0;
-  Int quantCoeffSum = 0;
-  for( Int i = 0; i < numCoeff; i++ )
+  const int targetCoeffSumInt = 0;
+  int quantCoeffSum = 0;
+  for( int i = 0; i < numCoeff; i++ )
   {
     quantCoeffSum += weights[i] * filterCoeffQuant[i];
   }
 
-  Int count = 0;
+  int count = 0;
   while( quantCoeffSum != targetCoeffSumInt && count < 10 )
   {
-    Int sign = quantCoeffSum > targetCoeffSumInt ? 1 : -1;
-    Int diff = ( quantCoeffSum - targetCoeffSumInt ) * sign;
+    int sign = quantCoeffSum > targetCoeffSumInt ? 1 : -1;
+    int diff = ( quantCoeffSum - targetCoeffSumInt ) * sign;
 
-    Double errMin = MAX_DOUBLE;
-    Int minInd = -1;
+    double errMin = MAX_DOUBLE;
+    int minInd = -1;
 
-    for( Int k = 0; k < numCoeff; k++ )
+    for( int k = 0; k < numCoeff; k++ )
     {
       if( weights[k] <= diff )
       {
-        memcpy( filterCoeffQuantMod, filterCoeffQuant, sizeof( Int ) * numCoeff );
+        memcpy( filterCoeffQuantMod, filterCoeffQuant, sizeof( int ) * numCoeff );
 
         filterCoeffQuantMod[k] -= sign;
-        Double error = calcErrorForCoeffs( E, y, filterCoeffQuantMod, numCoeff, bitDepth );
+        double error = calcErrorForCoeffs( E, y, filterCoeffQuantMod, numCoeff, bitDepth );
 
         if( error < errMin )
         {
@@ -1137,7 +1146,7 @@ Double EncAdaptiveLoopFilter::deriveCoeffQuant( Int *filterCoeffQuant, Double **
     }
 
     quantCoeffSum = 0;
-    for( Int i = 0; i < numCoeff; i++ )
+    for( int i = 0; i < numCoeff; i++ )
     {
       quantCoeffSum += weights[i] * filterCoeffQuant[i];
     }
@@ -1145,42 +1154,40 @@ Double EncAdaptiveLoopFilter::deriveCoeffQuant( Int *filterCoeffQuant, Double **
   }
   if( count == 10 )
   {
-    memset( filterCoeffQuant, 0, sizeof( Int ) * numCoeff );
+    memset( filterCoeffQuant, 0, sizeof( int ) * numCoeff );
   }
 
   //512 -> 1, (64+32+4+2)->0.199
-  // Int max_value = std::min((1 << (3 + m_nInputBitDepth + m_nBitIncrement)) - 1, (1 << 14) - 1);
-  // Int min_value = std::max(-(1 << (3 + m_nInputBitDepth + m_nBitIncrement)), -(1 << 14));
-  Int max_value = 512 + 64 + 32 + 4 + 2;  
-  Int min_value = -max_value;             
-  for ( Int i = 0; i < numCoeff - 1; i++ )
+  int max_value = 512 + 64 + 32 + 4 + 2;  
+  int min_value = -max_value;             
+  for ( int i = 0; i < numCoeff - 1; i++ )
   {
     filterCoeffQuant[i] = std::min( max_value, std::max( min_value, filterCoeffQuant[i] ) );
-    filterCoeff[i] = filterCoeffQuant[i] / Double( factor );
+    filterCoeff[i] = filterCoeffQuant[i] / double( factor );
   }
 
   quantCoeffSum = 0;
-  for ( Int i = 0; i < numCoeff - 1; i++ )
+  for ( int i = 0; i < numCoeff - 1; i++ )
   {
     quantCoeffSum += weights[i] * filterCoeffQuant[i];
-    filterCoeff[i] = filterCoeffQuant[i] / Double(factor);
+    filterCoeff[i] = filterCoeffQuant[i] / double(factor);
   }
   filterCoeffQuant[numCoeff - 1] = -quantCoeffSum;
-  filterCoeff[numCoeff - 1] = filterCoeffQuant[numCoeff - 1] / Double(factor);
+  filterCoeff[numCoeff - 1] = filterCoeffQuant[numCoeff - 1] / double(factor);
 
-  Double error = calcErrorForCoeffs( E, y, filterCoeffQuant, numCoeff, bitDepth );
+  double error = calcErrorForCoeffs( E, y, filterCoeffQuant, numCoeff, bitDepth );
   return error;
 }
 
-Double EncAdaptiveLoopFilter::calcErrorForCoeffs( Double **E, Double *y, Int *coeff, const Int numCoeff, const Int bitDepth )
+double EncAdaptiveLoopFilter::calcErrorForCoeffs( double **E, double *y, int *coeff, const int numCoeff, const int bitDepth )
 {
-  Double factor = 1 << ( bitDepth - 1 );
-  Double error = 0;
+  double factor = 1 << ( bitDepth - 1 );
+  double error = 0;
 
-  for( Int i = 0; i < numCoeff; i++ )   //diagonal
+  for( int i = 0; i < numCoeff; i++ )   //diagonal
   {
-    Double sum = 0;
-    for( Int j = i + 1; j < numCoeff; j++ )
+    double sum = 0;
+    for( int j = i + 1; j < numCoeff; j++ )
     {
       // E[j][i] = E[i][j], sum will be multiplied by 2 later
       sum += E[i][j] * coeff[j];
@@ -1191,23 +1198,23 @@ Double EncAdaptiveLoopFilter::calcErrorForCoeffs( Double **E, Double *y, Int *co
   return error / factor;
 }
 
-Void EncAdaptiveLoopFilter::roundFiltCoeff( Int *filterCoeffQuant, Double *filterCoeff, const Int numCoeff, const Int factor )
+void EncAdaptiveLoopFilter::roundFiltCoeff( int *filterCoeffQuant, double *filterCoeff, const int numCoeff, const int factor )
 {
-  for( Int i = 0; i < numCoeff; i++ )
+  for( int i = 0; i < numCoeff; i++ )
   {
-    Int sign = filterCoeff[i] > 0 ? 1 : -1;
-    filterCoeffQuant[i] = Int( filterCoeff[i] * sign * factor + 0.5 ) * sign;
+    int sign = filterCoeff[i] > 0 ? 1 : -1;
+    filterCoeffQuant[i] = int( filterCoeff[i] * sign * factor + 0.5 ) * sign;
   }
 }
 
-Void EncAdaptiveLoopFilter::mergeClasses( AlfCovariance* cov, AlfCovariance* covMerged, const Int numClasses, Short filterIndices[MAX_NUM_ALF_CLASSES][MAX_NUM_ALF_CLASSES] )
+void EncAdaptiveLoopFilter::mergeClasses( AlfCovariance* cov, AlfCovariance* covMerged, const int numClasses, short filterIndices[MAX_NUM_ALF_CLASSES][MAX_NUM_ALF_CLASSES] )
 {
-  static Bool availableClass[MAX_NUM_ALF_CLASSES];
+  static bool availableClass[MAX_NUM_ALF_CLASSES];
   static UChar indexList[MAX_NUM_ALF_CLASSES];
   static UChar indexListTemp[MAX_NUM_ALF_CLASSES];
-  Int numRemaining = numClasses;
+  int numRemaining = numClasses;
 
-  memset( filterIndices, 0, sizeof( Short ) * MAX_NUM_ALF_CLASSES * MAX_NUM_ALF_CLASSES );
+  memset( filterIndices, 0, sizeof( short ) * MAX_NUM_ALF_CLASSES * MAX_NUM_ALF_CLASSES );
 
   for( Int i = 0; i < numClasses; i++ )
   {
@@ -1224,22 +1231,22 @@ Void EncAdaptiveLoopFilter::mergeClasses( AlfCovariance* cov, AlfCovariance* cov
 
   while( numRemaining > 2 )
   {
-    Double errorMin = std::numeric_limits<Double>::max();
-    Int bestToMergeIdx1 = 0, bestToMergeIdx2 = 1;
+    double errorMin = std::numeric_limits<double>::max();
+    int bestToMergeIdx1 = 0, bestToMergeIdx2 = 1;
 
-    for( Int i = 0; i < numClasses - 1; i++ )
+    for( int i = 0; i < numClasses - 1; i++ )
     {
       if( availableClass[i] )
       {
-        for( Int j = i + 1; j < numClasses; j++ )
+        for( int j = i + 1; j < numClasses; j++ )
         {
           if( availableClass[j] )
           {
-            Double error1 = calculateError( covMerged[i] );
-            Double error2 = calculateError( covMerged[j] );
+            double error1 = calculateError( covMerged[i] );
+            double error2 = calculateError( covMerged[j] );
 
             tmpCov.add( covMerged[i], covMerged[j] );
-            Double error = calculateError( tmpCov ) - error1 - error2;
+            double error = calculateError( tmpCov ) - error1 - error2;
 
             if( error < errorMin )
             {
@@ -1255,7 +1262,7 @@ Void EncAdaptiveLoopFilter::mergeClasses( AlfCovariance* cov, AlfCovariance* cov
     covMerged[bestToMergeIdx1] += covMerged[bestToMergeIdx2];
     availableClass[bestToMergeIdx2] = false;
 
-    for( Int i = 0; i < numClasses; i++ )
+    for( int i = 0; i < numClasses; i++ )
     {
       if( indexList[i] == bestToMergeIdx2 )
       {
@@ -1268,13 +1275,13 @@ Void EncAdaptiveLoopFilter::mergeClasses( AlfCovariance* cov, AlfCovariance* cov
     {
       std::memcpy( indexListTemp, indexList, sizeof( UChar ) * numClasses );
 
-      Bool exist = false;
-      Int ind = 0;
+      bool exist = false;
+      int ind = 0;
 
-      for( Int j = 0; j < numClasses; j++ )
+      for( int j = 0; j < numClasses; j++ )
       {
         exist = false;
-        for( Int i = 0; i < numClasses; i++ )
+        for( int i = 0; i < numClasses; i++ )
         {
           if( indexListTemp[i] == j )
           {
@@ -1285,7 +1292,7 @@ Void EncAdaptiveLoopFilter::mergeClasses( AlfCovariance* cov, AlfCovariance* cov
 
         if( exist )
         {
-          for( Int i = 0; i < numClasses; i++ )
+          for( int i = 0; i < numClasses; i++ )
           {
             if( indexListTemp[i] == j )
             {
@@ -1300,10 +1307,10 @@ Void EncAdaptiveLoopFilter::mergeClasses( AlfCovariance* cov, AlfCovariance* cov
   }
 }
 
-Void EncAdaptiveLoopFilter::getFrameStats( ChannelType channel, Int iShapeIdx )
+void EncAdaptiveLoopFilter::getFrameStats( ChannelType channel, int iShapeIdx )
 {
-  Int numClasses = isLuma( channel ) ? MAX_NUM_ALF_CLASSES : 1;
-  for( Int i = 0; i < numClasses; i++ )
+  int numClasses = isLuma( channel ) ? MAX_NUM_ALF_CLASSES : 1;
+  for( int i = 0; i < numClasses; i++ )
   {
     m_alfCovarianceFrame[channel][iShapeIdx][i].reset();
   }
@@ -1318,13 +1325,13 @@ Void EncAdaptiveLoopFilter::getFrameStats( ChannelType channel, Int iShapeIdx )
   }
 }
 
-Void EncAdaptiveLoopFilter::getFrameStat( AlfCovariance* frameCov, AlfCovariance** ctbCov, UChar* ctbEnableFlags, const Int numClasses )
+void EncAdaptiveLoopFilter::getFrameStat( AlfCovariance* frameCov, AlfCovariance** ctbCov, UChar* ctbEnableFlags, const int numClasses )
 {
-  for( Int i = 0; i < m_numCTUsInPic; i++ )
+  for( int i = 0; i < m_numCTUsInPic; i++ )
   {
     if( ctbEnableFlags[i] )
     {
-      for( Int j = 0; j < numClasses; j++ )
+      for( int j = 0; j < numClasses; j++ )
       {
         frameCov[j] += ctbCov[i][j];
       }
@@ -1332,22 +1339,22 @@ Void EncAdaptiveLoopFilter::getFrameStat( AlfCovariance* frameCov, AlfCovariance
   }
 }
 
-Void EncAdaptiveLoopFilter::deriveStatsForFiltering( PelUnitBuf& orgYuv, PelUnitBuf& recYuv )
+void EncAdaptiveLoopFilter::deriveStatsForFiltering( PelUnitBuf& orgYuv, PelUnitBuf& recYuv )
 {
-  Int ctuRsAddr = 0;
-  const UInt numberOfComponents = getNumberValidComponents( m_chromaFormat );
+  int ctuRsAddr = 0;
+  const int numberOfComponents = getNumberValidComponents( m_chromaFormat );
 
   // init CTU stats buffers
-  for( Int compIdx = 0; compIdx < numberOfComponents; compIdx++ )
+  for( int compIdx = 0; compIdx < numberOfComponents; compIdx++ )
   {
     const ComponentID compID = ComponentID( compIdx );
-    const Int numClasses = isLuma( compID ) ? MAX_NUM_ALF_CLASSES : 1;
+    const int numClasses = isLuma( compID ) ? MAX_NUM_ALF_CLASSES : 1;
 
-    for( Int shape = 0; shape != m_filterShapes[toChannelType( compID )].size(); shape++ )
+    for( int shape = 0; shape != m_filterShapes[toChannelType( compID )].size(); shape++ )
     {
-      for( Int classIdx = 0; classIdx < numClasses; classIdx++ )
+      for( int classIdx = 0; classIdx < numClasses; classIdx++ )
       {
-        for( Int ctuIdx = 0; ctuIdx < m_numCTUsInPic; ctuIdx++ )
+        for( int ctuIdx = 0; ctuIdx < m_numCTUsInPic; ctuIdx++ )
         {
           m_alfCovariance[compIdx][shape][ctuIdx][classIdx].reset();
         }
@@ -1356,49 +1363,49 @@ Void EncAdaptiveLoopFilter::deriveStatsForFiltering( PelUnitBuf& orgYuv, PelUnit
   }
 
   // init Frame stats buffers
-  const UInt numberOfChannels = getNumberValidChannels( m_chromaFormat );
-  for( Int channelIdx = 0; channelIdx < numberOfChannels; channelIdx++ )
+  const int numberOfChannels = getNumberValidChannels( m_chromaFormat );
+  for( int channelIdx = 0; channelIdx < numberOfChannels; channelIdx++ )
   {
     const ChannelType channelID = ChannelType( channelIdx );
-    const Int numClasses = isLuma( channelID ) ? MAX_NUM_ALF_CLASSES : 1;
+    const int numClasses = isLuma( channelID ) ? MAX_NUM_ALF_CLASSES : 1;
 
-    for( Int shape = 0; shape != m_filterShapes[channelIdx].size(); shape++ )
+    for( int shape = 0; shape != m_filterShapes[channelIdx].size(); shape++ )
     {
-      for( Int classIdx = 0; classIdx < numClasses; classIdx++ )
+      for( int classIdx = 0; classIdx < numClasses; classIdx++ )
       {
         m_alfCovarianceFrame[channelIdx][shape][classIdx].reset();
       }
     }
   }
 
-  for( UInt yPos = 0; yPos < m_picHeight; yPos += m_maxCUHeight )
+  for( int yPos = 0; yPos < m_picHeight; yPos += m_maxCUHeight )
   {
-    for( UInt xPos = 0; xPos < m_picWidth; xPos += m_maxCUWidth )
+    for( int xPos = 0; xPos < m_picWidth; xPos += m_maxCUWidth )
     {
-      const UInt width = ( xPos + m_maxCUWidth > m_picWidth ) ? ( m_picWidth - xPos ) : m_maxCUWidth;
-      const UInt height = ( yPos + m_maxCUHeight > m_picHeight ) ? ( m_picHeight - yPos ) : m_maxCUHeight;
+      const int width = ( xPos + m_maxCUWidth > m_picWidth ) ? ( m_picWidth - xPos ) : m_maxCUWidth;
+      const int height = ( yPos + m_maxCUHeight > m_picHeight ) ? ( m_picHeight - yPos ) : m_maxCUHeight;
       const UnitArea area( m_chromaFormat, Area( xPos, yPos, width, height ) );
 
-      for( Int compIdx = 0; compIdx < numberOfComponents; compIdx++ )
+      for( int compIdx = 0; compIdx < numberOfComponents; compIdx++ )
       {
         const ComponentID compID = ComponentID( compIdx );
         const CompArea& compArea = area.block( compID );
 
-        Int  recStride = recYuv.get( compID ).stride;
+        int  recStride = recYuv.get( compID ).stride;
         Pel* rec = recYuv.get( compID ).bufAt( compArea );
 
-        Int  orgStride = orgYuv.get( compID ).stride;
+        int  orgStride = orgYuv.get( compID ).stride;
         Pel* org = orgYuv.get( compID ).bufAt( compArea );
 
         ChannelType chType = toChannelType( compID );
 
-        for( Int shape = 0; shape != m_filterShapes[chType].size(); shape++ )
+        for( int shape = 0; shape != m_filterShapes[chType].size(); shape++ )
         {
           getBlkStats( m_alfCovariance[compIdx][shape][ctuRsAddr], m_filterShapes[chType][shape], compIdx ? nullptr : m_classifier, org, orgStride, rec, recStride, compArea );
 
-          const Int numClasses = isLuma( compID ) ? MAX_NUM_ALF_CLASSES : 1;
+          const int numClasses = isLuma( compID ) ? MAX_NUM_ALF_CLASSES : 1;
 
-          for( Int classIdx = 0; classIdx < numClasses; classIdx++ )
+          for( int classIdx = 0; classIdx < numClasses; classIdx++ )
           {
             m_alfCovarianceFrame[chType][shape][classIdx] += m_alfCovariance[compIdx][shape][ctuRsAddr][classIdx];
           }
@@ -1409,29 +1416,30 @@ Void EncAdaptiveLoopFilter::deriveStatsForFiltering( PelUnitBuf& orgYuv, PelUnit
   }
 }
 
-Void EncAdaptiveLoopFilter::getBlkStats( AlfCovariance* alfCovariace, const AlfFilterShape& shape, AlfClassifier** classifier, Pel* org, Int orgStride, Pel* rec, Int recStride, const CompArea& area )
+void EncAdaptiveLoopFilter::getBlkStats( AlfCovariance* alfCovariace, const AlfFilterShape& shape, AlfClassifier** classifier, Pel* org, const int orgStride, Pel* rec, const int recStride, const CompArea& area )
 {
-  static Int ELocal[MAX_NUM_ALF_LUMA_COEFF];
+  static int ELocal[MAX_NUM_ALF_LUMA_COEFF];
 
-  Int transposeIdx = 0;
-  Int classIdx = 0;
+  int transposeIdx = 0;
+  int classIdx = 0;
 
-  for( Int i = 0; i < area.height; i++ )
+  for( int i = 0; i < area.height; i++ )
   {
-    for( Int j = 0; j < area.width; j++ )
+    for( int j = 0; j < area.width; j++ )
     {
-      std::memset( ELocal, 0, shape.numCoeff * sizeof( Int ) );
+      std::memset( ELocal, 0, shape.numCoeff * sizeof( int ) );
       if( classifier )
       {
         AlfClassifier& cl = classifier[area.y + i][area.x + j];
         transposeIdx = cl.transposeIdx;
         classIdx = cl.classIdx;
       }
-      Int yLocal = org[j] - rec[j];
+
+      int yLocal = org[j] - rec[j];
       calcCovariance( ELocal, rec + j, recStride, shape.pattern.data(), shape.filterLength >> 1, transposeIdx );
-      for( Int k = 0; k < shape.numCoeff; k++ )
+      for( int k = 0; k < shape.numCoeff; k++ )
       {
-        for( Int l = k; l < shape.numCoeff; l++ )
+        for( int l = k; l < shape.numCoeff; l++ )
         {
           alfCovariace[classIdx].E[k][l] += ELocal[k] * ELocal[l];
         }
@@ -1443,12 +1451,12 @@ Void EncAdaptiveLoopFilter::getBlkStats( AlfCovariance* alfCovariace, const AlfF
     rec += recStride;
   }
 
-  Int numClasses = classifier ? MAX_NUM_ALF_CLASSES : 1;
+  int numClasses = classifier ? MAX_NUM_ALF_CLASSES : 1;
   for( classIdx = 0; classIdx < numClasses; classIdx++ )
   {
-    for( Int k = 1; k < shape.numCoeff; k++ )
+    for( int k = 1; k < shape.numCoeff; k++ )
     {
-      for( Int l = 0; l < k; l++ )
+      for( int l = 0; l < k; l++ )
       {
         alfCovariace[classIdx].E[k][l] = alfCovariace[classIdx].E[l][k];
       }
@@ -1456,74 +1464,74 @@ Void EncAdaptiveLoopFilter::getBlkStats( AlfCovariance* alfCovariace, const AlfF
   }
 }
 
-Void EncAdaptiveLoopFilter::calcCovariance( Int *ELocal, const Pel *rec, const Int stride, const Int *filterPattern, const Int halfFilterLength, const Int transposeIdx )
+void EncAdaptiveLoopFilter::calcCovariance( int *ELocal, const Pel *rec, const int stride, const int *filterPattern, const int halfFilterLength, const int transposeIdx )
 {
-  Int k = 0;
+  int k = 0;
 
   if( transposeIdx == 0 )
   {
-    for( Int i = -halfFilterLength; i < 0; i++ )
+    for( int i = -halfFilterLength; i < 0; i++ )
     {
       const Pel* rec0 = rec + i * stride;
       const Pel* rec1 = rec - i * stride;
 
-      for( Int j = -halfFilterLength - i; j <= halfFilterLength + i; j++ )
+      for( int j = -halfFilterLength - i; j <= halfFilterLength + i; j++ )
       {
         ELocal[filterPattern[k++]] += rec0[j] + rec1[-j];
       }
     }
-    for( Int j = -halfFilterLength; j < 0; j++ )
+    for( int j = -halfFilterLength; j < 0; j++ )
     {
       ELocal[filterPattern[k++]] += rec[j] + rec[-j];
     }
   }
   else if( transposeIdx == 1 )
   {
-    for( Int j = -halfFilterLength; j < 0; j++ )
+    for( int j = -halfFilterLength; j < 0; j++ )
     {
       const Pel* rec0 = rec + j;
       const Pel* rec1 = rec - j;
 
-      for( Int i = -halfFilterLength - j; i <= halfFilterLength + j; i++ )
+      for( int i = -halfFilterLength - j; i <= halfFilterLength + j; i++ )
       {
         ELocal[filterPattern[k++]] += rec0[i * stride] + rec1[-i * stride];
       }
     }
-    for( Int i = -halfFilterLength; i < 0; i++ )
+    for( int i = -halfFilterLength; i < 0; i++ )
     {
       ELocal[filterPattern[k++]] += rec[i*stride] + rec[-i * stride];
     }
   }
   else if( transposeIdx == 2 )
   {
-    for( Int i = -halfFilterLength; i < 0; i++ )
+    for( int i = -halfFilterLength; i < 0; i++ )
     {
       const Pel* rec0 = rec + i * stride;
       const Pel* rec1 = rec - i * stride;
 
-      for( Int j = halfFilterLength + i; j >= -halfFilterLength - i; j-- )
+      for( int j = halfFilterLength + i; j >= -halfFilterLength - i; j-- )
       {
         ELocal[filterPattern[k++]] += rec0[j] + rec1[-j];
       }
     }
-    for( Int j = -halfFilterLength; j < 0; j++ )
+    for( int j = -halfFilterLength; j < 0; j++ )
     {
       ELocal[filterPattern[k++]] += rec[j] + rec[-j];
     }
   }
   else
   {
-    for( Int j = -halfFilterLength; j < 0; j++ )
+    for( int j = -halfFilterLength; j < 0; j++ )
     {
       const Pel* rec0 = rec + j;
       const Pel* rec1 = rec - j;
 
-      for( Int i = halfFilterLength + j; i >= -halfFilterLength - j; i-- )
+      for( int i = halfFilterLength + j; i >= -halfFilterLength - j; i-- )
       {
         ELocal[filterPattern[k++]] += rec0[i * stride] + rec1[-i * stride];
       }
     }
-    for( Int i = -halfFilterLength; i < 0; i++ )
+    for( int i = -halfFilterLength; i < 0; i++ )
     {
       ELocal[filterPattern[k++]] += rec[i*stride] + rec[-i * stride];
     }
@@ -1533,14 +1541,14 @@ Void EncAdaptiveLoopFilter::calcCovariance( Int *ELocal, const Pel *rec, const I
 
 
 
-Double EncAdaptiveLoopFilter::calculateError( AlfCovariance& cov )
+double EncAdaptiveLoopFilter::calculateError( AlfCovariance& cov )
 {
-  static Double c[MAX_NUM_ALF_COEFF];
+  static double c[MAX_NUM_ALF_COEFF];
 
   gnsSolveByChol( cov.E, cov.y, c, cov.numCoeff );
 
-  Double sum = 0;
-  for( Int i = 0; i < cov.numCoeff; i++ )
+  double sum = 0;
+  for( int i = 0; i < cov.numCoeff; i++ )
   {
     sum += c[i] * cov.y[i];
   }
@@ -1557,19 +1565,19 @@ Double EncAdaptiveLoopFilter::calculateError( AlfCovariance& cov )
 #define REG_SQR          0.0000001
 
 //Find filter coeff related
-Int EncAdaptiveLoopFilter::gnsCholeskyDec( Double **inpMatr, Double outMatr[MAX_NUM_ALF_COEFF][MAX_NUM_ALF_COEFF], Int numEq )
+int EncAdaptiveLoopFilter::gnsCholeskyDec( double **inpMatr, double outMatr[MAX_NUM_ALF_COEFF][MAX_NUM_ALF_COEFF], int numEq )
 {
-  static Double invDiag[MAX_NUM_ALF_COEFF];  /* Vector of the inverse of diagonal entries of outMatr */
+  static double invDiag[MAX_NUM_ALF_COEFF];  /* Vector of the inverse of diagonal entries of outMatr */
 
-  for( Int i = 0; i < numEq; i++ )
+  for( int i = 0; i < numEq; i++ )
   {
-    for( Int j = i; j < numEq; j++ )
+    for( int j = i; j < numEq; j++ )
     {
       /* Compute the scaling factor */
-      Double scale = inpMatr[i][j];
+      double scale = inpMatr[i][j];
       if( i > 0 )
       {
-        for( Int k = i - 1; k >= 0; k-- )
+        for( int k = i - 1; k >= 0; k-- )
         {
           scale -= outMatr[k][j] * outMatr[k][i];
         }
@@ -1595,16 +1603,16 @@ Int EncAdaptiveLoopFilter::gnsCholeskyDec( Double **inpMatr, Double outMatr[MAX_
   return 1; /* Signal that Cholesky factorization is successfully performed */
 }
 
-Void EncAdaptiveLoopFilter::gnsTransposeBacksubstitution( Double U[MAX_NUM_ALF_COEFF][MAX_NUM_ALF_COEFF], Double* rhs, Double* x, Int order )
+void EncAdaptiveLoopFilter::gnsTransposeBacksubstitution( double U[MAX_NUM_ALF_COEFF][MAX_NUM_ALF_COEFF], double* rhs, double* x, int order )
 {
   /* Backsubstitution starts */
   x[0] = rhs[0] / U[0][0];               /* First row of U'                   */
-  for( Int i = 1; i < order; i++ )
+  for( int i = 1; i < order; i++ )
   {         /* For the rows 1..order-1           */
 
-    Double sum = 0; //Holds backsubstitution from already handled rows
+    double sum = 0; //Holds backsubstitution from already handled rows
 
-    for( Int j = 0; j < i; j++ ) /* Backsubst already solved unknowns */
+    for( int j = 0; j < i; j++ ) /* Backsubst already solved unknowns */
     {
       sum += x[j] * U[j][i];
     }
@@ -1613,16 +1621,16 @@ Void EncAdaptiveLoopFilter::gnsTransposeBacksubstitution( Double U[MAX_NUM_ALF_C
   }
 }
 
-Void EncAdaptiveLoopFilter::gnsBacksubstitution( Double R[MAX_NUM_ALF_COEFF][MAX_NUM_ALF_COEFF], Double* z, Int size, Double* A )
+void EncAdaptiveLoopFilter::gnsBacksubstitution( double R[MAX_NUM_ALF_COEFF][MAX_NUM_ALF_COEFF], double* z, int size, double* A )
 {
   size--;
   A[size] = z[size] / R[size][size];
 
-  for( Int i = size - 1; i >= 0; i-- )
+  for( int i = size - 1; i >= 0; i-- )
   {
-    Double sum = 0;
+    double sum = 0;
 
-    for( Int j = i + 1; j <= size; j++ )
+    for( int j = i + 1; j <= size; j++ )
     {
       sum += R[i][j] * A[j];
     }
@@ -1631,11 +1639,11 @@ Void EncAdaptiveLoopFilter::gnsBacksubstitution( Double R[MAX_NUM_ALF_COEFF][MAX
   }
 }
 
-Int EncAdaptiveLoopFilter::gnsSolveByChol( Double **LHS, Double *rhs, Double *x, Int numEq )
+int EncAdaptiveLoopFilter::gnsSolveByChol( double **LHS, double *rhs, double *x, int numEq )
 {
-  static Double aux[MAX_NUM_ALF_COEFF];     /* Auxiliary vector */
-  static Double U[MAX_NUM_ALF_COEFF][MAX_NUM_ALF_COEFF];    /* Upper triangular Cholesky factor of LHS */
-  Int res = 1;  // Signal that Cholesky factorization is successfully performed
+  static double aux[MAX_NUM_ALF_COEFF];     /* Auxiliary vector */
+  static double U[MAX_NUM_ALF_COEFF][MAX_NUM_ALF_COEFF];    /* Upper triangular Cholesky factor of LHS */
+  int res = 1;  // Signal that Cholesky factorization is successfully performed
 
                 /* The equation to be solved is LHSx = rhs */
 
@@ -1666,7 +1674,7 @@ Int EncAdaptiveLoopFilter::gnsSolveByChol( Double **LHS, Double *rhs, Double *x,
 
     if( !res )
     {
-      std::memset( x, 0, sizeof( Double )*numEq );
+      std::memset( x, 0, sizeof( double )*numEq );
       return 0;
     }
 
@@ -1679,7 +1687,7 @@ Int EncAdaptiveLoopFilter::gnsSolveByChol( Double **LHS, Double *rhs, Double *x,
   return res;
 }
 //////////////////////////////////////////////////////////////////////////////////////////
-Void EncAdaptiveLoopFilter::setEnableFlag( AlfSliceParam& alfSlicePara, ChannelType channel, Bool val )
+void EncAdaptiveLoopFilter::setEnableFlag( AlfSliceParam& alfSlicePara, ChannelType channel, bool val )
 {
   if( channel == CHANNEL_TYPE_LUMA )
   {
@@ -1690,14 +1698,15 @@ Void EncAdaptiveLoopFilter::setEnableFlag( AlfSliceParam& alfSlicePara, ChannelT
     alfSlicePara.enabledFlag[COMPONENT_Cb] = alfSlicePara.enabledFlag[COMPONENT_Cr] = val;
   }
 }
-Void EncAdaptiveLoopFilter::setEnableFlag( AlfSliceParam& alfSlicePara, ChannelType channel, UChar** ctuFlags )
+
+void EncAdaptiveLoopFilter::setEnableFlag( AlfSliceParam& alfSlicePara, ChannelType channel, UChar** ctuFlags )
 {
   const ComponentID compIDFirst = isLuma( channel ) ? COMPONENT_Y : COMPONENT_Cb;
   const ComponentID compIDLast = isLuma( channel ) ? COMPONENT_Y : COMPONENT_Cr;
-  for( Int compId = compIDFirst; compId <= compIDLast; compId++ )
+  for( int compId = compIDFirst; compId <= compIDLast; compId++ )
   {
     alfSlicePara.enabledFlag[compId] = false;
-    for( Int i = 0; i < m_numCTUsInPic; i++ )
+    for( int i = 0; i < m_numCTUsInPic; i++ )
     {
       if( ctuFlags[compId][i] )
       {
@@ -1708,7 +1717,7 @@ Void EncAdaptiveLoopFilter::setEnableFlag( AlfSliceParam& alfSlicePara, ChannelT
   }
 }
 
-Void EncAdaptiveLoopFilter::copyCtuEnableFlag( UChar** ctuFlagsDst, UChar** ctuFlagsSrc, ChannelType channel )
+void EncAdaptiveLoopFilter::copyCtuEnableFlag( UChar** ctuFlagsDst, UChar** ctuFlagsSrc, ChannelType channel )
 {
   if( isLuma( channel ) )
   {
@@ -1720,6 +1729,7 @@ Void EncAdaptiveLoopFilter::copyCtuEnableFlag( UChar** ctuFlagsDst, UChar** ctuF
     memcpy( ctuFlagsDst[COMPONENT_Cr], ctuFlagsSrc[COMPONENT_Cr], sizeof( UChar ) * m_numCTUsInPic );
   }
 }
+
 Void EncAdaptiveLoopFilter::setCtuEnableFlag( UChar** ctuFlags, ChannelType channel, UChar val )
 {
   if( isLuma( channel ) )
