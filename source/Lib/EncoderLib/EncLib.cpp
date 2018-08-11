@@ -850,7 +850,7 @@ Void EncLib::xInitSPS(SPS &sps)
 #if JEM_TOOLS
   sps.getSpsNext().setCABACEngineMode       ( m_CABACEngineMode );
 #endif
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   sps.getSpsNext().setImvMode               ( ImvMode(m_ImvMode) );
   sps.getSpsNext().setUseIMV                ( m_ImvMode != IMV_OFF );
 #endif

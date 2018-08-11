@@ -520,16 +520,16 @@ Void DecCu::xDeriveCUMV( CodingUnit &cu )
     }
     else
     {
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
 #if REUSE_CU_RESULTS
-      if( cu.imv && !cu.cs->pcv->isEncoder )
+        if (cu.imv && !cu.cs->pcv->isEncoder)
 #else
-      if( cu.imv )
+        if (cu.imv)
 #endif
-      {
-        PU::applyImv( pu, mrgCtx, m_pcInterPred );
-      }
-      else
+        {
+          PU::applyImv(pu, mrgCtx, m_pcInterPred);
+        }
+        else
 #endif
       {
 #if JEM_TOOLS || JVET_K_AFFINE
@@ -658,19 +658,34 @@ Void DecCu::xDeriveCUMV( CodingUnit &cu )
     }
     else
     {
-      for ( UInt uiRefListIdx = 0; uiRefListIdx < 2; uiRefListIdx++ )
+#if JVET_K0357_AMVR
+#if REUSE_CU_RESULTS
+      if (cu.imv && !cu.cs->pcv->isEncoder)
+#else
+      if (cu.imv)
+#endif
       {
-        RefPicList eRefList = RefPicList( uiRefListIdx );
-        if ( pu.cs->slice->getNumRefIdx( eRefList ) > 0 && ( pu.interDir & ( 1 << uiRefListIdx ) ) )
-        {
-          AMVPInfo amvpInfo;
-          PU::fillMvpCand( pu, eRefList, pu.refIdx[eRefList], amvpInfo );
-          pu.mvpNum [eRefList] = amvpInfo.numCand;
-          pu.mv     [eRefList] = amvpInfo.mvCand[pu.mvpIdx [eRefList]] + pu.mvd[eRefList];
-        }
+        PU::applyImv(pu, mrgCtx, m_pcInterPred);
       }
-      PU::spanMotionInfo( pu, mrgCtx );
+      else
+      {
+#endif
+        for ( UInt uiRefListIdx = 0; uiRefListIdx < 2; uiRefListIdx++ )
+        {
+          RefPicList eRefList = RefPicList( uiRefListIdx );
+          if ( pu.cs->slice->getNumRefIdx( eRefList ) > 0 && ( pu.interDir & ( 1 << uiRefListIdx ) ) )
+          {
+            AMVPInfo amvpInfo;
+            PU::fillMvpCand( pu, eRefList, pu.refIdx[eRefList], amvpInfo );
+            pu.mvpNum [eRefList] = amvpInfo.numCand;
+            pu.mv     [eRefList] = amvpInfo.mvCand[pu.mvpIdx [eRefList]] + pu.mvd[eRefList];
+          }
+        }
+        PU::spanMotionInfo( pu, mrgCtx );
+      }
+#if JVET_K0357_AMVR
     }
+#endif
   }
 }
 #endif

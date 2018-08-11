@@ -194,7 +194,7 @@ protected:
     Distortion  uiBestSad;
     UChar       ucPointNr;
     Int         subShiftMode;
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
     unsigned    imvShift;
 #endif
   } IntTZSearchStruct;
@@ -241,7 +241,7 @@ protected:
                                     AMVPInfo&   amvpInfo,
                                     UInt&       ruiBits,
                                     Distortion& ruiCost
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
                                     ,
                                     const UChar  imv
 #endif

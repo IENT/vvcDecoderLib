@@ -306,7 +306,7 @@ struct CodingUnit : public UnitArea
   Bool           pdpc;
 #endif
   Bool           ipcm;
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   UChar          imv;
 #endif
   Bool           rootCbf;

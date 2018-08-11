@@ -187,7 +187,7 @@ public:
 
     return uiLength2 + ( g_aucPrevLog2[uiTemp2] << 1 );
   }
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   Distortion     getCostOfVectorWithPredictor( const Int x, const Int y, const unsigned imvShift )  { return Distortion( m_motionLambda * getBitsOfVectorWithPredictor(x, y, imvShift )); }
   UInt           getBitsOfVectorWithPredictor( const Int x, const Int y, const unsigned imvShift )  { return xGetExpGolombNumberOfBits(((x << m_iCostScale) - m_mvPredictor.getHor())>>imvShift) + xGetExpGolombNumberOfBits(((y << m_iCostScale) - m_mvPredictor.getVer())>>imvShift); }
 #else
