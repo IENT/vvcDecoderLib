@@ -109,7 +109,7 @@ private:
 
   CABACWriter*          m_CABACEstimator;
   RateCtrl*             m_pcRateCtrl;
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   CodingStructure    ***m_pImvTempCS;
 #endif
   EncModeCtrl          *m_modeCtrl;
@@ -199,13 +199,15 @@ protected:
   void xCheckDQP              ( CodingStructure& cs, Partitioner& partitioner, bool bKeepCtx = false);
   void xFillPCMBuffer         ( CodingUnit &cu);
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
   void xCheckRDCostAffineMerge2Nx2N
                               ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode );
 #endif
   void xCheckRDCostInter      ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &pm, const EncTestMode& encTestMode );
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   bool xCheckRDCostInterIMV   ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &pm, const EncTestMode& encTestMode );
+#endif
+#if JEM_TOOLS
   void xCheckRDCostInterWoOBMC( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &pm, const EncTestMode& encTestMode );
 #endif
   void xEncodeDontSplit       ( CodingStructure &cs, Partitioner &partitioner);
@@ -216,7 +218,7 @@ protected:
   void xCheckRDCostMerge2Nx2NFRUC
                               ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode );
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0357_AMVR
   void xEncodeInterResidual   ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode, int residualPass = 0, CodingStructure* imvCS = NULL, int emtMode = 1, bool* bestHasNonResi = NULL );
 #else
   void xEncodeInterResidual   ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode, int residualPass, bool* bestHasNonResi );

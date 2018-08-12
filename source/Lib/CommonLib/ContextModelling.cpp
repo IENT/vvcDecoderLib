@@ -635,7 +635,7 @@ unsigned DeriveCtx::CtxInterDir( const PredictionUnit& pu )
   return pu.cu->qtDepth;
 }
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
 unsigned DeriveCtx::CtxAffineFlag( const CodingUnit& cu )
 {
   const CodingStructure *cs = cu.cs;
@@ -667,7 +667,7 @@ unsigned DeriveCtx::CtxSkipFlag( const CodingUnit& cu )
 }
 
 
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
 unsigned DeriveCtx::CtxIMVFlag( const CodingUnit& cu )
 {
   const CodingStructure *cs = cu.cs;

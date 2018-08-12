@@ -833,16 +833,23 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
   ("SubPuMvpLog2Size",                               m_SubPuMvpLog2Size,                                   2u, "Sub-PU TMVP size index: 2^n")
   ("HighPrecMv",                                     m_highPrecisionMv,                                 false, "High precision motion vectors for temporal merging (0:off, 1:on)  [default: off]")
 #endif
+#if JEM_TOOLS || JVET_K_AFFINE
+  ("HighPrecMv",                                      m_highPrecisionMv,                               false, "High precision motion vectors for temporal merging (0:off, 1:on)  [default: off]")
+  ("Affine",                                          m_Affine,                                        false, "Enable affine prediction (0:off, 1:on)  [default: off]")
+#if JVET_K0337_AFFINE_6PARA
+  ( "AffineType",                                     m_AffineType,                                     true,  "Enable affine type prediction (0:off, 1:on)  [default: on]" )
+#endif
+#endif
 #if JEM_TOOLS
-  ("HighPrecMv",                                      m_highPrecisionMv,                                false, "High precision motion vectors for temporal merging (0:off, 1:on)  [default: off]")
-  ("Affine",                                          m_Affine,                                         false, "Enable affine prediction (0:off, 1:on)  [default: off]")
   ("BIO",                                             m_BIO,                                            false, "Enable bi-directional optical flow")
 #endif
   ("DisableMotCompression",                           m_DisableMotionCompression,                       false, "Disable motion data compression for all modes")
 #if JEM_TOOLS
   ("LICMode",                                         m_LICMode,                                           0u, "Local illumination compensation [LIC] (0:disabled, 1:enabled, 2:enabled for certain modes)  [default: 0]")
   ("FastPicLevelLIC",                                 m_FastPicLevelLIC,                                false, "Fast picture level LIC decision (0:disabled, 1:enabled)  [default: 0]")
-  ("IMV",                                             m_ImvMode,                                            0, "Adaptive MV precision Mode (IMV)\n"
+#endif
+#if JVET_K0357_AMVR
+  ("IMV",                                             m_ImvMode,                                            2, "Adaptive MV precision Mode (IMV)\n"
                                                                                                                "\t0: disabled IMV\n"
                                                                                                                "\t1: IMV default (Full-Pel)\n"
                                                                                                                "\t2: IMV Full-Pel and 4-PEL\n")
@@ -1962,12 +1969,14 @@ Bool EncAppCfg::xCheckParameter()
     xConfirmPara( m_altResiCompId > 0, "Alternative residual compression can only be used with NEXT profile" );
 #endif
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
     xConfirmPara( m_highPrecisionMv, "High precision MV for temporal merging can only be used with NEXT profile" );
     xConfirmPara( m_Affine, "Affine is only allowed with NEXT profile" );
+#endif
+#if JEM_TOOLS
     xConfirmPara( m_BIO, "BIO only allowed with NEXT profile" );
 #endif
-#if !JEM_TOOLS && JVET_K0346
+#if !JEM_TOOLS && JVET_K0346 && !JVET_K_AFFINE
     xConfirmPara(m_highPrecisionMv, "High precision MV for temporal merging can only be used with NEXT profile");
 #endif
     xConfirmPara( m_DisableMotionCompression, "Disable motion data compression only allowed with NEXT profile" );
@@ -1975,7 +1984,7 @@ Bool EncAppCfg::xCheckParameter()
     xConfirmPara( m_LICMode, "LICMode > 0 is only allowed with NEXT profile" );
 #endif
     xConfirmPara( m_MTT, "Multi type tree is only allowed with NEXT profile" );
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
     xConfirmPara( m_ImvMode, "IMV is only allowed with NEXT profile" );
 #endif
 #if JEM_TOOLS
@@ -2043,6 +2052,8 @@ Bool EncAppCfg::xCheckParameter()
 #endif
 #if JEM_TOOLS
     xConfirmPara( !( m_OBMCBlkSize == 4 || m_OBMCBlkSize == 8 ), "OBMC Block Size must be set to 4 or 8 samples" );
+#endif
+#if JVET_K_AFFINE
     xConfirmPara( m_Affine && !m_highPrecisionMv, "Affine is not yet implemented for HighPrecMv off." );
 #endif
 #if JEM_TOOLS
@@ -3004,7 +3015,7 @@ Bool EncAppCfg::xCheckParameter()
 #if U0033_ALTERNATIVE_TRANSFER_CHARACTERISTICS_SEI
   xConfirmPara(m_preferredTransferCharacteristics > 255, "transfer_characteristics_idc should not be greater than 255.");
 #endif
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   xConfirmPara( unsigned(m_ImvMode) > 2, "ImvMode exceeds range (0 to 2)" );
 #endif
   xConfirmPara( m_decodeBitstreams[0] == m_bitstreamFileName, "Debug bitstream and the output bitstream cannot be equal.\n" );
@@ -3254,11 +3265,26 @@ Void EncAppCfg::xPrintParameter()
     msg( VERBOSE, "IntraBoundaryFilter:%d ", m_IntraBoundaryFilter );
     msg( VERBOSE, "NSST:%d ", m_NSST );
     msg( VERBOSE, "Affine:%d ", m_Affine );
+#if JVET_K0337_AFFINE_6PARA
+    if ( m_Affine )
+    {
+      msg( VERBOSE, "AffineType:%d ", m_AffineType );
+    }
+#endif
     msg( VERBOSE, "SubPuMvp:%d+%d ", m_SubPuMvpMode & 1, ( m_SubPuMvpMode & 2 ) == 2 );
     if( m_SubPuMvpMode != 0 )
     {
       msg( VERBOSE, "SubPuMvpLog2Size:%d ", m_SubPuMvpLog2Size );
     }
+#endif
+#if !JEM_TOOLS && JVET_K_AFFINE
+    msg( VERBOSE, "Affine:%d ", m_Affine );
+#if JVET_K0337_AFFINE_6PARA
+    if ( m_Affine )
+    {
+      msg( VERBOSE, "AffineType:%d ", m_AffineType );
+    }
+#endif
 #endif
 #if !JEM_TOOLS && JVET_K0346
     msg(VERBOSE, "SubPuMvp:%d+%d ", m_SubPuMvpMode & 1, (m_SubPuMvpMode & 2) == 2);
@@ -3273,7 +3299,7 @@ Void EncAppCfg::xPrintParameter()
     msg( VERBOSE, "QTBT:%d ", m_QTBT );
     if( m_QTBT ) msg( VERBOSE, "DualITree:%d ", m_dualTree );
     msg( VERBOSE, "LargeCTU:%d ", m_LargeCTU );
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
     msg( VERBOSE, "IMV:%d ", m_ImvMode );
     if( !m_QTBT ) msg( VERBOSE, "IMVMaxCand:%d ", m_ImvMaxCand );
 #endif
@@ -3287,7 +3313,7 @@ Void EncAppCfg::xPrintParameter()
     msg( VERBOSE, "HighPrecMv:%d ", m_highPrecisionMv );
     msg( VERBOSE, "BIO:%d ", m_BIO );
 #endif
-#if !JEM_TOOLS && JVET_K0346
+#if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
     msg(VERBOSE, "HighPrecMv:%d ", m_highPrecisionMv);
 #endif
     msg( VERBOSE, "DisMDC:%d ", m_DisableMotionCompression );
@@ -3349,6 +3375,8 @@ Void EncAppCfg::xPrintParameter()
   msg( VERBOSE, "PBIntraFast:%d ", m_usePbIntraFast );
 #if JEM_TOOLS
   if( m_LICMode > 0 ) msg( VERBOSE, "FastPicLevelLIC:%d ", m_FastPicLevelLIC );
+#endif
+#if JVET_K0357_AMVR
   if( m_ImvMode == 2 ) msg( VERBOSE, "IMV4PelFast:%d ", m_Imv4PelFast );
 #endif
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT

@@ -159,7 +159,7 @@ public:
   Void           setPredictor             ( const Mv& rcMv )
   {
     m_mvPredictor = rcMv;
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
     if( m_mvPredictor.highPrec )
     {
       m_mvPredictor = Mv( m_mvPredictor.hor >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, m_mvPredictor.ver >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, false );
@@ -187,7 +187,7 @@ public:
 
     return uiLength2 + ( g_aucPrevLog2[uiTemp2] << 1 );
   }
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   Distortion     getCostOfVectorWithPredictor( const Int x, const Int y, const unsigned imvShift )  { return Distortion( m_motionLambda * getBitsOfVectorWithPredictor(x, y, imvShift )); }
   UInt           getBitsOfVectorWithPredictor( const Int x, const Int y, const unsigned imvShift )  { return xGetExpGolombNumberOfBits(((x << m_iCostScale) - m_mvPredictor.getHor())>>imvShift) + xGetExpGolombNumberOfBits(((y << m_iCostScale) - m_mvPredictor.getVer())>>imvShift); }
 #else

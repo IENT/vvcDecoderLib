@@ -594,11 +594,16 @@ unsigned CtxQtCbf     ( const ComponentID compID );
 #endif
 unsigned CtxInterDir  ( const PredictionUnit& pu );
 unsigned CtxSkipFlag  ( const CodingUnit& cu );
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
 unsigned CtxIMVFlag   ( const CodingUnit& cu );
+#endif
+#if JEM_TOOLS
 unsigned CtxAffineFlag( const CodingUnit& cu );
 unsigned CtxFrucFlag  ( const PredictionUnit& pu );
 unsigned CtxFrucMode  ( const PredictionUnit& pu );
+#endif
+#if !JEM_TOOLS && JVET_K_AFFINE
+unsigned CtxAffineFlag( const CodingUnit& cu );
 #endif
 }
 

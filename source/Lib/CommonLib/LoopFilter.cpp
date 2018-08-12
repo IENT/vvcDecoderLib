@@ -278,7 +278,7 @@ void LoopFilter::xDeblockCU( CodingUnit& cu, const DeblockEdgeDir edgeDir )
 #endif
   }
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
   if ( cu.affine )
   {
     const Int widthInBaseUnits = cu.Y().width >> pcv.minCUWidthLog2;
@@ -500,7 +500,7 @@ unsigned LoopFilter::xGetBoundaryStrengthSingle ( const CodingUnit& cu, const De
     if( 0 <= miQ.refIdx[1] ) { mvQ1 = miQ.mv[1]; }
 
     Int nThreshold = 4;
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
     if( cu.cs->sps->getSpsNext().getUseHighPrecMv() )
     {
       mvP0.setHighPrec();
@@ -563,7 +563,7 @@ unsigned LoopFilter::xGetBoundaryStrengthSingle ( const CodingUnit& cu, const De
   Mv mvQ0 = miQ.mv[0];
 
   Int nThreshold = 4;
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
   if( cu.cs->sps->getSpsNext().getUseHighPrecMv() )
   {
     mvP0.setHighPrec();

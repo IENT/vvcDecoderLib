@@ -109,6 +109,15 @@ inline Int64 abs (Int64 x) { return _abs64(x); };
 #define NULL              0
 #endif
 
+#if JVET_K0337_AFFINE_6PARA
+typedef enum
+{
+  AFFINEMODEL_4PARAM,
+  AFFINEMODEL_6PARAM,
+  AFFINE_MODEL_NUM
+} EAffineModel;
+#endif
+
 // ====================================================================================================================
 // Common constants
 // ====================================================================================================================
@@ -283,7 +292,7 @@ static const Int CABAC_INIT_PRESENT_FLAG =                          1;
 
 static const Int LUMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS   = 4;
 static const Int CHROMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS = 8;
-#if JEM_TOOLS || JVET_K0346
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
 static const Int VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE         = 2;   ///< additional precision bit for MV storage
 #endif
 
@@ -344,7 +353,7 @@ static const Int CONTEXT_STATE_BITS =                               6;
 static const Int LAST_SIGNIFICANT_GROUPS =                         14;
 static const Int MAX_GR_ORDER_RESIDUAL =                           10;
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
 static const Int AFFINE_MAX_NUM_V0 =                                3; ///< max number of motion candidates in top-left corner
 static const Int AFFINE_MAX_NUM_V1 =                                2; ///< max number of motion candidates in top-right corner
 static const Int AFFINE_MAX_NUM_V2 =                                2; ///< max number of motion candidates in left-bottom corner

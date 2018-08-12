@@ -332,8 +332,11 @@ public:
   static const CtxSet   DeltaQP;
   static const CtxSet   InterDir;
   static const CtxSet   RefPic;
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
   static const CtxSet   AffineFlag;
+#if JVET_K0337_AFFINE_6PARA
+  static const CtxSet   AffineType;
+#endif
 #endif
   static const CtxSet   Mvd;
   static const CtxSet   TransSubdivFlag;
@@ -379,8 +382,10 @@ public:
   static const CtxSet   CrossCompPred;
   static const CtxSet   ChromaQpAdjFlag;
   static const CtxSet   ChromaQpAdjIdc;
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   static const CtxSet   ImvFlag;
+#endif
+#if JEM_TOOLS
   static const CtxSet   LICFlag;
   static const CtxSet   ObmcFlag;
   static const CtxSet   FrucFlag;

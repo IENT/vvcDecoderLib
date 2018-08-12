@@ -958,9 +958,9 @@ Void QuantRDOQ::xRateDistOptQuant(TransformUnit &tu, const ComponentID &compID, 
         const BinFracBits fracBitsOne = fracBits.getFracBitsArray( cctx.greater1CtxId( c1 ) );
         const BinFracBits fracBitsAbs = fracBits.getFracBitsArray( cctx.greater2CtxId()     );
 #endif
-#endif
 
         DTRACE_COND( ( uiMaxAbsLevel != 0 ), g_trace_ctx, D_RDOQ_MORE, " One=%d Abs=%d", uiOneCtx, uiAbsCtx );
+#endif
 
         if( iScanPos == iLastScanPos )
         {

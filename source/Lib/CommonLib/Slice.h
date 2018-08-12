@@ -819,7 +819,7 @@ private:
 #if JEM_TOOLS
   bool              m_ModifiedCABACEngine;        // 8
 #endif
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   bool              m_IMV;                        // 9
 #endif
 #if JVET_K0072
@@ -832,7 +832,7 @@ private:
   bool              m_highPrecMv;                 // 11
   bool              m_BIO;                        // 12
 #endif
-#if !JEM_TOOLS && JVET_K0346
+#if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
   bool              m_highPrecMv;
 #endif
   bool              m_DisableMotionCompression;   // 13
@@ -852,7 +852,16 @@ private:
   bool              m_OBMC;                       // 20
   bool              m_FRUC;                       // 21
   bool              m_Affine;                     // 22
+#if JVET_K0337_AFFINE_6PARA
+  bool              m_AffineType;
+#endif
   bool              m_AClip;                      // 23
+#endif
+#if !JEM_TOOLS && JVET_K_AFFINE
+  bool              m_Affine;
+#if JVET_K0337_AFFINE_6PARA
+  bool              m_AffineType;
+#endif
 #endif
 #if JEM_TOOLS
   bool              m_CIPFEnabled;                // 24
@@ -889,7 +898,7 @@ private:
   // cabac engine
   unsigned    m_CABACEngineMode;
 #endif
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   //imv
   ImvMode     m_ImvMode;
 #endif
@@ -968,11 +977,25 @@ public:
 #if JEM_TOOLS
   bool      getModifiedCABACEngine()                                      const     { return m_ModifiedCABACEngine; }
 #endif
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   void      setUseIMV             ( bool b )                                        { m_IMV = b; }
   bool      getUseIMV             ()                                      const     { return m_IMV; }
+#endif
+#if JEM_TOOLS
   void      setUseAffine          ( bool b )                                        { m_Affine = b; }
   bool      getUseAffine          ()                                      const     { return m_Affine; }
+#if JVET_K0337_AFFINE_6PARA
+  void      setUseAffineType      ( bool b )                                        { m_AffineType = b; }
+  bool      getUseAffineType      ()                                      const     { return m_AffineType; }
+#endif
+#endif
+#if !JEM_TOOLS && JVET_K_AFFINE
+  void      setUseAffine          ( bool b )                                        { m_Affine = b; }
+  bool      getUseAffine          ()                                      const     { return m_Affine; }
+#if JVET_K0337_AFFINE_6PARA
+  void      setUseAffineType      ( bool b )                                        { m_AffineType = b; }
+  bool      getUseAffineType      ()                                      const     { return m_AffineType; }
+#endif
 #endif
 #if JVET_K0072
 #else
@@ -987,7 +1010,7 @@ public:
   void      setUseBIO             ( bool b )                                        { m_BIO = b; }
   bool      getUseBIO             ()                                      const     { return m_BIO; }
 #endif
-#if !JEM_TOOLS && JVET_K0346
+#if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
   void      setUseHighPrecMv(bool b) { m_highPrecMv = b; }
   bool      getUseHighPrecMv()                                      const { return m_highPrecMv; }
 #endif
@@ -1078,7 +1101,7 @@ public:
   unsigned  getCABACEngineMode    ()                                      const     { return m_CABACEngineMode; }
   void      setCABACEngineMode    ( unsigned    mode )                              { m_CABACEngineMode = mode; m_ModifiedCABACEngine = ( m_CABACEngineMode != 0 ); }
 #endif
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   void      setImvMode(ImvMode m) { m_ImvMode = m; m_IMV = m != 0;  }
   ImvMode   getImvMode            ()                                      const     { return m_ImvMode; }
 #endif

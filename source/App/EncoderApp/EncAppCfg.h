@@ -225,9 +225,18 @@ protected:
 #if JEM_TOOLS
   bool      m_highPrecisionMv;
   bool      m_Affine;
+#if JVET_K0337_AFFINE_6PARA
+  bool      m_AffineType;
+#endif
   bool      m_BIO;
 #endif
-#if !JEM_TOOLS && JVET_K0346
+#if !JEM_TOOLS && JVET_K_AFFINE
+  bool      m_Affine;
+#if JVET_K0337_AFFINE_6PARA
+  bool      m_AffineType;
+#endif
+#endif
+#if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
   bool      m_highPrecisionMv;
 #endif
   bool      m_DisableMotionCompression;
@@ -536,7 +545,7 @@ protected:
   Int       m_maxBitsPerMinCuDenom;                           ///< Indicates an upper bound for the number of bits of coding_unit() data
   Int       m_log2MaxMvLengthHorizontal;                      ///< Indicate the maximum absolute value of a decoded horizontal MV component in quarter-pel luma units
   Int       m_log2MaxMvLengthVertical;                        ///< Indicate the maximum absolute value of a decoded vertical MV component in quarter-pel luma units
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   Int       m_ImvMode;                                        ///< imv mode
   Int       m_Imv4PelFast;                                    ///< imv 4-Pel fast mode
   Int       m_ImvMaxCand;                                     ///< imv max num cand for test (QTBT off only)

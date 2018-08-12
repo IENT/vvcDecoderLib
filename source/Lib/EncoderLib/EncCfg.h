@@ -228,9 +228,18 @@ protected:
 #if JEM_TOOLS
   bool      m_highPrecMv;
   bool      m_Affine;
+#if JVET_K0337_AFFINE_6PARA
+  bool      m_AffineType;
+#endif
   bool      m_BIO;
 #endif
-#if !JEM_TOOLS && JVET_K0346
+#if !JEM_TOOLS && JVET_K_AFFINE
+  bool      m_Affine;
+#if JVET_K0337_AFFINE_6PARA
+  bool      m_AffineType;
+#endif
+#endif
+#if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
   bool      m_highPrecMv;
 #endif
   bool      m_DisableMotionCompression;
@@ -550,7 +559,7 @@ protected:
   std::string m_summaryOutFilename;                           ///< filename to use for producing summary output file.
   std::string m_summaryPicFilenameBase;                       ///< Base filename to use for producing summary picture output files. The actual filenames used will have I.txt, P.txt and B.txt appended.
   UInt        m_summaryVerboseness;                           ///< Specifies the level of the verboseness of the text output.
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   int       m_ImvMode;
   int       m_Imv4PelFast;
   int       m_ImvMaxCand;
@@ -712,8 +721,20 @@ public:
 
   void      setAffine                       ( bool b )       { m_Affine = b; }
   bool      getAffine                       ()         const { return m_Affine; }
+#if JVET_K0337_AFFINE_6PARA
+  void      setAffineType( bool b )                          { m_AffineType = b; }
+  bool      getAffineType()                            const { return m_AffineType; }
 #endif
-#if !JEM_TOOLS && JVET_K0346
+#endif
+#if !JEM_TOOLS && JVET_K_AFFINE
+  void      setAffine                       ( bool b )       { m_Affine = b; }
+  bool      getAffine                       ()         const { return m_Affine; }
+#if JVET_K0337_AFFINE_6PARA
+  void      setAffineType( bool b )                          { m_AffineType = b; }
+  bool      getAffineType()                            const { return m_AffineType; }
+#endif
+#endif
+#if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
   void      setHighPrecisionMv(bool b) { m_highPrecMv = b; }
   bool      getHighPrecisionMv()       { return m_highPrecMv; }
 #endif
@@ -1423,7 +1444,7 @@ public:
 
   Void         setSummaryVerboseness(UInt v)                         { m_summaryVerboseness = v; }
   UInt         getSummaryVerboseness( ) const                        { return m_summaryVerboseness; }
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   Void         setIMV(int n)                                         { m_ImvMode = n; }
   Int          getIMV() const                                        { return m_ImvMode; }
   Void         setIMV4PelFast(int n)                                 { m_Imv4PelFast = n; }

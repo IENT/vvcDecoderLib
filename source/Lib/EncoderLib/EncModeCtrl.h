@@ -59,7 +59,7 @@ enum EncTestModeType
   ETM_MERGE_FRUC,
 #endif
   ETM_INTER_ME,
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
   ETM_AFFINE,
 #endif
   ETM_INTRA,
@@ -73,7 +73,7 @@ enum EncTestModeType
 #if REUSE_CU_RESULTS
   ETM_RECO_CACHED,
 #endif
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   ETM_TRIGGER_IMV_LIST,
 #endif
   ETM_INVALID
@@ -83,9 +83,11 @@ enum EncTestModeOpts
 {
   ETO_STANDARD    =  0,                   // empty      (standard option)
   ETO_FORCE_MERGE =  1<<0,                // bit   0    (indicates forced merge)
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   ETO_IMV_SHIFT   =     1,                // bits  1-3  (imv parameter starts at bit 1)
   ETO_IMV         =  7<<ETO_IMV_SHIFT,    // bits  1-3  (imv parameter uses 3 bits)
+#endif
+#if JEM_TOOLS
   ETO_LIC         =  1<<4,                // bit   4    (local illumination compensation)
 #endif
   ETO_DUMMY       =  1<<5,                // bit   5    (dummy)
@@ -153,6 +155,9 @@ inline bool isModeInter( const EncTestMode& encTestmode ) // perhaps remove
           || encTestmode.type == ETM_MERGE_SKIP
 #if JEM_TOOLS
           || encTestmode.type == ETM_MERGE_FRUC
+          || encTestmode.type == ETM_AFFINE
+#endif
+#if !JEM_TOOLS && JVET_K_AFFINE
           || encTestmode.type == ETM_AFFINE
 #endif
          );
@@ -353,7 +358,11 @@ struct SaveLoadStruct
   bool            mergeFlag;
 #if JEM_TOOLS
   bool            LICFlag;
+#endif
+#if JVET_K0357_AMVR
   unsigned        imv;
+#endif
+#if JEM_TOOLS
   unsigned        nsstIdx;
   bool            pdpc;
 #endif
@@ -362,6 +371,9 @@ struct SaveLoadStruct
   unsigned        emtTuIndex;
   unsigned        emtCuFlag;
   unsigned        frucMode;
+  bool            affineFlag;
+#endif
+#if !JEM_TOOLS && JVET_K_AFFINE
   bool            affineFlag;
 #endif
 };
@@ -536,9 +548,11 @@ class EncModeCtrlMTnoRQT : public EncModeCtrl, public SaveLoadEncInfoCtrl, publi
     HISTORY_DO_SAVE,
     SAVE_LOAD_TAG,
 #endif
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
     BEST_NO_IMV_COST,
     BEST_IMV_COST,
+#endif
+#if JEM_TOOLS
     LAST_NSST_IDX,
     SKIP_OTHER_NSST,
 #endif

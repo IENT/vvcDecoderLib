@@ -1282,7 +1282,7 @@ void CABACReader::cu_skip_flag( CodingUnit& cu )
   }
 }
 
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
 void CABACReader::imv_mode( CodingUnit& cu, MergeCtx& mrgCtx )
 {
   RExt__DECODER_DEBUG_BIT_STATISTICS_CREATE_SET( STATS__CABAC_BITS__OTHER );
@@ -1375,8 +1375,10 @@ void CABACReader::cu_pred_data( CodingUnit &cu )
     prediction_unit( pu, mrgCtx );
   }
 
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   imv_mode   ( cu, mrgCtx );
+#endif
+#if JEM_TOOLS
   obmc_flag  ( cu );
   cu_lic_flag( cu ); // local illumination compensation
 
@@ -1828,31 +1830,31 @@ void CABACReader::prediction_unit( PredictionUnit& pu, MergeCtx& mrgCtx )
     fruc_mrg_mode( pu );
     affine_flag  ( *pu.cu );
 #endif
+#if !JEM_TOOLS && JVET_K_AFFINE
+    affine_flag  ( *pu.cu );
+#endif
     merge_data   ( pu );
   }
   else
   {
     inter_pred_idc( pu );
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
     affine_flag   ( *pu.cu );
 #endif
 
     if( pu.interDir != 2 /* PRED_L1 */ )
     {
       ref_idx     ( pu, REF_PIC_LIST_0 );
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
       if( pu.cu->affine )
       {
-        Mv affLT, affRT;
-        mvd_coding( affLT );
-        mvd_coding( affRT );
-
-#if JVET_K0220_ENC_CTRL
-        pu.mvdAffi[REF_PIC_LIST_0][0] = affLT;
-        pu.mvdAffi[REF_PIC_LIST_0][1] = affRT;
-#else
-        PU::setAllAffineMvd( pu.getMotionBuf(), affLT, affRT, REF_PIC_LIST_0, pu.cs->pcv->rectCUs );
-
+        mvd_coding( pu.mvdAffi[REF_PIC_LIST_0][0] );
+        mvd_coding( pu.mvdAffi[REF_PIC_LIST_0][1] );
+#if JVET_K0337_AFFINE_6PARA
+        if ( pu.cu->affineType == AFFINEMODEL_6PARAM )
+        {
+          mvd_coding( pu.mvdAffi[REF_PIC_LIST_0][2] );
+        }
 #endif
       }
       else
@@ -1862,31 +1864,29 @@ void CABACReader::prediction_unit( PredictionUnit& pu, MergeCtx& mrgCtx )
       }
       mvp_flag    ( pu, REF_PIC_LIST_0 );
     }
-#if JEM_TOOLS
-    else if( pu.cu->affine )
-    {
-      PU::setAllAffineMv( pu, Mv(), Mv(), Mv(), REF_PIC_LIST_0 ); // done in JEM, but maybe unnecessary
-    }
-#endif
+
     if( pu.interDir != 1 /* PRED_L0 */ )
     {
       ref_idx     ( pu, REF_PIC_LIST_1 );
       if( pu.cu->cs->slice->getMvdL1ZeroFlag() && pu.interDir == 3 /* PRED_BI */ )
       {
         pu.mvd[ REF_PIC_LIST_1 ] = Mv();
+#if JEM_TOOLS || JVET_K_AFFINE
+        pu.mvdAffi[REF_PIC_LIST_1][0] = Mv();
+        pu.mvdAffi[REF_PIC_LIST_1][1] = Mv();
+        pu.mvdAffi[REF_PIC_LIST_1][2] = Mv();
+#endif
       }
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
       else if( pu.cu->affine )
       {
-        Mv affLT, affRT;
-        mvd_coding( affLT );
-        mvd_coding( affRT );
-
-#if JVET_K0220_ENC_CTRL
-        pu.mvdAffi[REF_PIC_LIST_1][0] = affLT;
-        pu.mvdAffi[REF_PIC_LIST_1][1] = affRT;
-#else
-        PU::setAllAffineMvd( pu.getMotionBuf(), affLT, affRT, REF_PIC_LIST_1, pu.cs->pcv->rectCUs );
+        mvd_coding( pu.mvdAffi[REF_PIC_LIST_1][0] );
+        mvd_coding( pu.mvdAffi[REF_PIC_LIST_1][1] );
+#if JVET_K0337_AFFINE_6PARA
+        if ( pu.cu->affineType == AFFINEMODEL_6PARAM )
+        {
+          mvd_coding( pu.mvdAffi[REF_PIC_LIST_1][2] );
+        }
 #endif
       }
 #endif
@@ -1896,12 +1896,6 @@ void CABACReader::prediction_unit( PredictionUnit& pu, MergeCtx& mrgCtx )
       }
       mvp_flag    ( pu, REF_PIC_LIST_1 );
     }
-#if JEM_TOOLS
-    else if( pu.cu->affine )
-    {
-      PU::setAllAffineMv( pu, Mv(), Mv(), Mv(), REF_PIC_LIST_1 ); // done in JEM, but maybe not necessary
-    }
-#endif
   }
   if( pu.interDir == 3 /* PRED_BI */ && PU::isBipredRestriction(pu) )
   {
@@ -1913,10 +1907,14 @@ void CABACReader::prediction_unit( PredictionUnit& pu, MergeCtx& mrgCtx )
   PU::spanMotionInfo( pu, mrgCtx );
 }
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
 void CABACReader::affine_flag( CodingUnit& cu )
 {
+#if JEM_TOOLS
   if( cu.cs->slice->isIntra() || !cu.cs->sps->getSpsNext().getUseAffine() || cu.partSize != SIZE_2Nx2N || cu.firstPU->frucMrgMode )
+#else
+  if( cu.cs->slice->isIntra() || !cu.cs->sps->getSpsNext().getUseAffine() || cu.partSize != SIZE_2Nx2N )
+#endif
   {
     return;
   }
@@ -1939,6 +1937,19 @@ void CABACReader::affine_flag( CodingUnit& cu )
   cu.affine = m_BinDecoder.decodeBin( Ctx::AffineFlag( ctxId ) );
 
   DTRACE( g_trace_ctx, D_SYNTAX, "affine_flag() affine=%d ctx=%d pos=(%d,%d)\n", cu.affine ? 1 : 0, ctxId, cu.Y().x, cu.Y().y );
+
+#if JVET_K0337_AFFINE_6PARA
+  if ( cu.affine && !cu.firstPU->mergeFlag && cu.cs->sps->getSpsNext().getUseAffineType() )
+  {
+    ctxId = 0;
+    cu.affineType = m_BinDecoder.decodeBin( Ctx::AffineType( ctxId ) );
+    DTRACE( g_trace_ctx, D_SYNTAX, "affine_type() affine_type=%d ctx=%d pos=(%d,%d)\n", cu.affineType ? 1 : 0, ctxId, cu.Y().x, cu.Y().y );
+  }
+  else
+  {
+    cu.affineType = AFFINEMODEL_4PARAM;
+  }
+#endif
 }
 #endif
 
@@ -1956,6 +1967,12 @@ void CABACReader::merge_data( PredictionUnit& pu )
 {
 #if JEM_TOOLS
   if( pu.frucMrgMode || pu.cu->affine )
+  {
+    return;
+  }
+#endif
+#if !JEM_TOOLS && JVET_K_AFFINE
+  if ( pu.cu->affine )
   {
     return;
   }

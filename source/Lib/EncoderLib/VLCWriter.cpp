@@ -551,7 +551,7 @@ Void HLSWriter::codeSPSNext( const SPSNext& spsNext, const bool usePCM )
 #if JEM_TOOLS
   WRITE_FLAG( spsNext.getModifiedCABACEngine() ? 1 : 0,                                         "modified_cabac_engine_flag" );
 #endif
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   WRITE_FLAG( spsNext.getUseIMV() ? 1 : 0,                                                      "imv_enable_flag" );
 #endif
 #if JVET_K0072
@@ -564,7 +564,7 @@ Void HLSWriter::codeSPSNext( const SPSNext& spsNext, const bool usePCM )
   WRITE_FLAG( spsNext.getUseHighPrecMv() ? 1 : 0,                                               "high_precision_motion_vectors" );
   WRITE_FLAG( spsNext.getUseBIO() ? 1 : 0,                                                      "bio_enable_flag" );
 #endif
-#if !JEM_TOOLS && JVET_K0346
+#if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
   WRITE_FLAG(spsNext.getUseHighPrecMv() ? 1 : 0,                                                "high_precision_motion_vectors");
 #endif
   WRITE_FLAG( spsNext.getDisableMotCompress() ? 1 : 0,                                          "disable_motion_compression_flag" );
@@ -584,7 +584,22 @@ Void HLSWriter::codeSPSNext( const SPSNext& spsNext, const bool usePCM )
   WRITE_FLAG( spsNext.getUseOBMC() ? 1 : 0,                                                     "obmc_flag" );
   WRITE_FLAG( spsNext.getUseFRUCMrgMode() ? 1 : 0,                                              "fruc_merge_flag" );
   WRITE_FLAG( spsNext.getUseAffine() ? 1 : 0,                                                   "affine_flag" );
+#if JVET_K0337_AFFINE_6PARA
+  if ( spsNext.getUseAffine() )
+  {
+    WRITE_FLAG( spsNext.getUseAffineType() ? 1 : 0,                                             "affine_type_flag" );
+  }
+#endif
   WRITE_FLAG( spsNext.getUseAClip() ? 1 : 0,                                                    "adaptive_clipping_flag" );
+#endif
+#if !JEM_TOOLS && JVET_K_AFFINE
+  WRITE_FLAG( spsNext.getUseAffine() ? 1 : 0,                                                   "affine_flag" );
+#if JVET_K0337_AFFINE_6PARA
+  if ( spsNext.getUseAffine() )
+  {
+    WRITE_FLAG( spsNext.getUseAffineType() ? 1 : 0,                                             "affine_type_flag" );
+  }
+#endif
 #endif
 #if JEM_TOOLS
   WRITE_FLAG( spsNext.getCIPFMode() ? 1 : 0,                                                    "cipf_enabled_flag" );
@@ -642,12 +657,13 @@ Void HLSWriter::codeSPSNext( const SPSNext& spsNext, const bool usePCM )
     WRITE_UVLC( spsNext.getCABACEngineMode() - 1,                                               "cabac_engine_mode_minus1" );
   }
 #endif
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   if( spsNext.getUseIMV() )
   {
     WRITE_UVLC( spsNext.getImvMode()-1,                                                         "imv_mode_minus1" );
   }
-
+#endif
+#if JEM_TOOLS
   if( spsNext.getLICEnabled() )
   {
     WRITE_UVLC( spsNext.getLICMode() - 1,                                                       "lic_mode_minus1" );

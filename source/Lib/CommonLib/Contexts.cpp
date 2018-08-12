@@ -1000,13 +1000,22 @@ const CtxSet ContextSetCfg::RefPic = ContextSetCfg::addCtxSet
   {  CNU, CNU,},
 });
 
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
 const CtxSet ContextSetCfg::AffineFlag = ContextSetCfg::addCtxSet
 ({
   {  197, 185, 201,},
   {  197, 185, 201,},
   {  CNU, CNU, CNU,},
 });
+
+#if JVET_K0337_AFFINE_6PARA
+const CtxSet ContextSetCfg::AffineType = ContextSetCfg::addCtxSet
+({
+  { 92,  },
+  { 77,  },
+  { CNU, },
+});
+#endif
 #endif
 
 const CtxSet ContextSetCfg::Mvd = ContextSetCfg::addCtxSet
@@ -1401,14 +1410,15 @@ const CtxSet ContextSetCfg::ChromaQpAdjIdc = ContextSetCfg::addCtxSet
   {  154,},
 });
 
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
 const CtxSet ContextSetCfg::ImvFlag = ContextSetCfg::addCtxSet
 ({
   {  197, 185, 201, 185,},
   {  197, 185, 201, 185,},
   {  CNU, CNU, CNU, CNU,},
 });
-
+#endif
+#if JEM_TOOLS
 const CtxSet ContextSetCfg::LICFlag = ContextSetCfg::addCtxSet
 ({
   {  154,},
@@ -1697,7 +1707,7 @@ void CtxWSizeStore::xInitMappingTable( const SPS* sps )
   unsigned        numCtxTransSubdiv   = ( spsNext.getUseLargeCTU() || spsNext.getUseQTBT() ? 4 : 3 ); // hard-wired in JEM
   unsigned        numCtxLastXY        = ( spsNext.getUseLargeCTU() || spsNext.getUseQTBT() ? 25 : 15 ); // hard-wired in JEM
   unsigned        numCtxEmtCUFlag     = ( spsNext.getUseLargeCTU() || spsNext.getUseQTBT() ? 6 : 4 ); // hard-wired in JEM
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   unsigned        numImvCtx           = ( spsNext.getImvMode() > 1 ? 4 : 3 );
 #endif
   addCtxSetToMapping      ( m_codeId2ctxId, Ctx::SplitFlag,              0, numCtxSplitFlag );
@@ -1804,10 +1814,12 @@ void CtxWSizeStore::xInitMappingTable( const SPS* sps )
   {
     addCtxSetToMapping    ( m_codeId2ctxId, Ctx::ObmcFlag,               0, 1 );
   }
+#if JVET_K0357_AMVR
   if( true /* VCEG_AZ07_IMV */ )
   {
     addCtxSetToMapping    ( m_codeId2ctxId, Ctx::ImvFlag,                0, numImvCtx );
   }
+#endif
   if( spsNext.getLICEnabled() ) // hard-wired in JEM
   {
     addCtxSetToMapping    ( m_codeId2ctxId, Ctx::LICFlag,                0, 1 );

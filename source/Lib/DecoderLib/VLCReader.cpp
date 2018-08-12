@@ -816,7 +816,7 @@ void HLSyntaxReader::parseSPSNext( SPSNext& spsNext, const bool usePCM )
 #if JEM_TOOLS
   READ_FLAG( symbol,    "modified_cabac_engine_flag" );             spsNext.setCABACEngineMode        ( symbol );
 #endif
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   READ_FLAG( symbol,    "imv_enable_flag" );                        spsNext.setUseIMV                 ( symbol != 0 );
 #endif
 #if JVET_K0072
@@ -829,7 +829,7 @@ void HLSyntaxReader::parseSPSNext( SPSNext& spsNext, const bool usePCM )
   READ_FLAG( symbol,    "high_precision_motion_vectors" );          spsNext.setUseHighPrecMv          ( symbol != 0 );
   READ_FLAG( symbol,    "bio_enable_flag" );                        spsNext.setUseBIO                 ( symbol != 0 );
 #endif
-#if !JEM_TOOLS && JVET_K0346
+#if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
   READ_FLAG( symbol,    "high_precision_motion_vectors"    );       spsNext.setUseHighPrecMv(symbol != 0);
 #endif
   READ_FLAG( symbol,    "disable_motion_compression_flag" );        spsNext.setDisableMotCompress     ( symbol != 0 );
@@ -849,7 +849,22 @@ void HLSyntaxReader::parseSPSNext( SPSNext& spsNext, const bool usePCM )
   READ_FLAG( symbol,    "obmc_flag" );                              spsNext.setUseOBMC                ( symbol != 0 );
   READ_FLAG( symbol,    "fruc_merge_flag" );                        spsNext.setUseFRUCMrgMode         ( symbol != 0 );
   READ_FLAG( symbol,    "affine_flag" );                            spsNext.setUseAffine              ( symbol != 0 );
+#if JVET_K0337_AFFINE_6PARA
+  if ( spsNext.getUseAffine() )
+  {
+    READ_FLAG( symbol,  "affine_type_flag" );                       spsNext.setUseAffineType          ( symbol != 0 );
+  }
+#endif
   READ_FLAG( symbol,    "adaptive_clipping_flag" );                 spsNext.setUseAClip               ( symbol != 0 );
+#endif
+#if !JEM_TOOLS && JVET_K_AFFINE
+  READ_FLAG( symbol,    "affine_flag" );                            spsNext.setUseAffine              ( symbol != 0 );
+#if JVET_K0337_AFFINE_6PARA
+  if ( spsNext.getUseAffine() )
+  {
+    READ_FLAG( symbol,  "affine_type_flag" );                       spsNext.setUseAffineType          ( symbol != 0 );
+  }
+#endif
 #endif
 #if JEM_TOOLS
   READ_FLAG( symbol,    "cipf_enabled_flag" );                      spsNext.setCIPFMode               ( symbol );
@@ -923,12 +938,13 @@ void HLSyntaxReader::parseSPSNext( SPSNext& spsNext, const bool usePCM )
   }
 #endif
 
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   if( spsNext.getUseIMV() )
   {
     READ_UVLC( symbol, "imv_mode_minus1" );                         spsNext.setImvMode( ImvMode( symbol + 1 ) );
   }
-
+#endif
+#if JEM_TOOLS
   if( spsNext.getLICEnabled() )
   {
     READ_UVLC( symbol,  "lic_mode_minus1" );                        spsNext.setLICMode( symbol + 1 );
