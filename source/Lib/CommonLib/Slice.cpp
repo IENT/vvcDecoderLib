@@ -1716,7 +1716,7 @@ SPSRExt::SPSRExt()
 SPSNext::SPSNext( SPS& sps )
   : m_SPS                       ( sps )
   , m_NextEnabled               ( false )
-#if JEM_TOOLS
+#if JEM_TOOLS && !JVET_K0371_ALF
   , m_GALFEnabled               ( false )
 #endif
   // disable all tool enabling flags by default
