@@ -796,7 +796,7 @@ private:
   SPS&  m_SPS;
 
   bool              m_NextEnabled;
-#if JEM_TOOLS
+#if JEM_TOOLS && !JVET_K0371_ALF
   bool              m_GALFEnabled;
 #endif
   //=====  tool enabling flags (4 bytes - NOTE: last flag must be used for new extensions) =====
