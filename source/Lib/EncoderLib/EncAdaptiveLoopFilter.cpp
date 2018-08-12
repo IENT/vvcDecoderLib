@@ -174,14 +174,11 @@ void EncAdaptiveLoopFilter::destroy()
     }
   }
 
-  if( m_alfCovarianceMerged )
+  for( int i = 0; i != m_filterShapes[COMPONENT_Y].size(); i++ )
   {
-    for( int i = 0; i != m_filterShapes[COMPONENT_Y].size(); i++ )
+    for( int j = 0; j <= MAX_NUM_ALF_CLASSES; j++ )
     {
-      for( int j = 0; j <= MAX_NUM_ALF_CLASSES; j++ )
-      {
-        m_alfCovarianceMerged[i][j].destroy();
-      }
+      m_alfCovarianceMerged[i][j].destroy();
     }
   }
 
