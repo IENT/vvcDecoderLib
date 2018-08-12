@@ -31,22 +31,28 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** \file     AdaptiveLoopFilter.cpp
+/** \file     AdaptiveLoopFilterX86.h
     \brief    adaptive loop filter class
 */
+#include "CommonDefX86.h"
+#include "../AdaptiveLoopFilter.h"
 
-#include "AdaptiveLoopFilter.h"
+//! \ingroup CommonLib
+//! \{
 
-#if ENABLE_SIMD_OPT_ALF
-#include "CodingStructure.h"
-#include "Picture.h"
-#include <nmmintrin.h>
+#ifdef TARGET_SIMD_X86
+#if JVET_K0371_ALF
+#if defined _MSC_VER
+#include <tmmintrin.h>
+#else
+#include <immintrin.h>
+#endif
 
-Void AdaptiveLoopFilter::deriveClassificationBlkSIMD( AlfClassifier** classifier, const CPelBuf& srcLuma, const Area& blk )
+template<X86_VEXT vext>
+static void simdDeriveClassificationBlk( AlfClassifier** classifier, int** laplacian[NUM_DIRECTIONS], const CPelBuf& srcLuma, const Area& blk, const int shift )
 {
   const int img_stride = srcLuma.stride;
   const Pel* srcExt = srcLuma.buf;
-  const int shift = m_inputBitDepth[CHANNEL_TYPE_LUMA] + 3;
 
   const int fl = 2;
   const int flplusOne = fl + 1;
@@ -60,7 +66,7 @@ Void AdaptiveLoopFilter::deriveClassificationBlkSIMD( AlfClassifier** classifier
   const int posY = blk.pos().y;
   const int start_height1 = posY - flplusOne;
 
-  UShort _temp[( m_CLASSIFICATION_BLK_SIZE + 4 ) >> 1][m_CLASSIFICATION_BLK_SIZE + 4];
+  static UShort _temp[( AdaptiveLoopFilter::m_CLASSIFICATION_BLK_SIZE + 4 ) >> 1][AdaptiveLoopFilter::m_CLASSIFICATION_BLK_SIZE + 4];
 
   for( int i = 0; i < imgHExtended - 2; i += 2 )
   {
@@ -197,7 +203,7 @@ Void AdaptiveLoopFilter::deriveClassificationBlkSIMD( AlfClassifier** classifier
       __m128i xmm12 = _mm_blend_epi16( xmm4, _mm_shuffle_epi32( xmm0, 0x40 ), 0xF0 );
       __m128i xmm10 = _mm_shuffle_epi32( xmm12, 0xB1 );
       xmm12 = _mm_add_epi32( xmm10, xmm12 );
-      xmm12 = _mm_srai_epi32( xmm12, shift + 1 - 5 );
+      xmm12 = _mm_srai_epi32( xmm12, shift - 5 );
       xmm12 = _mm_min_epi32( xmm12, xmm13 );
 
       xmm12 = _mm_and_si128( xmm12, mm_15 );
@@ -309,7 +315,8 @@ Void AdaptiveLoopFilter::deriveClassificationBlkSIMD( AlfClassifier** classifier
   }
 }
 
-Void AdaptiveLoopFilter::filter5x5BlkSIMD( const PelUnitBuf &recDst, const CPelUnitBuf& recSrc, const Area& blk, const ComponentID compId, short* filterSet )
+template<X86_VEXT vext>
+static void simdFilter5x5Blk( AlfClassifier** classifier, const PelUnitBuf &recDst, const CPelUnitBuf& recSrc, const Area& blk, const ComponentID compId, short* filterSet, const ClpRng& clpRng )
 {
   static const unsigned char mask05[16] = { 8, 9, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
   static const unsigned char mask03[16] = { 4, 5, 2, 3, 0, 1, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
@@ -331,13 +338,13 @@ Void AdaptiveLoopFilter::filter5x5BlkSIMD( const PelUnitBuf &recDst, const CPelU
   short *coef = filterSet;
   const Pel *pImg0, *pImg1, *pImg2, *pImg3, *pImg4, *pImg5;
 
-  int numBitsMinus1 = m_NUM_BITS - 1;
-  int offset = ( 1 << ( m_NUM_BITS - 2 ) );
+  const int numBitsMinus1 = AdaptiveLoopFilter::m_NUM_BITS - 1;
+  const int offset = ( 1 << ( AdaptiveLoopFilter::m_NUM_BITS - 2 ) );
 
-  int startHeight = blk.y;
-  int endHeight = blk.y + blk.height;
-  int startWidth = blk.x;
-  int endWidth = blk.x + blk.width;
+  const int startHeight = blk.y;
+  const int endHeight = blk.y + blk.height;
+  const int startWidth = blk.x;
+  const int endWidth = blk.x + blk.width;
 
   Pel* imgYRecPost = dst;
   imgYRecPost += startHeight * dstStride;
@@ -351,8 +358,6 @@ Void AdaptiveLoopFilter::filter5x5BlkSIMD( const PelUnitBuf &recDst, const CPelU
   CHECK( startWidth % clsSizeX, "Wrong startWidth in filtering" );
   CHECK( ( endHeight - startHeight ) % clsSizeY, "Wrong endHeight in filtering" );
   CHECK( ( endWidth - startWidth ) % clsSizeX, "Wrong endWidth in filtering" );
-
-  const ClpRng& clpRng = m_clpRngs.comp[compId];
 
   const Pel* imgYRec = srcExt;
 
@@ -383,7 +388,7 @@ Void AdaptiveLoopFilter::filter5x5BlkSIMD( const PelUnitBuf &recDst, const CPelU
 
     if( !bChroma )
     {
-      pClass = m_classifier[startHeight + i] + startWidth;
+      pClass = classifier[startHeight + i] + startWidth;
     }
 
     for( int j = 0; j < endWidth - startWidth; j += 4 )
@@ -524,7 +529,8 @@ Void AdaptiveLoopFilter::filter5x5BlkSIMD( const PelUnitBuf &recDst, const CPelU
   }
 }
 
-Void AdaptiveLoopFilter::filter7x7BlkSIMD( const PelUnitBuf &recDst, const CPelUnitBuf& recSrc, const Area& blk, const ComponentID compId, short* filterSet )
+template<X86_VEXT vext>
+static void simdFilter7x7Blk( AlfClassifier** classifier, const PelUnitBuf &recDst, const CPelUnitBuf& recSrc, const Area& blk, const ComponentID compId, short* filterSet, const ClpRng& clpRng )
 {
   static const unsigned char mask0[16] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 6, 7, 4, 5, 2, 3 };
   static const unsigned char mask00[16] = { 2, 3, 0, 1, 0, 0, 0, 0, 8, 9, 0, 0, 0, 0, 0, 1 };
@@ -555,13 +561,13 @@ Void AdaptiveLoopFilter::filter7x7BlkSIMD( const PelUnitBuf &recDst, const CPelU
   const Pel *pImg0, *pImg1, *pImg2, *pImg3, *pImg4;
   const Pel *pImg5, *pImg6;
 
-  int numBitsMinus1 = m_NUM_BITS - 1;
-  int offset = ( 1 << ( m_NUM_BITS - 2 ) );
+  const int numBitsMinus1 = AdaptiveLoopFilter::m_NUM_BITS - 1;
+  const int offset = ( 1 << ( AdaptiveLoopFilter::m_NUM_BITS - 2 ) );
 
-  int startHeight = blk.y;
-  int endHeight = blk.y + blk.height;
-  int startWidth = blk.x;
-  int endWidth = blk.x + blk.width;
+  const int startHeight = blk.y;
+  const int endHeight = blk.y + blk.height;
+  const int startWidth = blk.x;
+  const int endWidth = blk.x + blk.width;
 
   Pel* imgYRecPost = dst;
   imgYRecPost += startHeight * dstStride;
@@ -575,8 +581,6 @@ Void AdaptiveLoopFilter::filter7x7BlkSIMD( const PelUnitBuf &recDst, const CPelU
   CHECK( startWidth % clsSizeX, "Wrong startWidth in filtering" );
   CHECK( ( endHeight - startHeight ) % clsSizeY, "Wrong endHeight in filtering" );
   CHECK( ( endWidth - startWidth ) % clsSizeX, "Wrong endWidth in filtering" );
-
-  const ClpRng& clpRng = m_clpRngs.comp[compId];
 
   const Pel* imgYRec = srcExt;
 
@@ -608,7 +612,7 @@ Void AdaptiveLoopFilter::filter7x7BlkSIMD( const PelUnitBuf &recDst, const CPelU
 
     if( !bChroma )
     {
-      pClass = m_classifier[startHeight + i] + startWidth;
+      pClass = classifier[startHeight + i] + startWidth;
     }
 
     for( int j = 0; j < endWidth - startWidth; j += 4 )
@@ -767,4 +771,16 @@ Void AdaptiveLoopFilter::filter7x7BlkSIMD( const PelUnitBuf &recDst, const CPelU
     pImgYPad6 += srcStride2;
   }
 }
-#endif
+
+template <X86_VEXT vext>
+void AdaptiveLoopFilter::_initAdaptiveLoopFilterX86()
+{
+  m_deriveClassificationBlk = simdDeriveClassificationBlk<vext>;
+  m_filter5x5Blk = simdFilter5x5Blk<vext>;
+  m_filter7x7Blk = simdFilter7x7Blk<vext>;
+}
+
+template void AdaptiveLoopFilter::_initAdaptiveLoopFilterX86<SIMDX86>();
+#endif //#if ALF_K0371_ALF
+#endif //#ifdef TARGET_SIMD_X86
+//! \}

@@ -450,25 +450,11 @@ void EncAdaptiveLoopFilter::alfEncoder( CodingStructure& cs, AlfSliceParam& alfS
           {
             if( filterType == ALF_FILTER_5 )
             {
-#if ENABLE_SIMD_OPT_ALF
-              if( m_useSIMD )
-              {
-                filter5x5BlkSIMD( recBuf, recExtBuf, blk, compID, coeff );
-              }
-              else
-#endif
-              filterBlk<ALF_FILTER_5>( recBuf, recExtBuf, blk, compID, coeff );
+              m_filter5x5Blk( m_classifier, recBuf, recExtBuf, blk, compID, coeff, m_clpRngs.comp[compIdx] );
             }
             else if( filterType == ALF_FILTER_7 )
             {
-#if ENABLE_SIMD_OPT_ALF
-              if( m_useSIMD )
-              {
-                filter7x7BlkSIMD( recBuf, recExtBuf, blk, compID, coeff );
-              }
-              else
-#endif
-              filterBlk<ALF_FILTER_7>( recBuf, recExtBuf, blk, compID, coeff );
+              m_filter7x7Blk( m_classifier, recBuf, recExtBuf, blk, compID, coeff, m_clpRngs.comp[compIdx] );
             }
             else
             {

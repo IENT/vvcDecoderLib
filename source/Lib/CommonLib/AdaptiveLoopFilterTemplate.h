@@ -34,9 +34,9 @@
  /** \file     AdaptiveLoopFilterTemplate.h
      \brief    adaptive loop filter class
  */
-
+#if JVET_K0371_ALF
 template<AlfFilterType filtType>
-void AdaptiveLoopFilter::filterBlk( const PelUnitBuf &recDst, const CPelUnitBuf& recSrc, const Area& blk, const ComponentID compId, short* filterSet )
+void AdaptiveLoopFilter::filterBlk( AlfClassifier** classifier, const PelUnitBuf &recDst, const CPelUnitBuf& recSrc, const Area& blk, const ComponentID compId, short* filterSet, const ClpRng& clpRng )
 {
   const bool bChroma = isChroma( compId );
   if( bChroma )
@@ -75,8 +75,6 @@ void AdaptiveLoopFilter::filterBlk( const PelUnitBuf &recDst, const CPelUnitBuf&
   CHECK( ( endHeight - startHeight ) % clsSizeY, "Wrong endHeight in filtering" );
   CHECK( ( endWidth - startWidth ) % clsSizeX, "Wrong endWidth in filtering" );
 
-  const ClpRng& clpRng = m_clpRngs.comp[compId];
-
   AlfClassifier *pClass = nullptr;
 
   int dstStride2 = dstStride * clsSizeY;
@@ -99,7 +97,7 @@ void AdaptiveLoopFilter::filterBlk( const PelUnitBuf &recDst, const CPelUnitBuf&
   {
     if( !bChroma )
     {
-      pClass = m_classifier[startHeight + i] + startWidth;
+      pClass = classifier[startHeight + i] + startWidth;
     }
 
     for( int j = 0; j < endWidth - startWidth; j += clsSizeX )
@@ -223,4 +221,5 @@ void AdaptiveLoopFilter::filterBlk( const PelUnitBuf &recDst, const CPelUnitBuf&
     pImgYPad6 += srcStride2;
   }
 }
+#endif
 //! \}

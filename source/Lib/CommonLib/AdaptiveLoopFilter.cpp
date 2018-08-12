@@ -36,6 +36,7 @@
 */
 
 #include "AdaptiveLoopFilter.h"
+#include "AdaptiveLoopFilterTemplate.h"
 
 #if JVET_K0371_ALF
 #include "CodingStructure.h"
@@ -55,20 +56,15 @@ AdaptiveLoopFilter::AdaptiveLoopFilter()
     m_ctuEnableFlag[compIdx] = nullptr;
   }
 
-  auto vext = read_x86_extension_flags();
-  switch( vext )
-  {
-  case AVX512:
-  case AVX2:
-  case AVX:
-  case SSE42:
-  case SSE41:
-    m_useSIMD = true;
-    break;
-  default:
-    m_useSIMD = false;
-    break;
-  }
+  m_deriveClassificationBlk = deriveClassificationBlk;
+  m_filter5x5Blk = filterBlk<ALF_FILTER_5>;
+  m_filter7x7Blk = filterBlk<ALF_FILTER_7>;
+
+#if ENABLE_SIMD_OPT_ALF
+#ifdef TARGET_SIMD_X86
+  initAdaptiveLoopFilterX86();
+#endif
+#endif
 }
 
 void AdaptiveLoopFilter::ALFProcess( CodingStructure& cs, AlfSliceParam& alfSliceParam )
@@ -114,25 +110,11 @@ void AdaptiveLoopFilter::ALFProcess( CodingStructure& cs, AlfSliceParam& alfSlic
 
         if( alfSliceParam.lumaFilterType == ALF_FILTER_5 )
         {
-#if ENABLE_SIMD_OPT_ALF
-          if( m_useSIMD )
-          {
-            filter5x5BlkSIMD( recYuv, tmpYuv, blk, COMPONENT_Y, m_coeffFinal );
-          }
-          else
-#endif
-          filterBlk<ALF_FILTER_5>( recYuv, tmpYuv, blk, COMPONENT_Y, m_coeffFinal );
+          m_filter5x5Blk( m_classifier, recYuv, tmpYuv, blk, COMPONENT_Y, m_coeffFinal, m_clpRngs.comp[COMPONENT_Y] );
         }
         else if( alfSliceParam.lumaFilterType == ALF_FILTER_7 )
         {
-#if ENABLE_SIMD_OPT_ALF
-          if( m_useSIMD )
-          {
-            filter7x7BlkSIMD( recYuv, tmpYuv, blk, COMPONENT_Y, m_coeffFinal );
-          }
-          else
-#endif
-          filterBlk<ALF_FILTER_7>( recYuv, tmpYuv, blk, COMPONENT_Y, m_coeffFinal );
+          m_filter7x7Blk( m_classifier, recYuv, tmpYuv, blk, COMPONENT_Y, m_coeffFinal, m_clpRngs.comp[COMPONENT_Y] );
         }
         else
         {
@@ -150,14 +132,7 @@ void AdaptiveLoopFilter::ALFProcess( CodingStructure& cs, AlfSliceParam& alfSlic
         {
           Area blk( xPos >> chromaScaleX, yPos >> chromaScaleY, width >> chromaScaleX, height >> chromaScaleY );
 
-#if ENABLE_SIMD_OPT_ALF
-          if( m_useSIMD )
-          {
-            filter5x5BlkSIMD( recYuv, tmpYuv, blk, compID, alfSliceParam.chromaCoeff );
-          }
-          else
-#endif
-          filterBlk<ALF_FILTER_5>( recYuv, tmpYuv, blk, compID, alfSliceParam.chromaCoeff );
+          m_filter5x5Blk( m_classifier, recYuv, tmpYuv, blk, compID, alfSliceParam.chromaCoeff, m_clpRngs.comp[compIdx] );
         }
       }
       ctuIdx++;
@@ -305,25 +280,16 @@ void AdaptiveLoopFilter::deriveClassification( AlfClassifier** classifier, const
     {
       int nWidth = std::min( j + m_CLASSIFICATION_BLK_SIZE, width ) - j;
 
-#if ENABLE_SIMD_OPT_ALF
-      if( m_useSIMD )
-      {
-        deriveClassificationBlkSIMD( classifier, srcLuma, Area( j, i, nWidth, nHeight ) );
-      }
-      else
-#endif
-      deriveClassificationBlk( classifier, srcLuma, Area( j, i, nWidth, nHeight ) );
-
+      m_deriveClassificationBlk( classifier, m_laplacian, srcLuma, Area( j, i, nWidth, nHeight ), m_inputBitDepth[CHANNEL_TYPE_LUMA] + 4 );
     }
   }
 }
 
-void AdaptiveLoopFilter::deriveClassificationBlk( AlfClassifier** classifier, const CPelBuf& srcLuma, const Area& blk )
+void AdaptiveLoopFilter::deriveClassificationBlk( AlfClassifier** classifier, int** laplacian[NUM_DIRECTIONS], const CPelBuf& srcLuma, const Area& blk, const int shift )
 {
   static const int th[16] = { 0, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4 };
   const int stride = srcLuma.stride;
   const Pel* src = srcLuma.buf;
-  const int shift = m_inputBitDepth[CHANNEL_TYPE_LUMA] + 4;
   const int maxActivity = 15;
 
   int fl = 2;
@@ -347,10 +313,10 @@ void AdaptiveLoopFilter::deriveClassificationBlk( AlfClassifier** classifier, co
     const Pel *src2 = &src[yoffset + stride];
     const Pel *src3 = &src[yoffset + stride * 2];
 
-    int* pYver = m_laplacian[VER][i];
-    int* pYhor = m_laplacian[HOR][i];
-    int* pYdig0 = m_laplacian[DIAG0][i];
-    int* pYdig1 = m_laplacian[DIAG1][i];
+    int* pYver = laplacian[VER][i];
+    int* pYhor = laplacian[HOR][i];
+    int* pYdig0 = laplacian[DIAG0][i];
+    int* pYdig1 = laplacian[DIAG1][i];
 
     for( int j = 0; j < width; j += 2 )
     {
@@ -390,25 +356,25 @@ void AdaptiveLoopFilter::deriveClassificationBlk( AlfClassifier** classifier, co
 
   for( int i = 0; i < blk.height; i += clsSizeY )
   {
-    int* pYver = m_laplacian[VER][i];
-    int* pYver2 = m_laplacian[VER][i + 2];
-    int* pYver4 = m_laplacian[VER][i + 4];
-    int* pYver6 = m_laplacian[VER][i + 6];
+    int* pYver = laplacian[VER][i];
+    int* pYver2 = laplacian[VER][i + 2];
+    int* pYver4 = laplacian[VER][i + 4];
+    int* pYver6 = laplacian[VER][i + 6];
 
-    int* pYhor = m_laplacian[HOR][i];
-    int* pYhor2 = m_laplacian[HOR][i + 2];
-    int* pYhor4 = m_laplacian[HOR][i + 4];
-    int* pYhor6 = m_laplacian[HOR][i + 6];
+    int* pYhor = laplacian[HOR][i];
+    int* pYhor2 = laplacian[HOR][i + 2];
+    int* pYhor4 = laplacian[HOR][i + 4];
+    int* pYhor6 = laplacian[HOR][i + 6];
 
-    int* pYdig0 = m_laplacian[DIAG0][i];
-    int* pYdig02 = m_laplacian[DIAG0][i + 2];
-    int* pYdig04 = m_laplacian[DIAG0][i + 4];
-    int* pYdig06 = m_laplacian[DIAG0][i + 6];
+    int* pYdig0 = laplacian[DIAG0][i];
+    int* pYdig02 = laplacian[DIAG0][i + 2];
+    int* pYdig04 = laplacian[DIAG0][i + 4];
+    int* pYdig06 = laplacian[DIAG0][i + 6];
 
-    int* pYdig1 = m_laplacian[DIAG1][i];
-    int* pYdig12 = m_laplacian[DIAG1][i + 2];
-    int* pYdig14 = m_laplacian[DIAG1][i + 4];
-    int* pYdig16 = m_laplacian[DIAG1][i + 6];
+    int* pYdig1 = laplacian[DIAG1][i];
+    int* pYdig12 = laplacian[DIAG1][i + 2];
+    int* pYdig14 = laplacian[DIAG1][i + 4];
+    int* pYdig16 = laplacian[DIAG1][i + 6];
 
     for( int j = 0; j < blk.width; j += clsSizeX )
     {
