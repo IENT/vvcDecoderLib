@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -392,6 +392,9 @@ Void EncApp::xInitLibCfg()
   m_cEncLib.setPCMInputBitDepthFlag                              ( m_bPCMInputBitDepthFlag);
   m_cEncLib.setPCMFilterDisableFlag                              ( m_bPCMFilterDisableFlag);
 
+#if K0238_SAO_GREEDY_MERGE_ENCODING
+  m_cEncLib.setSaoGreedyMergeEnc                                 ( m_saoGreedyMergeEnc);
+#endif
   m_cEncLib.setIntraSmoothingDisabledFlag                        (!m_enableIntraReferenceSmoothing );
   m_cEncLib.setDecodedPictureHashSEIType                         ( m_decodedPictureHashSEIType );
   m_cEncLib.setRecoveryPointSEIEnabled                           ( m_recoveryPointSEIEnabled );
@@ -644,7 +647,7 @@ Void EncApp::encode()
   m_bitstream.open(m_bitstreamFileName.c_str(), fstream::binary | fstream::out);
   if (!m_bitstream)
   {
-    EXIT( "failed to open bitstream file " << m_bitstreamFileName.c_str() << " for writing\n");
+    EXIT( "Failed to open bitstream file " << m_bitstreamFileName.c_str() << " for writing\n");
   }
 
   std::list<PelUnitBuf*> recBufList;

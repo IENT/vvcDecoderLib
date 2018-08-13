@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -152,7 +152,7 @@ Void VideoIOYuv::open( const std::string &fileName, Bool bWriteMode, const Int f
 
     if( m_cHandle.fail() )
     {
-      EXIT( "failed to write reconstructed YUV file" );
+      EXIT( "Failed to write reconstructed YUV file: " << fileName.c_str() );
     }
   }
   else
@@ -161,7 +161,7 @@ Void VideoIOYuv::open( const std::string &fileName, Bool bWriteMode, const Int f
 
     if( m_cHandle.fail() )
     {
-      EXIT( "failed to open Input YUV file");
+      EXIT( "Failed to open input YUV file: " << fileName.c_str() );
     }
   }
 
