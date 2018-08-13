@@ -320,66 +320,66 @@ void IntraPrediction::predIntraAng( const ComponentID compId, PelBuf &piPred, co
   Bool pdpcCondition = (uiDirMode == PLANAR_IDX || uiDirMode == DC_IDX || uiDirMode == HOR_IDX || uiDirMode == VER_IDX);
   if (pdpcCondition)
   {
-    const CPelBuf pSrc = CPelBuf(ptrSrc, srcStride, srcStride);
-    PelBuf pDst = piPred;
-    const Int scale = ((g_aucLog2[iWidth] - 2 + g_aucLog2[iHeight] - 2 + 2) >> 2);
+    const CPelBuf srcBuf = CPelBuf(ptrSrc, srcStride, srcStride);
+    PelBuf dstBuf = piPred;
+    const int scale = ((g_aucLog2[iWidth] - 2 + g_aucLog2[iHeight] - 2 + 2) >> 2);
     CHECK(scale < 0 || scale > 31, "PDPC: scale < 0 || scale > 31");
 
     if (uiDirMode == PLANAR_IDX)
     {
-      for (Int y = 0; y < iHeight; y++)
+      for (int y = 0; y < iHeight; y++)
       {
-        Int wT = 32 >> std::min(31, ((y << 1) >> scale));
-        const Pel left = pSrc.at(0, y + 1);
-        for (Int x = 0; x < iWidth; x++)
+        int wT = 32 >> std::min(31, ((y << 1) >> scale));
+        const Pel left = srcBuf.at(0, y + 1);
+        for (int x = 0; x < iWidth; x++)
         {
-          const Pel top = pSrc.at(x + 1, 0);
-          Int wL = 32 >> std::min(31, ((x << 1) >> scale));
-          pDst.at(x, y) = ClipPel((wL * left + wT * top + (64 - wL - wT) * pDst.at(x, y) + 32) >> 6, clpRng);
+          const Pel top = srcBuf.at(x + 1, 0);
+          int wL = 32 >> std::min(31, ((x << 1) >> scale));
+          dstBuf.at(x, y) = ClipPel((wL * left + wT * top + (64 - wL - wT) * dstBuf.at(x, y) + 32) >> 6, clpRng);
         }
       }
     }
     else if (uiDirMode == DC_IDX)
     {
-      const Pel topLeft = pSrc.at(0, 0);
-      for (Int y = 0; y < iHeight; y++)
+      const Pel topLeft = srcBuf.at(0, 0);
+      for (int y = 0; y < iHeight; y++)
       {
-        Int wT = 32 >> std::min(31, ((y << 1) >> scale));
-        const Pel left = pSrc.at(0, y + 1);
-        for (Int x = 0; x < iWidth; x++)
+        int wT = 32 >> std::min(31, ((y << 1) >> scale));
+        const Pel left = srcBuf.at(0, y + 1);
+        for (int x = 0; x < iWidth; x++)
         {
-          const Pel top = pSrc.at(x + 1, 0);
-          Int wL = 32 >> std::min(31, ((x << 1) >> scale));
-          Int wTL = (wL >> 4) + (wT >> 4);
-          pDst.at(x, y) = ClipPel((wL * left + wT * top - wTL * topLeft + (64 - wL - wT + wTL) * pDst.at(x, y) + 32) >> 6, clpRng);
+          const Pel top = srcBuf.at(x + 1, 0);
+          int wL = 32 >> std::min(31, ((x << 1) >> scale));
+          int wTL = (wL >> 4) + (wT >> 4);
+          dstBuf.at(x, y) = ClipPel((wL * left + wT * top - wTL * topLeft + (64 - wL - wT + wTL) * dstBuf.at(x, y) + 32) >> 6, clpRng);
         }
       }
     }
     else if (uiDirMode == HOR_IDX)
     {
-      const Pel topLeft = pSrc.at(0, 0);
-      for (Int y = 0; y < iHeight; y++)
+      const Pel topLeft = srcBuf.at(0, 0);
+      for (int y = 0; y < iHeight; y++)
       {
-        Int wT = 32 >> std::min(31, ((y << 1) >> scale));
-        for (Int x = 0; x < iWidth; x++)
+        int wT = 32 >> std::min(31, ((y << 1) >> scale));
+        for (int x = 0; x < iWidth; x++)
         {
-          const Pel top = pSrc.at(x + 1, 0);
-          Int wTL = wT;
-          pDst.at(x, y) = ClipPel((wT * top - wTL * topLeft + (64 - wT + wTL) * pDst.at(x, y) + 32) >> 6, clpRng);
+          const Pel top = srcBuf.at(x + 1, 0);
+          int wTL = wT;
+          dstBuf.at(x, y) = ClipPel((wT * top - wTL * topLeft + (64 - wT + wTL) * dstBuf.at(x, y) + 32) >> 6, clpRng);
         }
       }
     }
     else if (uiDirMode == VER_IDX)
     {
-      const Pel topLeft = pSrc.at(0, 0);
-      for (Int y = 0; y < iHeight; y++)
+      const Pel topLeft = srcBuf.at(0, 0);
+      for (int y = 0; y < iHeight; y++)
       {
-        const Pel left = pSrc.at(0, y + 1);
-        for (Int x = 0; x < iWidth; x++)
+        const Pel left = srcBuf.at(0, y + 1);
+        for (int x = 0; x < iWidth; x++)
         {
-          Int wL = 32 >> std::min(31, ((x << 1) >> scale));
-          Int wTL = wL;
-          pDst.at(x, y) = ClipPel((wL * left - wTL * topLeft + (64 - wL + wTL) * pDst.at(x, y) + 32) >> 6, clpRng);
+          int wL = 32 >> std::min(31, ((x << 1) >> scale));
+          int wTL = wL;
+          dstBuf.at(x, y) = ClipPel((wL * left - wTL * topLeft + (64 - wL + wTL) * dstBuf.at(x, y) + 32) >> 6, clpRng);
         }
       }
     }
@@ -1015,8 +1015,8 @@ Void IntraPrediction::xPredIntraAng( const CPelBuf &pSrc, PelBuf &pDst, const Ch
         }
       }
 #if JVET_K0063_PDPC_SIMP
-      const Int Nmodes = 8;
-      const Int scale = ((g_aucLog2[width] - 2 + g_aucLog2[height] - 2 + 2) >> 2);
+      const int numModes = 8;
+      const int scale = ((g_aucLog2[width] - 2 + g_aucLog2[height] - 2 + 2) >> 2);
       CHECK(scale < 0 || scale > 31, "PDPC: scale < 0 || scale > 31");
 
 #if JVET_K0500_WAIP
@@ -1025,14 +1025,14 @@ Void IntraPrediction::xPredIntraAng( const CPelBuf &pSrc, PelBuf &pDst, const Ch
       if (dirMode == 2 || dirMode == VDIA_IDX)
 #endif
       {
-        Int wT = 16 >> std::min(31, ((y << 1) >> scale));
+        int wT = 16 >> std::min(31, ((y << 1) >> scale));
 
-        for (Int x = 0; x < width; x++)
+        for (int x = 0; x < width; x++)
         {
-          Int wL = 16 >> std::min(31, ((x << 1) >> scale));
+          int wL = 16 >> std::min(31, ((x << 1) >> scale));
           if (wT + wL == 0) break;
 
-          Int c = x + y + 1;
+          int c = x + y + 1;
           const Pel left = refSide[c + 1];
           const Pel top = refMain[c + 1];
 
@@ -1040,27 +1040,27 @@ Void IntraPrediction::xPredIntraAng( const CPelBuf &pSrc, PelBuf &pDst, const Ch
         }
       }
 #if JVET_K0500_WAIP
-      else if ((predMode >= VDIA_IDX - Nmodes && predMode != VDIA_IDX) || (predMode != 2 && predMode <= (2 + Nmodes)))
+      else if ((predMode >= VDIA_IDX - numModes && predMode != VDIA_IDX) || (predMode != 2 && predMode <= (2 + numModes)))
 #else
-      else if ((dirMode >= VDIA_IDX - Nmodes && dirMode < VDIA_IDX) || (dirMode > 2 && dirMode <= (2 + Nmodes)))
+      else if ((dirMode >= VDIA_IDX - numModes && dirMode < VDIA_IDX) || (dirMode > 2 && dirMode <= (2 + numModes)))
 #endif
       {
-        Int invAngleSum0 = 2;
-        for (Int x = 0; x < width; x++)
+        int invAngleSum0 = 2;
+        for (int x = 0; x < width; x++)
         {
           invAngleSum0 += invAngle;
-          Int deltaPos0 = invAngleSum0 >> 2;
-          Int deltaFrac0 = deltaPos0 & 63;
-          Int deltaInt0 = deltaPos0 >> 6;
+          int deltaPos0 = invAngleSum0 >> 2;
+          int deltaFrac0 = deltaPos0 & 63;
+          int deltaInt0 = deltaPos0 >> 6;
 
-          Int deltay = y + deltaInt0 + 1;
+          int deltay = y + deltaInt0 + 1;
 #if JVET_K0500_WAIP
           if (deltay >(bIsModeVer ? m_leftRefLength : m_topRefLength) - 1) break;
 #else
           if (deltay > height + width - 1) break;
 #endif
 
-          Int wL = 32 >> std::min(31, ((x << 1) >> scale));
+          int wL = 32 >> std::min(31, ((x << 1) >> scale));
           if (wL == 0) break;
           Pel *p = refSide + deltay;
 
