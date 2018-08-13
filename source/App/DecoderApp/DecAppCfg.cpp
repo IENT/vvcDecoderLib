@@ -56,12 +56,12 @@ namespace po = df::program_options_lite;
 /** \param argc number of arguments
     \param argv array of arguments
  */
-bool DecAppCfg::parseCfg( Int argc, char* argv[] )
+bool DecAppCfg::parseCfg( int argc, char* argv[] )
 {
   bool do_help = false;
   string cfg_TargetDecLayerIdSetFile;
   string outputColourSpaceConvert;
-  Int warnUnknowParameter = 0;
+  int warnUnknowParameter = 0;
 #if ENABLE_TRACING
   string sTracingRule;
   string sTracingFile;
@@ -167,7 +167,7 @@ bool DecAppCfg::parseCfg( Int argc, char* argv[] )
       bool isLayerIdZeroIncluded = false;
       while ( !feof(targetDecLayerIdSetFile) )
       {
-        Int layerIdParsed = 0;
+        int layerIdParsed = 0;
         if ( fscanf( targetDecLayerIdSetFile, "%d ", &layerIdParsed ) != 1 )
         {
           if ( m_targetDecLayerIdSet.size() == 0 )

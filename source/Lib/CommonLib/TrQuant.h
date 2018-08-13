@@ -51,11 +51,11 @@
 //! \{
 
 #if JVET_K1000_SIMPLIFIED_EMT
-typedef void FwdTrans(const TCoeff*, TCoeff*, Int, Int, Int, Int);
-typedef void InvTrans(const TCoeff*, TCoeff*, Int, Int, Int, Int, const TCoeff, const TCoeff);
+typedef void FwdTrans(const TCoeff*, TCoeff*, int, int, int, int);
+typedef void InvTrans(const TCoeff*, TCoeff*, int, int, int, int, const TCoeff, const TCoeff);
 #else
-typedef void FwdTrans(const TCoeff*, TCoeff*, Int, Int, Int, Int, Int);
-typedef void InvTrans(const TCoeff*, TCoeff*, Int, Int, Int, Int, Int, const TCoeff, const TCoeff);
+typedef void FwdTrans(const TCoeff*, TCoeff*, int, int, int, int, int);
+typedef void InvTrans(const TCoeff*, TCoeff*, int, int, int, int, int, const TCoeff, const TCoeff);
 #endif
 
 // ====================================================================================================================
@@ -101,8 +101,8 @@ public:
 #endif
 
 #if JEM_TOOLS
-  void FwdNsstNxN( Int* src, const UInt uiMode, const UInt uiIndex, const UInt uiSize );
-  void InvNsstNxN( Int* src, const UInt uiMode, const UInt uiIndex, const UInt uiSize );
+  void FwdNsstNxN( int* src, const UInt uiMode, const UInt uiIndex, const UInt uiSize );
+  void InvNsstNxN( int* src, const UInt uiMode, const UInt uiIndex, const UInt uiSize );
 #endif
 
 protected:

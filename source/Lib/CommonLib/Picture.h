@@ -236,7 +236,7 @@ public:
   bool fieldPic;
   int  m_prevQP[MAX_NUM_CHANNEL_TYPE];
 
-  Int  poc;
+  int  poc;
   UInt layer;
   UInt depth;
 
@@ -298,11 +298,11 @@ public:
 
 #if JVET_K0371_ALF
   std::vector<uint8_t> m_alfCtuEnableFlag[MAX_NUM_COMPONENT];
-  uint8_t* getAlfCtuEnableFlag( Int compIdx ) { return m_alfCtuEnableFlag[compIdx].data(); }
+  uint8_t* getAlfCtuEnableFlag( int compIdx ) { return m_alfCtuEnableFlag[compIdx].data(); }
   std::vector<uint8_t>* getAlfCtuEnableFlag() { return m_alfCtuEnableFlag; }
-  void resizeAlfCtuEnableFlag( Int numEntries )
+  void resizeAlfCtuEnableFlag( int numEntries )
   {
-    for( Int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++ )
+    for( int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++ )
     {
       m_alfCtuEnableFlag[compIdx].resize( numEntries );
       std::fill( m_alfCtuEnableFlag[compIdx].begin(), m_alfCtuEnableFlag[compIdx].end(), 0 );

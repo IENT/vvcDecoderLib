@@ -40,7 +40,7 @@
 
 #include "CommonDef.h"
 
-typedef Int PosType;
+typedef int PosType;
 typedef UInt SizeType;
 struct Position
 {

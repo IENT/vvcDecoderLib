@@ -56,15 +56,15 @@ using namespace std;
 #include "../EncoderLib/EncCfg.h"
 #include <list>
 
-const Int g_RCInvalidQPValue = -999;
-const Int g_RCSmoothWindowSize = 40;
-const Int g_RCMaxPicListSize = 32;
+const int g_RCInvalidQPValue = -999;
+const int g_RCSmoothWindowSize = 40;
+const int g_RCMaxPicListSize = 32;
 const double g_RCWeightPicTargetBitInGOP    = 0.9;
 const double g_RCWeightPicRargetBitInBuffer = 1.0 - g_RCWeightPicTargetBitInGOP;
-const Int g_RCIterationNum = 20;
+const int g_RCIterationNum = 20;
 const double g_RCWeightHistoryLambda = 0.5;
 const double g_RCWeightCurrentLambda = 1.0 - g_RCWeightHistoryLambda;
-const Int g_RCLCUSmoothWindowSize = 4;
+const int g_RCLCUSmoothWindowSize = 4;
 const double g_RCAlphaMinValue = 0.05;
 const double g_RCAlphaMaxValue = 500.0;
 const double g_RCBetaMinValue  = -3.0;
@@ -76,14 +76,14 @@ const double g_RCBetaMaxValue  = -0.1;
 
 struct TRCLCU
 {
-  Int m_actualBits;
-  Int m_QP;     // QP of skip mode is set to g_RCInvalidQPValue
-  Int m_targetBits;
+  int m_actualBits;
+  int m_QP;     // QP of skip mode is set to g_RCInvalidQPValue
+  int m_targetBits;
   double m_lambda;
   double m_bitWeight;
-  Int m_numberOfPixel;
+  int m_numberOfPixel;
   double m_costIntra;
-  Int m_targetBitsLeft;
+  int m_targetBitsLeft;
 };
 
 struct TRCParameter
@@ -99,83 +99,83 @@ public:
   ~EncRCSeq();
 
 public:
-  void create( Int totalFrames, Int targetBitrate, Int frameRate, Int GOPSize, Int picWidth, Int picHeight, Int LCUWidth, Int LCUHeight, Int numberOfLevel, bool useLCUSeparateModel, Int adaptiveBit );
+  void create( int totalFrames, int targetBitrate, int frameRate, int GOPSize, int picWidth, int picHeight, int LCUWidth, int LCUHeight, int numberOfLevel, bool useLCUSeparateModel, int adaptiveBit );
   void destroy();
-  void initBitsRatio( Int bitsRatio[] );
-  void initGOPID2Level( Int GOPID2Level[] );
+  void initBitsRatio( int bitsRatio[] );
+  void initGOPID2Level( int GOPID2Level[] );
   void initPicPara( TRCParameter* picPara  = NULL );    // NULL to initial with default value
   void initLCUPara( TRCParameter** LCUPara = NULL );    // NULL to initial with default value
-  void updateAfterPic ( Int bits );
+  void updateAfterPic ( int bits );
   void setAllBitRatio( double basicLambda, double* equaCoeffA, double* equaCoeffB );
 
 public:
-  Int  getTotalFrames()                 { return m_totalFrames; }
-  Int  getTargetRate()                  { return m_targetRate; }
-  Int  getFrameRate()                   { return m_frameRate; }
-  Int  getGOPSize()                     { return m_GOPSize; }
-  Int  getPicWidth()                    { return m_picWidth; }
-  Int  getPicHeight()                   { return m_picHeight; }
-  Int  getLCUWidth()                    { return m_LCUWidth; }
-  Int  getLCUHeight()                   { return m_LCUHeight; }
-  Int  getNumberOfLevel()               { return m_numberOfLevel; }
-  Int  getAverageBits()                 { return m_averageBits; }
-  Int  getLeftAverageBits()             { CHECK(!( m_framesLeft > 0 ), "No frames left"); return (Int)(m_bitsLeft / m_framesLeft); }
+  int  getTotalFrames()                 { return m_totalFrames; }
+  int  getTargetRate()                  { return m_targetRate; }
+  int  getFrameRate()                   { return m_frameRate; }
+  int  getGOPSize()                     { return m_GOPSize; }
+  int  getPicWidth()                    { return m_picWidth; }
+  int  getPicHeight()                   { return m_picHeight; }
+  int  getLCUWidth()                    { return m_LCUWidth; }
+  int  getLCUHeight()                   { return m_LCUHeight; }
+  int  getNumberOfLevel()               { return m_numberOfLevel; }
+  int  getAverageBits()                 { return m_averageBits; }
+  int  getLeftAverageBits()             { CHECK(!( m_framesLeft > 0 ), "No frames left"); return (int)(m_bitsLeft / m_framesLeft); }
   bool getUseLCUSeparateModel()         { return m_useLCUSeparateModel; }
 
-  Int  getNumPixel()                    { return m_numberOfPixel; }
+  int  getNumPixel()                    { return m_numberOfPixel; }
   int64_t  getTargetBits()                { return m_targetBits; }
-  Int  getNumberOfLCU()                 { return m_numberOfLCU; }
-  Int* getBitRatio()                    { return m_bitsRatio; }
-  Int  getBitRatio( Int idx )           { CHECK(!( idx<m_GOPSize), "Idx exceeds GOP size"); return m_bitsRatio[idx]; }
-  Int* getGOPID2Level()                 { return m_GOPID2Level; }
-  Int  getGOPID2Level( Int ID )         { CHECK(!( ID < m_GOPSize ), "Idx exceeds GOP size"); return m_GOPID2Level[ID]; }
+  int  getNumberOfLCU()                 { return m_numberOfLCU; }
+  int* getBitRatio()                    { return m_bitsRatio; }
+  int  getBitRatio( int idx )           { CHECK(!( idx<m_GOPSize), "Idx exceeds GOP size"); return m_bitsRatio[idx]; }
+  int* getGOPID2Level()                 { return m_GOPID2Level; }
+  int  getGOPID2Level( int ID )         { CHECK(!( ID < m_GOPSize ), "Idx exceeds GOP size"); return m_GOPID2Level[ID]; }
   TRCParameter*  getPicPara()                                   { return m_picPara; }
-  TRCParameter   getPicPara( Int level )                        { CHECK(!( level < m_numberOfLevel ), "Level too big"); return m_picPara[level]; }
-  void           setPicPara( Int level, TRCParameter para )     { CHECK(!( level < m_numberOfLevel ), "Level too big"); m_picPara[level] = para; }
+  TRCParameter   getPicPara( int level )                        { CHECK(!( level < m_numberOfLevel ), "Level too big"); return m_picPara[level]; }
+  void           setPicPara( int level, TRCParameter para )     { CHECK(!( level < m_numberOfLevel ), "Level too big"); m_picPara[level] = para; }
   TRCParameter** getLCUPara()                                   { return m_LCUPara; }
-  TRCParameter*  getLCUPara( Int level )                        { CHECK(!( level < m_numberOfLevel ), "Level too big"); return m_LCUPara[level]; }
-  TRCParameter   getLCUPara( Int level, Int LCUIdx )            { CHECK(!( LCUIdx  < m_numberOfLCU ), "LCU id exceeds number of LCU"); return getLCUPara(level)[LCUIdx]; }
-  void           setLCUPara( Int level, Int LCUIdx, TRCParameter para ) { CHECK(!( level < m_numberOfLevel ), "Level too big"); CHECK(!( LCUIdx  < m_numberOfLCU ), "LCU id exceeds number of LCU"); m_LCUPara[level][LCUIdx] = para; }
+  TRCParameter*  getLCUPara( int level )                        { CHECK(!( level < m_numberOfLevel ), "Level too big"); return m_LCUPara[level]; }
+  TRCParameter   getLCUPara( int level, int LCUIdx )            { CHECK(!( LCUIdx  < m_numberOfLCU ), "LCU id exceeds number of LCU"); return getLCUPara(level)[LCUIdx]; }
+  void           setLCUPara( int level, int LCUIdx, TRCParameter para ) { CHECK(!( level < m_numberOfLevel ), "Level too big"); CHECK(!( LCUIdx  < m_numberOfLCU ), "LCU id exceeds number of LCU"); m_LCUPara[level][LCUIdx] = para; }
 
-  Int  getFramesLeft()                  { return m_framesLeft; }
+  int  getFramesLeft()                  { return m_framesLeft; }
   int64_t  getBitsLeft()                  { return m_bitsLeft; }
 
   double getSeqBpp()                    { return m_seqTargetBpp; }
   double getAlphaUpdate()               { return m_alphaUpdate; }
   double getBetaUpdate()                { return m_betaUpdate; }
 
-  Int    getAdaptiveBits()              { return m_adaptiveBit;  }
+  int    getAdaptiveBits()              { return m_adaptiveBit;  }
   double getLastLambda()                { return m_lastLambda;   }
   void   setLastLambda( double lamdba ) { m_lastLambda = lamdba; }
 
 private:
-  Int m_totalFrames;
-  Int m_targetRate;
-  Int m_frameRate;
-  Int m_GOPSize;
-  Int m_picWidth;
-  Int m_picHeight;
-  Int m_LCUWidth;
-  Int m_LCUHeight;
-  Int m_numberOfLevel;
-  Int m_averageBits;
+  int m_totalFrames;
+  int m_targetRate;
+  int m_frameRate;
+  int m_GOPSize;
+  int m_picWidth;
+  int m_picHeight;
+  int m_LCUWidth;
+  int m_LCUHeight;
+  int m_numberOfLevel;
+  int m_averageBits;
 
-  Int m_numberOfPixel;
+  int m_numberOfPixel;
   int64_t m_targetBits;
-  Int m_numberOfLCU;
-  Int* m_bitsRatio;
-  Int* m_GOPID2Level;
+  int m_numberOfLCU;
+  int* m_bitsRatio;
+  int* m_GOPID2Level;
   TRCParameter*  m_picPara;
   TRCParameter** m_LCUPara;
 
-  Int m_framesLeft;
+  int m_framesLeft;
   int64_t m_bitsLeft;
   double m_seqTargetBpp;
   double m_alphaUpdate;
   double m_betaUpdate;
   bool m_useLCUSeparateModel;
 
-  Int m_adaptiveBit;
+  int m_adaptiveBit;
   double m_lastLambda;
 };
 
@@ -186,30 +186,30 @@ public:
   ~EncRCGOP();
 
 public:
-  void create( EncRCSeq* encRCSeq, Int numPic );
+  void create( EncRCSeq* encRCSeq, int numPic );
   void destroy();
-  void updateAfterPicture( Int bitsCost );
+  void updateAfterPicture( int bitsCost );
 
 private:
-  Int  xEstGOPTargetBits( EncRCSeq* encRCSeq, Int GOPSize );
-  void   xCalEquaCoeff( EncRCSeq* encRCSeq, double* lambdaRatio, double* equaCoeffA, double* equaCoeffB, Int GOPSize );
-  double xSolveEqua( double targetBpp, double* equaCoeffA, double* equaCoeffB, Int GOPSize );
+  int  xEstGOPTargetBits( EncRCSeq* encRCSeq, int GOPSize );
+  void   xCalEquaCoeff( EncRCSeq* encRCSeq, double* lambdaRatio, double* equaCoeffA, double* equaCoeffB, int GOPSize );
+  double xSolveEqua( double targetBpp, double* equaCoeffA, double* equaCoeffB, int GOPSize );
 
 public:
   EncRCSeq* getEncRCSeq()        { return m_encRCSeq; }
-  Int  getNumPic()                { return m_numPic;}
-  Int  getTargetBits()            { return m_targetBits; }
-  Int  getPicLeft()               { return m_picLeft; }
-  Int  getBitsLeft()              { return m_bitsLeft; }
-  Int  getTargetBitInGOP( Int i ) { return m_picTargetBitInGOP[i]; }
+  int  getNumPic()                { return m_numPic;}
+  int  getTargetBits()            { return m_targetBits; }
+  int  getPicLeft()               { return m_picLeft; }
+  int  getBitsLeft()              { return m_bitsLeft; }
+  int  getTargetBitInGOP( int i ) { return m_picTargetBitInGOP[i]; }
 
 private:
   EncRCSeq* m_encRCSeq;
-  Int* m_picTargetBitInGOP;
-  Int m_numPic;
-  Int m_targetBits;
-  Int m_picLeft;
-  Int m_bitsLeft;
+  int* m_picTargetBitInGOP;
+  int m_numPic;
+  int m_targetBits;
+  int m_picLeft;
+  int m_bitsLeft;
 };
 
 class EncRCPic
@@ -219,67 +219,67 @@ public:
   ~EncRCPic();
 
 public:
-  void create( EncRCSeq* encRCSeq, EncRCGOP* encRCGOP, Int frameLevel, list<EncRCPic*>& listPreviousPictures );
+  void create( EncRCSeq* encRCSeq, EncRCGOP* encRCGOP, int frameLevel, list<EncRCPic*>& listPreviousPictures );
   void destroy();
 
-  Int    estimatePicQP    ( double lambda, list<EncRCPic*>& listPreviousPictures );
-  Int    getRefineBitsForIntra(Int orgBits);
+  int    estimatePicQP    ( double lambda, list<EncRCPic*>& listPreviousPictures );
+  int    getRefineBitsForIntra(int orgBits);
   double calculateLambdaIntra(double alpha, double beta, double MADPerPixel, double bitsPerPixel);
   double estimatePicLambda( list<EncRCPic*>& listPreviousPictures, SliceType eSliceType);
 
   void   updateAlphaBetaIntra(double *alpha, double *beta);
 
   double getLCUTargetBpp(SliceType eSliceType);
-  double getLCUEstLambdaAndQP(double bpp, Int clipPicQP, Int *estQP);
+  double getLCUEstLambdaAndQP(double bpp, int clipPicQP, int *estQP);
   double getLCUEstLambda( double bpp );
-  Int    getLCUEstQP( double lambda, Int clipPicQP );
+  int    getLCUEstQP( double lambda, int clipPicQP );
 
-  void updateAfterCTU( Int LCUIdx, Int bits, Int QP, double lambda, bool updateLCUParameter = true );
-  void updateAfterPicture( Int actualHeaderBits, Int actualTotalBits, double averageQP, double averageLambda, SliceType eSliceType);
+  void updateAfterCTU( int LCUIdx, int bits, int QP, double lambda, bool updateLCUParameter = true );
+  void updateAfterPicture( int actualHeaderBits, int actualTotalBits, double averageQP, double averageLambda, SliceType eSliceType);
 
   void addToPictureLsit( list<EncRCPic*>& listPreviousPictures );
   double calAverageQP();
   double calAverageLambda();
 
 private:
-  Int xEstPicTargetBits( EncRCSeq* encRCSeq, EncRCGOP* encRCGOP );
-  Int xEstPicHeaderBits( list<EncRCPic*>& listPreviousPictures, Int frameLevel );
+  int xEstPicTargetBits( EncRCSeq* encRCSeq, EncRCGOP* encRCGOP );
+  int xEstPicHeaderBits( list<EncRCPic*>& listPreviousPictures, int frameLevel );
 #if V0078_ADAPTIVE_LOWER_BOUND
-  Int xEstPicLowerBound( EncRCSeq* encRCSeq, EncRCGOP* encRCGOP );
+  int xEstPicLowerBound( EncRCSeq* encRCSeq, EncRCGOP* encRCGOP );
 #endif
 
 public:
   EncRCSeq*      getRCSequence()                         { return m_encRCSeq; }
   EncRCGOP*      getRCGOP()                              { return m_encRCGOP; }
 
-  Int  getFrameLevel()                                    { return m_frameLevel; }
-  Int  getNumberOfPixel()                                 { return m_numberOfPixel; }
-  Int  getNumberOfLCU()                                   { return m_numberOfLCU; }
-  Int  getTargetBits()                                    { return m_targetBits; }
-  Int  getEstHeaderBits()                                 { return m_estHeaderBits; }
-  Int  getLCULeft()                                       { return m_LCULeft; }
-  Int  getBitsLeft()                                      { return m_bitsLeft; }
-  Int  getPixelsLeft()                                    { return m_pixelsLeft; }
-  Int  getBitsCoded()                                     { return m_targetBits - m_estHeaderBits - m_bitsLeft; }
-  Int  getLCUCoded()                                      { return m_numberOfLCU - m_LCULeft; }
+  int  getFrameLevel()                                    { return m_frameLevel; }
+  int  getNumberOfPixel()                                 { return m_numberOfPixel; }
+  int  getNumberOfLCU()                                   { return m_numberOfLCU; }
+  int  getTargetBits()                                    { return m_targetBits; }
+  int  getEstHeaderBits()                                 { return m_estHeaderBits; }
+  int  getLCULeft()                                       { return m_LCULeft; }
+  int  getBitsLeft()                                      { return m_bitsLeft; }
+  int  getPixelsLeft()                                    { return m_pixelsLeft; }
+  int  getBitsCoded()                                     { return m_targetBits - m_estHeaderBits - m_bitsLeft; }
+  int  getLCUCoded()                                      { return m_numberOfLCU - m_LCULeft; }
 #if V0078_ADAPTIVE_LOWER_BOUND
-  Int  getLowerBound()                                    { return m_lowerBound; }
+  int  getLowerBound()                                    { return m_lowerBound; }
 #endif
   TRCLCU* getLCU()                                        { return m_LCUs; }
-  TRCLCU& getLCU( Int LCUIdx )                            { return m_LCUs[LCUIdx]; }
-  Int  getPicActualHeaderBits()                           { return m_picActualHeaderBits; }
+  TRCLCU& getLCU( int LCUIdx )                            { return m_LCUs[LCUIdx]; }
+  int  getPicActualHeaderBits()                           { return m_picActualHeaderBits; }
 #if U0132_TARGET_BITS_SATURATION
-  void setBitLeft(Int bits)                               { m_bitsLeft = bits; }
+  void setBitLeft(int bits)                               { m_bitsLeft = bits; }
 #endif
-  void setTargetBits( Int bits )                          { m_targetBits = bits; m_bitsLeft = bits;}
+  void setTargetBits( int bits )                          { m_targetBits = bits; m_bitsLeft = bits;}
   void setTotalIntraCost(double cost)                     { m_totalCostIntra = cost; }
   void getLCUInitTargetBits();
 
-  Int  getPicActualBits()                                 { return m_picActualBits; }
-  Int  getPicActualQP()                                   { return m_picQP; }
+  int  getPicActualBits()                                 { return m_picActualBits; }
+  int  getPicActualQP()                                   { return m_picQP; }
   double getPicActualLambda()                             { return m_picLambda; }
-  Int  getPicEstQP()                                      { return m_estPicQP; }
-  void setPicEstQP( Int QP )                              { m_estPicQP = QP; }
+  int  getPicEstQP()                                      { return m_estPicQP; }
+  void setPicEstQP( int QP )                              { m_estPicQP = QP; }
   double getPicEstLambda()                                { return m_estPicLambda; }
   void setPicEstLambda( double lambda )                   { m_picLambda = lambda; }
 
@@ -287,27 +287,27 @@ private:
   EncRCSeq* m_encRCSeq;
   EncRCGOP* m_encRCGOP;
 
-  Int m_frameLevel;
-  Int m_numberOfPixel;
-  Int m_numberOfLCU;
-  Int m_targetBits;
-  Int m_estHeaderBits;
-  Int m_estPicQP;
+  int m_frameLevel;
+  int m_numberOfPixel;
+  int m_numberOfLCU;
+  int m_targetBits;
+  int m_estHeaderBits;
+  int m_estPicQP;
 #if V0078_ADAPTIVE_LOWER_BOUND
-  Int m_lowerBound;
+  int m_lowerBound;
 #endif
   double m_estPicLambda;
 
-  Int m_LCULeft;
-  Int m_bitsLeft;
-  Int m_pixelsLeft;
+  int m_LCULeft;
+  int m_bitsLeft;
+  int m_pixelsLeft;
 
   TRCLCU* m_LCUs;
-  Int m_picActualHeaderBits;    // only SH and potential APS
+  int m_picActualHeaderBits;    // only SH and potential APS
   double m_totalCostIntra;
   double m_remainingCostIntra;
-  Int m_picActualBits;          // the whole picture, including header
-  Int m_picQP;                  // in integer form
+  int m_picActualBits;          // the whole picture, including header
+  int m_picQP;                  // in integer form
   double m_picLambda;
 };
 
@@ -318,15 +318,15 @@ public:
   ~RateCtrl();
 
 public:
-  void init( Int totalFrames, Int targetBitrate, Int frameRate, Int GOPSize, Int picWidth, Int picHeight, Int LCUWidth, Int LCUHeight, Int keepHierBits, bool useLCUSeparateModel, GOPEntry GOPList[MAX_GOP] );
+  void init( int totalFrames, int targetBitrate, int frameRate, int GOPSize, int picWidth, int picHeight, int LCUWidth, int LCUHeight, int keepHierBits, bool useLCUSeparateModel, GOPEntry GOPList[MAX_GOP] );
   void destroy();
-  void initRCPic( Int frameLevel );
-  void initRCGOP( Int numberOfPictures );
+  void initRCPic( int frameLevel );
+  void initRCGOP( int numberOfPictures );
   void destroyRCGOP();
 
 public:
-  void       setRCQP ( Int QP ) { m_RCQP = QP;   }
-  Int        getRCQP () const   { return m_RCQP; }
+  void       setRCQP ( int QP ) { m_RCQP = QP;   }
+  int        getRCQP () const   { return m_RCQP; }
   EncRCSeq* getRCSeq()          { CHECK( m_encRCSeq == NULL, "Object does not exist" ); return m_encRCSeq; }
   EncRCGOP* getRCGOP()          { CHECK( m_encRCGOP == NULL, "Object does not exist" ); return m_encRCGOP; }
   EncRCPic* getRCPic()          { CHECK( m_encRCPic == NULL, "Object does not exist" ); return m_encRCPic; }
@@ -336,8 +336,8 @@ public:
   UInt       getCpbState()              { return m_cpbState;       }
   UInt       getCpbSize()               { return m_cpbSize;        }
   UInt       getBufferingRate()         { return m_bufferingRate;  }
-  Int        updateCpbState(Int actualBits);
-  void       initHrdParam(const HRD* pcHrd, Int iFrameRate, double fInitialCpbFullness);
+  int        updateCpbState(int actualBits);
+  void       initHrdParam(const HRD* pcHrd, int iFrameRate, double fInitialCpbFullness);
 #endif
 
 private:
@@ -345,10 +345,10 @@ private:
   EncRCGOP* m_encRCGOP;
   EncRCPic* m_encRCPic;
   list<EncRCPic*> m_listRCPictures;
-  Int        m_RCQP;
+  int        m_RCQP;
 #if U0132_TARGET_BITS_SATURATION
   bool       m_CpbSaturationEnabled;    // Enable target bits saturation to avoid CPB overflow and underflow
-  Int        m_cpbState;                // CPB State
+  int        m_cpbState;                // CPB State
   UInt       m_cpbSize;                 // CPB size
   UInt       m_bufferingRate;           // Buffering rate
 #endif

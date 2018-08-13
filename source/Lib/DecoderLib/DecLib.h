@@ -70,12 +70,12 @@ bool tryDecodePicture( Picture* pcPic, const int expectedPoc, const std::string&
 class DecLib
 {
 private:
-  Int                     m_iMaxRefPicNum;
+  int                     m_iMaxRefPicNum;
 
   NalUnitType             m_associatedIRAPType; ///< NAL unit type of the associated IRAP picture
-  Int                     m_pocCRA;            ///< POC number of the latest CRA picture
-  Int                     m_pocRandomAccess;   ///< POC number of the random access point (the first IDR or CRA picture)
-  Int                     m_lastRasPoc;
+  int                     m_pocCRA;            ///< POC number of the latest CRA picture
+  int                     m_pocRandomAccess;   ///< POC number of the random access point (the first IDR or CRA picture)
+  int                     m_lastRasPoc;
 
   PicList                 m_cListPic;         //  Dynamic buffer
   ParameterSetManager     m_parameterSetManager;  // storage for parameter sets
@@ -107,23 +107,23 @@ private:
   CacheModel              m_cacheModel;
 #endif
 
-  bool isSkipPictureForBLA(Int& iPOCLastDisplay);
-  bool isRandomAccessSkipPicture(Int& iSkipFrame,  Int& iPOCLastDisplay);
+  bool isSkipPictureForBLA(int& iPOCLastDisplay);
+  bool isRandomAccessSkipPicture(int& iSkipFrame,  int& iPOCLastDisplay);
   Picture*                m_pcPic;
   UInt                    m_uiSliceSegmentIdx;
-  Int                     m_prevPOC;
-  Int                     m_prevTid0POC;
+  int                     m_prevPOC;
+  int                     m_prevTid0POC;
   bool                    m_bFirstSliceInPicture;
   bool                    m_bFirstSliceInSequence;
   bool                    m_prevSliceSkipped;
-  Int                     m_skippedPOC;
+  int                     m_skippedPOC;
   bool                    m_bFirstSliceInBitstream;
-  Int                     m_lastPOCNoOutputPriorPics;
+  int                     m_lastPOCNoOutputPriorPics;
   bool                    m_isNoOutputPriorPics;
   bool                    m_craNoRaslOutputFlag;    //value of variable NoRaslOutputFlag of the last CRA pic
   std::ostream           *m_pDecodedSEIOutputStream;
 
-  Int                     m_decodedPictureHashSEIEnabled;  ///< Checksum(3)/CRC(2)/MD5(1)/disable(0) acting on decoded picture hash SEI message
+  int                     m_decodedPictureHashSEIEnabled;  ///< Checksum(3)/CRC(2)/MD5(1)/disable(0) acting on decoded picture hash SEI message
   UInt                    m_numberOfChecksumErrorsDetected;
 
   bool                    m_warningMessageSkipPicture;
@@ -136,19 +136,19 @@ public:
   void  create  ();
   void  destroy ();
 
-  void  setDecodedPictureHashSEIEnabled(Int enabled) { m_decodedPictureHashSEIEnabled=enabled; }
+  void  setDecodedPictureHashSEIEnabled(int enabled) { m_decodedPictureHashSEIEnabled=enabled; }
 
   void  init(
 #if JVET_J0090_MEMORY_BANDWITH_MEASURE
     const std::string& cacheCfgFileName
 #endif
   );
-  bool  decode(InputNALUnit& nalu, Int& iSkipFrame, Int& iPOCLastDisplay);
+  bool  decode(InputNALUnit& nalu, int& iSkipFrame, int& iPOCLastDisplay);
   void  deletePicBuffer();
 
   void  executeLoopFilters();
-  void  finishPicture(Int& poc, PicList*& rpcListPic, MsgLevel msgl = INFO);
-  void  finishPictureLight(Int& poc, PicList*& rpcListPic );
+  void  finishPicture(int& poc, PicList*& rpcListPic, MsgLevel msgl = INFO);
+  void  finishPictureLight(int& poc, PicList*& rpcListPic );
   void  checkNoOutputPriorPics (PicList* rpcListPic);
 
   bool  getNoOutputPriorPicsFlag () const   { return m_isNoOutputPriorPics; }
@@ -163,10 +163,10 @@ protected:
   void  xUpdateRasInit(Slice* slice);
 
   Picture * xGetNewPicBuffer(const SPS &sps, const PPS &pps, const UInt temporalLayer);
-  void  xCreateLostPicture (Int iLostPOC);
+  void  xCreateLostPicture (int iLostPOC);
 
   void      xActivateParameterSets();
-  bool      xDecodeSlice(InputNALUnit &nalu, Int &iSkipFrame, Int iPOCLastDisplay);
+  bool      xDecodeSlice(InputNALUnit &nalu, int &iSkipFrame, int iPOCLastDisplay);
 #if HEVC_VPS
   void      xDecodeVPS( InputNALUnit& nalu );
 #endif

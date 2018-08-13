@@ -199,8 +199,8 @@ private:
   void        alf_chroma                ( ALFParam& alfParam );
   void        alf_cu_ctrl               ( ALFParam& alfParam );
   UInt        parseAlfUvlc();
-  Int         parseAlfSvlc();
-  Int         alfGolombDecode(Int k);
+  int         parseAlfSvlc();
+  int         alfGolombDecode(int k);
 #endif
 
   void        xReadTruncBinCode   ( UInt& ruiSymbol, UInt uiMaxSymbol );

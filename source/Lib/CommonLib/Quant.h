@@ -62,16 +62,16 @@
 /// QP struct
 struct QpParam
 {
-  Int Qp;
-  Int per;
-  Int rem;
+  int Qp;
+  int per;
+  int rem;
 
 private:
 
-  QpParam(const Int           qpy,
+  QpParam(const int           qpy,
           const ChannelType   chType,
-          const Int           qpBdOffset,
-          const Int           chromaQPOffset,
+          const int           qpBdOffset,
+          const int           chromaQPOffset,
           const ChromaFormat  chFmt,
           const int           dqp );
 
@@ -117,18 +117,18 @@ public:
   double getLambda               () const                                      { return m_dLambda; }
 
 #if HEVC_USE_SCALING_LISTS
-  Int* getQuantCoeff             ( UInt list, Int qp, UInt sizeX, UInt sizeY ) { return m_quantCoef            [sizeX][sizeY][list][qp]; };  //!< get Quant Coefficent
-  Int* getDequantCoeff           ( UInt list, Int qp, UInt sizeX, UInt sizeY ) { return m_dequantCoef          [sizeX][sizeY][list][qp]; };  //!< get DeQuant Coefficent
+  int* getQuantCoeff             ( UInt list, int qp, UInt sizeX, UInt sizeY ) { return m_quantCoef            [sizeX][sizeY][list][qp]; };  //!< get Quant Coefficent
+  int* getDequantCoeff           ( UInt list, int qp, UInt sizeX, UInt sizeY ) { return m_dequantCoef          [sizeX][sizeY][list][qp]; };  //!< get DeQuant Coefficent
 
   void setUseScalingList         ( bool bUseScalingList){ m_scalingListEnabledFlag = bUseScalingList; };
   bool getUseScalingList         ( const UInt width, const UInt height, const bool isTransformSkip){ return m_scalingListEnabledFlag && (!isTransformSkip || ((width == 4) && (height == 4))); };
 
   void setScalingListDec         ( const ScalingList &scalingList);
-  void processScalingListEnc     ( Int *coeff, Int *quantcoeff, Int quantScales, UInt height, UInt width, UInt ratio, Int sizuNum, UInt dc);
-  void processScalingListDec     ( const Int *coeff, Int *dequantcoeff, Int invQuantScales, UInt height, UInt width, UInt ratio, Int sizuNum, UInt dc);
+  void processScalingListEnc     ( int *coeff, int *quantcoeff, int quantScales, UInt height, UInt width, UInt ratio, int sizuNum, UInt dc);
+  void processScalingListDec     ( const int *coeff, int *dequantcoeff, int invQuantScales, UInt height, UInt width, UInt ratio, int sizuNum, UInt dc);
 
-  virtual void setFlatScalingList( const Int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths);
-  virtual void setScalingList    ( ScalingList *scalingList, const Int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths);
+  virtual void setFlatScalingList( const int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths);
+  virtual void setScalingList    ( ScalingList *scalingList, const int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths);
 #endif
 
   // quantization
@@ -156,20 +156,20 @@ protected:
 #if JVET_K0072
 #else
 #if JEM_TOOLS
-  Int      m_altResiCompId;
+  int      m_altResiCompId;
 #endif
 #endif
 #if HEVC_USE_SCALING_LISTS
 private:
   void xInitScalingList   ( const Quant* other );
   void xDestroyScalingList();
-  void xSetFlatScalingList( UInt list, UInt sizeX, UInt sizeY, Int qp );
-  void xSetScalingListEnc ( ScalingList *scalingList, UInt list, UInt size, Int qp );
-  void xSetScalingListDec ( const ScalingList &scalingList, UInt list, UInt size, Int qp );
+  void xSetFlatScalingList( UInt list, UInt sizeX, UInt sizeY, int qp );
+  void xSetScalingListEnc ( ScalingList *scalingList, UInt list, UInt size, int qp );
+  void xSetScalingListDec ( const ScalingList &scalingList, UInt list, UInt size, int qp );
 #endif
 #if HEVC_USE_SIGN_HIDING
 private:
-  void xSignBitHidingHDQ  (TCoeff* pQCoef, const TCoeff* pCoef, TCoeff* deltaU, const CoeffCodingContext& cctx, const Int maxLog2TrDynamicRange);
+  void xSignBitHidingHDQ  (TCoeff* pQCoef, const TCoeff* pCoef, TCoeff* deltaU, const CoeffCodingContext& cctx, const int maxLog2TrDynamicRange);
 #endif
 
 private:
@@ -180,8 +180,8 @@ private:
   bool     m_scalingListEnabledFlag;
   bool     m_isScalingListOwner;
 
-  Int      *m_quantCoef            [SCALING_LIST_SIZE_NUM][SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM][SCALING_LIST_REM_NUM]; ///< array of quantization matrix coefficient 4x4
-  Int      *m_dequantCoef          [SCALING_LIST_SIZE_NUM][SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM][SCALING_LIST_REM_NUM]; ///< array of dequantization matrix coefficient 4x4
+  int      *m_quantCoef            [SCALING_LIST_SIZE_NUM][SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM][SCALING_LIST_REM_NUM]; ///< array of quantization matrix coefficient 4x4
+  int      *m_dequantCoef          [SCALING_LIST_SIZE_NUM][SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM][SCALING_LIST_REM_NUM]; ///< array of dequantization matrix coefficient 4x4
 #endif
 };// END CLASS DEFINITION Quant
 

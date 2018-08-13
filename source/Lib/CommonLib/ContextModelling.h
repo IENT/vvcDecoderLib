@@ -140,9 +140,9 @@ public:
     const UInt    posY      = m_scanPosY[ scanPos ];
     const UInt    posX      = m_scanPosX[ scanPos ];
     const TCoeff* pData     = coeff + posX + posY * m_width;
-    const Int     diag      = posX + posY;
-    Int           numPos    = 0;
-    Int           sumAbs    = 0;
+    const int     diag      = posX + posY;
+    int           numPos    = 0;
+    int           sumAbs    = 0;
 #define UPDATE(x) {int a=abs(x);sumAbs+=std::min(4-(a&1),a);numPos+=!!a;}
     if( posX < m_width-1 )
     {
@@ -196,7 +196,7 @@ public:
     const UInt    posY      = m_scanPosY[ scanPos ];
     const UInt    posX      = m_scanPosX[ scanPos ];
     const TCoeff* pData     = coeff + posX + posY * m_width;
-    Int           sum       = 0;
+    int           sum       = 0;
     if( posX < m_width-1 )
     {
       UPDATE( pData[1] );
@@ -232,11 +232,11 @@ public:
 
     strd = strd == 0 ? m_width : strd;
     const TCoeff *pData = coeff + posX + posY * strd;
-    const Int   widthM1 = m_width - 1;
-    const Int  heightM1 = m_height - 1;
-    const Int      diag = posX + posY;
+    const int   widthM1 = m_width - 1;
+    const int  heightM1 = m_height - 1;
+    const int      diag = posX + posY;
 
-    Int numPos = 0;
+    int numPos = 0;
 
     if( posX < widthM1 )
     {
@@ -259,8 +259,8 @@ public:
       }
     }
 
-    const Int ctxIdx = std::min( numPos, 5 );
-          Int ctxOfs = diag < 2 ? 6 : 0;
+    const int ctxIdx = std::min( numPos, 5 );
+          int ctxOfs = diag < 2 ? 6 : 0;
 
     if( m_chType == CHANNEL_TYPE_LUMA )
     {
@@ -289,11 +289,11 @@ public:
 
     strd = strd == 0 ? m_width : strd;
     const TCoeff *pData = coeff + posX + posY * strd;
-    const Int   widthM1 = m_width - 1;
-    const Int  heightM1 = m_height - 1;
-    const Int      diag = posX + posY;
+    const int   widthM1 = m_width - 1;
+    const int  heightM1 = m_height - 1;
+    const int      diag = posX + posY;
 
-    Int numPos = 0;
+    int numPos = 0;
 
     if( posX < widthM1 )
     {
@@ -316,8 +316,8 @@ public:
       }
     }
 
-    const Int ctxIdx = std::min( numPos, 4 ) + 1;
-          Int ctxOfs = 0;
+    const int ctxIdx = std::min( numPos, 4 ) + 1;
+          int ctxOfs = 0;
 
     if( m_chType == CHANNEL_TYPE_LUMA )
     {
@@ -341,11 +341,11 @@ public:
 
     strd = strd == 0 ? m_width : strd;
     const TCoeff *pData = coeff + posX + posY * strd;
-    const Int   widthM1 = m_width - 1;
-    const Int  heightM1 = m_height - 1;
-    const Int      diag = posX + posY;
+    const int   widthM1 = m_width - 1;
+    const int  heightM1 = m_height - 1;
+    const int      diag = posX + posY;
 
-    Int numPos = 0;
+    int numPos = 0;
 
     if( posX < widthM1 )
     {
@@ -368,8 +368,8 @@ public:
       }
     }
 
-    const Int ctxIdx = std::min( numPos, 4 ) + 1;
-          Int ctxOfs = 0;
+    const int ctxIdx = std::min( numPos, 4 ) + 1;
+          int ctxOfs = 0;
 
     if( m_chType == CHANNEL_TYPE_LUMA )
     {
@@ -388,12 +388,12 @@ public:
 
     strd = strd == 0 ? m_width : strd;
     const TCoeff *pData = coeff + posX + posY * strd;
-    const Int   widthM1 = m_width - 1;
-    const Int  heightM1 = m_height - 1;
-//    const Int      diag = posX + posY;
+    const int   widthM1 = m_width - 1;
+    const int  heightM1 = m_height - 1;
+//    const int      diag = posX + posY;
 
-    Int numPos = 0;
-    Int sumAbs = 0;
+    int numPos = 0;
+    int sumAbs = 0;
 
     if( posX < widthM1 )
     {

@@ -221,7 +221,7 @@ public:
 #if JVET_K0371_ALF
   void        codeAlfCtuEnableFlags     ( CodingStructure& cs, ChannelType channel, AlfSliceParam* alfParam);
   void        codeAlfCtuEnableFlags     ( CodingStructure& cs, ComponentID compID, AlfSliceParam* alfParam);
-  void        codeAlfCtuEnableFlag      ( CodingStructure& cs, UInt ctuRsAddr, const Int compIdx, AlfSliceParam* alfParam = NULL );
+  void        codeAlfCtuEnableFlag      ( CodingStructure& cs, UInt ctuRsAddr, const int compIdx, AlfSliceParam* alfParam = NULL );
 #endif
 
 private:
@@ -236,9 +236,9 @@ private:
   void        alf_filter                ( const ALFParam&               alfParam, bool isGALF, bool bChroma = false );
   void        alf_cu_ctrl               ( const ALFParam&               alfParam );
   void        alf_chroma                ( const ALFParam&               alfParam );
-  Int         alf_lengthGolomb          ( int coeffVal, int k );
+  int         alf_lengthGolomb          ( int coeffVal, int k );
   void        codeAlfUvlc               ( UInt uiCode );
-  void        codeAlfSvlc               ( Int iCode );
+  void        codeAlfSvlc               ( int iCode );
   void        alfGolombEncode           ( int coeff, int k );
 
 #endif

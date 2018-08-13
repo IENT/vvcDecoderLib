@@ -421,10 +421,10 @@ void EncCu::compressCtu( CodingStructure& cs, const UnitArea& area, const unsign
 // Protected member functions
 // ====================================================================================================================
 
-static int xCalcHADs8x8_ISlice(const Pel *piOrg, const Int iStrideOrg)
+static int xCalcHADs8x8_ISlice(const Pel *piOrg, const int iStrideOrg)
 {
-  Int k, i, j, jj;
-  Int diff[64], m1[8][8], m2[8][8], m3[8][8], iSumHad = 0;
+  int k, i, j, jj;
+  int diff[64], m1[8][8], m2[8][8], m3[8][8], iSumHad = 0;
 
   for (k = 0; k < 64; k += 8)
   {
@@ -517,12 +517,12 @@ static int xCalcHADs8x8_ISlice(const Pel *piOrg, const Int iStrideOrg)
 
 int  EncCu::updateCtuDataISlice(const CPelBuf buf)
 {
-  Int  xBl, yBl;
-  const Int iBlkSize = 8;
+  int  xBl, yBl;
+  const int iBlkSize = 8;
   const Pel* pOrgInit = buf.buf;
-  Int  iStrideOrig = buf.stride;
+  int  iStrideOrig = buf.stride;
 
-  Int iSumHad = 0;
+  int iSumHad = 0;
   for( yBl = 0; ( yBl + iBlkSize ) <= buf.height; yBl += iBlkSize )
   {
     for( xBl = 0; ( xBl + iBlkSize ) <= buf.width; xBl += iBlkSize )
@@ -630,8 +630,8 @@ void EncCu::xCompressCU( CodingStructure *&tempCS, CodingStructure *&bestCS, Par
 
   if( slice.getUseChromaQpAdj() )
   {
-    Int lgMinCuSize = sps.getLog2MinCodingBlockSize() +
-      std::max<Int>( 0, sps.getLog2DiffMaxMinCodingBlockSize() - Int( pps.getPpsRangeExtension().getDiffCuChromaQpOffsetDepth() ) );
+    int lgMinCuSize = sps.getLog2MinCodingBlockSize() +
+      std::max<int>( 0, sps.getLog2DiffMaxMinCodingBlockSize() - int( pps.getPpsRangeExtension().getDiffCuChromaQpOffsetDepth() ) );
     m_cuChromaQpOffsetIdxPlus1 = ( ( uiLPelX >> lgMinCuSize ) + ( uiTPelY >> lgMinCuSize ) ) % ( pps.getPpsRangeExtension().getChromaQpOffsetListLen() + 1 );
   }
 
@@ -773,19 +773,19 @@ void EncCu::xCompressCU( CodingStructure *&tempCS, CodingStructure *&bestCS, Par
 void EncCu::updateLambda( Slice* slice, double dQP )
 {
 #if WCG_EXT
-  Int    NumberBFrames = ( m_pcEncCfg->getGOPSize() - 1 );
-  Int    SHIFT_QP = 12;
+  int    NumberBFrames = ( m_pcEncCfg->getGOPSize() - 1 );
+  int    SHIFT_QP = 12;
   double dLambda_scale = 1.0 - Clip3( 0.0, 0.5, 0.05*(double)(slice->getPic()->fieldPic ? NumberBFrames/2 : NumberBFrames) );
 
 #if DISTORTION_LAMBDA_BUGFIX
-  Int bitdepth_luma_qp_scale = 6
+  int bitdepth_luma_qp_scale = 6
                                * (slice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA) - 8
                                   - DISTORTION_PRECISION_ADJUSTMENT(slice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA)));
 #else
 #if FULL_NBIT
-  Int bitdepth_luma_qp_scale = 6 * (slice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA) - 8);
+  int bitdepth_luma_qp_scale = 6 * (slice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA) - 8);
 #else
-  Int    bitdepth_luma_qp_scale = 0;
+  int    bitdepth_luma_qp_scale = 0;
 #endif
 #endif
   double qp_temp = (double) dQP + bitdepth_luma_qp_scale - SHIFT_QP;
@@ -816,11 +816,11 @@ void EncCu::updateLambda( Slice* slice, double dQP )
   }
 
   double dLambda = dQPFactor*pow( 2.0, qp_temp/3.0 );
-  Int depth = slice->getDepth();
+  int depth = slice->getDepth();
 
   if( !m_pcEncCfg->getLambdaFromQPEnable() && depth>0 )
   {
-    Int qp_temp_slice = slice->getSliceQp() + bitdepth_luma_qp_scale - SHIFT_QP; // avoid lambda  over adjustment,  use slice_qp here
+    int qp_temp_slice = slice->getSliceQp() + bitdepth_luma_qp_scale - SHIFT_QP; // avoid lambda  over adjustment,  use slice_qp here
     dLambda *= Clip3( 2.00, 4.00, (qp_temp_slice / 6.0) ); // (j == B_SLICE && p_cur_frm->layer != 0 )
   }
   if( !m_pcEncCfg->getUseHADME() && slice->getSliceType( ) != I_SLICE )
@@ -828,7 +828,7 @@ void EncCu::updateLambda( Slice* slice, double dQP )
     dLambda *= 0.95;
   }
 
-  const Int temporalId = m_pcEncCfg->getGOPEntry( m_pcSliceEncoder->getGopId() ).m_temporalId;
+  const int temporalId = m_pcEncCfg->getGOPEntry( m_pcSliceEncoder->getGopId() ).m_temporalId;
   const std::vector<double> &intraLambdaModifiers = m_pcEncCfg->getIntraLambdaModifier();
   double lambdaModifier;
   if( slice->getSliceType( ) != I_SLICE || intraLambdaModifiers.empty())
@@ -841,12 +841,12 @@ void EncCu::updateLambda( Slice* slice, double dQP )
   }
   dLambda *= lambdaModifier;
 
-  Int qpBDoffset = slice->getSPS()->getQpBDOffset(CHANNEL_TYPE_LUMA);
-  Int iQP = max( -qpBDoffset, min( MAX_QP, (Int) floor( dQP + 0.5 ) ) );
+  int qpBDoffset = slice->getSPS()->getQpBDOffset(CHANNEL_TYPE_LUMA);
+  int iQP = max( -qpBDoffset, min( MAX_QP, (int) floor( dQP + 0.5 ) ) );
   m_pcSliceEncoder->setUpLambda(slice, dLambda, iQP);
 
 #else
-  Int iQP = (Int)dQP;
+  int iQP = (int)dQP;
   const double oldQP     = (double)slice->getSliceQpBase();
   const double oldLambda = m_pcSliceEncoder->calculateLambda (slice, m_pcSliceEncoder->getGopId(), slice->getDepth(), oldQP, oldQP, iQP);
   const double newLambda = oldLambda * pow (2.0, (dQP - oldQP) / 3.0);
@@ -1008,7 +1008,7 @@ void EncCu::copyState( EncCu* other, Partitioner& partitioner, const UnitArea& c
 
 void EncCu::xCheckModeSplit(CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode)
 {
-  const Int qp                = encTestMode.qp;
+  const int qp                = encTestMode.qp;
   const PPS &pps              = *tempCS->pps;
   const Slice &slice          = *tempCS->slice;
   const bool bIsLosslessMode  = false; // False at this level. Next level down may set it to true.
@@ -1842,7 +1842,7 @@ void EncCu::xCheckRDCostMerge2Nx2N( CodingStructure *&tempCS, CodingStructure *&
         }
         else if( m_pcEncCfg->getMotionEstimationSearchMethod() != MESEARCH_SELECTIVE )
         {
-          Int absolute_MV = 0;
+          int absolute_MV = 0;
 
           for( UInt uiRefListIdx = 0; uiRefListIdx < 2; uiRefListIdx++ )
           {
@@ -2126,7 +2126,7 @@ void EncCu::xCheckRDCostMerge2Nx2NFRUC( CodingStructure *&tempCS, CodingStructur
 
   PelUnitBuf acMergeBuffer[2];
 
-  for( Int nME = 0; nME < 2; nME++ )
+  for( int nME = 0; nME < 2; nME++ )
   {
 #if !JVET_K0220_ENC_CTRL
     if( slsCtrl && m_pcEncCfg->getUseSaveLoadEncInfo() && LOAD_ENC_INFO == slsCtrl->getSaveLoadTag( tempCS->area ) && uhFRUCME[nME] != slsCtrl->getSaveLoadFrucMode( tempCS->area ) )
@@ -2225,7 +2225,7 @@ void EncCu::xCheckRDCostMerge2Nx2NFRUC( CodingStructure *&tempCS, CodingStructur
 bool EncCu::xCheckRDCostInterIMV( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode )
 {
   int iIMV = int( ( encTestMode.opts & ETO_IMV ) >> ETO_IMV_SHIFT );
-  // Only Int-Pel, 4-Pel and fast 4-Pel allowed
+  // Only int-Pel, 4-Pel and fast 4-Pel allowed
   CHECK( iIMV != 1 && iIMV != 2 && iIMV != 3, "Unsupported IMV Mode" );
   // Fast 4-Pel Mode
 
@@ -2541,9 +2541,9 @@ void EncCu::xReuseCachedResult( CodingStructure *&tempCS, CodingStructure *&best
     }
 
     Distortion finalDistortion = 0;
-    const Int  numValidComponents = getNumberValidComponents( tempCS->area.chromaFormat );
+    const int  numValidComponents = getNumberValidComponents( tempCS->area.chromaFormat );
 
-    for( Int comp = 0; comp < numValidComponents; comp++ )
+    for( int comp = 0; comp < numValidComponents; comp++ )
     {
       const ComponentID compID = ComponentID( comp );
 

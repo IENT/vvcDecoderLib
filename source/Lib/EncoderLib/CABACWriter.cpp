@@ -58,7 +58,7 @@ void CABACWriter::initCtxModels( const Slice& slice, const CABACDataStore* cabac
 void CABACWriter::initCtxModels( const Slice& slice )
 #endif
 {
-  Int       qp                = slice.getSliceQp();
+  int       qp                = slice.getSliceQp();
   SliceType sliceType         = slice.getSliceType();
   SliceType encCABACTableIdx  = slice.getEncCABACTableIdx();
   if( !slice.isIntra() && (encCABACTableIdx==B_SLICE || encCABACTableIdx==P_SLICE) && slice.getPPS()->getCabacInitPresentFlag() )
@@ -273,7 +273,7 @@ void CABACWriter::coding_tree_unit( CodingStructure& cs, const UnitArea& area, i
   }
 
 #if JVET_K0371_ALF
-  for( Int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++ )
+  for( int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++ )
   {
     codeAlfCtuEnableFlag( cs, ctuRsAddr, compIdx );
   }
@@ -349,11 +349,11 @@ void CABACWriter::sao( const Slice& slice, unsigned ctuRsAddr )
   const unsigned      curSliceIdx             = slice.getIndependentSliceIdx();
 #if HEVC_TILES_WPP
   const unsigned      curTileIdx              = cs.picture->tileMap->getTileIdxMap( pos );
-  bool                leftMergeAvail          = cs.getCURestricted( pos.offset( -(Int)pcv.maxCUWidth, 0  ), curSliceIdx, curTileIdx, CH_L ) ? true : false;
-  bool                aboveMergeAvail         = cs.getCURestricted( pos.offset( 0, -(Int)pcv.maxCUHeight ), curSliceIdx, curTileIdx, CH_L ) ? true : false;
+  bool                leftMergeAvail          = cs.getCURestricted( pos.offset( -(int)pcv.maxCUWidth, 0  ), curSliceIdx, curTileIdx, CH_L ) ? true : false;
+  bool                aboveMergeAvail         = cs.getCURestricted( pos.offset( 0, -(int)pcv.maxCUHeight ), curSliceIdx, curTileIdx, CH_L ) ? true : false;
 #else
-  bool                leftMergeAvail          = cs.getCURestricted( pos.offset( -(Int)pcv.maxCUWidth, 0  ), curSliceIdx, CH_L ) ? true : false;
-  bool                aboveMergeAvail         = cs.getCURestricted( pos.offset( 0, -(Int)pcv.maxCUHeight ), curSliceIdx, CH_L ) ? true : false;
+  bool                leftMergeAvail          = cs.getCURestricted( pos.offset( -(int)pcv.maxCUWidth, 0  ), curSliceIdx, CH_L ) ? true : false;
+  bool                aboveMergeAvail         = cs.getCURestricted( pos.offset( 0, -(int)pcv.maxCUHeight ), curSliceIdx, CH_L ) ? true : false;
 #endif
   sao_block_pars( sao_ctu_pars, sps.getBitDepths(), sliceEnabled, leftMergeAvail, aboveMergeAvail, false );
 }
@@ -471,7 +471,7 @@ void CABACWriter::sao_offset_pars( const SAOOffset& ctbPars, ComponentID compID,
 
 #if JEM_TOOLS
 #if !JVET_K0371_ALF
-Int CABACWriter::alf_lengthGolomb(int coeffVal, int k)
+int CABACWriter::alf_lengthGolomb(int coeffVal, int k)
 {
   int m = 2 << (k - 1);
   int q = coeffVal / m;
@@ -483,7 +483,7 @@ Int CABACWriter::alf_lengthGolomb(int coeffVal, int k)
 
 void CABACWriter::codeAlfUvlc( UInt uiCode )
 {
-  Int i;
+  int i;
   if ( uiCode == 0 )
   {
     m_BinEncoder.encodeBinEP(0);
@@ -499,9 +499,9 @@ void CABACWriter::codeAlfUvlc( UInt uiCode )
   }
 }
 
-void CABACWriter::codeAlfSvlc( Int iCode )
+void CABACWriter::codeAlfSvlc( int iCode )
 {
-  Int i;
+  int i;
   if ( iCode == 0 )
     {
     m_BinEncoder.encodeBinEP(0);
@@ -576,7 +576,7 @@ void CABACWriter::xWriteTruncBinCode(UInt uiSymbol, UInt uiMaxSymbol)
 void CABACWriter::xWriteEpExGolomb(UInt uiSymbol, UInt uiCount)
 {
   UInt bins = 0;
-  Int numBins = 0;
+  int numBins = 0;
 
   while (uiSymbol >= (UInt)(1 << uiCount))
   {
@@ -683,7 +683,7 @@ void CABACWriter::alf( const ALFParam& alfParam, SliceType sliceType, bool isGAL
 
 void CABACWriter::alf_aux( const ALFParam& alfParam, bool isGALF )
 {
-  Int iNoVarBins = AdaptiveLoopFilter::m_NO_VAR_BINS;
+  int iNoVarBins = AdaptiveLoopFilter::m_NO_VAR_BINS;
 #if GALF
   xWriteTruncBinCode((UInt)(alfParam.filters_per_group - 1), (UInt)iNoVarBins);
 #endif
@@ -694,19 +694,19 @@ void CABACWriter::alf_aux( const ALFParam& alfParam, bool isGALF )
   //FilterMode
   if( isGALF )
   {
-    //Int iNoVarBins = AdaptiveLoopFilter::m_NO_VAR_BINS;
+    //int iNoVarBins = AdaptiveLoopFilter::m_NO_VAR_BINS;
     //xWriteTruncBinCode((UInt)(alfParam.filters_per_group - 1), (UInt)iNoVarBins);
     if (alfParam.filters_per_group > 1)
     {
-      for (Int i = 0; i < iNoVarBins; i++)
+      for (int i = 0; i < iNoVarBins; i++)
       {
         xWriteTruncBinCode((UInt)alfParam.filterPattern[i], (UInt)alfParam.filters_per_group);
       }
     }
 
 #if JVET_C0038_NO_PREV_FILTERS
-    Int i;
-    Int availableFilters = alfParam.iAvailableFilters;
+    int i;
+    int availableFilters = alfParam.iAvailableFilters;
     uint8_t codetab_pred[3] = { 1, 0, 2 };
 
     if (availableFilters > 0)
@@ -742,7 +742,7 @@ void CABACWriter::alf_aux( const ALFParam& alfParam, bool isGALF )
     }
     else if ( alfParam.filterMode == ALF_MULTIPLE_FILTERS )
     {
-      for( Int i=1; i< AdaptiveLoopFilter::m_NO_VAR_BINS; i++)
+      for( int i=1; i< AdaptiveLoopFilter::m_NO_VAR_BINS; i++)
       {
         m_BinEncoder.encodeBinEP( alfParam.filterPattern[i] );
       }
@@ -752,9 +752,9 @@ void CABACWriter::alf_aux( const ALFParam& alfParam, bool isGALF )
 
 void CABACWriter::alf_filter( const ALFParam& alfParam, bool isGALF, bool bChroma )
 {
-  Int filters_per_group;
-  Int sqrFiltLength;
-  Int filtType;
+  int filters_per_group;
+  int sqrFiltLength;
+  int filtType;
   if( isGALF )
   {
     filters_per_group = bChroma ? 1: alfParam.filters_per_group;
@@ -796,7 +796,7 @@ void CABACWriter::alf_filter( const ALFParam& alfParam, bool isGALF, bool bChrom
       minKStart, minBitsKStart, bitsKStart;
 
   maxScanVal = 0;
-  const Int* pDepthInt = AdaptiveLoopFilter::m_pDepthIntTab[filtType];
+  const int* pDepthInt = AdaptiveLoopFilter::m_pDepthIntTab[filtType];
   for(i = 0; i < sqrFiltLength; i++ )
   {
     maxScanVal = max(maxScanVal, pDepthInt[i]);
@@ -982,7 +982,7 @@ void CABACWriter::alf_chroma( const ALFParam& alfParam )
   {
     codeAlfUvlc((alfParam.tap_chroma-5)/2);
     // filter coefficients for chroma
-    for(Int pos=0; pos<alfParam.num_coeff_chroma; pos++)
+    for(int pos=0; pos<alfParam.num_coeff_chroma; pos++)
     {
       codeAlfSvlc( alfParam.coeff_chroma[pos] );
     }
@@ -3251,7 +3251,7 @@ void CABACWriter::last_sig_coeff( CoeffCodingContext& cctx )
   if( GroupIdxX > 3 )
   {
     posX -= g_uiMinInGroup[ GroupIdxX ];
-    for (Int i = ( ( GroupIdxX - 2 ) >> 1 ) - 1 ; i >= 0; i-- )
+    for (int i = ( ( GroupIdxX - 2 ) >> 1 ) - 1 ; i >= 0; i-- )
     {
       m_BinEncoder.encodeBinEP( ( posX >> i ) & 1 );
     }
@@ -3259,7 +3259,7 @@ void CABACWriter::last_sig_coeff( CoeffCodingContext& cctx )
   if( GroupIdxY > 3 )
   {
     posY -= g_uiMinInGroup[ GroupIdxY ];
-    for ( Int i = ( ( GroupIdxY - 2 ) >> 1 ) - 1 ; i >= 0; i-- )
+    for ( int i = ( ( GroupIdxY - 2 ) >> 1 ) - 1 ; i >= 0; i-- )
     {
       m_BinEncoder.encodeBinEP( ( posY >> i ) & 1 );
     }
@@ -3926,35 +3926,35 @@ void CABACWriter::codeAlfCtuEnableFlags( CodingStructure& cs, ComponentID compID
 {
   UInt numCTUs = cs.pcv->sizeInCtus;
 
-  for( Int ctuIdx = 0; ctuIdx < numCTUs; ctuIdx++ )
+  for( int ctuIdx = 0; ctuIdx < numCTUs; ctuIdx++ )
   {
     codeAlfCtuEnableFlag( cs, ctuIdx, compID, alfParam );
   }
 }
 
-void CABACWriter::codeAlfCtuEnableFlag( CodingStructure& cs, UInt ctuRsAddr, const Int compIdx, AlfSliceParam* alfParam)
+void CABACWriter::codeAlfCtuEnableFlag( CodingStructure& cs, UInt ctuRsAddr, const int compIdx, AlfSliceParam* alfParam)
 {
   AlfSliceParam& alfSliceParam = alfParam ? (*alfParam) : cs.slice->getAlfSliceParam();
 
   if( cs.sps->getUseALF() && alfSliceParam.enabledFlag[compIdx] )
   {
     const PreCalcValues& pcv = *cs.pcv;
-    Int                 frame_width_in_ctus = pcv.widthInCtus;
-    Int                 ry = ctuRsAddr / frame_width_in_ctus;
-    Int                 rx = ctuRsAddr - ry * frame_width_in_ctus;
+    int                 frame_width_in_ctus = pcv.widthInCtus;
+    int                 ry = ctuRsAddr / frame_width_in_ctus;
+    int                 rx = ctuRsAddr - ry * frame_width_in_ctus;
     const Position      pos( rx * cs.pcv->maxCUWidth, ry * cs.pcv->maxCUHeight );
     const UInt          curSliceIdx = cs.slice->getIndependentSliceIdx();
 #if HEVC_TILES_WPP
     const UInt          curTileIdx = cs.picture->tileMap->getTileIdxMap( pos );
-    bool                leftMergeAvail = cs.getCURestricted( pos.offset( -(Int)pcv.maxCUWidth, 0 ), curSliceIdx, curTileIdx, CH_L ) ? true : false;
-    bool                aboveMergeAvail = cs.getCURestricted( pos.offset( 0, -(Int)pcv.maxCUHeight ), curSliceIdx, curTileIdx, CH_L ) ? true : false;
+    bool                leftMergeAvail = cs.getCURestricted( pos.offset( -(int)pcv.maxCUWidth, 0 ), curSliceIdx, curTileIdx, CH_L ) ? true : false;
+    bool                aboveMergeAvail = cs.getCURestricted( pos.offset( 0, -(int)pcv.maxCUHeight ), curSliceIdx, curTileIdx, CH_L ) ? true : false;
 #else
-    bool                leftAvail = cs.getCURestricted( pos.offset( -(Int)pcv.maxCUWidth, 0 ), curSliceIdx, CH_L ) ? true : false;
-    bool                aboveAvail = cs.getCURestricted( pos.offset( 0, -(Int)pcv.maxCUHeight ), curSliceIdx, CH_L ) ? true : false;
+    bool                leftAvail = cs.getCURestricted( pos.offset( -(int)pcv.maxCUWidth, 0 ), curSliceIdx, CH_L ) ? true : false;
+    bool                aboveAvail = cs.getCURestricted( pos.offset( 0, -(int)pcv.maxCUHeight ), curSliceIdx, CH_L ) ? true : false;
 #endif
 
-    Int leftCTUAddr = leftAvail ? ctuRsAddr - 1 : -1;
-    Int aboveCTUAddr = aboveAvail ? ctuRsAddr - frame_width_in_ctus : -1;
+    int leftCTUAddr = leftAvail ? ctuRsAddr - 1 : -1;
+    int aboveCTUAddr = aboveAvail ? ctuRsAddr - frame_width_in_ctus : -1;
 
     if( alfSliceParam.enabledFlag[compIdx] )
     {
@@ -3965,7 +3965,7 @@ void CABACWriter::codeAlfCtuEnableFlag( CodingStructure& cs, UInt ctuRsAddr, con
       }
       else
       {
-        Int ctx = 0;
+        int ctx = 0;
         ctx += leftCTUAddr > -1 ? ( ctbAlfFlag[leftCTUAddr] ? 1 : 0 ) : 0;
         ctx += aboveCTUAddr > -1 ? ( ctbAlfFlag[aboveCTUAddr] ? 1 : 0 ) : 0;
         m_BinEncoder.encodeBin( ctbAlfFlag[ctuRsAddr], Ctx::ctbAlfFlag( compIdx * 3 + ctx ) );

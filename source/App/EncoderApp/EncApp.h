@@ -61,7 +61,7 @@ private:
   EncLib            m_cEncLib;                    ///< encoder class
   VideoIOYuv        m_cVideoIOYuvInputFile;       ///< input YUV file
   VideoIOYuv        m_cVideoIOYuvReconFile;       ///< output reconstruction file
-  Int               m_iFrameRcvd;                 ///< number of received frames
+  int               m_iFrameRcvd;                 ///< number of received frames
   UInt              m_essentialBytes;
   UInt              m_totalBytes;
   fstream           m_bitstream;
@@ -75,7 +75,7 @@ private:
   void xDestroyLib ();                           ///< destroy encoder class
 
   // file I/O
-  void xWriteOutput     ( Int iNumEncoded, std::list<PelUnitBuf*>& recBufList
+  void xWriteOutput     ( int iNumEncoded, std::list<PelUnitBuf*>& recBufList
                          );                      ///< write bitstream to file
   void rateStatsAccum   ( const AccessUnit& au, const std::vector<UInt>& stats);
   void printRateSummary ();

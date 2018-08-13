@@ -572,10 +572,10 @@ void DecCu::xDeriveCUMV( CodingUnit &cu )
               }
 #endif
 #else
-              Int iWidth = pu.Y().width;
-              Int iHeight = pu.Y().height;
-              Int vx2 =  - ( mvRT.getVer() - mvLT.getVer() ) * iHeight / iWidth + mvLT.getHor();
-              Int vy2 =    ( mvRT.getHor() - mvLT.getHor() ) * iHeight / iWidth + mvLT.getVer();
+              int iWidth = pu.Y().width;
+              int iHeight = pu.Y().height;
+              int vx2 =  - ( mvRT.getVer() - mvLT.getVer() ) * iHeight / iWidth + mvLT.getHor();
+              int vy2 =    ( mvRT.getHor() - mvLT.getHor() ) * iHeight / iWidth + mvLT.getVer();
               //    Mv mvLB( vx2, vy2 );
               Mv mvLB( vx2, vy2, true );
 

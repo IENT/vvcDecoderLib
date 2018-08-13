@@ -163,7 +163,7 @@ void EncModeCtrl::xGetMinMaxQP( int& minQP, int& maxQP, const CodingStructure& c
   {
     if( currDepth <= pps.getMaxCuDQPDepth() )
     {
-      Int deltaQP = m_pcEncCfg->getMaxDeltaQP();
+      int deltaQP = m_pcEncCfg->getMaxDeltaQP();
       minQP = Clip3( -sps.getQpBDOffset( CHANNEL_TYPE_LUMA ), MAX_QP, baseQP - deltaQP );
       maxQP = Clip3( -sps.getQpBDOffset( CHANNEL_TYPE_LUMA ), MAX_QP, baseQP + deltaQP );
     }
@@ -185,7 +185,7 @@ void EncModeCtrl::xGetMinMaxQP( int& minQP, int& maxQP, const CodingStructure& c
   {
     if( currDepth == pps.getMaxCuDQPDepth() )
     {
-      Int deltaQP = m_pcEncCfg->getMaxDeltaQP();
+      int deltaQP = m_pcEncCfg->getMaxDeltaQP();
       minQP = Clip3( -sps.getQpBDOffset( CHANNEL_TYPE_LUMA ), MAX_QP, baseQP - deltaQP );
       maxQP = Clip3( -sps.getQpBDOffset( CHANNEL_TYPE_LUMA ), MAX_QP, baseQP + deltaQP );
     }
@@ -222,7 +222,7 @@ int EncModeCtrl::xComputeDQP( const CodingStructure &cs, const Partitioner &part
   double dCUAct       = pcAQLayer->getActivity( cs.area.Y().topLeft() );
   double dNormAct     = ( dMaxQScale*dCUAct + dAvgAct ) / ( dCUAct + dMaxQScale*dAvgAct );
   double dQpOffset    = log( dNormAct ) / log( 2.0 ) * 6.0;
-  int    iQpOffset    = Int( floor( dQpOffset + 0.49999 ) );
+  int    iQpOffset    = int( floor( dQpOffset + 0.49999 ) );
   return iQpOffset;
 }
 
@@ -239,9 +239,9 @@ void EncModeCtrl::initLumaDeltaQpLUT()
 
   // map the sparse LumaLevelToDeltaQPMapping.mapping to a fully populated linear table.
 
-  Int         lastDeltaQPValue = 0;
+  int         lastDeltaQPValue = 0;
   std::size_t nextSparseIndex = 0;
-  for( Int index = 0; index < LUMA_LEVEL_TO_DQP_LUT_MAXSIZE; index++ )
+  for( int index = 0; index < LUMA_LEVEL_TO_DQP_LUT_MAXSIZE; index++ )
   {
     while( nextSparseIndex < mapping.mapping.size() && index >= mapping.mapping[nextSparseIndex].first )
     {
@@ -252,7 +252,7 @@ void EncModeCtrl::initLumaDeltaQpLUT()
   }
 }
 
-Int EncModeCtrl::calculateLumaDQP( const CPelBuf& rcOrg )
+int EncModeCtrl::calculateLumaDQP( const CPelBuf& rcOrg )
 {
   double avg = 0;
 
@@ -264,7 +264,7 @@ Int EncModeCtrl::calculateLumaDQP( const CPelBuf& rcOrg )
 #endif
   {
     // Use avg method
-    Int sum = 0;
+    int sum = 0;
     for( UInt y = 0; y < rcOrg.height; y++ )
     {
       for( UInt x = 0; x < rcOrg.width; x++ )
@@ -278,7 +278,7 @@ Int EncModeCtrl::calculateLumaDQP( const CPelBuf& rcOrg )
   else
   {
     // Use maximum luma value
-    Int maxVal = 0;
+    int maxVal = 0;
     for( UInt y = 0; y < rcOrg.height; y++ )
     {
       for( UInt x = 0; x < rcOrg.width; x++ )
@@ -294,8 +294,8 @@ Int EncModeCtrl::calculateLumaDQP( const CPelBuf& rcOrg )
     avg = ( double ) maxVal * m_pcEncCfg->getLumaLevelToDeltaQPMapping().maxMethodWeight;
   }
 #endif
-  Int lumaIdx = Clip3<Int>( 0, Int( LUMA_LEVEL_TO_DQP_LUT_MAXSIZE ) - 1, Int( avg + 0.5 ) );
-  Int QP = m_lumaLevelToDeltaQPLUT[lumaIdx];
+  int lumaIdx = Clip3<int>( 0, int( LUMA_LEVEL_TO_DQP_LUT_MAXSIZE ) - 1, int( avg + 0.5 ) );
+  int QP = m_lumaLevelToDeltaQPLUT[lumaIdx];
   return QP;
 }
 #endif
@@ -1245,7 +1245,7 @@ void EncModeCtrlMTnoRQT::initCULevel( Partitioner &partitioner, const CodingStru
       {
         if( m_pcEncCfg->getIMV() == IMV_4PEL )
         {
-          Int imv = m_pcEncCfg->getIMV4PelFast() ? 3 : 2;
+          int imv = m_pcEncCfg->getIMV4PelFast() ? 3 : 2;
 #if JEM_TOOLS
           // inter with imv and illumination compensation
           if( m_slice->getUseLIC() )

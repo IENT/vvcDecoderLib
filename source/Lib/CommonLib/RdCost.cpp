@@ -201,7 +201,7 @@ void RdCost::copyState( const RdCost& other )
 }
 #endif
 
-void RdCost::setDistParam( DistParam &rcDP, const CPelBuf &org, const Pel* piRefY, Int iRefStride, Int bitDepth, ComponentID compID, Int subShiftMode, Int step, bool useHadamard )
+void RdCost::setDistParam( DistParam &rcDP, const CPelBuf &org, const Pel* piRefY, int iRefStride, int bitDepth, ComponentID compID, int subShiftMode, int step, bool useHadamard )
 {
   rcDP.bitDepth   = bitDepth;
   rcDP.compID     = compID;
@@ -283,7 +283,7 @@ void RdCost::setDistParam( DistParam &rcDP, const CPelBuf &org, const Pel* piRef
   }
 }
 
-void RdCost::setDistParam( DistParam &rcDP, const CPelBuf &org, const CPelBuf &cur, Int bitDepth, ComponentID compID, bool useHadamard )
+void RdCost::setDistParam( DistParam &rcDP, const CPelBuf &org, const CPelBuf &cur, int bitDepth, ComponentID compID, bool useHadamard )
 {
   rcDP.isQtbt       = m_useQtbt;
   rcDP.org          = org;
@@ -326,7 +326,7 @@ void RdCost::setDistParam( DistParam &rcDP, const CPelBuf &org, const CPelBuf &c
   rcDP.maximumDistortionForEarlyExit = std::numeric_limits<Distortion>::max();
 }
 
-void RdCost::setDistParam( DistParam &rcDP, const Pel* pOrg, const Pel* piRefY, Int iOrgStride, Int iRefStride, Int bitDepth, ComponentID compID, Int width, Int height, Int subShiftMode, Int step, bool useHadamard )
+void RdCost::setDistParam( DistParam &rcDP, const Pel* pOrg, const Pel* piRefY, int iOrgStride, int iRefStride, int bitDepth, ComponentID compID, int width, int height, int subShiftMode, int step, bool useHadamard )
 {
   rcDP.bitDepth   = bitDepth;
   rcDP.compID     = compID;
@@ -366,9 +366,9 @@ void RdCost::setDistParam( DistParam &rcDP, const Pel* pOrg, const Pel* piRefY, 
 }
 
 #if WCG_EXT
-Distortion RdCost::getDistPart( const CPelBuf &org, const CPelBuf &cur, Int bitDepth, const ComponentID compID, DFunc eDFunc, const CPelBuf *orgLuma )
+Distortion RdCost::getDistPart( const CPelBuf &org, const CPelBuf &cur, int bitDepth, const ComponentID compID, DFunc eDFunc, const CPelBuf *orgLuma )
 #else
-Distortion RdCost::getDistPart( const CPelBuf &org, const CPelBuf &cur, Int bitDepth, const ComponentID compID, DFunc eDFunc )
+Distortion RdCost::getDistPart( const CPelBuf &org, const CPelBuf &cur, int bitDepth, const ComponentID compID, DFunc eDFunc )
 #endif
 {
   DistParam cDtParam;
@@ -456,12 +456,12 @@ Distortion RdCost::xGetSAD( const DistParam& rcDtParam )
 
   const Pel* piOrg           = rcDtParam.org.buf;
   const Pel* piCur           = rcDtParam.cur.buf;
-  const Int  iCols           = rcDtParam.org.width;
-        Int  iRows           = rcDtParam.org.height;
-  const Int  iSubShift       = rcDtParam.subShift;
-  const Int  iSubStep        = ( 1 << iSubShift );
-  const Int  iStrideCur      = rcDtParam.cur.stride * iSubStep;
-  const Int  iStrideOrg      = rcDtParam.org.stride * iSubStep;
+  const int  iCols           = rcDtParam.org.width;
+        int  iRows           = rcDtParam.org.height;
+  const int  iSubShift       = rcDtParam.subShift;
+  const int  iSubStep        = ( 1 << iSubShift );
+  const int  iStrideCur      = rcDtParam.cur.stride * iSubStep;
+  const int  iStrideOrg      = rcDtParam.org.stride * iSubStep;
 #if DISTORTION_LAMBDA_BUGFIX
   const UInt distortionShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth);
 #else
@@ -472,7 +472,7 @@ Distortion RdCost::xGetSAD( const DistParam& rcDtParam )
 
   for( ; iRows != 0; iRows -= iSubStep )
   {
-    for (Int n = 0; n < iCols; n++ )
+    for (int n = 0; n < iCols; n++ )
     {
       uiSum += abs( piOrg[n] - piCur[n] );
     }
@@ -497,11 +497,11 @@ Distortion RdCost::xGetSAD4( const DistParam& rcDtParam )
 
   const Pel* piOrg   = rcDtParam.org.buf;
   const Pel* piCur   = rcDtParam.cur.buf;
-  Int  iRows         = rcDtParam.org.height;
-  Int  iSubShift     = rcDtParam.subShift;
-  Int  iSubStep      = ( 1 << iSubShift );
-  Int  iStrideCur    = rcDtParam.cur.stride * iSubStep;
-  Int  iStrideOrg    = rcDtParam.org.stride * iSubStep;
+  int  iRows         = rcDtParam.org.height;
+  int  iSubShift     = rcDtParam.subShift;
+  int  iSubStep      = ( 1 << iSubShift );
+  int  iStrideCur    = rcDtParam.cur.stride * iSubStep;
+  int  iStrideOrg    = rcDtParam.org.stride * iSubStep;
 
   Distortion uiSum = 0;
 
@@ -533,11 +533,11 @@ Distortion RdCost::xGetSAD8( const DistParam& rcDtParam )
 
   const Pel* piOrg      = rcDtParam.org.buf;
   const Pel* piCur      = rcDtParam.cur.buf;
-  Int  iRows            = rcDtParam.org.height;
-  Int  iSubShift        = rcDtParam.subShift;
-  Int  iSubStep         = ( 1 << iSubShift );
-  Int  iStrideCur       = rcDtParam.cur.stride * iSubStep;
-  Int  iStrideOrg       = rcDtParam.org.stride * iSubStep;
+  int  iRows            = rcDtParam.org.height;
+  int  iSubShift        = rcDtParam.subShift;
+  int  iSubStep         = ( 1 << iSubShift );
+  int  iStrideCur       = rcDtParam.cur.stride * iSubStep;
+  int  iStrideOrg       = rcDtParam.org.stride * iSubStep;
 
   Distortion uiSum = 0;
 
@@ -573,11 +573,11 @@ Distortion RdCost::xGetSAD16( const DistParam& rcDtParam )
 
   const Pel* piOrg      = rcDtParam.org.buf;
   const Pel* piCur      = rcDtParam.cur.buf;
-  Int  iRows            = rcDtParam.org.height;
-  Int  iSubShift        = rcDtParam.subShift;
-  Int  iSubStep         = ( 1 << iSubShift );
-  Int  iStrideCur       = rcDtParam.cur.stride * iSubStep;
-  Int  iStrideOrg       = rcDtParam.org.stride * iSubStep;
+  int  iRows            = rcDtParam.org.height;
+  int  iSubShift        = rcDtParam.subShift;
+  int  iSubStep         = ( 1 << iSubShift );
+  int  iStrideCur       = rcDtParam.cur.stride * iSubStep;
+  int  iStrideOrg       = rcDtParam.org.stride * iSubStep;
 
   Distortion uiSum = 0;
 
@@ -621,11 +621,11 @@ Distortion RdCost::xGetSAD12( const DistParam& rcDtParam )
 
   const Pel* piOrg      = rcDtParam.org.buf;
   const Pel* piCur      = rcDtParam.cur.buf;
-  Int  iRows            = rcDtParam.org.height;
-  Int  iSubShift        = rcDtParam.subShift;
-  Int  iSubStep         = ( 1 << iSubShift );
-  Int  iStrideCur       = rcDtParam.cur.stride * iSubStep;
-  Int  iStrideOrg       = rcDtParam.org.stride * iSubStep;
+  int  iRows            = rcDtParam.org.height;
+  int  iSubShift        = rcDtParam.subShift;
+  int  iSubStep         = ( 1 << iSubShift );
+  int  iStrideCur       = rcDtParam.cur.stride * iSubStep;
+  int  iStrideOrg       = rcDtParam.org.stride * iSubStep;
 
   Distortion uiSum = 0;
 
@@ -660,18 +660,18 @@ Distortion RdCost::xGetSAD16N( const DistParam &rcDtParam )
 {
   const Pel* piOrg  = rcDtParam.org.buf;
   const Pel* piCur  = rcDtParam.cur.buf;
-  Int  iRows        = rcDtParam.org.height;
-  Int  iCols        = rcDtParam.org.width;
-  Int  iSubShift    = rcDtParam.subShift;
-  Int  iSubStep     = ( 1 << iSubShift );
-  Int  iStrideCur   = rcDtParam.cur.stride * iSubStep;
-  Int  iStrideOrg   = rcDtParam.org.stride * iSubStep;
+  int  iRows        = rcDtParam.org.height;
+  int  iCols        = rcDtParam.org.width;
+  int  iSubShift    = rcDtParam.subShift;
+  int  iSubStep     = ( 1 << iSubShift );
+  int  iStrideCur   = rcDtParam.cur.stride * iSubStep;
+  int  iStrideOrg   = rcDtParam.org.stride * iSubStep;
 
   Distortion uiSum = 0;
 
   for( ; iRows != 0; iRows-=iSubStep )
   {
-    for (Int n = 0; n < iCols; n+=16 )
+    for (int n = 0; n < iCols; n+=16 )
     {
       uiSum += abs( piOrg[n+ 0] - piCur[n+ 0] );
       uiSum += abs( piOrg[n+ 1] - piCur[n+ 1] );
@@ -711,11 +711,11 @@ Distortion RdCost::xGetSAD32( const DistParam &rcDtParam )
 
   const Pel* piOrg      = rcDtParam.org.buf;
   const Pel* piCur      = rcDtParam.cur.buf;
-  Int  iRows            = rcDtParam.org.height;
-  Int  iSubShift        = rcDtParam.subShift;
-  Int  iSubStep         = ( 1 << iSubShift );
-  Int  iStrideCur       = rcDtParam.cur.stride * iSubStep;
-  Int  iStrideOrg       = rcDtParam.org.stride * iSubStep;
+  int  iRows            = rcDtParam.org.height;
+  int  iSubShift        = rcDtParam.subShift;
+  int  iSubStep         = ( 1 << iSubShift );
+  int  iStrideCur       = rcDtParam.cur.stride * iSubStep;
+  int  iStrideOrg       = rcDtParam.org.stride * iSubStep;
 
   Distortion uiSum = 0;
 
@@ -775,11 +775,11 @@ Distortion RdCost::xGetSAD24( const DistParam &rcDtParam )
 
   const Pel* piOrg      = rcDtParam.org.buf;
   const Pel* piCur      = rcDtParam.cur.buf;
-  Int  iRows            = rcDtParam.org.height;
-  Int  iSubShift        = rcDtParam.subShift;
-  Int  iSubStep         = ( 1 << iSubShift );
-  Int  iStrideCur       = rcDtParam.cur.stride * iSubStep;
-  Int  iStrideOrg       = rcDtParam.org.stride * iSubStep;
+  int  iRows            = rcDtParam.org.height;
+  int  iSubShift        = rcDtParam.subShift;
+  int  iSubStep         = ( 1 << iSubShift );
+  int  iStrideCur       = rcDtParam.cur.stride * iSubStep;
+  int  iStrideOrg       = rcDtParam.org.stride * iSubStep;
 
   Distortion uiSum = 0;
 
@@ -831,11 +831,11 @@ Distortion RdCost::xGetSAD64( const DistParam &rcDtParam )
 
   const Pel* piOrg      = rcDtParam.org.buf;
   const Pel* piCur      = rcDtParam.cur.buf;
-  Int  iRows            = rcDtParam.org.height;
-  Int  iSubShift        = rcDtParam.subShift;
-  Int  iSubStep         = ( 1 << iSubShift );
-  Int  iStrideCur       = rcDtParam.cur.stride * iSubStep;
-  Int  iStrideOrg       = rcDtParam.org.stride * iSubStep;
+  int  iRows            = rcDtParam.org.height;
+  int  iSubShift        = rcDtParam.subShift;
+  int  iSubStep         = ( 1 << iSubShift );
+  int  iStrideCur       = rcDtParam.cur.stride * iSubStep;
+  int  iStrideOrg       = rcDtParam.org.stride * iSubStep;
 
   Distortion uiSum = 0;
 
@@ -927,11 +927,11 @@ Distortion RdCost::xGetSAD48( const DistParam &rcDtParam )
 
   const Pel* piOrg      = rcDtParam.org.buf;
   const Pel* piCur      = rcDtParam.cur.buf;
-  Int  iRows            = rcDtParam.org.height;
-  Int  iSubShift        = rcDtParam.subShift;
-  Int  iSubStep         = ( 1 << iSubShift );
-  Int  iStrideCur       = rcDtParam.cur.stride * iSubStep;
-  Int  iStrideOrg       = rcDtParam.org.stride * iSubStep;
+  int  iRows            = rcDtParam.org.height;
+  int  iSubShift        = rcDtParam.subShift;
+  int  iSubStep         = ( 1 << iSubShift );
+  int  iStrideCur       = rcDtParam.cur.stride * iSubStep;
+  int  iStrideOrg       = rcDtParam.org.stride * iSubStep;
 
   Distortion uiSum = 0;
 
@@ -1009,12 +1009,12 @@ Distortion RdCost::xGetMRSAD( const DistParam& rcDtParam )
 {
   const Pel* piOrg           = rcDtParam.org.buf;
   const Pel* piCur           = rcDtParam.cur.buf;
-  const Int  iCols           = rcDtParam.org.width;
-        Int  iRows           = rcDtParam.org.height;
-  const Int  iSubShift       = rcDtParam.subShift;
-  const Int  iSubStep        = ( 1 << iSubShift );
-  const Int  iStrideCur      = rcDtParam.cur.stride * iSubStep;
-  const Int  iStrideOrg      = rcDtParam.org.stride * iSubStep;
+  const int  iCols           = rcDtParam.org.width;
+        int  iRows           = rcDtParam.org.height;
+  const int  iSubShift       = rcDtParam.subShift;
+  const int  iSubStep        = ( 1 << iSubShift );
+  const int  iStrideCur      = rcDtParam.cur.stride * iSubStep;
+  const int  iStrideOrg      = rcDtParam.org.stride * iSubStep;
 #if DISTORTION_LAMBDA_BUGFIX
   const UInt distortionShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth);
 #else
@@ -1036,7 +1036,7 @@ Distortion RdCost::xGetMRSAD( const DistParam& rcDtParam )
   Distortion uiSum = 0;
   for( ; iRows != 0; iRows -= iSubStep )
   {
-    for (Int n = 0; n < iCols; n++ )
+    for (int n = 0; n < iCols; n++ )
     {
       uiSum += abs( piOrg[n] - piCur[n] - offset );
     }
@@ -1056,11 +1056,11 @@ Distortion RdCost::xGetMRSAD4( const DistParam& rcDtParam )
 {
   const Pel* piOrg   = rcDtParam.org.buf;
   const Pel* piCur   = rcDtParam.cur.buf;
-  Int  iRows         = rcDtParam.org.height;
-  Int  iSubShift     = rcDtParam.subShift;
-  Int  iSubStep      = ( 1 << iSubShift );
-  Int  iStrideCur    = rcDtParam.cur.stride * iSubStep;
-  Int  iStrideOrg    = rcDtParam.org.stride * iSubStep;
+  int  iRows         = rcDtParam.org.height;
+  int  iSubShift     = rcDtParam.subShift;
+  int  iSubStep      = ( 1 << iSubShift );
+  int  iStrideCur    = rcDtParam.cur.stride * iSubStep;
+  int  iStrideOrg    = rcDtParam.org.stride * iSubStep;
 
   int32_t deltaSum = 0;
   for( int r = iRows; r != 0; r-=iSubStep, piOrg += iStrideOrg, piCur += iStrideCur )
@@ -1099,11 +1099,11 @@ Distortion RdCost::xGetMRSAD8( const DistParam& rcDtParam )
 {
   const Pel* piOrg      = rcDtParam.org.buf;
   const Pel* piCur      = rcDtParam.cur.buf;
-  Int  iRows            = rcDtParam.org.height;
-  Int  iSubShift        = rcDtParam.subShift;
-  Int  iSubStep         = ( 1 << iSubShift );
-  Int  iStrideCur       = rcDtParam.cur.stride * iSubStep;
-  Int  iStrideOrg       = rcDtParam.org.stride * iSubStep;
+  int  iRows            = rcDtParam.org.height;
+  int  iSubShift        = rcDtParam.subShift;
+  int  iSubStep         = ( 1 << iSubShift );
+  int  iStrideCur       = rcDtParam.cur.stride * iSubStep;
+  int  iStrideOrg       = rcDtParam.org.stride * iSubStep;
 
   int32_t deltaSum = 0;
   for( int r = iRows; r != 0; r-=iSubStep, piOrg += iStrideOrg, piCur += iStrideCur )
@@ -1149,11 +1149,11 @@ Distortion RdCost::xGetMRSAD16( const DistParam& rcDtParam )
 {
   const Pel* piOrg      = rcDtParam.org.buf;
   const Pel* piCur      = rcDtParam.cur.buf;
-  Int  iRows            = rcDtParam.org.height;
-  Int  iSubShift        = rcDtParam.subShift;
-  Int  iSubStep         = ( 1 << iSubShift );
-  Int  iStrideCur       = rcDtParam.cur.stride * iSubStep;
-  Int  iStrideOrg       = rcDtParam.org.stride * iSubStep;
+  int  iRows            = rcDtParam.org.height;
+  int  iSubShift        = rcDtParam.subShift;
+  int  iSubStep         = ( 1 << iSubShift );
+  int  iStrideCur       = rcDtParam.cur.stride * iSubStep;
+  int  iStrideOrg       = rcDtParam.org.stride * iSubStep;
 
   int32_t deltaSum = 0;
   for( int r = iRows; r != 0; r-=iSubStep, piOrg += iStrideOrg, piCur += iStrideCur )
@@ -1215,11 +1215,11 @@ Distortion RdCost::xGetMRSAD12( const DistParam& rcDtParam )
 {
   const Pel* piOrg      = rcDtParam.org.buf;
   const Pel* piCur      = rcDtParam.cur.buf;
-  Int  iRows            = rcDtParam.org.height;
-  Int  iSubShift        = rcDtParam.subShift;
-  Int  iSubStep         = ( 1 << iSubShift );
-  Int  iStrideCur       = rcDtParam.cur.stride * iSubStep;
-  Int  iStrideOrg       = rcDtParam.org.stride * iSubStep;
+  int  iRows            = rcDtParam.org.height;
+  int  iSubShift        = rcDtParam.subShift;
+  int  iSubStep         = ( 1 << iSubShift );
+  int  iStrideCur       = rcDtParam.cur.stride * iSubStep;
+  int  iStrideOrg       = rcDtParam.org.stride * iSubStep;
 
   int32_t deltaSum = 0;
   for( int r = iRows; r != 0; r-=iSubStep, piOrg += iStrideOrg, piCur += iStrideCur )
@@ -1273,12 +1273,12 @@ Distortion RdCost::xGetMRSAD16N( const DistParam &rcDtParam )
 {
   const Pel* piOrg  = rcDtParam.org.buf;
   const Pel* piCur  = rcDtParam.cur.buf;
-  Int  iRows        = rcDtParam.org.height;
-  Int  iCols        = rcDtParam.org.width;
-  Int  iSubShift    = rcDtParam.subShift;
-  Int  iSubStep     = ( 1 << iSubShift );
-  Int  iStrideCur   = rcDtParam.cur.stride * iSubStep;
-  Int  iStrideOrg   = rcDtParam.org.stride * iSubStep;
+  int  iRows        = rcDtParam.org.height;
+  int  iCols        = rcDtParam.org.width;
+  int  iSubShift    = rcDtParam.subShift;
+  int  iSubStep     = ( 1 << iSubShift );
+  int  iStrideCur   = rcDtParam.cur.stride * iSubStep;
+  int  iStrideOrg   = rcDtParam.org.stride * iSubStep;
 
   int32_t deltaSum = 0;
   for( int r = iRows; r != 0; r-=iSubStep, piOrg += iStrideOrg, piCur += iStrideCur )
@@ -1310,7 +1310,7 @@ Distortion RdCost::xGetMRSAD16N( const DistParam &rcDtParam )
   Distortion uiSum  = 0;
   for( ; iRows != 0; iRows-=iSubStep )
   {
-    for (Int n = 0; n < iCols; n+=16 )
+    for (int n = 0; n < iCols; n+=16 )
     {
       uiSum += abs( piOrg[n+ 0] - piCur[n+ 0] - offset );
       uiSum += abs( piOrg[n+ 1] - piCur[n+ 1] - offset );
@@ -1345,11 +1345,11 @@ Distortion RdCost::xGetMRSAD32( const DistParam &rcDtParam )
 {
   const Pel* piOrg      = rcDtParam.org.buf;
   const Pel* piCur      = rcDtParam.cur.buf;
-  Int  iRows            = rcDtParam.org.height;
-  Int  iSubShift        = rcDtParam.subShift;
-  Int  iSubStep         = ( 1 << iSubShift );
-  Int  iStrideCur       = rcDtParam.cur.stride * iSubStep;
-  Int  iStrideOrg       = rcDtParam.org.stride * iSubStep;
+  int  iRows            = rcDtParam.org.height;
+  int  iSubShift        = rcDtParam.subShift;
+  int  iSubStep         = ( 1 << iSubShift );
+  int  iStrideCur       = rcDtParam.cur.stride * iSubStep;
+  int  iStrideOrg       = rcDtParam.org.stride * iSubStep;
 
   int32_t deltaSum = 0;
   for( int r = iRows; r != 0; r-=iSubStep, piOrg += iStrideOrg, piCur += iStrideCur )
@@ -1443,11 +1443,11 @@ Distortion RdCost::xGetMRSAD24( const DistParam &rcDtParam )
 {
   const Pel* piOrg      = rcDtParam.org.buf;
   const Pel* piCur      = rcDtParam.cur.buf;
-  Int  iRows            = rcDtParam.org.height;
-  Int  iSubShift        = rcDtParam.subShift;
-  Int  iSubStep         = ( 1 << iSubShift );
-  Int  iStrideCur       = rcDtParam.cur.stride * iSubStep;
-  Int  iStrideOrg       = rcDtParam.org.stride * iSubStep;
+  int  iRows            = rcDtParam.org.height;
+  int  iSubShift        = rcDtParam.subShift;
+  int  iSubStep         = ( 1 << iSubShift );
+  int  iStrideCur       = rcDtParam.cur.stride * iSubStep;
+  int  iStrideOrg       = rcDtParam.org.stride * iSubStep;
 
   int32_t deltaSum = 0;
   for( int r = iRows; r != 0; r-=iSubStep, piOrg += iStrideOrg, piCur += iStrideCur )
@@ -1525,11 +1525,11 @@ Distortion RdCost::xGetMRSAD64( const DistParam &rcDtParam )
 {
   const Pel* piOrg      = rcDtParam.org.buf;
   const Pel* piCur      = rcDtParam.cur.buf;
-  Int  iRows            = rcDtParam.org.height;
-  Int  iSubShift        = rcDtParam.subShift;
-  Int  iSubStep         = ( 1 << iSubShift );
-  Int  iStrideCur       = rcDtParam.cur.stride * iSubStep;
-  Int  iStrideOrg       = rcDtParam.org.stride * iSubStep;
+  int  iRows            = rcDtParam.org.height;
+  int  iSubShift        = rcDtParam.subShift;
+  int  iSubStep         = ( 1 << iSubShift );
+  int  iStrideCur       = rcDtParam.cur.stride * iSubStep;
+  int  iStrideOrg       = rcDtParam.org.stride * iSubStep;
 
   int32_t deltaSum = 0;
   for( int r = iRows; r != 0; r-=iSubStep, piOrg += iStrideOrg, piCur += iStrideCur )
@@ -1687,11 +1687,11 @@ Distortion RdCost::xGetMRSAD48( const DistParam &rcDtParam )
 {
   const Pel* piOrg      = rcDtParam.org.buf;
   const Pel* piCur      = rcDtParam.cur.buf;
-  Int  iRows            = rcDtParam.org.height;
-  Int  iSubShift        = rcDtParam.subShift;
-  Int  iSubStep         = ( 1 << iSubShift );
-  Int  iStrideCur       = rcDtParam.cur.stride * iSubStep;
-  Int  iStrideOrg       = rcDtParam.org.stride * iSubStep;
+  int  iRows            = rcDtParam.org.height;
+  int  iSubShift        = rcDtParam.subShift;
+  int  iSubStep         = ( 1 << iSubShift );
+  int  iStrideCur       = rcDtParam.cur.stride * iSubStep;
+  int  iStrideOrg       = rcDtParam.org.stride * iSubStep;
 
   int32_t deltaSum = 0;
   for( int r = iRows; r != 0; r-=iSubStep, piOrg += iStrideOrg, piCur += iStrideCur )
@@ -1826,10 +1826,10 @@ Distortion RdCost::xGetSSE( const DistParam &rcDtParam )
 
   const Pel* piOrg      = rcDtParam.org.buf;
   const Pel* piCur      = rcDtParam.cur.buf;
-  Int  iRows            = rcDtParam.org.height;
-  Int  iCols            = rcDtParam.org.width;
-  Int  iStrideCur       = rcDtParam.cur.stride;
-  Int  iStrideOrg       = rcDtParam.org.stride;
+  int  iRows            = rcDtParam.org.height;
+  int  iCols            = rcDtParam.org.width;
+  int  iStrideCur       = rcDtParam.cur.stride;
+  int  iStrideOrg       = rcDtParam.org.stride;
 
   Distortion uiSum   = 0;
 #if DISTORTION_LAMBDA_BUGFIX
@@ -1842,7 +1842,7 @@ Distortion RdCost::xGetSSE( const DistParam &rcDtParam )
 
   for( ; iRows != 0; iRows-- )
   {
-    for (Int n = 0; n < iCols; n++ )
+    for (int n = 0; n < iCols; n++ )
     {
       iTemp = piOrg[n  ] - piCur[n  ];
       uiSum += Distortion(( iTemp * iTemp ) >> uiShift);
@@ -1864,9 +1864,9 @@ Distortion RdCost::xGetSSE4( const DistParam &rcDtParam )
 
   const Pel* piOrg   = rcDtParam.org.buf;
   const Pel* piCur   = rcDtParam.cur.buf;
-  Int  iRows         = rcDtParam.org.height;
-  Int  iStrideOrg    = rcDtParam.org.stride;
-  Int  iStrideCur    = rcDtParam.cur.stride;
+  int  iRows         = rcDtParam.org.height;
+  int  iStrideOrg    = rcDtParam.org.stride;
+  int  iStrideCur    = rcDtParam.cur.stride;
 
   Distortion uiSum   = 0;
 #if DISTORTION_LAMBDA_BUGFIX
@@ -1902,9 +1902,9 @@ Distortion RdCost::xGetSSE8( const DistParam &rcDtParam )
 
   const Pel* piOrg   = rcDtParam.org.buf;
   const Pel* piCur   = rcDtParam.cur.buf;
-  Int  iRows         = rcDtParam.org.height;
-  Int  iStrideOrg    = rcDtParam.org.stride;
-  Int  iStrideCur    = rcDtParam.cur.stride;
+  int  iRows         = rcDtParam.org.height;
+  int  iStrideOrg    = rcDtParam.org.stride;
+  int  iStrideCur    = rcDtParam.cur.stride;
 
   Distortion uiSum   = 0;
 #if DISTORTION_LAMBDA_BUGFIX
@@ -1943,9 +1943,9 @@ Distortion RdCost::xGetSSE16( const DistParam &rcDtParam )
 
   const Pel* piOrg   = rcDtParam.org.buf;
   const Pel* piCur   = rcDtParam.cur.buf;
-  Int  iRows         = rcDtParam.org.height;
-  Int  iStrideOrg    = rcDtParam.org.stride;
-  Int  iStrideCur    = rcDtParam.cur.stride;
+  int  iRows         = rcDtParam.org.height;
+  int  iStrideOrg    = rcDtParam.org.stride;
+  int  iStrideCur    = rcDtParam.cur.stride;
 
   Distortion uiSum   = 0;
 #if DISTORTION_LAMBDA_BUGFIX
@@ -1991,10 +1991,10 @@ Distortion RdCost::xGetSSE16N( const DistParam &rcDtParam )
   }
   const Pel* piOrg   = rcDtParam.org.buf;
   const Pel* piCur   = rcDtParam.cur.buf;
-  Int  iRows         = rcDtParam.org.height;
-  Int  iCols         = rcDtParam.org.width;
-  Int  iStrideOrg    = rcDtParam.org.stride;
-  Int  iStrideCur    = rcDtParam.cur.stride;
+  int  iRows         = rcDtParam.org.height;
+  int  iCols         = rcDtParam.org.width;
+  int  iStrideOrg    = rcDtParam.org.stride;
+  int  iStrideCur    = rcDtParam.cur.stride;
 
   Distortion uiSum   = 0;
 #if DISTORTION_LAMBDA_BUGFIX
@@ -2007,7 +2007,7 @@ Distortion RdCost::xGetSSE16N( const DistParam &rcDtParam )
 
   for( ; iRows != 0; iRows-- )
   {
-    for (Int n = 0; n < iCols; n+=16 )
+    for (int n = 0; n < iCols; n+=16 )
     {
 
       iTemp = piOrg[n+ 0] - piCur[n+ 0]; uiSum += Distortion(( iTemp * iTemp ) >> uiShift);
@@ -2045,9 +2045,9 @@ Distortion RdCost::xGetSSE32( const DistParam &rcDtParam )
 
   const Pel* piOrg   = rcDtParam.org.buf;
   const Pel* piCur   = rcDtParam.cur.buf;
-  Int  iRows         = rcDtParam.org.height;
-  Int  iStrideOrg    = rcDtParam.org.stride;
-  Int  iStrideCur    = rcDtParam.cur.stride;
+  int  iRows         = rcDtParam.org.height;
+  int  iStrideOrg    = rcDtParam.org.stride;
+  int  iStrideCur    = rcDtParam.cur.stride;
 
   Distortion uiSum   = 0;
 #if DISTORTION_LAMBDA_BUGFIX
@@ -2111,9 +2111,9 @@ Distortion RdCost::xGetSSE64( const DistParam &rcDtParam )
 
   const Pel* piOrg   = rcDtParam.org.buf;
   const Pel* piCur   = rcDtParam.cur.buf;
-  Int  iRows         = rcDtParam.org.height;
-  Int  iStrideOrg    = rcDtParam.org.stride;
-  Int  iStrideCur    = rcDtParam.cur.stride;
+  int  iRows         = rcDtParam.org.height;
+  int  iStrideOrg    = rcDtParam.org.stride;
+  int  iStrideCur    = rcDtParam.cur.stride;
 
   Distortion uiSum   = 0;
 #if DISTORTION_LAMBDA_BUGFIX
@@ -2202,7 +2202,7 @@ Distortion RdCost::xGetSSE64( const DistParam &rcDtParam )
 // HADAMARD with step (used in fractional search)
 // --------------------------------------------------------------------------------------------------------------------
 
-Distortion RdCost::xCalcHADs2x2( const Pel *piOrg, const Pel *piCur, Int iStrideOrg, Int iStrideCur, Int iStep )
+Distortion RdCost::xCalcHADs2x2( const Pel *piOrg, const Pel *piCur, int iStrideOrg, int iStrideCur, int iStep )
 {
   Distortion satd = 0;
   TCoeff diff[4], m[4];
@@ -2224,9 +2224,9 @@ Distortion RdCost::xCalcHADs2x2( const Pel *piOrg, const Pel *piCur, Int iStride
   return satd;
 }
 
-Distortion RdCost::xCalcHADs4x4( const Pel *piOrg, const Pel *piCur, Int iStrideOrg, Int iStrideCur, Int iStep )
+Distortion RdCost::xCalcHADs4x4( const Pel *piOrg, const Pel *piCur, int iStrideOrg, int iStrideCur, int iStep )
 {
-  Int k;
+  int k;
   Distortion satd = 0;
   TCoeff diff[16], m[16], d[16];
 
@@ -2320,9 +2320,9 @@ Distortion RdCost::xCalcHADs4x4( const Pel *piOrg, const Pel *piCur, Int iStride
   return satd;
 }
 
-Distortion RdCost::xCalcHADs8x8( const Pel *piOrg, const Pel *piCur, Int iStrideOrg, Int iStrideCur, Int iStep )
+Distortion RdCost::xCalcHADs8x8( const Pel *piOrg, const Pel *piCur, int iStrideOrg, int iStrideCur, int iStep )
 {
-  Int k, i, j, jj;
+  int k, i, j, jj;
   Distortion sad = 0;
   TCoeff diff[64], m1[8][8], m2[8][8], m3[8][8];
   CHECK( iStep != 1, "Invalid step" );
@@ -2417,10 +2417,10 @@ Distortion RdCost::xCalcHADs8x8( const Pel *piOrg, const Pel *piCur, Int iStride
   return sad;
 }
 
-Distortion RdCost::xCalcHADs16x8( const Pel *piOrg, const Pel *piCur, Int iStrideOrg, Int iStrideCur )
+Distortion RdCost::xCalcHADs16x8( const Pel *piOrg, const Pel *piCur, int iStrideOrg, int iStrideCur )
 {   //need to add SIMD implementation ,JCA
-  Int k, i, j, jj, sad = 0;
-  Int diff[128], m1[8][16], m2[8][16];
+  int k, i, j, jj, sad = 0;
+  int diff[128], m1[8][16], m2[8][16];
   for( k = 0; k < 128; k += 16 )
   {
     diff[k + 0] = piOrg[0] - piCur[0];
@@ -2558,15 +2558,15 @@ Distortion RdCost::xCalcHADs16x8( const Pel *piOrg, const Pel *piCur, Int iStrid
     }
   }
 
-  sad = ( Int ) ( sad / sqrt( 16.0 * 8 ) * 2 );
+  sad = ( int ) ( sad / sqrt( 16.0 * 8 ) * 2 );
 
   return sad;
 }
 
-Distortion RdCost::xCalcHADs8x16( const Pel *piOrg, const Pel *piCur, Int iStrideOrg, Int iStrideCur )
+Distortion RdCost::xCalcHADs8x16( const Pel *piOrg, const Pel *piCur, int iStrideOrg, int iStrideCur )
 {
-  Int k, i, j, jj, sad = 0;
-  Int diff[128], m1[16][8], m2[16][8];
+  int k, i, j, jj, sad = 0;
+  int diff[128], m1[16][8], m2[16][8];
   for( k = 0; k < 128; k += 8 )
   {
     diff[k + 0] = piOrg[0] - piCur[0];
@@ -2695,14 +2695,14 @@ Distortion RdCost::xCalcHADs8x16( const Pel *piOrg, const Pel *piCur, Int iStrid
     }
   }
 
-  sad = ( Int ) ( sad / sqrt( 16.0 * 8 ) * 2 );
+  sad = ( int ) ( sad / sqrt( 16.0 * 8 ) * 2 );
 
   return sad;
 }
-Distortion RdCost::xCalcHADs4x8( const Pel *piOrg, const Pel *piCur, Int iStrideOrg, Int iStrideCur )
+Distortion RdCost::xCalcHADs4x8( const Pel *piOrg, const Pel *piCur, int iStrideOrg, int iStrideCur )
 {
-  Int k, i, j, jj, sad = 0;
-  Int diff[32], m1[8][4], m2[8][4];
+  int k, i, j, jj, sad = 0;
+  int diff[32], m1[8][4], m2[8][4];
   for( k = 0; k < 32; k += 4 )
   {
     diff[k + 0] = piOrg[0] - piCur[0];
@@ -2768,15 +2768,15 @@ Distortion RdCost::xCalcHADs4x8( const Pel *piOrg, const Pel *piCur, Int iStride
     }
   }
 
-  sad = ( Int ) ( sad / sqrt( 4.0 * 8 ) * 2 );
+  sad = ( int ) ( sad / sqrt( 4.0 * 8 ) * 2 );
 
   return sad;
 }
 
-Distortion RdCost::xCalcHADs8x4( const Pel *piOrg, const Pel *piCur, Int iStrideOrg, Int iStrideCur )
+Distortion RdCost::xCalcHADs8x4( const Pel *piOrg, const Pel *piCur, int iStrideOrg, int iStrideCur )
 {
-  Int k, i, j, jj, sad = 0;
-  Int diff[32], m1[4][8], m2[4][8];
+  int k, i, j, jj, sad = 0;
+  int diff[32], m1[4][8], m2[4][8];
   for( k = 0; k < 32; k += 8 )
   {
     diff[k + 0] = piOrg[0] - piCur[0];
@@ -2847,7 +2847,7 @@ Distortion RdCost::xCalcHADs8x4( const Pel *piOrg, const Pel *piCur, Int iStride
     }
   }
 
-  sad = ( Int ) ( sad / sqrt( 4.0 * 8 ) * 2 );
+  sad = ( int ) ( sad / sqrt( 4.0 * 8 ) * 2 );
 
   return sad;
 }
@@ -2860,13 +2860,13 @@ Distortion RdCost::xGetHADs( const DistParam &rcDtParam )
   }
   const Pel* piOrg = rcDtParam.org.buf;
   const Pel* piCur = rcDtParam.cur.buf;
-  const Int  iRows = rcDtParam.org.height;
-  const Int  iCols = rcDtParam.org.width;
-  const Int  iStrideCur = rcDtParam.cur.stride;
-  const Int  iStrideOrg = rcDtParam.org.stride;
-  const Int  iStep = rcDtParam.step;
+  const int  iRows = rcDtParam.org.height;
+  const int  iCols = rcDtParam.org.width;
+  const int  iStrideCur = rcDtParam.cur.stride;
+  const int  iStrideOrg = rcDtParam.org.stride;
+  const int  iStep = rcDtParam.step;
 
-  Int  x = 0, y = 0;
+  int  x = 0, y = 0;
 
   Distortion uiSum = 0;
 
@@ -2920,8 +2920,8 @@ Distortion RdCost::xGetHADs( const DistParam &rcDtParam )
   }
   else if( ( iRows % 8 == 0 ) && ( iCols % 8 == 0 ) )
   {
-    Int  iOffsetOrg = iStrideOrg << 3;
-    Int  iOffsetCur = iStrideCur << 3;
+    int  iOffsetOrg = iStrideOrg << 3;
+    int  iOffsetCur = iStrideCur << 3;
     for( y = 0; y < iRows; y += 8 )
     {
       for( x = 0; x < iCols; x += 8 )
@@ -2934,8 +2934,8 @@ Distortion RdCost::xGetHADs( const DistParam &rcDtParam )
   }
   else if( ( iRows % 4 == 0 ) && ( iCols % 4 == 0 ) )
   {
-    Int  iOffsetOrg = iStrideOrg << 2;
-    Int  iOffsetCur = iStrideCur << 2;
+    int  iOffsetOrg = iStrideOrg << 2;
+    int  iOffsetCur = iStrideCur << 2;
 
     for( y = 0; y < iRows; y += 4 )
     {
@@ -2949,8 +2949,8 @@ Distortion RdCost::xGetHADs( const DistParam &rcDtParam )
   }
   else if( ( iRows % 2 == 0 ) && ( iCols % 2 == 0 ) )
   {
-    Int  iOffsetOrg = iStrideOrg << 1;
-    Int  iOffsetCur = iStrideCur << 1;
+    int  iOffsetOrg = iStrideOrg << 1;
+    int  iOffsetCur = iStrideCur << 1;
     for( y = 0; y < iRows; y += 2 )
     {
       for( x = 0; x < iCols; x += 2 )
@@ -2985,7 +2985,7 @@ void RdCost::saveUnadjustedLambda()
 
 void RdCost::initLumaLevelToWeightTable()
 {
-  for (Int i = 0; i < LUMA_LEVEL_TO_DQP_LUT_MAXSIZE; i++) {
+  for (int i = 0; i < LUMA_LEVEL_TO_DQP_LUT_MAXSIZE; i++) {
     double x = i;
     double y;
 
@@ -3008,7 +3008,7 @@ void RdCost::initLumaLevelToWeightTable()
   }
 }
 
-Distortion RdCost::getWeightedMSE(Int compIdx, const Pel org, const Pel cur, const UInt uiShift, const Pel orgLuma) 
+Distortion RdCost::getWeightedMSE(int compIdx, const Pel org, const Pel cur, const UInt uiShift, const Pel orgLuma) 
 {
   Distortion distortionVal = 0;
   Intermediate_Int iTemp = org - cur;
@@ -3031,15 +3031,15 @@ Distortion RdCost::xGetSSE_WTD( const DistParam &rcDtParam )
   {
     return RdCostWeightPrediction::xGetSSEw( rcDtParam );  // ignore it for now
   }
-        Int  iRows = rcDtParam.org.height;
+        int  iRows = rcDtParam.org.height;
   const Pel* piOrg = rcDtParam.org.buf;
   const Pel* piCur = rcDtParam.cur.buf;
-  const Int  iCols = rcDtParam.org.width;
-  const Int  iStrideCur = rcDtParam.cur.stride;
-  const Int  iStrideOrg = rcDtParam.org.stride;
+  const int  iCols = rcDtParam.org.width;
+  const int  iStrideCur = rcDtParam.cur.stride;
+  const int  iStrideOrg = rcDtParam.org.stride;
   const Pel* piOrgLuma        = rcDtParam.orgLuma.buf;
-  const Int  iStrideOrgLuma   = rcDtParam.orgLuma.stride;
-  const Int  cShift           = (rcDtParam.compID==COMPONENT_Y) ? 0 : 1; // assume 420, could use getComponentScaleX, getComponentScaleY
+  const int  iStrideOrgLuma   = rcDtParam.orgLuma.stride;
+  const int  cShift           = (rcDtParam.compID==COMPONENT_Y) ? 0 : 1; // assume 420, could use getComponentScaleX, getComponentScaleY
 
   Distortion uiSum   = 0;
 #if DISTORTION_LAMBDA_BUGFIX
@@ -3049,7 +3049,7 @@ Distortion RdCost::xGetSSE_WTD( const DistParam &rcDtParam )
 #endif
   for( ; iRows != 0; iRows-- )
   {
-    for (Int n = 0; n < iCols; n++ )
+    for (int n = 0; n < iCols; n++ )
     {
       uiSum += getWeightedMSE(rcDtParam.compID, piOrg[n  ], piCur[n  ], uiShift, piOrgLuma[n<<cShift]); 
     }
@@ -3068,11 +3068,11 @@ Distortion RdCost::xGetSSE2_WTD( const DistParam &rcDtParam )
     return RdCostWeightPrediction::xGetSSEw( rcDtParam ); // ignore it for now
   }
   
-  Int  iRows = rcDtParam.org.height;
+  int  iRows = rcDtParam.org.height;
   const Pel* piOrg = rcDtParam.org.buf;
   const Pel* piCur = rcDtParam.cur.buf;
-  const Int  iStrideCur = rcDtParam.cur.stride;
-  const Int  iStrideOrg = rcDtParam.org.stride;
+  const int  iStrideCur = rcDtParam.cur.stride;
+  const int  iStrideOrg = rcDtParam.org.stride;
   const Pel* piOrgLuma           = rcDtParam.orgLuma.buf;
   const size_t  iStrideOrgLuma   = rcDtParam.orgLuma.stride;
   const size_t  cShift           = (rcDtParam.compID==COMPONENT_Y) ? 0 : 1; // assume 420, could use getComponentScaleX, getComponentScaleY
@@ -3101,11 +3101,11 @@ Distortion RdCost::xGetSSE4_WTD( const DistParam &rcDtParam )
     return RdCostWeightPrediction::xGetSSEw( rcDtParam ); // ignore it for now
   }
 
-        Int  iRows = rcDtParam.org.height;
+        int  iRows = rcDtParam.org.height;
   const Pel* piOrg = rcDtParam.org.buf;
   const Pel* piCur = rcDtParam.cur.buf;
-  const Int  iStrideCur = rcDtParam.cur.stride;
-  const Int  iStrideOrg = rcDtParam.org.stride;
+  const int  iStrideCur = rcDtParam.cur.stride;
+  const int  iStrideOrg = rcDtParam.org.stride;
   const Pel* piOrgLuma        = rcDtParam.orgLuma.buf;
   const size_t  iStrideOrgLuma   = rcDtParam.orgLuma.stride;
   const size_t  cShift           = (rcDtParam.compID==COMPONENT_Y) ? 0 : 1; // assume 420, could use getComponentScaleX, getComponentScaleY
@@ -3136,11 +3136,11 @@ Distortion RdCost::xGetSSE8_WTD( const DistParam &rcDtParam )
     return RdCostWeightPrediction::xGetSSEw( rcDtParam );
   }
 
-        Int  iRows = rcDtParam.org.height;
+        int  iRows = rcDtParam.org.height;
   const Pel* piOrg = rcDtParam.org.buf;
   const Pel* piCur = rcDtParam.cur.buf;
-  const Int  iStrideCur = rcDtParam.cur.stride;
-  const Int  iStrideOrg = rcDtParam.org.stride;
+  const int  iStrideCur = rcDtParam.cur.stride;
+  const int  iStrideOrg = rcDtParam.org.stride;
   const Pel* piOrgLuma        = rcDtParam.orgLuma.buf;
   const size_t  iStrideOrgLuma   = rcDtParam.orgLuma.stride;
   const size_t  cShift           = (rcDtParam.compID==COMPONENT_Y) ? 0 : 1; // assume 420, could use getComponentScaleX, getComponentScaleY
@@ -3175,11 +3175,11 @@ Distortion RdCost::xGetSSE16_WTD( const DistParam &rcDtParam )
     CHECK( rcDtParam.org.width != 16, "" );
     return RdCostWeightPrediction::xGetSSEw( rcDtParam );
   }
-        Int  iRows = rcDtParam.org.height;
+        int  iRows = rcDtParam.org.height;
   const Pel* piOrg = rcDtParam.org.buf;
   const Pel* piCur = rcDtParam.cur.buf;
-  const Int  iStrideCur = rcDtParam.cur.stride;
-  const Int  iStrideOrg = rcDtParam.org.stride;
+  const int  iStrideCur = rcDtParam.cur.stride;
+  const int  iStrideOrg = rcDtParam.org.stride;
   const Pel* piOrgLuma        = rcDtParam.orgLuma.buf;
   const size_t  iStrideOrgLuma   = rcDtParam.orgLuma.stride;
   const size_t  cShift           = (rcDtParam.compID==COMPONENT_Y) ? 0 : 1; // assume 420, could use getComponentScaleX, getComponentScaleY
@@ -3221,12 +3221,12 @@ Distortion RdCost::xGetSSE16N_WTD( const DistParam &rcDtParam )
   {
     return RdCostWeightPrediction::xGetSSEw( rcDtParam );
   }
-        Int  iRows = rcDtParam.org.height;
+        int  iRows = rcDtParam.org.height;
   const Pel* piOrg = rcDtParam.org.buf;
   const Pel* piCur = rcDtParam.cur.buf;
-  const Int  iCols = rcDtParam.org.width;
-  const Int  iStrideCur = rcDtParam.cur.stride;
-  const Int  iStrideOrg = rcDtParam.org.stride;
+  const int  iCols = rcDtParam.org.width;
+  const int  iStrideCur = rcDtParam.cur.stride;
+  const int  iStrideOrg = rcDtParam.org.stride;
   const Pel* piOrgLuma        = rcDtParam.orgLuma.buf;
   const size_t  iStrideOrgLuma   = rcDtParam.orgLuma.stride;
   const size_t  cShift           = (rcDtParam.compID==COMPONENT_Y) ? 0 : 1; // assume 420, could use getComponentScaleX, getComponentScaleY
@@ -3238,7 +3238,7 @@ Distortion RdCost::xGetSSE16N_WTD( const DistParam &rcDtParam )
 #endif
   for( ; iRows != 0; iRows-- )
   {
-    for (Int n = 0; n < iCols; n+=16 )
+    for (int n = 0; n < iCols; n+=16 )
     {
       uiSum += getWeightedMSE(rcDtParam.compID, piOrg[n+0 ], piCur[n+0 ], uiShift, piOrgLuma[size_t(n+0)<<cShift ]);  // iTemp = piOrg[n+ 0] - piCur[n+ 0]; uiSum += Distortion(( iTemp * iTemp ) >> uiShift);
       uiSum += getWeightedMSE(rcDtParam.compID, piOrg[n+1 ], piCur[n+1 ], uiShift, piOrgLuma[size_t(n+1)<<cShift ]);  // iTemp = piOrg[n+ 1] - piCur[n+ 1]; uiSum += Distortion(( iTemp * iTemp ) >> uiShift);
@@ -3271,11 +3271,11 @@ Distortion RdCost::xGetSSE32_WTD( const DistParam &rcDtParam )
     CHECK( rcDtParam.org.width != 32, "" );
     return RdCostWeightPrediction::xGetSSEw( rcDtParam );
   }
-        Int  iRows = rcDtParam.org.height;
+        int  iRows = rcDtParam.org.height;
   const Pel* piOrg = rcDtParam.org.buf;
   const Pel* piCur = rcDtParam.cur.buf;
-  const Int  iStrideCur = rcDtParam.cur.stride;
-  const Int  iStrideOrg = rcDtParam.org.stride;
+  const int  iStrideCur = rcDtParam.cur.stride;
+  const int  iStrideOrg = rcDtParam.org.stride;
   const Pel* piOrgLuma        = rcDtParam.orgLuma.buf;
   const size_t  iStrideOrgLuma   = rcDtParam.orgLuma.stride;
   const size_t  cShift           = (rcDtParam.compID==COMPONENT_Y) ? 0 : 1; // assume 420, could use getComponentScaleX, getComponentScaleY
@@ -3334,11 +3334,11 @@ Distortion RdCost::xGetSSE64_WTD( const DistParam &rcDtParam )
     CHECK( rcDtParam.org.width != 64, "" );
     return RdCostWeightPrediction::xGetSSEw( rcDtParam );
   }
-        Int  iRows = rcDtParam.org.height;
+        int  iRows = rcDtParam.org.height;
   const Pel* piOrg = rcDtParam.org.buf;
   const Pel* piCur = rcDtParam.cur.buf;
-  const Int  iStrideCur = rcDtParam.cur.stride;
-  const Int  iStrideOrg = rcDtParam.org.stride;
+  const int  iStrideCur = rcDtParam.cur.stride;
+  const int  iStrideOrg = rcDtParam.org.stride;
   const Pel* piOrgLuma        = rcDtParam.orgLuma.buf;
   const size_t iStrideOrgLuma   = rcDtParam.orgLuma.stride;
   const size_t cShift           = (rcDtParam.compID==COMPONENT_Y) ? 0 : 1; // assume 420, could use getComponentScaleX, getComponentScaleY

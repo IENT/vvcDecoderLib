@@ -87,7 +87,7 @@ static void md5_plane(MD5& md5, const Pel* plane, UInt width, UInt height, UInt 
 }
 
 
-UInt compCRC(Int bitdepth, const Pel* plane, UInt width, UInt height, UInt stride, PictureHash &digest)
+UInt compCRC(int bitdepth, const Pel* plane, UInt width, UInt height, UInt stride, PictureHash &digest)
 {
   UInt crcMsb;
   UInt bitVal;
@@ -140,7 +140,7 @@ UInt calcCRC(const CPelUnitBuf& pic, PictureHash &digest, const BitDepths &bitDe
   return digestLen;
 }
 
-UInt compChecksum(Int bitdepth, const Pel* plane, UInt width, UInt height, UInt stride, PictureHash &digest, const BitDepths &/*bitDepths*/)
+UInt compChecksum(int bitdepth, const Pel* plane, UInt width, UInt height, UInt stride, PictureHash &digest, const BitDepths &/*bitDepths*/)
 {
   UInt checksum = 0;
   uint8_t xor_mask;
@@ -211,12 +211,12 @@ UInt calcMD5(const CPelUnitBuf& pic, PictureHash &digest, const BitDepths &bitDe
   return 16;
 }
 
-std::string hashToString(const PictureHash &digest, Int numChar)
+std::string hashToString(const PictureHash &digest, int numChar)
 {
   static const char* hex = "0123456789abcdef";
   std::string result;
 
-  for(Int pos=0; pos<Int(digest.hash.size()); pos++)
+  for(int pos=0; pos<int(digest.hash.size()); pos++)
   {
     if ((pos % numChar) == 0 && pos!=0 )
     {
@@ -233,7 +233,7 @@ int calcAndPrintHashStatus(const CPelUnitBuf& pic, const SEIDecodedPictureHash* 
 {
   /* calculate MD5sum for entire reconstructed picture */
   PictureHash recon_digest;
-  Int numChar=0;
+  int numChar=0;
   const char* hashType = "\0";
 
   if (pictureHashSEI)

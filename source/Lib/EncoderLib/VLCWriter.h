@@ -79,12 +79,12 @@ protected:
 
   void  xWriteCode            ( UInt uiCode, UInt uiLength );
   void  xWriteUvlc            ( UInt uiCode );
-  void  xWriteSvlc            ( Int  iCode   );
+  void  xWriteSvlc            ( int  iCode   );
   void  xWriteFlag            ( UInt uiCode );
 #if ENABLE_TRACING
   void  xWriteCodeTr          ( UInt value, UInt  length, const char *pSymbolName);
   void  xWriteUvlcTr          ( UInt value,               const char *pSymbolName);
-  void  xWriteSvlcTr          ( Int  value,               const char *pSymbolName);
+  void  xWriteSvlcTr          ( int  value,               const char *pSymbolName);
   void  xWriteFlagTr          ( UInt value,               const char *pSymbolName);
 #endif
   void  xWriteRbspTrailingBits();
@@ -98,7 +98,7 @@ public:
   AUDWriter() {};
   virtual ~AUDWriter() {};
 
-  void  codeAUD(OutputBitstream& bs, const Int pictureType);
+  void  codeAUD(OutputBitstream& bs, const int pictureType);
 };
 
 
@@ -113,8 +113,8 @@ public:
   void  init( CABACDataStore& cabacDataStore ) { m_CABACDataStore = &cabacDataStore; }
 #endif
 private:
-  void xCodeShortTermRefPicSet  ( const ReferencePictureSet* pcRPS, bool calledFromSliceHeader, Int idx );
-  bool xFindMatchingLTRP        ( Slice* pcSlice, UInt *ltrpsIndex, Int ltrpPOC, bool usedFlag );
+  void xCodeShortTermRefPicSet  ( const ReferencePictureSet* pcRPS, bool calledFromSliceHeader, int idx );
+  bool xFindMatchingLTRP        ( Slice* pcSlice, UInt *ltrpsIndex, int ltrpPOC, bool usedFlag );
   void xCodePredWeightTable     ( Slice* pcSlice );
 #if HEVC_USE_SCALING_LISTS
   void xCodeScalingList         ( const ScalingList* scalingList, UInt sizeId, UInt listId);
@@ -133,7 +133,7 @@ public:
   void  codeVPS                 ( const VPS* pcVPS );
 #endif
   void  codeSliceHeader         ( Slice* pcSlice );
-  void  codePTL                 ( const PTL* pcPTL, bool profilePresentFlag, Int maxNumSubLayersMinus1);
+  void  codePTL                 ( const PTL* pcPTL, bool profilePresentFlag, int maxNumSubLayersMinus1);
   void  codeProfileTier         ( const ProfileTierLevel* ptl, const bool bIsSubLayer );
   void  codeHrdParameters       ( const HRD *hrd, bool commonInfPresentFlag, UInt maxNumSubLayersMinus1 );
 #if HEVC_TILES_WPP

@@ -50,9 +50,9 @@ private:
 
   // member functions
 
-  bool  xSelectWP            (Slice *const slice, const Int log2Denom);
-  bool  xSelectWPHistExtClip (Slice *const slice, const Int log2Denom, const bool bDoEnhancement, const bool bClipInitialSADWP, const bool bUseHistogram);
-  bool  xUpdatingWPParameters(Slice *const slice, const Int log2Denom);
+  bool  xSelectWP            (Slice *const slice, const int log2Denom);
+  bool  xSelectWPHistExtClip (Slice *const slice, const int log2Denom, const bool bDoEnhancement, const bool bClipInitialSADWP, const bool bUseHistogram);
+  bool  xUpdatingWPParameters(Slice *const slice, const int log2Denom);
 
 public:
 

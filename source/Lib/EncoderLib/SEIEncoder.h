@@ -72,10 +72,10 @@ public:
 #else
   void initSEIActiveParameterSets (SEIActiveParameterSets *sei, const SPS *sps);
 #endif
-  void initSEIFramePacking(SEIFramePacking *sei, Int currPicNum);
+  void initSEIFramePacking(SEIFramePacking *sei, int currPicNum);
   void initSEIDisplayOrientation(SEIDisplayOrientation *sei);
   void initSEIToneMappingInfo(SEIToneMappingInfo *sei);
-  void initSEISOPDescription(SEISOPDescription *sei, Slice *slice, Int picInGOP, Int lastIdr, Int currGOPSize);
+  void initSEISOPDescription(SEISOPDescription *sei, Slice *slice, int picInGOP, int lastIdr, int currGOPSize);
   void initSEIBufferingPeriod(SEIBufferingPeriod *sei, Slice *slice);
   void initSEIScalableNesting(SEIScalableNesting *sei, SEIMessages &nestedSEIs);
   void initSEIRecoveryPoint(SEIRecoveryPoint *sei, Slice *slice);
@@ -84,9 +84,9 @@ public:
   void initSEITempMotionConstrainedTileSets (SEITempMotionConstrainedTileSets *sei, const PPS *pps);
 #endif
   void initSEIKneeFunctionInfo(SEIKneeFunctionInfo *sei);
-  void initSEIChromaResamplingFilterHint(SEIChromaResamplingFilterHint *sei, Int iHorFilterIndex, Int iVerFilterIndex);
+  void initSEIChromaResamplingFilterHint(SEIChromaResamplingFilterHint *sei, int iHorFilterIndex, int iVerFilterIndex);
   void initSEITimeCode(SEITimeCode *sei);
-  bool initSEIColourRemappingInfo(SEIColourRemappingInfo *sei, Int currPOC); // returns true on success, false on failure.
+  bool initSEIColourRemappingInfo(SEIColourRemappingInfo *sei, int currPOC); // returns true on success, false on failure.
 #if U0033_ALTERNATIVE_TRANSFER_CHARACTERISTICS_SEI
   void initSEIAlternativeTransferCharacteristics(SEIAlternativeTransferCharacteristics *sei);
 #endif

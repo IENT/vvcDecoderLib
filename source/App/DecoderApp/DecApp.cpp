@@ -75,7 +75,7 @@ DecApp::DecApp()
  */
 UInt DecApp::decode()
 {
-  Int                 poc;
+  int                 poc;
   PicList* pcListPic = NULL;
 
   ifstream bitstreamFile(m_bitstreamFileName.c_str(), ifstream::in | ifstream::binary);
@@ -312,8 +312,8 @@ void DecApp::xWriteOutput( PicList* pcListPic, UInt tId )
   }
 
   PicList::iterator iterPic   = pcListPic->begin();
-  Int numPicsNotYetDisplayed = 0;
-  Int dpbFullness = 0;
+  int numPicsNotYetDisplayed = 0;
+  int dpbFullness = 0;
   const SPS* activeSPS = (pcListPic->front()->cs->sps);
   UInt numReorderPicsHighestTid;
   UInt maxDecPicBufferingHighestTid;
@@ -600,7 +600,7 @@ bool DecApp::isNaluWithinTargetDecLayerIdSet( InputNALUnit* nalu )
   {
     return true;
   }
-  for (std::vector<Int>::iterator it = m_targetDecLayerIdSet.begin(); it != m_targetDecLayerIdSet.end(); it++)
+  for (std::vector<int>::iterator it = m_targetDecLayerIdSet.begin(); it != m_targetDecLayerIdSet.end(); it++)
   {
     if ( nalu->m_nuhLayerId == (*it) )
     {

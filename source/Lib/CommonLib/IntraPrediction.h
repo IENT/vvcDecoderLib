@@ -67,7 +67,7 @@ class IntraPrediction
 private:
 
   Pel* m_piYuvExt[MAX_NUM_COMPONENT][NUM_PRED_BUF];
-  Int  m_iYuvExtSize;
+  int  m_iYuvExtSize;
 
 
   static const uint8_t m_aucIntraFilter[MAX_NUM_CHANNEL_TYPE][MAX_INTRA_FILTER_DEPTHS];
@@ -131,27 +131,27 @@ protected:
 
   void destroy                    ();
 
-  void xFilterGroup               ( Pel* pMulDst[], Int i, Pel const* const piSrc, Int iRecStride, bool bAboveAvaillable, bool bLeftAvaillable);
+  void xFilterGroup               ( Pel* pMulDst[], int i, Pel const* const piSrc, int iRecStride, bool bAboveAvaillable, bool bLeftAvaillable);
 #if !JVET_K0190
 #if JEM_TOOLS
 
   struct MMLM_parameter
   {
-    Int Inf;  // Inferio boundary
-    Int Sup;  // Superior bounday
-    Int a;
-    Int b;
-    Int shift;
+    int Inf;  // Inferio boundary
+    int Sup;  // Superior bounday
+    int a;
+    int b;
+    int shift;
   };
 
-  Int xCalcLMParametersGeneralized(Int x, Int y, Int xx, Int xy, Int count, Int bitDepth, Int &a, Int &b, Int &iShift);
-  Int xLMSampleClassifiedTraining (Int count, Int LumaSamples[], Int ChrmSamples[], Int GroupNum, Int bitDepth, MMLM_parameter parameters[]);
-  Int xGetMMLMParameters          (const PredictionUnit &pu, const ComponentID compID, const CompArea& chromaArea, Int &numClass, MMLM_parameter parameters[]);
-  void xGetLMParameters           (const PredictionUnit &pu, const ComponentID compID, const CompArea& chromaArea, Int iPredType, Int& a, Int& b, Int& iShift);
+  int xCalcLMParametersGeneralized(int x, int y, int xx, int xy, int count, int bitDepth, int &a, int &b, int &iShift);
+  int xLMSampleClassifiedTraining (int count, int LumaSamples[], int ChrmSamples[], int GroupNum, int bitDepth, MMLM_parameter parameters[]);
+  int xGetMMLMParameters          (const PredictionUnit &pu, const ComponentID compID, const CompArea& chromaArea, int &numClass, MMLM_parameter parameters[]);
+  void xGetLMParameters           (const PredictionUnit &pu, const ComponentID compID, const CompArea& chromaArea, int iPredType, int& a, int& b, int& iShift);
 
 #endif
 #else
-  void xGetLMParameters(const PredictionUnit &pu, const ComponentID compID, const CompArea& chromaArea, Int& a, Int& b, Int& iShift);
+  void xGetLMParameters(const PredictionUnit &pu, const ComponentID compID, const CompArea& chromaArea, int& a, int& b, int& iShift);
 #endif
 public:
   IntraPrediction();
@@ -164,12 +164,12 @@ public:
   Pel*  getPredictorPtr           (const ComponentID compID, const bool bUseFilteredPredictions = false) { return m_piYuvExt[compID][bUseFilteredPredictions?PRED_BUF_FILTERED:PRED_BUF_UNFILTERED]; }
 #if JVET_K0190
   // Cross-component Chroma
-  void predIntraChromaLM(const ComponentID compID, PelBuf &piPred, const PredictionUnit &pu, const CompArea& chromaArea, Int intraDir);
+  void predIntraChromaLM(const ComponentID compID, PelBuf &piPred, const PredictionUnit &pu, const CompArea& chromaArea, int intraDir);
   void xGetLumaRecPixels(const PredictionUnit &pu, CompArea chromaArea);
 #else
 #if JEM_TOOLS
   // Cross-component Chroma
-  void predIntraChromaLM          (const ComponentID compID, PelBuf &piPred, const PredictionUnit &pu, const CompArea& chromaArea, Int intraDir);
+  void predIntraChromaLM          (const ComponentID compID, PelBuf &piPred, const PredictionUnit &pu, const CompArea& chromaArea, int intraDir);
   void xGetLumaRecPixels          (const PredictionUnit &pu, CompArea chromaArea);
   void addCrossColorResi          (const ComponentID compID, PelBuf &piPred, const TransformUnit &tu, const CPelBuf &pResiCb);
 #endif

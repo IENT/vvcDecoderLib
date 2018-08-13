@@ -79,7 +79,7 @@ void EncApp::xInitLibCfg()
     vps.setTemporalNestingFlag(true);
   }
   vps.setMaxLayers                                                ( 1 );
-  for(Int i = 0; i < MAX_TLAYER; i++)
+  for(int i = 0; i < MAX_TLAYER; i++)
   {
     vps.setNumReorderPics                                         ( m_numReorderPics[i], i );
     vps.setMaxDecPicBuffering                                     ( m_maxDecPicBuffering[i], i );
@@ -118,7 +118,7 @@ void EncApp::xInitLibCfg()
   m_cEncLib.setGOPSize                                           ( m_iGOPSize );
   m_cEncLib.setGopList                                           ( m_GOPList );
   m_cEncLib.setExtraRPSs                                         ( m_extraRPSs );
-  for(Int i = 0; i < MAX_TLAYER; i++)
+  for(int i = 0; i < MAX_TLAYER; i++)
   {
     m_cEncLib.setNumReorderPics                                  ( m_numReorderPics[i], i );
     m_cEncLib.setMaxDecPicBuffering                              ( m_maxDecPicBuffering[i], i );
@@ -449,7 +449,7 @@ void EncApp::xInitLibCfg()
   m_cEncLib.setTMCTSSEIEnabled                                   ( m_tmctsSEIEnabled );
   m_cEncLib.setTimeCodeSEIEnabled                                ( m_timeCodeSEIEnabled );
   m_cEncLib.setNumberOfTimeSets                                  ( m_timeCodeSEINumTs );
-  for(Int i = 0; i < m_timeCodeSEINumTs; i++)
+  for(int i = 0; i < m_timeCodeSEINumTs; i++)
   {
     m_cEncLib.setTimeSet(m_timeSetArray[i], i);
   }
@@ -486,7 +486,7 @@ void EncApp::xInitLibCfg()
 #endif
   m_cEncLib.xCheckGSParameters();
 #if HEVC_TILES_WPP
-  Int uiTilesCount = (m_numTileRowsMinus1+1) * (m_numTileColumnsMinus1+1);
+  int uiTilesCount = (m_numTileRowsMinus1+1) * (m_numTileColumnsMinus1+1);
   if(uiTilesCount == 1)
   {
     m_bLFCrossTileBoundaryFlag = true;
@@ -660,7 +660,7 @@ void EncApp::encode()
   printChromaFormat();
 
   // main encoder loop
-  Int   iNumEncoded = 0;
+  int   iNumEncoded = 0;
   bool  bEos = false;
 
   const InputColourSpaceConversion ipCSC  =  m_inputColourSpaceConvert;
@@ -668,7 +668,7 @@ void EncApp::encode()
 
   PelStorage trueOrgPic;
   PelStorage orgPic;
-  const Int sourceHeight = m_isField ? m_iSourceHeightOrg : m_iSourceHeight;
+  const int sourceHeight = m_isField ? m_iSourceHeightOrg : m_iSourceHeight;
   UnitArea unitArea( m_chromaFormatIDC, Area( 0, 0, m_iSourceWidth, sourceHeight ) );
 
   orgPic.create( unitArea );
@@ -768,12 +768,12 @@ void EncApp::encode()
   \param iNumEncoded    number of encoded frames
   \param accessUnits    list of access units to be written
  */
-void EncApp::xWriteOutput( Int iNumEncoded, std::list<PelUnitBuf*>& recBufList
+void EncApp::xWriteOutput( int iNumEncoded, std::list<PelUnitBuf*>& recBufList
                           )
 {
   const InputColourSpaceConversion ipCSC = (!m_outputInternalColourSpace) ? m_inputColourSpaceConvert : IPCOLOURSPACE_UNCHANGED;
   std::list<PelUnitBuf*>::iterator iterPicYuvRec = recBufList.end();
-  Int i;
+  int i;
 
   for ( i = 0; i < iNumEncoded; i++ )
   {

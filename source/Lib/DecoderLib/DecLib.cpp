@@ -217,8 +217,8 @@ bool tryDecodePicture( Picture* pcEncPic, const int expectedPoc, const std::stri
           if( ! pcListPic->empty())
           {
             PicList::iterator iterPic   = pcListPic->begin();
-            Int numPicsNotYetDisplayed = 0;
-            Int dpbFullness = 0;
+            int numPicsNotYetDisplayed = 0;
+            int dpbFullness = 0;
             const SPS* activeSPS = (pcListPic->front()->cs->sps);
             UInt maxNrSublayers = activeSPS->getMaxTLayers();
             UInt numReorderPicsHighestTid = activeSPS->getNumReorderPics(maxNrSublayers-1);
@@ -426,9 +426,9 @@ void DecLib::init(
 void DecLib::deletePicBuffer ( )
 {
   PicList::iterator  iterPic   = m_cListPic.begin();
-  Int iSize = Int( m_cListPic.size() );
+  int iSize = int( m_cListPic.size() );
 
-  for (Int i = 0; i < iSize; i++ )
+  for (int i = 0; i < iSize; i++ )
   {
     Picture* pcPic = *(iterPic++);
     pcPic->destroy();
@@ -558,7 +558,7 @@ void DecLib::executeLoopFilters()
 #endif
 }
 
-void DecLib::finishPictureLight(Int& poc, PicList*& rpcListPic )
+void DecLib::finishPictureLight(int& poc, PicList*& rpcListPic )
 {
   Slice*  pcSlice = m_pcPic->cs->slice;
 
@@ -570,7 +570,7 @@ void DecLib::finishPictureLight(Int& poc, PicList*& rpcListPic )
   rpcListPic          = &m_cListPic;
 }
 
-void DecLib::finishPicture(Int& poc, PicList*& rpcListPic, MsgLevel msgl )
+void DecLib::finishPicture(int& poc, PicList*& rpcListPic, MsgLevel msgl )
 {
   Slice*  pcSlice = m_pcPic->cs->slice;
 #if JEM_TOOLS && !JVET_K0371_ALF
@@ -594,10 +594,10 @@ void DecLib::finishPicture(Int& poc, PicList*& rpcListPic, MsgLevel msgl )
          pcSlice->getSliceQp() );
   msg( msgl, "[DT %6.3f] ", pcSlice->getProcessingTime() );
 
-  for (Int iRefList = 0; iRefList < 2; iRefList++)
+  for (int iRefList = 0; iRefList < 2; iRefList++)
   {
     msg( msgl, "[L%d ", iRefList);
-    for (Int iRefIndex = 0; iRefIndex < pcSlice->getNumRefIdx(RefPicList(iRefList)); iRefIndex++)
+    for (int iRefIndex = 0; iRefIndex < pcSlice->getNumRefIdx(RefPicList(iRefList)); iRefIndex++)
     {
       msg( msgl, "%d ", pcSlice->getRefPOC(RefPicList(iRefList), iRefIndex));
     }
@@ -663,7 +663,7 @@ void DecLib::xUpdateRasInit(Slice* slice)
   }
 }
 
-void DecLib::xCreateLostPicture(Int iLostPoc)
+void DecLib::xCreateLostPicture(int iLostPoc)
 {
   msg( INFO, "\ninserting lost poc : %d\n",iLostPoc);
   Picture *cFillPic = xGetNewPicBuffer(*(m_parameterSetManager.getFirstSPS()), *(m_parameterSetManager.getFirstPPS()), 0);
@@ -673,7 +673,7 @@ void DecLib::xCreateLostPicture(Int iLostPoc)
   cFillPic->slices[0]->initSlice();
 
   PicList::iterator iterPic = m_cListPic.begin();
-  Int closestPoc = 1000000;
+  int closestPoc = 1000000;
   while ( iterPic != m_cListPic.end())
   {
     Picture * rpcPic = *(iterPic++);
@@ -694,7 +694,7 @@ void DecLib::xCreateLostPicture(Int iLostPoc)
     }
   }
 
-//  for(Int ctuRsAddr=0; ctuRsAddr<cFillPic->getNumberOfCtusInFrame(); ctuRsAddr++)  { cFillPic->getCtu(ctuRsAddr)->initCtu(cFillPic, ctuRsAddr); }
+//  for(int ctuRsAddr=0; ctuRsAddr<cFillPic->getNumberOfCtusInFrame(); ctuRsAddr++)  { cFillPic->getCtu(ctuRsAddr)->initCtu(cFillPic, ctuRsAddr); }
   cFillPic->referenced = true;
   cFillPic->slices[0]->setPOC(iLostPoc);
   xUpdatePreviousTid0POC(cFillPic->slices[0]);
@@ -909,7 +909,7 @@ void DecLib::xParsePrefixSEImessages()
 }
 
 
-bool DecLib::xDecodeSlice(InputNALUnit &nalu, Int &iSkipFrame, Int iPOCLastDisplay )
+bool DecLib::xDecodeSlice(InputNALUnit &nalu, int &iSkipFrame, int iPOCLastDisplay )
 {
   m_apcSlicePilot->initSlice(); // the slice pilot is an object to prepare for a new slice
                                 // it is not associated with picture, sps or pps structures.
@@ -1021,7 +1021,7 @@ bool DecLib::xDecodeSlice(InputNALUnit &nalu, Int &iSkipFrame, Int iPOCLastDispl
     CHECK(pps == 0, "No PPS present");
     SPS *sps = m_parameterSetManager.getSPS(pps->getSPSId());
     CHECK(sps == 0, "No SPS present");
-    Int iMaxPOClsb = 1 << sps->getBitsForPOC();
+    int iMaxPOClsb = 1 << sps->getBitsForPOC();
     m_apcSlicePilot->setPOC( m_apcSlicePilot->getPOC() & (iMaxPOClsb - 1) );
     xUpdatePreviousTid0POC(m_apcSlicePilot);
   }
@@ -1077,7 +1077,7 @@ bool DecLib::xDecodeSlice(InputNALUnit &nalu, Int &iSkipFrame, Int iPOCLastDispl
 
   //detect lost reference picture and insert copy of earlier frame.
   {
-    Int lostPoc;
+    int lostPoc;
     while((lostPoc=m_apcSlicePilot->checkThatAllRefPicsAreAvailable(m_cListPic, m_apcSlicePilot->getRPS(), true, m_pocRandomAccess)) > 0)
     {
       xCreateLostPicture(lostPoc-1);
@@ -1145,8 +1145,8 @@ bool DecLib::xDecodeSlice(InputNALUnit &nalu, Int &iSkipFrame, Int iPOCLastDispl
     if (!pcSlice->isIntra())
     {
       bool bLowDelay = true;
-      Int  iCurrPOC  = pcSlice->getPOC();
-      Int iRefIdx = 0;
+      int  iCurrPOC  = pcSlice->getPOC();
+      int iRefIdx = 0;
 
       for (iRefIdx = 0; iRefIdx < pcSlice->getNumRefIdx(REF_PIC_LIST_0) && bLowDelay; iRefIdx++)
       {
@@ -1281,7 +1281,7 @@ void DecLib::xDecodePPS( InputNALUnit& nalu )
   m_parameterSetManager.storePPS( pps, nalu.getBitstream().getFifo() );
 }
 
-bool DecLib::decode(InputNALUnit& nalu, Int& iSkipFrame, Int& iPOCLastDisplay)
+bool DecLib::decode(InputNALUnit& nalu, int& iSkipFrame, int& iPOCLastDisplay)
 {
   bool ret;
   // ignore all NAL units of layers > 0
@@ -1443,7 +1443,7 @@ bool DecLib::decode(InputNALUnit& nalu, Int& iSkipFrame, Int& iPOCLastDisplay)
 /** Function for checking if picture should be skipped because of association with a previous BLA picture
  *  This function skips all TFD pictures that follow a BLA picture in decoding order and precede it in output order.
  */
-bool DecLib::isSkipPictureForBLA( Int& iPOCLastDisplay )
+bool DecLib::isSkipPictureForBLA( int& iPOCLastDisplay )
 {
   if( ( m_associatedIRAPType == NAL_UNIT_CODED_SLICE_BLA_N_LP || m_associatedIRAPType == NAL_UNIT_CODED_SLICE_BLA_W_LP || m_associatedIRAPType == NAL_UNIT_CODED_SLICE_BLA_W_RADL ) &&
         m_apcSlicePilot->getPOC() < m_pocCRA && ( m_apcSlicePilot->getNalUnitType() == NAL_UNIT_CODED_SLICE_RASL_R || m_apcSlicePilot->getNalUnitType() == NAL_UNIT_CODED_SLICE_RASL_N ) )
@@ -1463,7 +1463,7 @@ bool DecLib::isSkipPictureForBLA( Int& iPOCLastDisplay )
  *  equal to or greater than the random access point POC is attempted. For non IDR/CRA/BLA random
  *  access point there is no guarantee that the decoder will not crash.
  */
-bool DecLib::isRandomAccessSkipPicture( Int& iSkipFrame, Int& iPOCLastDisplay )
+bool DecLib::isRandomAccessSkipPicture( int& iSkipFrame, int& iPOCLastDisplay )
 {
   if (iSkipFrame)
   {

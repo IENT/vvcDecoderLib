@@ -59,8 +59,8 @@ struct NALUnit
   /** construct an NALunit structure with given header values. */
   NALUnit(
     NalUnitType nalUnitType,
-    Int         temporalId = 0,
-    Int         nuhLayerId = 0)
+    int         temporalId = 0,
+    int         nuhLayerId = 0)
     :m_nalUnitType (nalUnitType)
     ,m_temporalId  (temporalId)
     ,m_nuhLayerId  (nuhLayerId)

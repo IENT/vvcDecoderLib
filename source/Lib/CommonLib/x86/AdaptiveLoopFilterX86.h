@@ -171,7 +171,7 @@ static void simdDeriveClassificationBlk( AlfClassifier** classifier, int** lapla
     }
   }
 
-  //const Int offset = 8 << NO_VALS_LAGR_SHIFT;
+  //const int offset = 8 << NO_VALS_LAGR_SHIFT;
 
   const __m128i mm_0 = _mm_setzero_si128();
   const __m128i mm_15 = _mm_set1_epi64x( 0x000000000000000F );

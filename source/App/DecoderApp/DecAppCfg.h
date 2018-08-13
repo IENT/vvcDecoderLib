@@ -58,16 +58,16 @@ class DecAppCfg
 protected:
   std::string   m_bitstreamFileName;                    ///< input bitstream file name
   std::string   m_reconFileName;                        ///< output reconstruction file name
-  Int           m_iSkipFrame;                           ///< counter for frames prior to the random access point to skip
-  Int           m_outputBitDepth[MAX_NUM_CHANNEL_TYPE]; ///< bit depth used for writing output
+  int           m_iSkipFrame;                           ///< counter for frames prior to the random access point to skip
+  int           m_outputBitDepth[MAX_NUM_CHANNEL_TYPE]; ///< bit depth used for writing output
   InputColourSpaceConversion m_outputColourSpaceConvert;
 
-  Int           m_iMaxTemporalLayer;                  ///< maximum temporal layer to be decoded
-  Int           m_decodedPictureHashSEIEnabled;       ///< Checksum(3)/CRC(2)/MD5(1)/disable(0) acting on decoded picture hash SEI message
+  int           m_iMaxTemporalLayer;                  ///< maximum temporal layer to be decoded
+  int           m_decodedPictureHashSEIEnabled;       ///< Checksum(3)/CRC(2)/MD5(1)/disable(0) acting on decoded picture hash SEI message
   bool          m_decodedNoDisplaySEIEnabled;         ///< Enable(true)/disable(false) writing only pictures that get displayed based on the no display SEI message
   std::string   m_colourRemapSEIFileName;             ///< output Colour Remapping file name
-  std::vector<Int> m_targetDecLayerIdSet;             ///< set of LayerIds to be included in the sub-bitstream extraction process.
-  Int           m_respectDefDispWindow;               ///< Only output content inside the default display window
+  std::vector<int> m_targetDecLayerIdSet;             ///< set of LayerIds to be included in the sub-bitstream extraction process.
+  int           m_respectDefDispWindow;               ///< Only output content inside the default display window
   std::string   m_outputDecodedSEIMessagesFilename;   ///< filename to output decoded SEI messages to. If '-', then use stdout. If empty, do not output details.
   bool          m_bClipOutputVideoToRec709Range;      ///< If true, clip the output video to the Rec 709 range on saving.
   std::string   m_cacheCfgFile;                       ///< Config file of cache model
@@ -76,7 +76,7 @@ public:
   DecAppCfg();
   virtual ~DecAppCfg();
 
-  bool  parseCfg        ( Int argc, char* argv[] );   ///< initialize option class from configuration
+  bool  parseCfg        ( int argc, char* argv[] );   ///< initialize option class from configuration
 };
 
 //! \}

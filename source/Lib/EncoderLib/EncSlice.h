@@ -87,7 +87,7 @@ private:
   uint64_t                  m_uiPicDist;                          ///< total distortion for the picture
   std::vector<double>     m_vdRdPicLambda;                      ///< array of lambda candidates
   std::vector<double>     m_vdRdPicQp;                          ///< array of picture QP candidates (double-type for lambda)
-  std::vector<Int>        m_viRdPicQp;                          ///< array of picture QP candidates (Int-type)
+  std::vector<int>        m_viRdPicQp;                          ///< array of picture QP candidates (int-type)
   RateCtrl*               m_pcRateCtrl;                         ///< Rate control manager
   UInt                    m_uiSliceSegmentIdx;
 #if HEVC_DEPENDENT_SLICES
@@ -101,26 +101,26 @@ private:
 #endif
   SliceType               m_encCABACTableIdx;
 #if SHARP_LUMA_DELTA_QP
-  Int                     m_gopID;
+  int                     m_gopID;
 #endif
 
 #if SHARP_LUMA_DELTA_QP
 public:
-  Int getGopId()        const { return m_gopID; }
-  double  calculateLambda( const Slice* slice, const Int GOPid, const Int depth, const double refQP, const double dQP, Int &iQP );
+  int getGopId()        const { return m_gopID; }
+  double  calculateLambda( const Slice* slice, const int GOPid, const int depth, const double refQP, const double dQP, int &iQP );
 #if WCG_EXT
-  void    setUpLambda( Slice* slice, const double dLambda, Int iQP );
+  void    setUpLambda( Slice* slice, const double dLambda, int iQP );
 #endif
   
 private:
 #endif
 #if !WCG_EXT
-  void    setUpLambda( Slice* slice, const double dLambda, Int iQP );
+  void    setUpLambda( Slice* slice, const double dLambda, int iQP );
 #endif
 #if HEVC_TILES_WPP
-  void    calculateBoundingCtuTsAddrForSlice( UInt &startCtuTSAddrSlice, UInt &boundingCtuTSAddrSlice, bool &haveReachedTileBoundary, Picture* pcPic, const Int sliceMode, const Int sliceArgument );
+  void    calculateBoundingCtuTsAddrForSlice( UInt &startCtuTSAddrSlice, UInt &boundingCtuTSAddrSlice, bool &haveReachedTileBoundary, Picture* pcPic, const int sliceMode, const int sliceArgument );
 #else
-  void    calculateBoundingCtuTsAddrForSlice( UInt &startCtuTSAddrSlice, UInt &boundingCtuTSAddrSlice, Picture* pcPic, const Int sliceMode, const Int sliceArgument );
+  void    calculateBoundingCtuTsAddrForSlice( UInt &startCtuTSAddrSlice, UInt &boundingCtuTSAddrSlice, Picture* pcPic, const int sliceMode, const int sliceArgument );
 #endif
 
 
@@ -128,14 +128,14 @@ public:
   EncSlice();
   virtual ~EncSlice();
 
-  void    create              ( Int iWidth, Int iHeight, ChromaFormat chromaFormat, UInt iMaxCUWidth, UInt iMaxCUHeight, uint8_t uhTotalDepth );
+  void    create              ( int iWidth, int iHeight, ChromaFormat chromaFormat, UInt iMaxCUWidth, UInt iMaxCUHeight, uint8_t uhTotalDepth );
   void    destroy             ();
   void    init                ( EncLib* pcEncLib, const SPS& sps );
 
   /// preparation of slice encoding (reference marking, QP and lambda)
-  void    initEncSlice        ( Picture*  pcPic, const Int pocLast, const Int pocCurr,
-                                const Int iGOPid,   Slice*& rpcSlice, const bool isField );
-  void    resetQP             ( Picture* pic, Int sliceQP, double lambda );
+  void    initEncSlice        ( Picture*  pcPic, const int pocLast, const int pocCurr,
+                                const int iGOPid,   Slice*& rpcSlice, const bool isField );
+  void    resetQP             ( Picture* pic, int sliceQP, double lambda );
 
   // compress and encode slice
   void    precompressSlice    ( Picture* pcPic                                     );      ///< precompress slice for multi-loop slice-level QP opt.

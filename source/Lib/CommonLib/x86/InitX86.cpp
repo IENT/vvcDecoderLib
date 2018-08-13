@@ -56,7 +56,7 @@
 
 
 #if ENABLE_SIMD_OPT_MCIF
-void InterpolationFilter::initInterpolationFilterX86( /*Int iBitDepthY, Int iBitDepthC*/ )
+void InterpolationFilter::initInterpolationFilterX86( /*int iBitDepthY, int iBitDepthC*/ )
 {
   auto vext = read_x86_extension_flags();
   switch (vext){

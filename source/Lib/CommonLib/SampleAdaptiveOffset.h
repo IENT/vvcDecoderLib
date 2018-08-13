@@ -55,7 +55,7 @@
 // Class definition
 // ====================================================================================================================
 
-template <typename T> Int sgn(T val)
+template <typename T> int sgn(T val)
 {
   return (T(0) < val) - (val < T(0));
 }
@@ -67,9 +67,9 @@ public:
   virtual ~SampleAdaptiveOffset();
   void SAOProcess( CodingStructure& cs, SAOBlkParam* saoBlkParams
                    );
-  void create( Int picWidth, Int picHeight, ChromaFormat format, UInt maxCUWidth, UInt maxCUHeight, UInt maxCUDepth, UInt lumaBitShift, UInt chromaBitShift );
+  void create( int picWidth, int picHeight, ChromaFormat format, UInt maxCUWidth, UInt maxCUHeight, UInt maxCUDepth, UInt lumaBitShift, UInt chromaBitShift );
   void destroy();
-  static Int getMaxOffsetQVal(const Int channelBitDepth) { return (1<<(std::min<Int>(channelBitDepth,MAX_SAO_TRUNCATED_BITDEPTH)-5))-1; } //Table 9-32, inclusive
+  static int getMaxOffsetQVal(const int channelBitDepth) { return (1<<(std::min<int>(channelBitDepth,MAX_SAO_TRUNCATED_BITDEPTH)-5))-1; } //Table 9-32, inclusive
 
 protected:
   void deriveLoopFilterBoundaryAvailibility(CodingStructure& cs, const Position &pos,
@@ -83,11 +83,11 @@ protected:
     bool& isBelowRightAvail
     ) const;
 
-  void offsetBlock(const Int channelBitDepth, const ClpRng& clpRng, Int typeIdx, Int* offset, const Pel* srcBlk, Pel* resBlk, Int srcStride, Int resStride,  Int width, Int height
+  void offsetBlock(const int channelBitDepth, const ClpRng& clpRng, int typeIdx, int* offset, const Pel* srcBlk, Pel* resBlk, int srcStride, int resStride,  int width, int height
                   , bool isLeftAvail, bool isRightAvail, bool isAboveAvail, bool isBelowAvail, bool isAboveLeftAvail, bool isAboveRightAvail, bool isBelowLeftAvail, bool isBelowRightAvail);
-  void invertQuantOffsets(ComponentID compIdx, Int typeIdc, Int typeAuxInfo, Int* dstOffsets, Int* srcOffsets);
+  void invertQuantOffsets(ComponentID compIdx, int typeIdc, int typeAuxInfo, int* dstOffsets, int* srcOffsets);
   void reconstructBlkSAOParam(SAOBlkParam& recParam, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES]);
-  Int  getMergeList(CodingStructure& cs, Int ctuRsAddr, SAOBlkParam* blkParams, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES]);
+  int  getMergeList(CodingStructure& cs, int ctuRsAddr, SAOBlkParam* blkParams, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES]);
   void offsetCTU(const UnitArea& area, const CPelUnitBuf& src, PelUnitBuf& res, SAOBlkParam& saoblkParam, CodingStructure& cs);
   void xPCMLFDisableProcess(CodingStructure& cs);
   void xPCMCURestoration(CodingStructure& cs, const UnitArea &ctuArea);

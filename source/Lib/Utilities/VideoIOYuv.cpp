@@ -66,7 +66,7 @@ using namespace std;
  * @param minval  minimum clipping value when dividing.
  * @param maxval  maximum clipping value when dividing.
  */
-static void scalePlane( PelBuf& areaBuf, const Int shiftbits, const Pel minval, const Pel maxval)
+static void scalePlane( PelBuf& areaBuf, const int shiftbits, const Pel minval, const Pel maxval)
 {
   const unsigned width  = areaBuf.width;
   const unsigned height = areaBuf.height;
@@ -124,7 +124,7 @@ static void scalePlane( PelBuf& areaBuf, const Int shiftbits, const Pel minval, 
  * \param MSBExtendedBitDepth
  * \param internalBitDepth bit-depth array to scale image data to/from when reading/writing.
  */
-void VideoIOYuv::open( const std::string &fileName, bool bWriteMode, const Int fileBitDepth[MAX_NUM_CHANNEL_TYPE], const Int MSBExtendedBitDepth[MAX_NUM_CHANNEL_TYPE], const Int internalBitDepth[MAX_NUM_CHANNEL_TYPE] )
+void VideoIOYuv::open( const std::string &fileName, bool bWriteMode, const int fileBitDepth[MAX_NUM_CHANNEL_TYPE], const int MSBExtendedBitDepth[MAX_NUM_CHANNEL_TYPE], const int internalBitDepth[MAX_NUM_CHANNEL_TYPE] )
 {
   //NOTE: files cannot have bit depth greater than 16
   for(UInt ch=0; ch<MAX_NUM_CHANNEL_TYPE; ch++)
@@ -190,7 +190,7 @@ bool VideoIOYuv::isFail()
  * seekable, by consuming bytes.
  */
 #if EXTENSION_360_VIDEO
-void VideoIOYuv::skipFrames(Int numFrames, UInt width, UInt height, ChromaFormat format)
+void VideoIOYuv::skipFrames(int numFrames, UInt width, UInt height, ChromaFormat format)
 #else
 void VideoIOYuv::skipFrames(UInt numFrames, UInt width, UInt height, ChromaFormat format)
 #endif
@@ -290,7 +290,7 @@ static bool readPlane(Pel* dst,
 
   Pel  *pDstPad              = dst + stride_dest * height_dest;
   Pel  *pDstBuf              = dst;
-  const Int dstbuf_stride    = stride_dest;
+  const int dstbuf_stride    = stride_dest;
 
   if (compID!=COMPONENT_Y && (fileFormat==CHROMA_400 || destFormat==CHROMA_400))
   {
@@ -419,7 +419,7 @@ static bool writePlane(ostream& fd, const Pel* src, bool is16bit,
                        const ComponentID compID,
                        const ChromaFormat srcFormat,
                        const ChromaFormat fileFormat,
-                       const Int fileBitDepth)
+                       const int fileBitDepth)
 {
   const UInt csx_file =getComponentScaleX(compID, fileFormat);
   const UInt csy_file =getComponentScaleY(compID, fileFormat);
@@ -436,7 +436,7 @@ static bool writePlane(ostream& fd, const Pel* src, bool is16bit,
   uint8_t *buf=&(bufVec[0]);
 
   const Pel *pSrcBuf         = src;
-  const Int srcbuf_stride    = stride_src;
+  const int srcbuf_stride    = stride_src;
 
 
 
@@ -692,7 +692,7 @@ static bool writeField(ostream& fd, const Pel* top, const Pel* bottom, bool is16
  * @param format           chroma format
  * @return true for success, false in case of error
  */
-bool VideoIOYuv::read ( PelUnitBuf& pic, PelUnitBuf& picOrg, const InputColourSpaceConversion ipcsc, Int aiPad[2], ChromaFormat format, const bool bClipToRec709 )
+bool VideoIOYuv::read ( PelUnitBuf& pic, PelUnitBuf& picOrg, const InputColourSpaceConversion ipcsc, int aiPad[2], ChromaFormat format, const bool bClipToRec709 )
 {
   // check end-of-file
   if ( isEof() )
@@ -734,7 +734,7 @@ bool VideoIOYuv::read ( PelUnitBuf& pic, PelUnitBuf& picOrg, const InputColourSp
     const ComponentID compID = ComponentID(comp);
     const ChannelType chType=toChannelType(compID);
 
-    const Int desired_bitdepth = m_MSBExtendedBitDepth[chType] + m_bitdepthShift[chType];
+    const int desired_bitdepth = m_MSBExtendedBitDepth[chType] + m_bitdepthShift[chType];
 
     const bool b709Compliance=(bClipToRec709) && (m_bitdepthShift[chType] < 0 && desired_bitdepth >= 8);     /* ITU-R BT.709 compliant clipping for converting say 10b to 8b */
     const Pel minval = b709Compliance? ((   1 << (desired_bitdepth - 8))   ) : 0;
@@ -777,7 +777,7 @@ bool VideoIOYuv::read ( PelUnitBuf& pic, PelUnitBuf& picOrg, const InputColourSp
  * @return true for success, false in case of error
  */
 bool VideoIOYuv::write( const CPelUnitBuf& pic,
-                        const InputColourSpaceConversion ipCSC, Int confLeft, Int confRight, Int confTop, Int confBottom, ChromaFormat format, const bool bClipToRec709 )
+                        const InputColourSpaceConversion ipCSC, int confLeft, int confRight, int confTop, int confBottom, ChromaFormat format, const bool bClipToRec709 )
 {
   PelStorage interm;
 
@@ -847,7 +847,7 @@ bool VideoIOYuv::write( const CPelUnitBuf& pic,
     const UInt        csx         = ::getComponentScaleX(compID, format);
     const UInt        csy         = ::getComponentScaleY(compID, format);
     const CPelBuf     area        = picO.get(compID);
-    const Int         planeOffset = (confLeft >> csx) + (confTop >> csy) * area.stride;
+    const int         planeOffset = (confLeft >> csx) + (confTop >> csy) * area.stride;
     if (!writePlane (m_cHandle, area.bufAt (0, 0) + planeOffset, is16bit, area.stride,
                      width444, height444, compID, picO.chromaFormat, format, m_fileBitdepth[ch]))
     {
@@ -858,7 +858,7 @@ bool VideoIOYuv::write( const CPelUnitBuf& pic,
   return retval;
 }
 
-bool VideoIOYuv::write( const CPelUnitBuf& picTop, const CPelUnitBuf& picBottom, const InputColourSpaceConversion ipCSC, Int confLeft, Int confRight, Int confTop, Int confBottom, ChromaFormat format, const bool isTff, const bool bClipToRec709 )
+bool VideoIOYuv::write( const CPelUnitBuf& picTop, const CPelUnitBuf& picBottom, const InputColourSpaceConversion ipCSC, int confLeft, int confRight, int confTop, int confBottom, ChromaFormat format, const bool isTff, const bool bClipToRec709 )
 {
   PelStorage intermTop;
   PelStorage intermBottom;
@@ -948,7 +948,7 @@ bool VideoIOYuv::write( const CPelUnitBuf& picTop, const CPelUnitBuf& picBottom,
 
     const UInt csx = ::getComponentScaleX(compID, dstChrFormat );
     const UInt csy = ::getComponentScaleY(compID, dstChrFormat );
-    const Int planeOffset  = (confLeft>>csx) + ( confTop>>csy) * areaTop.stride; //offset is for entire frame - round up for top field and down for bottom field
+    const int planeOffset  = (confLeft>>csx) + ( confTop>>csy) * areaTop.stride; //offset is for entire frame - round up for top field and down for bottom field
 
     if (! writeField(m_cHandle,
                      (areaTop.   bufAt(0,0) + planeOffset),

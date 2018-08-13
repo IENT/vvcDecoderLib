@@ -45,7 +45,7 @@
 #include "CommonLib/Buffer.h"
 #include "CommonLib/Unit.h"
 
-inline unsigned calcCheckSum( const Int iWidth, const Int iHeight,  const Pel* p,  const UInt stride,  const Int bitdepth )
+inline unsigned calcCheckSum( const int iWidth, const int iHeight,  const Pel* p,  const UInt stride,  const int bitdepth )
 {
   unsigned checksum = 0;
   for( unsigned y = 0; y < iHeight; y++)
@@ -78,8 +78,8 @@ inline unsigned calcCheckSum( const CPelBuf& buf, int bitdepth )
 //////////////////////////////////////////////////////////////////////////
 inline void dtraceCoeffBuf( DTRACE_CHANNEL channnel, const CCoeffBuf& coefBuf, const UnitArea& ua, PredMode predMode, const ComponentID compId, UInt zIdx = 0 )
 {
-  Int x0 = ua.blocks[compId].x;
-  Int y0 = ua.blocks[compId].y;
+  int x0 = ua.blocks[compId].x;
+  int y0 = ua.blocks[compId].y;
   const UInt    uiStride = coefBuf.stride;
   const TCoeff* piReco   = coefBuf.buf;
   const UInt    uiWidth  = ua.blocks[compId].width;
@@ -90,8 +90,8 @@ inline void dtraceCoeffBuf( DTRACE_CHANNEL channnel, const CCoeffBuf& coefBuf, c
 
 inline void dtracePelBuf( DTRACE_CHANNEL channnel, const CPelBuf& pelBuf, const UnitArea& ua, PredMode predMode, const ComponentID compId )
 {
-  Int x0 = ua.block(compId).x;
-  Int y0 = ua.block(compId).y;
+  int x0 = ua.block(compId).x;
+  int y0 = ua.block(compId).y;
   const UInt    uiStride     = pelBuf.stride;
   const Pel*    piReco       = pelBuf.buf;
   const UInt    uiWidth      = ua.block(compId).width;
@@ -104,8 +104,8 @@ inline void dtraceBlockRec( const CPelUnitBuf& pelUnitBuf, const UnitArea& ua, P
 {
   if( ua.blocks[COMPONENT_Y].valid() )
   {
-    const Int     x0           = ua.lumaPos().x;
-    const Int     y0           = ua.lumaPos().y;
+    const int     x0           = ua.lumaPos().x;
+    const int     y0           = ua.lumaPos().y;
     const UInt    uiStride     = pelUnitBuf.Y().stride;
     const Pel*    piReco       = pelUnitBuf.Y().buf;
     const UInt    uiWidth      = ua.lumaSize().width;
@@ -115,8 +115,8 @@ inline void dtraceBlockRec( const CPelUnitBuf& pelUnitBuf, const UnitArea& ua, P
   }
   if( ua.blocks[COMPONENT_Cb].valid() )
   {
-    const Int     x0           = ua.blocks[1].x;
-    const Int     y0           = ua.blocks[1].y;
+    const int     x0           = ua.blocks[1].x;
+    const int     y0           = ua.blocks[1].y;
     const UInt    uiWidth      = ua.blocks[1].width;
     const UInt    uiHeight     = ua.blocks[1].height;
     const UInt    uiCStride    = pelUnitBuf.Cb().stride;
@@ -136,8 +136,8 @@ inline void dtraceUnitComp( DTRACE_CHANNEL channel, CPelUnitBuf& pelUnitBuf, con
   UInt       uiStride = pelUnitBuf.bufs[compId].stride;
   UInt       uiWidth  = ua.blocks[compId].width;
   UInt       uiHeight = ua.blocks[compId].height;
-  Int x0              = ua.lumaPos().x;
-  Int y0              = ua.lumaPos().y;
+  int x0              = ua.lumaPos().x;
+  int y0              = ua.lumaPos().y;
 
   DTRACE      ( g_trace_ctx, channel, "%s: %d, x=%d, y=%d, size=%dx%d, predmode=%d \n", g_trace_ctx->getChannelName(channel), zIdx, x0, y0, uiWidth, uiHeight, predMode );
   DTRACE_BLOCK( g_trace_ctx, channel, piReco, uiStride, uiWidth, uiHeight );

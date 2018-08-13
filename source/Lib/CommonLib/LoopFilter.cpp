@@ -281,13 +281,13 @@ void LoopFilter::xDeblockCU( CodingUnit& cu, const DeblockEdgeDir edgeDir )
 #if JEM_TOOLS || JVET_K_AFFINE
   if ( cu.affine )
   {
-    const Int widthInBaseUnits = cu.Y().width >> pcv.minCUWidthLog2;
+    const int widthInBaseUnits = cu.Y().width >> pcv.minCUWidthLog2;
     for( UInt edgeIdx = 1 ; edgeIdx < widthInBaseUnits ; edgeIdx++ )
     {
       const Area affiBlockV( cu.Y().x + edgeIdx * pcv.minCUWidth, cu.Y().y, pcv.minCUWidth, cu.Y().height );
       xSetEdgefilterMultiple( cu, EDGE_VER, affiBlockV, m_stLFCUParam.internalEdge, 1 );
     }
-    const Int heightInBaseUnits = cu.Y().height >> pcv.minCUHeightLog2;
+    const int heightInBaseUnits = cu.Y().height >> pcv.minCUHeightLog2;
     for( UInt edgeIdx = 1 ; edgeIdx < heightInBaseUnits ; edgeIdx++ )
     {
       const Area affiBlockH( cu.Y().x, cu.Y().y + edgeIdx * pcv.minCUHeight, cu.Y().width, pcv.minCUHeight );
@@ -499,7 +499,7 @@ unsigned LoopFilter::xGetBoundaryStrengthSingle ( const CodingUnit& cu, const De
     if( 0 <= miQ.refIdx[0] ) { mvQ0 = miQ.mv[0]; }
     if( 0 <= miQ.refIdx[1] ) { mvQ1 = miQ.mv[1]; }
 
-    Int nThreshold = 4;
+    int nThreshold = 4;
 #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
     if( cu.cs->sps->getSpsNext().getUseHighPrecMv() )
     {
@@ -562,7 +562,7 @@ unsigned LoopFilter::xGetBoundaryStrengthSingle ( const CodingUnit& cu, const De
   Mv mvP0 = miP.mv[0];
   Mv mvQ0 = miQ.mv[0];
 
-  Int nThreshold = 4;
+  int nThreshold = 4;
 #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
   if( cu.cs->sps->getSpsNext().getUseHighPrecMv() )
   {
@@ -587,7 +587,7 @@ void LoopFilter::xEdgeFilterLuma(const CodingUnit& cu, const DeblockEdgeDir edge
   const SPS     &sps      = *(cu.cs->sps);
   const Slice   &slice    = *(cu.slice);
   const bool    ppsTransquantBypassEnabledFlag = pps.getTransquantBypassEnabledFlag();
-  const Int     bitDepthLuma                   = sps.getBitDepth(CHANNEL_TYPE_LUMA);
+  const int     bitDepthLuma                   = sps.getBitDepth(CHANNEL_TYPE_LUMA);
   const ClpRng& clpRng( cu.cs->slice->clpRng(COMPONENT_Y) );
 
   int          iQP          = 0;
@@ -659,7 +659,7 @@ void LoopFilter::xEdgeFilterLuma(const CodingUnit& cu, const DeblockEdgeDir edge
 
       iQP = (cuP.qp + cuQ.qp + 1) >> 1;
 
-      const int iIndexTC  = Clip3(0, MAX_QP + DEFAULT_INTRA_TC_OFFSET, Int(iQP + DEFAULT_INTRA_TC_OFFSET*(uiBs - 1) + (tcOffsetDiv2 << 1)));
+      const int iIndexTC  = Clip3(0, MAX_QP + DEFAULT_INTRA_TC_OFFSET, int(iQP + DEFAULT_INTRA_TC_OFFSET*(uiBs - 1) + (tcOffsetDiv2 << 1)));
       const int iIndexB   = Clip3(0, MAX_QP, iQP + (betaOffsetDiv2 << 1));
 
       const int iTc       = sm_tcTable  [iIndexTC] * iBitdepthScale;

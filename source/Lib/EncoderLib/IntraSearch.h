@@ -174,7 +174,7 @@ protected:
 
   uint64_t xFracModeBitsIntra       (PredictionUnit &pu, const UInt &uiMode, const ChannelType &compID);
 
-  void xIntraCodingTUBlock        (TransformUnit &tu, const ComponentID &compID, const bool &checkCrossCPrediction, Distortion& ruiDist, const Int &default0Save1Load2 = 0, UInt* numSig = nullptr );
+  void xIntraCodingTUBlock        (TransformUnit &tu, const ComponentID &compID, const bool &checkCrossCPrediction, Distortion& ruiDist, const int &default0Save1Load2 = 0, UInt* numSig = nullptr );
 
   ChromaCbfs xRecurIntraChromaCodingQT  (CodingStructure &cs, Partitioner& pm);
 

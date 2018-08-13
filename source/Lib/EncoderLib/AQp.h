@@ -60,7 +60,7 @@ private:
   std::vector<double>   m_acEncAQU;
 
 public:
-  AQpLayer( Int iWidth, Int iHeight, UInt uiAQPartWidth, UInt uiAQPartHeight );
+  AQpLayer( int iWidth, int iHeight, UInt uiAQPartWidth, UInt uiAQPartHeight );
   virtual ~AQpLayer();
 
   UInt                   getAQPartWidth()        { return m_uiAQPartWidth;       }

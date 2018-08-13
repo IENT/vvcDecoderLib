@@ -356,7 +356,6 @@
 // Basic type redefinition
 // ====================================================================================================================
 
-typedef       int                 Int;
 typedef       unsigned int        UInt;
 
 
@@ -365,18 +364,18 @@ typedef       unsigned int        UInt;
 // ====================================================================================================================
 
 #if RExt__HIGH_BIT_DEPTH_SUPPORT
-typedef       Int             Pel;               ///< pixel type
+typedef       int             Pel;               ///< pixel type
 typedef       int64_t           TCoeff;            ///< transform coefficient
-typedef       Int             TMatrixCoeff;      ///< transform matrix coefficient
+typedef       int             TMatrixCoeff;      ///< transform matrix coefficient
 typedef       int16_t           TFilterCoeff;      ///< filter coefficient
 typedef       int64_t           Intermediate_Int;  ///< used as intermediate value in calculations
 typedef       uint64_t          Intermediate_UInt; ///< used as intermediate value in calculations
 #else
 typedef       int16_t           Pel;               ///< pixel type
-typedef       Int             TCoeff;            ///< transform coefficient
+typedef       int             TCoeff;            ///< transform coefficient
 typedef       int16_t           TMatrixCoeff;      ///< transform matrix coefficient
 typedef       int16_t           TFilterCoeff;      ///< filter coefficient
-typedef       Int             Intermediate_Int;  ///< used as intermediate value in calculations
+typedef       int             Intermediate_Int;  ///< used as intermediate value in calculations
 typedef       UInt            Intermediate_UInt; ///< used as intermediate value in calculations
 #endif
 
@@ -1011,9 +1010,9 @@ class PicSym;
 struct SAOOffset
 {
   SAOMode modeIdc; // NEW, MERGE, OFF
-  Int typeIdc;     // union of SAOModeMergeTypes and SAOModeNewTypes, depending on modeIdc.
-  Int typeAuxInfo; // BO: starting band index
-  Int offset[MAX_NUM_SAO_CLASSES];
+  int typeIdc;     // union of SAOModeMergeTypes and SAOModeNewTypes, depending on modeIdc.
+  int typeAuxInfo; // BO: starting band index
+  int offset[MAX_NUM_SAO_CLASSES];
 
   SAOOffset();
   ~SAOOffset();
@@ -1029,8 +1028,8 @@ struct SAOBlkParam
   ~SAOBlkParam();
   void reset();
   const SAOBlkParam& operator= (const SAOBlkParam& src);
-  SAOOffset& operator[](Int compIdx){ return offsetParam[compIdx];}
-  const SAOOffset& operator[](Int compIdx) const { return offsetParam[compIdx];}
+  SAOOffset& operator[](int compIdx){ return offsetParam[compIdx];}
+  const SAOOffset& operator[](int compIdx) const { return offsetParam[compIdx];}
 private:
   SAOOffset offsetParam[MAX_NUM_COMPONENT];
 
@@ -1069,31 +1068,31 @@ struct ALFParam
   void reset();
   void copyFrom(const ALFParam& src, const bool isGALF, bool max_depth_copy = true);
 
-  Int alf_flag;                           ///< indicates use of ALF
-  Int cu_control_flag;                    ///< coding unit based control flag
-  Int chroma_idc;                         ///< indicates use of ALF for chroma
+  int alf_flag;                           ///< indicates use of ALF
+  int cu_control_flag;                    ///< coding unit based control flag
+  int chroma_idc;                         ///< indicates use of ALF for chroma
 #if JVET_C0038_NO_PREV_FILTERS
-  Int iAvailableFilters;
-  Int iPredPattern;
-  Int PrevFiltIdx[NUM_OF_ALF_CLASSES];
+  int iAvailableFilters;
+  int iPredPattern;
+  int PrevFiltIdx[NUM_OF_ALF_CLASSES];
 #endif
   //Filter Adaptation (Classification)
   AlfFilterMode filterMode;
-  Int mapClassToFilter [NUM_OF_ALF_CLASSES];
-  Int filterPattern    [NUM_OF_ALF_CLASSES];
-  Int startSecondFilter;
-  Int **alfCoeffLuma;
-  Int  *alfCoeffChroma;
+  int mapClassToFilter [NUM_OF_ALF_CLASSES];
+  int filterPattern    [NUM_OF_ALF_CLASSES];
+  int startSecondFilter;
+  int **alfCoeffLuma;
+  int  *alfCoeffChroma;
 
   AlfFilterType filterType;
-  Int tapH;                               ///< number of filter taps - horizontal
-  Int tapV;                               ///< number of filter taps - vertical
-  Int num_coeff;                          ///< number of filter coefficients
-  Int **coeffmulti;
+  int tapH;                               ///< number of filter taps - horizontal
+  int tapV;                               ///< number of filter taps - vertical
+  int num_coeff;                          ///< number of filter coefficients
+  int **coeffmulti;
 
-  Int tap_chroma;                         ///< number of filter taps (chroma)
-  Int num_coeff_chroma;                   ///< number of filter coefficients (chroma)
-  Int *coeff_chroma;                      ///< filter coefficient array (chroma)
+  int tap_chroma;                         ///< number of filter taps (chroma)
+  int num_coeff_chroma;                   ///< number of filter coefficients (chroma)
+  int *coeff_chroma;                      ///< filter coefficient array (chroma)
 
   //CU Adaptation
   UInt num_alf_cu_flag;
@@ -1104,28 +1103,28 @@ struct ALFParam
   UInt num_ctus_in_frame;
   UInt maxCodingDepth;
 
-  Int codedVarBins[NUM_OF_ALF_CLASSES];
-  Int filters_per_group_diff; //this can be updated using codedVarBins
-  Int filters_per_group;
+  int codedVarBins[NUM_OF_ALF_CLASSES];
+  int filters_per_group_diff; //this can be updated using codedVarBins
+  int filters_per_group;
 
 
-  Int forceCoeff0;
-  Int predMethod;
+  int forceCoeff0;
+  int predMethod;
 
-  Int minKStart;
-  Int maxScanVal;
-  Int kMinTab[42];
+  int minKStart;
+  int maxScanVal;
+  int kMinTab[42];
 
   //Use stored parameter
   bool temporalPredFlag;        //indicate whether reuse previous ALF coefficients
-  Int  prevIdx;                 //index of the reused ALF coefficients
+  int  prevIdx;                 //index of the reused ALF coefficients
 };
 #endif
 
 
 struct BitDepths
 {
-  Int recon[MAX_NUM_CHANNEL_TYPE]; ///< the bit depth as indicated in the SPS
+  int recon[MAX_NUM_CHANNEL_TYPE]; ///< the bit depth as indicated in the SPS
 };
 
 /// parameters for deblocking filter
@@ -1184,19 +1183,19 @@ struct SEITimeSet
   { }
   bool clockTimeStampFlag;
   bool numUnitFieldBasedFlag;
-  Int  countingType;
+  int  countingType;
   bool fullTimeStampFlag;
   bool discontinuityFlag;
   bool cntDroppedFlag;
-  Int  numberOfFrames;
-  Int  secondsValue;
-  Int  minutesValue;
-  Int  hoursValue;
+  int  numberOfFrames;
+  int  secondsValue;
+  int  minutesValue;
+  int  hoursValue;
   bool secondsFlag;
   bool minutesFlag;
   bool hoursFlag;
-  Int  timeOffsetLength;
-  Int  timeOffsetValue;
+  int  timeOffsetLength;
+  int  timeOffsetValue;
 };
 
 struct SEIMasteringDisplay
@@ -1213,7 +1212,7 @@ struct LumaLevelToDeltaQPMapping
 {
   LumaLevelToDQPMode                 mode;             ///< use deltaQP determined by block luma level
   double                             maxMethodWeight;  ///< weight of max luma value when mode = 2
-  std::vector< std::pair<Int, Int> > mapping;          ///< first=luma level, second=delta QP.
+  std::vector< std::pair<int, int> > mapping;          ///< first=luma level, second=delta QP.
 #if ENABLE_QPA
   bool isEnabled() const { return (mode != LUMALVL_TO_DQP_DISABLED && mode != LUMALVL_TO_DQP_NUM_MODES); }
 #else

@@ -74,9 +74,9 @@ uint64_t CS::getEstBits(const CodingStructure &cs)
 
 
 #if JEM_TOOLS
-static void xInitFrucMvpEl( CodingStructure& cs, Int x, Int y, Int nCurPOC, Int nTargetRefIdx, Int nTargetRefPOC, Int nCurRefIdx, Int nCurRefPOC, Int nColPOC, RefPicList eRefPicList, const Picture* pColPic )
+static void xInitFrucMvpEl( CodingStructure& cs, int x, int y, int nCurPOC, int nTargetRefIdx, int nTargetRefPOC, int nCurRefIdx, int nCurRefPOC, int nColPOC, RefPicList eRefPicList, const Picture* pColPic )
 {
-  const unsigned scale = ( cs.pcv->noMotComp ? 1 : 4 * std::max<Int>( 1, 4 * AMVP_DECIMATION_FACTOR / 4 ) );
+  const unsigned scale = ( cs.pcv->noMotComp ? 1 : 4 * std::max<int>( 1, 4 * AMVP_DECIMATION_FACTOR / 4 ) );
 
   const unsigned mask = ~( scale - 1 );
 
@@ -90,7 +90,7 @@ static void xInitFrucMvpEl( CodingStructure& cs, Int x, Int y, Int nCurPOC, Int 
   {
     CHECK( frucMi.isInter == false && frucMi.interDir < 1, "invalid motion info" );
 
-    Int nColRefPOC = pColPic->cs->slice->getRefPOC( eRefPicList, frucMi.refIdx[eRefPicList] );
+    int nColRefPOC = pColPic->cs->slice->getRefPOC( eRefPicList, frucMi.refIdx[eRefPicList] );
     Mv mvColPic = frucMi.mv[eRefPicList];
     if( cs.sps->getSpsNext().getUseHighPrecMv() )
     {
@@ -99,11 +99,11 @@ static void xInitFrucMvpEl( CodingStructure& cs, Int x, Int y, Int nCurPOC, Int 
 
     Mv mv2CurRefPic = PU::scaleMv( mvColPic, nCurPOC, nCurRefPOC, nColPOC, nColRefPOC, cs.slice );
 
-    Int xCurPic = 0;
-    Int yCurPic = 0;
+    int xCurPic = 0;
+    int yCurPic = 0;
     if( cs.sps->getSpsNext().getUseHighPrecMv() )
     {
-      Int nOffset = 1 << ( VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE + 1 );
+      int nOffset = 1 << ( VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE + 1 );
 
       xCurPic = x + ( MIN_PU_SIZE >> 1 ) - ( ( mv2CurRefPic.getHor() + nOffset ) >> ( 2 + VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE ) );
       yCurPic = y + ( MIN_PU_SIZE >> 1 ) - ( ( mv2CurRefPic.getVer() + nOffset ) >> ( 2 + VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE ) );
@@ -131,21 +131,21 @@ static void xInitFrucMvpEl( CodingStructure& cs, Int x, Int y, Int nCurPOC, Int 
 
 void CS::initFrucMvp( CodingStructure &cs )
 {
-  const Int width  = cs.picture->Y().width;
-  const Int height = cs.picture->Y().height;
+  const int width  = cs.picture->Y().width;
+  const int height = cs.picture->Y().height;
 
-  const Int nCurPOC = cs.slice->getPOC();
+  const int nCurPOC = cs.slice->getPOC();
 
-  for( Int nRefPicList = 0; nRefPicList < 2; nRefPicList++ )
+  for( int nRefPicList = 0; nRefPicList < 2; nRefPicList++ )
   {
     RefPicList eRefPicList = ( RefPicList ) nRefPicList;
-    for( Int nRefIdx = 0; nRefIdx < cs.slice->getNumRefIdx( eRefPicList ); nRefIdx++ )
+    for( int nRefIdx = 0; nRefIdx < cs.slice->getNumRefIdx( eRefPicList ); nRefIdx++ )
     {
-      const Int nTargetRefIdx = 0;
-      const Int nTargetRefPOC = cs.slice->getRefPOC( eRefPicList, nTargetRefIdx );
-      const Int nCurRefIdx    = nRefIdx;
-      const Int nCurRefPOC    = cs.slice->getRefPOC( eRefPicList, nCurRefIdx );
-      const Int nColPOC       = cs.slice->getRefPOC( eRefPicList, nRefIdx );
+      const int nTargetRefIdx = 0;
+      const int nTargetRefPOC = cs.slice->getRefPOC( eRefPicList, nTargetRefIdx );
+      const int nCurRefIdx    = nRefIdx;
+      const int nCurRefPOC    = cs.slice->getRefPOC( eRefPicList, nCurRefIdx );
+      const int nColPOC       = cs.slice->getRefPOC( eRefPicList, nRefIdx );
 
       const Picture* pColPic  = cs.slice->getRefPic( eRefPicList, nRefIdx );
 
@@ -155,36 +155,36 @@ void CS::initFrucMvp( CodingStructure &cs )
       }
 
 #if HM_FRUC_Z_ORDER_AS_IN_JEM
-      const Int log2ctuSize = g_aucLog2[cs.pcv->maxCUWidth];
+      const int log2ctuSize = g_aucLog2[cs.pcv->maxCUWidth];
 
-      for( Int yCtu = 0; yCtu < height; yCtu += ( 1 << log2ctuSize ) )
+      for( int yCtu = 0; yCtu < height; yCtu += ( 1 << log2ctuSize ) )
       {
-        for( Int xCtu = 0; xCtu < width; xCtu += ( 1 << log2ctuSize ) )
+        for( int xCtu = 0; xCtu < width; xCtu += ( 1 << log2ctuSize ) )
         {
-          for( Int yCtuLgM1 = 0; yCtuLgM1 < ( 1 << log2ctuSize ); yCtuLgM1 += ( 1 << ( log2ctuSize - 1 ) ) )
+          for( int yCtuLgM1 = 0; yCtuLgM1 < ( 1 << log2ctuSize ); yCtuLgM1 += ( 1 << ( log2ctuSize - 1 ) ) )
           {
-            for( Int xCtuLgM1 = 0; xCtuLgM1 < ( 1 << log2ctuSize ); xCtuLgM1 += ( 1 << ( log2ctuSize - 1 ) ) )
+            for( int xCtuLgM1 = 0; xCtuLgM1 < ( 1 << log2ctuSize ); xCtuLgM1 += ( 1 << ( log2ctuSize - 1 ) ) )
             {
-              for( Int yCtuLgM2 = 0; yCtuLgM2 < ( 1 << ( log2ctuSize - 1 ) ); yCtuLgM2 += ( 1 << ( log2ctuSize - 2 ) ) )
+              for( int yCtuLgM2 = 0; yCtuLgM2 < ( 1 << ( log2ctuSize - 1 ) ); yCtuLgM2 += ( 1 << ( log2ctuSize - 2 ) ) )
               {
-                for( Int xCtuLgM2 = 0; xCtuLgM2 < ( 1 << ( log2ctuSize - 1 ) ); xCtuLgM2 += ( 1 << ( log2ctuSize - 2 ) ) )
+                for( int xCtuLgM2 = 0; xCtuLgM2 < ( 1 << ( log2ctuSize - 1 ) ); xCtuLgM2 += ( 1 << ( log2ctuSize - 2 ) ) )
                 {
-                  for( Int yCtuLgM3 = 0; yCtuLgM3 < ( 1 << ( log2ctuSize - 2 ) ); yCtuLgM3 += ( 1 << ( log2ctuSize - 3 ) ) )
+                  for( int yCtuLgM3 = 0; yCtuLgM3 < ( 1 << ( log2ctuSize - 2 ) ); yCtuLgM3 += ( 1 << ( log2ctuSize - 3 ) ) )
                   {
-                    for( Int xCtuLgM3 = 0; xCtuLgM3 < ( 1 << ( log2ctuSize - 2 ) ); xCtuLgM3 += ( 1 << ( log2ctuSize - 3 ) ) )
+                    for( int xCtuLgM3 = 0; xCtuLgM3 < ( 1 << ( log2ctuSize - 2 ) ); xCtuLgM3 += ( 1 << ( log2ctuSize - 3 ) ) )
                     {
-                      for( Int yCtuLgM4 = 0; yCtuLgM4 < ( 1 << ( log2ctuSize - 3 ) ); yCtuLgM4 += ( 1 << ( log2ctuSize - 4 ) ) )
+                      for( int yCtuLgM4 = 0; yCtuLgM4 < ( 1 << ( log2ctuSize - 3 ) ); yCtuLgM4 += ( 1 << ( log2ctuSize - 4 ) ) )
                       {
-                        for( Int xCtuLgM4 = 0; xCtuLgM4 < ( 1 << ( log2ctuSize - 3 ) ); xCtuLgM4 += ( 1 << ( log2ctuSize - 4 ) ) )
+                        for( int xCtuLgM4 = 0; xCtuLgM4 < ( 1 << ( log2ctuSize - 3 ) ); xCtuLgM4 += ( 1 << ( log2ctuSize - 4 ) ) )
                         {
                           if( log2ctuSize - 4 > MIN_CU_LOG2 )
                           {
-                            for( Int yCtuLgM5 = 0; yCtuLgM5 < ( 1 << ( log2ctuSize - 4 ) ); yCtuLgM5 += ( 1 << ( log2ctuSize - 5 ) ) )
+                            for( int yCtuLgM5 = 0; yCtuLgM5 < ( 1 << ( log2ctuSize - 4 ) ); yCtuLgM5 += ( 1 << ( log2ctuSize - 5 ) ) )
                             {
-                              for( Int xCtuLgM5 = 0; xCtuLgM5 < ( 1 << ( log2ctuSize - 4 ) ); xCtuLgM5 += ( 1 << ( log2ctuSize - 5 ) ) )
+                              for( int xCtuLgM5 = 0; xCtuLgM5 < ( 1 << ( log2ctuSize - 4 ) ); xCtuLgM5 += ( 1 << ( log2ctuSize - 5 ) ) )
                               {
-                                const Int x = xCtu + xCtuLgM1 + xCtuLgM2 + xCtuLgM3 + xCtuLgM4 + xCtuLgM5;
-                                const Int y = yCtu + yCtuLgM1 + yCtuLgM2 + yCtuLgM3 + yCtuLgM4 + yCtuLgM5;
+                                const int x = xCtu + xCtuLgM1 + xCtuLgM2 + xCtuLgM3 + xCtuLgM4 + xCtuLgM5;
+                                const int y = yCtu + yCtuLgM1 + yCtuLgM2 + yCtuLgM3 + yCtuLgM4 + yCtuLgM5;
 
                                 if( x >= width || y >= height )
                                 {
@@ -197,8 +197,8 @@ void CS::initFrucMvp( CodingStructure &cs )
                           }
                           else
                           {
-                            const Int x = xCtu + xCtuLgM1 + xCtuLgM2 + xCtuLgM3 + xCtuLgM4;
-                            const Int y = yCtu + yCtuLgM1 + yCtuLgM2 + yCtuLgM3 + yCtuLgM4;
+                            const int x = xCtu + xCtuLgM1 + xCtuLgM2 + xCtuLgM3 + xCtuLgM4;
+                            const int y = yCtu + yCtuLgM1 + yCtuLgM2 + yCtuLgM3 + yCtuLgM4;
 
                             if( x >= width || y >= height )
                             {
@@ -218,9 +218,9 @@ void CS::initFrucMvp( CodingStructure &cs )
         }
       }
 #else
-      for( Int y = 0; y < height; y += MIN_PU_SIZE )
+      for( int y = 0; y < height; y += MIN_PU_SIZE )
       {
-        for( Int x = 0; x < width; x += MIN_PU_SIZE )
+        for( int x = 0; x < width; x += MIN_PU_SIZE )
         {
           xInitFrucMvpEl( cs, x, y, nCurPOC, nTargetRefIdx, nTargetRefPOC, nCurRefIdx, nCurRefPOC, nColPOC, eRefPicList, pColPic );
         }
@@ -511,7 +511,7 @@ int PU::getIntraMPMs( const PredictionUnit &pu, unsigned* mpm, const ChannelType
   if (pu.cs->sps->getSpsNext().getUseIntra65Ang() || isChromaMDMS)
 #endif
   {
-    Int  numCand = -1;
+    int  numCand = -1;
     UInt modeIdx =  0;
 
     bool includedMode[NUM_INTRA_MODE];
@@ -519,12 +519,12 @@ int PU::getIntraMPMs( const PredictionUnit &pu, unsigned* mpm, const ChannelType
     if ( isChromaMDMS )
     {
       // mark LMChroma already included
-      for ( Int i = LM_CHROMA_IDX; i < LM_CHROMA_IDX + NUM_LMC_MODE; i++ )
+      for ( int i = LM_CHROMA_IDX; i < LM_CHROMA_IDX + NUM_LMC_MODE; i++ )
       {
         includedMode[ i ] = true;
       }
       // mark direct modes already included
-      for ( Int i = 0; i < startIdx; i++ )
+      for ( int i = 0; i < startIdx; i++ )
       {
         includedMode[ mpm[i] ] = true;
       }
@@ -625,8 +625,8 @@ int PU::getIntraMPMs( const PredictionUnit &pu, unsigned* mpm, const ChannelType
 
     // -+1 derived angular modes
     const UInt numAddedModes = modeIdx;
-    const Int  offset        = (Int)NUM_LUMA_MODE - 5;
-    const Int  mod           = offset + 3;
+    const int  offset        = (int)NUM_LUMA_MODE - 5;
+    const int  mod           = offset + 3;
 
     for( UInt idx = 0; idx < numAddedModes && modeIdx < numMPMs; idx++ )
     {
@@ -745,8 +745,8 @@ int PU::getIntraMPMs( const PredictionUnit &pu, unsigned* mpm, const ChannelType
   }
 #else
   {
-    Int numCand = -1;
-    Int leftIntraDir = DC_IDX, aboveIntraDir = DC_IDX;
+    int numCand = -1;
+    int leftIntraDir = DC_IDX, aboveIntraDir = DC_IDX;
 
     const CompArea& area = pu.block( getFirstComponentOfChannel( channelType ) );
     const Position& pos  = area.pos();
@@ -779,9 +779,9 @@ int PU::getIntraMPMs( const PredictionUnit &pu, unsigned* mpm, const ChannelType
 
     CHECK( 2 >= numMPMs, "Invalid number of most probable modes" );
 
-    const Int offset = 29;
+    const int offset = 29;
 
-    const Int mod    = offset + 3;
+    const int mod    = offset + 3;
 
     if( leftIntraDir == aboveIntraDir )
     {
@@ -839,8 +839,8 @@ int PU::getDMModes(const PredictionUnit &pu, unsigned *modeList)
     const UInt scaleX       = getComponentScaleX( pu.blocks[pu.chType].compID, pu.chromaFormat );
     const UInt scaleY       = getComponentScaleY( pu.blocks[pu.chType].compID, pu.chromaFormat );
     const Size lumaSize     = Size( chromaSize.width << scaleX, chromaSize.height << scaleY );
-    const Int centerOffsetX = ( lumaSize.width  == 4 ) ? ( 0 ) : ( ( lumaSize.width  >> 1 ) - 1 );
-    const Int centerOffsetY = ( lumaSize.height == 4 ) ? ( 0 ) : ( ( lumaSize.height >> 1 ) - 1 );
+    const int centerOffsetX = ( lumaSize.width  == 4 ) ? ( 0 ) : ( ( lumaSize.width  >> 1 ) - 1 );
+    const int centerOffsetY = ( lumaSize.height == 4 ) ? ( 0 ) : ( ( lumaSize.height >> 1 ) - 1 );
     unsigned candModes[ NUM_DM_MODES ];
     static_assert( 5 <= NUM_DM_MODES, "Too many chroma direct modes" );
     // center
@@ -859,11 +859,11 @@ int PU::getDMModes(const PredictionUnit &pu, unsigned *modeList)
     const PredictionUnit *lumaBR = pu.cs->picture->cs->getPU( lumaPos.offset( lumaSize.width - 1, lumaSize.height - 1 ), CHANNEL_TYPE_LUMA );
     candModes[4] = lumaBR->intraDir[CHANNEL_TYPE_LUMA];
     // remove duplicates
-    for ( Int i = 0; i < NUM_DM_MODES; i++ )
+    for ( int i = 0; i < NUM_DM_MODES; i++ )
     {
       const unsigned mode = candModes[ i ];
       bool isIncluded     = false;
-      for ( Int j = 0; j < numDMs; j++ )
+      for ( int j = 0; j < numDMs; j++ )
       {
         if ( mode == modeList[ j ] )
         {
@@ -899,7 +899,7 @@ void PU::getIntraChromaCandModes( const PredictionUnit &pu, unsigned modeList[NU
     modeList[ 3 ] = LM_CHROMA_F2_IDX;
     modeList[ 4 ] = LM_CHROMA_F3_IDX;
     modeList[ 5 ] = LM_CHROMA_F4_IDX;
-    Int numDMs = getDMModes( pu, &modeList[6] );
+    int numDMs = getDMModes( pu, &modeList[6] );
     if ( numDMs < NUM_DM_MODES )
     {
       PU::getIntraMPMs( pu, &modeList[ 6 ], CHANNEL_TYPE_CHROMA, true, numDMs );
@@ -934,7 +934,7 @@ void PU::getIntraChromaCandModes( const PredictionUnit &pu, unsigned modeList[NU
 
     const PredictionUnit *lumaPU = CS::isDualITree( *pu.cs ) ? pu.cs->picture->cs->getPU( pu.blocks[pu.chType].lumaPos(), CHANNEL_TYPE_LUMA ) : &pu;
     const UInt lumaMode = lumaPU->intraDir[CHANNEL_TYPE_LUMA];
-    for( Int i = 0; i < 4; i++ )
+    for( int i = 0; i < 4; i++ )
     {
       if( lumaMode == modeList[i] )
       {
@@ -961,8 +961,8 @@ bool PU::isMMLMEnabled(const PredictionUnit &pu)
 {
   if ( pu.cs->sps->getSpsNext().isELMModeMMLM() )
   {
-    const Int blockSize = pu.Cb().width + pu.Cb().height;
-    const Int minSize   = g_aiMMLM_MinSize[ CU::isIntra(*(pu.cu)) ? 0 : 1 ];
+    const int blockSize = pu.Cb().width + pu.Cb().height;
+    const int minSize   = g_aiMMLM_MinSize[ CU::isIntra(*(pu.cu)) ? 0 : 1 ];
     return blockSize >= minSize;
   }
   return false;
@@ -972,8 +972,8 @@ bool PU::isMFLMEnabled(const PredictionUnit &pu)
 {
   if ( pu.cs->sps->getSpsNext().isELMModeMFLM() )
   {
-    const Int blockSize = pu.Cb().width + pu.Cb().height;
-    const Int minSize   = g_aiMFLM_MinSize[ CU::isIntra(*(pu.cu)) ? 0 : 1 ];
+    const int blockSize = pu.Cb().width + pu.Cb().height;
+    const int minSize   = g_aiMFLM_MinSize[ CU::isIntra(*(pu.cu)) ? 0 : 1 ];
     return blockSize >= minSize;
   }
   return false;
@@ -1000,9 +1000,9 @@ bool PU::isLMCModeEnabled(const PredictionUnit &pu, unsigned mode)
   return false;
 }
 
-int PU::getLMSymbolList(const PredictionUnit &pu, Int *pModeList)
+int PU::getLMSymbolList(const PredictionUnit &pu, int *pModeList)
 {
-  const Int iNeighbors = 5;
+  const int iNeighbors = 5;
   const PredictionUnit* neighboringPUs[ iNeighbors ];
 
   const CompArea& area = pu.Cb();
@@ -1016,12 +1016,12 @@ int PU::getLMSymbolList(const PredictionUnit &pu, Int *pModeList)
   neighboringPUs[ 3 ] = pu.cs->getPURestricted( posLB.offset(-1,  1), pu, CHANNEL_TYPE_CHROMA ); //BelowLeft
   neighboringPUs[ 4 ] = pu.cs->getPURestricted( posLT.offset(-1, -1), pu, CHANNEL_TYPE_CHROMA ); //AboveLeft
 
-  Int iCount = 0;
-  for ( Int i = 0; i < iNeighbors; i++ )
+  int iCount = 0;
+  for ( int i = 0; i < iNeighbors; i++ )
   {
     if ( neighboringPUs[i] && CU::isIntra( *(neighboringPUs[i]->cu) ) )
     {
-      Int iMode = neighboringPUs[i]->intraDir[CHANNEL_TYPE_CHROMA];
+      int iMode = neighboringPUs[i]->intraDir[CHANNEL_TYPE_CHROMA];
       if ( ! PU::isLMCMode( iMode ) )
       {
         iCount++;
@@ -1030,7 +1030,7 @@ int PU::getLMSymbolList(const PredictionUnit &pu, Int *pModeList)
   }
 
   bool bNonLMInsert = false;
-  Int iIdx = 0;
+  int iIdx = 0;
 
   pModeList[ iIdx++ ] = LM_CHROMA_IDX;
 
@@ -1127,7 +1127,7 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx, co
   mrgCtx.numValidMergeCand = maxNumMergeCand;
   // compute the location of the current PU
 
-  Int cnt = 0;
+  int cnt = 0;
 
   const Position posLT = pu.Y().topLeft();
   const Position posRT = pu.Y().topRight();
@@ -1608,11 +1608,11 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx, co
     static const UInt uiPriorityList0[NUM_PRIORITY_LIST] = { 0 , 1, 0, 2, 1, 2, 0, 3, 1, 3, 2, 3 };
     static const UInt uiPriorityList1[NUM_PRIORITY_LIST] = { 1 , 0, 2, 0, 2, 1, 3, 0, 3, 1, 3, 2 };
 
-    for (Int idx = 0; idx < uiCutoff * (uiCutoff - 1) && uiArrayAddr != maxNumMergeCand; idx++)
+    for (int idx = 0; idx < uiCutoff * (uiCutoff - 1) && uiArrayAddr != maxNumMergeCand; idx++)
     {
       CHECK( idx >= NUM_PRIORITY_LIST, "Invalid priority list number" );
-      Int i = uiPriorityList0[idx];
-      Int j = uiPriorityList1[idx];
+      int i = uiPriorityList0[idx];
+      int j = uiPriorityList1[idx];
       if (isCandInter[i] && isCandInter[j] && (mrgCtx.interDirNeighbours[i] & 0x1) && (mrgCtx.interDirNeighbours[j] & 0x2))
       {
         isCandInter[uiArrayAddr] = true;
@@ -1625,8 +1625,8 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx, co
         mrgCtx.mvFieldNeighbours[ uiArrayAddr << 1     ].setMvField(mrgCtx.mvFieldNeighbours[ i << 1     ].mv, mrgCtx.mvFieldNeighbours[ i << 1     ].refIdx);
         mrgCtx.mvFieldNeighbours[(uiArrayAddr << 1) + 1].setMvField(mrgCtx.mvFieldNeighbours[(j << 1) + 1].mv, mrgCtx.mvFieldNeighbours[(j << 1) + 1].refIdx);
 
-        Int iRefPOCL0 = slice.getRefPOC(REF_PIC_LIST_0, mrgCtx.mvFieldNeighbours[(uiArrayAddr << 1)    ].refIdx);
-        Int iRefPOCL1 = slice.getRefPOC(REF_PIC_LIST_1, mrgCtx.mvFieldNeighbours[(uiArrayAddr << 1) + 1].refIdx);
+        int iRefPOCL0 = slice.getRefPOC(REF_PIC_LIST_0, mrgCtx.mvFieldNeighbours[(uiArrayAddr << 1)    ].refIdx);
+        int iRefPOCL1 = slice.getRefPOC(REF_PIC_LIST_1, mrgCtx.mvFieldNeighbours[(uiArrayAddr << 1) + 1].refIdx);
 
         if( iRefPOCL0 == iRefPOCL1 && mrgCtx.mvFieldNeighbours[( uiArrayAddr << 1 )].mv == mrgCtx.mvFieldNeighbours[( uiArrayAddr << 1 ) + 1].mv )
         {
@@ -1646,10 +1646,10 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx, co
     return;
   }
 
-  Int iNumRefIdx = slice.isInterB() ? std::min(slice.getNumRefIdx(REF_PIC_LIST_0), slice.getNumRefIdx(REF_PIC_LIST_1)) : slice.getNumRefIdx(REF_PIC_LIST_0);
+  int iNumRefIdx = slice.isInterB() ? std::min(slice.getNumRefIdx(REF_PIC_LIST_0), slice.getNumRefIdx(REF_PIC_LIST_1)) : slice.getNumRefIdx(REF_PIC_LIST_0);
 
-  Int r = 0;
-  Int refcnt = 0;
+  int r = 0;
+  int refcnt = 0;
   while (uiArrayAddr < maxNumMergeCand)
   {
     isCandInter               [uiArrayAddr     ] = true;
@@ -1708,7 +1708,7 @@ bool PU::getColocatedMVP(const PredictionUnit &pu, const RefPicList &eRefPicList
 #endif
 {
   // don't perform MV compression when generally disabled or subPuMvp is used
-  const unsigned scale = ( pu.cs->pcv->noMotComp ? 1 : 4 * std::max<Int>(1, 4 * AMVP_DECIMATION_FACTOR / 4) );
+  const unsigned scale = ( pu.cs->pcv->noMotComp ? 1 : 4 * std::max<int>(1, 4 * AMVP_DECIMATION_FACTOR / 4) );
   const unsigned mask  = ~( scale - 1 );
 
   const Position pos = Position{ PosType( _pos.x & mask ), PosType( _pos.y & mask ) };
@@ -1784,11 +1784,11 @@ bool PU::getColocatedMVP(const PredictionUnit &pu, const RefPicList &eRefPicList
   }
   else
   {
-    const Int currPOC    = slice.getPOC();
-    const Int colPOC     = colSlice.getPOC();
-    const Int colRefPOC  = colSlice.getRefPOC(eColRefPicList, iColRefIdx);
-    const Int currRefPOC = slice.getRefPic(eRefPicList, refIdx)->getPOC();
-    const Int distscale  = xGetDistScaleFactor(currPOC, currRefPOC, colPOC, colRefPOC);
+    const int currPOC    = slice.getPOC();
+    const int colPOC     = colSlice.getPOC();
+    const int colRefPOC  = colSlice.getRefPOC(eColRefPicList, iColRefIdx);
+    const int currRefPOC = slice.getRefPic(eRefPicList, refIdx)->getPOC();
+    const int distscale  = xGetDistScaleFactor(currPOC, currRefPOC, colPOC, colRefPOC);
 
     if (distscale == 4096)
     {
@@ -1929,7 +1929,7 @@ void PU::fillMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, const in
   if( pu.cu->imv != 0)
   {
     unsigned imvShift = pu.cu->imv << 1;
-    for( Int i = 0; i < pInfo->numCand; i++ )
+    for( int i = 0; i < pInfo->numCand; i++ )
     {
       roundMV( pInfo->mvCand[i], imvShift );
     }
@@ -2004,7 +2004,7 @@ void PU::fillMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, const in
       }
       else if( pInfo->mvCand[0] != mv )
       {
-        for( Int n = std::min( (int)pInfo->numCand, AMVP_MAX_NUM_CANDS - 1 ); n > 0; n-- )
+        for( int n = std::min( (int)pInfo->numCand, AMVP_MAX_NUM_CANDS - 1 ); n > 0; n-- )
         {
           pInfo->mvCand[n] = pInfo->mvCand[n-1];
         }
@@ -2041,7 +2041,7 @@ void PU::fillMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, const in
   if (pu.cu->imv != 0)
   {
     unsigned imvShift = pu.cu->imv << 1;
-    for (Int i = 0; i < pInfo->numCand; i++)
+    for (int i = 0; i < pInfo->numCand; i++)
     {
       roundMV(pInfo->mvCand[i], imvShift);
     }
@@ -2184,7 +2184,7 @@ void PU::xInheritedAffineMv( const PredictionUnit &pu, const PredictionUnit* puN
 }
 
 #if !JVET_K0337_AFFINE_MVP_IMPROVE
-bool isValidAffineCandidate( const PredictionUnit &pu, Mv cMv0, Mv cMv1, Mv cMv2, Int& riDV )
+bool isValidAffineCandidate( const PredictionUnit &pu, Mv cMv0, Mv cMv1, Mv cMv2, int& riDV )
 {
   Mv zeroMv(0, 0);
   Mv deltaHor = cMv1 - cMv0;
@@ -2198,10 +2198,10 @@ bool isValidAffineCandidate( const PredictionUnit &pu, Mv cMv0, Mv cMv1, Mv cMv2
   deltaVer.setHighPrec();
 
   // S/8, but the Mv is 4 precision, so change to S/2
-  Int width = pu.Y().width;
-  Int height = pu.Y().height;
-  Int iDiffHor = width>>1;
-  Int iDiffVer = height>>1;
+  int width = pu.Y().width;
+  int height = pu.Y().height;
+  int iDiffHor = width>>1;
+  int iDiffVer = height>>1;
 
   if ( deltaHor.getAbsHor() > iDiffHor || deltaHor.getAbsVer() > iDiffVer || deltaVer.getAbsHor() > iDiffHor || deltaVer.getAbsVer() > iDiffVer )
   {
@@ -2435,29 +2435,29 @@ void PU::fillAffineMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, co
     }
   }
 
-  for ( Int i = 0; i < amvpInfo0.numCand; i++ )
+  for ( int i = 0; i < amvpInfo0.numCand; i++ )
   {
     amvpInfo0.mvCand[i].setHighPrec();
   }
-  for ( Int i = 0; i < amvpInfo1.numCand; i++ )
+  for ( int i = 0; i < amvpInfo1.numCand; i++ )
   {
     amvpInfo1.mvCand[i].setHighPrec();
   }
-  for ( Int i = 0; i < amvpInfo2.numCand; i++ )
+  for ( int i = 0; i < amvpInfo2.numCand; i++ )
   {
     amvpInfo2.mvCand[i].setHighPrec();
   }
 
   // Check Valid Candidates and Sort through DV
-  Int   iRecord[AFFINE_MAX_NUM_COMB][3];
-  Int   iDV[AFFINE_MAX_NUM_COMB];
-  Int   iTempDV;
-  Int   iCount = 0;
-  for ( Int i = 0; i < amvpInfo0.numCand; i++ )
+  int   iRecord[AFFINE_MAX_NUM_COMB][3];
+  int   iDV[AFFINE_MAX_NUM_COMB];
+  int   iTempDV;
+  int   iCount = 0;
+  for ( int i = 0; i < amvpInfo0.numCand; i++ )
   {
-    for ( Int j = 0; j < amvpInfo1.numCand; j++ )
+    for ( int j = 0; j < amvpInfo1.numCand; j++ )
     {
-      for ( Int k = 0; k < amvpInfo2.numCand; k++ )
+      for ( int k = 0; k < amvpInfo2.numCand; k++ )
       {
         bool bValid = isValidAffineCandidate( pu, amvpInfo0.mvCand[i], amvpInfo1.mvCand[j], amvpInfo2.mvCand[k], iDV[iCount] );
         if ( bValid )
@@ -2474,11 +2474,11 @@ void PU::fillAffineMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, co
             // save last element
             iTempDV = iDV[iCount];
             // find position and move back record
-            Int m = 0;
+            int m = 0;
             for ( m = iCount - 1; m >= 0 && iTempDV < iDV[m]; m-- )
             {
               iDV[m+1] = iDV[m];
-              memcpy( iRecord[m+1], iRecord[m], sizeof(Int) * 3 );
+              memcpy( iRecord[m+1], iRecord[m], sizeof(int) * 3 );
             }
             // insert
             iDV[m+1] = iTempDV;
@@ -2494,10 +2494,10 @@ void PU::fillAffineMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, co
 
   affiAMVPInfo.numCand = std::min<int>(iCount, AMVP_MAX_NUM_CANDS);
 
-  Int iWidth = pu.Y().width;
-  Int iHeight = pu.Y().height;
+  int iWidth = pu.Y().width;
+  int iHeight = pu.Y().height;
 
-  for ( Int i = 0; i < affiAMVPInfo.numCand; i++ )
+  for ( int i = 0; i < affiAMVPInfo.numCand; i++ )
   {
     affiAMVPInfo.mvCandLT[i] = amvpInfo0.mvCand[ iRecord[i][0] ];
     affiAMVPInfo.mvCandRT[i] = amvpInfo1.mvCand[ iRecord[i][1] ];
@@ -2509,8 +2509,8 @@ void PU::fillAffineMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, co
     clipMv( affiAMVPInfo.mvCandLT[i], pu.cu->lumaPos(), *pu.cs->sps );
     clipMv( affiAMVPInfo.mvCandRT[i], pu.cu->lumaPos(), *pu.cs->sps );
 
-    Int vx2 =  - ( affiAMVPInfo.mvCandRT[i].getVer() - affiAMVPInfo.mvCandLT[i].getVer() ) * iHeight / iWidth + affiAMVPInfo.mvCandLT[i].getHor();
-    Int vy2 =    ( affiAMVPInfo.mvCandRT[i].getHor() - affiAMVPInfo.mvCandLT[i].getHor() ) * iHeight / iWidth + affiAMVPInfo.mvCandLT[i].getVer();
+    int vx2 =  - ( affiAMVPInfo.mvCandRT[i].getVer() - affiAMVPInfo.mvCandLT[i].getVer() ) * iHeight / iWidth + affiAMVPInfo.mvCandLT[i].getHor();
+    int vy2 =    ( affiAMVPInfo.mvCandRT[i].getHor() - affiAMVPInfo.mvCandLT[i].getHor() ) * iHeight / iWidth + affiAMVPInfo.mvCandLT[i].getVer();
 
     affiAMVPInfo.mvCandLB[i] = Mv( vx2, vy2, true );
     if( !pu.cu->cs->pcv->only2Nx2N )
@@ -2527,8 +2527,8 @@ void PU::fillAffineMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, co
     AMVPInfo amvpInfo;
     PU::fillMvpCand( pu, eRefPicList, refIdx, amvpInfo );
 
-    Int iAdd = amvpInfo.numCand - affiAMVPInfo.numCand;
-    for ( Int i = 0; i < iAdd; i++ )
+    int iAdd = amvpInfo.numCand - affiAMVPInfo.numCand;
+    for ( int i = 0; i < iAdd; i++ )
     {
       amvpInfo.mvCand[i].setHighPrec();
 #if !JVET_K_AFFINE_BUG_FIXES
@@ -2583,20 +2583,20 @@ bool PU::addMVPCandUnscaled( const PredictionUnit &pu, const RefPicList &eRefPic
 
   const MotionInfo& neibMi        = neibPU->getMotionInfo( neibPos );
 
-  const Int        currRefPOC     = cs.slice->getRefPic( eRefPicList, iRefIdx )->getPOC();
+  const int        currRefPOC     = cs.slice->getRefPic( eRefPicList, iRefIdx )->getPOC();
   const RefPicList eRefPicList2nd = ( eRefPicList == REF_PIC_LIST_0 ) ? REF_PIC_LIST_1 : REF_PIC_LIST_0;
 
-  for( Int predictorSource = 0; predictorSource < 2; predictorSource++ ) // examine the indicated reference picture list, then if not available, examine the other list.
+  for( int predictorSource = 0; predictorSource < 2; predictorSource++ ) // examine the indicated reference picture list, then if not available, examine the other list.
   {
     const RefPicList eRefPicListIndex = ( predictorSource == 0 ) ? eRefPicList : eRefPicList2nd;
-    const Int        neibRefIdx       = neibMi.refIdx[eRefPicListIndex];
+    const int        neibRefIdx       = neibMi.refIdx[eRefPicListIndex];
 
     if( neibRefIdx >= 0 && currRefPOC == cs.slice->getRefPOC( eRefPicListIndex, neibRefIdx ) )
     {
 #if JEM_TOOLS || JVET_K_AFFINE
       if( affine )
       {
-        Int i = 0;
+        int i = 0;
         for( i = 0; i < info.numCand; i++ )
         {
           if( info.mvCand[i] == neibMi.mv[eRefPicListIndex] )
@@ -2714,7 +2714,7 @@ bool PU::addMVPCandWithScaling( const PredictionUnit &pu, const RefPicList &eRef
 #if JEM_TOOLS || JVET_K_AFFINE
         if( affine )
         {
-          Int i;
+          int i;
           for( i = 0; i < info.numCand; i++ )
           {
             if( info.mvCand[i] == cMv )
@@ -2873,7 +2873,7 @@ bool PU::getInterMergeSubPuMvpCand( const PredictionUnit &pu, MergeCtx& mrgCtx, 
 {
   const Slice   &slice   = *pu.cs->slice;
 #if JVET_K0346
-  const unsigned scale = 4 * std::max<Int>(1, 4 * AMVP_DECIMATION_FACTOR / 4);
+  const unsigned scale = 4 * std::max<int>(1, 4 * AMVP_DECIMATION_FACTOR / 4);
   const unsigned mask = ~(scale - 1);
 #else
   const SPSNext &spsNext =  pu.cs->sps->getSpsNext();
@@ -3214,15 +3214,15 @@ bool PU::getMvPair( const PredictionUnit &pu, RefPicList eCurRefPicList, const M
 {
   Slice &slice      = *pu.cs->slice;
 
-  Int nTargetRefIdx = slice.getRefIdx4MVPair( eCurRefPicList , rCurMvField.refIdx );
+  int nTargetRefIdx = slice.getRefIdx4MVPair( eCurRefPicList , rCurMvField.refIdx );
   if( nTargetRefIdx < 0 )
     return false;
 
-  RefPicList eTarRefPicList = ( RefPicList )( 1 - ( Int ) eCurRefPicList );
-  Int nCurPOC               = slice.getPOC();
-  Int nRefPOC               = slice.getRefPOC( eCurRefPicList , rCurMvField.refIdx );
-  Int nTargetPOC            = slice.getRefPOC( eTarRefPicList , nTargetRefIdx );
-  Int nScale                = xGetDistScaleFactorFRUC( nCurPOC , nTargetPOC , nCurPOC , nRefPOC, pu.cs->slice );
+  RefPicList eTarRefPicList = ( RefPicList )( 1 - ( int ) eCurRefPicList );
+  int nCurPOC               = slice.getPOC();
+  int nRefPOC               = slice.getRefPOC( eCurRefPicList , rCurMvField.refIdx );
+  int nTargetPOC            = slice.getRefPOC( eTarRefPicList , nTargetRefIdx );
+  int nScale                = xGetDistScaleFactorFRUC( nCurPOC , nTargetPOC , nCurPOC , nRefPOC, pu.cs->slice );
   rMvPair.mv                = rCurMvField.mv.scaleMv( nScale );
   rMvPair.refIdx            = nTargetRefIdx;
 
@@ -3241,10 +3241,10 @@ bool PU::isSameMVField( const PredictionUnit &pu, RefPicList eListA, MvField &rM
   }
 }
 
-Mv PU::scaleMv( const Mv &rColMV, Int iCurrPOC, Int iCurrRefPOC, Int iColPOC, Int iColRefPOC, Slice *slice )
+Mv PU::scaleMv( const Mv &rColMV, int iCurrPOC, int iCurrRefPOC, int iColPOC, int iColRefPOC, Slice *slice )
 {
   Mv mv = rColMV;
-  Int iScale = xGetDistScaleFactorFRUC( iCurrPOC, iCurrRefPOC, iColPOC, iColRefPOC, slice );
+  int iScale = xGetDistScaleFactorFRUC( iCurrPOC, iCurrRefPOC, iColPOC, iColRefPOC, slice );
   if ( iScale != 4096 )
   {
     mv = rColMV.scaleMv( iScale );
@@ -3273,7 +3273,7 @@ static void getNeighboringMvField( const Slice& slice, const MotionInfo &miNB, M
         iRefPOCSrc    = slice.getRefPOC( eRefPicListSrc, miNB.refIdx[eRefPicListSrc] );
         iRefPOCMirror = slice.getRefPOC( eRefPicListSrc, 0 );
 
-        Int iScale = xGetDistScaleFactor( slice.getPOC(), iRefPOCMirror, slice.getPOC(), iRefPOCSrc );
+        int iScale = xGetDistScaleFactor( slice.getPOC(), iRefPOCMirror, slice.getPOC(), iRefPOCSrc );
         if( iScale == 4096 )
         {
           cMvField[uiMvIdxSrc].setMvField( miNB.mv[eRefPicListSrc], 0 );
@@ -3319,7 +3319,7 @@ static void getNeighboringMvField( const Slice& slice, const MotionInfo &miNB, M
     else
     {
       iRefPOCMirror = slice.getRefPOC( eRefPicListSrc, 0 );
-      Int iScale = xGetDistScaleFactor( slice.getPOC(), iRefPOCMirror, slice.getPOC(), iRefPOCSrc );
+      int iScale = xGetDistScaleFactor( slice.getPOC(), iRefPOCMirror, slice.getPOC(), iRefPOCSrc );
       if( iScale == 4096 )
       {
         cMvField[uiMvIdxSrc].setMvField( miNB.mv[eRefPicListSrc], 0 );
@@ -3438,9 +3438,9 @@ bool PU::getInterMergeSubPuRecurCand( const PredictionUnit &pu, MergeCtx& mrgCtx
 
   MotionInfo mi1stSubPart;
 
-  for( Int y = 0; y < puSize.height; y += iPUHeight )
+  for( int y = 0; y < puSize.height; y += iPUHeight )
   {
-    for( Int x = 0; x < puSize.width; x += iPUWidth )
+    for( int x = 0; x < puSize.width; x += iPUWidth )
     {
       MvField cMvField[6];
       MvField cMvFieldMedian[2];
@@ -3688,7 +3688,7 @@ bool PU::isAffineMrgFlagCoded( const PredictionUnit &pu )
 
 void PU::getAffineMergeCand( const PredictionUnit &pu, MvField (*mvFieldNeighbours)[3], unsigned char &interDirNeighbours, int &numValidMergeCand )
 {
-  for ( Int mvNum = 0; mvNum < 3; mvNum++ )
+  for ( int mvNum = 0; mvNum < 3; mvNum++ )
   {
     mvFieldNeighbours[0][mvNum].setMvField( Mv(), -1 );
     mvFieldNeighbours[1][mvNum].setMvField( Mv(), -1 );
@@ -3740,7 +3740,7 @@ void PU::setAllAffineMvField( PredictionUnit &pu, MvField *mvField, RefPicList e
 {
   // Set Mv
   Mv mv[3];
-  for ( Int i = 0; i < 3; i++ )
+  for ( int i = 0; i < 3; i++ )
   {
     mv[i] = mvField[i].mv;
   }
@@ -3940,7 +3940,7 @@ bool PU::getInterMergeSubPuMvpCand(const PredictionUnit &pu, MergeCtx& mrgCtx, b
 {
   const Slice   &slice = *pu.cs->slice;
 #if JVET_K0346
-  const unsigned scale = 4 * std::max<Int>(1, 4 * AMVP_DECIMATION_FACTOR / 4);
+  const unsigned scale = 4 * std::max<int>(1, 4 * AMVP_DECIMATION_FACTOR / 4);
   const unsigned mask = ~(scale - 1);
 #else
   const SPSNext &spsNext = pu.cs->sps->getSpsNext();
@@ -4670,15 +4670,15 @@ bool CU::isObmcFlagCoded ( const CodingUnit &cu )
 
 
 #if JEM_TOOLS
-bool PU::getNeighborMotion( PredictionUnit &pu, MotionInfo& mi, Position off, Int iDir, bool bSubPu )
+bool PU::getNeighborMotion( PredictionUnit &pu, MotionInfo& mi, Position off, int iDir, bool bSubPu )
 {
   PredictionUnit* tmpPu      = nullptr;
   Position posNeighborMotion = Position( 0, 0 );
 
 #if JEM_TOOLS
-  const Int iBlkSize         = pu.cs->sps->getSpsNext().getOBMCBlkSize();
+  const int iBlkSize         = pu.cs->sps->getSpsNext().getOBMCBlkSize();
 #else
-  const Int iBlkSize         = 4; //TODO: check this
+  const int iBlkSize         = 4; //TODO: check this
 #endif
   const Position posSubBlock ( pu.lumaPos().offset( off ) );
 
@@ -4887,11 +4887,11 @@ UInt TU::getCoefScanIdx(const TransformUnit &tu, const ComponentID &compID)
 
   //------------------
 
-       if (abs((Int) uiDirMode - VER_IDX) <= MDCS_ANGLE_LIMIT)
+       if (abs((int) uiDirMode - VER_IDX) <= MDCS_ANGLE_LIMIT)
   {
     return SCAN_HOR;
   }
-  else if (abs((Int) uiDirMode - HOR_IDX) <= MDCS_ANGLE_LIMIT)
+  else if (abs((int) uiDirMode - HOR_IDX) <= MDCS_ANGLE_LIMIT)
   {
     return SCAN_VER;
   }

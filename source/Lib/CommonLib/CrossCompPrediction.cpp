@@ -50,11 +50,11 @@ int8_t CrossComponentPrediction::xCalcCrossComponentPredictionAlpha( TransformUn
   const CPelBuf pResiL = useRecoResidual ? tu.cs->getResiBuf( tu.Y() ) : tu.cs->getOrgResiBuf( tu.Y() );
   const CPelBuf pResiC = tu.cs->getResiBuf( tu.blocks[compID] );
 
-  const Int diffBitDepth = tu.cs->sps->getDifferentialLumaChromaBitDepth();
+  const int diffBitDepth = tu.cs->sps->getDifferentialLumaChromaBitDepth();
 
   int8_t alpha = 0;
-  Int SSxy = 0;
-  Int SSxx = 0;
+  int SSxy = 0;
+  int SSxx = 0;
 
   for( UInt uiY = 0; uiY < pResiL.height; uiY++ )
   {
@@ -69,11 +69,11 @@ int8_t CrossComponentPrediction::xCalcCrossComponentPredictionAlpha( TransformUn
   if( SSxx != 0 )
   {
     double dAlpha = SSxy / double( SSxx );
-    alpha = int8_t( Clip3<Int>( -16, 16, ( Int ) ( dAlpha * 16 ) ) );
+    alpha = int8_t( Clip3<int>( -16, 16, ( int ) ( dAlpha * 16 ) ) );
 
     static const int8_t alphaQuant[17] = { 0, 1, 1, 2, 2, 2, 4, 4, 4, 4, 4, 4, 8, 8, 8, 8, 8 };
 
-    alpha = ( alpha < 0 ) ? -alphaQuant[Int( -alpha )] : alphaQuant[Int( alpha )];
+    alpha = ( alpha < 0 ) ? -alphaQuant[int( -alpha )] : alphaQuant[int( alpha )];
   }
 
   tu.compAlpha[compID] = alpha;
@@ -89,8 +89,8 @@ void CrossComponentPrediction::crossComponentPrediction(        TransformUnit &t
                                                                 PelBuf        &piResiT,
                                                           const bool          &reverse )
 {
-  const Int alpha = tu.compAlpha[compID];
-  const Int diffBitDepth = tu.cs->sps->getDifferentialLumaChromaBitDepth();
+  const int alpha = tu.compAlpha[compID];
+  const int diffBitDepth = tu.cs->sps->getDifferentialLumaChromaBitDepth();
 
 #if !RExt__HIGH_BIT_DEPTH_SUPPORT
   ClpRng clpRng; //not limited by adaptive clipping
@@ -98,7 +98,7 @@ void CrossComponentPrediction::crossComponentPrediction(        TransformUnit &t
   clpRng.max = std::numeric_limits<Pel>::max();
 #endif
 
-  for( Int y = 0; y < piResiT.height; y++ )
+  for( int y = 0; y < piResiT.height; y++ )
   {
     if( reverse )
     {
@@ -108,23 +108,23 @@ void CrossComponentPrediction::crossComponentPrediction(        TransformUnit &t
       //  The result of the constraint is that for 8/10/12bit profiles, the input values
       //  can be represented within a 16-bit Pel-type.
 #if RExt__HIGH_BIT_DEPTH_SUPPORT
-      for( Int x = 0; x < piResiT.width; x++ )
+      for( int x = 0; x < piResiT.width; x++ )
       {
         piResiT.at( x, y ) = piResiC.at( x, y ) + ( ( alpha * rightShift( piResiL.at( x, y ), diffBitDepth ) ) >> 3 );
       }
 #else
-      for( Int x = 0; x < piResiT.width; x++ )
+      for( int x = 0; x < piResiT.width; x++ )
       {
-        piResiT.at( x, y ) = ClipPel<Int>( piResiC.at( x, y ) + ( ( alpha * rightShift<Int>( Int( piResiL.at( x, y ) ), diffBitDepth ) ) >> 3 ), clpRng );
+        piResiT.at( x, y ) = ClipPel<int>( piResiC.at( x, y ) + ( ( alpha * rightShift<int>( int( piResiL.at( x, y ) ), diffBitDepth ) ) >> 3 ), clpRng );
       }
 #endif
     }
     else
     {
       // Forward does not need clipping. Pel type should always be big enough.
-      for( Int x = 0; x < piResiT.width; x++ )
+      for( int x = 0; x < piResiT.width; x++ )
       {
-        piResiT.at( x, y ) = piResiC.at( x, y ) - ( ( alpha * rightShift<Int>( Int( piResiL.at( x, y ) ), diffBitDepth ) ) >> 3 );
+        piResiT.at( x, y ) = piResiC.at( x, y ) - ( ( alpha * rightShift<int>( int( piResiL.at( x, y ) ), diffBitDepth ) ) >> 3 );
       }
     }
   }

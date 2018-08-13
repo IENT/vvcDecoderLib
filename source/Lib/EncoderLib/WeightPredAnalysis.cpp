@@ -45,30 +45,30 @@ static const double WEIGHT_PRED_SAD_RELATIVE_TO_NON_WEIGHT_PRED_SAD=0.99; // NOT
 
 //! calculate SAD values for both WP version and non-WP version.
 static
-int64_t xCalcSADvalueWP(const Int   bitDepth,
+int64_t xCalcSADvalueWP(const int   bitDepth,
                       const Pel  *pOrgPel,
                       const Pel  *pRefPel,
-                      const Int   width,
-                      const Int   height,
-                      const Int   orgStride,
-                      const Int   refStride,
-                      const Int   log2Denom,
-                      const Int   weight,
-                      const Int   offset,
+                      const int   width,
+                      const int   height,
+                      const int   orgStride,
+                      const int   refStride,
+                      const int   log2Denom,
+                      const int   weight,
+                      const int   offset,
                       const bool  useHighPrecision);
 
 //! calculate SAD values for both WP version and non-WP version.
 static
-int64_t xCalcSADvalueWPOptionalClip(const Int   bitDepth,
+int64_t xCalcSADvalueWPOptionalClip(const int   bitDepth,
                                   const Pel  *pOrgPel,
                                   const Pel  *pRefPel,
-                                  const Int   width,
-                                  const Int   height,
-                                  const Int   orgStride,
-                                  const Int   refStride,
-                                  const Int   log2Denom,
-                                  const Int   weight,
-                                  const Int   offset,
+                                  const int   width,
+                                  const int   height,
+                                  const int   orgStride,
+                                  const int   refStride,
+                                  const int   log2Denom,
+                                  const int   weight,
+                                  const int   offset,
                                   const bool  useHighPrecision,
                                   const bool  clipped);
 
@@ -79,17 +79,17 @@ int64_t xCalcSADvalueWPOptionalClip(const Int   bitDepth,
 //! calculate Histogram for array of pixels
 static
 void xCalcHistogram(const Pel  *pPel,
-                    std::vector<Int> &histogram,
-                    const Int   width,
-                    const Int   height,
-                    const Int   stride,
-                    const Int   maxPel)
+                    std::vector<int> &histogram,
+                    const int   width,
+                    const int   height,
+                    const int   stride,
+                    const int   maxPel)
 {
   histogram.clear();
   histogram.resize(maxPel);
-  for( Int y = 0; y < height; y++ )
+  for( int y = 0; y < height; y++ )
   {
-    for( Int x = 0; x < width; x++ )
+    for( int x = 0; x < width; x++ )
     {
       const Pel v=pPel[x];
       histogram[v<0?0:(v>=maxPel)?maxPel-1:v]++;
@@ -99,15 +99,15 @@ void xCalcHistogram(const Pel  *pPel,
 }
 
 static
-Distortion xCalcHistDistortion (const std::vector<Int> &histogram0,
-                                const std::vector<Int> &histogram1)
+Distortion xCalcHistDistortion (const std::vector<int> &histogram0,
+                                const std::vector<int> &histogram1)
 {
   Distortion distortion = 0;
   CHECK(histogram0.size()!=histogram1.size(), "Different histogram sizes");
-  const Int numElements=Int(histogram0.size());
+  const int numElements=int(histogram0.size());
 
   // Scan histograms to compute histogram distortion
-  for (Int i = 0; i <= numElements; i++)
+  for (int i = 0; i <= numElements; i++)
   {
     distortion += (Distortion)(abs(histogram0[i] - histogram1[i]));
   }
@@ -116,64 +116,64 @@ Distortion xCalcHistDistortion (const std::vector<Int> &histogram0,
 }
 
 static
-void xScaleHistogram(const std::vector<Int> &histogramInput,
-                           std::vector<Int> &histogramOutput, // cannot be the same as the input
-                     const Int               bitDepth,
-                     const Int               log2Denom,
-                     const Int               weight,
-                     const Int               offset,
+void xScaleHistogram(const std::vector<int> &histogramInput,
+                           std::vector<int> &histogramOutput, // cannot be the same as the input
+                     const int               bitDepth,
+                     const int               log2Denom,
+                     const int               weight,
+                     const int               offset,
                      const bool              bHighPrecision)
 {
   CHECK(&histogramInput == &histogramOutput, "Input and output histogram are the same");
-  const Int numElements=Int(histogramInput.size());
+  const int numElements=int(histogramInput.size());
   histogramOutput.clear();
   histogramOutput.resize(numElements);
 
   const int64_t iRealLog2Denom = bHighPrecision ? 0 : (bitDepth - 8);
   const int64_t iRealOffset    = ((int64_t)offset)<<iRealLog2Denom;
 
-  const Int divOffset = log2Denom == 0 ? 0 : 1 << (log2Denom - 1);
+  const int divOffset = log2Denom == 0 ? 0 : 1 << (log2Denom - 1);
   // Scan histogram and apply illumination parameters appropriately
   // Then compute updated histogram.
   // Note that this technique only works with single list weights/offsets.
 
-  for (Int i = 0; i < numElements; i++)
+  for (int i = 0; i < numElements; i++)
   {
-    const Int j = Clip3(0, numElements - 1, (Int)(((weight * i + divOffset) >> log2Denom) + iRealOffset));
+    const int j = Clip3(0, numElements - 1, (int)(((weight * i + divOffset) >> log2Denom) + iRealOffset));
     histogramOutput[j] += histogramInput[i];
   }
 }
 
 static
-Distortion xSearchHistogram(const std::vector<Int> &histogramSource,
-                            const std::vector<Int> &histogramRef,
-                                  std::vector<Int> &outputHistogram,
-                            const Int               bitDepth,
-                            const Int               log2Denom,
-                                  Int              &weightToUpdate,
-                                  Int              &offsetToUpdate,
+Distortion xSearchHistogram(const std::vector<int> &histogramSource,
+                            const std::vector<int> &histogramRef,
+                                  std::vector<int> &outputHistogram,
+                            const int               bitDepth,
+                            const int               log2Denom,
+                                  int              &weightToUpdate,
+                                  int              &offsetToUpdate,
                             const bool              bHighPrecision,
                             const ComponentID       compID)
 {
-  const Int initialWeight   = weightToUpdate;
-  const Int initialOffset   = offsetToUpdate;
-  const Int weightRange     = 10;
-  const Int offsetRange     = 10;
-  const Int maxOffset       = 1 << ((bHighPrecision == true) ? (bitDepth - 1) : 7);
-  const Int range           = bHighPrecision ? (1<<bitDepth) / 2 : 128;
-  const Int defaultWeight   = (1<<log2Denom);
-  const Int minSearchWeight = std::max<Int>(initialWeight - weightRange, defaultWeight - range);
-  const Int maxSearchWeight = std::min<Int>(initialWeight + weightRange+1, defaultWeight + range);
+  const int initialWeight   = weightToUpdate;
+  const int initialOffset   = offsetToUpdate;
+  const int weightRange     = 10;
+  const int offsetRange     = 10;
+  const int maxOffset       = 1 << ((bHighPrecision == true) ? (bitDepth - 1) : 7);
+  const int range           = bHighPrecision ? (1<<bitDepth) / 2 : 128;
+  const int defaultWeight   = (1<<log2Denom);
+  const int minSearchWeight = std::max<int>(initialWeight - weightRange, defaultWeight - range);
+  const int maxSearchWeight = std::min<int>(initialWeight + weightRange+1, defaultWeight + range);
 
   Distortion minDistortion   = std::numeric_limits<Distortion>::max();
-  Int        bestWeight      = initialWeight;
-  Int        bestOffset      = initialOffset;
+  int        bestWeight      = initialWeight;
+  int        bestOffset      = initialOffset;
 
-  for (Int searchWeight = minSearchWeight; searchWeight < maxSearchWeight; searchWeight++)
+  for (int searchWeight = minSearchWeight; searchWeight < maxSearchWeight; searchWeight++)
   {
     if (compID == COMPONENT_Y)
     {
-      for (Int searchOffset = std::max<Int>(initialOffset - offsetRange, -maxOffset);
+      for (int searchOffset = std::max<int>(initialOffset - offsetRange, -maxOffset);
                searchOffset <= initialOffset + offsetRange && searchOffset<=(maxOffset-1);
                searchOffset++)
       {
@@ -190,12 +190,12 @@ Distortion xSearchHistogram(const std::vector<Int> &histogramSource,
     }
     else
     {
-      const Int pred        = ( maxOffset - ( ( maxOffset*searchWeight)>>(log2Denom) ) );
+      const int pred        = ( maxOffset - ( ( maxOffset*searchWeight)>>(log2Denom) ) );
 
-      for (Int searchOffset = initialOffset - offsetRange; searchOffset <= initialOffset + offsetRange; searchOffset++)
+      for (int searchOffset = initialOffset - offsetRange; searchOffset <= initialOffset + offsetRange; searchOffset++)
       {
-        const Int deltaOffset   = Clip3( -4*maxOffset, 4*maxOffset-1, (searchOffset - pred) ); // signed 10bit (if !bHighPrecision)
-        const Int clippedOffset = Clip3( -1*maxOffset, 1*maxOffset-1, (deltaOffset  + pred) ); // signed 8bit  (if !bHighPrecision)
+        const int deltaOffset   = Clip3( -4*maxOffset, 4*maxOffset-1, (searchOffset - pred) ); // signed 10bit (if !bHighPrecision)
+        const int clippedOffset = Clip3( -1*maxOffset, 1*maxOffset-1, (deltaOffset  + pred) ); // signed 8bit  (if !bHighPrecision)
         xScaleHistogram(histogramRef, outputHistogram, bitDepth, log2Denom, searchWeight, clippedOffset, bHighPrecision);
         const Distortion distortion = xCalcHistDistortion(histogramSource, outputHistogram);
 
@@ -226,9 +226,9 @@ WeightPredAnalysis::WeightPredAnalysis()
 {
   for ( UInt lst =0 ; lst<NUM_REF_PIC_LIST_01 ; lst++ )
   {
-    for ( Int refIdx=0 ; refIdx<MAX_NUM_REF ; refIdx++ )
+    for ( int refIdx=0 ; refIdx<MAX_NUM_REF ; refIdx++ )
     {
-      for ( Int comp=0 ; comp<MAX_NUM_COMPONENT ;comp++ )
+      for ( int comp=0 ; comp<MAX_NUM_COMPONENT ;comp++ )
       {
         WPScalingParam  *pwp   = &(m_wp[lst][refIdx][comp]);
         pwp->bPresentFlag      = false;
@@ -250,7 +250,7 @@ void WeightPredAnalysis::xCalcACDCParamSlice(Slice *const slice)
 
   WPACDCParam weightACDCParam[MAX_NUM_COMPONENT];
 
-  for(Int componentIndex = 0; componentIndex < ::getNumberValidComponents(pPic.chromaFormat); componentIndex++)
+  for(int componentIndex = 0; componentIndex < ::getNumberValidComponents(pPic.chromaFormat); componentIndex++)
   {
     const ComponentID compID = ComponentID(componentIndex);
 
@@ -258,21 +258,21 @@ void WeightPredAnalysis::xCalcACDCParamSlice(Slice *const slice)
 
     // calculate DC/AC value for channel
 
-    const Int stride = compBuf.stride;
-    const Int width  = compBuf.width;
-    const Int height = compBuf.height;
+    const int stride = compBuf.stride;
+    const int width  = compBuf.width;
+    const int height = compBuf.height;
 
-    const Int sample = width*height;
+    const int sample = width*height;
 
     int64_t orgDC = 0;
     {
       const Pel *pPel = compBuf.buf;
 
-      for(Int y = 0; y < height; y++, pPel+=stride )
+      for(int y = 0; y < height; y++, pPel+=stride )
       {
-        for(Int x = 0; x < width; x++ )
+        for(int x = 0; x < width; x++ )
         {
-          orgDC += (Int)( pPel[x] );
+          orgDC += (int)( pPel[x] );
         }
       }
     }
@@ -283,16 +283,16 @@ void WeightPredAnalysis::xCalcACDCParamSlice(Slice *const slice)
     {
       const Pel *pPel = compBuf.buf;
 
-      for(Int y = 0; y < height; y++, pPel += stride )
+      for(int y = 0; y < height; y++, pPel += stride )
       {
-        for(Int x = 0; x < width; x++ )
+        for(int x = 0; x < width; x++ )
         {
-          orgAC += abs( (Int)pPel[x] - (Int)orgNormDC );
+          orgAC += abs( (int)pPel[x] - (int)orgNormDC );
         }
       }
     }
 
-    const Int fixedBitShift = (slice->getSPS()->getSpsRangeExtension().getHighPrecisionOffsetsEnabledFlag())?RExt__PREDICTION_WEIGHTING_ANALYSIS_DC_PRECISION:0;
+    const int fixedBitShift = (slice->getSPS()->getSpsRangeExtension().getHighPrecisionOffsetsEnabledFlag())?RExt__PREDICTION_WEIGHTING_ANALYSIS_DC_PRECISION:0;
     weightACDCParam[compID].iDC = (((orgDC<<fixedBitShift)+(sample>>1)) / sample);
     weightACDCParam[compID].iAC = orgAC;
   }
@@ -306,15 +306,15 @@ void  WeightPredAnalysis::xCheckWPEnable(Slice *const slice)
 {
 //  const PicYuv *pPic = slice->getPic()->getPicYuvOrg();
 
-  Int presentCnt = 0;
+  int presentCnt = 0;
   for ( UInt lst=0 ; lst<NUM_REF_PIC_LIST_01 ; lst++ )
   {
-    for ( Int refIdx=0 ; refIdx<MAX_NUM_REF ; refIdx++ )
+    for ( int refIdx=0 ; refIdx<MAX_NUM_REF ; refIdx++ )
     {
-      for(Int componentIndex = 0; componentIndex < ::getNumberValidComponents( slice->getSPS()->getChromaFormatIdc() ); componentIndex++)
+      for(int componentIndex = 0; componentIndex < ::getNumberValidComponents( slice->getSPS()->getChromaFormatIdc() ); componentIndex++)
       {
         WPScalingParam  *pwp = &(m_wp[lst][refIdx][componentIndex]);
-        presentCnt += (Int)pwp->bPresentFlag;
+        presentCnt += (int)pwp->bPresentFlag;
       }
     }
   }
@@ -326,9 +326,9 @@ void  WeightPredAnalysis::xCheckWPEnable(Slice *const slice)
 
     for ( UInt lst=0 ; lst<NUM_REF_PIC_LIST_01 ; lst++ )
     {
-      for ( Int refIdx=0 ; refIdx<MAX_NUM_REF ; refIdx++ )
+      for ( int refIdx=0 ; refIdx<MAX_NUM_REF ; refIdx++ )
       {
-        for(Int componentIndex = 0; componentIndex < ::getNumberValidComponents( slice->getSPS()->getChromaFormatIdc() ); componentIndex++)
+        for(int componentIndex = 0; componentIndex < ::getNumberValidComponents( slice->getSPS()->getChromaFormatIdc() ); componentIndex++)
         {
           WPScalingParam  *pwp = &(m_wp[lst][refIdx][componentIndex]);
 
@@ -352,7 +352,7 @@ void  WeightPredAnalysis::xCheckWPEnable(Slice *const slice)
 //! estimate wp tables for explicit wp
 void WeightPredAnalysis::xEstimateWPParamSlice(Slice *const slice, const WeightedPredictionMethod method)
 {
-  Int  iDenom         = 6;
+  int  iDenom         = 6;
   bool validRangeFlag = false;
 
   if(slice->getNumRefIdx(REF_PIC_LIST_0)>3)
@@ -398,31 +398,31 @@ void WeightPredAnalysis::xEstimateWPParamSlice(Slice *const slice, const Weighte
 
 
 //! update wp tables for explicit wp w.r.t range limitation
-bool WeightPredAnalysis::xUpdatingWPParameters(Slice *const slice, const Int log2Denom)
+bool WeightPredAnalysis::xUpdatingWPParameters(Slice *const slice, const int log2Denom)
 {
-  const Int  numComp                    = ::getNumberValidComponents( slice->getSPS()->getChromaFormatIdc() );
+  const int  numComp                    = ::getNumberValidComponents( slice->getSPS()->getChromaFormatIdc() );
   const bool bUseHighPrecisionWeighting = slice->getSPS()->getSpsRangeExtension().getHighPrecisionOffsetsEnabledFlag();
-  const Int numPredDir                  = slice->isInterP() ? 1 : 2;
+  const int numPredDir                  = slice->isInterP() ? 1 : 2;
 
-  CHECK(numPredDir > Int(NUM_REF_PIC_LIST_01), "Invalid reference picture list");
+  CHECK(numPredDir > int(NUM_REF_PIC_LIST_01), "Invalid reference picture list");
 
-  for ( Int refList = 0; refList < numPredDir; refList++ )
+  for ( int refList = 0; refList < numPredDir; refList++ )
   {
     const RefPicList eRefPicList = ( refList ? REF_PIC_LIST_1 : REF_PIC_LIST_0 );
 
-    for ( Int refIdxTemp = 0; refIdxTemp < slice->getNumRefIdx(eRefPicList); refIdxTemp++ )
+    for ( int refIdxTemp = 0; refIdxTemp < slice->getNumRefIdx(eRefPicList); refIdxTemp++ )
     {
       const WPACDCParam *currWeightACDCParam, *refWeightACDCParam;
       slice->getWpAcDcParam(currWeightACDCParam);
       slice->getRefPic(eRefPicList, refIdxTemp)->slices[0]->getWpAcDcParam(refWeightACDCParam);
 
-      for ( Int comp = 0; comp < numComp; comp++ )
+      for ( int comp = 0; comp < numComp; comp++ )
       {
         const ComponentID compID        = ComponentID(comp);
-        const Int         bitDepth      = slice->getSPS()->getBitDepth(toChannelType(compID));
-        const Int         range         = bUseHighPrecisionWeighting ? (1<<bitDepth)/2 : 128;
-        const Int         realLog2Denom = log2Denom + (bUseHighPrecisionWeighting ? RExt__PREDICTION_WEIGHTING_ANALYSIS_DC_PRECISION : (bitDepth - 8));
-        const Int         realOffset    = ((Int)1<<(realLog2Denom-1));
+        const int         bitDepth      = slice->getSPS()->getBitDepth(toChannelType(compID));
+        const int         range         = bUseHighPrecisionWeighting ? (1<<bitDepth)/2 : 128;
+        const int         realLog2Denom = log2Denom + (bUseHighPrecisionWeighting ? RExt__PREDICTION_WEIGHTING_ANALYSIS_DC_PRECISION : (bitDepth - 8));
+        const int         realOffset    = ((int)1<<(realLog2Denom-1));
 
         // current frame
         const int64_t currDC = currWeightACDCParam[comp].iDC;
@@ -433,14 +433,14 @@ bool WeightPredAnalysis::xUpdatingWPParameters(Slice *const slice, const Int log
 
         // calculating iWeight and iOffset params
         const double dWeight = (refAC==0) ? (double)1.0 : Clip3( -16.0, 15.0, ((double)currAC / (double)refAC) );
-        const Int weight     = (Int)( 0.5 + dWeight * (double)(1<<log2Denom) );
-        const Int offset     = (Int)( ((currDC<<log2Denom) - ((int64_t)weight * refDC) + (int64_t)realOffset) >> realLog2Denom );
+        const int weight     = (int)( 0.5 + dWeight * (double)(1<<log2Denom) );
+        const int offset     = (int)( ((currDC<<log2Denom) - ((int64_t)weight * refDC) + (int64_t)realOffset) >> realLog2Denom );
 
-        Int clippedOffset;
+        int clippedOffset;
         if(isChroma(compID)) // Chroma offset range limination
         {
-          const Int pred        = ( range - ( ( range*weight)>>(log2Denom) ) );
-          const Int deltaOffset = Clip3( -4*range, 4*range-1, (offset - pred) ); // signed 10bit
+          const int pred        = ( range - ( ( range*weight)>>(log2Denom) ) );
+          const int deltaOffset = Clip3( -4*range, 4*range-1, (offset - pred) ); // signed 10bit
 
           clippedOffset = Clip3( -range, range-1, (deltaOffset + pred) );  // signed 8bit
         }
@@ -450,8 +450,8 @@ bool WeightPredAnalysis::xUpdatingWPParameters(Slice *const slice, const Int log
         }
 
         // Weighting factor limitation
-        const Int defaultWeight = (1<<log2Denom);
-        const Int deltaWeight   = (weight - defaultWeight);
+        const int defaultWeight = (1<<log2Denom);
+        const int deltaWeight   = (weight - defaultWeight);
 
         if(deltaWeight >= range || deltaWeight < -range)
         {
@@ -474,40 +474,40 @@ bool WeightPredAnalysis::xUpdatingWPParameters(Slice *const slice, const Int log
  * \param log2Denom
  * \returns bool
  */
-bool WeightPredAnalysis::xSelectWPHistExtClip(Slice *const slice, const Int log2Denom, const bool bDoEnhancement, const bool bClipInitialSADWP, const bool bUseHistogram)
+bool WeightPredAnalysis::xSelectWPHistExtClip(Slice *const slice, const int log2Denom, const bool bDoEnhancement, const bool bClipInitialSADWP, const bool bUseHistogram)
 {
 
   const CPelUnitBuf       pPic             = slice->getPic()->getOrigBuf();
-  const Int               defaultWeight    = 1<<log2Denom;
-  const Int               numPredDir       = slice->isInterP() ? 1 : 2;
+  const int               defaultWeight    = 1<<log2Denom;
+  const int               numPredDir       = slice->isInterP() ? 1 : 2;
   const bool              useHighPrecision = slice->getSPS()->getSpsRangeExtension().getHighPrecisionOffsetsEnabledFlag();
 
-  CHECK(numPredDir > Int(NUM_REF_PIC_LIST_01), "Invalid reference picture list");
+  CHECK(numPredDir > int(NUM_REF_PIC_LIST_01), "Invalid reference picture list");
 
-  for ( Int refList = 0; refList < numPredDir; refList++ )
+  for ( int refList = 0; refList < numPredDir; refList++ )
   {
     const RefPicList eRefPicList = ( refList ? REF_PIC_LIST_1 : REF_PIC_LIST_0 );
 
-    for ( Int refIdxTemp = 0; refIdxTemp < slice->getNumRefIdx(eRefPicList); refIdxTemp++ )
+    for ( int refIdxTemp = 0; refIdxTemp < slice->getNumRefIdx(eRefPicList); refIdxTemp++ )
     {
       bool  useChromaWeight = false;
 
-      for (Int comp = 0; comp < ::getNumberValidComponents(pPic.chromaFormat); comp++)
+      for (int comp = 0; comp < ::getNumberValidComponents(pPic.chromaFormat); comp++)
       {
         const ComponentID  compID     = ComponentID(comp);
         const Pel         *pRef       = slice->getRefPic(eRefPicList, refIdxTemp)->getRecoBuf().get(compID).buf;
-        const Int          refStride  = slice->getRefPic(eRefPicList, refIdxTemp)->getRecoBuf().get(compID).stride;;
+        const int          refStride  = slice->getRefPic(eRefPicList, refIdxTemp)->getRecoBuf().get(compID).stride;;
         const CPelBuf      compBuf    = pPic.get( compID );
         const Pel         *pOrg       = compBuf.buf;
-        const Int          orgStride  = compBuf.stride;
-        const Int          width      = compBuf.width;
-        const Int          height     = compBuf.height;
-        const Int          bitDepth   = slice->getSPS()->getBitDepth(toChannelType(compID));
+        const int          orgStride  = compBuf.stride;
+        const int          width      = compBuf.width;
+        const int          height     = compBuf.height;
+        const int          bitDepth   = slice->getSPS()->getBitDepth(toChannelType(compID));
               WPScalingParam &wp      = m_wp[refList][refIdxTemp][compID];
-              Int          weight     = wp.iWeight;
-              Int          offset     = wp.iOffset;
-              Int          weightDef  = defaultWeight;
-              Int          offsetDef  = 0;
+              int          weight     = wp.iWeight;
+              int          offset     = wp.iOffset;
+              int          weightDef  = defaultWeight;
+              int          offsetDef  = 0;
 
         // calculate SAD costs with/without wp for luma
         const int64_t SADnoWP = xCalcSADvalueWPOptionalClip(bitDepth, pOrg, pRef, width, height, orgStride, refStride, log2Denom, defaultWeight, 0, useHighPrecision, bClipInitialSADWP);
@@ -520,9 +520,9 @@ bool WeightPredAnalysis::xSelectWPHistExtClip(Slice *const slice, const Int log2
 
           if (bUseHistogram)
           {
-            std::vector<Int> histogramOrg;// = pPic->getHistogram(compID);
-            std::vector<Int> histogramRef;// = slice->getRefPic(eRefPicList, refIdxTemp)->getPicYuvRec()->getHistogram(compID);
-            std::vector<Int> searchedHistogram;
+            std::vector<int> histogramOrg;// = pPic->getHistogram(compID);
+            std::vector<int> histogramRef;// = slice->getRefPic(eRefPicList, refIdxTemp)->getPicYuvRec()->getHistogram(compID);
+            std::vector<int> searchedHistogram;
 
             // Compute histograms
             xCalcHistogram(pOrg, histogramOrg, width, height, orgStride, 1 << bitDepth);
@@ -583,7 +583,7 @@ bool WeightPredAnalysis::xSelectWPHistExtClip(Slice *const slice, const Int log2
         }
       }
 
-      for (Int comp = 1; comp < ::getNumberValidComponents(pPic.chromaFormat); comp++)
+      for (int comp = 1; comp < ::getNumberValidComponents(pPic.chromaFormat); comp++)
       {
         m_wp[refList][refIdxTemp][comp].bPresentFlag = useChromaWeight;
       }
@@ -594,34 +594,34 @@ bool WeightPredAnalysis::xSelectWPHistExtClip(Slice *const slice, const Int log2
 }
 
 //! select whether weighted pred enables or not.
-bool WeightPredAnalysis::xSelectWP(Slice *const slice, const Int log2Denom)
+bool WeightPredAnalysis::xSelectWP(Slice *const slice, const int log2Denom)
 {
   const CPelUnitBuf       pPic                                = slice->getPic()->getOrigBuf();
-  const Int               defaultWeight                       = 1<<log2Denom;
-  const Int               numPredDir                          = slice->isInterP() ? 1 : 2;
+  const int               defaultWeight                       = 1<<log2Denom;
+  const int               numPredDir                          = slice->isInterP() ? 1 : 2;
   const bool              useHighPrecisionPredictionWeighting = slice->getSPS()->getSpsRangeExtension().getHighPrecisionOffsetsEnabledFlag();
 
-  CHECK(numPredDir > Int(NUM_REF_PIC_LIST_01), "Invalid reference picture list");
+  CHECK(numPredDir > int(NUM_REF_PIC_LIST_01), "Invalid reference picture list");
 
-  for ( Int refList = 0; refList < numPredDir; refList++ )
+  for ( int refList = 0; refList < numPredDir; refList++ )
   {
     const RefPicList eRefPicList = ( refList ? REF_PIC_LIST_1 : REF_PIC_LIST_0 );
 
-    for ( Int refIdxTemp = 0; refIdxTemp < slice->getNumRefIdx(eRefPicList); refIdxTemp++ )
+    for ( int refIdxTemp = 0; refIdxTemp < slice->getNumRefIdx(eRefPicList); refIdxTemp++ )
     {
       int64_t SADWP = 0, SADnoWP = 0;
 
-      for (Int comp = 0; comp < ::getNumberValidComponents(pPic.chromaFormat); comp++)
+      for (int comp = 0; comp < ::getNumberValidComponents(pPic.chromaFormat); comp++)
       {
         const ComponentID  compID     = ComponentID(comp);
         const CPelBuf      compBuf    = pPic.get( compID );
         const Pel         *pRef       = slice->getRefPic(eRefPicList, refIdxTemp)->getRecoBuf().get( compID ).buf;
-        const Int          refStride  = slice->getRefPic(eRefPicList, refIdxTemp)->getRecoBuf().get( compID ).stride;
+        const int          refStride  = slice->getRefPic(eRefPicList, refIdxTemp)->getRecoBuf().get( compID ).stride;
         const Pel         *pOrg       = compBuf.buf;
-        const Int          orgStride  = compBuf.stride;
-        const Int          width      = compBuf.width;
-        const Int          height     = compBuf.height;
-        const Int          bitDepth   = slice->getSPS()->getBitDepth(toChannelType(compID));
+        const int          orgStride  = compBuf.stride;
+        const int          width      = compBuf.width;
+        const int          height     = compBuf.height;
+        const int          bitDepth   = slice->getSPS()->getBitDepth(toChannelType(compID));
 
         // calculate SAD costs with/without wp for luma
         SADWP   += xCalcSADvalueWP(bitDepth, pOrg, pRef, width, height, orgStride, refStride, log2Denom, m_wp[refList][refIdxTemp][compID].iWeight, m_wp[refList][refIdxTemp][compID].iOffset, useHighPrecisionPredictionWeighting);
@@ -636,7 +636,7 @@ bool WeightPredAnalysis::xSelectWP(Slice *const slice, const Int log2Denom)
 #endif
       if(dRatio >= dMaxRatio)
       {
-        for(Int comp=0; comp < ::getNumberValidComponents(pPic.chromaFormat); comp++)
+        for(int comp=0; comp < ::getNumberValidComponents(pPic.chromaFormat); comp++)
         {
           WPScalingParam &wp=m_wp[refList][refIdxTemp][comp];
           wp.bPresentFlag      = false;
@@ -654,16 +654,16 @@ bool WeightPredAnalysis::xSelectWP(Slice *const slice, const Int log2Denom)
 // Alternatively, a SSE-based measure could be used instead.
 // The respective function has been removed as it currently redundant.
 static
-int64_t xCalcSADvalueWP(const Int   bitDepth,
+int64_t xCalcSADvalueWP(const int   bitDepth,
                       const Pel  *pOrgPel,
                       const Pel  *pRefPel,
-                      const Int   width,
-                      const Int   height,
-                      const Int   orgStride,
-                      const Int   refStride,
-                      const Int   log2Denom,
-                      const Int   weight,
-                      const Int   offset,
+                      const int   width,
+                      const int   height,
+                      const int   orgStride,
+                      const int   refStride,
+                      const int   log2Denom,
+                      const int   weight,
+                      const int   offset,
                       const bool  useHighPrecision)
 {
   //const int64_t iSize          = iWidth*iHeight;
@@ -671,9 +671,9 @@ int64_t xCalcSADvalueWP(const Int   bitDepth,
   const int64_t realOffset    = ((int64_t)offset)<<realLog2Denom;
 
   int64_t SAD = 0;
-  for( Int y = 0; y < height; y++ )
+  for( int y = 0; y < height; y++ )
   {
-    for( Int x = 0; x < width; x++ )
+    for( int x = 0; x < width; x++ )
     {
       SAD += abs(( ((int64_t)pOrgPel[x] << (int64_t) log2Denom) - ( (int64_t) pRefPel[x] * (int64_t) weight + (realOffset) ) ) );
     }
@@ -686,16 +686,16 @@ int64_t xCalcSADvalueWP(const Int   bitDepth,
 }
 
 static
-int64_t xCalcSADvalueWPOptionalClip(const Int   bitDepth,
+int64_t xCalcSADvalueWPOptionalClip(const int   bitDepth,
                                   const Pel  *pOrgPel,
                                   const Pel  *pRefPel,
-                                  const Int   width,
-                                  const Int   height,
-                                  const Int   orgStride,
-                                  const Int   refStride,
-                                  const Int   log2Denom,
-                                  const Int   weight,
-                                  const Int   offset,
+                                  const int   width,
+                                  const int   height,
+                                  const int   orgStride,
+                                  const int   refStride,
+                                  const int   log2Denom,
+                                  const int   weight,
+                                  const int   offset,
                                   const bool  useHighPrecision,
                                   const bool  clipped)
 {
@@ -708,9 +708,9 @@ int64_t xCalcSADvalueWPOptionalClip(const Int   bitDepth,
     const int64_t minValue = 0;
     const int64_t maxValue = (1 << bitDepth) - 1;
 
-    for( Int y = 0; y < height; y++ )
+    for( int y = 0; y < height; y++ )
     {
-      for( Int x = 0; x < width; x++ )
+      for( int x = 0; x < width; x++ )
       {
         int64_t scaledValue = Clip3(minValue, maxValue,  ((((int64_t) pRefPel[x] * (int64_t) weight + roundOffset) ) >>  (int64_t) log2Denom) + realOffset); //ClipPel
         SAD += abs((int64_t)pOrgPel[x] -  scaledValue);
@@ -725,9 +725,9 @@ int64_t xCalcSADvalueWPOptionalClip(const Int   bitDepth,
     const int64_t realLog2Denom = useHighPrecision ? log2Denom : (log2Denom + (bitDepth - 8));
     const int64_t realOffset    = ((int64_t)offset)<<realLog2Denom;
 
-    for( Int y = 0; y < height; y++ )
+    for( int y = 0; y < height; y++ )
     {
-      for( Int x = 0; x < width; x++ )
+      for( int x = 0; x < width; x++ )
       {
         SAD += abs(( ((int64_t)pOrgPel[x] << (int64_t) log2Denom) - ( (int64_t) pRefPel[x] * (int64_t) weight + (realOffset) ) ) );
       }

@@ -115,7 +115,7 @@ namespace CU
 namespace PU
 {
 #if JVET_K0190
-  int  getLMSymbolList(const PredictionUnit &pu, Int *pModeList);
+  int  getLMSymbolList(const PredictionUnit &pu, int *pModeList);
 #if JEM_TOOLS
   int  getIntraMPMs(const PredictionUnit &pu, unsigned *mpm, const ChannelType &channelType = CHANNEL_TYPE_LUMA, const bool isChromaMDMS = false, const unsigned startIdx = 0);  
   int  getDMModes(const PredictionUnit &pu, unsigned *modeList);
@@ -125,7 +125,7 @@ namespace PU
 #else
 #if JEM_TOOLS
   int  getIntraMPMs                   (const PredictionUnit &pu, unsigned *mpm, const ChannelType &channelType = CHANNEL_TYPE_LUMA, const bool isChromaMDMS = false, const unsigned startIdx = 0 );
-  int  getLMSymbolList                (const PredictionUnit &pu, Int *pModeList);
+  int  getLMSymbolList                (const PredictionUnit &pu, int *pModeList);
   int  getDMModes                     (const PredictionUnit &pu, unsigned *modeList);
 #else
   int  getIntraMPMs                   (const PredictionUnit &pu, unsigned *mpm, const ChannelType &channelType = CHANNEL_TYPE_LUMA);
@@ -187,10 +187,10 @@ namespace PU
   bool isBiPredFromDifferentDir       (const PredictionUnit &pu);
   void restrictBiPredMergeCands       (const PredictionUnit &pu, MergeCtx& mrgCtx);
 #if JEM_TOOLS
-  bool getNeighborMotion              (      PredictionUnit &pu, MotionInfo& mi, Position off, Int iDir, bool bSubPu );
+  bool getNeighborMotion              (      PredictionUnit &pu, MotionInfo& mi, Position off, int iDir, bool bSubPu );
   bool getMvPair                      (const PredictionUnit &pu, RefPicList eCurRefPicList, const MvField & rCurMvField, MvField &rMvPair);
   bool isSameMVField                  (const PredictionUnit &pu, RefPicList eListA, MvField &rMVFieldA, RefPicList eListB, MvField &rMVFieldB);
-  Mv   scaleMv                        (const Mv &rColMV, Int iCurrPOC, Int iCurrRefPOC, Int iColPOC, Int iColRefPOC, Slice *slice);
+  Mv   scaleMv                        (const Mv &rColMV, int iCurrPOC, int iCurrRefPOC, int iColPOC, int iColRefPOC, Slice *slice);
 #endif
 
 #if JEM_TOOLS||JVET_K0190

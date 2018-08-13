@@ -153,12 +153,12 @@ public:
   virtual ~SEIActiveParameterSets() {}
 
 #if HEVC_VPS
-  Int activeVPSId;
+  int activeVPSId;
 #endif
   bool m_selfContainedCvsFlag;
   bool m_noParameterSetUpdateFlag;
-  Int numSpsIdsMinus1;
-  std::vector<Int> activeSeqParameterSetId;
+  int numSpsIdsMinus1;
+  std::vector<int> activeSeqParameterSetId;
 };
 
 class SEIBufferingPeriod : public SEI
@@ -233,10 +233,10 @@ public:
     , m_picSptDpbOutputDuDelay(0)
   {}
   virtual ~SEIDecodingUnitInfo() {}
-  Int m_decodingUnitIdx;
-  Int m_duSptCpbRemovalDelay;
+  int m_decodingUnitIdx;
+  int m_duSptCpbRemovalDelay;
   bool m_dpbOutputDuDelayPresentFlag;
-  Int m_picSptDpbOutputDuDelay;
+  int m_picSptDpbOutputDuDelay;
 };
 
 class SEIRecoveryPoint : public SEI
@@ -247,7 +247,7 @@ public:
   SEIRecoveryPoint() {}
   virtual ~SEIRecoveryPoint() {}
 
-  Int  m_recoveryPocCnt;
+  int  m_recoveryPocCnt;
   bool m_exactMatchingFlag;
   bool m_brokenLinkFlag;
 };
@@ -260,22 +260,22 @@ public:
   SEIFramePacking() {}
   virtual ~SEIFramePacking() {}
 
-  Int  m_arrangementId;
+  int  m_arrangementId;
   bool m_arrangementCancelFlag;
-  Int  m_arrangementType;
+  int  m_arrangementType;
   bool m_quincunxSamplingFlag;
-  Int  m_contentInterpretationType;
+  int  m_contentInterpretationType;
   bool m_spatialFlippingFlag;
   bool m_frame0FlippedFlag;
   bool m_fieldViewsFlag;
   bool m_currentFrameIsFrame0Flag;
   bool m_frame0SelfContainedFlag;
   bool m_frame1SelfContainedFlag;
-  Int  m_frame0GridPositionX;
-  Int  m_frame0GridPositionY;
-  Int  m_frame1GridPositionX;
-  Int  m_frame1GridPositionY;
-  Int  m_arrangementReservedByte;
+  int  m_frame0GridPositionX;
+  int  m_frame0GridPositionY;
+  int  m_frame1GridPositionX;
+  int  m_frame1GridPositionY;
+  int  m_arrangementReservedByte;
   bool m_arrangementPersistenceFlag;
   bool m_upsampledAspectRatio;
 };
@@ -289,7 +289,7 @@ public:
   virtual ~SEISegmentedRectFramePacking() {}
 
   bool m_arrangementCancelFlag;
-  Int  m_contentInterpretationType;
+  int  m_contentInterpretationType;
   bool m_arrangementPersistenceFlag;
 };
 
@@ -369,7 +369,7 @@ public:
   UInt m_sopDescVclNaluType[MAX_NUM_PICS_IN_SOP];
   UInt m_sopDescTemporalId[MAX_NUM_PICS_IN_SOP];
   UInt m_sopDescStRpsIdx[MAX_NUM_PICS_IN_SOP];
-  Int m_sopDescPocDelta[MAX_NUM_PICS_IN_SOP];
+  int m_sopDescPocDelta[MAX_NUM_PICS_IN_SOP];
 };
 
 class SEIToneMappingInfo : public SEI
@@ -379,32 +379,32 @@ public:
   SEIToneMappingInfo() {}
   virtual ~SEIToneMappingInfo() {}
 
-  Int    m_toneMapId;
+  int    m_toneMapId;
   bool   m_toneMapCancelFlag;
   bool   m_toneMapPersistenceFlag;
-  Int    m_codedDataBitDepth;
-  Int    m_targetBitDepth;
-  Int    m_modelId;
-  Int    m_minValue;
-  Int    m_maxValue;
-  Int    m_sigmoidMidpoint;
-  Int    m_sigmoidWidth;
-  std::vector<Int> m_startOfCodedInterval;
-  Int    m_numPivots;
-  std::vector<Int> m_codedPivotValue;
-  std::vector<Int> m_targetPivotValue;
-  Int    m_cameraIsoSpeedIdc;
-  Int    m_cameraIsoSpeedValue;
-  Int    m_exposureIndexIdc;
-  Int    m_exposureIndexValue;
+  int    m_codedDataBitDepth;
+  int    m_targetBitDepth;
+  int    m_modelId;
+  int    m_minValue;
+  int    m_maxValue;
+  int    m_sigmoidMidpoint;
+  int    m_sigmoidWidth;
+  std::vector<int> m_startOfCodedInterval;
+  int    m_numPivots;
+  std::vector<int> m_codedPivotValue;
+  std::vector<int> m_targetPivotValue;
+  int    m_cameraIsoSpeedIdc;
+  int    m_cameraIsoSpeedValue;
+  int    m_exposureIndexIdc;
+  int    m_exposureIndexValue;
   bool   m_exposureCompensationValueSignFlag;
-  Int    m_exposureCompensationValueNumerator;
-  Int    m_exposureCompensationValueDenomIdc;
-  Int    m_refScreenLuminanceWhite;
-  Int    m_extendedRangeWhiteLevel;
-  Int    m_nominalBlackLevelLumaCodeValue;
-  Int    m_nominalWhiteLevelLumaCodeValue;
-  Int    m_extendedWhiteLevelLumaCodeValue;
+  int    m_exposureCompensationValueNumerator;
+  int    m_exposureCompensationValueDenomIdc;
+  int    m_refScreenLuminanceWhite;
+  int    m_extendedRangeWhiteLevel;
+  int    m_nominalBlackLevelLumaCodeValue;
+  int    m_nominalWhiteLevelLumaCodeValue;
+  int    m_extendedWhiteLevelLumaCodeValue;
 };
 
 class SEIKneeFunctionInfo : public SEI
@@ -414,16 +414,16 @@ public:
   SEIKneeFunctionInfo() {}
   virtual ~SEIKneeFunctionInfo() {}
 
-  Int   m_kneeId;
+  int   m_kneeId;
   bool  m_kneeCancelFlag;
   bool  m_kneePersistenceFlag;
-  Int   m_kneeInputDrange;
-  Int   m_kneeInputDispLuminance;
-  Int   m_kneeOutputDrange;
-  Int   m_kneeOutputDispLuminance;
-  Int   m_kneeNumKneePointsMinus1;
-  std::vector<Int> m_kneeInputKneePoint;
-  std::vector<Int> m_kneeOutputKneePoint;
+  int   m_kneeInputDrange;
+  int   m_kneeInputDispLuminance;
+  int   m_kneeOutputDrange;
+  int   m_kneeOutputDispLuminance;
+  int   m_kneeNumKneePointsMinus1;
+  std::vector<int> m_kneeInputKneePoint;
+  std::vector<int> m_kneeOutputKneePoint;
 };
 
 class SEIColourRemappingInfo : public SEI
@@ -432,8 +432,8 @@ public:
 
   struct CRIlut
   {
-    Int codedValue;
-    Int targetValue;
+    int codedValue;
+    int targetValue;
     bool operator < (const CRIlut& a) const
     {
       return codedValue < a.codedValue;
@@ -454,17 +454,17 @@ public:
   bool                m_colourRemapPersistenceFlag;
   bool                m_colourRemapVideoSignalInfoPresentFlag;
   bool                m_colourRemapFullRangeFlag;
-  Int                 m_colourRemapPrimaries;
-  Int                 m_colourRemapTransferFunction;
-  Int                 m_colourRemapMatrixCoefficients;
-  Int                 m_colourRemapInputBitDepth;
-  Int                 m_colourRemapBitDepth;
-  Int                 m_preLutNumValMinus1[3];
+  int                 m_colourRemapPrimaries;
+  int                 m_colourRemapTransferFunction;
+  int                 m_colourRemapMatrixCoefficients;
+  int                 m_colourRemapInputBitDepth;
+  int                 m_colourRemapBitDepth;
+  int                 m_preLutNumValMinus1[3];
   std::vector<CRIlut> m_preLut[3];
   bool                m_colourRemapMatrixPresentFlag;
-  Int                 m_log2MatrixDenom;
-  Int                 m_colourRemapCoeffs[3][3];
-  Int                 m_postLutNumValMinus1[3];
+  int                 m_log2MatrixDenom;
+  int                 m_colourRemapCoeffs[3][3];
+  int                 m_postLutNumValMinus1[3];
   std::vector<CRIlut> m_postLut[3];
 };
 
@@ -475,13 +475,13 @@ public:
   SEIChromaResamplingFilterHint() {}
   virtual ~SEIChromaResamplingFilterHint() {}
 
-  Int                            m_verChromaFilterIdc;
-  Int                            m_horChromaFilterIdc;
+  int                            m_verChromaFilterIdc;
+  int                            m_horChromaFilterIdc;
   bool                           m_verFilteringFieldProcessingFlag;
-  Int                            m_targetFormatIdc;
+  int                            m_targetFormatIdc;
   bool                           m_perfectReconstructionFlag;
-  std::vector<std::vector<Int> > m_verFilterCoeff;
-  std::vector<std::vector<Int> > m_horFilterCoeff;
+  std::vector<std::vector<int> > m_verFilterCoeff;
+  std::vector<std::vector<int> > m_horFilterCoeff;
 };
 
 class SEIMasteringDisplayColourVolume : public SEI
@@ -550,34 +550,34 @@ class SEITempMotionConstrainedTileSets: public SEI
   struct TileSetData
   {
     protected:
-      std::vector<Int> m_top_left_tile_index;  //[tileSetIdx][tileIdx];
-      std::vector<Int> m_bottom_right_tile_index;
+      std::vector<int> m_top_left_tile_index;  //[tileSetIdx][tileIdx];
+      std::vector<int> m_bottom_right_tile_index;
 
     public:
-      Int     m_mcts_id;
+      int     m_mcts_id;
       bool    m_display_tile_set_flag;
-      Int     m_num_tile_rects_in_set; //_minus1;
+      int     m_num_tile_rects_in_set; //_minus1;
       bool    m_exact_sample_value_match_flag;
       bool    m_mcts_tier_level_idc_present_flag;
       bool    m_mcts_tier_flag;
-      Int     m_mcts_level_idc;
+      int     m_mcts_level_idc;
 
-      void setNumberOfTileRects(const Int number)
+      void setNumberOfTileRects(const int number)
       {
         m_top_left_tile_index    .resize(number);
         m_bottom_right_tile_index.resize(number);
       }
 
-      Int  getNumberOfTileRects() const
+      int  getNumberOfTileRects() const
       {
         CHECK(m_top_left_tile_index.size() != m_bottom_right_tile_index.size(), "Inconsistent tile arrangement");
-        return Int(m_top_left_tile_index.size());
+        return int(m_top_left_tile_index.size());
       }
 
-            Int &topLeftTileIndex    (const Int tileRectIndex)       { return m_top_left_tile_index    [tileRectIndex]; }
-            Int &bottomRightTileIndex(const Int tileRectIndex)       { return m_bottom_right_tile_index[tileRectIndex]; }
-      const Int &topLeftTileIndex    (const Int tileRectIndex) const { return m_top_left_tile_index    [tileRectIndex]; }
-      const Int &bottomRightTileIndex(const Int tileRectIndex) const { return m_bottom_right_tile_index[tileRectIndex]; }
+            int &topLeftTileIndex    (const int tileRectIndex)       { return m_top_left_tile_index    [tileRectIndex]; }
+            int &bottomRightTileIndex(const int tileRectIndex)       { return m_bottom_right_tile_index[tileRectIndex]; }
+      const int &topLeftTileIndex    (const int tileRectIndex) const { return m_top_left_tile_index    [tileRectIndex]; }
+      const int &bottomRightTileIndex(const int tileRectIndex) const { return m_bottom_right_tile_index[tileRectIndex]; }
   };
 
 protected:
@@ -590,15 +590,15 @@ public:
   bool    m_limited_tile_set_display_flag;
   bool    m_max_mcs_tier_level_idc_present_flag;
   bool    m_max_mcts_tier_flag;
-  Int     m_max_mcts_level_idc;
+  int     m_max_mcts_level_idc;
 
   PayloadType payloadType() const { return TEMP_MOTION_CONSTRAINED_TILE_SETS; }
 
-  void setNumberOfTileSets(const Int number)       { m_tile_set_data.resize(number);     }
-  Int  getNumberOfTileSets()                 const { return Int(m_tile_set_data.size()); }
+  void setNumberOfTileSets(const int number)       { m_tile_set_data.resize(number);     }
+  int  getNumberOfTileSets()                 const { return int(m_tile_set_data.size()); }
 
-        TileSetData &tileSetData (const Int index)       { return m_tile_set_data[index]; }
-  const TileSetData &tileSetData (const Int index) const { return m_tile_set_data[index]; }
+        TileSetData &tileSetData (const int index)       { return m_tile_set_data[index]; }
+  const TileSetData &tileSetData (const int index) const { return m_tile_set_data[index]; }
 
 };
 #endif

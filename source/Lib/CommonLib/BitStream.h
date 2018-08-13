@@ -113,7 +113,7 @@ public:
    * returns the number of bits that need to be written to
    * achieve byte alignment.
    */
-  Int getNumBitsUntilByteAligned() const { return (8 - m_num_held_bits) & 0x7; }
+  int getNumBitsUntilByteAligned() const { return (8 - m_num_held_bits) & 0x7; }
 
   /**
    * Return the number of bits that have been written since the last clear()
@@ -137,7 +137,7 @@ public:
   void writeByteAlignment();
 
   //! returns the number of start code emulations contained in the current buffer
-  Int countStartCodeEmulations();
+  int countStartCodeEmulations();
 };
 
 /**

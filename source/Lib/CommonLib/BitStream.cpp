@@ -195,7 +195,7 @@ void OutputBitstream::writeByteAlignment()
   writeAlignZero();
 }
 
-Int OutputBitstream::countStartCodeEmulations()
+int OutputBitstream::countStartCodeEmulations()
 {
   UInt cnt = 0;
   vector<uint8_t>& rbsp   = getFIFO();

@@ -137,9 +137,9 @@ public:
   void calculateCombinedValues(const ChromaFormat chFmt, double &PSNRyuv, double &MSEyuv, const BitDepths &bitDepths)
   {
     MSEyuv    = 0;
-    Int scale = 0;
+    int scale = 0;
 
-    Int maximumBitDepth = bitDepths.recon[CHANNEL_TYPE_LUMA];
+    int maximumBitDepth = bitDepths.recon[CHANNEL_TYPE_LUMA];
     for (UInt channelTypeIndex = 1; channelTypeIndex < MAX_NUM_CHANNEL_TYPE; channelTypeIndex++)
     {
       if (bitDepths.recon[channelTypeIndex] > maximumBitDepth)
@@ -160,7 +160,7 @@ public:
       const ComponentID compID        = ComponentID(comp);
       const UInt        csx           = getComponentScaleX(compID, chFmt);
       const UInt        csy           = getComponentScaleY(compID, chFmt);
-      const Int         scaleChan     = (4>>(csx+csy));
+      const int         scaleChan     = (4>>(csx+csy));
       const UInt        bitDepthShift = 2 * (maximumBitDepth - bitDepths.recon[toChannelType(compID)]); //*2 because this is a squared number
 
       const double      channelMSE    = (m_MSEyuvframe[compID] * double(1 << bitDepthShift)) / double(getNumPic());

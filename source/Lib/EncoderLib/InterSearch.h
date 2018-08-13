@@ -87,7 +87,7 @@ private:
   Pel*            m_tmpAffiError;
   int*            m_tmpAffiDeri[2];
 #else
-  Int*            m_tmpAffiError;
+  int*            m_tmpAffiError;
   double*         m_tmpAffiDeri[2];
 #endif
 
@@ -115,10 +115,10 @@ protected:
 
 #endif
   // ME parameters
-  Int             m_iSearchRange;
-  Int             m_bipredSearchRange; // Search range for bi-prediction
+  int             m_iSearchRange;
+  int             m_bipredSearchRange; // Search range for bi-prediction
   MESearchMethod  m_motionEstimationSearchMethod;
-  Int             m_aaiAdaptSR                  [MAX_NUM_REF_LIST_ADAPT_SR][MAX_IDX_ADAPT_SR];
+  int             m_aaiAdaptSR                  [MAX_NUM_REF_LIST_ADAPT_SR][MAX_IDX_ADAPT_SR];
 
   // RD computation
   CABACWriter*    m_CABACEstimator;
@@ -149,8 +149,8 @@ public:
                                       BilateralFilter*
                                                      bilateralFilter,
 #endif
-                                      Int            iSearchRange,
-                                      Int            bipredSearchRange,
+                                      int            iSearchRange,
+                                      int            bipredSearchRange,
                                       MESearchMethod motionEstimationSearchMethod,
                                       const UInt     maxCUWidth,
                                       const UInt     maxCUHeight,
@@ -171,14 +171,14 @@ public:
 protected:
 
   /// sub-function for motion vector refinement used in fractional-pel accuracy
-  Distortion  xPatternRefinement    ( const CPelBuf* pcPatternKey, Mv baseRefMv, Int iFrac, Mv& rcMvFrac, bool bAllowUseOfHadamard );
+  Distortion  xPatternRefinement    ( const CPelBuf* pcPatternKey, Mv baseRefMv, int iFrac, Mv& rcMvFrac, bool bAllowUseOfHadamard );
 
    typedef struct
    {
-     Int left;
-     Int right;
-     Int top;
-     Int bottom;
+     int left;
+     int right;
+     int top;
+     int bottom;
    }SearchRange;
 
   typedef struct
@@ -186,24 +186,24 @@ protected:
     SearchRange searchRange;
     const CPelBuf* pcPatternKey;
     const Pel*  piRefY;
-    Int         iRefStride;
-    Int         iBestX;
-    Int         iBestY;
+    int         iRefStride;
+    int         iBestX;
+    int         iBestY;
     UInt        uiBestRound;
     UInt        uiBestDistance;
     Distortion  uiBestSad;
     uint8_t       ucPointNr;
-    Int         subShiftMode;
+    int         subShiftMode;
 #if JVET_K0357_AMVR
     unsigned    imvShift;
 #endif
   } IntTZSearchStruct;
 
   // sub-functions for ME
-  inline void xTZSearchHelp         ( IntTZSearchStruct& rcStruct, const Int iSearchX, const Int iSearchY, const uint8_t ucPointNr, const UInt uiDistance );
+  inline void xTZSearchHelp         ( IntTZSearchStruct& rcStruct, const int iSearchX, const int iSearchY, const uint8_t ucPointNr, const UInt uiDistance );
   inline void xTZ2PointSearch       ( IntTZSearchStruct& rcStruct );
-  inline void xTZ8PointSquareSearch ( IntTZSearchStruct& rcStruct, const Int iStartX, const Int iStartY, const Int iDist );
-  inline void xTZ8PointDiamondSearch( IntTZSearchStruct& rcStruct, const Int iStartX, const Int iStartY, const Int iDist, const bool bCheckCornersAtDist1 );
+  inline void xTZ8PointSquareSearch ( IntTZSearchStruct& rcStruct, const int iStartX, const int iStartY, const int iDist );
+  inline void xTZ8PointDiamondSearch( IntTZSearchStruct& rcStruct, const int iStartX, const int iStartY, const int iDist, const bool bCheckCornersAtDist1 );
 
   Distortion xGetInterPredictionError( PredictionUnit& pu, PelUnitBuf& origBuf, const RefPicList &eRefPicList = REF_PIC_LIST_X );
 
@@ -215,7 +215,7 @@ public:
   void predInterSearch(CodingUnit& cu, Partitioner& partitioner );
 
   /// set ME search range
-  void setAdaptiveSearchRange       ( Int iDir, Int iRefIdx, Int iSearchRange) { CHECK(iDir >= MAX_NUM_REF_LIST_ADAPT_SR || iRefIdx>=Int(MAX_IDX_ADAPT_SR), "Invalid index"); m_aaiAdaptSR[iDir][iRefIdx] = iSearchRange; }
+  void setAdaptiveSearchRange       ( int iDir, int iRefIdx, int iSearchRange) { CHECK(iDir >= MAX_NUM_REF_LIST_ADAPT_SR || iRefIdx>=int(MAX_IDX_ADAPT_SR), "Invalid index"); m_aaiAdaptSR[iDir][iRefIdx] = iSearchRange; }
 
 
 protected:
@@ -227,7 +227,7 @@ protected:
   void xEstimateMvPredAMVP        ( PredictionUnit&       pu,
                                     PelUnitBuf&           origBuf,
                                     RefPicList            eRefPicList,
-                                    Int                   iRefIdx,
+                                    int                   iRefIdx,
                                     Mv&                   rcMvPred,
                                     AMVPInfo&             amvpInfo,
                                     bool                  bFilled = false,
@@ -237,7 +237,7 @@ protected:
   void xCheckBestMVP              ( RefPicList  eRefPicList,
                                     Mv          cMv,
                                     Mv&         rcMvPred,
-                                    Int&        riMVPIdx,
+                                    int&        riMVPIdx,
                                     AMVPInfo&   amvpInfo,
                                     UInt&       ruiBits,
                                     Distortion& ruiCost
@@ -251,20 +251,20 @@ protected:
                                     PelUnitBuf&           origBuf,
                                     PelUnitBuf&           predBuf,
                                     Mv                    cMvCand,
-                                    Int                   iMVPIdx,
-                                    Int                   iMVPNum,
+                                    int                   iMVPIdx,
+                                    int                   iMVPNum,
                                     RefPicList            eRefPicList,
-                                    Int                   iRefIdx
+                                    int                   iRefIdx
                                   );
 
 
   void xCopyAMVPInfo              ( AMVPInfo*   pSrc, AMVPInfo* pDst );
-  UInt xGetMvpIdxBits             ( Int iIdx, Int iNum );
-  void xGetBlkBits                ( PartSize  eCUMode, bool bPSlice, Int iPartIdx,  UInt uiLastMode, UInt uiBlkBit[3]);
+  UInt xGetMvpIdxBits             ( int iIdx, int iNum );
+  void xGetBlkBits                ( PartSize  eCUMode, bool bPSlice, int iPartIdx,  UInt uiLastMode, UInt uiBlkBit[3]);
 
   void xMergeEstimation           ( PredictionUnit&       pu,
                                     PelUnitBuf&           origBuf,
-                                    Int                   iPartIdx,
+                                    int                   iPartIdx,
                                     UInt&                 uiMergeIndex,
                                     Distortion&           ruiCost,
                                     MergeCtx &            mergeCtx
@@ -288,9 +288,9 @@ protected:
                                     PelUnitBuf&           origBuf,
                                     RefPicList            eRefPicList,
                                     Mv&                   rcMvPred,
-                                    Int                   iRefIdxPred,
+                                    int                   iRefIdxPred,
                                     Mv&                   rcMv,
-                                    Int&                  riMVPIdx,
+                                    int&                  riMVPIdx,
                                     UInt&                 ruiBits,
                                     Distortion&           ruiCost,
                                     const AMVPInfo&       amvpInfo,
@@ -315,7 +315,7 @@ protected:
 
   void xSetSearchRange            ( const PredictionUnit& pu,
                                     const Mv&             cMvPred,
-                                    const Int             iSrchRng,
+                                    const int             iSrchRng,
                                     SearchRange&          sr
                                   );
 
@@ -335,7 +335,7 @@ protected:
                                     IntTZSearchStruct&  cStruct,
                                     Mv&                 rcMv,
                                     Mv&                 rcMvPred,
-                                    Int&                riMVPIdx,
+                                    int&                riMVPIdx,
                                     UInt&               ruiBits,
                                     Distortion&         ruiCost,
                                     const AMVPInfo&     amvpInfo,
@@ -344,7 +344,7 @@ protected:
 
   void xPatternSearchFracDIF      ( const PredictionUnit& pu,
                                     RefPicList            eRefPicList,
-                                    Int                   iRefIdx,
+                                    int                   iRefIdx,
                                     IntTZSearchStruct&    cStruct,
                                     const Mv&             rcMvInt,
                                     Mv&                   rcMvHalf,
@@ -355,7 +355,7 @@ protected:
 #if JEM_TOOLS || JVET_K_AFFINE
   void xPredAffineInterSearch     ( PredictionUnit&       pu,
                                     PelUnitBuf&           origBuf,
-                                    Int                   puIdx,
+                                    int                   puIdx,
                                     UInt&                 lastMode,
                                     Distortion&           affineCost,
 #if JVET_K0220_ENC_CTRL
@@ -374,7 +374,7 @@ protected:
                                     PelUnitBuf&     origBuf,
                                     RefPicList      eRefPicList,
                                     Mv              acMvPred[3],
-                                    Int             iRefIdxPred,
+                                    int             iRefIdxPred,
                                     Mv              acMv[3],
                                     UInt&           ruiBits,
                                     Distortion&     ruiCost,
@@ -385,15 +385,15 @@ protected:
                                     AffineAMVPInfo&  affineAMVPInfo,
                                     PelUnitBuf&      origBuf,
                                     RefPicList       eRefPicList,
-                                    Int              iRefIdx,
+                                    int              iRefIdx,
                                     Mv               acMvPred[3],
                                     Distortion*      puiDistBiP
                                   );
 
-  Distortion xGetAffineTemplateCost( PredictionUnit& pu, PelUnitBuf& origBuf, PelUnitBuf& predBuf, Mv acMvCand[3], Int iMVPIdx, Int iMVPNum, RefPicList eRefPicList, Int iRefIdx );
+  Distortion xGetAffineTemplateCost( PredictionUnit& pu, PelUnitBuf& origBuf, PelUnitBuf& predBuf, Mv acMvCand[3], int iMVPIdx, int iMVPNum, RefPicList eRefPicList, int iRefIdx );
 
   void xCopyAffineAMVPInfo        ( AffineAMVPInfo& src, AffineAMVPInfo& dst );
-  void xCheckBestAffineMVP        ( PredictionUnit &pu, AffineAMVPInfo &affineAMVPInfo, RefPicList eRefPicList, Mv acMv[3], Mv acMvPred[3], Int& riMVPIdx, UInt& ruiBits, Distortion& ruiCost );
+  void xCheckBestAffineMVP        ( PredictionUnit &pu, AffineAMVPInfo &affineAMVPInfo, RefPicList eRefPicList, Mv acMv[3], Mv acMvPred[3], int& riMVPIdx, UInt& ruiBits, Distortion& ruiCost );
 #endif
   void xExtDIFUpSamplingH         ( CPelBuf* pcPattern );
   void xExtDIFUpSamplingQ         ( CPelBuf* pcPatternKey, Mv halfPelRef );
@@ -402,7 +402,7 @@ protected:
   // compute symbol bits
   // -------------------------------------------------------------------------------------------------------------------
 
-  void  setWpScalingDistParam     ( Int iRefIdx, RefPicList eRefPicListCur, Slice *slice );
+  void  setWpScalingDistParam     ( int iRefIdx, RefPicList eRefPicListCur, Slice *slice );
 
 
 public:

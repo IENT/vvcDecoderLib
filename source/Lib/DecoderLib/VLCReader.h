@@ -89,18 +89,18 @@ protected:
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
   void  xReadCode    ( UInt   length, UInt& val, const char *pSymbolName );
   void  xReadUvlc    (                UInt& val, const char *pSymbolName );
-  void  xReadSvlc    (                 Int& val, const char *pSymbolName );
+  void  xReadSvlc    (                 int& val, const char *pSymbolName );
   void  xReadFlag    (                UInt& val, const char *pSymbolName );
 #else
   void  xReadCode    ( UInt   length, UInt& val );
   void  xReadUvlc    (                UInt& val );
-  void  xReadSvlc    (                 Int& val );
+  void  xReadSvlc    (                 int& val );
   void  xReadFlag    (                UInt& val );
 #endif
 #if ENABLE_TRACING
   void  xReadCodeTr  ( UInt  length, UInt& rValue, const char *pSymbolName );
   void  xReadUvlcTr  (               UInt& rValue, const char *pSymbolName );
-  void  xReadSvlcTr  (                Int& rValue, const char *pSymbolName );
+  void  xReadSvlcTr  (                int& rValue, const char *pSymbolName );
   void  xReadFlagTr  (               UInt& rValue, const char *pSymbolName );
 #endif
 public:
@@ -143,7 +143,7 @@ public:
   void  init( CABACDataStore& cabacDataStore ) { m_CABACDataStore = &cabacDataStore; }
 #endif
 protected:
-  void  parseShortTermRefPicSet            (SPS* pcSPS, ReferencePictureSet* pcRPS, Int idx);
+  void  parseShortTermRefPicSet            (SPS* pcSPS, ReferencePictureSet* pcRPS, int idx);
 
 public:
   void  setBitstream        ( InputBitstream* p )   { m_pcBitstream = p; }
@@ -154,10 +154,10 @@ public:
   void  parseSPS            ( SPS* pcSPS );
   void  parsePPS            ( PPS* pcPPS );
   void  parseVUI            ( VUI* pcVUI, SPS* pcSPS );
-  void  parsePTL            ( PTL *rpcPTL, bool profilePresentFlag, Int maxNumSubLayersMinus1 );
+  void  parsePTL            ( PTL *rpcPTL, bool profilePresentFlag, int maxNumSubLayersMinus1 );
   void  parseProfileTier    ( ProfileTierLevel *ptl, const bool bIsSubLayer );
   void  parseHrdParameters  ( HRD *hrd, bool cprms_present_flag, UInt tempLevelHigh );
-  void  parseSliceHeader    ( Slice* pcSlice, ParameterSetManager *parameterSetManager, const Int prevTid0POC );
+  void  parseSliceHeader    ( Slice* pcSlice, ParameterSetManager *parameterSetManager, const int prevTid0POC );
   void  parseTerminatingBit ( UInt& ruiBit );
   void  parseRemainingBytes ( bool noTrailingBytesExpected );
 

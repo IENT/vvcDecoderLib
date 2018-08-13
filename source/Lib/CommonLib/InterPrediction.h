@@ -97,7 +97,7 @@ protected:
 
   RdCost*              m_pcRdCost;
 
-  Int                  m_iRefListIdx;
+  int                  m_iRefListIdx;
   
 #if JEM_TOOLS
   Pel*                 m_pGradX0;
@@ -119,22 +119,22 @@ protected:
 #define BIO_FILTER_LENGTH_MINUS_1         (BIO_FILTER_LENGTH-1)
 #define BIO_FILTER_HALF_LENGTH_MINUS_1    ((BIO_FILTER_LENGTH>>1)-1)
 
-  void          xGradFilterX    ( const Pel* piRefY, Int iRefStride, Pel*  piDstY, Int iDstStride, Int iWidth, Int iHeight, Int iMVyFrac, Int iMVxFrac, const Int bitDepth );
-  void          xGradFilterY    ( const Pel* piRefY, Int iRefStride, Pel*  piDstY, Int iDstStride, Int iWidth, Int iHeight, Int iMVyFrac, Int iMVxFrac, const Int bitDepth );
-  inline void   gradFilter2DVer ( const Pel* piSrc, Int iSrcStride, Int iWidth, Int iHeight, Int iDstStride, Pel*& rpiDst, Int iMv, const Int iShift );
-  inline void   gradFilter2DHor ( const Pel* piSrc, Int iSrcStride, Int iWidth, Int iHeight, Int iDstStride, Pel*& rpiDst, Int iMV, const Int iShift );
-  inline void   fracFilter2DHor ( const Pel* piSrc, Int iSrcStride, Int iWidth, Int iHeight, Int iDstStride, Pel*& rpiDst, Int iMV, const Int iShift );
-  inline void   fracFilter2DVer ( const Pel* piSrc, Int iSrcStride, Int iWidth, Int iHeight, Int iDstStride, Pel*& rpiDst, Int iMv, const Int iShift );
-  inline void   gradFilter1DHor ( const Pel* piSrc, Int iSrcStride, Int iWidth, Int iHeight, Int iDstStride, Pel*& rpiDst, Int iMV, const Int iShift );
-  inline void   gradFilter1DVer ( const Pel* piSrc, Int iSrcStride, Int iWidth, Int iHeight, Int iDstStride, Pel*& rpiDst, Int iMV, const Int iShift );
+  void          xGradFilterX    ( const Pel* piRefY, int iRefStride, Pel*  piDstY, int iDstStride, int iWidth, int iHeight, int iMVyFrac, int iMVxFrac, const int bitDepth );
+  void          xGradFilterY    ( const Pel* piRefY, int iRefStride, Pel*  piDstY, int iDstStride, int iWidth, int iHeight, int iMVyFrac, int iMVxFrac, const int bitDepth );
+  inline void   gradFilter2DVer ( const Pel* piSrc, int iSrcStride, int iWidth, int iHeight, int iDstStride, Pel*& rpiDst, int iMv, const int iShift );
+  inline void   gradFilter2DHor ( const Pel* piSrc, int iSrcStride, int iWidth, int iHeight, int iDstStride, Pel*& rpiDst, int iMV, const int iShift );
+  inline void   fracFilter2DHor ( const Pel* piSrc, int iSrcStride, int iWidth, int iHeight, int iDstStride, Pel*& rpiDst, int iMV, const int iShift );
+  inline void   fracFilter2DVer ( const Pel* piSrc, int iSrcStride, int iWidth, int iHeight, int iDstStride, Pel*& rpiDst, int iMv, const int iShift );
+  inline void   gradFilter1DHor ( const Pel* piSrc, int iSrcStride, int iWidth, int iHeight, int iDstStride, Pel*& rpiDst, int iMV, const int iShift );
+  inline void   gradFilter1DVer ( const Pel* piSrc, int iSrcStride, int iWidth, int iHeight, int iDstStride, Pel*& rpiDst, int iMV, const int iShift );
 
   inline int64_t  divide64        ( int64_t numer, int64_t denom);
-  inline void   calcBlkGradient ( Int sx, Int sy, int64_t *arraysGx2, int64_t *arraysGxGy, int64_t *arraysGxdI, int64_t *arraysGy2, int64_t *arraysGydI, int64_t &sGx2, int64_t &sGy2, int64_t &sGxGy, int64_t &sGxdI, int64_t &sGydI, Int iWidth, Int iHeight);
+  inline void   calcBlkGradient ( int sx, int sy, int64_t *arraysGx2, int64_t *arraysGxGy, int64_t *arraysGxdI, int64_t *arraysGy2, int64_t *arraysGydI, int64_t &sGx2, int64_t &sGy2, int64_t &sGxGy, int64_t &sGxdI, int64_t &sGydI, int iWidth, int iHeight);
 
   Pel  optical_flow_averaging   ( int64_t s1, int64_t s2, int64_t s3, int64_t s5, int64_t s6,
                                   Pel pGradX0, Pel pGradX1, Pel pGradY0, Pel pGradY1, Pel pSrcY0Temp, Pel pSrcY1Temp,
                                   const int shiftNum, const int offset, const int64_t limit, const int64_t denom_min_1, const int64_t denom_min_2, const ClpRng& clpRng );
-  void applyBiOptFlow           ( const PredictionUnit &pu, const CPelUnitBuf &pcYuvSrc0, const CPelUnitBuf &pcYuvSrc1, const Int &iRefIdx0, const Int &iRefIdx1, PelUnitBuf &pcYuvDst, const BitDepths &clipBitDepths);
+  void applyBiOptFlow           ( const PredictionUnit &pu, const CPelUnitBuf &pcYuvSrc0, const CPelUnitBuf &pcYuvSrc1, const int &iRefIdx0, const int &iRefIdx1, PelUnitBuf &pcYuvDst, const BitDepths &clipBitDepths);
 #endif
 
 #if JEM_TOOLS
@@ -146,7 +146,7 @@ protected:
 #endif
   void xPredInterBlk            ( const ComponentID& compID, const PredictionUnit& pu, const Picture* refPic, const Mv& _mv, PelUnitBuf& dstPic, const bool& bi, const ClpRng& clpRng
 #if JEM_TOOLS
-                                  , const bool& bBIOApplied = false, const bool& bDMVRApplied = false, const Int& nFRUCMode = FRUC_MERGE_OFF, const bool& doLic = true
+                                  , const bool& bBIOApplied = false, const bool& bDMVRApplied = false, const int& nFRUCMode = FRUC_MERGE_OFF, const bool& doLic = true
 #endif
                                  );
   
@@ -166,8 +166,8 @@ protected:
 
 #if JEM_TOOLS
   void xSubPuMC                 ( PredictionUnit& pu, PelUnitBuf& predBuf, const RefPicList &eRefPicList = REF_PIC_LIST_X );
-  void xSubblockOBMC            ( const ComponentID eComp, PredictionUnit &pu, PelUnitBuf &pcYuvPredDst, PelUnitBuf &pcYuvPredSrc, Int iDir, bool bOBMCSimp );
-  void xSubtractOBMC            ( PredictionUnit &pu, PelUnitBuf &pcYuvPredDst, PelUnitBuf &pcYuvPredSrc, Int iDir, bool bOBMCSimp );
+  void xSubblockOBMC            ( const ComponentID eComp, PredictionUnit &pu, PelUnitBuf &pcYuvPredDst, PelUnitBuf &pcYuvPredSrc, int iDir, bool bOBMCSimp );
+  void xSubtractOBMC            ( PredictionUnit &pu, PelUnitBuf &pcYuvPredDst, PelUnitBuf &pcYuvPredSrc, int iDir, bool bOBMCSimp );
 #endif
 #if !JEM_TOOLS && JVET_K0346
   void xSubPuMC(PredictionUnit& pu, PelUnitBuf& predBuf, const RefPicList &eRefPicList = REF_PIC_LIST_X);
@@ -190,64 +190,64 @@ protected:
   bool xFrucFindBlkMv           (PredictionUnit& pu, const MergeCtx& mergeCtx );
   bool xFrucRefineSubBlkMv      (PredictionUnit& pu, const MergeCtx& mergeCtx, bool bTM);
 
-  void xFrucCollectBlkStartMv   (PredictionUnit& pu, const MergeCtx& mergeCtx, RefPicList eTargetRefList = REF_PIC_LIST_0, Int nTargetRefIdx = -1, AMVPInfo* pInfo = NULL);
-  void xFrucCollectSubBlkStartMv(PredictionUnit& pu, const MergeCtx& mergeCtx, RefPicList eRefPicList , const MvField& rMvStart , Int nSubBlkWidth , Int nSubBlkHeight, Position basePuPos);
+  void xFrucCollectBlkStartMv   (PredictionUnit& pu, const MergeCtx& mergeCtx, RefPicList eTargetRefList = REF_PIC_LIST_0, int nTargetRefIdx = -1, AMVPInfo* pInfo = NULL);
+  void xFrucCollectSubBlkStartMv(PredictionUnit& pu, const MergeCtx& mergeCtx, RefPicList eRefPicList , const MvField& rMvStart , int nSubBlkWidth , int nSubBlkHeight, Position basePuPos);
 #if DISTORTION_TYPE_BUGFIX
   Distortion xFrucFindBestMvFromList(MvField *pBestMvField, RefPicList &rBestRefPicList, PredictionUnit &pu,
-                                     const MvField &rMvStart, Int nBlkWidth, Int nBlkHeight, bool bTM, bool bMvCost);
-  Distortion xFrucRefineMv(MvField *pBestMvField, RefPicList eCurRefPicList, Distortion uiMinCost, Int nSearchMethod,
-                           PredictionUnit &pu, const MvField &rMvStart, Int nBlkWidth, Int nBlkHeight, bool bTM,
+                                     const MvField &rMvStart, int nBlkWidth, int nBlkHeight, bool bTM, bool bMvCost);
+  Distortion xFrucRefineMv(MvField *pBestMvField, RefPicList eCurRefPicList, Distortion uiMinCost, int nSearchMethod,
+                           PredictionUnit &pu, const MvField &rMvStart, int nBlkWidth, int nBlkHeight, bool bTM,
                            bool bMvCostZero = false);
 #else
-  UInt xFrucFindBestMvFromList  (MvField* pBestMvField, RefPicList& rBestRefPicList, PredictionUnit& pu, const MvField& rMvStart, Int nBlkWidth, Int nBlkHeight, bool bTM, bool bMvCost);
-  UInt xFrucRefineMv(MvField *pBestMvField, RefPicList eCurRefPicList, UInt uiMinCost, Int nSearchMethod,
-                     PredictionUnit &pu, const MvField &rMvStart, Int nBlkWidth, Int nBlkHeight, bool bTM,
+  UInt xFrucFindBestMvFromList  (MvField* pBestMvField, RefPicList& rBestRefPicList, PredictionUnit& pu, const MvField& rMvStart, int nBlkWidth, int nBlkHeight, bool bTM, bool bMvCost);
+  UInt xFrucRefineMv(MvField *pBestMvField, RefPicList eCurRefPicList, UInt uiMinCost, int nSearchMethod,
+                     PredictionUnit &pu, const MvField &rMvStart, int nBlkWidth, int nBlkHeight, bool bTM,
                      bool bMvCostZero = false);
 #endif
 #if DISTORTION_TYPE_BUGFIX
-  template<Int SearchPattern>
+  template<int SearchPattern>
   Distortion xFrucRefineMvSearch(MvField *pBestMvField, RefPicList eCurRefPicList, PredictionUnit &pu,
-                                 const MvField &rMvStart, Int nBlkWidth, Int nBlkHeight, Distortion uiMinDist, bool bTM,
-                                 Int nSearchStepShift, UInt uiMaxSearchRounds = MAX_UINT, bool bMvCostZero = false);
+                                 const MvField &rMvStart, int nBlkWidth, int nBlkHeight, Distortion uiMinDist, bool bTM,
+                                 int nSearchStepShift, UInt uiMaxSearchRounds = MAX_UINT, bool bMvCostZero = false);
 #else
-  template<Int SearchPattern>
-  UInt xFrucRefineMvSearch      (MvField* pBestMvField, RefPicList eCurRefPicList, PredictionUnit& pu, const MvField& rMvStart, Int nBlkWidth, Int nBlkHeight, UInt uiMinDist, bool bTM, Int nSearchStepShift, UInt uiMaxSearchRounds = MAX_UINT, bool bMvCostZero = false);
+  template<int SearchPattern>
+  UInt xFrucRefineMvSearch      (MvField* pBestMvField, RefPicList eCurRefPicList, PredictionUnit& pu, const MvField& rMvStart, int nBlkWidth, int nBlkHeight, UInt uiMinDist, bool bTM, int nSearchStepShift, UInt uiMaxSearchRounds = MAX_UINT, bool bMvCostZero = false);
 #endif
 
 #if DISTORTION_TYPE_BUGFIX
-  Distortion xFrucGetMvCost(const Mv &rMvStart, const Mv &rMvCur, Int nSearchRange, Int nWeighting, UInt precShift);
-  Distortion xFrucGetBilaMatchCost(PredictionUnit &pu, Int nWidth, Int nHeight, RefPicList eCurRefPicList,
+  Distortion xFrucGetMvCost(const Mv &rMvStart, const Mv &rMvCur, int nSearchRange, int nWeighting, UInt precShift);
+  Distortion xFrucGetBilaMatchCost(PredictionUnit &pu, int nWidth, int nHeight, RefPicList eCurRefPicList,
                                    const MvField &rCurMvField, MvField &rPairMVField, Distortion uiMVCost);
-  Distortion xFrucGetTempMatchCost(PredictionUnit &pu, Int nWidth, Int nHeight, RefPicList eCurRefPicList,
+  Distortion xFrucGetTempMatchCost(PredictionUnit &pu, int nWidth, int nHeight, RefPicList eCurRefPicList,
                                    const MvField &rCurMvField, Distortion uiMVCost);
 #else
-  UInt xFrucGetMvCost(const Mv &rMvStart, const Mv &rMvCur, Int nSearchRange, Int nWeighting, UInt precShift);
-  UInt xFrucGetBilaMatchCost    (PredictionUnit& pu, Int nWidth, Int nHeight, RefPicList eCurRefPicList, const MvField& rCurMvField, MvField& rPairMVField, UInt uiMVCost );
-  UInt xFrucGetTempMatchCost    (PredictionUnit& pu, Int nWidth, Int nHeight, RefPicList eCurRefPicList, const MvField& rCurMvField, UInt uiMVCost );
+  UInt xFrucGetMvCost(const Mv &rMvStart, const Mv &rMvCur, int nSearchRange, int nWeighting, UInt precShift);
+  UInt xFrucGetBilaMatchCost    (PredictionUnit& pu, int nWidth, int nHeight, RefPicList eCurRefPicList, const MvField& rCurMvField, MvField& rPairMVField, UInt uiMVCost );
+  UInt xFrucGetTempMatchCost    (PredictionUnit& pu, int nWidth, int nHeight, RefPicList eCurRefPicList, const MvField& rCurMvField, UInt uiMVCost );
 #endif
-  void xFrucUpdateTemplate      (PredictionUnit& pu, Int nWidth, Int nHeight, RefPicList eCurRefPicList, const MvField& rCurMvField );
+  void xFrucUpdateTemplate      (PredictionUnit& pu, int nWidth, int nHeight, RefPicList eCurRefPicList, const MvField& rCurMvField );
 
 
   void xFrucInsertMv2StartList  (const MvField & rMvField, std::list<MvField> & rList,bool setHighPrec);
   bool xFrucIsInList            (const MvField & rMvField, std::list<MvField> & rList);
 
-  bool xFrucGetCurBlkTemplate   (PredictionUnit& pu, Int nCurBlkWidth , Int nCurBlkHeight);
+  bool xFrucGetCurBlkTemplate   (PredictionUnit& pu, int nCurBlkWidth , int nCurBlkHeight);
   bool xFrucIsTopTempAvailable  (PredictionUnit& pu);
   bool xFrucIsLeftTempAvailable (PredictionUnit& pu);
-  Int  xFrucGetSubBlkSize       (PredictionUnit& pu, Int nBlkWidth, Int nBlkHeight);
+  int  xFrucGetSubBlkSize       (PredictionUnit& pu, int nBlkWidth, int nBlkHeight);
 
 #if DISTORTION_TYPE_BUGFIX
-  void xBIPMVRefine(PredictionUnit &pu, RefPicList eRefPicList, Int iWidth, Int iHeight, const CPelUnitBuf &pcYuvOrg,
+  void xBIPMVRefine(PredictionUnit &pu, RefPicList eRefPicList, int iWidth, int iHeight, const CPelUnitBuf &pcYuvOrg,
                     UInt uiMaxSearchRounds, UInt nSearchStepShift, Distortion &uiMinCost, bool fullPel = true);
-  Distortion xDirectMCCost(Int iBitDepth, Pel *pRef, UInt uiRefStride, const Pel *pOrg, UInt uiOrgStride, Int iWidth,
-                           Int iHeight);
+  Distortion xDirectMCCost(int iBitDepth, Pel *pRef, UInt uiRefStride, const Pel *pOrg, UInt uiOrgStride, int iWidth,
+                           int iHeight);
 #else
-  void xBIPMVRefine(PredictionUnit &pu, RefPicList eRefPicList, Int iWidth, Int iHeight, const CPelUnitBuf &pcYuvOrg,
+  void xBIPMVRefine(PredictionUnit &pu, RefPicList eRefPicList, int iWidth, int iHeight, const CPelUnitBuf &pcYuvOrg,
                     UInt uiMaxSearchRounds, UInt nSearchStepShift, UInt &uiMinCost, bool fullPel = true);
-  UInt xDirectMCCost            (Int iBitDepth, Pel* pRef, UInt uiRefStride, const Pel* pOrg, UInt uiOrgStride, Int iWidth, Int iHeight);
+  UInt xDirectMCCost            (int iBitDepth, Pel* pRef, UInt uiRefStride, const Pel* pOrg, UInt uiOrgStride, int iWidth, int iHeight);
 #endif
   void xPredInterLines          (const PredictionUnit& pu, const Picture* refPic, Mv &mv, PelUnitBuf &dstPic, const bool &bi, const ClpRng& clpRng );
-  void xFillPredBlckAndBorder   (const PredictionUnit& pu, RefPicList eRefPicList, Int iWidth, Int iHeight, PelBuf &cTmpY );
+  void xFillPredBlckAndBorder   (const PredictionUnit& pu, RefPicList eRefPicList, int iWidth, int iHeight, PelBuf &cTmpY );
   void xProcessDMVR             (      PredictionUnit& pu, PelUnitBuf &pcYuvDst, const ClpRngs &clpRngs, const bool bBIOApplied);
 #endif
 
@@ -271,7 +271,7 @@ public:
   void    subBlockOBMC        (PredictionUnit  &pu, PelUnitBuf *pDst = nullptr, bool bOBMC4ME = false);
 
   bool    deriveFRUCMV        (PredictionUnit &pu);
-  bool    frucFindBlkMv4Pred  (PredictionUnit& pu, RefPicList eTargetRefPicList, const Int nTargetRefIdx, AMVPInfo* pInfo = NULL);
+  bool    frucFindBlkMv4Pred  (PredictionUnit& pu, RefPicList eTargetRefPicList, const int nTargetRefIdx, AMVPInfo* pInfo = NULL);
 #endif
 #if JVET_J0090_MEMORY_BANDWITH_MEASURE
   void    cacheAssign( CacheModel *cache );

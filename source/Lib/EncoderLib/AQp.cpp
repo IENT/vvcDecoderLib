@@ -43,7 +43,7 @@
 
 /** Constructor
  */
-AQpLayer::AQpLayer( Int iWidth, Int iHeight, UInt uiAQPartWidth, UInt uiAQPartHeight )
+AQpLayer::AQpLayer( int iWidth, int iHeight, UInt uiAQPartWidth, UInt uiAQPartHeight )
 : m_uiAQPartWidth(uiAQPartWidth)
 , m_uiAQPartHeight(uiAQPartHeight)
 , m_uiNumAQPartInWidth((iWidth + uiAQPartWidth-1) / uiAQPartWidth)
@@ -69,9 +69,9 @@ AQpLayer::~AQpLayer()
 void AQpPreanalyzer::preanalyze( Picture* pcEPic )
 {
   const CPelBuf lumaPlane = pcEPic->getOrigBuf().Y();
-  const Int iWidth  = lumaPlane.width;
-  const Int iHeight = lumaPlane.height;
-  const Int iStride = lumaPlane.stride;
+  const int iWidth  = lumaPlane.width;
+  const int iHeight = lumaPlane.height;
+  const int iStride = lumaPlane.stride;
 
   for ( UInt d = 0; d < pcEPic->aqlayer.size(); d++ )
   {
@@ -132,7 +132,7 @@ void AQpPreanalyzer::preanalyze( Picture* pcEPic )
         double dMinVar = DBL_MAX;
         if (numPixInAQPart!=0)
         {
-          for ( Int i=0; i<4; i++)
+          for ( int i=0; i<4; i++)
           {
             const double dAverage = double(uiSum[i]) / numPixInAQPart;
             const double dVariance = double(uiSumSq[i]) / numPixInAQPart - dAverage * dAverage;

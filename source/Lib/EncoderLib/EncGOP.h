@@ -86,8 +86,8 @@ class EncGOP
     :accumBitsDU(0)
     ,accumNalsDU(0) {};
 
-    Int accumBitsDU;
-    Int accumNalsDU;
+    int accumBitsDU;
+    int accumNalsDU;
   };
 
 private:
@@ -113,12 +113,12 @@ private:
   UInt                    m_numLongTermRefPicSPS;
   UInt                    m_ltRefPicPocLsbSps[MAX_NUM_LONG_TERM_REF_PICS];
   bool                    m_ltRefPicUsedByCurrPicFlag[MAX_NUM_LONG_TERM_REF_PICS];
-  Int                     m_iLastIDR;
-  Int                     m_iGopSize;
-  Int                     m_iNumPicCoded;
+  int                     m_iLastIDR;
+  int                     m_iGopSize;
+  int                     m_iNumPicCoded;
   bool                    m_bFirst;
-  Int                     m_iLastRecoveryPicPOC;
-  Int                     m_lastRasPoc;
+  int                     m_iLastRecoveryPicPOC;
+  int                     m_lastRasPoc;
 
   //  Access channel
   EncLib*                 m_pcEncLib;
@@ -142,18 +142,18 @@ private:
 
   // clean decoding refresh
   bool                    m_bRefreshPending;
-  Int                     m_pocCRA;
+  int                     m_pocCRA;
   NalUnitType             m_associatedIRAPType;
-  Int                     m_associatedIRAPPOC;
+  int                     m_associatedIRAPPOC;
 
-  std::vector<Int>        m_vRVM_RP;
+  std::vector<int>        m_vRVM_RP;
   UInt                    m_lastBPSEI;
   UInt                    m_totalCoded;
   bool                    m_bufferingPeriodSEIPresentInAU;
   SEIEncoder              m_seiEncoder;
 #if W0038_DB_OPT
   PelStorage*             m_pcDeblockingTempPicYuv;
-  Int                     m_DBParam[MAX_ENCODER_DEBLOCKING_QUALITY_LAYERS][4];   //[layer_id][0: available; 1: bDBDisabled; 2: Beta Offset Div2; 3: Tc Offset Div2;]
+  int                     m_DBParam[MAX_ENCODER_DEBLOCKING_QUALITY_LAYERS][4];   //[layer_id][0: available; 1: bDBDisabled; 2: Beta Offset Div2; 3: Tc Offset Div2;]
 #endif
 
   // members needed for adaptive max BT size
@@ -172,12 +172,12 @@ public:
   void  destroy     ();
 
   void  init        ( EncLib* pcEncLib );
-  void  compressGOP ( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic, std::list<PelUnitBuf*>& rcListPicYuvRec,
+  void  compressGOP ( int iPOCLast, int iNumPicRcvd, PicList& rcListPic, std::list<PelUnitBuf*>& rcListPicYuvRec,
                       bool isField, bool isTff, const InputColourSpaceConversion snr_conversion, const bool printFrameMSE );
   void  xAttachSliceDataToNalUnit (OutputNALUnit& rNalu, OutputBitstream* pcBitstreamRedirect);
 
 
-  Int   getGOPSize()          { return  m_iGopSize;  }
+  int   getGOPSize()          { return  m_iGopSize;  }
 
   PicList*   getListPic()      { return m_pcListPic; }
 
@@ -186,7 +186,7 @@ public:
   uint64_t  preLoopFilterPicAndCalcDist( Picture* pcPic );
 #endif
   EncSlice*  getSliceEncoder()   { return m_pcSliceEncoder; }
-  NalUnitType getNalUnitType( Int pocCurr, Int lastIdr, bool isField );
+  NalUnitType getNalUnitType( int pocCurr, int lastIdr, bool isField );
   void arrangeLongtermPicturesInRPS(Slice *, PicList& );
 
 #if EXTENSION_360_VIDEO
@@ -201,11 +201,11 @@ protected:
 
 protected:
 
-  void  xInitGOP          ( Int iPOCLast, Int iNumPicRcvd, bool isField );
+  void  xInitGOP          ( int iPOCLast, int iNumPicRcvd, bool isField );
   void  xGetBuffer        ( PicList& rcListPic, std::list<PelUnitBuf*>& rcListPicYuvRecOut,
-                            Int iNumPicRcvd, Int iTimeOffset, Picture*& rpcPic, Int pocCurr, bool isField );
+                            int iNumPicRcvd, int iTimeOffset, Picture*& rpcPic, int pocCurr, bool isField );
 
-  void  xCalculateAddPSNRs         ( const bool isField, const bool isFieldTopFieldFirst, const Int iGOPid, Picture* pcPic, const AccessUnit&accessUnit, PicList &rcListPic, int64_t dEncTime, const InputColourSpaceConversion snr_conversion, const bool printFrameMSE, double* PSNR_Y );
+  void  xCalculateAddPSNRs         ( const bool isField, const bool isFieldTopFieldFirst, const int iGOPid, Picture* pcPic, const AccessUnit&accessUnit, PicList &rcListPic, int64_t dEncTime, const InputColourSpaceConversion snr_conversion, const bool printFrameMSE, double* PSNR_Y );
   void  xCalculateAddPSNR          ( Picture* pcPic, PelUnitBuf cPicD, const AccessUnit&, double dEncTime, const InputColourSpaceConversion snr_conversion, const bool printFrameMSE, double* PSNR_Y );
   void  xCalculateInterlacedAddPSNR( Picture* pcPicOrgFirstField, Picture* pcPicOrgSecondField,
                                      PelUnitBuf cPicRecFirstField, PelUnitBuf cPicRecSecondField,
@@ -226,31 +226,31 @@ protected:
   void xWriteAccessUnitDelimiter (AccessUnit &accessUnit, Slice *slice);
 
   void xCreateIRAPLeadingSEIMessages (SEIMessages& seiMessages, const SPS *sps, const PPS *pps);
-  void xCreatePerPictureSEIMessages (Int picInGOP, SEIMessages& seiMessages, SEIMessages& nestedSeiMessages, Slice *slice);
-  void xCreatePictureTimingSEI  (Int IRAPGOPid, SEIMessages& seiMessages, SEIMessages& nestedSeiMessages, SEIMessages& duInfoSeiMessages, Slice *slice, bool isField, std::deque<DUData> &duData);
+  void xCreatePerPictureSEIMessages (int picInGOP, SEIMessages& seiMessages, SEIMessages& nestedSeiMessages, Slice *slice);
+  void xCreatePictureTimingSEI  (int IRAPGOPid, SEIMessages& seiMessages, SEIMessages& nestedSeiMessages, SEIMessages& duInfoSeiMessages, Slice *slice, bool isField, std::deque<DUData> &duData);
   void xUpdateDuData(AccessUnit &testAU, std::deque<DUData> &duData);
   void xUpdateTimingSEI(SEIPictureTiming *pictureTimingSEI, std::deque<DUData> &duData, const SPS *sps);
   void xUpdateDuInfoSEI(SEIMessages &duInfoSeiMessages, SEIPictureTiming *pictureTimingSEI);
 
   void xCreateScalableNestingSEI (SEIMessages& seiMessages, SEIMessages& nestedSeiMessages);
-  void xWriteSEI (NalUnitType naluType, SEIMessages& seiMessages, AccessUnit &accessUnit, AccessUnit::iterator &auPos, Int temporalId, const SPS *sps);
-  void xWriteSEISeparately (NalUnitType naluType, SEIMessages& seiMessages, AccessUnit &accessUnit, AccessUnit::iterator &auPos, Int temporalId, const SPS *sps);
+  void xWriteSEI (NalUnitType naluType, SEIMessages& seiMessages, AccessUnit &accessUnit, AccessUnit::iterator &auPos, int temporalId, const SPS *sps);
+  void xWriteSEISeparately (NalUnitType naluType, SEIMessages& seiMessages, AccessUnit &accessUnit, AccessUnit::iterator &auPos, int temporalId, const SPS *sps);
   void xClearSEIs(SEIMessages& seiMessages, bool deleteMessages);
-  void xWriteLeadingSEIOrdered (SEIMessages& seiMessages, SEIMessages& duInfoSeiMessages, AccessUnit &accessUnit, Int temporalId, const SPS *sps, bool testWrite);
-  void xWriteLeadingSEIMessages  (SEIMessages& seiMessages, SEIMessages& duInfoSeiMessages, AccessUnit &accessUnit, Int temporalId, const SPS *sps, std::deque<DUData> &duData);
-  void xWriteTrailingSEIMessages (SEIMessages& seiMessages, AccessUnit &accessUnit, Int temporalId, const SPS *sps);
-  void xWriteDuSEIMessages       (SEIMessages& duInfoSeiMessages, AccessUnit &accessUnit, Int temporalId, const SPS *sps, std::deque<DUData> &duData);
+  void xWriteLeadingSEIOrdered (SEIMessages& seiMessages, SEIMessages& duInfoSeiMessages, AccessUnit &accessUnit, int temporalId, const SPS *sps, bool testWrite);
+  void xWriteLeadingSEIMessages  (SEIMessages& seiMessages, SEIMessages& duInfoSeiMessages, AccessUnit &accessUnit, int temporalId, const SPS *sps, std::deque<DUData> &duData);
+  void xWriteTrailingSEIMessages (SEIMessages& seiMessages, AccessUnit &accessUnit, int temporalId, const SPS *sps);
+  void xWriteDuSEIMessages       (SEIMessages& duInfoSeiMessages, AccessUnit &accessUnit, int temporalId, const SPS *sps, std::deque<DUData> &duData);
 
 #if HEVC_VPS
-  Int xWriteVPS (AccessUnit &accessUnit, const VPS *vps);
+  int xWriteVPS (AccessUnit &accessUnit, const VPS *vps);
 #endif
-  Int xWriteSPS (AccessUnit &accessUnit, const SPS *sps);
-  Int xWritePPS (AccessUnit &accessUnit, const PPS *pps);
-  Int xWriteParameterSets (AccessUnit &accessUnit, Slice *slice, const bool bSeqFirst);
+  int xWriteSPS (AccessUnit &accessUnit, const SPS *sps);
+  int xWritePPS (AccessUnit &accessUnit, const PPS *pps);
+  int xWriteParameterSets (AccessUnit &accessUnit, Slice *slice, const bool bSeqFirst);
 
   void applyDeblockingFilterMetric( Picture* pcPic, UInt uiNumSlices );
 #if W0038_DB_OPT
-  void applyDeblockingFilterParameterSelection( Picture* pcPic, const UInt numSlices, const Int gopID );
+  void applyDeblockingFilterParameterSelection( Picture* pcPic, const UInt numSlices, const int gopID );
 #endif
 };// END CLASS DEFINITION EncGOP
 

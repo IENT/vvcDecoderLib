@@ -55,28 +55,28 @@
 
 
 //! rounding with IBDI
-inline double xRoundIbdi2(Int bitDepth, double x)
+inline double xRoundIbdi2(int bitDepth, double x)
 {
 #if DISTORTION_LAMBDA_BUGFIX
 #if FULL_NBIT
-  return ((x) >= 0 ? ((Int)((x) + 0.5)) : ((Int)((x) -0.5)));
+  return ((x) >= 0 ? ((int)((x) + 0.5)) : ((int)((x) -0.5)));
 #else
   if (DISTORTION_PRECISION_ADJUSTMENT(bitDepth) == 0)
-    return ((x) >= 0 ? ((Int)((x) + 0.5)) : ((Int)((x) -0.5)));
+    return ((x) >= 0 ? ((int)((x) + 0.5)) : ((int)((x) -0.5)));
   else
-    return ((x) > 0) ? (Int)(((Int)(x) + (1 << (DISTORTION_PRECISION_ADJUSTMENT(bitDepth) - 1)))
+    return ((x) > 0) ? (int)(((int)(x) + (1 << (DISTORTION_PRECISION_ADJUSTMENT(bitDepth) - 1)))
                              / (1 << DISTORTION_PRECISION_ADJUSTMENT(bitDepth)))
-                     : ((Int)(((Int)(x) - (1 << (DISTORTION_PRECISION_ADJUSTMENT(bitDepth) - 1)))
+                     : ((int)(((int)(x) - (1 << (DISTORTION_PRECISION_ADJUSTMENT(bitDepth) - 1)))
                               / (1 << DISTORTION_PRECISION_ADJUSTMENT(bitDepth))));
 #endif
 #else
-  return ((x)>0) ? (Int)(((Int)(x)+(1<<(bitDepth-8-1)))/(1<<(bitDepth-8))) : ((Int)(((Int)(x)-(1<<(bitDepth-8-1)))/(1<<(bitDepth-8))));
+  return ((x)>0) ? (int)(((int)(x)+(1<<(bitDepth-8-1)))/(1<<(bitDepth-8))) : ((int)(((int)(x)-(1<<(bitDepth-8-1)))/(1<<(bitDepth-8))));
 #endif
 }
 
-inline double xRoundIbdi(Int bitDepth, double x)
+inline double xRoundIbdi(int bitDepth, double x)
 {
-  return (bitDepth > 8 ? xRoundIbdi2(bitDepth, (x)) : ((x)>=0 ? ((Int)((x)+0.5)) : ((Int)((x)-0.5)))) ;
+  return (bitDepth > 8 ? xRoundIbdi2(bitDepth, (x)) : ((x)>=0 ? ((int)((x)+0.5)) : ((int)((x)-0.5)))) ;
 }
 
 
@@ -119,7 +119,7 @@ void EncSampleAdaptiveOffset::createEncData(bool isPreDBFSamplesUsed, UInt numCT
 
   ::memset(m_saoDisabledRate, 0, sizeof(m_saoDisabledRate));
 
-  for(Int typeIdc=0; typeIdc < NUM_SAO_NEW_TYPES; typeIdc++)
+  for(int typeIdc=0; typeIdc < NUM_SAO_NEW_TYPES; typeIdc++)
   {
     m_skipLinesR[COMPONENT_Y ][typeIdc]= 5;
     m_skipLinesR[COMPONENT_Cb][typeIdc]= m_skipLinesR[COMPONENT_Cr][typeIdc]= 3;
@@ -190,9 +190,9 @@ void EncSampleAdaptiveOffset::destroyEncData()
   m_statData.clear();
 
 
-  for(Int i=0; i< m_preDBFstatData.size(); i++)
+  for(int i=0; i< m_preDBFstatData.size(); i++)
   {
-    for(Int compIdx=0; compIdx< MAX_NUM_COMPONENT; compIdx++)
+    for(int compIdx=0; compIdx< MAX_NUM_COMPONENT; compIdx++)
     {
       delete[] m_preDBFstatData[i][compIdx];
     }
@@ -288,7 +288,7 @@ void EncSampleAdaptiveOffset::getStatistics(std::vector<SAOStatData**>& blkStats
   bool isLeftAvail, isRightAvail, isAboveAvail, isBelowAvail, isAboveLeftAvail, isAboveRightAvail;
 
   const PreCalcValues& pcv = *cs.pcv;
-  const Int numberOfComponents = getNumberValidComponents(pcv.chrFormat);
+  const int numberOfComponents = getNumberValidComponents(pcv.chrFormat);
 
   size_t lineBufferSize = pcv.maxCUWidth + 1;
   if (m_signLineBuf1.size() != lineBufferSize)
@@ -315,15 +315,15 @@ void EncSampleAdaptiveOffset::getStatistics(std::vector<SAOStatData**>& blkStats
       isBelowAvail      = (yPos + pcv.maxCUHeight < pcv.lumaHeight);
       isAboveRightAvail = ((yPos > 0) && (isRightAvail));
 
-      for(Int compIdx = 0; compIdx < numberOfComponents; compIdx++)
+      for(int compIdx = 0; compIdx < numberOfComponents; compIdx++)
       {
         const ComponentID compID = ComponentID(compIdx);
         const CompArea& compArea = area.block( compID );
 
-        Int  srcStride  = srcYuv.get(compID).stride;
+        int  srcStride  = srcYuv.get(compID).stride;
         Pel* srcBlk     = srcYuv.get(compID).bufAt( compArea );
 
-        Int  orgStride  = orgYuv.get(compID).stride;
+        int  orgStride  = orgYuv.get(compID).stride;
         Pel* orgBlk     = orgYuv.get(compID).bufAt( compArea );
 
         getBlkStats(compID, cs.sps->getBitDepth(toChannelType(compID)), blkStats[ctuRsAddr][compID]
@@ -341,25 +341,25 @@ void EncSampleAdaptiveOffset::decidePicParams(const Slice& slice, bool* sliceEna
 {
   if ( slice.getPendingRasInit() )
   { // reset
-    for (Int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++)
+    for (int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++)
     {
-      for (Int tempLayer = 1; tempLayer < MAX_TLAYER; tempLayer++)
+      for (int tempLayer = 1; tempLayer < MAX_TLAYER; tempLayer++)
       {
         m_saoDisabledRate[compIdx][tempLayer] = 0.0;
       }
     }
   }
 
-  const Int picTempLayer = slice.getDepth();
+  const int picTempLayer = slice.getDepth();
 
   //decide sliceEnabled[compIdx]
-  const Int numberOfComponents = m_numberOfComponents;
-  for (Int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++)
+  const int numberOfComponents = m_numberOfComponents;
+  for (int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++)
   {
     sliceEnabled[compIdx] = false;
   }
 
-  for (Int compIdx = 0; compIdx < numberOfComponents; compIdx++)
+  for (int compIdx = 0; compIdx < numberOfComponents; compIdx++)
   {
     // reset flags & counters
     sliceEnabled[compIdx] = true;
@@ -388,13 +388,13 @@ void EncSampleAdaptiveOffset::decidePicParams(const Slice& slice, bool* sliceEna
   }
 }
 
-int64_t EncSampleAdaptiveOffset::getDistortion(const Int channelBitDepth, Int typeIdc, Int typeAuxInfo, Int* invQuantOffset, SAOStatData& statData)
+int64_t EncSampleAdaptiveOffset::getDistortion(const int channelBitDepth, int typeIdc, int typeAuxInfo, int* invQuantOffset, SAOStatData& statData)
 {
   int64_t dist        = 0;
 #if DISTORTION_LAMBDA_BUGFIX
-  Int shift = 2 * DISTORTION_PRECISION_ADJUSTMENT(channelBitDepth);
+  int shift = 2 * DISTORTION_PRECISION_ADJUSTMENT(channelBitDepth);
 #else
-  Int shift         = 2 * DISTORTION_PRECISION_ADJUSTMENT(channelBitDepth - 8);
+  int shift         = 2 * DISTORTION_PRECISION_ADJUSTMENT(channelBitDepth - 8);
 #endif
 
   switch(typeIdc)
@@ -404,7 +404,7 @@ int64_t EncSampleAdaptiveOffset::getDistortion(const Int channelBitDepth, Int ty
     case SAO_TYPE_EO_135:
     case SAO_TYPE_EO_45:
       {
-        for (Int offsetIdx=0; offsetIdx<NUM_SAO_EO_CLASSES; offsetIdx++)
+        for (int offsetIdx=0; offsetIdx<NUM_SAO_EO_CLASSES; offsetIdx++)
         {
           dist += estSaoDist( statData.count[offsetIdx], invQuantOffset[offsetIdx], statData.diff[offsetIdx], shift);
         }
@@ -412,9 +412,9 @@ int64_t EncSampleAdaptiveOffset::getDistortion(const Int channelBitDepth, Int ty
       break;
     case SAO_TYPE_BO:
       {
-        for (Int offsetIdx=typeAuxInfo; offsetIdx<typeAuxInfo+4; offsetIdx++)
+        for (int offsetIdx=typeAuxInfo; offsetIdx<typeAuxInfo+4; offsetIdx++)
         {
-          Int bandIdx = offsetIdx % NUM_SAO_BO_CLASSES ;
+          int bandIdx = offsetIdx % NUM_SAO_BO_CLASSES ;
           dist += estSaoDist( statData.count[bandIdx], invQuantOffset[bandIdx], statData.diff[bandIdx], shift);
         }
       }
@@ -428,26 +428,26 @@ int64_t EncSampleAdaptiveOffset::getDistortion(const Int channelBitDepth, Int ty
   return dist;
 }
 
-inline int64_t EncSampleAdaptiveOffset::estSaoDist(int64_t count, int64_t offset, int64_t diffSum, Int shift)
+inline int64_t EncSampleAdaptiveOffset::estSaoDist(int64_t count, int64_t offset, int64_t diffSum, int shift)
 {
   return (( count*offset*offset-diffSum*offset*2 ) >> shift);
 }
 
 
-inline Int EncSampleAdaptiveOffset::estIterOffset(Int typeIdx, double lambda, Int offsetInput, int64_t count, int64_t diffSum, Int shift, Int bitIncrease, int64_t& bestDist, double& bestCost, Int offsetTh )
+inline int EncSampleAdaptiveOffset::estIterOffset(int typeIdx, double lambda, int offsetInput, int64_t count, int64_t diffSum, int shift, int bitIncrease, int64_t& bestDist, double& bestCost, int offsetTh )
 {
-  Int iterOffset, tempOffset;
+  int iterOffset, tempOffset;
   int64_t tempDist, tempRate;
   double tempCost, tempMinCost;
-  Int offsetOutput = 0;
+  int offsetOutput = 0;
   iterOffset = offsetInput;
   // Assuming sending quantized value 0 results in zero offset and sending the value zero needs 1 bit. entropy coder can be used to measure the exact rate here.
   tempMinCost = lambda;
   while (iterOffset != 0)
   {
     // Calculate the bits required for signaling the offset
-    tempRate = (typeIdx == SAO_TYPE_BO) ? (abs((Int)iterOffset)+2) : (abs((Int)iterOffset)+1);
-    if (abs((Int)iterOffset)==offsetTh) //inclusive
+    tempRate = (typeIdx == SAO_TYPE_BO) ? (abs((int)iterOffset)+2) : (abs((int)iterOffset)+1);
+    if (abs((int)iterOffset)==offsetTh) //inclusive
     {
       tempRate --;
     }
@@ -467,21 +467,21 @@ inline Int EncSampleAdaptiveOffset::estIterOffset(Int typeIdx, double lambda, In
   return offsetOutput;
 }
 
-void EncSampleAdaptiveOffset::deriveOffsets(ComponentID compIdx, const Int channelBitDepth, Int typeIdc, SAOStatData& statData, Int* quantOffsets, Int& typeAuxInfo)
+void EncSampleAdaptiveOffset::deriveOffsets(ComponentID compIdx, const int channelBitDepth, int typeIdc, SAOStatData& statData, int* quantOffsets, int& typeAuxInfo)
 {
-  Int bitDepth = channelBitDepth;
+  int bitDepth = channelBitDepth;
 #if DISTORTION_LAMBDA_BUGFIX
-  Int shift = 2 * DISTORTION_PRECISION_ADJUSTMENT(bitDepth);
+  int shift = 2 * DISTORTION_PRECISION_ADJUSTMENT(bitDepth);
 #else
-  Int shift    = 2 * DISTORTION_PRECISION_ADJUSTMENT(bitDepth-8);
+  int shift    = 2 * DISTORTION_PRECISION_ADJUSTMENT(bitDepth-8);
 #endif
-  Int offsetTh = SampleAdaptiveOffset::getMaxOffsetQVal(channelBitDepth);  //inclusive
+  int offsetTh = SampleAdaptiveOffset::getMaxOffsetQVal(channelBitDepth);  //inclusive
 
-  ::memset(quantOffsets, 0, sizeof(Int)*MAX_NUM_SAO_CLASSES);
+  ::memset(quantOffsets, 0, sizeof(int)*MAX_NUM_SAO_CLASSES);
 
   //derive initial offsets
-  Int numClasses = (typeIdc == SAO_TYPE_BO)?((Int)NUM_SAO_BO_CLASSES):((Int)NUM_SAO_EO_CLASSES);
-  for(Int classIdx=0; classIdx< numClasses; classIdx++)
+  int numClasses = (typeIdc == SAO_TYPE_BO)?((int)NUM_SAO_BO_CLASSES):((int)NUM_SAO_EO_CLASSES);
+  for(int classIdx=0; classIdx< numClasses; classIdx++)
   {
     if( (typeIdc != SAO_TYPE_BO) && (classIdx==SAO_CLASS_EO_PLAIN)  )
     {
@@ -495,11 +495,11 @@ void EncSampleAdaptiveOffset::deriveOffsets(ComponentID compIdx, const Int chann
 
 #if DISTORTION_LAMBDA_BUGFIX
     quantOffsets[classIdx] =
-      (Int) xRoundIbdi(bitDepth, (double)(statData.diff[classIdx] << DISTORTION_PRECISION_ADJUSTMENT(bitDepth))
+      (int) xRoundIbdi(bitDepth, (double)(statData.diff[classIdx] << DISTORTION_PRECISION_ADJUSTMENT(bitDepth))
                                    / (double)(statData.count[classIdx] << m_offsetStepLog2[compIdx]));
 #else
     quantOffsets[classIdx] =
-      (Int) xRoundIbdi(bitDepth, (double)(statData.diff[classIdx] << (bitDepth - 8))
+      (int) xRoundIbdi(bitDepth, (double)(statData.diff[classIdx] << (bitDepth - 8))
                                    / (double)(statData.count[classIdx] << m_offsetStepLog2[compIdx]));
 #endif
     quantOffsets[classIdx] = Clip3(-offsetTh, offsetTh, quantOffsets[classIdx]);
@@ -515,7 +515,7 @@ void EncSampleAdaptiveOffset::deriveOffsets(ComponentID compIdx, const Int chann
       {
         int64_t classDist;
         double classCost;
-        for(Int classIdx=0; classIdx<NUM_SAO_EO_CLASSES; classIdx++)
+        for(int classIdx=0; classIdx<NUM_SAO_EO_CLASSES; classIdx++)
         {
           if(classIdx==SAO_CLASS_EO_FULL_VALLEY && quantOffsets[classIdx] < 0)
           {
@@ -548,7 +548,7 @@ void EncSampleAdaptiveOffset::deriveOffsets(ComponentID compIdx, const Int chann
         int64_t  distBOClasses[NUM_SAO_BO_CLASSES];
         double costBOClasses[NUM_SAO_BO_CLASSES];
         ::memset(distBOClasses, 0, sizeof(int64_t)*NUM_SAO_BO_CLASSES);
-        for(Int classIdx=0; classIdx< NUM_SAO_BO_CLASSES; classIdx++)
+        for(int classIdx=0; classIdx< NUM_SAO_BO_CLASSES; classIdx++)
         {
           costBOClasses[classIdx]= m_lambda[compIdx];
           if( quantOffsets[classIdx] != 0 ) //iterative adjustment only when derived offset is not zero
@@ -559,7 +559,7 @@ void EncSampleAdaptiveOffset::deriveOffsets(ComponentID compIdx, const Int chann
 
         //decide the starting band index
         double minCost = MAX_DOUBLE, cost;
-        for(Int band=0; band< NUM_SAO_BO_CLASSES- 4+ 1; band++)
+        for(int band=0; band< NUM_SAO_BO_CLASSES- 4+ 1; band++)
         {
           cost  = costBOClasses[band  ];
           cost += costBOClasses[band+1];
@@ -573,14 +573,14 @@ void EncSampleAdaptiveOffset::deriveOffsets(ComponentID compIdx, const Int chann
           }
         }
         //clear those unused classes
-        Int clearQuantOffset[NUM_SAO_BO_CLASSES];
-        ::memset(clearQuantOffset, 0, sizeof(Int)*NUM_SAO_BO_CLASSES);
-        for(Int i=0; i< 4; i++)
+        int clearQuantOffset[NUM_SAO_BO_CLASSES];
+        ::memset(clearQuantOffset, 0, sizeof(int)*NUM_SAO_BO_CLASSES);
+        for(int i=0; i< 4; i++)
         {
-          Int band = (typeAuxInfo+i)%NUM_SAO_BO_CLASSES;
+          int band = (typeAuxInfo+i)%NUM_SAO_BO_CLASSES;
           clearQuantOffset[band] = quantOffsets[band];
         }
-        ::memcpy(quantOffsets, clearQuantOffset, sizeof(Int)*NUM_SAO_BO_CLASSES);
+        ::memcpy(quantOffsets, clearQuantOffset, sizeof(int)*NUM_SAO_BO_CLASSES);
       }
       break;
     default:
@@ -593,16 +593,16 @@ void EncSampleAdaptiveOffset::deriveOffsets(ComponentID compIdx, const Int chann
 
 }
 
-void EncSampleAdaptiveOffset::deriveModeNewRDO(const BitDepths &bitDepths, Int ctuRsAddr, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES], bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, SAOBlkParam& modeParam, double& modeNormCost )
+void EncSampleAdaptiveOffset::deriveModeNewRDO(const BitDepths &bitDepths, int ctuRsAddr, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES], bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, SAOBlkParam& modeParam, double& modeNormCost )
 {
   double minCost, cost;
   uint64_t previousFracBits;
-  const Int numberOfComponents = m_numberOfComponents;
+  const int numberOfComponents = m_numberOfComponents;
 
   int64_t dist[MAX_NUM_COMPONENT], modeDist[MAX_NUM_COMPONENT];
   SAOOffset testOffset[MAX_NUM_COMPONENT];
-  Int invQuantOffset[MAX_NUM_SAO_CLASSES];
-  for(Int comp=0; comp < MAX_NUM_COMPONENT; comp++)
+  int invQuantOffset[MAX_NUM_SAO_CLASSES];
+  for(int comp=0; comp < MAX_NUM_COMPONENT; comp++)
   {
     modeDist[comp] = 0;
   }
@@ -626,7 +626,7 @@ void EncSampleAdaptiveOffset::deriveModeNewRDO(const BitDepths &bitDepths, Int c
     ctxBestLuma = SAOCtx( m_CABACEstimator->getCtx() );
     if(sliceEnabled[compIdx])
     {
-      for(Int typeIdc=0; typeIdc< NUM_SAO_NEW_TYPES; typeIdc++)
+      for(int typeIdc=0; typeIdc< NUM_SAO_NEW_TYPES; typeIdc++)
       {
         testOffset[compIdx].modeIdc = SAO_MODE_NEW;
         testOffset[compIdx].typeIdc = typeIdc;
@@ -679,7 +679,7 @@ void EncSampleAdaptiveOffset::deriveModeNewRDO(const BitDepths &bitDepths, Int c
 
   //doesn't need to store cabac status here since the whole CTU parameters will be re-encoded at the end of this function
 
-  for(Int typeIdc=0; typeIdc< NUM_SAO_NEW_TYPES; typeIdc++)
+  for(int typeIdc=0; typeIdc< NUM_SAO_NEW_TYPES; typeIdc++)
   {
     m_CABACEstimator->getCtx() = SAOCtx( ctxBestLuma );
     m_CABACEstimator->resetBits();
@@ -733,18 +733,18 @@ void EncSampleAdaptiveOffset::deriveModeNewRDO(const BitDepths &bitDepths, Int c
   modeNormCost += FracBitsScale*(double)m_CABACEstimator->getEstFracBits();
 }
 
-void EncSampleAdaptiveOffset::deriveModeMergeRDO(const BitDepths &bitDepths, Int ctuRsAddr, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES], bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, SAOBlkParam& modeParam, double& modeNormCost )
+void EncSampleAdaptiveOffset::deriveModeMergeRDO(const BitDepths &bitDepths, int ctuRsAddr, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES], bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, SAOBlkParam& modeParam, double& modeNormCost )
 {
   modeNormCost = MAX_DOUBLE;
 
   double cost;
   SAOBlkParam testBlkParam;
-  const Int numberOfComponents = m_numberOfComponents;
+  const int numberOfComponents = m_numberOfComponents;
 
   const TempCtx ctxStart  ( m_CtxCache, SAOCtx( m_CABACEstimator->getCtx() ) );
   TempCtx       ctxBest   ( m_CtxCache );
 
-  for(Int mergeType=0; mergeType< NUM_SAO_MERGE_TYPES; mergeType++)
+  for(int mergeType=0; mergeType< NUM_SAO_MERGE_TYPES; mergeType++)
   {
     if(mergeList[mergeType] == NULL)
     {
@@ -754,7 +754,7 @@ void EncSampleAdaptiveOffset::deriveModeMergeRDO(const BitDepths &bitDepths, Int
     testBlkParam = *(mergeList[mergeType]);
     //normalized distortion
     double normDist=0;
-    for(Int compIdx = 0; compIdx < numberOfComponents; compIdx++)
+    for(int compIdx = 0; compIdx < numberOfComponents; compIdx++)
     {
       testBlkParam[compIdx].modeIdc = SAO_MODE_MERGE;
       testBlkParam[compIdx].typeIdc = mergeType;
@@ -873,7 +873,7 @@ void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, bool* sliceEn
       getMergeList(cs, ctuRsAddr, reconParams, mergeList);
 
       minCost = MAX_DOUBLE;
-      for(Int mode=1; mode < NUM_SAO_MODES; mode++)
+      for(int mode=1; mode < NUM_SAO_MODES; mode++)
       {
         if( mode > 1 )
         {
@@ -1099,10 +1099,10 @@ void EncSampleAdaptiveOffset::disabledRate( CodingStructure& cs, SAOBlkParam* re
   {
     const PreCalcValues& pcv = *cs.pcv;
     const UInt numberOfComponents = m_numberOfComponents;
-    Int picTempLayer = cs.slice->getDepth();
-    Int numCtusForSAOOff[MAX_NUM_COMPONENT];
+    int picTempLayer = cs.slice->getDepth();
+    int numCtusForSAOOff[MAX_NUM_COMPONENT];
 
-    for (Int compIdx = 0; compIdx < numberOfComponents; compIdx++)
+    for (int compIdx = 0; compIdx < numberOfComponents; compIdx++)
     {
       numCtusForSAOOff[compIdx] = 0;
       for( int ctuRsAddr=0; ctuRsAddr< pcv.sizeInCtus; ctuRsAddr++)
@@ -1115,7 +1115,7 @@ void EncSampleAdaptiveOffset::disabledRate( CodingStructure& cs, SAOBlkParam* re
     }
     if (saoEncodingRateChroma > 0.0)
     {
-      for (Int compIdx = 0; compIdx < numberOfComponents; compIdx++)
+      for (int compIdx = 0; compIdx < numberOfComponents; compIdx++)
       {
         m_saoDisabledRate[compIdx][picTempLayer] = (double)numCtusForSAOOff[compIdx]/(double)pcv.sizeInCtus;
       }
@@ -1127,20 +1127,20 @@ void EncSampleAdaptiveOffset::disabledRate( CodingStructure& cs, SAOBlkParam* re
   }
 }
 
-void EncSampleAdaptiveOffset::getBlkStats(const ComponentID compIdx, const Int channelBitDepth, SAOStatData* statsDataTypes
-                        , Pel* srcBlk, Pel* orgBlk, Int srcStride, Int orgStride, Int width, Int height
+void EncSampleAdaptiveOffset::getBlkStats(const ComponentID compIdx, const int channelBitDepth, SAOStatData* statsDataTypes
+                        , Pel* srcBlk, Pel* orgBlk, int srcStride, int orgStride, int width, int height
                         , bool isLeftAvail,  bool isRightAvail, bool isAboveAvail, bool isBelowAvail, bool isAboveLeftAvail, bool isAboveRightAvail
                         , bool isCalculatePreDeblockSamples
                         )
 {
-  Int x,y, startX, startY, endX, endY, edgeType, firstLineStartX, firstLineEndX;
+  int x,y, startX, startY, endX, endY, edgeType, firstLineStartX, firstLineEndX;
   int8_t signLeft, signRight, signDown;
   int64_t *diff, *count;
   Pel *srcLine, *orgLine;
-  Int* skipLinesR = m_skipLinesR[compIdx];
-  Int* skipLinesB = m_skipLinesB[compIdx];
+  int* skipLinesR = m_skipLinesR[compIdx];
+  int* skipLinesB = m_skipLinesB[compIdx];
 
-  for(Int typeIdx=0; typeIdx< NUM_SAO_NEW_TYPES; typeIdx++)
+  for(int typeIdx=0; typeIdx< NUM_SAO_NEW_TYPES; typeIdx++)
   {
     SAOStatData& statsData= statsDataTypes[typeIdx];
     statsData.reset();
@@ -1452,13 +1452,13 @@ void EncSampleAdaptiveOffset::getBlkStats(const ComponentID compIdx, const Int c
                                                 :width
                                                 ;
         endY = isBelowAvail ? (height- skipLinesB[typeIdx]) : height;
-        Int shiftBits = channelBitDepth - NUM_SAO_BO_CLASSES_LOG2;
+        int shiftBits = channelBitDepth - NUM_SAO_BO_CLASSES_LOG2;
         for (y=0; y< endY; y++)
         {
           for (x=startX; x< endX; x++)
           {
 
-            Int bandIdx= srcLine[x] >> shiftBits;
+            int bandIdx= srcLine[x] >> shiftBits;
             diff [bandIdx] += (orgLine[x] - srcLine[x]);
             count[bandIdx] ++;
           }
@@ -1476,7 +1476,7 @@ void EncSampleAdaptiveOffset::getBlkStats(const ComponentID compIdx, const Int c
             {
               for (x=startX; x< endX; x++)
               {
-                Int bandIdx= srcLine[x] >> shiftBits;
+                int bandIdx= srcLine[x] >> shiftBits;
                 diff [bandIdx] += (orgLine[x] - srcLine[x]);
                 count[bandIdx] ++;
               }

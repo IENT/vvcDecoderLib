@@ -121,7 +121,7 @@ protected:
 #include "Picture.h"
 
 
-const static Int ALF_NUM_OF_CLASSES = 16;
+const static int ALF_NUM_OF_CLASSES = 16;
 
 void destroyMatrix_int(int **m2D);
 void initMatrix_int(int ***m2D, int d1, int d2);
@@ -134,136 +134,136 @@ void initMatrix_int(int ***m2D, int d1, int d2);
 class AdaptiveLoopFilter
 {
 public:
-  static const Int m_ALF_MAX_NUM_COEF      = 42;                                    ///< maximum number of filter coefficients
-  static const Int m_ALF_MAX_NUM_COEF_C    = 14;                                    ///< number of filter taps for chroma
+  static const int m_ALF_MAX_NUM_COEF      = 42;                                    ///< maximum number of filter coefficients
+  static const int m_ALF_MAX_NUM_COEF_C    = 14;                                    ///< number of filter taps for chroma
 protected:
-  static const Int m_ALF_VAR_SIZE_H        = 4;
-  static const Int m_ALF_VAR_SIZE_W        = 4;
+  static const int m_ALF_VAR_SIZE_H        = 4;
+  static const int m_ALF_VAR_SIZE_W        = 4;
 
-  static const Int m_ALF_WIN_VERSIZE       = 32;
-  static const Int m_ALF_WIN_HORSIZE       = 32;
+  static const int m_ALF_WIN_VERSIZE       = 32;
+  static const int m_ALF_WIN_HORSIZE       = 32;
 
-  static const Int m_ALF_MAX_NUM_TAP       = 9;                                     ///< maximum number of filter taps (9x9)
-  static const Int m_ALF_MIN_NUM_TAP       = 5;                                     ///< minimum number of filter taps (5x5)
-  static const Int m_ALF_MAX_NUM_TAP_C     = 5;                                     ///< number of filter taps for chroma (5x5)
+  static const int m_ALF_MAX_NUM_TAP       = 9;                                     ///< maximum number of filter taps (9x9)
+  static const int m_ALF_MIN_NUM_TAP       = 5;                                     ///< minimum number of filter taps (5x5)
+  static const int m_ALF_MAX_NUM_TAP_C     = 5;                                     ///< number of filter taps for chroma (5x5)
 
-  static const Int m_ALF_MIN_NUM_COEF      = 14;                                    ///< minimum number of filter coefficients
+  static const int m_ALF_MIN_NUM_COEF      = 14;                                    ///< minimum number of filter coefficients
 
-  static const Int m_ALF_NUM_BIT_SHIFT     = 8;                                     ///< bit shift parameter for quantization of ALF param.
-  static const Int m_ALF_ROUND_OFFSET      = ( 1 << ( m_ALF_NUM_BIT_SHIFT - 1 ) );  ///< rounding offset for ALF quantization
+  static const int m_ALF_NUM_BIT_SHIFT     = 8;                                     ///< bit shift parameter for quantization of ALF param.
+  static const int m_ALF_ROUND_OFFSET      = ( 1 << ( m_ALF_NUM_BIT_SHIFT - 1 ) );  ///< rounding offset for ALF quantization
 
-  static const Int m_VAR_SIZE              = 1;                                     ///< JCTVC-E323+E046
+  static const int m_VAR_SIZE              = 1;                                     ///< JCTVC-E323+E046
 
-  static const Int m_FILTER_LENGTH         = 9;
+  static const int m_FILTER_LENGTH         = 9;
 
-  static const Int m_ALF_HM3_QC_CLIP_RANGE = 1024;
-  static const Int m_ALF_HM3_QC_CLIP_OFFSET= 384;
+  static const int m_ALF_HM3_QC_CLIP_RANGE = 1024;
+  static const int m_ALF_HM3_QC_CLIP_OFFSET= 384;
 
 public:
 
-  static const Int m_NO_TEST_FILT          =  3;                                    ///< Filter supports (5/7/9)
+  static const int m_NO_TEST_FILT          =  3;                                    ///< Filter supports (5/7/9)
 
   #define NO_VALS_LAGR                     5    //galf stuff
   #define NO_VALS_LAGR_SHIFT               3    //galf stuff
-  static const Int m_MAX_SQT_FILT_SYM_LENGTH = ((m_FILTER_LENGTH*m_FILTER_LENGTH) / 4 + 1);
+  static const int m_MAX_SQT_FILT_SYM_LENGTH = ((m_FILTER_LENGTH*m_FILTER_LENGTH) / 4 + 1);
 
 #if GALF
-  static const Int m_NUM_BITS            = 10;
-  static const Int m_NO_VAR_BINS         = 25;
-  static const Int m_NO_FILTERS          = 25;
-  static const Int m_MAX_SQR_FILT_LENGTH = ((m_FILTER_LENGTH*m_FILTER_LENGTH) / 2 + 1);
-  static const Int m_SQR_FILT_LENGTH_9SYM = ((9 * 9) / 4 + 1);
-  static const Int m_SQR_FILT_LENGTH_7SYM = ((7 * 7) / 4 + 1);
-  static const Int m_SQR_FILT_LENGTH_5SYM = ((5 * 5) / 4 + 1);
+  static const int m_NUM_BITS            = 10;
+  static const int m_NO_VAR_BINS         = 25;
+  static const int m_NO_FILTERS          = 25;
+  static const int m_MAX_SQR_FILT_LENGTH = ((m_FILTER_LENGTH*m_FILTER_LENGTH) / 2 + 1);
+  static const int m_SQR_FILT_LENGTH_9SYM = ((9 * 9) / 4 + 1);
+  static const int m_SQR_FILT_LENGTH_7SYM = ((7 * 7) / 4 + 1);
+  static const int m_SQR_FILT_LENGTH_5SYM = ((5 * 5) / 4 + 1);
 #else
-  static const Int m_NUM_BITS              = 9;
-  static const Int m_NO_VAR_BINS           = 16;
-  static const Int m_NO_FILTERS            = 16;
-  static const Int m_MAX_SQR_FILT_LENGTH = ((m_FILTER_LENGTH*m_FILTER_LENGTH) / 2 + 2);
-  static const Int m_SQR_FILT_LENGTH_9SYM = ((9 * 9) / 4 + 2 - 1);
-  static const Int m_SQR_FILT_LENGTH_7SYM = ((7 * 7) / 4 + 2);
-  static const Int m_SQR_FILT_LENGTH_5SYM = ((5 * 5) / 4 + 2);
+  static const int m_NUM_BITS              = 9;
+  static const int m_NO_VAR_BINS           = 16;
+  static const int m_NO_FILTERS            = 16;
+  static const int m_MAX_SQR_FILT_LENGTH = ((m_FILTER_LENGTH*m_FILTER_LENGTH) / 2 + 2);
+  static const int m_SQR_FILT_LENGTH_9SYM = ((9 * 9) / 4 + 2 - 1);
+  static const int m_SQR_FILT_LENGTH_7SYM = ((7 * 7) / 4 + 2);
+  static const int m_SQR_FILT_LENGTH_5SYM = ((5 * 5) / 4 + 2);
 #endif
-  static const Int m_FilterTapsOfType[ALF_NUM_OF_FILTER_TYPES];
+  static const int m_FilterTapsOfType[ALF_NUM_OF_FILTER_TYPES];
 
-  static const Int m_MAX_SCAN_VAL          = 11;
-  static const Int m_MAX_EXP_GOLOMB        = 16;
+  static const int m_MAX_SCAN_VAL          = 11;
+  static const int m_MAX_EXP_GOLOMB        = 16;
 
   // quantized filter coefficients
-  static const Int m_aiSymmetricMag9x9[41];                                         ///< quantization scaling factor for 9x9 filter
-  static const Int m_aiSymmetricMag7x7[25];                                         ///< quantization scaling factor for 7x7 filter
-  static const Int m_aiSymmetricMag5x5[13];                                         ///< quantization scaling factor for 5x5 filter
-  static const Int m_aiSymmetricMag9x7[32];                                         ///< quantization scaling factor for 9x7 filter
+  static const int m_aiSymmetricMag9x9[41];                                         ///< quantization scaling factor for 9x9 filter
+  static const int m_aiSymmetricMag7x7[25];                                         ///< quantization scaling factor for 7x7 filter
+  static const int m_aiSymmetricMag5x5[13];                                         ///< quantization scaling factor for 5x5 filter
+  static const int m_aiSymmetricMag9x7[32];                                         ///< quantization scaling factor for 9x7 filter
 
   // temporary picture buffer
   PelStorage   m_tmpRecExtBuf;                                                     ///< temporary picture buffer for extended reconstructed frame
 
 public:
-  static const Int* m_pDepthIntTab[m_NO_TEST_FILT];
+  static const int* m_pDepthIntTab[m_NO_TEST_FILT];
 
 protected:
 #if JVET_C0038_NO_PREV_FILTERS
-  static const Int m_ALFfilterCoeffFixed[m_NO_FILTERS*JVET_C0038_NO_PREV_FILTERS][21]; /// fixed filters used in ALF.
+  static const int m_ALFfilterCoeffFixed[m_NO_FILTERS*JVET_C0038_NO_PREV_FILTERS][21]; /// fixed filters used in ALF.
 #endif
-  static const Int depthInt9x9Cut[21];
-  static const Int depthInt7x7Cut[14];
-  static const Int depthInt5x5Cut[8];
-  static const Int m_depthInt9x9Sym[21];
-  static const Int m_depthInt7x7Sym[14];
-  static const Int m_depthInt5x5Sym[8];
+  static const int depthInt9x9Cut[21];
+  static const int depthInt7x7Cut[14];
+  static const int depthInt5x5Cut[8];
+  static const int m_depthInt9x9Sym[21];
+  static const int m_depthInt7x7Sym[14];
+  static const int m_depthInt5x5Sym[8];
   // ------------------------------------------------------------------------------------------------------------------
   // For luma component
   // ------------------------------------------------------------------------------------------------------------------
 #if GALF
-  static const Int m_pattern9x9Sym[41];
-  static const Int m_weights9x9Sym[22];
+  static const int m_pattern9x9Sym[41];
+  static const int m_weights9x9Sym[22];
 #else
-  static const Int m_pattern9x9Sym[39];
-  static const Int m_weights9x9Sym[21];
+  static const int m_pattern9x9Sym[39];
+  static const int m_weights9x9Sym[21];
 #endif
-  static const Int m_pattern9x9Sym_Quart[42];
-  static const Int m_pattern7x7Sym[25];
-  static const Int m_weights7x7Sym[14];
-  static const Int m_pattern7x7Sym_Quart[42];
-  static const Int m_pattern5x5Sym[13];
-  static const Int m_weights5x5Sym[8];
-  static const Int m_pattern5x5Sym_Quart[45];
-  static const Int m_pattern9x9Sym_9[39];
-  static const Int m_pattern9x9Sym_7[25];
-  static const Int m_pattern9x9Sym_5[13];
+  static const int m_pattern9x9Sym_Quart[42];
+  static const int m_pattern7x7Sym[25];
+  static const int m_weights7x7Sym[14];
+  static const int m_pattern7x7Sym_Quart[42];
+  static const int m_pattern5x5Sym[13];
+  static const int m_weights5x5Sym[8];
+  static const int m_pattern5x5Sym_Quart[45];
+  static const int m_pattern9x9Sym_9[39];
+  static const int m_pattern9x9Sym_7[25];
+  static const int m_pattern9x9Sym_5[13];
 
-  static const Int m_flTab[m_NO_TEST_FILT];
-  static const Int *m_patternTab[m_NO_TEST_FILT];
-  static const Int *m_patternMapTab[m_NO_TEST_FILT];
-  static const Int *m_weightsTab[m_NO_TEST_FILT];
-  static const Int m_sqrFiltLengthTab[m_NO_TEST_FILT];
-  static const Int m_mapTypeToNumOfTaps[m_NO_TEST_FILT];
+  static const int m_flTab[m_NO_TEST_FILT];
+  static const int *m_patternTab[m_NO_TEST_FILT];
+  static const int *m_patternMapTab[m_NO_TEST_FILT];
+  static const int *m_weightsTab[m_NO_TEST_FILT];
+  static const int m_sqrFiltLengthTab[m_NO_TEST_FILT];
+  static const int m_mapTypeToNumOfTaps[m_NO_TEST_FILT];
 
-  Int       m_img_height,m_img_width;
-  Int       m_nInputBitDepth;
-  Int       m_nInternalBitDepth;
-  Int       m_nBitIncrement;
-  Int       m_nIBDIMax;
+  int       m_img_height,m_img_width;
+  int       m_nInputBitDepth;
+  int       m_nInternalBitDepth;
+  int       m_nBitIncrement;
+  int       m_nIBDIMax;
   ClpRngs   m_clpRngs;
   UInt      m_uiMaxTotalCUDepth;
   UInt      m_uiMaxCUWidth;
   UInt      m_uiNumCUsInFrame; //TODO rename
 
   Pel**     m_imgY_var;
-  Int**     m_imgY_temp;
+  int**     m_imgY_temp;
 
-  Int**     m_imgY_ver;
-  Int**     m_imgY_hor;
-  Int**     m_imgY_dig0;
-  Int**     m_imgY_dig1;
-  Int **    m_filterCoeffFinal;
+  int**     m_imgY_ver;
+  int**     m_imgY_hor;
+  int**     m_imgY_dig0;
+  int**     m_imgY_dig1;
+  int **    m_filterCoeffFinal;
   Pel**     m_varImgMethods;
 
-  Int**     m_filterCoeffSym;
-  Int**     m_filterCoeffPrevSelected;
+  int**     m_filterCoeffSym;
+  int**     m_filterCoeffPrevSelected;
   int16_t**   m_filterCoeffShort;
-  Int**     m_filterCoeffTmp;
-  Int**     m_filterCoeffSymTmp;
+  int**     m_filterCoeffTmp;
+  int**     m_filterCoeffSymTmp;
 
   bool      m_isGALF;
   bool      m_wasCreated;
@@ -287,13 +287,13 @@ protected:
   void xFilterBlkGalf(PelUnitBuf &recDst, const CPelUnitBuf& recSrcExt, const Area& blk, AlfFilterType filtType, const ComponentID compId);
   void xFilterBlkAlf (PelBuf &recDst, const CPelBuf& recSrc, const Area& blk, AlfFilterType filtType);
 
-  void xClassify                 (Pel** classes, const CPelBuf& recSrcBuf, Int pad_size, Int fl);
-  void xClassifyByGeoLaplacian   (Pel** classes, const CPelBuf& srcLumaBuf, Int pad_size, Int fl, const Area& blk);
-  void xClassifyByGeoLaplacianBlk(Pel** classes, const CPelBuf& srcLumaBuf, Int pad_size, Int fl, const Area& blk);
-  Int  selectTransposeVarInd     (Int varInd, Int *transpose);
+  void xClassify                 (Pel** classes, const CPelBuf& recSrcBuf, int pad_size, int fl);
+  void xClassifyByGeoLaplacian   (Pel** classes, const CPelBuf& srcLumaBuf, int pad_size, int fl, const Area& blk);
+  void xClassifyByGeoLaplacianBlk(Pel** classes, const CPelBuf& srcLumaBuf, int pad_size, int fl, const Area& blk);
+  int  selectTransposeVarInd     (int varInd, int *transpose);
 
-  void xClassifyByLaplacian      (Pel** classes, const CPelBuf& srcLumaBuf, Int pad_size, Int fl, const Area& blk);
-  void xClassifyByLaplacianBlk   (Pel** classes, const CPelBuf& srcLumaBuf, Int pad_size, Int fl, const Area& blk);
+  void xClassifyByLaplacian      (Pel** classes, const CPelBuf& srcLumaBuf, int pad_size, int fl, const Area& blk);
+  void xClassifyByLaplacianBlk   (Pel** classes, const CPelBuf& srcLumaBuf, int pad_size, int fl, const Area& blk);
   void xDecodeFilter( ALFParam* pcAlfParam );
 
   // memory allocation
@@ -329,7 +329,7 @@ public:
   virtual ~AdaptiveLoopFilter() {}
 
   // initialize & destroy temporary buffer
-  void create( const Int iPicWidth, Int iPicHeight, const ChromaFormat chromaFormatIDC, const Int uiMaxCUWidth, const UInt uiMaxCUHeight, const UInt uiMaxCUDepth, const Int nInputBitDepth, const Int nInternalBitDepth, const Int numberOfCTUs );
+  void create( const int iPicWidth, int iPicHeight, const ChromaFormat chromaFormatIDC, const int uiMaxCUWidth, const UInt uiMaxCUHeight, const UInt uiMaxCUDepth, const int nInputBitDepth, const int nInternalBitDepth, const int numberOfCTUs );
   void destroy ();
 
   void ALFProcess     ( CodingStructure& cs, ALFParam* pcAlfParam
@@ -353,9 +353,9 @@ public:
 
   void refreshAlfTempPred();
 
-  static Int ALFTapHToTapV     ( Int tapH );
-  static Int ALFTapHToNumCoeff ( Int tapH );
-  static Int ALFFlHToFlV       ( Int flH  );
+  static int ALFTapHToTapV     ( int tapH );
+  static int ALFTapHToNumCoeff ( int tapH );
+  static int ALFFlHToFlV       ( int flH  );
 };
 #endif
 

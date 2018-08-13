@@ -73,7 +73,7 @@ void CABACReader::initCtxModels( Slice& slice )
 #endif
 {
   SliceType sliceType  = slice.getSliceType();
-  Int       qp         = slice.getSliceQp();
+  int       qp         = slice.getSliceQp();
   if( slice.getPPS()->getCabacInitPresentFlag() && slice.getCabacInitFlag() )
   {
     switch( sliceType )
@@ -169,29 +169,29 @@ bool CABACReader::coding_tree_unit( CodingStructure& cs, const UnitArea& area, i
   {
 
     const PreCalcValues& pcv = *cs.pcv;
-    Int                 frame_width_in_ctus = pcv.widthInCtus;
-    Int                 ry = ctuRsAddr / frame_width_in_ctus;
-    Int                 rx = ctuRsAddr - ry * frame_width_in_ctus;
+    int                 frame_width_in_ctus = pcv.widthInCtus;
+    int                 ry = ctuRsAddr / frame_width_in_ctus;
+    int                 rx = ctuRsAddr - ry * frame_width_in_ctus;
     const Position      pos( rx * cs.pcv->maxCUWidth, ry * cs.pcv->maxCUHeight );
     const UInt          curSliceIdx = cs.slice->getIndependentSliceIdx();
 #if HEVC_TILES_WPP
     const UInt          curTileIdx = cs.picture->tileMap->getTileIdxMap( pos );
-    bool                leftMergeAvail = cs.getCURestricted( pos.offset( -(Int)pcv.maxCUWidth, 0 ), curSliceIdx, curTileIdx, CH_L ) ? true : false;
-    bool                aboveMergeAvail = cs.getCURestricted( pos.offset( 0, -(Int)pcv.maxCUHeight ), curSliceIdx, curTileIdx, CH_L ) ? true : false;
+    bool                leftMergeAvail = cs.getCURestricted( pos.offset( -(int)pcv.maxCUWidth, 0 ), curSliceIdx, curTileIdx, CH_L ) ? true : false;
+    bool                aboveMergeAvail = cs.getCURestricted( pos.offset( 0, -(int)pcv.maxCUHeight ), curSliceIdx, curTileIdx, CH_L ) ? true : false;
 #else
-    bool                leftAvail = cs.getCURestricted( pos.offset( -(Int)pcv.maxCUWidth, 0 ), curSliceIdx, CH_L ) ? true : false;
-    bool                aboveAvail = cs.getCURestricted( pos.offset( 0, -(Int)pcv.maxCUHeight ), curSliceIdx, CH_L ) ? true : false;
+    bool                leftAvail = cs.getCURestricted( pos.offset( -(int)pcv.maxCUWidth, 0 ), curSliceIdx, CH_L ) ? true : false;
+    bool                aboveAvail = cs.getCURestricted( pos.offset( 0, -(int)pcv.maxCUHeight ), curSliceIdx, CH_L ) ? true : false;
 #endif
 
-    Int leftCTUAddr = leftAvail ? ctuRsAddr - 1 : -1;
-    Int aboveCTUAddr = aboveAvail ? ctuRsAddr - frame_width_in_ctus : -1;
+    int leftCTUAddr = leftAvail ? ctuRsAddr - 1 : -1;
+    int aboveCTUAddr = aboveAvail ? ctuRsAddr - frame_width_in_ctus : -1;
 
-    for( Int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++ )
+    for( int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++ )
     {
       if( alfSliceParam.enabledFlag[compIdx] )
       {
         uint8_t* ctbAlfFlag = cs.slice->getPic()->getAlfCtuEnableFlag( compIdx );
-        Int ctx = 0;
+        int ctx = 0;
         ctx += leftCTUAddr > -1 ? ( ctbAlfFlag[leftCTUAddr] ? 1 : 0 ) : 0;
         ctx += aboveCTUAddr > -1 ? ( ctbAlfFlag[aboveCTUAddr] ? 1 : 0 ) : 0;
 
@@ -290,9 +290,9 @@ void CABACReader::sao( CodingStructure& cs, unsigned ctuRsAddr )
   RExt__DECODER_DEBUG_BIT_STATISTICS_CREATE_SET( STATS__CABAC_BITS__SAO );
 
 #if HEVC_TILES_WPP
-  if( cs.getCURestricted( pos.offset(-(Int)cs.pcv->maxCUWidth, 0), curSliceIdx, curTileIdx, CH_L ) )
+  if( cs.getCURestricted( pos.offset(-(int)cs.pcv->maxCUWidth, 0), curSliceIdx, curTileIdx, CH_L ) )
 #else
-  if( cs.getCURestricted( pos.offset(-(Int)cs.pcv->maxCUWidth, 0), curSliceIdx, CH_L ) )
+  if( cs.getCURestricted( pos.offset(-(int)cs.pcv->maxCUWidth, 0), curSliceIdx, CH_L ) )
 #endif
   {
     // sao_merge_left_flag
@@ -300,9 +300,9 @@ void CABACReader::sao( CodingStructure& cs, unsigned ctuRsAddr )
   }
 
 #if HEVC_TILES_WPP
-  if( sao_merge_type < 0 && cs.getCURestricted( pos.offset(0, -(Int)cs.pcv->maxCUHeight), curSliceIdx, curTileIdx, CH_L ) )
+  if( sao_merge_type < 0 && cs.getCURestricted( pos.offset(0, -(int)cs.pcv->maxCUHeight), curSliceIdx, curTileIdx, CH_L ) )
 #else
-  if( sao_merge_type < 0 && cs.getCURestricted( pos.offset(0, -(Int)cs.pcv->maxCUHeight), curSliceIdx, CH_L ) )
+  if( sao_merge_type < 0 && cs.getCURestricted( pos.offset(0, -(int)cs.pcv->maxCUHeight), curSliceIdx, CH_L ) )
 #endif
   {
     // sao_merge_above_flag
@@ -414,7 +414,7 @@ void CABACReader::sao( CodingStructure& cs, unsigned ctuRsAddr )
 UInt CABACReader::parseAlfUvlc ()
 {
   UInt uiCode;
-  Int  i;
+  int  i;
 
   uiCode = m_BinDecoder.decodeBinEP();
   if ( uiCode == 0 )
@@ -432,11 +432,11 @@ UInt CABACReader::parseAlfUvlc ()
   return i;
 }
 
-Int CABACReader::parseAlfSvlc()
+int CABACReader::parseAlfSvlc()
 {
   UInt uiCode;
-  Int  iSign;
-  Int  i;
+  int  iSign;
+  int  i;
 
   uiCode = m_BinDecoder.decodeBinEP();
   if ( uiCode == 0 )
@@ -516,13 +516,13 @@ UInt CABACReader::xReadEpExGolomb(UInt uiCount)
   return uiSymbol;
 }
 
-Int CABACReader::alfGolombDecode(Int k)
+int CABACReader::alfGolombDecode(int k)
 {
   UInt uiSymbol;
-  Int q = -1;
-  Int nr = 0;
-  Int m = (Int)pow(2.0, k);
-  Int a;
+  int q = -1;
+  int nr = 0;
+  int m = (int)pow(2.0, k);
+  int a;
 
   uiSymbol = 1;
   while (uiSymbol)
@@ -616,15 +616,15 @@ void CABACReader::alf( CodingStructure& cs )
 
 void CABACReader::alf_aux( ALFParam& alfParam, bool isGALF )
 {
-  Int FiltTab[3] = {5, 7, 9};
-  Int sqrFiltLengthTab[3] = {AdaptiveLoopFilter::m_SQR_FILT_LENGTH_5SYM, AdaptiveLoopFilter::m_SQR_FILT_LENGTH_7SYM, AdaptiveLoopFilter::m_SQR_FILT_LENGTH_9SYM };
+  int FiltTab[3] = {5, 7, 9};
+  int sqrFiltLengthTab[3] = {AdaptiveLoopFilter::m_SQR_FILT_LENGTH_5SYM, AdaptiveLoopFilter::m_SQR_FILT_LENGTH_7SYM, AdaptiveLoopFilter::m_SQR_FILT_LENGTH_9SYM };
 
   UInt uiSymbol;
   const int iNoVarBins = AdaptiveLoopFilter::m_NO_VAR_BINS;
   int i;
   if( isGALF )
   {
-    memset(alfParam.filterPattern, 0, sizeof(Int)*AdaptiveLoopFilter::m_NO_VAR_BINS);
+    memset(alfParam.filterPattern, 0, sizeof(int)*AdaptiveLoopFilter::m_NO_VAR_BINS);
     //number of total filters
     xReadTruncBinCode(uiSymbol, iNoVarBins);
     alfParam.filters_per_group = uiSymbol + 1;
@@ -643,17 +643,17 @@ void CABACReader::alf_aux( ALFParam& alfParam, bool isGALF )
       for (i = 0; i< iNoVarBins; i++)
       {
         xReadTruncBinCode(uiSymbol, (UInt)alfParam.filters_per_group);
-        alfParam.filterPattern[i] = (Int)uiSymbol;
+        alfParam.filterPattern[i] = (int)uiSymbol;
       }
     }
     else
     {
-      memset(alfParam.filterPattern, 0, iNoVarBins* sizeof(Int));
+      memset(alfParam.filterPattern, 0, iNoVarBins* sizeof(int));
     }
 
 #if JVET_C0038_NO_PREV_FILTERS
-    Int decodetab_pred[3] = { 1, 0, 2 };
-    memset(alfParam.PrevFiltIdx, 0, sizeof(Int)*AdaptiveLoopFilter::m_NO_VAR_BINS);
+    int decodetab_pred[3] = { 1, 0, 2 };
+    memset(alfParam.PrevFiltIdx, 0, sizeof(int)*AdaptiveLoopFilter::m_NO_VAR_BINS);
 
     if (alfParam.iAvailableFilters > 0)
     {
@@ -664,7 +664,7 @@ void CABACReader::alf_aux( ALFParam& alfParam, bool isGALF )
 
       if (alfParam.iPredPattern == 0)
       {
-        memset(alfParam.PrevFiltIdx, 0, sizeof(Int)*AdaptiveLoopFilter::m_NO_VAR_BINS);
+        memset(alfParam.PrevFiltIdx, 0, sizeof(int)*AdaptiveLoopFilter::m_NO_VAR_BINS);
       }
       else
       {
@@ -703,7 +703,7 @@ void CABACReader::alf_aux( ALFParam& alfParam, bool isGALF )
   else
   {
     alfParam.filters_per_group = 0;
-    memset ( alfParam.filterPattern, 0 , sizeof(Int)*AdaptiveLoopFilter::m_NO_VAR_BINS);
+    memset ( alfParam.filterPattern, 0 , sizeof(int)*AdaptiveLoopFilter::m_NO_VAR_BINS);
 
     AlfFilterMode fMode = (AlfFilterMode) parseAlfUvlc();
 
@@ -737,7 +737,7 @@ void CABACReader::alf_aux( ALFParam& alfParam, bool isGALF )
   }
 
  memset( alfParam.mapClassToFilter, 0, AdaptiveLoopFilter::m_NO_VAR_BINS * sizeof(int));
- for(Int i = 1; i < AdaptiveLoopFilter::m_NO_VAR_BINS; ++i)
+ for(int i = 1; i < AdaptiveLoopFilter::m_NO_VAR_BINS; ++i)
  {
    if( alfParam.filterPattern[i])
    {
@@ -758,7 +758,7 @@ void CABACReader::alf_filter( ALFParam& alfParam, bool isGALF, bool bChroma )
   int golombIndexBit;
   int kMin;
   int maxScanVal = 0;
-  const Int* pDepthInt = nullptr;
+  const int* pDepthInt = nullptr;
 
 #if FORCE0
   if (!bChroma)
@@ -839,7 +839,7 @@ void CABACReader::alf_filter( ALFParam& alfParam, bool isGALF, bool bChroma )
 #endif
   if( bChroma && isGALF)
   {
-    Int iNumCoeffMinus1 = alfParam.num_coeff_chroma - 1;
+    int iNumCoeffMinus1 = alfParam.num_coeff_chroma - 1;
     for (i = 0; i < iNumCoeffMinus1; i++)
     {
       scanPos = pDepthInt[i] - 1;
@@ -929,7 +929,7 @@ void CABACReader::alf_chroma( ALFParam& alfParam )
     alfParam.tap_chroma = (parseAlfUvlc() <<1 ) + 5;
     alfParam.num_coeff_chroma = ((alfParam.tap_chroma*alfParam.tap_chroma+1) >> 1) + 1;
     // filter coefficients for chroma
-    for(Int pos=0; pos<alfParam.num_coeff_chroma; pos++)
+    for(int pos=0; pos<alfParam.num_coeff_chroma; pos++)
     {
       alfParam.coeff_chroma[pos] = parseAlfSvlc();
     }
@@ -3079,7 +3079,7 @@ int CABACReader::last_sig_coeff( CoeffCodingContext& cctx )
   {
     UInt uiTemp  = 0;
     UInt uiCount = ( PosLastX - 2 ) >> 1;
-    for ( Int i = uiCount - 1; i >= 0; i-- )
+    for ( int i = uiCount - 1; i >= 0; i-- )
     {
       uiTemp += m_BinDecoder.decodeBinEP( ) << i;
     }
@@ -3089,7 +3089,7 @@ int CABACReader::last_sig_coeff( CoeffCodingContext& cctx )
   {
     UInt uiTemp  = 0;
     UInt uiCount = ( PosLastY - 2 ) >> 1;
-    for ( Int i = uiCount - 1; i >= 0; i-- )
+    for ( int i = uiCount - 1; i >= 0; i-- )
     {
       uiTemp += m_BinDecoder.decodeBinEP( ) << i;
     }

@@ -74,8 +74,8 @@ class EncLib : public EncCfg
 {
 private:
   // picture
-  Int                       m_iPOCLast;                           ///< time index (POC)
-  Int                       m_iNumPicRcvd;                        ///< number of received pictures
+  int                       m_iPOCLast;                           ///< time index (POC)
+  int                       m_iNumPicRcvd;                        ///< number of received pictures
   UInt                      m_uiNumAllPicCoded;                   ///< number of coded pictures
   PicList                   m_cListPic;                           ///< dynamic list of pictures
 
@@ -153,7 +153,7 @@ public:
 #endif
 
 protected:
-  void  xGetNewPicBuffer  ( std::list<PelUnitBuf*>& rcListPicYuvRecOut, Picture*& rpcPic, Int ppsId ); ///< get picture buffer which will be processed. If ppsId<0, then the ppsMap will be queried for the first match.
+  void  xGetNewPicBuffer  ( std::list<PelUnitBuf*>& rcListPicYuvRecOut, Picture*& rpcPic, int ppsId ); ///< get picture buffer which will be processed. If ppsId<0, then the ppsMap will be queried for the first match.
 #if HEVC_VPS
   void  xInitVPS          (VPS &vps, const SPS &sps); ///< initialize VPS from encoder options
 #endif
@@ -230,11 +230,11 @@ public:
 #endif
   RateCtrl*               getRateCtrl           ()              { return  &m_cRateCtrl;            }
 
-  void selectReferencePictureSet(Slice* slice, Int POCCurr, Int GOPid );
-  Int getReferencePictureSetIdxForSOP(Int POCCurr, Int GOPid );
+  void selectReferencePictureSet(Slice* slice, int POCCurr, int GOPid );
+  int getReferencePictureSetIdxForSOP(int POCCurr, int GOPid );
 
-  bool                   PPSNeedsWriting(Int ppsId);
-  bool                   SPSNeedsWriting(Int spsId);
+  bool                   PPSNeedsWriting(int ppsId);
+  bool                   SPSNeedsWriting(int spsId);
   const PPS* getPPS( int Id ) { return m_ppsMap.getPS( Id); }
 
 #if ENABLE_SPLIT_PARALLELISM || ENABLE_WPP_PARALLELISM
@@ -251,14 +251,14 @@ public:
                PelStorage* pcPicYuvOrg,
                PelStorage* pcPicYuvTrueOrg, const InputColourSpaceConversion snrCSC, // used for SNR calculations. Picture in original colour space.
                std::list<PelUnitBuf*>& rcListPicYuvRecOut,
-               Int& iNumEncoded );
+               int& iNumEncoded );
 
   /// encode several number of pictures until end-of-sequence
   void encode( bool bEos,
                PelStorage* pcPicYuvOrg,
                PelStorage* pcPicYuvTrueOrg, const InputColourSpaceConversion snrCSC, // used for SNR calculations. Picture in original colour space.
                std::list<PelUnitBuf*>& rcListPicYuvRecOut,
-               Int& iNumEncoded, bool isTff );
+               int& iNumEncoded, bool isTff );
 
 
   void printSummary(bool isField) { m_cGOPEncoder.printOutSummary (m_uiNumAllPicCoded, isField, m_printMSEBasedSequencePSNR, m_printSequenceMSE, m_spsMap.getFirstPS()->getBitDepths()); }

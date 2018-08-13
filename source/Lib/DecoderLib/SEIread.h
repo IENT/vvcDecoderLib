@@ -90,7 +90,7 @@ protected:
 
   void sei_read_code(std::ostream *pOS, UInt uiLength, UInt& ruiCode, const char *pSymbolName);
   void sei_read_uvlc(std::ostream *pOS,                UInt& ruiCode, const char *pSymbolName);
-  void sei_read_svlc(std::ostream *pOS,                Int&  ruiCode, const char *pSymbolName);
+  void sei_read_svlc(std::ostream *pOS,                int&  ruiCode, const char *pSymbolName);
   void sei_read_flag(std::ostream *pOS,                UInt& ruiCode, const char *pSymbolName);
 };
 

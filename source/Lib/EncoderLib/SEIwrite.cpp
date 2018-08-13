@@ -240,7 +240,7 @@ void SEIWriter::xWriteSEIActiveParameterSets(const SEIActiveParameterSets& sei)
 
   CHECK(sei.activeSeqParameterSetId.size() != (sei.numSpsIdsMinus1 + 1), "Unknown active SPS");
 
-  for (Int i = 0; i < sei.activeSeqParameterSetId.size(); i++)
+  for (int i = 0; i < sei.activeSeqParameterSetId.size(); i++)
   {
     WRITE_UVLC(sei.activeSeqParameterSetId[i], "active_seq_parameter_set_id");
   }
@@ -263,7 +263,7 @@ void SEIWriter::xWriteSEIDecodingUnitInfo(const SEIDecodingUnitInfo& sei, const 
 
 void SEIWriter::xWriteSEIBufferingPeriod(const SEIBufferingPeriod& sei, const SPS *sps)
 {
-  Int i, nalOrVcl;
+  int i, nalOrVcl;
   const VUI *vui = sps->getVuiParameters();
   const HRD *hrd = vui->getHrdParameters();
 
@@ -299,7 +299,7 @@ void SEIWriter::xWriteSEIBufferingPeriod(const SEIBufferingPeriod& sei, const SP
 }
 void SEIWriter::xWriteSEIPictureTiming(const SEIPictureTiming& sei, const SPS *sps)
 {
-  Int i;
+  int i;
   const VUI *vui = sps->getVuiParameters();
   const HRD *hrd = vui->getHrdParameters();
 
@@ -389,7 +389,7 @@ void SEIWriter::xWriteSEISegmentedRectFramePacking(const SEISegmentedRectFramePa
 
 void SEIWriter::xWriteSEIToneMappingInfo(const SEIToneMappingInfo& sei)
 {
-  Int i;
+  int i;
   WRITE_UVLC( sei.m_toneMapId,                    "tone_map_id" );
   WRITE_FLAG( sei.m_toneMapCancelFlag,            "tone_map_cancel_flag" );
   if( !sei.m_toneMapCancelFlag )
@@ -560,7 +560,7 @@ void SEIWriter::xWriteSEITempMotionConstrainedTileSets(const SEITempMotionConstr
 
     if(sei.getNumberOfTileSets() > 0)
     {
-      for(Int i = 0; i < sei.getNumberOfTileSets(); i++)
+      for(int i = 0; i < sei.getNumberOfTileSets(); i++)
       {
         WRITE_UVLC(sei.tileSetData(i).m_mcts_id, "mcts_id");
 
@@ -571,7 +571,7 @@ void SEIWriter::xWriteSEITempMotionConstrainedTileSets(const SEITempMotionConstr
 
         WRITE_UVLC((sei.tileSetData(i).getNumberOfTileRects() - 1), "num_tile_rects_in_set_minus1");
 
-        for(Int j = 0; j < sei.tileSetData(i).getNumberOfTileRects(); j++)
+        for(int j = 0; j < sei.tileSetData(i).getNumberOfTileRects(); j++)
         {
           WRITE_UVLC(sei.tileSetData(i).topLeftTileIndex    (j), "top_left_tile_index");
           WRITE_UVLC(sei.tileSetData(i).bottomRightTileIndex(j), "bottom_right_tile_index");
@@ -608,7 +608,7 @@ void SEIWriter::xWriteSEITempMotionConstrainedTileSets(const SEITempMotionConstr
 void SEIWriter::xWriteSEITimeCode(const SEITimeCode& sei)
 {
   WRITE_CODE(sei.numClockTs, 2, "num_clock_ts");
-  for(Int i = 0; i < sei.numClockTs; i++)
+  for(int i = 0; i < sei.numClockTs; i++)
   {
     const SEITimeSet &currentTimeSet = sei.timeSetArray[i];
     WRITE_FLAG(currentTimeSet.clockTimeStampFlag, "clock_time_stamp_flag");
@@ -673,15 +673,15 @@ void SEIWriter::xWriteSEIChromaResamplingFilterHint(const SEIChromaResamplingFil
     WRITE_UVLC(sei.m_targetFormatIdc, "target_format_idc");
     if(sei.m_verChromaFilterIdc == 1)
     {
-      const Int numVerticalFilter = (Int)sei.m_verFilterCoeff.size();
+      const int numVerticalFilter = (int)sei.m_verFilterCoeff.size();
       WRITE_UVLC(numVerticalFilter, "num_vertical_filters");
       if(numVerticalFilter > 0)
       {
-        for(Int i = 0; i < numVerticalFilter; i ++)
+        for(int i = 0; i < numVerticalFilter; i ++)
         {
-          const Int verTapLengthMinus1 = (Int) sei.m_verFilterCoeff[i].size() - 1;
+          const int verTapLengthMinus1 = (int) sei.m_verFilterCoeff[i].size() - 1;
           WRITE_UVLC(verTapLengthMinus1, "ver_tap_length_minus_1");
-          for(Int j = 0; j < (verTapLengthMinus1 + 1); j ++)
+          for(int j = 0; j < (verTapLengthMinus1 + 1); j ++)
           {
             WRITE_SVLC(sei.m_verFilterCoeff[i][j], "ver_filter_coeff");
           }
@@ -690,15 +690,15 @@ void SEIWriter::xWriteSEIChromaResamplingFilterHint(const SEIChromaResamplingFil
     }
     if(sei.m_horChromaFilterIdc == 1)
     {
-      const Int numHorizontalFilter = (Int) sei.m_horFilterCoeff.size();
+      const int numHorizontalFilter = (int) sei.m_horFilterCoeff.size();
       WRITE_UVLC(numHorizontalFilter, "num_horizontal_filters");
       if(numHorizontalFilter > 0)
       {
-        for(Int i = 0; i < numHorizontalFilter; i ++)
+        for(int i = 0; i < numHorizontalFilter; i ++)
         {
-          const Int horTapLengthMinus1 = (Int) sei.m_horFilterCoeff[i].size() - 1;
+          const int horTapLengthMinus1 = (int) sei.m_horFilterCoeff[i].size() - 1;
           WRITE_UVLC(horTapLengthMinus1, "hor_tap_length_minus_1");
-          for(Int j = 0; j < (horTapLengthMinus1 + 1); j ++)
+          for(int j = 0; j < (horTapLengthMinus1 + 1); j ++)
           {
             WRITE_SVLC(sei.m_horFilterCoeff[i][j], "hor_filter_coeff");
           }
@@ -720,7 +720,7 @@ void SEIWriter::xWriteSEIKneeFunctionInfo(const SEIKneeFunctionInfo &sei)
     WRITE_CODE( (UInt)sei.m_kneeOutputDrange, 32,  "output_d_range" );
     WRITE_CODE( (UInt)sei.m_kneeOutputDispLuminance, 32,  "output_disp_luminance" );
     WRITE_UVLC( sei.m_kneeNumKneePointsMinus1, "num_knee_points_minus1" );
-    for(Int i = 0; i <= sei.m_kneeNumKneePointsMinus1; i++ )
+    for(int i = 0; i <= sei.m_kneeNumKneePointsMinus1; i++ )
     {
       WRITE_CODE( (UInt)sei.m_kneeInputKneePoint[i], 10,"input_knee_point" );
       WRITE_CODE( (UInt)sei.m_kneeOutputKneePoint[i], 10, "output_knee_point" );
@@ -745,12 +745,12 @@ void SEIWriter::xWriteSEIColourRemappingInfo(const SEIColourRemappingInfo& sei)
     }
     WRITE_CODE( sei.m_colourRemapInputBitDepth,             8, "colour_remap_input_bit_depth" );
     WRITE_CODE( sei.m_colourRemapBitDepth,                  8, "colour_remap_bit_depth" );
-    for( Int c=0 ; c<3 ; c++ )
+    for( int c=0 ; c<3 ; c++ )
     {
       WRITE_CODE( sei.m_preLutNumValMinus1[c],              8, "pre_lut_num_val_minus1[c]" );
       if( sei.m_preLutNumValMinus1[c]>0 )
       {
-        for( Int i=0 ; i<=sei.m_preLutNumValMinus1[c] ; i++ )
+        for( int i=0 ; i<=sei.m_preLutNumValMinus1[c] ; i++ )
         {
           WRITE_CODE( sei.m_preLut[c][i].codedValue,  (( sei.m_colourRemapInputBitDepth + 7 ) >> 3 ) << 3, "pre_lut_coded_value[c][i]" );
           WRITE_CODE( sei.m_preLut[c][i].targetValue, (( sei.m_colourRemapBitDepth      + 7 ) >> 3 ) << 3, "pre_lut_target_value[c][i]" );
@@ -761,21 +761,21 @@ void SEIWriter::xWriteSEIColourRemappingInfo(const SEIColourRemappingInfo& sei)
     if( sei.m_colourRemapMatrixPresentFlag )
     {
       WRITE_CODE( sei.m_log2MatrixDenom,                    4, "log2_matrix_denom" );
-      for( Int c=0 ; c<3 ; c++ )
+      for( int c=0 ; c<3 ; c++ )
       {
-        for( Int i=0 ; i<3 ; i++ )
+        for( int i=0 ; i<3 ; i++ )
         {
           WRITE_SVLC( sei.m_colourRemapCoeffs[c][i],           "colour_remap_coeffs[c][i]" );
         }
       }
     }
 
-    for( Int c=0 ; c<3 ; c++ )
+    for( int c=0 ; c<3 ; c++ )
     {
       WRITE_CODE( sei.m_postLutNumValMinus1[c],             8, "m_postLutNumValMinus1[c]" );
       if( sei.m_postLutNumValMinus1[c]>0 )
       {
-        for( Int i=0 ; i<=sei.m_postLutNumValMinus1[c] ; i++ )
+        for( int i=0 ; i<=sei.m_postLutNumValMinus1[c] ; i++ )
         {
           WRITE_CODE( sei.m_postLut[c][i].codedValue, (( sei.m_colourRemapBitDepth + 7 ) >> 3 ) << 3, "post_lut_coded_value[c][i]" );
           WRITE_CODE( sei.m_postLut[c][i].targetValue, (( sei.m_colourRemapBitDepth + 7 ) >> 3 ) << 3, "post_lut_target_value[c][i]" );

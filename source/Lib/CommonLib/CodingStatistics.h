@@ -223,7 +223,7 @@ public:
   {
   }
 
-  CodingStatisticsClassType( const CodingStatisticsType t, const Int width, const Int height ) : type( t ), subClass( gp_sizeIdxInfo->idxFrom( height ) * CODING_STATS_NUM_WIDTHS + gp_sizeIdxInfo->idxFrom( width ) )
+  CodingStatisticsClassType( const CodingStatisticsType t, const int width, const int height ) : type( t ), subClass( gp_sizeIdxInfo->idxFrom( height ) * CODING_STATS_NUM_WIDTHS + gp_sizeIdxInfo->idxFrom( width ) )
   {
   }
 
@@ -398,7 +398,7 @@ public:
     int64_t cr = 0; // CABAC remainder, which is added to "STATS__CABAC_INITIALISATION"
     {
       int64_t totalCABACbits = 0, roundedCABACbits = 0;
-      for( Int i = STATS__NAL_UNIT_PACKING; i < STATS__NUM_STATS; i++ )
+      for( int i = STATS__NAL_UNIT_PACKING; i < STATS__NUM_STATS; i++ )
       {
         int64_t classCount = 0;
 
@@ -435,7 +435,7 @@ public:
     SStat statTotals_cabac[CODING_STATS_NUM_SUBCLASSES];
     SStat statTotals_ep   [CODING_STATS_NUM_SUBCLASSES];
 
-    for( Int i = 0; i < STATS__NUM_STATS; i++ )
+    for( int i = 0; i < STATS__NUM_STATS; i++ )
     {
       SStat cabacSubTotal, epSubTotal;
       cabacSubTotal.classCount = classCounts[i];
@@ -599,7 +599,7 @@ public:
 
   static SStat &GetStatisticEP    ( const char *pKey )                     { return GetStatisticEP( std::string( pKey ) ); }
 
-  static int getNumOnes( Int bins )
+  static int getNumOnes( int bins )
   {
     CHECK( bins < 0, "Bins should not be nagative" );
 
@@ -612,7 +612,7 @@ public:
     return count;
   }
 
-  static void IncrementStatisticEP( const CodingStatisticsClassType &stat, const Int numBits, const Int value )
+  static void IncrementStatisticEP( const CodingStatisticsClassType &stat, const int numBits, const int value )
   {
     CHECK( stat.type == STATS__CABAC_BITS__INVALID, "Should never be used." );
     SStat &s = GetStatisticEP( stat );
@@ -621,7 +621,7 @@ public:
     s.sum   += getNumOnes( value );
   }
 
-  static void IncrementStatisticEP( const std::string &str, const Int numBits, const Int value )
+  static void IncrementStatisticEP( const std::string &str, const int numBits, const int value )
   {
     SStat &s = GetStatisticEP( str );
     s.bits  += numBits;
@@ -629,7 +629,7 @@ public:
     s.sum   += getNumOnes( value );
   }
 
-  static void IncrementStatisticEP( const char *pKey, const Int numBits, const Int value )
+  static void IncrementStatisticEP( const char *pKey, const int numBits, const int value )
   {
     SStat &s = GetStatisticEP( pKey );
     s.bits  += numBits;
@@ -639,7 +639,7 @@ public:
 
   StatLogValue values;
 
-  static void UpdateCABACStat( const CodingStatisticsClassType &stat, UInt uiRangeBefore, UInt uiRangeAfter, Int val )
+  static void UpdateCABACStat( const CodingStatisticsClassType &stat, UInt uiRangeBefore, UInt uiRangeAfter, int val )
   {
     CHECK( stat.type == STATS__CABAC_BITS__INVALID, "Should never be used." );
     CodingStatistics &inst = GetSingletonInstance();

@@ -122,7 +122,7 @@ void AreaBuf<Pel>::addAvg( const AreaBuf<const Pel> &other1, const AreaBuf<const
   const unsigned src2Stride = other2.stride;
   const unsigned destStride =        stride;
   const int     clipbd      = clpRng.bd;
-  const int     shiftNum    = std::max<Int>(2, (IF_INTERNAL_PREC - clipbd)) + 1;
+  const int     shiftNum    = std::max<int>(2, (IF_INTERNAL_PREC - clipbd)) + 1;
   const int     offset      = (1 << (shiftNum - 1)) + 2 * IF_INTERNAL_OFFS;
 
 #if ENABLE_SIMD_OPT_BUFFER && defined(TARGET_SIMD_X86)
@@ -156,9 +156,9 @@ void AreaBuf<Pel>::toLast( const ClpRng& clpRng )
         Pel* src       = buf;
   const UInt srcStride = stride;
 
-  const Int  clipbd    = clpRng.bd;
-  const Int  shiftNum  = std::max<Int>(2, (IF_INTERNAL_PREC - clipbd));
-  const Int  offset    = ( 1 << ( shiftNum - 1 ) ) + IF_INTERNAL_OFFS;
+  const int  clipbd    = clpRng.bd;
+  const int  shiftNum  = std::max<int>(2, (IF_INTERNAL_PREC - clipbd));
+  const int  offset    = ( 1 << ( shiftNum - 1 ) ) + IF_INTERNAL_OFFS;
 
   if (width == 1)
   {
@@ -166,9 +166,9 @@ void AreaBuf<Pel>::toLast( const ClpRng& clpRng )
   }
   else if (width&2)
   {
-    for ( Int y = 0; y < height; y++ )
+    for ( int y = 0; y < height; y++ )
     {
-      for (Int x=0 ; x < width; x+=2 )
+      for (int x=0 ; x < width; x+=2 )
       {
         src[x + 0] = ClipPel( rightShift( ( src[x + 0] + offset ), shiftNum ), clpRng );
         src[x + 1] = ClipPel( rightShift( ( src[x + 1] + offset ), shiftNum ), clpRng );
@@ -178,9 +178,9 @@ void AreaBuf<Pel>::toLast( const ClpRng& clpRng )
   }
   else
   {
-    for ( Int y = 0; y < height; y++ )
+    for ( int y = 0; y < height; y++ )
     {
-      for (Int x=0 ; x < width; x+=4 )
+      for (int x=0 ; x < width; x+=4 )
       {
         src[x + 0] = ClipPel( rightShift( ( src[x + 0] + offset ), shiftNum ), clpRng );
         src[x + 1] = ClipPel( rightShift( ( src[x + 1] + offset ), shiftNum ), clpRng );

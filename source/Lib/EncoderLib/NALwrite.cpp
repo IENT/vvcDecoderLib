@@ -89,7 +89,7 @@ void write(ostream& out, OutputNALUnit& nalu)
   vector<uint8_t> outputBuffer;
   outputBuffer.resize(rbsp.size()*2+1); //there can never be enough emulation_prevention_three_bytes to require this much space
   std::size_t outputAmount = 0;
-  Int         zeroCount    = 0;
+  int         zeroCount    = 0;
   for (vector<uint8_t>::iterator it = rbsp.begin(); it != rbsp.end(); it++)
   {
     const uint8_t v=(*it);

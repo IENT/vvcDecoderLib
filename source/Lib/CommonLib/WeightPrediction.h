@@ -56,8 +56,8 @@ public:
   WeightPrediction();
 
   void  getWpScaling(           const Slice                *slice,
-                                const Int                  &iRefIdx0,
-                                const Int                  &iRefIdx1,
+                                const int                  &iRefIdx0,
+                                const int                  &iRefIdx1,
                                       WPScalingParam      *&wp0,
                                       WPScalingParam      *&wp1,
                                 const ComponentID           maxNumComp = MAX_NUM_COMPONENT );
@@ -81,7 +81,7 @@ public:
                                 const CPelUnitBuf          &pcYuvSrc,
                                 const RefPicList           &eRefPicList,
                                       PelUnitBuf           &pcYuvPred,
-                                const Int                   iRefIdx=-1,
+                                const int                   iRefIdx=-1,
                                 const ComponentID           maxNumComp = MAX_NUM_COMPONENT);
 
   void  xWeightedPredictionBi(  const PredictionUnit       &pu,

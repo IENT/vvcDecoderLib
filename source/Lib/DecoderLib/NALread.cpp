@@ -89,7 +89,7 @@ static void convertPayloadToRBSP(vector<uint8_t>& nalUnitBuf, InputBitstream *bi
   if (isVclNalUnit)
   {
     // Remove cabac_zero_word from payload if present
-    Int n = 0;
+    int n = 0;
 
     while (it_write[-1] == 0x00)
     {

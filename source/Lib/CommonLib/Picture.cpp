@@ -513,11 +513,11 @@ void TileMap::initTileMap( const SPS& sps, const PPS& pps )
   if( pps.getTileUniformSpacingFlag() )
   {
     //set width and height for each (uniform) tile
-    for(Int row=0; row < numTileRows; row++)
+    for(int row=0; row < numTileRows; row++)
     {
-      for(Int col=0; col < numTileColumns; col++)
+      for(int col=0; col < numTileColumns; col++)
       {
-        const Int tileIdx = row * numTileColumns + col;
+        const int tileIdx = row * numTileColumns + col;
         tiles[tileIdx].setTileWidthInCtus(  (col+1)*frameWidthInCtus/numTileColumns - (col*frameWidthInCtus)/numTileColumns );
         tiles[tileIdx].setTileHeightInCtus( (row+1)*frameHeightInCtus/numTileRows   - (row*frameHeightInCtus)/numTileRows );
       }
@@ -526,10 +526,10 @@ void TileMap::initTileMap( const SPS& sps, const PPS& pps )
   else
   {
     //set the width for each tile
-    for(Int row=0; row < numTileRows; row++)
+    for(int row=0; row < numTileRows; row++)
     {
-      Int cumulativeTileWidth = 0;
-      for(Int col=0; col < numTileColumns - 1; col++)
+      int cumulativeTileWidth = 0;
+      for(int col=0; col < numTileColumns - 1; col++)
       {
         tiles[row * numTileColumns + col].setTileWidthInCtus( pps.getTileColumnWidth(col) );
         cumulativeTileWidth += pps.getTileColumnWidth(col);
@@ -538,10 +538,10 @@ void TileMap::initTileMap( const SPS& sps, const PPS& pps )
     }
 
     //set the height for each tile
-    for(Int col=0; col < numTileColumns; col++)
+    for(int col=0; col < numTileColumns; col++)
     {
-      Int cumulativeTileHeight = 0;
-      for(Int row=0; row < numTileRows - 1; row++)
+      int cumulativeTileHeight = 0;
+      for(int row=0; row < numTileRows - 1; row++)
       {
         tiles[row * numTileColumns + col].setTileHeightInCtus( pps.getTileRowHeight(row) );
         cumulativeTileHeight += pps.getTileRowHeight(row);
@@ -551,9 +551,9 @@ void TileMap::initTileMap( const SPS& sps, const PPS& pps )
   }
 
   // Tile size check
-  Int minWidth  = 1;
-  Int minHeight = 1;
-  const Int profileIdc = sps.getPTL()->getGeneralPTL()->getProfileIdc();
+  int minWidth  = 1;
+  int minHeight = 1;
+  const int profileIdc = sps.getPTL()->getGeneralPTL()->getProfileIdc();
   if (  profileIdc == Profile::MAIN || profileIdc == Profile::MAIN10)
   {
     if (pps.getTilesEnabledFlag())
@@ -562,34 +562,34 @@ void TileMap::initTileMap( const SPS& sps, const PPS& pps )
       minWidth  = 256 / sps.getMaxCUWidth();
     }
   }
-  for(Int row=0; row < numTileRows; row++)
+  for(int row=0; row < numTileRows; row++)
   {
-    for(Int col=0; col < numTileColumns; col++)
+    for(int col=0; col < numTileColumns; col++)
     {
-      const Int tileIdx = row * numTileColumns + col;
+      const int tileIdx = row * numTileColumns + col;
       if(tiles[tileIdx].getTileWidthInCtus() < minWidth)   { THROW("Invalid tile size"); }
       if(tiles[tileIdx].getTileHeightInCtus() < minHeight) { THROW("Invalid tile size"); }
     }
   }
 
   //initialize each tile of the current picture
-  for( Int row=0; row < numTileRows; row++ )
+  for( int row=0; row < numTileRows; row++ )
   {
-    for( Int col=0; col < numTileColumns; col++ )
+    for( int col=0; col < numTileColumns; col++ )
     {
-      const Int tileIdx = row * numTileColumns + col;
+      const int tileIdx = row * numTileColumns + col;
 
       //initialize the RightEdgePosInCU for each tile
-      Int rightEdgePosInCTU = 0;
-      for( Int i=0; i <= col; i++ )
+      int rightEdgePosInCTU = 0;
+      for( int i=0; i <= col; i++ )
       {
         rightEdgePosInCTU += tiles[row * numTileColumns + i].getTileWidthInCtus();
       }
       tiles[tileIdx].setRightEdgePosInCtus(rightEdgePosInCTU-1);
 
       //initialize the BottomEdgePosInCU for each tile
-      Int bottomEdgePosInCTU = 0;
-      for( Int i=0; i <= row; i++ )
+      int bottomEdgePosInCTU = 0;
+      for( int i=0; i <= row; i++ )
       {
         bottomEdgePosInCTU += tiles[i * numTileColumns + col].getTileHeightInCtus();
       }
@@ -601,14 +601,14 @@ void TileMap::initTileMap( const SPS& sps, const PPS& pps )
     }
   }
 
-  Int  columnIdx = 0;
-  Int  rowIdx = 0;
+  int  columnIdx = 0;
+  int  rowIdx = 0;
 
   //initialize the TileIdxMap
   const UInt numCtusInFrame = pcv->sizeInCtus;
-  for( Int i=0; i<numCtusInFrame; i++)
+  for( int i=0; i<numCtusInFrame; i++)
   {
-    for( Int col=0; col < numTileColumns; col++)
+    for( int col=0; col < numTileColumns; col++)
     {
       if(i % frameWidthInCtus <= tiles[col].getRightEdgePosInCtus())
       {
@@ -616,7 +616,7 @@ void TileMap::initTileMap( const SPS& sps, const PPS& pps )
         break;
       }
     }
-    for(Int row=0; row < numTileRows; row++)
+    for(int row=0; row < numTileRows; row++)
     {
       if(i / frameWidthInCtus <= tiles[row*numTileColumns].getBottomEdgePosInCtus())
       {
@@ -632,7 +632,7 @@ void TileMap::initCtuTsRsAddrMap()
 {
   //generate the Coding Order Map and Inverse Coding Order Map
   const UInt numCtusInFrame = pcv->sizeInCtus;
-  for(Int ctuTsAddr=0, ctuRsAddr=0; ctuTsAddr<numCtusInFrame; ctuTsAddr++, ctuRsAddr = calculateNextCtuRSAddr(ctuRsAddr))
+  for(int ctuTsAddr=0, ctuRsAddr=0; ctuTsAddr<numCtusInFrame; ctuTsAddr++, ctuRsAddr = calculateNextCtuRSAddr(ctuRsAddr))
   {
     ctuTsToRsAddrMap[ctuTsAddr] = ctuRsAddr;
     ctuRsToTsAddrMap[ctuRsAddr] = ctuTsAddr;
@@ -877,8 +877,8 @@ void Picture::finalInit( const SPS& sps, const PPS& pps )
 #endif
 
   const ChromaFormat chromaFormatIDC = sps.getChromaFormatIdc();
-  const Int          iWidth = sps.getPicWidthInLumaSamples();
-  const Int          iHeight = sps.getPicHeightInLumaSamples();
+  const int          iWidth = sps.getPicWidthInLumaSamples();
+  const int          iHeight = sps.getPicHeightInLumaSamples();
 
   if( cs )
   {
@@ -981,7 +981,7 @@ void Picture::extendPicBorder()
     return;
   }
 
-  for(Int comp=0; comp<getNumberValidComponents( cs->area.chromaFormat ); comp++)
+  for(int comp=0; comp<getNumberValidComponents( cs->area.chromaFormat ); comp++)
   {
     ComponentID compID = ComponentID( comp );
     PelBuf p = M_BUFS( 0, PIC_RECONSTRUCTION ).get( compID );
@@ -991,9 +991,9 @@ void Picture::extendPicBorder()
 
     Pel*  pi = piTxt;
     // do left and right margins
-    for (Int y = 0; y < p.height; y++)
+    for (int y = 0; y < p.height; y++)
     {
-      for (Int x = 0; x < xmargin; x++ )
+      for (int x = 0; x < xmargin; x++ )
       {
         pi[ -xmargin + x ] = pi[0];
         pi[  p.width + x ] = pi[p.width-1];
@@ -1004,7 +1004,7 @@ void Picture::extendPicBorder()
     // pi is now the (0,height) (bottom left of image within bigger picture
     pi -= (p.stride + xmargin);
     // pi is now the (-marginX, height-1)
-    for (Int y = 0; y < ymargin; y++ )
+    for (int y = 0; y < ymargin; y++ )
     {
       ::memcpy( pi + (y+1)*p.stride, pi, sizeof(Pel)*(p.width + (xmargin << 1)));
     }
@@ -1012,7 +1012,7 @@ void Picture::extendPicBorder()
     // pi is still (-marginX, height-1)
     pi -= ((p.height-1) * p.stride);
     // pi is now (-marginX, 0)
-    for (Int y = 0; y < ymargin; y++ )
+    for (int y = 0; y < ymargin; y++ )
     {
       ::memcpy( pi - (y+1)*p.stride, pi, sizeof(Pel)*(p.width + (xmargin<<1)) );
     }

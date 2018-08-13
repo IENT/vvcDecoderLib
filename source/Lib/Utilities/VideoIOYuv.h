@@ -55,18 +55,18 @@ class VideoIOYuv
 {
 private:
   fstream   m_cHandle;                                      ///< file handle
-  Int       m_fileBitdepth[MAX_NUM_CHANNEL_TYPE]; ///< bitdepth of input/output video file
-  Int       m_MSBExtendedBitDepth[MAX_NUM_CHANNEL_TYPE];  ///< bitdepth after addition of MSBs (with value 0)
-  Int       m_bitdepthShift[MAX_NUM_CHANNEL_TYPE];  ///< number of bits to increase or decrease image by before/after write/read
+  int       m_fileBitdepth[MAX_NUM_CHANNEL_TYPE]; ///< bitdepth of input/output video file
+  int       m_MSBExtendedBitDepth[MAX_NUM_CHANNEL_TYPE];  ///< bitdepth after addition of MSBs (with value 0)
+  int       m_bitdepthShift[MAX_NUM_CHANNEL_TYPE];  ///< number of bits to increase or decrease image by before/after write/read
 
 public:
   VideoIOYuv()           {}
   virtual ~VideoIOYuv()  {}
 
-  void  open  ( const std::string &fileName, bool bWriteMode, const Int fileBitDepth[MAX_NUM_CHANNEL_TYPE], const Int MSBExtendedBitDepth[MAX_NUM_CHANNEL_TYPE], const Int internalBitDepth[MAX_NUM_CHANNEL_TYPE] ); ///< open or create file
+  void  open  ( const std::string &fileName, bool bWriteMode, const int fileBitDepth[MAX_NUM_CHANNEL_TYPE], const int MSBExtendedBitDepth[MAX_NUM_CHANNEL_TYPE], const int internalBitDepth[MAX_NUM_CHANNEL_TYPE] ); ///< open or create file
   void  close ();                                           ///< close file
 #if EXTENSION_360_VIDEO
-  void skipFrames(Int numFrames, UInt width, UInt height, ChromaFormat format);
+  void skipFrames(int numFrames, UInt width, UInt height, ChromaFormat format);
 #else
   void skipFrames(UInt numFrames, UInt width, UInt height, ChromaFormat format);
 #endif
@@ -74,14 +74,14 @@ public:
 
 
   // If fileFormat=NUM_CHROMA_FORMAT, use the format defined by pPicYuvTrueOrg
-  bool  read ( PelUnitBuf& pic, PelUnitBuf& picOrg, const InputColourSpaceConversion ipcsc, Int aiPad[2], ChromaFormat fileFormat=NUM_CHROMA_FORMAT, const bool bClipToRec709=false );     ///< read one frame with padding parameter
+  bool  read ( PelUnitBuf& pic, PelUnitBuf& picOrg, const InputColourSpaceConversion ipcsc, int aiPad[2], ChromaFormat fileFormat=NUM_CHROMA_FORMAT, const bool bClipToRec709=false );     ///< read one frame with padding parameter
 
   // If fileFormat=NUM_CHROMA_FORMAT, use the format defined by pPicYuv
   bool  write( const CPelUnitBuf& pic,
-               const InputColourSpaceConversion ipCSC, Int confLeft = 0, Int confRight = 0, Int confTop = 0, Int confBottom = 0, ChromaFormat format = NUM_CHROMA_FORMAT, const bool bClipToRec709 = false ); ///< write one YUV frame with padding parameter
+               const InputColourSpaceConversion ipCSC, int confLeft = 0, int confRight = 0, int confTop = 0, int confBottom = 0, ChromaFormat format = NUM_CHROMA_FORMAT, const bool bClipToRec709 = false ); ///< write one YUV frame with padding parameter
 
   // If fileFormat=NUM_CHROMA_FORMAT, use the format defined by pPicYuvTop and pPicYuvBottom
-  bool  write( const CPelUnitBuf& picTop, const CPelUnitBuf& picBot, const InputColourSpaceConversion ipCSC, Int confLeft=0, Int confRight=0, Int confTop=0, Int confBottom=0, ChromaFormat fileFormat=NUM_CHROMA_FORMAT, const bool isTff=false, const bool bClipToRec709=false);
+  bool  write( const CPelUnitBuf& picTop, const CPelUnitBuf& picBot, const InputColourSpaceConversion ipCSC, int confLeft=0, int confRight=0, int confTop=0, int confBottom=0, ChromaFormat fileFormat=NUM_CHROMA_FORMAT, const bool isTff=false, const bool bClipToRec709=false);
   static void ColourSpaceConvert(const CPelUnitBuf &src, PelUnitBuf &dest, const InputColourSpaceConversion conversion, bool bIsForwards);
 
   bool  isEof ();                                           ///< check for end-of-file

@@ -67,7 +67,7 @@ public:
   SEIRemovalAppCfg();
   virtual ~SEIRemovalAppCfg();
 
-  bool  parseCfg        ( Int argc, char* argv[] );   ///< initialize option class from configuration
+  bool  parseCfg        ( int argc, char* argv[] );   ///< initialize option class from configuration
 };
 
 //! \}

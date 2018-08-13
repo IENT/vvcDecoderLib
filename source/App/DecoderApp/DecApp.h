@@ -64,7 +64,7 @@ private:
   VideoIOYuv      m_cVideoIOYuvReconFile;        ///< reconstruction YUV class
 
   // for output control
-  Int             m_iPOCLastDisplay;              ///< last POC in display order
+  int             m_iPOCLastDisplay;              ///< last POC in display order
   std::ofstream   m_seiMessageFileStream;         ///< Used for outputing SEI messages.
   ColourRemapping m_cColourRemapping;             ///< colour remapping handler
 

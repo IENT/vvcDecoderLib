@@ -55,7 +55,7 @@ const uint8_t g_NsstLut[NUM_INTRA_MODE-1] =
 
 tabSinCos g_tabSinCos[NSST_HYGT_PTS];
 
-const Int g_nsstHyGTPar4x4[35][3][64] =
+const int g_nsstHyGTPar4x4[35][3][64] =
 {
   {  //   0
     {
@@ -729,7 +729,7 @@ const uint8_t g_nsstHyGTPermut4x4[35][3][16] =
 };
 
 #if !ENABLE_BMS
-const Int g_nsstHyGTPar8x8[35][3][768] =
+const int g_nsstHyGTPar8x8[35][3][768] =
 {
   {  //   0
     {

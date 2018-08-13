@@ -67,15 +67,15 @@ class InterpolationFilter
 #endif
 public:
   template<bool isFirst, bool isLast>
-  static void filterCopy( const ClpRng& clpRng, const Pel *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height );
+  static void filterCopy( const ClpRng& clpRng, const Pel *src, int srcStride, Pel *dst, int dstStride, int width, int height );
 
-  template<Int N, bool isVertical, bool isFirst, bool isLast>
-  static void filter(const ClpRng& clpRng, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, TFilterCoeff const *coeff);
+  template<int N, bool isVertical, bool isFirst, bool isLast>
+  static void filter(const ClpRng& clpRng, Pel const *src, int srcStride, Pel *dst, int dstStride, int width, int height, TFilterCoeff const *coeff);
 
-  template<Int N>
-  void filterHor(const ClpRng& clpRng, Pel const* src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height,               bool isLast, TFilterCoeff const *coeff);
-  template<Int N>
-  void filterVer(const ClpRng& clpRng, Pel const* src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, bool isFirst, bool isLast, TFilterCoeff const *coeff);
+  template<int N>
+  void filterHor(const ClpRng& clpRng, Pel const* src, int srcStride, Pel *dst, int dstStride, int width, int height,               bool isLast, TFilterCoeff const *coeff);
+  template<int N>
+  void filterVer(const ClpRng& clpRng, Pel const* src, int srcStride, Pel *dst, int dstStride, int width, int height, bool isFirst, bool isLast, TFilterCoeff const *coeff);
 
 protected:
 #if JVET_J0090_MEMORY_BANDWITH_MEASURE
@@ -85,9 +85,9 @@ public:
   InterpolationFilter();
   ~InterpolationFilter() {}
 
-  void( *m_filterHor[3][2][2] )( const ClpRng& clpRng, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, TFilterCoeff const *coeff );
-  void( *m_filterVer[3][2][2] )( const ClpRng& clpRng, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, TFilterCoeff const *coeff );
-  void( *m_filterCopy[2][2] )  ( const ClpRng& clpRng, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height );
+  void( *m_filterHor[3][2][2] )( const ClpRng& clpRng, Pel const *src, int srcStride, Pel *dst, int dstStride, int width, int height, TFilterCoeff const *coeff );
+  void( *m_filterVer[3][2][2] )( const ClpRng& clpRng, Pel const *src, int srcStride, Pel *dst, int dstStride, int width, int height, TFilterCoeff const *coeff );
+  void( *m_filterCopy[2][2] )  ( const ClpRng& clpRng, Pel const *src, int srcStride, Pel *dst, int dstStride, int width, int height );
 
   void initInterpolationFilter( bool enable );
 #ifdef TARGET_SIMD_X86
@@ -97,11 +97,11 @@ public:
 #endif
 
 #if JEM_TOOLS
-  void filterHor(const ComponentID compID, Pel const* src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Int frac,               bool isLast, const ChromaFormat fmt, const ClpRng& clpRng, Int nFilterIdx = 0 );
-  void filterVer(const ComponentID compID, Pel const* src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Int frac, bool isFirst, bool isLast, const ChromaFormat fmt, const ClpRng& clpRng, Int nFilterIdx = 0 );
+  void filterHor(const ComponentID compID, Pel const* src, int srcStride, Pel *dst, int dstStride, int width, int height, int frac,               bool isLast, const ChromaFormat fmt, const ClpRng& clpRng, int nFilterIdx = 0 );
+  void filterVer(const ComponentID compID, Pel const* src, int srcStride, Pel *dst, int dstStride, int width, int height, int frac, bool isFirst, bool isLast, const ChromaFormat fmt, const ClpRng& clpRng, int nFilterIdx = 0 );
 #else
-  void filterHor(const ComponentID compID, Pel const* src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Int frac,               bool isLast, const ChromaFormat fmt, const ClpRng& clpRng );
-  void filterVer(const ComponentID compID, Pel const* src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Int frac, bool isFirst, bool isLast, const ChromaFormat fmt, const ClpRng& clpRng );
+  void filterHor(const ComponentID compID, Pel const* src, int srcStride, Pel *dst, int dstStride, int width, int height, int frac,               bool isLast, const ChromaFormat fmt, const ClpRng& clpRng );
+  void filterVer(const ComponentID compID, Pel const* src, int srcStride, Pel *dst, int dstStride, int width, int height, int frac, bool isFirst, bool isLast, const ChromaFormat fmt, const ClpRng& clpRng );
 #endif
 #if JVET_J0090_MEMORY_BANDWITH_MEASURE
   void cacheAssign( CacheModel *cache ) { m_cacheModel = cache; }

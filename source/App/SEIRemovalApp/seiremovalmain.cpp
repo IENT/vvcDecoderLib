@@ -52,7 +52,7 @@
 
 int main(int argc, char* argv[])
 {
-  Int returnCode = EXIT_SUCCESS;
+  int returnCode = EXIT_SUCCESS;
 
   // print information
   fprintf( stdout, "\n" );

@@ -62,21 +62,21 @@ public:
 
 public:
 #if HEVC_USE_SCALING_LISTS
-  void setFlatScalingList   ( const Int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths );
-  void setScalingList       ( ScalingList *scalingList, const Int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths);
+  void setFlatScalingList   ( const int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths );
+  void setScalingList       ( ScalingList *scalingList, const int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths);
 #endif
   // quantization
   void quant                ( TransformUnit &tu, const ComponentID &compID, const CCoeffBuf &pSrc, TCoeff &uiAbsSum, const QpParam &cQP, const Ctx& ctx );
 
 private:
 #if HEVC_USE_SCALING_LISTS
-  double* xGetErrScaleCoeff              ( UInt list, UInt sizeX, UInt sizeY, Int qp ) { return m_errScale             [sizeX][sizeY][list][qp]; };  //!< get Error Scale Coefficent
-  double& xGetErrScaleCoeffNoScalingList ( UInt list, UInt sizeX, UInt sizeY, Int qp ) { return m_errScaleNoScalingList[sizeX][sizeY][list][qp]; };  //!< get Error Scale Coefficent
+  double* xGetErrScaleCoeff              ( UInt list, UInt sizeX, UInt sizeY, int qp ) { return m_errScale             [sizeX][sizeY][list][qp]; };  //!< get Error Scale Coefficent
+  double& xGetErrScaleCoeffNoScalingList ( UInt list, UInt sizeX, UInt sizeY, int qp ) { return m_errScaleNoScalingList[sizeX][sizeY][list][qp]; };  //!< get Error Scale Coefficent
   void    xInitScalingList               ( const QuantRDOQ* other );
   void    xDestroyScalingList            ();
-  void    xSetErrScaleCoeff              ( UInt list, UInt sizeX, UInt sizeY, Int qp, const Int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths );
+  void    xSetErrScaleCoeff              ( UInt list, UInt sizeX, UInt sizeY, int qp, const int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths );
 #else
-  double  xGetErrScaleCoeff              ( SizeType width, SizeType height, Int qp, const Int maxLog2TrDynamicRange, const Int channelBitDepth);
+  double  xGetErrScaleCoeff              ( SizeType width, SizeType height, int qp, const int maxLog2TrDynamicRange, const int channelBitDepth);
 #endif
 
   // RDOQ functions
@@ -93,18 +93,18 @@ private:
                               const BinFracBits& fracBitsGt1,
                               const BinFracBits& fracBitsGt2,
                               uint16_t             ui16AbsGoRice,
-                              Int                iQBits,
+                              int                iQBits,
                               double             errorScale,
                               bool               bLast,
                               bool               useLimitedPrefixLength,
-                              const Int          maxLog2TrDynamicRange ) const;
-  inline Int xGetICRate     ( const UInt         uiAbsLevel,
+                              const int          maxLog2TrDynamicRange ) const;
+  inline int xGetICRate     ( const UInt         uiAbsLevel,
                               const BinFracBits& fracBitsPar,
                               const BinFracBits& fracBitsGt1,
                               const BinFracBits& fracBitsGt2,
                               const uint16_t       ui16AbsGoRice,
                               const bool         useLimitedPrefixLength,
-                              const Int          maxLog2TrDynamicRange  ) const;
+                              const int          maxLog2TrDynamicRange  ) const;
 #else
   inline UInt xGetCodedLevel  ( double&             rd64CodedCost,
                                 double&             rd64CodedCost0,
@@ -120,13 +120,13 @@ private:
                                 uint16_t              ui16AbsGoRice,
                                 UInt                c1Idx,
                                 UInt                c2Idx,
-                                Int                 iQBits,
+                                int                 iQBits,
                                 double              errorScale,
                                 bool                bLast,
                                 bool                useLimitedPrefixLength,
-                                const Int           maxLog2TrDynamicRange
+                                const int           maxLog2TrDynamicRange
                               ) const;
-  inline Int xGetICRate  ( const UInt         uiAbsLevel,
+  inline int xGetICRate  ( const UInt         uiAbsLevel,
                            const BinFracBits& fracBitsOne,
                            const BinFracBits& fracBitsAbs,
 #if JEM_TOOLS
@@ -136,7 +136,7 @@ private:
                            const UInt         c1Idx,
                            const UInt         c2Idx,
                            const bool         useLimitedPrefixLength,
-                           const Int          maxLog2TrDynamicRange
+                           const int          maxLog2TrDynamicRange
                          ) const;
 #endif
   inline double xGetRateLast         ( const int* lastBitsX, const int* lastBitsY,
@@ -162,9 +162,9 @@ private:
   double m_pdCostCoeff0       [MAX_TU_SIZE * MAX_TU_SIZE];
   double m_pdCostCoeffGroupSig[(MAX_TU_SIZE * MAX_TU_SIZE) >> MLS_CG_SIZE]; // even if CG size is 2 (if one of the sides is 2) instead of 4, there should be enough space
 #if HEVC_USE_SIGN_HIDING
-  Int    m_rateIncUp          [MAX_TU_SIZE * MAX_TU_SIZE];
-  Int    m_rateIncDown        [MAX_TU_SIZE * MAX_TU_SIZE];
-  Int    m_sigRateDelta       [MAX_TU_SIZE * MAX_TU_SIZE];
+  int    m_rateIncUp          [MAX_TU_SIZE * MAX_TU_SIZE];
+  int    m_rateIncDown        [MAX_TU_SIZE * MAX_TU_SIZE];
+  int    m_sigRateDelta       [MAX_TU_SIZE * MAX_TU_SIZE];
   TCoeff m_deltaU             [MAX_TU_SIZE * MAX_TU_SIZE];
 #endif
 };// END CLASS DEFINITION QuantRDOQ

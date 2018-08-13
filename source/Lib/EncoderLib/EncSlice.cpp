@@ -65,7 +65,7 @@ EncSlice::~EncSlice()
   destroy();
 }
 
-void EncSlice::create( Int iWidth, Int iHeight, ChromaFormat chromaFormat, UInt iMaxCUWidth, UInt iMaxCUHeight, uint8_t uhTotalDepth )
+void EncSlice::create( int iWidth, int iHeight, ChromaFormat chromaFormat, UInt iMaxCUWidth, UInt iMaxCUHeight, uint8_t uhTotalDepth )
 {
 }
 
@@ -102,7 +102,7 @@ void EncSlice::init( EncLib* pcEncLib, const SPS& sps )
 }
 
 void
-EncSlice::setUpLambda( Slice* slice, const double dLambda, Int iQP)
+EncSlice::setUpLambda( Slice* slice, const double dLambda, int iQP)
 {
   // store lambda
   m_pcRdCost ->setLambda( dLambda, slice->getSPS()->getBitDepths() );
@@ -113,8 +113,8 @@ EncSlice::setUpLambda( Slice* slice, const double dLambda, Int iQP)
   for( UInt compIdx = 1; compIdx < MAX_NUM_COMPONENT; compIdx++ )
   {
     const ComponentID compID = ComponentID( compIdx );
-    Int chromaQPOffset       = slice->getPPS()->getQpOffset( compID ) + slice->getSliceChromaQpDelta( compID );
-    Int qpc                  = ( iQP + chromaQPOffset < 0 ) ? iQP : getScaledChromaQP( iQP + chromaQPOffset, m_pcCfg->getChromaFormatIdc() );
+    int chromaQPOffset       = slice->getPPS()->getQpOffset( compID ) + slice->getSliceChromaQpDelta( compID );
+    int qpc                  = ( iQP + chromaQPOffset < 0 ) ? iQP : getScaledChromaQP( iQP + chromaQPOffset, m_pcCfg->getChromaFormatIdc() );
     double tmpWeight         = pow( 2.0, ( iQP - qpc ) / 3.0 );  // takes into account of the chroma qp mapping and chroma qp Offset
 #if JVET_K0072
     if( m_pcCfg->getDepQuantEnabledFlag() )
@@ -160,7 +160,7 @@ EncSlice::setUpLambda( Slice* slice, const double dLambda, Int iQP)
  \param isField       true for field coding
  */
 
-void EncSlice::initEncSlice( Picture* pcPic, const Int pocLast, const Int pocCurr, const Int iGOPid, Slice*& rpcSlice, const bool isField )
+void EncSlice::initEncSlice( Picture* pcPic, const int pocLast, const int pocCurr, const int iGOPid, Slice*& rpcSlice, const bool isField )
 {
   double dQP;
   double dLambda;
@@ -187,9 +187,9 @@ void EncSlice::initEncSlice( Picture* pcPic, const Int pocLast, const Int pocCur
 #endif
 
   // depth computation based on GOP size
-  Int depth;
+  int depth;
   {
-    Int poc = rpcSlice->getPOC();
+    int poc = rpcSlice->getPOC();
     if(isField)
     {
       poc = (poc/2) % (m_pcCfg->getGOPSize()/2);
@@ -205,11 +205,11 @@ void EncSlice::initEncSlice( Picture* pcPic, const Int pocLast, const Int pocCur
     }
     else
     {
-      Int step = m_pcCfg->getGOPSize();
+      int step = m_pcCfg->getGOPSize();
       depth    = 0;
-      for( Int i=step>>1; i>=1; i>>=1 )
+      for( int i=step>>1; i>=1; i>>=1 )
       {
-        for ( Int j=i; j<m_pcCfg->getGOPSize(); j+=step )
+        for ( int j=i; j<m_pcCfg->getGOPSize(); j+=step )
         {
           if ( j == poc )
           {
@@ -284,7 +284,7 @@ void EncSlice::initEncSlice( Picture* pcPic, const Int pocLast, const Int pocCur
   }
 
   // modify QP
-  const Int* pdQPs = m_pcCfg->getdQPs();
+  const int* pdQPs = m_pcCfg->getdQPs();
   if ( pdQPs )
   {
     dQP += pdQPs[ rpcSlice->getPOC() ];
@@ -302,16 +302,16 @@ void EncSlice::initEncSlice( Picture* pcPic, const Int pocLast, const Int pocCur
   // ------------------------------------------------------------------------------------------------------------------
 
 #if X0038_LAMBDA_FROM_QP_CAPABILITY
-  const Int temporalId=m_pcCfg->getGOPEntry(iGOPid).m_temporalId;
+  const int temporalId=m_pcCfg->getGOPEntry(iGOPid).m_temporalId;
 #if !SHARP_LUMA_DELTA_QP
   const std::vector<double> &intraLambdaModifiers=m_pcCfg->getIntraLambdaModifier();
 #endif
 #endif
-  Int iQP;
+  int iQP;
   double dOrigQP = dQP;
 
   // pre-compute lambda and QP values for all possible QP candidates
-  for ( Int iDQpIdx = 0; iDQpIdx < 2 * m_pcCfg->getDeltaQpRD() + 1; iDQpIdx++ )
+  for ( int iDQpIdx = 0; iDQpIdx < 2 * m_pcCfg->getDeltaQpRD() + 1; iDQpIdx++ )
   {
     // compute QP value
     dQP = dOrigQP + ((iDQpIdx+1)>>1)*(iDQpIdx%2 ? -1 : 1);
@@ -319,19 +319,19 @@ void EncSlice::initEncSlice( Picture* pcPic, const Int pocLast, const Int pocCur
     dLambda = calculateLambda(rpcSlice, iGOPid, depth, dQP, dQP, iQP );
 #else
     // compute lambda value
-    Int    NumberBFrames = ( m_pcCfg->getGOPSize() - 1 );
-    Int    SHIFT_QP = 12;
+    int    NumberBFrames = ( m_pcCfg->getGOPSize() - 1 );
+    int    SHIFT_QP = 12;
 
 #if DISTORTION_LAMBDA_BUGFIX
-    Int    bitdepth_luma_qp_scale =
+    int    bitdepth_luma_qp_scale =
       6
       * (rpcSlice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA) - 8
          - DISTORTION_PRECISION_ADJUSTMENT(rpcSlice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA)));
 #else
 #if FULL_NBIT
-    Int    bitdepth_luma_qp_scale = 6 * (rpcSlice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA) - 8);
+    int    bitdepth_luma_qp_scale = 6 * (rpcSlice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA) - 8);
 #else
-    Int    bitdepth_luma_qp_scale = 0;
+    int    bitdepth_luma_qp_scale = 0;
 #endif
 #endif
     double qp_temp = (double) dQP + bitdepth_luma_qp_scale - SHIFT_QP;
@@ -405,7 +405,7 @@ void EncSlice::initEncSlice( Picture* pcPic, const Int pocLast, const Int pocCur
     dLambda *= lambdaModifier;
 #endif
 
-    iQP = max( -rpcSlice->getSPS()->getQpBDOffset(CHANNEL_TYPE_LUMA), min( MAX_QP, (Int) floor( dQP + 0.5 ) ) );
+    iQP = max( -rpcSlice->getSPS()->getQpBDOffset(CHANNEL_TYPE_LUMA), min( MAX_QP, (int) floor( dQP + 0.5 ) ) );
 #endif
 
     m_vdRdPicLambda[iDQpIdx] = dLambda;
@@ -419,7 +419,7 @@ void EncSlice::initEncSlice( Picture* pcPic, const Int pocLast, const Int pocCur
   iQP     = m_viRdPicQp    [0];
 
 #if !X0038_LAMBDA_FROM_QP_CAPABILITY
-  const Int temporalId=m_pcCfg->getGOPEntry(iGOPid).m_temporalId;
+  const int temporalId=m_pcCfg->getGOPEntry(iGOPid).m_temporalId;
   const std::vector<double> &intraLambdaModifiers=m_pcCfg->getIntraLambdaModifier();
 #endif
 
@@ -427,8 +427,8 @@ void EncSlice::initEncSlice( Picture* pcPic, const Int pocLast, const Int pocCur
   if(rpcSlice->getPPS()->getSliceChromaQpFlag())
   {
     const bool bUseIntraOrPeriodicOffset = rpcSlice->getSliceType()==I_SLICE || (m_pcCfg->getSliceChromaOffsetQpPeriodicity()!=0 && (rpcSlice->getPOC()%m_pcCfg->getSliceChromaOffsetQpPeriodicity())==0);
-    Int cbQP = bUseIntraOrPeriodicOffset? m_pcCfg->getSliceChromaOffsetQpIntraOrPeriodic(false) : m_pcCfg->getGOPEntry(iGOPid).m_CbQPoffset;
-    Int crQP = bUseIntraOrPeriodicOffset? m_pcCfg->getSliceChromaOffsetQpIntraOrPeriodic(true)  : m_pcCfg->getGOPEntry(iGOPid).m_CrQPoffset;
+    int cbQP = bUseIntraOrPeriodicOffset? m_pcCfg->getSliceChromaOffsetQpIntraOrPeriodic(false) : m_pcCfg->getGOPEntry(iGOPid).m_CbQPoffset;
+    int crQP = bUseIntraOrPeriodicOffset? m_pcCfg->getSliceChromaOffsetQpIntraOrPeriodic(true)  : m_pcCfg->getGOPEntry(iGOPid).m_CrQPoffset;
 
     cbQP = Clip3( -12, 12, cbQP + rpcSlice->getPPS()->getQpOffset(COMPONENT_Cb) ) - rpcSlice->getPPS()->getQpOffset(COMPONENT_Cb);
     crQP = Clip3( -12, 12, crQP + rpcSlice->getPPS()->getQpOffset(COMPONENT_Cr) ) - rpcSlice->getPPS()->getQpOffset(COMPONENT_Cr);
@@ -491,7 +491,7 @@ void EncSlice::initEncSlice( Picture* pcPic, const Int pocLast, const Int pocCur
   if (m_pcCfg->getUseRecalculateQPAccordingToLambda())
   {
     dQP = xGetQPValueAccordingToLambda( dLambda );
-    iQP = max( -rpcSlice->getSPS()->getQpBDOffset(CHANNEL_TYPE_LUMA), min( MAX_QP, (Int) floor( dQP + 0.5 ) ) );
+    iQP = max( -rpcSlice->getSPS()->getQpBDOffset(CHANNEL_TYPE_LUMA), min( MAX_QP, (int) floor( dQP + 0.5 ) ) );
   }
 
   rpcSlice->setSliceQp           ( iQP );
@@ -559,30 +559,30 @@ void EncSlice::initEncSlice( Picture* pcPic, const Int pocLast, const Int pocCur
 
 #if SHARP_LUMA_DELTA_QP
 double EncSlice::calculateLambda( const Slice*     slice,
-                                  const Int        GOPid, // entry in the GOP table
-                                  const Int        depth, // slice GOP hierarchical depth.
+                                  const int        GOPid, // entry in the GOP table
+                                  const int        depth, // slice GOP hierarchical depth.
                                   const double     refQP, // initial slice-level QP
                                   const double     dQP,   // initial double-precision QP
-                                        Int       &iQP )  // returned integer QP.
+                                        int       &iQP )  // returned integer QP.
 {
   enum   SliceType eSliceType    = slice->getSliceType();
   const  bool      isField       = slice->getPic()->fieldPic;
-  const  Int       NumberBFrames = ( m_pcCfg->getGOPSize() - 1 );
-  const  Int       SHIFT_QP      = 12;
+  const  int       NumberBFrames = ( m_pcCfg->getGOPSize() - 1 );
+  const  int       SHIFT_QP      = 12;
 #if X0038_LAMBDA_FROM_QP_CAPABILITY
-  const Int temporalId=m_pcCfg->getGOPEntry(GOPid).m_temporalId;
+  const int temporalId=m_pcCfg->getGOPEntry(GOPid).m_temporalId;
   const std::vector<double> &intraLambdaModifiers=m_pcCfg->getIntraLambdaModifier();
 #endif
 
 #if DISTORTION_LAMBDA_BUGFIX
-  Int bitdepth_luma_qp_scale = 6
+  int bitdepth_luma_qp_scale = 6
                                * (slice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA) - 8
                                   - DISTORTION_PRECISION_ADJUSTMENT(slice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA)));
 #else
 #if FULL_NBIT
-  Int    bitdepth_luma_qp_scale = 6 * (slice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA) - 8);
+  int    bitdepth_luma_qp_scale = 6 * (slice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA) - 8);
 #else
-  Int    bitdepth_luma_qp_scale = 0;
+  int    bitdepth_luma_qp_scale = 0;
 #endif
 #endif
   double qp_temp = dQP + bitdepth_luma_qp_scale - SHIFT_QP;
@@ -659,7 +659,7 @@ double EncSlice::calculateLambda( const Slice*     slice,
   dLambda *= lambdaModifier;
 #endif
 
-  iQP = max( -slice->getSPS()->getQpBDOffset(CHANNEL_TYPE_LUMA), min( MAX_QP, (Int) floor( dQP + 0.5 ) ) );
+  iQP = max( -slice->getSPS()->getQpBDOffset(CHANNEL_TYPE_LUMA), min( MAX_QP, (int) floor( dQP + 0.5 ) ) );
 
 #if JVET_K0072
   if( m_pcCfg->getDepQuantEnabledFlag() )
@@ -673,7 +673,7 @@ double EncSlice::calculateLambda( const Slice*     slice,
 }
 #endif
 
-void EncSlice::resetQP( Picture* pic, Int sliceQP, double lambda )
+void EncSlice::resetQP( Picture* pic, int sliceQP, double lambda )
 {
   Slice* slice = pic->slices[0];
 
@@ -683,33 +683,33 @@ void EncSlice::resetQP( Picture* pic, Int sliceQP, double lambda )
 }
 
 #if ENABLE_QPA
-static inline Int apprI2Log2 (const double d)
+static inline int apprI2Log2 (const double d)
 {
-  return d < 6.0e-20 ? -128 : Int(floor(2.0 * log(d) / log(2.0) + 0.5));
+  return d < 6.0e-20 ? -128 : int(floor(2.0 * log(d) / log(2.0) + 0.5));
 }
 
 #ifndef HLM_L1_NORM
   #define HLM_L1_NORM
 #endif
 
-static Int filterAndCalculateAverageEnergies (const Pel* pSrc,     const Int  iSrcStride,
-                                              double &hpEner,      const Int  iHeight,    const Int iWidth,
-                                              const Int  iPOC = 0)
+static int filterAndCalculateAverageEnergies (const Pel* pSrc,     const int  iSrcStride,
+                                              double &hpEner,      const int  iHeight,    const int iWidth,
+                                              const int  iPOC = 0)
 {
-  Int iHpValue;
+  int iHpValue;
   UInt uHpERow, uHpEner = 0;
 
   // skip first row as there may be a black border frame
   pSrc += iSrcStride;
   // center rows
-  for (Int y = 1; y < iHeight - 1; y++)
+  for (int y = 1; y < iHeight - 1; y++)
   {
     uHpERow = 0;
     // skip column as there may be a black border frame
 
-    for (Int x = 1; x < iWidth - 1; x++) // and columns
+    for (int x = 1; x < iWidth - 1; x++) // and columns
     {
-      iHpValue = 4 * (Int)pSrc[x] - (Int)pSrc[x-1] - (Int)pSrc[x+1] - (Int)pSrc[x-iSrcStride] - (Int)pSrc[x+iSrcStride];
+      iHpValue = 4 * (int)pSrc[x] - (int)pSrc[x-1] - (int)pSrc[x+1] - (int)pSrc[x-iSrcStride] - (int)pSrc[x+iSrcStride];
 #ifdef HLM_L1_NORM
       uHpERow += abs (iHpValue);
 #else
@@ -929,20 +929,20 @@ static bool applyQPAdaptation (Picture* const pcPic, Slice* const pcSlice,    co
 //! set adaptive search range based on poc difference
 void EncSlice::setSearchRange( Slice* pcSlice )
 {
-  Int iCurrPOC = pcSlice->getPOC();
-  Int iRefPOC;
-  Int iGOPSize = m_pcCfg->getGOPSize();
-  Int iOffset = (iGOPSize >> 1);
-  Int iMaxSR = m_pcCfg->getSearchRange();
-  Int iNumPredDir = pcSlice->isInterP() ? 1 : 2;
+  int iCurrPOC = pcSlice->getPOC();
+  int iRefPOC;
+  int iGOPSize = m_pcCfg->getGOPSize();
+  int iOffset = (iGOPSize >> 1);
+  int iMaxSR = m_pcCfg->getSearchRange();
+  int iNumPredDir = pcSlice->isInterP() ? 1 : 2;
 
-  for (Int iDir = 0; iDir < iNumPredDir; iDir++)
+  for (int iDir = 0; iDir < iNumPredDir; iDir++)
   {
     RefPicList  e = ( iDir ? REF_PIC_LIST_1 : REF_PIC_LIST_0 );
-    for (Int iRefIdx = 0; iRefIdx < pcSlice->getNumRefIdx(e); iRefIdx++)
+    for (int iRefIdx = 0; iRefIdx < pcSlice->getNumRefIdx(e); iRefIdx++)
     {
       iRefPOC = pcSlice->getRefPic(e, iRefIdx)->getPOC();
-      Int newSearchRange = Clip3(m_pcCfg->getMinSearchWindow(), iMaxSR, (iMaxSR*ADAPT_SR_SCALE*abs(iCurrPOC - iRefPOC)+iOffset)/iGOPSize);
+      int newSearchRange = Clip3(m_pcCfg->getMinSearchWindow(), iMaxSR, (iMaxSR*ADAPT_SR_SCALE*abs(iCurrPOC - iRefPOC)+iOffset)/iGOPSize);
       m_pcInterSearch->setAdaptiveSearchRange(iDir, iRefIdx, newSearchRange);
 #if ENABLE_WPP_PARALLELISM
       for( int jId = 1; jId < m_pcLib->getNumCuEncStacks(); jId++ )
@@ -994,15 +994,15 @@ void EncSlice::precompressSlice( Picture* pcPic )
 
   double dFrameLambda;
 #if DISTORTION_LAMBDA_BUGFIX
-  Int SHIFT_QP = 12
+  int SHIFT_QP = 12
                  + 6
                      * (pcSlice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA) - 8
                         - DISTORTION_PRECISION_ADJUSTMENT(pcSlice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA)));
 #else
 #if FULL_NBIT
-  Int    SHIFT_QP = 12 + 6 * (pcSlice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA) - 8);
+  int    SHIFT_QP = 12 + 6 * (pcSlice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA) - 8);
 #else
-  Int    SHIFT_QP = 12;
+  int    SHIFT_QP = 12;
 #endif
 #endif
 
@@ -1057,8 +1057,8 @@ void EncSlice::calCostSliceI(Picture* pcPic) // TODO: this only analyses the fir
 #endif
   const PreCalcValues& pcv         = *pcPic->cs->pcv;
   const SPS     &sps               = *(pcSlice->getSPS());
-  const Int      shift             = sps.getBitDepth(CHANNEL_TYPE_LUMA)-8;
-  const Int      offset            = (shift>0)?(1<<(shift-1)):0;
+  const int      shift             = sps.getBitDepth(CHANNEL_TYPE_LUMA)-8;
+  const int      offset            = (shift>0)?(1<<(shift-1)):0;
 
 #if HEVC_DEPENDENT_SLICES
   pcSlice->setSliceSegmentBits(0);
@@ -1079,10 +1079,10 @@ void EncSlice::calCostSliceI(Picture* pcPic) // TODO: this only analyses the fir
   {
     Position pos( (ctuRsAddr % pcv.widthInCtus) * pcv.maxCUWidth, (ctuRsAddr / pcv.widthInCtus) * pcv.maxCUHeight);
 
-    const Int height  = std::min( pcv.maxCUHeight, pcv.lumaHeight - pos.y );
-    const Int width   = std::min( pcv.maxCUWidth,  pcv.lumaWidth  - pos.x );
+    const int height  = std::min( pcv.maxCUHeight, pcv.lumaHeight - pos.y );
+    const int width   = std::min( pcv.maxCUWidth,  pcv.lumaWidth  - pos.x );
     const CompArea blk( COMPONENT_Y, pcv.chrFormat, pos, Size( width, height));
-    Int iSumHad = m_pcCuEncoder->updateCtuDataISlice( pcPic->getOrigBuf( blk ) );
+    int iSumHad = m_pcCuEncoder->updateCtuDataISlice( pcPic->getOrigBuf( blk ) );
 
     (m_pcRateCtrl->getRCPic()->getLCU(ctuRsAddr)).m_costIntra=(iSumHad+offset)>>shift;
     iSumHadSlice += (m_pcRateCtrl->getRCPic()->getLCU(ctuRsAddr)).m_costIntra;
@@ -1287,7 +1287,7 @@ void EncSlice::compressSlice( Picture* pcPic, const bool bCompressEntireSlice, c
   }
 #endif
 
-  CHECK( pcPic->m_prevQP[0] == std::numeric_limits<Int>::max(), "Invalid previous QP" );
+  CHECK( pcPic->m_prevQP[0] == std::numeric_limits<int>::max(), "Invalid previous QP" );
 
   CodingStructure&  cs          = *pcPic->cs;
 #if ENABLE_QPA || ENABLE_WPP_PARALLELISM
@@ -1307,7 +1307,7 @@ void EncSlice::compressSlice( Picture* pcPic, const bool bCompressEntireSlice, c
   double hpEnerMax     = 1.0;
   double hpEnerPic     = 0.0;
  #endif
-  Int    iSrcOffset;
+  int    iSrcOffset;
 
  #if ENABLE_QPA
   if (m_pcCfg->getUsePerceptQPA() && pcSlice->getPPS()->getUseDQP() && !m_pcCfg->getUseRateCtrl())
@@ -1345,7 +1345,7 @@ void EncSlice::compressSlice( Picture* pcPic, const bool bCompressEntireSlice, c
       }
       CHECK (iSrcOffset < 0, "DC offset cannot be negative!");
 
-      Int x = iSrcHeight * iSrcWidth;
+      int x = iSrcHeight * iSrcWidth;
       iSrcOffset = (iSrcOffset + (x >> 1)) / x; // slow division
 
       filterAndCalculateAverageEnergies (pcPic->getOrigBuf (fltArea).buf, iSrcStride,
@@ -1467,7 +1467,7 @@ void EncSlice::encodeCtus( Picture* pcPic, const bool bCompressEntireSlice, cons
   const TileMap&  tileMap         = *pcPic->tileMap;
 #endif
 #if ENABLE_QPA
-  const Int iQPIndex              = pcSlice->getSliceQpBase();
+  const int iQPIndex              = pcSlice->getSliceQpBase();
   int iSrcOffset                  = 0;
 #endif
 
@@ -1598,7 +1598,7 @@ void EncSlice::encodeCtus( Picture* pcPic, const bool bCompressEntireSlice, cons
     const double oldLambda = pRdCost->getLambda();
     if ( pCfg->getUseRateCtrl() )
     {
-      Int estQP        = pcSlice->getSliceQp();
+      int estQP        = pcSlice->getSliceQp();
       double estLambda = -1.0;
       double bpp       = -1.0;
 
@@ -1720,16 +1720,16 @@ void EncSlice::encodeCtus( Picture* pcPic, const bool bCompressEntireSlice, cons
 #endif
 
 #if !ENABLE_WPP_PARALLELISM
-    Int actualBits = int(cs.fracBits >> SCALE_BITS);
+    int actualBits = int(cs.fracBits >> SCALE_BITS);
 #endif
     if ( pCfg->getUseRateCtrl() )
     {
 #if ENABLE_WPP_PARALLELISM
-      Int actualBits      = int( cs.fracBits >> SCALE_BITS );
+      int actualBits      = int( cs.fracBits >> SCALE_BITS );
 #endif
-      Int actualQP        = g_RCInvalidQPValue;
+      int actualQP        = g_RCInvalidQPValue;
       double actualLambda = pRdCost->getLambda();
-      Int numberOfEffectivePixels    = 0;
+      int numberOfEffectivePixels    = 0;
 
       for( auto &cu : cs.traverseCUs( ctuArea, CH_L ) )
       {
@@ -2001,10 +2001,10 @@ void EncSlice::encodeSlice   ( Picture* pcPic, OutputBitstream* pcSubstreams, UI
 
 #if HEVC_TILES_WPP
 void EncSlice::calculateBoundingCtuTsAddrForSlice(UInt &startCtuTSAddrSlice, UInt &boundingCtuTSAddrSlice, bool &haveReachedTileBoundary,
-                                                   Picture* pcPic, const Int sliceMode, const Int sliceArgument)
+                                                   Picture* pcPic, const int sliceMode, const int sliceArgument)
 #else
 void EncSlice::calculateBoundingCtuTsAddrForSlice(UInt &startCtuTSAddrSlice, UInt &boundingCtuTSAddrSlice,
-                                                   Picture* pcPic, const Int sliceMode, const Int sliceArgument)
+                                                   Picture* pcPic, const int sliceMode, const int sliceArgument)
 #endif
 {
 #if HEVC_TILES_WPP

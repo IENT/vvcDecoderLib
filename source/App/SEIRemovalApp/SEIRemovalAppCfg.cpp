@@ -54,10 +54,10 @@ namespace po = df::program_options_lite;
 /** \param argc number of arguments
     \param argv array of arguments
  */
-bool SEIRemovalAppCfg::parseCfg( Int argc, char* argv[] )
+bool SEIRemovalAppCfg::parseCfg( int argc, char* argv[] )
 {
   bool do_help = false;
-  Int warnUnknowParameter = 0;
+  int warnUnknowParameter = 0;
   po::Options opts;
   opts.addOptions()
 

@@ -71,18 +71,18 @@ extern       UInt   g_auiCoefTopLeftDiagScan8x8[ MAX_CU_SIZE / 2 + 1 ][64];
 
 #endif
 
-extern const Int g_quantScales   [SCALING_LIST_REM_NUM];          // Q(QP%6)
-extern const Int g_invQuantScales[SCALING_LIST_REM_NUM];          // IQ(QP%6)
+extern const int g_quantScales   [SCALING_LIST_REM_NUM];          // Q(QP%6)
+extern const int g_invQuantScales[SCALING_LIST_REM_NUM];          // IQ(QP%6)
 
 #if JVET_K1000_SIMPLIFIED_EMT
-static const Int g_numTransformMatrixSizes = 6;
-static const Int g_transformMatrixShift[TRANSFORM_NUMBER_OF_DIRECTIONS] = {  6, 6 };
+static const int g_numTransformMatrixSizes = 6;
+static const int g_transformMatrixShift[TRANSFORM_NUMBER_OF_DIRECTIONS] = {  6, 6 };
 #else
-static const Int g_numTransformMatrixSizes = 7;
+static const int g_numTransformMatrixSizes = 7;
 #if RExt__HIGH_PRECISION_FORWARD_TRANSFORM
-static const Int g_transformMatrixShift[TRANSFORM_NUMBER_OF_DIRECTIONS] = { 14, 6 };
+static const int g_transformMatrixShift[TRANSFORM_NUMBER_OF_DIRECTIONS] = { 14, 6 };
 #else
-static const Int g_transformMatrixShift[TRANSFORM_NUMBER_OF_DIRECTIONS] = {  6, 6 };
+static const int g_transformMatrixShift[TRANSFORM_NUMBER_OF_DIRECTIONS] = {  6, 6 };
 #endif
 
 extern const TMatrixCoeff g_aiT2  [TRANSFORM_NUMBER_OF_DIRECTIONS][  2][  2];
@@ -99,9 +99,9 @@ extern const TMatrixCoeff g_aiT128[TRANSFORM_NUMBER_OF_DIRECTIONS][128][128];
 // Luma QP to Chroma QP mapping
 // ====================================================================================================================
 #if JVET_K0251_QP_EXT
-static const Int chromaQPMappingTableSize = (MAX_QP + 7);
+static const int chromaQPMappingTableSize = (MAX_QP + 7);
 #else
-static const Int chromaQPMappingTableSize = 58;
+static const int chromaQPMappingTableSize = 58;
 #endif
 
 extern const uint8_t  g_aucChromaScale[NUM_CHROMA_FORMAT][chromaQPMappingTableSize];
@@ -142,8 +142,8 @@ static const unsigned mpmCtx[NUM_INTRA_MODE] =
 #endif
 
 #if JEM_TOOLS
-extern const Int g_intraCubicFilter[32][4];
-extern const Int g_intraGaussFilter[32][4];
+extern const int g_intraCubicFilter[32][4];
+extern const int g_intraGaussFilter[32][4];
 
 extern const int g_pdpc_pred_param[5][35][6];
 extern const int g_pdpcParam[5][6];
@@ -159,8 +159,8 @@ extern const TMatrixCoeff g_as_DST_MAT_4 [TRANSFORM_NUMBER_OF_DIRECTIONS][4][4];
 #endif
 
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
-extern const Int g_aiTrSubsetIntra[3][2];
-extern const Int g_aiTrSubsetInter[4];
+extern const int g_aiTrSubsetIntra[3][2];
+extern const int g_aiTrSubsetInter[4];
 
 extern const uint8_t g_aucTrSetVert[NUM_INTRA_MODE - 1];
 extern const uint8_t g_aucTrSetHorz[NUM_INTRA_MODE - 1];
@@ -183,13 +183,13 @@ extern TMatrixCoeff g_aiTr128 [NUM_TRANS_TYPE][128][128];
 
 #if JEM_TOOLS
 extern const uint8_t  g_NsstLut           [NUM_INTRA_MODE-1];
-struct tabSinCos { Int c, s; };
+struct tabSinCos { int c, s; };
 extern tabSinCos    g_tabSinCos         [NSST_HYGT_PTS];
 extern const uint8_t  g_nsstHyGTPermut4x4 [35][3][16];
-extern const Int    g_nsstHyGTPar4x4    [35][3][64];
+extern const int    g_nsstHyGTPar4x4    [35][3][64];
 #if !ENABLE_BMS
 extern const uint8_t  g_nsstHyGTPermut8x8 [35][3][64];
-extern const Int    g_nsstHyGTPar8x8    [35][3][768];
+extern const int    g_nsstHyGTPar8x8    [35][3][768];
 #endif
 #endif
 
@@ -280,9 +280,9 @@ const char* nalUnitTypeToString(NalUnitType type);
 extern const char *MatrixType   [SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM];
 extern const char *MatrixType_DC[SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM];
 
-extern const Int g_quantTSDefault4x4   [4*4];
-extern const Int g_quantIntraDefault8x8[8*8];
-extern const Int g_quantInterDefault8x8[8*8];
+extern const int g_quantTSDefault4x4   [4*4];
+extern const int g_quantIntraDefault8x8[8*8];
+extern const int g_quantInterDefault8x8[8*8];
 
 extern const UInt g_scalingListSize [SCALING_LIST_SIZE_NUM];
 extern const UInt g_scalingListSizeX[SCALING_LIST_SIZE_NUM];
@@ -293,20 +293,20 @@ extern MsgLevel g_verbosity;
 
 #if JEM_TOOLS
 
-extern Int g_aiLMDivTableLow[];
-extern Int g_aiLMDivTableHigh[];
+extern int g_aiLMDivTableLow[];
+extern int g_aiLMDivTableHigh[];
 
-extern const Int g_aiMFLM_MinSize[];
-extern const Int g_aiMMLM_MinSize[];
+extern const int g_aiMFLM_MinSize[];
+extern const int g_aiMMLM_MinSize[];
 #endif
 #if JEM_TOOLS||JVET_K0190
-extern const Int g_aiNonLMPosThrs[];
+extern const int g_aiNonLMPosThrs[];
 #endif
 #if JEM_TOOLS
 extern const uint8_t g_NonMPM[257];
 #if !INTRA67_3MPM
 #if JVET_B0051_NON_MPM_MODE
-extern const Int g_ipred_mode_table[];
+extern const int g_ipred_mode_table[];
 #endif
 #endif
 #endif

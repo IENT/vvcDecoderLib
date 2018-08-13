@@ -85,7 +85,7 @@ static inline UInt getTotalSamples(const UInt width, const UInt height, const Ch
 
 //------------------------------------------------
 
-static inline uint64_t getTotalFracBits(const UInt width, const UInt height, const ChromaFormat format, const Int bitDepths[MAX_NUM_CHANNEL_TYPE])
+static inline uint64_t getTotalFracBits(const UInt width, const UInt height, const ChromaFormat format, const int bitDepths[MAX_NUM_CHANNEL_TYPE])
 {
   unsigned bitsPerSampleTimes2 = MAX_UINT;
   switch (format)
@@ -114,7 +114,7 @@ static inline bool filterIntraReferenceSamples (const ChannelType chType, const 
 
 //------------------------------------------------
 
-static inline Int getTransformShift(const Int channelBitDepth, const Size size, const Int maxLog2TrDynamicRange)
+static inline int getTransformShift(const int channelBitDepth, const Size size, const int maxLog2TrDynamicRange)
 {
   return maxLog2TrDynamicRange - channelBitDepth - ( ( g_aucLog2[size.width] + g_aucLog2[size.height] ) >> 1 );
 }
@@ -122,7 +122,7 @@ static inline Int getTransformShift(const Int channelBitDepth, const Size size, 
 
 //------------------------------------------------
 
-static inline Int getScaledChromaQP(Int unscaledChromaQP, const ChromaFormat chFmt)
+static inline int getScaledChromaQP(int unscaledChromaQP, const ChromaFormat chFmt)
 {
   return g_aucChromaScale[chFmt][Clip3(0, (chromaQPMappingTableSize - 1), unscaledChromaQP)];
 }
@@ -133,7 +133,7 @@ static inline Int getScaledChromaQP(Int unscaledChromaQP, const ChromaFormat chF
 //Scaling lists  =======================================================================================================
 //======================================================================================================================
 
-static inline Int getScalingListType(const PredMode predMode, const ComponentID compID)
+static inline int getScalingListType(const PredMode predMode, const ComponentID compID)
 {
   return ((predMode != MODE_INTER) ? 0 : MAX_NUM_COMPONENT) + MAP_CHROMA(compID);
 }
