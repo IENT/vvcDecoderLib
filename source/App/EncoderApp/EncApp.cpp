@@ -639,7 +639,7 @@ Void EncApp::encode()
   m_bitstream.open(m_bitstreamFileName.c_str(), fstream::binary | fstream::out);
   if (!m_bitstream)
   {
-    EXIT( "failed to open bitstream file " << m_bitstreamFileName.c_str() << " for writing\n");
+    EXIT( "Failed to open bitstream file " << m_bitstreamFileName.c_str() << " for writing\n");
   }
 
   std::list<PelUnitBuf*> recBufList;

@@ -81,7 +81,7 @@ UInt DecApp::decode()
   ifstream bitstreamFile(m_bitstreamFileName.c_str(), ifstream::in | ifstream::binary);
   if (!bitstreamFile)
   {
-    EXIT( "failed to open bitstream file " << m_bitstreamFileName.c_str() << " for reading" ) ;
+    EXIT( "Failed to open bitstream file " << m_bitstreamFileName.c_str() << " for reading" ) ;
   }
 
   InputByteStream bytestream(bitstreamFile);
