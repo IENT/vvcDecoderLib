@@ -128,7 +128,7 @@ void SEIPictureTiming::copyTo (SEIPictureTiming& target)
 }
 
 // Static member
-const TChar *SEI::getSEIMessageString(SEI::PayloadType payloadType)
+const char *SEI::getSEIMessageString(SEI::PayloadType payloadType)
 {
   switch (payloadType)
   {

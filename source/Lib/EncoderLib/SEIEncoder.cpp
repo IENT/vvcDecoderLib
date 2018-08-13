@@ -421,7 +421,7 @@ template <typename T>
 static void readTokenValue(T            &returnedValue, /// value returned
                            bool         &failed,        /// used and updated
                            std::istream &is,            /// stream to read token from
-                           const TChar  *pToken)        /// token string
+                           const char  *pToken)        /// token string
 {
   returnedValue=T();
   if (failed)
@@ -470,7 +470,7 @@ template <typename T>
 static void readTokenValueAndValidate(T            &returnedValue, /// value returned
                                       bool         &failed,        /// used and updated
                                       std::istream &is,            /// stream to read token from
-                                      const TChar  *pToken,        /// token string
+                                      const char  *pToken,        /// token string
                                       const T      &minInclusive,  /// minimum value allowed, inclusive
                                       const T      &maxInclusive)  /// maximum value allowed, inclusive
 {
@@ -489,7 +489,7 @@ static void readTokenValueAndValidate(T            &returnedValue, /// value ret
 static void readTokenValueAndValidate(bool         &returnedValue, /// value returned
                                       bool         &failed,        /// used and updated
                                       std::istream &is,            /// stream to read token from
-                                      const TChar  *pToken)        /// token string
+                                      const char  *pToken)        /// token string
 {
   readTokenValue(returnedValue, failed, is, pToken);
 }

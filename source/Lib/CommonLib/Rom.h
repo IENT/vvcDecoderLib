@@ -274,11 +274,11 @@ extern UnitScale     g_miScaling; // scaling object for motion scaling
 extern CDTrace* g_trace_ctx;
 #endif
 
-const TChar* nalUnitTypeToString(NalUnitType type);
+const char* nalUnitTypeToString(NalUnitType type);
 
 #if HEVC_USE_SCALING_LISTS
-extern const TChar *MatrixType   [SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM];
-extern const TChar *MatrixType_DC[SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM];
+extern const char *MatrixType   [SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM];
+extern const char *MatrixType_DC[SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM];
 
 extern const Int g_quantTSDefault4x4   [4*4];
 extern const Int g_quantIntraDefault8x8[8*8];

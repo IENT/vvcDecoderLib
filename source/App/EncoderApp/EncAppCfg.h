@@ -593,7 +593,7 @@ public:
 public:
   void  create    ();                                         ///< create option handling class
   void  destroy   ();                                         ///< destroy option handling class
-  bool  parseCfg  ( Int argc, TChar* argv[] );                ///< parse configuration file to fill member variables
+  bool  parseCfg  ( Int argc, char* argv[] );                ///< parse configuration file to fill member variables
 
 };// END CLASS DEFINITION EncAppCfg
 

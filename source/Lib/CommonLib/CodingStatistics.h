@@ -122,9 +122,9 @@ enum CodingStatisticsType
   STATS__NUM_STATS
 };
 
-static inline const TChar* getName(CodingStatisticsType name)
+static inline const char* getName(CodingStatisticsType name)
 {
-  static const TChar *statNames[]=
+  static const char *statNames[]=
   {
     "NAL_UNIT_TOTAL_BODY", // This is a special case and is not included in the total sums.
     "NAL_UNIT_PACKING",
@@ -200,7 +200,7 @@ static inline const TChar* getName(CodingStatisticsType name)
     "CABAC_BITS__OTHER",
     "CABAC_BITS__INVALID"
   };
-  CHECK( STATS__NUM_STATS != sizeof( statNames ) / sizeof( TChar* ) || name >= STATS__NUM_STATS, "stats out of range" );
+  CHECK( STATS__NUM_STATS != sizeof( statNames ) / sizeof( char* ) || name >= STATS__NUM_STATS, "stats out of range" );
   return statNames[name];
 }
 
@@ -260,10 +260,10 @@ public:
     return ( subClass % CODING_STATS_NUM_SIZES ) / CODING_STATS_NUM_WIDTHS;
   }
 
-  static const TChar *GetSubClassString( const UInt subClass )
+  static const char *GetSubClassString( const UInt subClass )
   {
     CHECK( subClass >= CODING_STATS_NUM_SUBCLASSES, "Subclass does not exist" );
-    static const TChar *strings[1 + MAX_NUM_COMPONENT + MAX_NUM_CHANNEL_TYPE] = { "-", "Y", "Cb", "Cr", "Luma", "Chroma" };
+    static const char *strings[1 + MAX_NUM_COMPONENT + MAX_NUM_CHANNEL_TYPE] = { "-", "Y", "Cb", "Cr", "Luma", "Chroma" };
     return strings[subClass / CODING_STATS_NUM_SIZES];
   }
 
@@ -327,7 +327,7 @@ private:
   {
   }
 
-  static void OutputLine( const TChar *pName, const TChar sep, UInt wIdx, UInt hIdx, const TChar *pSubClassStr, const SStat &sCABAC, const SStat &sEP )
+  static void OutputLine( const char *pName, const char sep, UInt wIdx, UInt hIdx, const char *pSubClassStr, const SStat &sCABAC, const SStat &sEP )
   {
     if( wIdx == 0 && hIdx == 0 )
     {
@@ -349,7 +349,7 @@ private:
       printf( " %12lld %12lld %12lld %12lld (%12lld)%c\n", sEP.count, sEP.sum, sEP.bits, sCABAC.bits + sEP.bits, ( sCABAC.bits + sEP.bits ) / 8, sep == '~' ? ']' : ' ' );
     }
   }
-  static void OutputLine( const TChar *pName, const TChar sep, const TChar *pWidthString, const TChar *pHeightString, const TChar *pSubClassStr, const SStat &sCABAC, const SStat &sEP )
+  static void OutputLine( const char *pName, const char sep, const char *pWidthString, const char *pHeightString, const char *pSubClassStr, const SStat &sCABAC, const SStat &sEP )
   {
     printf( "%c%-45s%c  %6s %6s %6s ", sep == '~' ? '[' : ' ', pName, sep, pWidthString, pHeightString, pSubClassStr );
     if( sCABAC.count > 0 )
@@ -364,14 +364,14 @@ private:
     }
     printf( " %12lld %12lld %12lld %12lld (%12lld)%c\n", sEP.count, sEP.sum, sEP.bits, sCABAC.bits + sEP.bits, ( sCABAC.bits + sEP.bits ) / 8, sep == '~' ? ']' : ' ' );
   }
-  static void OutputLine( const TChar *pName, const TChar sep, const TChar *pWidthString, const TChar *pHeightString, const TChar *pSubClassStr, const SStat &sEP )
+  static void OutputLine( const char *pName, const char sep, const char *pWidthString, const char *pHeightString, const char *pSubClassStr, const SStat &sEP )
   {
     printf( "%c%-45s%c  %6s %6s %6s          -/- %12s %12s %12s %9s-/- %12lld %12lld %12lld %12lld (%12lld)%c\n",
             sep == '~' ? '[' : ' ', pName, sep, pWidthString, pHeightString, pSubClassStr,
             "", "", "", "", sEP.count, sEP.sum, sEP.bits, sEP.bits, ( sEP.bits ) / 8, sep == '~' ? ']' : ' ' );
   }
 
-  static void OutputDashedLine( const TChar *pText )
+  static void OutputDashedLine( const char *pText )
   {
     printf( "--%s", pText );
     UInt tot = 0;
@@ -442,7 +442,7 @@ public:
       epSubTotal   .classCount = classCounts[i];
       bool bHadClassifiedEntry = false;
 
-      const TChar *pName = getName( CodingStatisticsType( i ) );
+      const char *pName = getName( CodingStatisticsType( i ) );
 
       for( UInt c = 0; c < CODING_STATS_NUM_SUBCLASSES; c++ )
       {
@@ -597,7 +597,7 @@ public:
 
   static SStat &GetStatisticEP    ( const std::string &str )                { return GetSingletonInstance().data.mappings_ep[str]; }
 
-  static SStat &GetStatisticEP    ( const TChar *pKey )                     { return GetStatisticEP( std::string( pKey ) ); }
+  static SStat &GetStatisticEP    ( const char *pKey )                     { return GetStatisticEP( std::string( pKey ) ); }
 
   static int getNumOnes( Int bins )
   {
@@ -629,7 +629,7 @@ public:
     s.sum   += getNumOnes( value );
   }
 
-  static void IncrementStatisticEP( const TChar *pKey, const Int numBits, const Int value )
+  static void IncrementStatisticEP( const char *pKey, const Int numBits, const Int value )
   {
     SStat &s = GetStatisticEP( pKey );
     s.bits  += numBits;

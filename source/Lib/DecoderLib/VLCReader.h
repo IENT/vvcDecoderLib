@@ -87,10 +87,10 @@ protected:
   virtual ~VLCReader() {};
 
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
-  void  xReadCode    ( UInt   length, UInt& val, const TChar *pSymbolName );
-  void  xReadUvlc    (                UInt& val, const TChar *pSymbolName );
-  void  xReadSvlc    (                 Int& val, const TChar *pSymbolName );
-  void  xReadFlag    (                UInt& val, const TChar *pSymbolName );
+  void  xReadCode    ( UInt   length, UInt& val, const char *pSymbolName );
+  void  xReadUvlc    (                UInt& val, const char *pSymbolName );
+  void  xReadSvlc    (                 Int& val, const char *pSymbolName );
+  void  xReadFlag    (                UInt& val, const char *pSymbolName );
 #else
   void  xReadCode    ( UInt   length, UInt& val );
   void  xReadUvlc    (                UInt& val );
@@ -98,10 +98,10 @@ protected:
   void  xReadFlag    (                UInt& val );
 #endif
 #if ENABLE_TRACING
-  void  xReadCodeTr  ( UInt  length, UInt& rValue, const TChar *pSymbolName );
-  void  xReadUvlcTr  (               UInt& rValue, const TChar *pSymbolName );
-  void  xReadSvlcTr  (                Int& rValue, const TChar *pSymbolName );
-  void  xReadFlagTr  (               UInt& rValue, const TChar *pSymbolName );
+  void  xReadCodeTr  ( UInt  length, UInt& rValue, const char *pSymbolName );
+  void  xReadUvlcTr  (               UInt& rValue, const char *pSymbolName );
+  void  xReadSvlcTr  (                Int& rValue, const char *pSymbolName );
+  void  xReadFlagTr  (               UInt& rValue, const char *pSymbolName );
 #endif
 public:
   void  setBitstream ( InputBitstream* p )   { m_pcBitstream = p; }

@@ -56,7 +56,7 @@ namespace po = df::program_options_lite;
 /** \param argc number of arguments
     \param argv array of arguments
  */
-bool DecAppCfg::parseCfg( Int argc, TChar* argv[] )
+bool DecAppCfg::parseCfg( Int argc, char* argv[] )
 {
   bool do_help = false;
   string cfg_TargetDecLayerIdSetFile;
@@ -108,9 +108,9 @@ bool DecAppCfg::parseCfg( Int argc, TChar* argv[] )
 
   po::setDefaults(opts);
   po::ErrorReporter err;
-  const list<const TChar*>& argv_unhandled = po::scanArgv(opts, argc, (const TChar**) argv, err);
+  const list<const char*>& argv_unhandled = po::scanArgv(opts, argc, (const char**) argv, err);
 
-  for (list<const TChar*>::const_iterator it = argv_unhandled.begin(); it != argv_unhandled.end(); it++)
+  for (list<const char*>::const_iterator it = argv_unhandled.begin(); it != argv_unhandled.end(); it++)
   {
     msg( ERROR, "Unhandled argument ignored: `%s'\n", *it);
   }

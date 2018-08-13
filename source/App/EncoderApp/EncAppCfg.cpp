@@ -192,7 +192,7 @@ std::istringstream &operator>>(std::istringstream &in, GOPEntry &entry)     //in
   return in;
 }
 
-bool confirmPara(bool bflag, const TChar* message);
+bool confirmPara(bool bflag, const char* message);
 
 static inline ChromaFormat numberToChromaFormat(const Int val)
 {
@@ -208,7 +208,7 @@ static inline ChromaFormat numberToChromaFormat(const Int val)
 
 static const struct MapStrToProfile
 {
-  const TChar* str;
+  const char* str;
   Profile::Name value;
 }
 strToProfile[] =
@@ -224,7 +224,7 @@ strToProfile[] =
 
 static const struct MapStrToExtendedProfile
 {
-  const TChar* str;
+  const char* str;
   ExtendedProfileName value;
 }
 strToExtendedProfile[] =
@@ -284,7 +284,7 @@ static const ExtendedProfileName validRExtProfileNames[2/* intraConstraintFlag*/
 
 static const struct MapStrToTier
 {
-  const TChar* str;
+  const char* str;
   Level::Tier value;
 }
 strToTier[] =
@@ -295,7 +295,7 @@ strToTier[] =
 
 static const struct MapStrToLevel
 {
-  const TChar* str;
+  const char* str;
   Level::Name value;
 }
 strToLevel[] =
@@ -328,7 +328,7 @@ UInt g_uiMaxCpbSize[2][21] =
 
 static const struct MapStrToCostMode
 {
-  const TChar* str;
+  const char* str;
   CostMode    value;
 }
 strToCostMode[] =
@@ -342,7 +342,7 @@ strToCostMode[] =
 #if HEVC_USE_SCALING_LISTS
 static const struct MapStrToScalingListMode
 {
-  const TChar* str;
+  const char* str;
   ScalingListMode value;
 }
 strToScalingListMode[] =
@@ -438,7 +438,7 @@ struct SMultiValueInput
   SMultiValueInput<T> &operator=(const std::vector<T> &userValues) { values=userValues; return *this; }
   SMultiValueInput<T> &operator=(const SMultiValueInput<T> &userValues) { values=userValues.values; return *this; }
 
-  T readValue(const TChar *&pStr, bool &bSuccess);
+  T readValue(const char *&pStr, bool &bSuccess);
 
   istream& readValues(std::istream &in);
 };
@@ -450,9 +450,9 @@ static inline istream& operator >> (std::istream &in, SMultiValueInput<T> &value
 }
 
 template<>
-UInt SMultiValueInput<UInt>::readValue(const TChar *&pStr, bool &bSuccess)
+UInt SMultiValueInput<UInt>::readValue(const char *&pStr, bool &bSuccess)
 {
-  TChar *eptr;
+  char *eptr;
   UInt val=strtoul(pStr, &eptr, 0);
   pStr=eptr;
   bSuccess=!(*eptr!=0 && !isspace(*eptr) && *eptr!=',') && !(val<minValIncl || val>maxValIncl);
@@ -460,9 +460,9 @@ UInt SMultiValueInput<UInt>::readValue(const TChar *&pStr, bool &bSuccess)
 }
 
 template<>
-Int SMultiValueInput<Int>::readValue(const TChar *&pStr, bool &bSuccess)
+Int SMultiValueInput<Int>::readValue(const char *&pStr, bool &bSuccess)
 {
-  TChar *eptr;
+  char *eptr;
   Int val=strtol(pStr, &eptr, 0);
   pStr=eptr;
   bSuccess=!(*eptr!=0 && !isspace(*eptr) && *eptr!=',') && !(val<minValIncl || val>maxValIncl);
@@ -470,9 +470,9 @@ Int SMultiValueInput<Int>::readValue(const TChar *&pStr, bool &bSuccess)
 }
 
 template<>
-double SMultiValueInput<double>::readValue(const TChar *&pStr, bool &bSuccess)
+double SMultiValueInput<double>::readValue(const char *&pStr, bool &bSuccess)
 {
-  TChar *eptr;
+  char *eptr;
   double val=strtod(pStr, &eptr);
   pStr=eptr;
   bSuccess=!(*eptr!=0 && !isspace(*eptr) && *eptr!=',') && !(val<minValIncl || val>maxValIncl);
@@ -480,9 +480,9 @@ double SMultiValueInput<double>::readValue(const TChar *&pStr, bool &bSuccess)
 }
 
 template<>
-bool SMultiValueInput<bool>::readValue(const TChar *&pStr, bool &bSuccess)
+bool SMultiValueInput<bool>::readValue(const char *&pStr, bool &bSuccess)
 {
-  TChar *eptr;
+  char *eptr;
   Int val=strtol(pStr, &eptr, 0);
   pStr=eptr;
   bSuccess=!(*eptr!=0 && !isspace(*eptr) && *eptr!=',') && !(val<Int(minValIncl) || val>Int(maxValIncl));
@@ -500,7 +500,7 @@ istream& SMultiValueInput<T>::readValues(std::istream &in)
   }
   if (!str.empty())
   {
-    const TChar *pStr=str.c_str();
+    const char *pStr=str.c_str();
     // soak up any whitespace
     for(;isspace(*pStr);pStr++);
 
@@ -637,7 +637,7 @@ automaticallySelectRExtProfile(const bool bUsingGeneralRExtTools,
     \param  argv        array of arguments
     \retval             true when success
  */
-bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
+bool EncAppCfg::parseCfg( Int argc, char* argv[] )
 {
   bool do_help = false;
 
@@ -1350,9 +1350,9 @@ bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
   }
   po::setDefaults(opts);
   po::ErrorReporter err;
-  const list<const TChar*>& argv_unhandled = po::scanArgv(opts, argc, (const TChar**) argv, err);
+  const list<const char*>& argv_unhandled = po::scanArgv(opts, argc, (const char**) argv, err);
 
-  for (list<const TChar*>::const_iterator it = argv_unhandled.begin(); it != argv_unhandled.end(); it++)
+  for (list<const char*>::const_iterator it = argv_unhandled.begin(); it != argv_unhandled.end(); it++)
   {
     msg( ERROR, "Unhandled argument ignored: `%s'\n", *it);
   }
@@ -3045,7 +3045,7 @@ bool EncAppCfg::xCheckParameter()
   return check_failed;
 }
 
-const TChar *profileToString(const Profile::Name profile)
+const char *profileToString(const Profile::Name profile)
 {
   static const UInt numberOfProfiles = sizeof(strToProfile)/sizeof(*strToProfile);
 
@@ -3420,7 +3420,7 @@ void EncAppCfg::xPrintParameter()
   fflush( stdout );
 }
 
-bool confirmPara(bool bflag, const TChar* message)
+bool confirmPara(bool bflag, const char* message)
 {
   if (!bflag)
   {

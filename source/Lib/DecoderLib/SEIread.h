@@ -88,10 +88,10 @@ protected:
 #endif
   void xParseSEIGreenMetadataInfo             (SEIGreenMetadataInfo& sei,             UInt payLoadSize,                     std::ostream *pDecodedMessageOutputStream);
 
-  void sei_read_code(std::ostream *pOS, UInt uiLength, UInt& ruiCode, const TChar *pSymbolName);
-  void sei_read_uvlc(std::ostream *pOS,                UInt& ruiCode, const TChar *pSymbolName);
-  void sei_read_svlc(std::ostream *pOS,                Int&  ruiCode, const TChar *pSymbolName);
-  void sei_read_flag(std::ostream *pOS,                UInt& ruiCode, const TChar *pSymbolName);
+  void sei_read_code(std::ostream *pOS, UInt uiLength, UInt& ruiCode, const char *pSymbolName);
+  void sei_read_uvlc(std::ostream *pOS,                UInt& ruiCode, const char *pSymbolName);
+  void sei_read_svlc(std::ostream *pOS,                Int&  ruiCode, const char *pSymbolName);
+  void sei_read_flag(std::ostream *pOS,                UInt& ruiCode, const char *pSymbolName);
 };
 
 

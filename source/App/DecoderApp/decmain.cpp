@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
   df::program_options_lite::Options optsSimd;
   optsSimd.addOptions()( "SIMD", SIMD, string( "" ), "" );
   df::program_options_lite::SilentReporter err;
-  df::program_options_lite::scanArgv( optsSimd, argc, ( const TChar** ) argv, err );
+  df::program_options_lite::scanArgv( optsSimd, argc, ( const char** ) argv, err );
   fprintf( stdout, "[SIMD=%s] ", read_x86_extension( SIMD ) );
 #endif
 #if ENABLE_TRACING

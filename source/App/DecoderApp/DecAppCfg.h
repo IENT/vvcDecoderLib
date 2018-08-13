@@ -76,7 +76,7 @@ public:
   DecAppCfg();
   virtual ~DecAppCfg();
 
-  bool  parseCfg        ( Int argc, TChar* argv[] );   ///< initialize option class from configuration
+  bool  parseCfg        ( Int argc, char* argv[] );   ///< initialize option class from configuration
 };
 
 //! \}

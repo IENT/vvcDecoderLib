@@ -52,7 +52,7 @@
 
 #if ENABLE_TRACING
 
-void  VLCWriter::xWriteCodeTr (UInt value, UInt  length, const TChar *pSymbolName)
+void  VLCWriter::xWriteCodeTr (UInt value, UInt  length, const char *pSymbolName)
 {
   xWriteCode (value,length);
 
@@ -69,7 +69,7 @@ void  VLCWriter::xWriteCodeTr (UInt value, UInt  length, const TChar *pSymbolNam
   }
 }
 
-void  VLCWriter::xWriteUvlcTr (UInt value, const TChar *pSymbolName)
+void  VLCWriter::xWriteUvlcTr (UInt value, const char *pSymbolName)
 {
   xWriteUvlc (value);
   if( g_HLSTraceEnable )
@@ -78,7 +78,7 @@ void  VLCWriter::xWriteUvlcTr (UInt value, const TChar *pSymbolName)
   }
 }
 
-void  VLCWriter::xWriteSvlcTr (Int value, const TChar *pSymbolName)
+void  VLCWriter::xWriteSvlcTr (Int value, const char *pSymbolName)
 {
   xWriteSvlc(value);
   if( g_HLSTraceEnable )
@@ -87,7 +87,7 @@ void  VLCWriter::xWriteSvlcTr (Int value, const TChar *pSymbolName)
   }
 }
 
-void  VLCWriter::xWriteFlagTr(UInt value, const TChar *pSymbolName)
+void  VLCWriter::xWriteFlagTr(UInt value, const char *pSymbolName)
 {
   xWriteFlag(value);
   if( g_HLSTraceEnable )
@@ -315,7 +315,7 @@ void HLSWriter::codePPS( const PPS* pcPPS )
   if (pps_extension_present_flag)
   {
 #if ENABLE_TRACING /*|| RExt__DECODER_DEBUG_BIT_STATISTICS*/
-    static const TChar *syntaxStrings[]={ "pps_range_extension_flag",
+    static const char *syntaxStrings[]={ "pps_range_extension_flag",
       "pps_multilayer_extension_flag",
       "pps_extension_6bits[0]",
       "pps_extension_6bits[1]",
@@ -870,7 +870,7 @@ void HLSWriter::codeSPS( const SPS* pcSPS )
   if (sps_extension_present_flag)
   {
 #if ENABLE_TRACING /*|| RExt__DECODER_DEBUG_BIT_STATISTICS*/
-    static const TChar *syntaxStrings[]={ "sps_range_extension_flag",
+    static const char *syntaxStrings[]={ "sps_range_extension_flag",
       "sps_multilayer_extension_flag",
       "sps_extension_6bits[0]",
       "sps_extension_6bits[1]",

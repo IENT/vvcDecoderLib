@@ -52,7 +52,7 @@
 
 #if ENABLE_TRACING
 
-void  VLCReader::xReadCodeTr(UInt length, UInt& rValue, const TChar *pSymbolName)
+void  VLCReader::xReadCodeTr(UInt length, UInt& rValue, const char *pSymbolName)
 {
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
   xReadCode (length, rValue, pSymbolName);
@@ -69,7 +69,7 @@ void  VLCReader::xReadCodeTr(UInt length, UInt& rValue, const TChar *pSymbolName
   }
 }
 
-void  VLCReader::xReadUvlcTr(UInt& rValue, const TChar *pSymbolName)
+void  VLCReader::xReadUvlcTr(UInt& rValue, const char *pSymbolName)
 {
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
   xReadUvlc (rValue, pSymbolName);
@@ -79,7 +79,7 @@ void  VLCReader::xReadUvlcTr(UInt& rValue, const TChar *pSymbolName)
   DTRACE( g_trace_ctx, D_HEADER, "%-50s ue(v) : %u\n", pSymbolName, rValue );
 }
 
-void  VLCReader::xReadSvlcTr(Int& rValue, const TChar *pSymbolName)
+void  VLCReader::xReadSvlcTr(Int& rValue, const char *pSymbolName)
 {
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
   xReadSvlc (rValue, pSymbolName);
@@ -89,7 +89,7 @@ void  VLCReader::xReadSvlcTr(Int& rValue, const TChar *pSymbolName)
   DTRACE( g_trace_ctx, D_HEADER, "%-50s se(v) : %d\n", pSymbolName, rValue );
 }
 
-void  VLCReader::xReadFlagTr(UInt& rValue, const TChar *pSymbolName)
+void  VLCReader::xReadFlagTr(UInt& rValue, const char *pSymbolName)
 {
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
   xReadFlag (rValue, pSymbolName);
@@ -111,7 +111,7 @@ void xTraceFillerData ()
 // Protected member functions
 // ====================================================================================================================
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
-void VLCReader::xReadCode (UInt uiLength, UInt& ruiCode, const TChar *pSymbolName)
+void VLCReader::xReadCode (UInt uiLength, UInt& ruiCode, const char *pSymbolName)
 #else
 void VLCReader::xReadCode (UInt uiLength, UInt& ruiCode)
 #endif
@@ -124,7 +124,7 @@ void VLCReader::xReadCode (UInt uiLength, UInt& ruiCode)
 }
 
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
-void VLCReader::xReadUvlc( UInt& ruiVal, const TChar *pSymbolName)
+void VLCReader::xReadUvlc( UInt& ruiVal, const char *pSymbolName)
 #else
 void VLCReader::xReadUvlc( UInt& ruiVal)
 #endif
@@ -162,7 +162,7 @@ void VLCReader::xReadUvlc( UInt& ruiVal)
 }
 
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
-void VLCReader::xReadSvlc( Int& riVal, const TChar *pSymbolName)
+void VLCReader::xReadSvlc( Int& riVal, const char *pSymbolName)
 #else
 void VLCReader::xReadSvlc( Int& riVal)
 #endif
@@ -200,7 +200,7 @@ void VLCReader::xReadSvlc( Int& riVal)
 }
 
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
-void VLCReader::xReadFlag (UInt& ruiCode, const TChar *pSymbolName)
+void VLCReader::xReadFlag (UInt& ruiCode, const char *pSymbolName)
 #else
 void VLCReader::xReadFlag (UInt& ruiCode)
 #endif
@@ -530,7 +530,7 @@ void HLSyntaxReader::parsePPS( PPS* pcPPS )
   if (uiCode)
   {
 #if ENABLE_TRACING || RExt__DECODER_DEBUG_BIT_STATISTICS
-    static const TChar *syntaxStrings[]={ "pps_range_extension_flag",
+    static const char *syntaxStrings[]={ "pps_range_extension_flag",
       "pps_multilayer_extension_flag",
       "pps_extension_6bits[0]",
       "pps_extension_6bits[1]",
@@ -1197,7 +1197,7 @@ void HLSyntaxReader::parseSPS(SPS* pcSPS)
   if (uiCode)
   {
 #if ENABLE_TRACING || RExt__DECODER_DEBUG_BIT_STATISTICS
-    static const TChar *syntaxStrings[]={ "sps_range_extension_flag",
+    static const char *syntaxStrings[]={ "sps_range_extension_flag",
       "sps_multilayer_extension_flag",
       "sps_extension_6bits[0]",
       "sps_extension_6bits[1]",

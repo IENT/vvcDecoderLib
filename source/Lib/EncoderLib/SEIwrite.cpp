@@ -210,7 +210,7 @@ void SEIWriter::xWriteSEIuserDataUnregistered(const SEIuserDataUnregistered &sei
  */
 void SEIWriter::xWriteSEIDecodedPictureHash(const SEIDecodedPictureHash& sei)
 {
-  const TChar *traceString="\0";
+  const char *traceString="\0";
   switch (sei.method)
   {
     case HASHTYPE_MD5: traceString="picture_md5"; break;

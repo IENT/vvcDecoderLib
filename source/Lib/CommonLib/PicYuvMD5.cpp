@@ -213,7 +213,7 @@ UInt calcMD5(const CPelUnitBuf& pic, PictureHash &digest, const BitDepths &bitDe
 
 std::string hashToString(const PictureHash &digest, Int numChar)
 {
-  static const TChar* hex = "0123456789abcdef";
+  static const char* hex = "0123456789abcdef";
   std::string result;
 
   for(Int pos=0; pos<Int(digest.hash.size()); pos++)
@@ -234,7 +234,7 @@ int calcAndPrintHashStatus(const CPelUnitBuf& pic, const SEIDecodedPictureHash* 
   /* calculate MD5sum for entire reconstructed picture */
   PictureHash recon_digest;
   Int numChar=0;
-  const TChar* hashType = "\0";
+  const char* hashType = "\0";
 
   if (pictureHashSEI)
   {
@@ -267,7 +267,7 @@ int calcAndPrintHashStatus(const CPelUnitBuf& pic, const SEIDecodedPictureHash* 
   }
 
   /* compare digest against received version */
-  const TChar* ok = "(unk)";
+  const char* ok = "(unk)";
   bool mismatch = false;
 
   if (pictureHashSEI)

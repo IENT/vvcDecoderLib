@@ -96,7 +96,7 @@ public:
   SEI() {}
   virtual ~SEI() {}
 
-  static const TChar *getSEIMessageString(SEI::PayloadType payloadType);
+  static const char *getSEIMessageString(SEI::PayloadType payloadType);
 
   virtual PayloadType payloadType() const = 0;
 };

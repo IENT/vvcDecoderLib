@@ -61,7 +61,7 @@ CDTrace *g_trace_ctx = NULL;
 
 MsgLevel g_verbosity = VERBOSE;
 
-const TChar* nalUnitTypeToString(NalUnitType type)
+const char* nalUnitTypeToString(NalUnitType type)
 {
   switch (type)
   {
@@ -991,7 +991,7 @@ const UInt g_auiGoRiceRange[MAX_GR_ORDER_RESIDUAL] =
 };
 
 #if HEVC_USE_SCALING_LISTS
-const TChar *MatrixType[SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM] =
+const char *MatrixType[SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM] =
 {
   {
     "INTRA2X2_LUMA",
@@ -1035,7 +1035,7 @@ const TChar *MatrixType[SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM] =
   },
 };
 
-const TChar *MatrixType_DC[SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM] =
+const char *MatrixType_DC[SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM] =
 {
   {
   },

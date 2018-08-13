@@ -581,7 +581,7 @@ void DecLib::finishPicture(Int& poc, PicList*& rpcListPic, MsgLevel msgl )
 
 #endif
 
-  TChar c = (pcSlice->isIntra() ? 'I' : pcSlice->isInterP() ? 'P' : 'B');
+  char c = (pcSlice->isIntra() ? 'I' : pcSlice->isInterP() ? 'P' : 'B');
   if (!m_pcPic->referenced)
   {
     c += 32;  // tolower

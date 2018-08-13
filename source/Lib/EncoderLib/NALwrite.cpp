@@ -55,7 +55,7 @@ OutputBitstream bsNALUHeader;
   bsNALUHeader.write(nalu.m_nuhLayerId, 6);   // nuh_layer_id
   bsNALUHeader.write(nalu.m_temporalId+1, 3); // nuh_temporal_id_plus1
 
-  out.write(reinterpret_cast<const TChar*>(bsNALUHeader.getByteStream()), bsNALUHeader.getByteStreamLength());
+  out.write(reinterpret_cast<const char*>(bsNALUHeader.getByteStream()), bsNALUHeader.getByteStreamLength());
 }
 /**
  * write nalu to bytestream out, performing RBSP anti startcode
@@ -119,7 +119,7 @@ void write(ostream& out, OutputNALUnit& nalu)
   {
     outputBuffer[outputAmount++]=emulation_prevention_three_byte[0];
   }
-  out.write(reinterpret_cast<const TChar*>(&(*outputBuffer.begin())), outputAmount);
+  out.write(reinterpret_cast<const char*>(&(*outputBuffer.begin())), outputAmount);
 }
 
 //! \}

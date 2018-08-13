@@ -50,7 +50,7 @@
 //! \ingroup DecoderLib
 //! \{
 
-void SEIReader::sei_read_code(std::ostream *pOS, UInt uiLength, UInt& ruiCode, const TChar *pSymbolName)
+void SEIReader::sei_read_code(std::ostream *pOS, UInt uiLength, UInt& ruiCode, const char *pSymbolName)
 {
   READ_CODE(uiLength, ruiCode, pSymbolName);
   if (pOS)
@@ -59,7 +59,7 @@ void SEIReader::sei_read_code(std::ostream *pOS, UInt uiLength, UInt& ruiCode, c
   }
 }
 
-void SEIReader::sei_read_uvlc(std::ostream *pOS, UInt& ruiCode, const TChar *pSymbolName)
+void SEIReader::sei_read_uvlc(std::ostream *pOS, UInt& ruiCode, const char *pSymbolName)
 {
   READ_UVLC(ruiCode, pSymbolName);
   if (pOS)
@@ -68,7 +68,7 @@ void SEIReader::sei_read_uvlc(std::ostream *pOS, UInt& ruiCode, const TChar *pSy
   }
 }
 
-void SEIReader::sei_read_svlc(std::ostream *pOS, Int& ruiCode, const TChar *pSymbolName)
+void SEIReader::sei_read_svlc(std::ostream *pOS, Int& ruiCode, const char *pSymbolName)
 {
   READ_SVLC(ruiCode, pSymbolName);
   if (pOS)
@@ -77,7 +77,7 @@ void SEIReader::sei_read_svlc(std::ostream *pOS, Int& ruiCode, const TChar *pSym
   }
 }
 
-void SEIReader::sei_read_flag(std::ostream *pOS, UInt& ruiCode, const TChar *pSymbolName)
+void SEIReader::sei_read_flag(std::ostream *pOS, UInt& ruiCode, const char *pSymbolName)
 {
   READ_FLAG(ruiCode, pSymbolName);
   if (pOS)
@@ -419,7 +419,7 @@ void SEIReader::xParseSEIDecodedPictureHash(SEIDecodedPictureHash& sei, UInt pay
   sei_read_code( pDecodedMessageOutputStream, 8, val, "hash_type");
   sei.method = static_cast<HashType>(val); bytesRead++;
 
-  const TChar *traceString="\0";
+  const char *traceString="\0";
   switch (sei.method)
   {
     case HASHTYPE_MD5: traceString="picture_md5"; break;

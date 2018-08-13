@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
     ( "SIMD", SIMD, string( "" ), "" )
     ( "c", df::program_options_lite::parseConfigFile, "" );
   df::program_options_lite::SilentReporter err;
-  df::program_options_lite::scanArgv( opts, argc, ( const TChar** ) argv, err );
+  df::program_options_lite::scanArgv( opts, argc, ( const char** ) argv, err );
   fprintf( stdout, "[SIMD=%s] ", read_x86_extension( SIMD ) );
 #endif
 #if ENABLE_TRACING

@@ -1088,7 +1088,7 @@ cabac_zero_word_padding(Slice *const pcSlice, Picture *const pcPic, const std::s
         {
           zeroBytesPadding[i*3+2]=3;  // 00 00 03
         }
-        nalUnitData.write(reinterpret_cast<const TChar*>(&(zeroBytesPadding[0])), numberOfAdditionalCabacZeroBytes);
+        nalUnitData.write(reinterpret_cast<const char*>(&(zeroBytesPadding[0])), numberOfAdditionalCabacZeroBytes);
         msg( NOTICE, "Adding %d bytes of padding\n", UInt( numberOfAdditionalCabacZeroWords * 3 ) );
       }
       else
@@ -1291,7 +1291,7 @@ static UInt calculateCollocatedFromL1Flag(EncCfg *pCfg, const Int GOPid, const I
 static void
 printHash(const HashType hashType, const std::string &digestStr)
 {
-  const TChar *decodedPictureHashModeName;
+  const char *decodedPictureHashModeName;
   switch (hashType)
   {
     case HASHTYPE_MD5:
@@ -3265,7 +3265,7 @@ void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUn
   }
 #endif
 
-  TChar c = (pcSlice->isIntra() ? 'I' : pcSlice->isInterP() ? 'P' : 'B');
+  char c = (pcSlice->isIntra() ? 'I' : pcSlice->isInterP() ? 'P' : 'B');
   if (! pcPic->referenced)
   {
     c += 32;

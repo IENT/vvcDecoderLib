@@ -175,9 +175,9 @@ public:
 
 
 #if ENABLE_QPA || WCG_WPSNR
-  void    printOut ( TChar cDelim, const ChromaFormat chFmt, const bool printMSEBasedSNR, const bool printSequenceMSE, const BitDepths &bitDepths, const bool useWPSNR = false )
+  void    printOut ( char cDelim, const ChromaFormat chFmt, const bool printMSEBasedSNR, const bool printSequenceMSE, const BitDepths &bitDepths, const bool useWPSNR = false )
 #else
-  void    printOut ( TChar cDelim, const ChromaFormat chFmt, const bool printMSEBasedSNR, const bool printSequenceMSE, const BitDepths &bitDepths )
+  void    printOut ( char cDelim, const ChromaFormat chFmt, const bool printMSEBasedSNR, const bool printSequenceMSE, const BitDepths &bitDepths )
 #endif
   {
 #if !WCG_WPSNR

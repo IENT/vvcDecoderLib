@@ -73,12 +73,12 @@ static std::vector<UInt> writeAnnexB(std::ostream& out, const AccessUnit& au)
        *    unit of an access unit in decoding order, as specified by subclause
        *    7.4.1.2.3.
        */
-      out.write(reinterpret_cast<const TChar*>(start_code_prefix), 4);
+      out.write(reinterpret_cast<const char*>(start_code_prefix), 4);
       size += 4;
     }
     else
     {
-      out.write(reinterpret_cast<const TChar*>(start_code_prefix+1), 3);
+      out.write(reinterpret_cast<const char*>(start_code_prefix+1), 3);
       size += 3;
     }
     out << nalu.m_nalUnitData.str();

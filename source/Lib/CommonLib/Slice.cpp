@@ -2273,7 +2273,7 @@ bool ScalingList::xParseScalingList(const std::string &fileName)
 {
   static const Int LINE_SIZE=1024;
   FILE *fp = NULL;
-  TChar line[LINE_SIZE];
+  char line[LINE_SIZE];
 
   if (fileName.empty())
   {
@@ -2313,8 +2313,8 @@ bool ScalingList::xParseScalingList(const std::string &fileName)
           bool bFound=false;
           while ((!feof(fp)) && (!bFound))
           {
-            TChar *ret = fgets(line, LINE_SIZE, fp);
-            TChar *findNamePosition= ret==NULL ? NULL : strstr(line, MatrixType[sizeIdc][listIdc]);
+            char *ret = fgets(line, LINE_SIZE, fp);
+            char *findNamePosition= ret==NULL ? NULL : strstr(line, MatrixType[sizeIdc][listIdc]);
             // This could be a match against the DC string as well, so verify it isn't
             if (findNamePosition!= NULL && (MatrixType_DC[sizeIdc][listIdc]==NULL || strstr(line, MatrixType_DC[sizeIdc][listIdc])==NULL))
             {
@@ -2353,8 +2353,8 @@ bool ScalingList::xParseScalingList(const std::string &fileName)
             bool bFound=false;
             while ((!feof(fp)) && (!bFound))
             {
-              TChar *ret = fgets(line, LINE_SIZE, fp);
-              TChar *findNamePosition= ret==NULL ? NULL : strstr(line, MatrixType_DC[sizeIdc][listIdc]);
+              char *ret = fgets(line, LINE_SIZE, fp);
+              char *findNamePosition= ret==NULL ? NULL : strstr(line, MatrixType_DC[sizeIdc][listIdc]);
               if (findNamePosition!= NULL)
               {
                 // This won't be a match against the non-DC string.

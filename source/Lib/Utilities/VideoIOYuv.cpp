@@ -226,7 +226,7 @@ void VideoIOYuv::skipFrames(UInt numFrames, UInt width, UInt height, ChromaForma
   m_cHandle.clear();
 
   /* fall back to consuming the input */
-  TChar buf[512];
+  char buf[512];
   const streamoff offset_mod_bufsize = offset % sizeof(buf);
   for (streamoff i = 0; i < offset - offset_mod_bufsize; i += sizeof(buf))
   {
@@ -326,7 +326,7 @@ static bool readPlane(Pel* dst,
       if ((y444&mask_y_file)==0)
       {
         // read a new line
-        fd.read(reinterpret_cast<TChar*>(buf), stride_file);
+        fd.read(reinterpret_cast<char*>(buf), stride_file);
         if (fd.eof() || fd.fail() )
         {
           return false;
@@ -466,7 +466,7 @@ static bool writePlane(ostream& fd, const Pel* src, bool is16bit,
           }
         }
 
-        fd.write(reinterpret_cast<const TChar*>(buf), stride_file);
+        fd.write(reinterpret_cast<const char*>(buf), stride_file);
         if (fd.eof() || fd.fail() )
         {
           return false;
@@ -525,7 +525,7 @@ static bool writePlane(ostream& fd, const Pel* src, bool is16bit,
           }
         }
 
-        fd.write (reinterpret_cast<const TChar*>(buf), stride_file);
+        fd.write (reinterpret_cast<const char*>(buf), stride_file);
         if (fd.eof() || fd.fail())
         {
           return false;
@@ -594,7 +594,7 @@ static bool writeField(ostream& fd, const Pel* top, const Pel* bottom, bool is16
           }
         }
 
-        fd.write(reinterpret_cast<const TChar*>(buf), (stride_file * 2));
+        fd.write(reinterpret_cast<const char*>(buf), (stride_file * 2));
         if (fd.eof() || fd.fail() )
         {
           return false;
@@ -658,7 +658,7 @@ static bool writeField(ostream& fd, const Pel* top, const Pel* bottom, bool is16
           }
         }
 
-        fd.write(reinterpret_cast<const TChar*>(buf), (stride_file * 2));
+        fd.write(reinterpret_cast<const char*>(buf), (stride_file * 2));
         if (fd.eof() || fd.fail() )
         {
           return false;
