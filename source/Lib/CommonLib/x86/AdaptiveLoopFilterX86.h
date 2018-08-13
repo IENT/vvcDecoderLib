@@ -497,7 +497,7 @@ static void simdFilter5x5Blk( AlfClassifier** classifier, const PelUnitBuf &recD
         xmm12 = _mm_add_epi32( xmm12, mmOffset );
         xmm12 = _mm_srai_epi32( xmm12, numBitsMinus1 );
 
-        xmm12 = _mm_min_epi16( mmMax, _mm_max_epi16( xmm12, mmMin ) );
+        xmm12 = _mm_min_epi32( mmMax, _mm_max_epi32( xmm12, mmMin ) );
 
         xmm12 = _mm_packus_epi32( xmm12, xmm12 );
 
@@ -739,7 +739,7 @@ static void simdFilter7x7Blk( AlfClassifier** classifier, const PelUnitBuf &recD
         xmm12 = _mm_add_epi32( xmm12, mmOffset );
         xmm12 = _mm_srai_epi32( xmm12, numBitsMinus1 );
 
-        xmm12 = _mm_min_epi16( mmMax, _mm_max_epi16( xmm12, mmMin ) );
+        xmm12 = _mm_min_epi32( mmMax, _mm_max_epi32( xmm12, mmMin ) );
 
         xmm12 = _mm_packus_epi32( xmm12, xmm12 );
 
