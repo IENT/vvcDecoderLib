@@ -394,7 +394,7 @@ void SEIReader::xParseSEIuserDataUnregistered(SEIuserDataUnregistered &sei, UInt
     return;
   }
 
-  sei.userData = new UChar[sei.userDataLength];
+  sei.userData = new uint8_t[sei.userDataLength];
   for (UInt i = 0; i < sei.userDataLength; i++)
   {
     sei_read_code( NULL, 8, val, "user_data_payload_byte" );
@@ -437,7 +437,7 @@ void SEIReader::xParseSEIDecodedPictureHash(SEIDecodedPictureHash& sei, UInt pay
   for(;bytesRead < payloadSize; bytesRead++)
   {
     sei_read_code( NULL, 8, val, traceString);
-    sei.m_pictureHash.hash.push_back((UChar)val);
+    sei.m_pictureHash.hash.push_back((uint8_t)val);
     if (pDecodedMessageOutputStream)
     {
       (*pDecodedMessageOutputStream) << std::setw(2) << val;

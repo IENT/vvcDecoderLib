@@ -1083,7 +1083,7 @@ cabac_zero_word_padding(Slice *const pcSlice, Picture *const pcPic, const std::s
       const std::size_t numberOfAdditionalCabacZeroBytes=numberOfAdditionalCabacZeroWords*3;
       if (cabacZeroWordPaddingEnabled)
       {
-        std::vector<UChar> zeroBytesPadding(numberOfAdditionalCabacZeroBytes, UChar(0));
+        std::vector<uint8_t> zeroBytesPadding(numberOfAdditionalCabacZeroBytes, uint8_t(0));
         for(std::size_t i=0; i<numberOfAdditionalCabacZeroWords; i++)
         {
           zeroBytesPadding[i*3+2]=3;  // 00 00 03

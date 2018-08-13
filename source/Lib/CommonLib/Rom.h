@@ -104,7 +104,7 @@ static const Int chromaQPMappingTableSize = (MAX_QP + 7);
 static const Int chromaQPMappingTableSize = 58;
 #endif
 
-extern const UChar  g_aucChromaScale[NUM_CHROMA_FORMAT][chromaQPMappingTableSize];
+extern const uint8_t  g_aucChromaScale[NUM_CHROMA_FORMAT][chromaQPMappingTableSize];
 
 
 // ====================================================================================================================
@@ -124,15 +124,15 @@ extern const UInt   g_auiGoRiceRange[ MAX_GR_ORDER_RESIDUAL ];                  
 // Intra prediction table
 // ====================================================================================================================
 
-extern const UChar  g_aucIntraModeNumFast_UseMPM_2D[7 - MIN_CU_LOG2 + 1][7 - MIN_CU_LOG2 + 1];
-extern const UChar  g_aucIntraModeNumFast_UseMPM   [MAX_CU_DEPTH];
-extern const UChar  g_aucIntraModeNumFast_NotUseMPM[MAX_CU_DEPTH];
+extern const uint8_t  g_aucIntraModeNumFast_UseMPM_2D[7 - MIN_CU_LOG2 + 1][7 - MIN_CU_LOG2 + 1];
+extern const uint8_t  g_aucIntraModeNumFast_UseMPM   [MAX_CU_DEPTH];
+extern const uint8_t  g_aucIntraModeNumFast_NotUseMPM[MAX_CU_DEPTH];
 
-extern const UChar  g_chroma422IntraAngleMappingTable[NUM_INTRA_MODE];
+extern const uint8_t  g_chroma422IntraAngleMappingTable[NUM_INTRA_MODE];
 #if !INTRA67_3MPM
-extern const UChar  g_intraMode65to33AngMapping[NUM_INTRA_MODE];
+extern const uint8_t  g_intraMode65to33AngMapping[NUM_INTRA_MODE];
 
-extern const UChar  g_intraMode33to65AngMapping[36];
+extern const uint8_t  g_intraMode33to65AngMapping[36];
 
 static const unsigned mpmCtx[NUM_INTRA_MODE] =
 { 1, 1,                                                                                              // PLANAR, DC
@@ -162,11 +162,11 @@ extern const TMatrixCoeff g_as_DST_MAT_4 [TRANSFORM_NUMBER_OF_DIRECTIONS][4][4];
 extern const Int g_aiTrSubsetIntra[3][2];
 extern const Int g_aiTrSubsetInter[4];
 
-extern const UChar g_aucTrSetVert[NUM_INTRA_MODE - 1];
-extern const UChar g_aucTrSetHorz[NUM_INTRA_MODE - 1];
+extern const uint8_t g_aucTrSetVert[NUM_INTRA_MODE - 1];
+extern const uint8_t g_aucTrSetHorz[NUM_INTRA_MODE - 1];
 
-extern const UChar g_aucTrSetVert35[35];
-extern const UChar g_aucTrSetHorz35[35];
+extern const uint8_t g_aucTrSetVert35[35];
+extern const uint8_t g_aucTrSetHorz35[35];
 
 extern const UInt g_EmtSigNumThr;
 #endif
@@ -182,13 +182,13 @@ extern TMatrixCoeff g_aiTr128 [NUM_TRANS_TYPE][128][128];
 #endif
 
 #if JEM_TOOLS
-extern const UChar  g_NsstLut           [NUM_INTRA_MODE-1];
+extern const uint8_t  g_NsstLut           [NUM_INTRA_MODE-1];
 struct tabSinCos { Int c, s; };
 extern tabSinCos    g_tabSinCos         [NSST_HYGT_PTS];
-extern const UChar  g_nsstHyGTPermut4x4 [35][3][16];
+extern const uint8_t  g_nsstHyGTPermut4x4 [35][3][16];
 extern const Int    g_nsstHyGTPar4x4    [35][3][64];
 #if !ENABLE_BMS
-extern const UChar  g_nsstHyGTPermut8x8 [35][3][64];
+extern const uint8_t  g_nsstHyGTPermut8x8 [35][3][64];
 extern const Int    g_nsstHyGTPar8x8    [35][3][768];
 #endif
 #endif
@@ -303,7 +303,7 @@ extern const Int g_aiMMLM_MinSize[];
 extern const Int g_aiNonLMPosThrs[];
 #endif
 #if JEM_TOOLS
-extern const UChar g_NonMPM[257];
+extern const uint8_t g_NonMPM[257];
 #if !INTRA67_3MPM
 #if JVET_B0051_NON_MPM_MODE
 extern const Int g_ipred_mode_table[];
@@ -312,7 +312,7 @@ extern const Int g_ipred_mode_table[];
 #endif
 
 #if JVET_K0371_ALF
-constexpr UChar g_tbMax[257] = { 0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+constexpr uint8_t g_tbMax[257] = { 0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,

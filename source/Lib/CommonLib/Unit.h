@@ -286,11 +286,11 @@ struct CodingUnit : public UnitArea
   PredMode       predMode;
   PartSize       partSize;
 
-  UChar          depth;   // number of all splits, applied with generalized splits
-  UChar          qtDepth; // number of applied quad-splits, before switching to the multi-type-tree (mtt)
+  uint8_t          depth;   // number of all splits, applied with generalized splits
+  uint8_t          qtDepth; // number of applied quad-splits, before switching to the multi-type-tree (mtt)
   // a triple split would increase the mtDepth by 1, but the qtDepth by 2 in the first and last part and by 1 in the middle part (because of the 1-2-1 split proportions)
-  UChar          btDepth; // number of applied binary splits, after switching to the mtt (or it's equivalent)
-  UChar          mtDepth; // the actual number of splits after switching to mtt (equals btDepth if only binary splits are allowed)
+  uint8_t          btDepth; // number of applied binary splits, after switching to the mtt (or it's equivalent)
+  uint8_t          mtDepth; // the actual number of splits after switching to mtt (equals btDepth if only binary splits are allowed)
   int8_t          chromaQpAdj;
   int8_t          qp;
   SplitSeries    splitSeries;
@@ -307,14 +307,14 @@ struct CodingUnit : public UnitArea
 #endif
   bool           ipcm;
 #if JVET_K0357_AMVR
-  UChar          imv;
+  uint8_t          imv;
 #endif
   bool           rootCbf;
 #if HEVC_TILES_WPP
   UInt           tileIdx;
 #endif
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
-  UChar          emtFlag;
+  uint8_t          emtFlag;
 #endif
 #if JEM_TOOLS
   UInt           nsstIdx;
@@ -363,16 +363,16 @@ struct IntraPredictionData
 struct InterPredictionData
 {
   bool      mergeFlag;
-  UChar     mergeIdx;
-  UChar     interDir;
-  UChar     mvpIdx  [NUM_REF_PIC_LIST_01];
-  UChar     mvpNum  [NUM_REF_PIC_LIST_01];
+  uint8_t     mergeIdx;
+  uint8_t     interDir;
+  uint8_t     mvpIdx  [NUM_REF_PIC_LIST_01];
+  uint8_t     mvpNum  [NUM_REF_PIC_LIST_01];
   Mv        mvd     [NUM_REF_PIC_LIST_01];
   Mv        mv      [NUM_REF_PIC_LIST_01];
   Short     refIdx  [NUM_REF_PIC_LIST_01];
   MergeType mergeType;
 #if JEM_TOOLS
-  UChar     frucMrgMode;
+  uint8_t     frucMrgMode;
   bool      mvRefine;
 #endif
 #if JEM_TOOLS || JVET_K_AFFINE
@@ -430,12 +430,12 @@ struct TransformUnit : public UnitArea
   ChannelType      chType;
 
 #if ENABLE_BMS
-  UChar        depth;
+  uint8_t        depth;
 #endif
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
-  UChar        emtIdx;
+  uint8_t        emtIdx;
 #endif
-  UChar        cbf          [ MAX_NUM_TBLOCKS ];
+  uint8_t        cbf          [ MAX_NUM_TBLOCKS ];
   RDPCMMode    rdpcm        [ MAX_NUM_TBLOCKS ];
   bool         transformSkip[ MAX_NUM_TBLOCKS ];
   int8_t        compAlpha    [ MAX_NUM_TBLOCKS ];

@@ -292,7 +292,7 @@ bool CU::isSameCtu(const CodingUnit& cu, const CodingUnit& cu2)
 
 UInt CU::getIntraSizeIdx(const CodingUnit &cu)
 {
-  UChar uiWidth = cu.lumaSize().width;
+  uint8_t uiWidth = cu.lumaSize().width;
 
   UInt  uiCnt   = 0;
 

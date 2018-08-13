@@ -52,7 +52,7 @@ inline unsigned calcCheckSum( const Int iWidth, const Int iHeight,  const Pel* p
   {
     for( unsigned  x = 0; x < iWidth; x++)
     {
-      UChar xor_mask = (x & 0xff) ^ (y & 0xff) ^ (x >> 8) ^ (y >> 8);
+      uint8_t xor_mask = (x & 0xff) ^ (y & 0xff) ^ (x >> 8) ^ (y >> 8);
       checksum = (checksum + ((p[y*stride+x] & 0xff) ^ xor_mask)) & 0xffffffff;
 
       if(bitdepth > 8)

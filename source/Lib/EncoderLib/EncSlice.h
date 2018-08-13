@@ -128,7 +128,7 @@ public:
   EncSlice();
   virtual ~EncSlice();
 
-  void    create              ( Int iWidth, Int iHeight, ChromaFormat chromaFormat, UInt iMaxCUWidth, UInt iMaxCUHeight, UChar uhTotalDepth );
+  void    create              ( Int iWidth, Int iHeight, ChromaFormat chromaFormat, UInt iMaxCUWidth, UInt iMaxCUHeight, uint8_t uhTotalDepth );
   void    destroy             ();
   void    init                ( EncLib* pcEncLib, const SPS& sps );
 

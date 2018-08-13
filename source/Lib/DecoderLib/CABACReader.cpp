@@ -190,7 +190,7 @@ bool CABACReader::coding_tree_unit( CodingStructure& cs, const UnitArea& area, i
     {
       if( alfSliceParam.enabledFlag[compIdx] )
       {
-        UChar* ctbAlfFlag = cs.slice->getPic()->getAlfCtuEnableFlag( compIdx );
+        uint8_t* ctbAlfFlag = cs.slice->getPic()->getAlfCtuEnableFlag( compIdx );
         Int ctx = 0;
         ctx += leftCTUAddr > -1 ? ( ctbAlfFlag[leftCTUAddr] ? 1 : 0 ) : 0;
         ctx += aboveCTUAddr > -1 ? ( ctbAlfFlag[aboveCTUAddr] ? 1 : 0 ) : 0;
@@ -2880,7 +2880,7 @@ void CABACReader::emt_tu_index( TransformUnit& tu )
     maxSizeEmtInter = EMT_INTER_MAX_CU;
   }
 
-  UChar trIdx = 0;
+  uint8_t trIdx = 0;
   RExt__DECODER_DEBUG_BIT_STATISTICS_CREATE_SET( STATS__CABAC_BITS__EMT_TU_INDEX );
 
   if( CU::isIntra( *tu.cu ) && ( tu.cu->Y().width <= maxSizeEmtIntra ) && ( tu.cu->Y().height <= maxSizeEmtIntra ) )

@@ -1238,9 +1238,9 @@ void EncCu::xCheckRDCostIntra( CodingStructure *&tempCS, CodingStructure *&bestC
 #endif
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
 #if HM_EMT_NSST_AS_IN_JEM
-  UChar considerEmtSecondPass = ( sps.getSpsNext().getUseIntraEMT() && isLuma( partitioner.chType ) && partitioner.currArea().lwidth() <= maxSizeEMT && partitioner.currArea().lheight() <= maxSizeEMT ) ? 1 : 0;
+  uint8_t considerEmtSecondPass = ( sps.getSpsNext().getUseIntraEMT() && isLuma( partitioner.chType ) && partitioner.currArea().lwidth() <= maxSizeEMT && partitioner.currArea().lheight() <= maxSizeEMT ) ? 1 : 0;
 #else
-  UChar considerEmtSecondPass = ( sps.getSpsNext().getUseIntraEMT() && isLuma( partitioner.chType ) && partitioner.currArea().lwidth() <= maxSizeEMT && partitioner.currArea().lheight() <= maxSizeEMT && nsstIdx == 0 ) ? 1 : 0;
+  uint8_t considerEmtSecondPass = ( sps.getSpsNext().getUseIntraEMT() && isLuma( partitioner.chType ) && partitioner.currArea().lwidth() <= maxSizeEMT && partitioner.currArea().lheight() <= maxSizeEMT && nsstIdx == 0 ) ? 1 : 0;
 #endif
 #endif
 #if JEM_TOOLS
@@ -1252,9 +1252,9 @@ void EncCu::xCheckRDCostIntra( CodingStructure *&tempCS, CodingStructure *&bestC
 
 
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
-  for( UChar emtCuFlag = 0; emtCuFlag <= considerEmtSecondPass; emtCuFlag++ )
+  for( uint8_t emtCuFlag = 0; emtCuFlag <= considerEmtSecondPass; emtCuFlag++ )
 #else
-  for( UChar numPasses = 0; numPasses < 1; numPasses++ )
+  for( uint8_t numPasses = 0; numPasses < 1; numPasses++ )
 #endif
   {
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
@@ -2122,7 +2122,7 @@ void EncCu::xCheckRDCostMerge2Nx2NFRUC( CodingStructure *&tempCS, CodingStructur
   Size bufSize = g_miScaling.scale( tempCS->area.lumaSize() );
   mergeCtx.subPuFrucMiBuf = MotionBuf( m_SubPuFrucBuf, bufSize );
 
-  const UChar uhFRUCME[2] = { FRUC_MERGE_BILATERALMV, FRUC_MERGE_TEMPLATE };
+  const uint8_t uhFRUCME[2] = { FRUC_MERGE_BILATERALMV, FRUC_MERGE_TEMPLATE };
 
   PelUnitBuf acMergeBuffer[2];
 

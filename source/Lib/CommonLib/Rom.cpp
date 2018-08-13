@@ -448,7 +448,7 @@ void initROM()
   {
     const UInt blockWidth = sizeInfo.sizeFrom(blockWidthIdx);
 
-    const static UChar g_auiXYDiagScan8x8[64][2] =
+    const static uint8_t g_auiXYDiagScan8x8[64][2] =
     {
       { 0, 0 }, { 0, 1 }, { 1, 0 }, { 0, 2 }, { 1, 1 }, { 2, 0 }, { 0, 3 }, { 1, 2 },
       { 2, 1 }, { 3, 0 }, { 1, 3 }, { 2, 2 }, { 3, 1 }, { 2, 3 }, { 3, 2 }, { 3, 3 },
@@ -541,19 +541,19 @@ const Int g_aiTrSubsetIntra[3][2] = { { DST7, DCT8 }, { DST7, DST1 }, { DST7, DC
 #endif
 const Int g_aiTrSubsetInter[4] = { DCT8, DST7 };
 
-const UChar g_aucTrSetVert[NUM_INTRA_MODE - 1] =
+const uint8_t g_aucTrSetVert[NUM_INTRA_MODE - 1] =
 {//0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66
    2, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0
 };
-const UChar g_aucTrSetVert35[35] =
+const uint8_t g_aucTrSetVert35[35] =
 {//0  1  2     3     4     5     6     7     8     9    10    11    12    13    14    15    16    17    18    19    20    21    22    23    24    25    26    27    28    29    30    31    32    33    34
    2, 1, 0,    1,    0,    1,    0,    1,    0,    0,    0,    0,    0,    1,    0,    1,    0,    1,    0,    1,    0,    1,    0,    1,    2,    2,    2,    2,    2,    1,    0,    1,    0,    1,    0
 };
-const UChar g_aucTrSetHorz[NUM_INTRA_MODE - 1] =
+const uint8_t g_aucTrSetHorz[NUM_INTRA_MODE - 1] =
 {//0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66
    2, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0
 };
-const UChar g_aucTrSetHorz35[35] =
+const uint8_t g_aucTrSetHorz35[35] =
 {//0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34
    2, 1, 0, 1, 0, 1, 0, 1, 2, 2, 2, 2, 2, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0
 };
@@ -578,7 +578,7 @@ TMatrixCoeff g_aiTr128[NUM_TRANS_TYPE][128][128];
 //coefficients
 //--------------------------------------------------------------------------------------------------
 
-const UChar g_aucChromaScale[NUM_CHROMA_FORMAT][chromaQPMappingTableSize] =
+const uint8_t g_aucChromaScale[NUM_CHROMA_FORMAT][chromaQPMappingTableSize] =
 {
 #if JVET_K0251_QP_EXT
   //0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69
@@ -599,7 +599,7 @@ const UChar g_aucChromaScale[NUM_CHROMA_FORMAT][chromaQPMappingTableSize] =
 // Intra prediction
 // ====================================================================================================================
 
-const UChar g_aucIntraModeNumFast_UseMPM_2D[7 - MIN_CU_LOG2 + 1][7 - MIN_CU_LOG2 + 1] =
+const uint8_t g_aucIntraModeNumFast_UseMPM_2D[7 - MIN_CU_LOG2 + 1][7 - MIN_CU_LOG2 + 1] =
 {
   {3, 3, 3, 3, 2, 2},  //   4x4,   4x8,   4x16,   4x32,   4x64,   4x128,
   {3, 3, 3, 3, 3, 2},  //   8x4,   8x8,   8x16,   8x32,   8x64,   8x128,
@@ -609,7 +609,7 @@ const UChar g_aucIntraModeNumFast_UseMPM_2D[7 - MIN_CU_LOG2 + 1][7 - MIN_CU_LOG2
   {2, 2, 2, 2, 2, 3},  // 128x4, 128x8, 128x16, 128x32, 128x64, 128x128,
 };
 
-const UChar g_aucIntraModeNumFast_UseMPM[MAX_CU_DEPTH] =
+const uint8_t g_aucIntraModeNumFast_UseMPM[MAX_CU_DEPTH] =
 {
   3,  //   2x2
   8,  //   4x4
@@ -619,7 +619,7 @@ const UChar g_aucIntraModeNumFast_UseMPM[MAX_CU_DEPTH] =
   3,  //  64x64
   3   // 128x128
 };
-const UChar g_aucIntraModeNumFast_NotUseMPM[MAX_CU_DEPTH] =
+const uint8_t g_aucIntraModeNumFast_NotUseMPM[MAX_CU_DEPTH] =
 {
   3,  //   2x2
   9,  //   4x4
@@ -630,18 +630,18 @@ const UChar g_aucIntraModeNumFast_NotUseMPM[MAX_CU_DEPTH] =
   5   // 128x128
 };
 
-const UChar g_chroma422IntraAngleMappingTable[NUM_INTRA_MODE] =
+const uint8_t g_chroma422IntraAngleMappingTable[NUM_INTRA_MODE] =
 //                                                               H                                                               D                                                               V
 //0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, DM
 { 0, 1, 2, 2, 2, 2, 2, 2, 2, 3,  4,  6,  8, 10, 12, 13, 14, 16, 18, 20, 22, 23, 24, 26, 28, 30, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 44, 44, 45, 46, 46, 46, 47, 48, 48, 48, 49, 50, 51, 52, 52, 52, 53, 54, 54, 54, 55, 56, 56, 56, 57, 58, 59, 60, DM_CHROMA_IDX };
 
 #if !INTRA67_3MPM
-extern const UChar  g_intraMode65to33AngMapping[NUM_INTRA_MODE] =
+extern const uint8_t  g_intraMode65to33AngMapping[NUM_INTRA_MODE] =
 //                                                               H                                                               D                                                               V
 //0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, DM
 { 0, 1, 2, 2, 3, 3, 4, 4, 5, 5,  6,  6,  7,  7,  8,  8,  9,  9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 20, 20, 21, 21, 22, 22, 23, 23, 24, 24, 25, 25, 26, 26, 27, 27, 28, 28, 29, 29, 30, 30, 31, 31, 32, 32, 33, 33, 34, DM_CHROMA_IDX };
 
-extern const UChar g_intraMode33to65AngMapping[36] =
+extern const uint8_t g_intraMode33to65AngMapping[36] =
 //                                   H                               D                               V
 //0, 1, 2, 3, 4, 5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, DM
 { 0, 1, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, DM_CHROMA_IDX };
@@ -1097,7 +1097,7 @@ const UInt g_scalingListSize [SCALING_LIST_SIZE_NUM] = { 4, 16, 64, 256, 1024, 4
 const UInt g_scalingListSizeX[SCALING_LIST_SIZE_NUM] = { 2,  4,  8,  16,   32,   64,   128 };
 #endif
 
-const UChar g_NonMPM[257] = { 0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+const uint8_t g_NonMPM[257] = { 0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,

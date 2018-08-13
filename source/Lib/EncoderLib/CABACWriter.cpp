@@ -707,7 +707,7 @@ void CABACWriter::alf_aux( const ALFParam& alfParam, bool isGALF )
 #if JVET_C0038_NO_PREV_FILTERS
     Int i;
     Int availableFilters = alfParam.iAvailableFilters;
-    UChar codetab_pred[3] = { 1, 0, 2 };
+    uint8_t codetab_pred[3] = { 1, 0, 2 };
 
     if (availableFilters > 0)
     {
@@ -726,7 +726,7 @@ void CABACWriter::alf_aux( const ALFParam& alfParam, bool isGALF )
         {
           if (alfParam.PrevFiltIdx[i] > 0)
           {
-            xWriteTruncBinCode((UChar)alfParam.PrevFiltIdx[i] - 1, availableFilters);
+            xWriteTruncBinCode((uint8_t)alfParam.PrevFiltIdx[i] - 1, availableFilters);
           }
         }
       }
@@ -2617,7 +2617,7 @@ void CABACWriter::cbf_comp( const CodingStructure& cs, bool cbf, const CompArea&
 //================================================================================
 
 #if JVET_K0357_AMVR
-void CABACWriter::mvd_coding( const Mv &rMvd, UChar imv )
+void CABACWriter::mvd_coding( const Mv &rMvd, uint8_t imv )
 #else
 void CABACWriter::mvd_coding( const Mv &rMvd )
 #endif
@@ -3050,14 +3050,14 @@ void CABACWriter::emt_tu_index( const TransformUnit& tu )
   }
   if( CU::isIntra( *tu.cu ) && ( tu.cu->Y().width <= maxSizeEmtIntra ) && ( tu.cu->Y().height <= maxSizeEmtIntra ) )
   {
-    UChar trIdx = tu.emtIdx;
+    uint8_t trIdx = tu.emtIdx;
     m_BinEncoder.encodeBin( ( trIdx & 1 ) ? 1 : 0, Ctx::EMTTuIndex( 0 ) );
     m_BinEncoder.encodeBin( ( trIdx / 2 ) ? 1 : 0, Ctx::EMTTuIndex( 1 ) );
     DTRACE( g_trace_ctx, D_SYNTAX, "emt_tu_index() etype=%d pos=(%d,%d) emtTrIdx=%d\n", COMPONENT_Y, tu.blocks[COMPONENT_Y].x, tu.blocks[COMPONENT_Y].y, ( int ) tu.emtIdx );
   }
   if( !CU::isIntra( *tu.cu ) && ( tu.cu->Y().width <= maxSizeEmtInter ) && ( tu.cu->Y().height <= maxSizeEmtInter ) )
   {
-    UChar trIdx = tu.emtIdx;
+    uint8_t trIdx = tu.emtIdx;
     m_BinEncoder.encodeBin( ( trIdx & 1 ) ? 1 : 0, Ctx::EMTTuIndex( 2 ) );
     m_BinEncoder.encodeBin( ( trIdx / 2 ) ? 1 : 0, Ctx::EMTTuIndex( 3 ) );
     DTRACE( g_trace_ctx, D_SYNTAX, "emt_tu_index() etype=%d pos=(%d,%d) emtTrIdx=%d\n", COMPONENT_Y, tu.blocks[COMPONENT_Y].x, tu.blocks[COMPONENT_Y].y, ( int ) tu.emtIdx );
@@ -3958,7 +3958,7 @@ void CABACWriter::codeAlfCtuEnableFlag( CodingStructure& cs, UInt ctuRsAddr, con
 
     if( alfSliceParam.enabledFlag[compIdx] )
     {
-      UChar* ctbAlfFlag = cs.slice->getPic()->getAlfCtuEnableFlag( compIdx );
+      uint8_t* ctbAlfFlag = cs.slice->getPic()->getAlfCtuEnableFlag( compIdx );
       if( alfSliceParam.chromaCtbPresentFlag && compIdx )
       {
         CHECK( !ctbAlfFlag[ctuRsAddr], "ALF chroma CTB enable flag must be 1 with chromaCtbPresentFlag = 1" );

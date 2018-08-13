@@ -181,7 +181,7 @@ public:
 
 #if JVET_K0357_AMVR
   // mvd coding (clause 7.3.8.9)
-  void        mvd_coding                ( const Mv &rMvd, UChar imv );
+  void        mvd_coding                ( const Mv &rMvd, uint8_t imv );
 #else
   void        mvd_coding                ( const Mv &rMvd );
 #endif

@@ -192,7 +192,7 @@ protected:
     UInt        uiBestRound;
     UInt        uiBestDistance;
     Distortion  uiBestSad;
-    UChar       ucPointNr;
+    uint8_t       ucPointNr;
     Int         subShiftMode;
 #if JVET_K0357_AMVR
     unsigned    imvShift;
@@ -200,7 +200,7 @@ protected:
   } IntTZSearchStruct;
 
   // sub-functions for ME
-  inline void xTZSearchHelp         ( IntTZSearchStruct& rcStruct, const Int iSearchX, const Int iSearchY, const UChar ucPointNr, const UInt uiDistance );
+  inline void xTZSearchHelp         ( IntTZSearchStruct& rcStruct, const Int iSearchX, const Int iSearchY, const uint8_t ucPointNr, const UInt uiDistance );
   inline void xTZ2PointSearch       ( IntTZSearchStruct& rcStruct );
   inline void xTZ8PointSquareSearch ( IntTZSearchStruct& rcStruct, const Int iStartX, const Int iStartY, const Int iDist );
   inline void xTZ8PointDiamondSearch( IntTZSearchStruct& rcStruct, const Int iStartX, const Int iStartY, const Int iDist, const bool bCheckCornersAtDist1 );
@@ -243,7 +243,7 @@ protected:
                                     Distortion& ruiCost
 #if JVET_K0357_AMVR
                                     ,
-                                    const UChar  imv
+                                    const uint8_t  imv
 #endif
                                   );
 
@@ -274,7 +274,7 @@ protected:
   void xFRUCMrgEstimation         ( PredictionUnit&       pu,
                                     PelUnitBuf&           origBuf,
                                     Distortion&           ruiMinCost,
-                                    UChar&                ruhFRUCMode,
+                                    uint8_t&                ruhFRUCMode,
                                     MergeCtx&             mrgCtx
                                   );
 #endif

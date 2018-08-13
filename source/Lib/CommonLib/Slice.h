@@ -2106,7 +2106,7 @@ protected:
 
 
 
-void calculateParameterSetChangedFlag(bool &bChanged, const std::vector<UChar> *pOldData, const std::vector<UChar> *pNewData);
+void calculateParameterSetChangedFlag(bool &bChanged, const std::vector<uint8_t> *pOldData, const std::vector<uint8_t> *pNewData);
 
 template <class T> class ParameterSetMap
 {
@@ -2115,7 +2115,7 @@ public:
   struct MapData
   {
     bool                  bChanged;
-    std::vector<UChar>   *pNaluData; // Can be null
+    std::vector<uint8_t>   *pNaluData; // Can be null
     Tm*                   parameterSet;
   };
 
@@ -2148,7 +2148,7 @@ public:
     return m_paramsetMap[psId].parameterSet;
   }
 
-  void storePS(Int psId, T *ps, const std::vector<UChar> *pNaluData)
+  void storePS(Int psId, T *ps, const std::vector<uint8_t> *pNaluData)
   {
     CHECK( psId >= m_maxId, "Invalid PS id" );
     if ( m_paramsetMap.find(psId) != m_paramsetMap.end() )
@@ -2181,7 +2181,7 @@ public:
     }
     if (pNaluData != 0)
     {
-      m_paramsetMap[psId].pNaluData=new std::vector<UChar>;
+      m_paramsetMap[psId].pNaluData=new std::vector<uint8_t>;
       *(m_paramsetMap[psId].pNaluData) = *pNaluData;
     }
     else
@@ -2252,7 +2252,7 @@ public:
 
 #if HEVC_VPS
   //! store sequence parameter set and take ownership of it
-  void           storeVPS(VPS *vps, const std::vector<UChar> &naluData)      { m_vpsMap.storePS( vps->getVPSId(), vps, &naluData); };
+  void           storeVPS(VPS *vps, const std::vector<uint8_t> &naluData)      { m_vpsMap.storePS( vps->getVPSId(), vps, &naluData); };
   //! get pointer to existing video parameter set
   VPS*           getVPS(Int vpsId)                                           { return m_vpsMap.getPS(vpsId); };
   bool           getVPSChangedFlag(Int vpsId) const                          { return m_vpsMap.getChangedFlag(vpsId); }
@@ -2261,7 +2261,7 @@ public:
 #endif
 
   //! store sequence parameter set and take ownership of it
-  void           storeSPS(SPS *sps, const std::vector<UChar> &naluData) { m_spsMap.storePS( sps->getSPSId(), sps, &naluData); };
+  void           storeSPS(SPS *sps, const std::vector<uint8_t> &naluData) { m_spsMap.storePS( sps->getSPSId(), sps, &naluData); };
   //! get pointer to existing sequence parameter set
   SPS*           getSPS(Int spsId)                                           { return m_spsMap.getPS(spsId); };
   bool           getSPSChangedFlag(Int spsId) const                          { return m_spsMap.getChangedFlag(spsId); }
@@ -2269,7 +2269,7 @@ public:
   SPS*           getFirstSPS()                                               { return m_spsMap.getFirstPS(); };
 
   //! store picture parameter set and take ownership of it
-  void           storePPS(PPS *pps, const std::vector<UChar> &naluData) { m_ppsMap.storePS( pps->getPPSId(), pps, &naluData); };
+  void           storePPS(PPS *pps, const std::vector<uint8_t> &naluData) { m_ppsMap.storePS( pps->getPPSId(), pps, &naluData); };
   //! get pointer to existing picture parameter set
   PPS*           getPPS(Int ppsId)                                           { return m_ppsMap.getPS(ppsId); };
   bool           getPPSChangedFlag(Int ppsId) const                          { return m_ppsMap.getChangedFlag(ppsId); }

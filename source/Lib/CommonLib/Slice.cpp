@@ -2598,7 +2598,7 @@ PTL::PTL()
   ::memset(m_subLayerLevelPresentFlag,   0, sizeof(m_subLayerLevelPresentFlag  ));
 }
 
-void calculateParameterSetChangedFlag(bool &bChanged, const std::vector<UChar> *pOldData, const std::vector<UChar> *pNewData)
+void calculateParameterSetChangedFlag(bool &bChanged, const std::vector<uint8_t> *pOldData, const std::vector<uint8_t> *pNewData)
 {
   if (!bChanged)
   {
@@ -2615,8 +2615,8 @@ void calculateParameterSetChangedFlag(bool &bChanged, const std::vector<UChar> *
       }
       else
       {
-        const UChar *pNewDataArray=&(*pNewData)[0];
-        const UChar *pOldDataArray=&(*pOldData)[0];
+        const uint8_t *pNewDataArray=&(*pNewData)[0];
+        const uint8_t *pOldDataArray=&(*pOldData)[0];
         if (memcmp(pOldDataArray, pNewDataArray, pOldData->size()))
         {
           bChanged=true;

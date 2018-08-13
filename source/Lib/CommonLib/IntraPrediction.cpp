@@ -53,7 +53,7 @@
 // Tables
 // ====================================================================================================================
 
-const UChar IntraPrediction::m_aucIntraFilter[MAX_NUM_CHANNEL_TYPE][MAX_INTRA_FILTER_DEPTHS] =
+const uint8_t IntraPrediction::m_aucIntraFilter[MAX_NUM_CHANNEL_TYPE][MAX_INTRA_FILTER_DEPTHS] =
 {
   { // Luma
     20, //   1xn

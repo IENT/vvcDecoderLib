@@ -65,7 +65,7 @@ EncSlice::~EncSlice()
   destroy();
 }
 
-void EncSlice::create( Int iWidth, Int iHeight, ChromaFormat chromaFormat, UInt iMaxCUWidth, UInt iMaxCUHeight, UChar uhTotalDepth )
+void EncSlice::create( Int iWidth, Int iHeight, ChromaFormat chromaFormat, UInt iMaxCUWidth, UInt iMaxCUHeight, uint8_t uhTotalDepth )
 {
 }
 

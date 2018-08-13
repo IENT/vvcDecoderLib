@@ -93,11 +93,11 @@ private:
   inline int xCalcDP              ( Pel* piSrc, const int iOffset ) const;
   inline int xCalcDQ              ( Pel* piSrc, const int iOffset ) const;
 #if JVET_K0251_QP_EXT
-  static const UChar sm_tcTable[MAX_QP + 3];
-  static const UChar sm_betaTable[MAX_QP + 1];
+  static const uint8_t sm_tcTable[MAX_QP + 3];
+  static const uint8_t sm_betaTable[MAX_QP + 1];
 #else
-  static const UChar sm_tcTable[54];
-  static const UChar sm_betaTable[52];
+  static const uint8_t sm_tcTable[54];
+  static const uint8_t sm_betaTable[52];
 #endif
 
 public:

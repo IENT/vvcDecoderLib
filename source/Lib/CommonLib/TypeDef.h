@@ -356,7 +356,6 @@
 // Basic type redefinition
 // ====================================================================================================================
 
-typedef       unsigned char       UChar; // Unsigned 8-bit values
 typedef       short               Short;
 typedef       unsigned short      UShort;
 typedef       int                 Int;
@@ -1143,7 +1142,7 @@ struct LFCUParam
 
 struct PictureHash
 {
-  std::vector<UChar> hash;
+  std::vector<uint8_t> hash;
 
   bool operator==(const PictureHash &other) const
   {

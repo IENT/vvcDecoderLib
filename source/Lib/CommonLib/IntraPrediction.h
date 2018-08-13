@@ -70,7 +70,7 @@ private:
   Int  m_iYuvExtSize;
 
 
-  static const UChar m_aucIntraFilter[MAX_NUM_CHANNEL_TYPE][MAX_INTRA_FILTER_DEPTHS];
+  static const uint8_t m_aucIntraFilter[MAX_NUM_CHANNEL_TYPE][MAX_INTRA_FILTER_DEPTHS];
 
 #if JEM_TOOLS||JVET_K0190
   unsigned m_auShiftLM[32]; // Table for substituting division operation by multiplication

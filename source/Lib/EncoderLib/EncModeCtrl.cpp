@@ -1350,9 +1350,9 @@ void EncModeCtrlMTnoRQT::finishCULevel( Partitioner &partitioner )
     DTRACE( g_trace_ctx, D_SAVE_LOAD, "saving tag at %d,%d (%dx%d) -> %d\n", area.x, area.y, area.width >> 1, area.height >> 1, SAVE_LOAD_INIT );
   }
 
-  if( m_pcEncCfg->getUseSaveLoadSplitDecision() && m_pcEncCfg->getUseSaveLoadEncInfo() && area.width > ( 1 << MIN_CU_LOG2 ) && area.height > ( 1 << MIN_CU_LOG2 ) && cuECtx.get<UChar>( SAVE_LOAD_TAG ) == SAVE_ENC_INFO )
+  if( m_pcEncCfg->getUseSaveLoadSplitDecision() && m_pcEncCfg->getUseSaveLoadEncInfo() && area.width > ( 1 << MIN_CU_LOG2 ) && area.height > ( 1 << MIN_CU_LOG2 ) && cuECtx.get<uint8_t>( SAVE_LOAD_TAG ) == SAVE_ENC_INFO )
   {
-    UChar c = 0;
+    uint8_t c = 0;
     double bestNonSplit = cuECtx.get<double>( BEST_NON_SPLIT_COST  );
     double horzCost     = cuECtx.get<double>( BEST_HORZ_SPLIT_COST );
     double vertCost     = cuECtx.get<double>( BEST_VERT_SPLIT_COST );
@@ -1451,7 +1451,7 @@ bool EncModeCtrlMTnoRQT::tryMode( const EncTestMode& encTestmode, const CodingSt
   const EncTestMode      bestMode    = bestCS ? getCSEncMode( *bestCS ) : EncTestMode();
 
 #if !JVET_K0220_ENC_CTRL
-  UChar       saveLoadSplit          = 0;
+  uint8_t       saveLoadSplit          = 0;
   SaveLoadTag saveLoadTag            = cuECtx.get<SaveLoadTag>( SAVE_LOAD_TAG );
   SaveLoadStruct &sls                = getSaveLoadStruct( partitioner.currArea() );
 #endif

@@ -285,8 +285,8 @@ static bool readPlane(Pel* dst,
   const UInt full_height_dest = height_dest+pad_y_dest;
 
   const UInt stride_file      = (width444 * (is16bit ? 2 : 1)) >> csx_file;
-  std::vector<UChar> bufVec(stride_file);
-  UChar *buf=&(bufVec[0]);
+  std::vector<uint8_t> bufVec(stride_file);
+  uint8_t *buf=&(bufVec[0]);
 
   Pel  *pDstPad              = dst + stride_dest * height_dest;
   Pel  *pDstBuf              = dst;
@@ -432,8 +432,8 @@ static bool writePlane(ostream& fd, const Pel* src, bool is16bit,
   const UInt width_file       = width444 >>csx_file;
   const UInt height_file      = height444>>csy_file;
 
-  std::vector<UChar> bufVec(stride_file);
-  UChar *buf=&(bufVec[0]);
+  std::vector<uint8_t> bufVec(stride_file);
+  uint8_t *buf=&(bufVec[0]);
 
   const Pel *pSrcBuf         = src;
   const Int srcbuf_stride    = stride_src;
@@ -450,7 +450,7 @@ static bool writePlane(ostream& fd, const Pel* src, bool is16bit,
       {
         if (!is16bit)
         {
-          UChar val(value);
+          uint8_t val(value);
           for (UInt x = 0; x < width_file; x++)
           {
             buf[x]=val;
@@ -492,7 +492,7 @@ static bool writePlane(ostream& fd, const Pel* src, bool is16bit,
           {
             for (UInt x = 0; x < width_file; x++)
             {
-              buf[x] = (UChar)(pSrcBuf[x>>sx]);
+              buf[x] = (uint8_t)(pSrcBuf[x>>sx]);
             }
           }
           else
@@ -512,7 +512,7 @@ static bool writePlane(ostream& fd, const Pel* src, bool is16bit,
           {
             for (UInt x = 0; x < width_file; x++)
             {
-              buf[x] = (UChar)(pSrcBuf[x<<sx]);
+              buf[x] = (uint8_t)(pSrcBuf[x<<sx]);
             }
           }
           else
@@ -560,8 +560,8 @@ static bool writeField(ostream& fd, const Pel* top, const Pel* bottom, bool is16
   const UInt width_file       = width444 >>csx_file;
   const UInt height_file      = height444>>csy_file;
 
-  std::vector<UChar> bufVec(stride_file * 2);
-  UChar *buf=&(bufVec[0]);
+  std::vector<uint8_t> bufVec(stride_file * 2);
+  uint8_t *buf=&(bufVec[0]);
 
   if (compID!=COMPONENT_Y && (fileFormat==CHROMA_400 || srcFormat==CHROMA_400))
   {
@@ -573,11 +573,11 @@ static bool writeField(ostream& fd, const Pel* top, const Pel* bottom, bool is16
       {
         for (UInt field = 0; field < 2; field++)
         {
-          UChar *fieldBuffer = buf + (field * stride_file);
+          uint8_t *fieldBuffer = buf + (field * stride_file);
 
           if (!is16bit)
           {
-            UChar val(value);
+            uint8_t val(value);
             for (UInt x = 0; x < width_file; x++)
             {
               fieldBuffer[x]=val;
@@ -612,7 +612,7 @@ static bool writeField(ostream& fd, const Pel* top, const Pel* bottom, bool is16
       {
         for (UInt field = 0; field < 2; field++)
         {
-          UChar *fieldBuffer = buf + (field * stride_file);
+          uint8_t *fieldBuffer = buf + (field * stride_file);
           const Pel *src     = (((field == 0) && isTff) || ((field == 1) && (!isTff))) ? top : bottom;
 
           // write a new line
@@ -624,7 +624,7 @@ static bool writeField(ostream& fd, const Pel* top, const Pel* bottom, bool is16
             {
               for (UInt x = 0; x < width_file; x++)
               {
-                fieldBuffer[x] = (UChar)(src[x>>sx]);
+                fieldBuffer[x] = (uint8_t)(src[x>>sx]);
               }
             }
             else
@@ -644,7 +644,7 @@ static bool writeField(ostream& fd, const Pel* top, const Pel* bottom, bool is16
             {
               for (UInt x = 0; x < width_file; x++)
               {
-                fieldBuffer[x] = (UChar)(src[x<<sx]);
+                fieldBuffer[x] = (uint8_t)(src[x<<sx]);
               }
             }
             else

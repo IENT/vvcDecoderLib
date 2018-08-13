@@ -2166,8 +2166,8 @@ inline int64_t InterPrediction::divide64( int64_t numer, int64_t denom )
   int64_t iScaleShiftA2 = 0;
   int64_t iScaleShiftA1 = 0;
 
-  UChar signA1 = numer < 0;
-  UChar signA2 = denom < 0;
+  uint8_t signA1 = numer < 0;
+  uint8_t signA2 = denom < 0;
 
   numer = (signA1) ? -numer : numer;
   denom = (signA2) ? -denom : denom;

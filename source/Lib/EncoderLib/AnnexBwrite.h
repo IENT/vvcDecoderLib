@@ -58,7 +58,7 @@ static std::vector<UInt> writeAnnexB(std::ostream& out, const AccessUnit& au)
     const NALUnitEBSP& nalu = **it;
     UInt size = 0; /* size of annexB unit in bytes */
 
-    static const UChar start_code_prefix[] = {0,0,0,1};
+    static const uint8_t start_code_prefix[] = {0,0,0,1};
 #if HEVC_VPS
     if (it == au.begin() || nalu.m_nalUnitType == NAL_UNIT_VPS || nalu.m_nalUnitType == NAL_UNIT_SPS || nalu.m_nalUnitType == NAL_UNIT_PPS)
 #else

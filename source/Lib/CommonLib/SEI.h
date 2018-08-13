@@ -117,9 +117,9 @@ public:
     delete userData;
   }
 
-  UChar uuid_iso_iec_11578[ISO_IEC_11578_LEN];
+  uint8_t uuid_iso_iec_11578[ISO_IEC_11578_LEN];
   UInt  userDataLength;
-  UChar *userData;
+  uint8_t *userData;
 };
 
 class SEIDecodedPictureHash : public SEI
@@ -527,7 +527,7 @@ public:
   bool  m_allLayersFlag;                             //value valid if m_nestingOpFlag == 0
   UInt  m_nestingNoOpMaxTemporalIdPlus1;             //value valid if m_nestingOpFlag == 0 and m_allLayersFlag == 0
   UInt  m_nestingNumLayersMinus1;                    //value valid if m_nestingOpFlag == 0 and m_allLayersFlag == 0
-  UChar m_nestingLayerId[MAX_NESTING_NUM_LAYER];     //value valid if m_nestingOpFlag == 0 and m_allLayersFlag == 0. This can e.g. be a static array of 64 UChar values
+  uint8_t m_nestingLayerId[MAX_NESTING_NUM_LAYER];     //value valid if m_nestingOpFlag == 0 and m_allLayersFlag == 0. This can e.g. be a static array of 64 uint8_t values
 
   SEIMessages m_nestedSEIs;
 };

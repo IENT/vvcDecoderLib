@@ -79,7 +79,7 @@ void EncAdaptiveLoopFilter::create( const int picWidth, const int picHeight, con
 
   for( int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++ )
   {
-    m_ctuEnableFlagTmp[compIdx] = new UChar[m_numCTUsInPic];
+    m_ctuEnableFlagTmp[compIdx] = new uint8_t[m_numCTUsInPic];
     ChannelType chType = toChannelType( ComponentID( compIdx ) );
     int numClasses = compIdx ? 1 : MAX_NUM_ALF_CLASSES;
 
@@ -1193,8 +1193,8 @@ void EncAdaptiveLoopFilter::roundFiltCoeff( int *filterCoeffQuant, double *filte
 void EncAdaptiveLoopFilter::mergeClasses( AlfCovariance* cov, AlfCovariance* covMerged, const int numClasses, short filterIndices[MAX_NUM_ALF_CLASSES][MAX_NUM_ALF_CLASSES] )
 {
   static bool availableClass[MAX_NUM_ALF_CLASSES];
-  static UChar indexList[MAX_NUM_ALF_CLASSES];
-  static UChar indexListTemp[MAX_NUM_ALF_CLASSES];
+  static uint8_t indexList[MAX_NUM_ALF_CLASSES];
+  static uint8_t indexListTemp[MAX_NUM_ALF_CLASSES];
   int numRemaining = numClasses;
 
   memset( filterIndices, 0, sizeof( short ) * MAX_NUM_ALF_CLASSES * MAX_NUM_ALF_CLASSES );
@@ -1256,7 +1256,7 @@ void EncAdaptiveLoopFilter::mergeClasses( AlfCovariance* cov, AlfCovariance* cov
     numRemaining--;
     if( numRemaining <= numClasses )
     {
-      std::memcpy( indexListTemp, indexList, sizeof( UChar ) * numClasses );
+      std::memcpy( indexListTemp, indexList, sizeof( uint8_t ) * numClasses );
 
       bool exist = false;
       int ind = 0;
@@ -1308,7 +1308,7 @@ void EncAdaptiveLoopFilter::getFrameStats( ChannelType channel, int iShapeIdx )
   }
 }
 
-void EncAdaptiveLoopFilter::getFrameStat( AlfCovariance* frameCov, AlfCovariance** ctbCov, UChar* ctbEnableFlags, const int numClasses )
+void EncAdaptiveLoopFilter::getFrameStat( AlfCovariance* frameCov, AlfCovariance** ctbCov, uint8_t* ctbEnableFlags, const int numClasses )
 {
   for( int i = 0; i < m_numCTUsInPic; i++ )
   {
@@ -1682,7 +1682,7 @@ void EncAdaptiveLoopFilter::setEnableFlag( AlfSliceParam& alfSlicePara, ChannelT
   }
 }
 
-void EncAdaptiveLoopFilter::setEnableFlag( AlfSliceParam& alfSlicePara, ChannelType channel, UChar** ctuFlags )
+void EncAdaptiveLoopFilter::setEnableFlag( AlfSliceParam& alfSlicePara, ChannelType channel, uint8_t** ctuFlags )
 {
   const ComponentID compIDFirst = isLuma( channel ) ? COMPONENT_Y : COMPONENT_Cb;
   const ComponentID compIDLast = isLuma( channel ) ? COMPONENT_Y : COMPONENT_Cr;
@@ -1700,29 +1700,29 @@ void EncAdaptiveLoopFilter::setEnableFlag( AlfSliceParam& alfSlicePara, ChannelT
   }
 }
 
-void EncAdaptiveLoopFilter::copyCtuEnableFlag( UChar** ctuFlagsDst, UChar** ctuFlagsSrc, ChannelType channel )
+void EncAdaptiveLoopFilter::copyCtuEnableFlag( uint8_t** ctuFlagsDst, uint8_t** ctuFlagsSrc, ChannelType channel )
 {
   if( isLuma( channel ) )
   {
-    memcpy( ctuFlagsDst[COMPONENT_Y], ctuFlagsSrc[COMPONENT_Y], sizeof( UChar ) * m_numCTUsInPic );
+    memcpy( ctuFlagsDst[COMPONENT_Y], ctuFlagsSrc[COMPONENT_Y], sizeof( uint8_t ) * m_numCTUsInPic );
   }
   else
   {
-    memcpy( ctuFlagsDst[COMPONENT_Cb], ctuFlagsSrc[COMPONENT_Cb], sizeof( UChar ) * m_numCTUsInPic );
-    memcpy( ctuFlagsDst[COMPONENT_Cr], ctuFlagsSrc[COMPONENT_Cr], sizeof( UChar ) * m_numCTUsInPic );
+    memcpy( ctuFlagsDst[COMPONENT_Cb], ctuFlagsSrc[COMPONENT_Cb], sizeof( uint8_t ) * m_numCTUsInPic );
+    memcpy( ctuFlagsDst[COMPONENT_Cr], ctuFlagsSrc[COMPONENT_Cr], sizeof( uint8_t ) * m_numCTUsInPic );
   }
 }
 
-void EncAdaptiveLoopFilter::setCtuEnableFlag( UChar** ctuFlags, ChannelType channel, UChar val )
+void EncAdaptiveLoopFilter::setCtuEnableFlag( uint8_t** ctuFlags, ChannelType channel, uint8_t val )
 {
   if( isLuma( channel ) )
   {
-    memset( ctuFlags[COMPONENT_Y], val, sizeof( UChar ) * m_numCTUsInPic );
+    memset( ctuFlags[COMPONENT_Y], val, sizeof( uint8_t ) * m_numCTUsInPic );
   }
   else
   {
-    memset( ctuFlags[COMPONENT_Cb], val, sizeof( UChar ) * m_numCTUsInPic );
-    memset( ctuFlags[COMPONENT_Cr], val, sizeof( UChar ) * m_numCTUsInPic );
+    memset( ctuFlags[COMPONENT_Cb], val, sizeof( uint8_t ) * m_numCTUsInPic );
+    memset( ctuFlags[COMPONENT_Cr], val, sizeof( uint8_t ) * m_numCTUsInPic );
   }
 }
 #elif JEM_TOOLS

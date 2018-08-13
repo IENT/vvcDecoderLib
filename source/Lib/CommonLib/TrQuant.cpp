@@ -156,7 +156,7 @@ void xTrMxN_EMT( const Int bitDepth, const Pel *residual, size_t stride, TCoeff 
 #else
 void xTrMxN_EMT( const Int bitDepth, const Pel *residual, size_t stride, TCoeff *coeff, Int iWidth, Int iHeight, const int maxLog2TrDynamicRange,
 #endif
-  const UChar ucMode, const UChar ucTrIdx
+  const uint8_t ucMode, const uint8_t ucTrIdx
 #if !INTRA67_3MPM
   , const bool use65intraModes
 #endif
@@ -252,15 +252,15 @@ void xTrMxN_EMT( const Int bitDepth, const Pel *residual, size_t stride, TCoeff 
 
 #if HEVC_USE_4x4_DSTVII
 #if INTRA67_3MPM
-void xITrMxN_EMT(const Int bitDepth, const TCoeff *coeff, Pel *residual, size_t stride, Int iWidth, Int iHeight, UInt uiSkipWidth, UInt uiSkipHeight, bool useDST, const Int maxLog2TrDynamicRange, UChar ucMode, UChar ucTrIdx )
+void xITrMxN_EMT(const Int bitDepth, const TCoeff *coeff, Pel *residual, size_t stride, Int iWidth, Int iHeight, UInt uiSkipWidth, UInt uiSkipHeight, bool useDST, const Int maxLog2TrDynamicRange, uint8_t ucMode, uint8_t ucTrIdx )
 #else
-void xITrMxN_EMT( const Int bitDepth, const TCoeff *coeff, Pel *residual, size_t stride, Int iWidth, Int iHeight, UInt uiSkipWidth, UInt uiSkipHeight, bool useDST, const Int maxLog2TrDynamicRange, UChar ucMode, UChar ucTrIdx, bool use65intraModes )
+void xITrMxN_EMT( const Int bitDepth, const TCoeff *coeff, Pel *residual, size_t stride, Int iWidth, Int iHeight, UInt uiSkipWidth, UInt uiSkipHeight, bool useDST, const Int maxLog2TrDynamicRange, uint8_t ucMode, uint8_t ucTrIdx, bool use65intraModes )
 #endif
 #else
 #if INTRA67_3MPM
-void xITrMxN_EMT(const Int bitDepth, const TCoeff *coeff, Pel *residual, size_t stride, Int iWidth, Int iHeight, UInt uiSkipWidth, UInt uiSkipHeight, const Int maxLog2TrDynamicRange, UChar ucMode, UChar ucTrIdx )
+void xITrMxN_EMT(const Int bitDepth, const TCoeff *coeff, Pel *residual, size_t stride, Int iWidth, Int iHeight, UInt uiSkipWidth, UInt uiSkipHeight, const Int maxLog2TrDynamicRange, uint8_t ucMode, uint8_t ucTrIdx )
 #else
-void xITrMxN_EMT( const Int bitDepth, const TCoeff *coeff, Pel *residual, size_t stride, Int iWidth, Int iHeight, UInt uiSkipWidth, UInt uiSkipHeight, const Int maxLog2TrDynamicRange, UChar ucMode, UChar ucTrIdx, bool use65intraModes )
+void xITrMxN_EMT( const Int bitDepth, const TCoeff *coeff, Pel *residual, size_t stride, Int iWidth, Int iHeight, UInt uiSkipWidth, UInt uiSkipHeight, const Int maxLog2TrDynamicRange, uint8_t ucMode, uint8_t ucTrIdx, bool use65intraModes )
 #endif
 #endif
 {
@@ -760,13 +760,13 @@ void TrQuant::xInvNsst( const TransformUnit &tu, const ComponentID compID )
       const Int iSbSize     = 4;
       const Int iSubGrpXMax = 1;
       const Int iSubGrpYMax = 1;
-      const UChar * permut  = g_nsstHyGTPermut4x4[g_NsstLut[uiIntraMode]][uiNSSTIdx - 1];
+      const uint8_t * permut  = g_nsstHyGTPermut4x4[g_NsstLut[uiIntraMode]][uiNSSTIdx - 1];
 #else
       const Int iLog2SbSize = whge3 ? 3 : 2;
       const Int iSbSize     = whge3 ? 8 : 4;
       const Int iSubGrpXMax = Clip3( 1, 8, ( Int ) width  ) >> iLog2SbSize;
       const Int iSubGrpYMax = Clip3( 1, 8, ( Int ) height ) >> iLog2SbSize;
-      const UChar * permut  = ( iSbSize == 4 ) ? g_nsstHyGTPermut4x4[g_NsstLut[uiIntraMode]][uiNSSTIdx - 1] : g_nsstHyGTPermut8x8[g_NsstLut[uiIntraMode]][uiNSSTIdx - 1];
+      const uint8_t * permut  = ( iSbSize == 4 ) ? g_nsstHyGTPermut4x4[g_NsstLut[uiIntraMode]][uiNSSTIdx - 1] : g_nsstHyGTPermut8x8[g_NsstLut[uiIntraMode]][uiNSSTIdx - 1];
 #endif
       TCoeff * NSST_MATRIX  = m_tempMatrix;
       TCoeff * piNsstTemp;
@@ -865,13 +865,13 @@ void TrQuant::xFwdNsst( const TransformUnit &tu, const ComponentID compID )
       const Int iSbSize     = 4;
       const Int iSubGrpXMax = 1;
       const Int iSubGrpYMax = 1;
-      const UChar * permut  = g_nsstHyGTPermut4x4[g_NsstLut[uiIntraMode]][uiNSSTIdx - 1];
+      const uint8_t * permut  = g_nsstHyGTPermut4x4[g_NsstLut[uiIntraMode]][uiNSSTIdx - 1];
 #else
       const Int iLog2SbSize = whge3 ? 3 : 2;
       const Int iSbSize     = whge3 ? 8 : 4;
       const Int iSubGrpXMax = Clip3( 1, 8, ( Int ) width  ) >> iLog2SbSize;
       const Int iSubGrpYMax = Clip3( 1, 8, ( Int ) height ) >> iLog2SbSize;
-      const UChar * permut  = ( iSbSize == 4 ) ? g_nsstHyGTPermut4x4[g_NsstLut[uiIntraMode]][uiNSSTIdx - 1] : g_nsstHyGTPermut8x8[g_NsstLut[uiIntraMode]][uiNSSTIdx - 1];
+      const uint8_t * permut  = ( iSbSize == 4 ) ? g_nsstHyGTPermut4x4[g_NsstLut[uiIntraMode]][uiNSSTIdx - 1] : g_nsstHyGTPermut8x8[g_NsstLut[uiIntraMode]][uiNSSTIdx - 1];
 #endif
       TCoeff * NSST_MATRIX  = m_tempMatrix;
       TCoeff * piNsstTemp;
@@ -1261,12 +1261,12 @@ void TrQuant::xQuant(TransformUnit &tu, const ComponentID &compID, const CCoeffB
 }
 
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
-UChar TrQuant::getEmtTrIdx(TransformUnit tu, const ComponentID compID)
+uint8_t TrQuant::getEmtTrIdx(TransformUnit tu, const ComponentID compID)
 {
 #if JVET_K1000_SIMPLIFIED_EMT
-  UChar ucTrIdx = DCT2_EMT;
+  uint8_t ucTrIdx = DCT2_EMT;
 #else
-  UChar ucTrIdx = DCT2_HEVC;
+  uint8_t ucTrIdx = DCT2_HEVC;
 #endif
 
   if( compID == COMPONENT_Y )
@@ -1295,9 +1295,9 @@ UChar TrQuant::getEmtTrIdx(TransformUnit tu, const ComponentID compID)
   return ucTrIdx;
 }
 
-UChar TrQuant::getEmtMode( TransformUnit tu, const ComponentID compID )
+uint8_t TrQuant::getEmtMode( TransformUnit tu, const ComponentID compID )
 {
-  UChar ucMode = 0;
+  uint8_t ucMode = 0;
 
   if( isLuma( compID ) )
   {

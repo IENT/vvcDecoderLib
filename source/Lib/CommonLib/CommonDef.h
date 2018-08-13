@@ -124,8 +124,8 @@ typedef enum
 
 static const UInt   MAX_UINT =                            0xFFFFFFFFU; ///< max. value of unsigned 32-bit integer
 static const Int    MAX_INT =                              2147483647; ///< max. value of signed 32-bit integer
-static const UChar  MAX_UCHAR =                                   255;
-static const UChar  MAX_SCHAR =                                   127;
+static const uint8_t  MAX_UCHAR =                                   255;
+static const uint8_t  MAX_SCHAR =                                   127;
 static const double MAX_DOUBLE =                             1.7e+308; ///< max. value of double-type value
 
 // ====================================================================================================================
@@ -242,7 +242,7 @@ static const Int NUM_CHROMA_MODE =                                  5; ///< tota
 #endif
 static const Int DM_CHROMA_IDX =                       NUM_INTRA_MODE; ///< chroma mode index for derived from luma intra mode
 
-static const UChar INTER_MODE_IDX =                               255; ///< index for inter modes
+static const uint8_t INTER_MODE_IDX =                               255; ///< index for inter modes
 
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
 static const UInt  EMT_INTRA_MAX_CU =                              32; ///< Max Intra CU size applying EMT, supported values: 8, 16, 32, 64, 128

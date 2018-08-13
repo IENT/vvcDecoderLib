@@ -347,7 +347,7 @@ void IntraSearch::estIntraPredLumaQT( CodingUnit &cu, Partitioner &partitioner )
   // 0: EMT is either not applicable for current CU (cuWidth > EMT_INTRA_MAX_CU or cuHeight > EMT_INTRA_MAX_CU), not active in the config file or the fast decision algorithm is not used in this case
   // 1: EMT fast algorithm can be applied for the current CU, and the DCT2 is being checked
   // 2: EMT is being checked for current CU. Stored results of DCT2 can be utilized for speedup
-  UChar emtUsageFlag = 0;
+  uint8_t emtUsageFlag = 0;
   const int maxSizeEMT = cs.pcv->noRQT ? EMT_INTRA_MAX_CU_WITH_QTBT : EMT_INTRA_MAX_CU;
   if( width <= maxSizeEMT && height <= maxSizeEMT && sps.getSpsNext().getUseIntraEMT() )
   {
@@ -1499,9 +1499,9 @@ void IntraSearch::xIntraCodingTUBlock(TransformUnit &tu, const ComponentID &comp
   const bool           ccUseRecoResi        = m_pcEncCfg->getUseReconBasedCrossCPredictionEstimate();
 
 #if JVET_K1000_SIMPLIFIED_EMT
-  const UChar          transformIndex       = tu.cu->emtFlag && compID == COMPONENT_Y ? tu.emtIdx : DCT2_EMT ;
+  const uint8_t          transformIndex       = tu.cu->emtFlag && compID == COMPONENT_Y ? tu.emtIdx : DCT2_EMT ;
 #elif JEM_TOOLS
-  const UChar          transformIndex       = tu.cu->emtFlag && compID == COMPONENT_Y ? tu.emtIdx : ( tu.cu->cs->sps->getSpsNext().getUseIntraEMT() ? DCT2_EMT : DCT2_HEVC );
+  const uint8_t          transformIndex       = tu.cu->emtFlag && compID == COMPONENT_Y ? tu.emtIdx : ( tu.cu->cs->sps->getSpsNext().getUseIntraEMT() ? DCT2_EMT : DCT2_HEVC );
 #endif
 
   //===== init availability pattern =====
@@ -1719,15 +1719,15 @@ void IntraSearch::xRecurIntraCodingLumaQT( CodingStructure &cs, Partitioner &par
   bool       checkTransformSkip                 = pps.getUseTransformSkip();
   Int        bestModeId[MAX_NUM_COMPONENT]      = {0, 0, 0};
 #if JVET_K1000_SIMPLIFIED_EMT
-  UChar      nNumTransformCands                 = cu.emtFlag ? 4 : 1; //4 is the number of transforms of emt
+  uint8_t      nNumTransformCands                 = cu.emtFlag ? 4 : 1; //4 is the number of transforms of emt
 #else
-  UChar      nNumTransformCands                 = 1;
+  uint8_t      nNumTransformCands                 = 1;
 #endif
 #if JVET_K1000_SIMPLIFIED_EMT
   bool       isAllIntra                         = m_pcEncCfg->getIntraPeriod() == 1;
 #endif
 
-  UChar numTransformIndexCands                  = nNumTransformCands;
+  uint8_t numTransformIndexCands                  = nNumTransformCands;
 
   const TempCtx ctxStart  ( m_CtxCache, m_CABACEstimator->getCtx() );
   TempCtx       ctxBest   ( m_CtxCache );
@@ -1810,7 +1810,7 @@ void IntraSearch::xRecurIntraCodingLumaQT( CodingStructure &cs, Partitioner &par
       }
 
 #if JVET_K1000_SIMPLIFIED_EMT
-      UChar transformIndex = modeId;
+      uint8_t transformIndex = modeId;
 #endif
 
 

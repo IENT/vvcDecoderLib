@@ -96,8 +96,8 @@ public:
   );
 
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
-  UChar getEmtTrIdx( TransformUnit tu, const ComponentID compID );
-  UChar getEmtMode ( TransformUnit tu, const ComponentID compID );
+  uint8_t getEmtTrIdx( TransformUnit tu, const ComponentID compID );
+  uint8_t getEmtMode ( TransformUnit tu, const ComponentID compID );
 #endif
 
 #if JEM_TOOLS

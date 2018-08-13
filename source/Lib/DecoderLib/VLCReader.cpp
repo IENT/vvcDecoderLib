@@ -2496,7 +2496,7 @@ bool HLSyntaxReader::xMoreRbspData()
     return true;
   }
 
-  UChar lastByte = m_pcBitstream->peekBits(bitsLeft);
+  uint8_t lastByte = m_pcBitstream->peekBits(bitsLeft);
   Int cnt = bitsLeft;
 
   // remove trailing bits equal to zero

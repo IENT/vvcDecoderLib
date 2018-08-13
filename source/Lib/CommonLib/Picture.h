@@ -297,9 +297,9 @@ public:
   std::vector<SAOBlkParam> m_sao[2];
 
 #if JVET_K0371_ALF
-  std::vector<UChar> m_alfCtuEnableFlag[MAX_NUM_COMPONENT];
-  UChar* getAlfCtuEnableFlag( Int compIdx ) { return m_alfCtuEnableFlag[compIdx].data(); }
-  std::vector<UChar>* getAlfCtuEnableFlag() { return m_alfCtuEnableFlag; }
+  std::vector<uint8_t> m_alfCtuEnableFlag[MAX_NUM_COMPONENT];
+  uint8_t* getAlfCtuEnableFlag( Int compIdx ) { return m_alfCtuEnableFlag[compIdx].data(); }
+  std::vector<uint8_t>* getAlfCtuEnableFlag() { return m_alfCtuEnableFlag; }
   void resizeAlfCtuEnableFlag( Int numEntries )
   {
     for( Int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++ )

@@ -468,11 +468,11 @@ void EncApp::xInitLibCfg()
   m_cEncLib.setMasteringDisplaySEI                               ( m_masteringDisplay );
 #if U0033_ALTERNATIVE_TRANSFER_CHARACTERISTICS_SEI
   m_cEncLib.setSEIAlternativeTransferCharacteristicsSEIEnable    ( m_preferredTransferCharacteristics>=0     );
-  m_cEncLib.setSEIPreferredTransferCharacteristics               ( UChar(m_preferredTransferCharacteristics) );
+  m_cEncLib.setSEIPreferredTransferCharacteristics               ( uint8_t(m_preferredTransferCharacteristics) );
 #endif
   m_cEncLib.setSEIGreenMetadataInfoSEIEnable                     ( m_greenMetadataType > 0 );
-  m_cEncLib.setSEIGreenMetadataType                              ( UChar(m_greenMetadataType) );
-  m_cEncLib.setSEIXSDMetricType                                  ( UChar(m_xsdMetricType) );
+  m_cEncLib.setSEIGreenMetadataType                              ( uint8_t(m_greenMetadataType) );
+  m_cEncLib.setSEIXSDMetricType                                  ( uint8_t(m_xsdMetricType) );
 
 #if HEVC_TILES_WPP
   m_cEncLib.setTileUniformSpacingFlag                            ( m_tileUniformSpacingFlag );

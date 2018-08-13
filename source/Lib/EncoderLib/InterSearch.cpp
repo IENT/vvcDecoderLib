@@ -265,7 +265,7 @@ void InterSearch::init( EncCfg*        pcEncCfg,
 }
 
 
-inline void InterSearch::xTZSearchHelp( IntTZSearchStruct& rcStruct, const Int iSearchX, const Int iSearchY, const UChar ucPointNr, const UInt uiDistance )
+inline void InterSearch::xTZSearchHelp( IntTZSearchStruct& rcStruct, const Int iSearchX, const Int iSearchY, const uint8_t ucPointNr, const UInt uiDistance )
 {
   Distortion  uiSad = 0;
 
@@ -771,12 +771,12 @@ void InterSearch::xMergeEstimation( PredictionUnit& pu, PelUnitBuf& origBuf, Int
 }
 
 #if JEM_TOOLS
-void InterSearch::xFRUCMrgEstimation( PredictionUnit& pu, PelUnitBuf& origBuf, Distortion& ruiMinCost, UChar& ruhFRUCMode, MergeCtx &mrgCtx )
+void InterSearch::xFRUCMrgEstimation( PredictionUnit& pu, PelUnitBuf& origBuf, Distortion& ruiMinCost, uint8_t& ruhFRUCMode, MergeCtx &mrgCtx )
 {
   ruiMinCost = std::numeric_limits<Distortion>::max();
 
   CHECK( pu.mergeFlag == 0, "merge flag must be set" );
-  const UChar uhFRUCME[2] = { FRUC_MERGE_BILATERALMV , FRUC_MERGE_TEMPLATE };
+  const uint8_t uhFRUCME[2] = { FRUC_MERGE_BILATERALMV , FRUC_MERGE_TEMPLATE };
 
   for( Int nME = 0 ; nME < 2 ; nME++ )
   {
@@ -1344,7 +1344,7 @@ void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
 
 #if JEM_TOOLS
       Distortion uiFRUCMrgCost = std::numeric_limits<Distortion>::max();
-      UChar uhFRUCMode = 0;
+      uint8_t uhFRUCMode = 0;
       if( pu.cs->slice->getSPS()->getSpsNext().getUseFRUCMrgMode() )
       {
         xFRUCMrgEstimation( pu, origBuf, uiFRUCMrgCost, uhFRUCMode, mergeCtx );
@@ -1458,7 +1458,7 @@ void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
           // save 4 parameter results
           Mv bestMv[2][3], bestMvd[2][3];
           int bestMvpIdx[2], bestMvpNum[2], bestRefIdx[2];
-          UChar bestInterDir;
+          uint8_t bestInterDir;
 
           bestInterDir = pu.interDir;
           bestRefIdx[0] = pu.refIdx[0];
@@ -1675,7 +1675,7 @@ void InterSearch::xCopyAMVPInfo (AMVPInfo* pSrc, AMVPInfo* pDst)
 }
 
 #if JVET_K0357_AMVR
-void InterSearch::xCheckBestMVP ( RefPicList eRefPicList, Mv cMv, Mv& rcMvPred, Int& riMVPIdx, AMVPInfo& amvpInfo, UInt& ruiBits, Distortion& ruiCost, const UChar imv )
+void InterSearch::xCheckBestMVP ( RefPicList eRefPicList, Mv cMv, Mv& rcMvPred, Int& riMVPIdx, AMVPInfo& amvpInfo, UInt& ruiBits, Distortion& ruiCost, const uint8_t imv )
 #else
 void InterSearch::xCheckBestMVP ( RefPicList eRefPicList, Mv cMv, Mv& rcMvPred, Int& riMVPIdx, AMVPInfo& amvpInfo, UInt& ruiBits, Distortion& ruiCost )
 #endif

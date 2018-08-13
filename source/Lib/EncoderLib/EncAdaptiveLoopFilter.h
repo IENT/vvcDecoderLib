@@ -156,7 +156,7 @@ public:
 private:
   AlfCovariance***       m_alfCovariance[MAX_NUM_COMPONENT];          // [compIdx][shapeIdx][ctbAddr][classIdx]
   AlfCovariance**        m_alfCovarianceFrame[MAX_NUM_CHANNEL_TYPE];   // [CHANNEL][shapeIdx][classIdx]
-  UChar*                 m_ctuEnableFlagTmp[MAX_NUM_COMPONENT];
+  uint8_t*                 m_ctuEnableFlagTmp[MAX_NUM_COMPONENT];
 
   //for RDO
   AlfSliceParam          m_alfSliceParamTemp;
@@ -195,7 +195,7 @@ private:
   double mergeFiltersAndCost( AlfSliceParam& alfSliceParam, AlfFilterShape& alfShape, AlfCovariance* covFrame, AlfCovariance* covMerged, int& uiCoeffBits );
 
   void   getFrameStats( ChannelType channel, int iShapeIdx );
-  void   getFrameStat( AlfCovariance* frameCov, AlfCovariance** ctbCov, UChar* ctbEnableFlags, const int numClasses );
+  void   getFrameStat( AlfCovariance* frameCov, AlfCovariance** ctbCov, uint8_t* ctbEnableFlags, const int numClasses );
   void   deriveStatsForFiltering( PelUnitBuf& orgYuv, PelUnitBuf& recYuv );
   void   getBlkStats( AlfCovariance* alfCovariace, const AlfFilterShape& shape, AlfClassifier** classifier, Pel* org, const int orgStride, Pel* rec, const int recStride, const CompArea& area );
   void   calcCovariance( int *ELocal, const Pel *rec, const int stride, const int *filterPattern, const int halfFilterLength, const int transposeIdx );
@@ -233,9 +233,9 @@ private:
   int  gnsCholeskyDec( double **inpMatr, double outMatr[MAX_NUM_ALF_COEFF][MAX_NUM_ALF_COEFF], int numEq );
 
   void setEnableFlag( AlfSliceParam& alfSlicePara, ChannelType channel, bool val );
-  void setEnableFlag( AlfSliceParam& alfSlicePara, ChannelType channel, UChar** ctuFlags );
-  void setCtuEnableFlag( UChar** ctuFlags, ChannelType channel, UChar val );
-  void copyCtuEnableFlag( UChar** ctuFlagsDst, UChar** ctuFlagsSrc, ChannelType channel );
+  void setEnableFlag( AlfSliceParam& alfSlicePara, ChannelType channel, uint8_t** ctuFlags );
+  void setCtuEnableFlag( uint8_t** ctuFlags, ChannelType channel, uint8_t val );
+  void copyCtuEnableFlag( uint8_t** ctuFlagsDst, uint8_t** ctuFlagsSrc, ChannelType channel );
 };
 
 

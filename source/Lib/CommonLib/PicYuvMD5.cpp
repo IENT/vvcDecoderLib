@@ -46,7 +46,7 @@ template<UInt OUTPUT_BITDEPTH_DIV8>
 static void md5_block(MD5& md5, const Pel* plane, UInt n)
 {
   /* create a 64 byte buffer for packing Pel's into */
-  UChar buf[64/OUTPUT_BITDEPTH_DIV8][OUTPUT_BITDEPTH_DIV8];
+  uint8_t buf[64/OUTPUT_BITDEPTH_DIV8][OUTPUT_BITDEPTH_DIV8];
   for (UInt i = 0; i < n; i++)
   {
     Pel pel = plane[i];
@@ -56,7 +56,7 @@ static void md5_block(MD5& md5, const Pel* plane, UInt n)
       buf[i][d] = pel >> (d*8);
     }
   }
-  md5.update((UChar*)buf, n * OUTPUT_BITDEPTH_DIV8);
+  md5.update((uint8_t*)buf, n * OUTPUT_BITDEPTH_DIV8);
 }
 
 /**
@@ -143,7 +143,7 @@ UInt calcCRC(const CPelUnitBuf& pic, PictureHash &digest, const BitDepths &bitDe
 UInt compChecksum(Int bitdepth, const Pel* plane, UInt width, UInt height, UInt stride, PictureHash &digest, const BitDepths &/*bitDepths*/)
 {
   UInt checksum = 0;
-  UChar xor_mask;
+  uint8_t xor_mask;
 
   for (UInt y = 0; y < height; y++)
   {
@@ -200,7 +200,7 @@ UInt calcMD5(const CPelUnitBuf& pic, PictureHash &digest, const BitDepths &bitDe
     const ComponentID compID=ComponentID(chan);
     const CPelBuf area = pic.get(compID);
     md5_plane_func = bitDepths.recon[toChannelType(compID)] <= 8 ? (MD5PlaneFunc)md5_plane<1> : (MD5PlaneFunc)md5_plane<2>;
-    UChar tmp_digest[MD5_DIGEST_STRING_LENGTH];
+    uint8_t tmp_digest[MD5_DIGEST_STRING_LENGTH];
     md5_plane_func(md5[compID], area.bufAt(0, 0), area.width, area.height, area.stride );
     md5[compID].finalize(tmp_digest);
     for(UInt i=0; i<MD5_DIGEST_STRING_LENGTH; i++)

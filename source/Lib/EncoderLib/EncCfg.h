@@ -477,11 +477,11 @@ protected:
   SEIMasteringDisplay m_masteringDisplay;
 #if U0033_ALTERNATIVE_TRANSFER_CHARACTERISTICS_SEI
   bool      m_alternativeTransferCharacteristicsSEIEnabled;
-  UChar     m_preferredTransferCharacteristics;
+  uint8_t     m_preferredTransferCharacteristics;
 #endif
   bool      m_greenMetadataInfoSEIEnabled;
-  UChar     m_greenMetadataType;
-  UChar     m_xsdMetricType;
+  uint8_t     m_greenMetadataType;
+  uint8_t     m_xsdMetricType;
   //====== Weighted Prediction ========
   bool      m_useWeightedPred;       //< Use of Weighting Prediction (P_SLICE)
   bool      m_useWeightedBiPred;    //< Use of Bi-directional Weighting Prediction (B_SLICE)
@@ -1270,15 +1270,15 @@ public:
 #if U0033_ALTERNATIVE_TRANSFER_CHARACTERISTICS_SEI
   void  setSEIAlternativeTransferCharacteristicsSEIEnable( bool b)   { m_alternativeTransferCharacteristicsSEIEnabled = b;    }
   bool  getSEIAlternativeTransferCharacteristicsSEIEnable( ) const   { return m_alternativeTransferCharacteristicsSEIEnabled; }
-  void  setSEIPreferredTransferCharacteristics(UChar v)              { m_preferredTransferCharacteristics = v;    }
-  UChar getSEIPreferredTransferCharacteristics() const               { return m_preferredTransferCharacteristics; }
+  void  setSEIPreferredTransferCharacteristics(uint8_t v)              { m_preferredTransferCharacteristics = v;    }
+  uint8_t getSEIPreferredTransferCharacteristics() const               { return m_preferredTransferCharacteristics; }
 #endif
   void  setSEIGreenMetadataInfoSEIEnable( bool b)                    { m_greenMetadataInfoSEIEnabled = b;    }
   bool  getSEIGreenMetadataInfoSEIEnable( ) const                    { return m_greenMetadataInfoSEIEnabled; }
-  void  setSEIGreenMetadataType(UChar v)                             { m_greenMetadataType = v;    }
-  UChar getSEIGreenMetadataType() const                              { return m_greenMetadataType; }
-  void  setSEIXSDMetricType(UChar v)                                 { m_xsdMetricType = v;    }
-  UChar getSEIXSDMetricType() const                                  { return m_xsdMetricType; }
+  void  setSEIGreenMetadataType(uint8_t v)                             { m_greenMetadataType = v;    }
+  uint8_t getSEIGreenMetadataType() const                              { return m_greenMetadataType; }
+  void  setSEIXSDMetricType(uint8_t v)                                 { m_xsdMetricType = v;    }
+  uint8_t getSEIXSDMetricType() const                                  { return m_xsdMetricType; }
 
   const SEIMasteringDisplay &getMasteringDisplaySEI() const          { return m_masteringDisplay; }
   void         setUseWP               ( bool b )                     { m_useWeightedPred   = b;    }

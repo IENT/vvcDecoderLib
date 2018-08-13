@@ -46,13 +46,13 @@
 struct AlfClassifier
 {
   AlfClassifier() {}
-  AlfClassifier( UChar cIdx, UChar tIdx )
+  AlfClassifier( uint8_t cIdx, uint8_t tIdx )
     : classIdx( cIdx ), transposeIdx( tIdx )
   {
   }
 
-  UChar classIdx;
-  UChar transposeIdx;
+  uint8_t classIdx;
+  uint8_t transposeIdx;
 };
 
 enum Direction
@@ -102,7 +102,7 @@ protected:
   AlfClassifier**              m_classifier;
   short                        m_coeffFinal[MAX_NUM_ALF_CLASSES * MAX_NUM_ALF_LUMA_COEFF];
   int**                        m_laplacian[NUM_DIRECTIONS];
-  UChar*                       m_ctuEnableFlag[MAX_NUM_COMPONENT];
+  uint8_t*                       m_ctuEnableFlag[MAX_NUM_COMPONENT];
   PelStorage                   m_tempBuf;
   int                          m_inputBitDepth[MAX_NUM_CHANNEL_TYPE];
   int                          m_picWidth;

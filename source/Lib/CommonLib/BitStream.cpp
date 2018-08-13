@@ -90,9 +90,9 @@ void InputBitstream::resetToStart()
   m_numBitsRead=0;
 }
 
-UChar* OutputBitstream::getByteStream() const
+uint8_t* OutputBitstream::getByteStream() const
 {
-  return (UChar*) &m_fifo.front();
+  return (uint8_t*) &m_fifo.front();
 }
 
 UInt OutputBitstream::getByteStreamLength()
@@ -123,7 +123,7 @@ void OutputBitstream::write   ( UInt uiBits, UInt uiNumberOfBits )
    * len(H)=7, len(V)=1: ... ---- HHHH HHHV . 0000 0000, next_num_held_bits=0
    * len(H)=7, len(V)=2: ... ---- HHHH HHHV . V000 0000, next_num_held_bits=1
    * if total_bits < 8, the value of v_ is not used */
-  UChar next_held_bits = uiBits << (8 - next_num_held_bits);
+  uint8_t next_held_bits = uiBits << (8 - next_num_held_bits);
 
   if (!(num_total_bits >> 3))
   {
@@ -238,7 +238,7 @@ Int OutputBitstream::countStartCodeEmulations()
 void InputBitstream::pseudoRead ( UInt uiNumberOfBits, UInt& ruiBits )
 {
   UInt saved_num_held_bits = m_num_held_bits;
-  UChar saved_held_bits = m_held_bits;
+  uint8_t saved_held_bits = m_held_bits;
   UInt saved_fifo_idx = m_fifo_idx;
 
   UInt num_bits_to_read = min(uiNumberOfBits, getNumBitsLeft());

@@ -69,7 +69,7 @@ class OutputBitstream
   std::vector<uint8_t> m_fifo;
 
   UInt m_num_held_bits; /// number of bits not flushed to bytestream.
-  UChar m_held_bits; /// the bits held and not flushed to bytestream.
+  uint8_t m_held_bits; /// the bits held and not flushed to bytestream.
                              /// this value is always msb-aligned, bigendian.
 public:
   // create / destroy
@@ -97,7 +97,7 @@ public:
    * NB, data is arranged such that subsequent bytes in the
    * bytestream are stored in ascending addresses.
    */
-  UChar* getByteStream() const;
+  uint8_t* getByteStream() const;
 
   /**
    * Return the number of valid bytes available from  getByteStream()
@@ -127,7 +127,7 @@ public:
    */
   std::vector<uint8_t>& getFIFO() { return m_fifo; }
 
-  UChar getHeldBits  ()          { return m_held_bits;          }
+  uint8_t getHeldBits  ()          { return m_held_bits;          }
 
   //OutputBitstream& operator= (const OutputBitstream& src);
   /** Return a reference to the internal fifo */
@@ -153,7 +153,7 @@ protected:
   UInt m_fifo_idx; /// Read index into m_fifo
 
   UInt m_num_held_bits;
-  UChar m_held_bits;
+  uint8_t m_held_bits;
   UInt  m_numBitsRead;
 
 public:
@@ -185,7 +185,7 @@ public:
   }
 
   UInt        readOutTrailingBits ();
-  UChar getHeldBits  ()          { return m_held_bits;          }
+  uint8_t getHeldBits  ()          { return m_held_bits;          }
   OutputBitstream& operator= (const OutputBitstream& src);
   UInt  getByteLocation              ( )                     { return m_fifo_idx                    ; }
 
