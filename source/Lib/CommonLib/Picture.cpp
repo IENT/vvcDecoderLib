@@ -464,7 +464,7 @@ TileMap::TileMap()
 {
 }
 
-Void TileMap::create( const SPS& sps, const PPS& pps )
+void TileMap::create( const SPS& sps, const PPS& pps )
 {
   pcv = pps.pcv;
 
@@ -482,7 +482,7 @@ Void TileMap::create( const SPS& sps, const PPS& pps )
   initCtuTsRsAddrMap();
 }
 
-Void TileMap::destroy()
+void TileMap::destroy()
 {
   tiles.clear();
 
@@ -730,7 +730,7 @@ Picture::Picture()
   }
 }
 
-Void Picture::create(const ChromaFormat &_chromaFormat, const Size &size, const unsigned _maxCUSize, const unsigned _margin, const bool _decoder)
+void Picture::create(const ChromaFormat &_chromaFormat, const Size &size, const unsigned _maxCUSize, const unsigned _margin, const bool _decoder)
 {
   UnitArea::operator=( UnitArea( _chromaFormat, Area( Position{ 0, 0 }, size ) ) );
   margin            =  _margin;
@@ -747,7 +747,7 @@ Void Picture::create(const ChromaFormat &_chromaFormat, const Size &size, const 
 #endif
 }
 
-Void Picture::destroy()
+void Picture::destroy()
 {
 #if ENABLE_SPLIT_PARALLELISM
 #if ENABLE_WPP_PARALLELISM
@@ -790,7 +790,7 @@ Void Picture::destroy()
 #endif
 }
 
-Void Picture::createTempBuffers( const unsigned _maxCUSize )
+void Picture::createTempBuffers( const unsigned _maxCUSize )
 {
 #if KEEP_PRED_AND_RESI_SIGNALS
   const Area a( Position{ 0, 0 }, lumaSize() );
@@ -814,7 +814,7 @@ Void Picture::createTempBuffers( const unsigned _maxCUSize )
   if( cs ) cs->rebindPicBufs();
 }
 
-Void Picture::destroyTempBuffers()
+void Picture::destroyTempBuffers()
 {
 #if ENABLE_SPLIT_PARALLELISM
   scheduler.finishParallel();
@@ -858,7 +858,7 @@ const CPelUnitBuf Picture::getRecoBuf(const UnitArea &unit)     const { return g
        PelUnitBuf Picture::getRecoBuf()                               { return M_BUFS(scheduler.getSplitPicId(), PIC_RECONSTRUCTION); }
 const CPelUnitBuf Picture::getRecoBuf()                         const { return M_BUFS(scheduler.getSplitPicId(), PIC_RECONSTRUCTION); }
 
-Void Picture::finalInit( const SPS& sps, const PPS& pps )
+void Picture::finalInit( const SPS& sps, const PPS& pps )
 {
   for( auto &sei : SEIs )
   {
@@ -905,7 +905,7 @@ Void Picture::finalInit( const SPS& sps, const PPS& pps )
 #endif
 }
 
-Void Picture::allocateNewSlice()
+void Picture::allocateNewSlice()
 {
   slices.push_back(new Slice);
   Slice& slice = *slices.back();

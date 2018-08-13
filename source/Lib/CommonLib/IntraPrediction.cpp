@@ -116,7 +116,7 @@ IntraPrediction::~IntraPrediction()
   destroy();
 }
 
-Void IntraPrediction::destroy()
+void IntraPrediction::destroy()
 {
   for (UInt ch = 0; ch < MAX_NUM_COMPONENT; ch++)
   {
@@ -142,7 +142,7 @@ Void IntraPrediction::destroy()
 #endif
 }
 
-Void IntraPrediction::init(ChromaFormat chromaFormatIDC, const unsigned bitDepthY)
+void IntraPrediction::init(ChromaFormat chromaFormatIDC, const unsigned bitDepthY)
 {
   // if it has been initialised before, but the chroma format has changed, release the memory and start again.
   if (m_piYuvExt[COMPONENT_Y][PRED_BUF_UNFILTERED] != nullptr && m_currChromaFormat != chromaFormatIDC)
@@ -550,7 +550,7 @@ void IntraPrediction::predIntraAng( const ComponentID compId, PelBuf &piPred, co
 #endif
 }
 #if JVET_K0190
-Void IntraPrediction::predIntraChromaLM(const ComponentID compID, PelBuf &piPred, const PredictionUnit &pu, const CompArea& chromaArea, Int intraDir)
+void IntraPrediction::predIntraChromaLM(const ComponentID compID, PelBuf &piPred, const PredictionUnit &pu, const CompArea& chromaArea, Int intraDir)
 {
   Int  iLumaStride = 0;
   PelBuf Temp;
@@ -565,7 +565,7 @@ Void IntraPrediction::predIntraChromaLM(const ComponentID compID, PelBuf &piPred
 }
 #else
 #if JEM_TOOLS
-Void IntraPrediction::predIntraChromaLM(const ComponentID compID, PelBuf &piPred, const PredictionUnit &pu, const CompArea& chromaArea, Int intraDir)
+void IntraPrediction::predIntraChromaLM(const ComponentID compID, PelBuf &piPred, const PredictionUnit &pu, const CompArea& chromaArea, Int intraDir)
 {
   bool DO_ELM = false;
   if (pu.cs->sps->getSpsNext().isELMModeMMLM())
@@ -663,7 +663,7 @@ Void IntraPrediction::predIntraChromaLM(const ComponentID compID, PelBuf &piPred
   }
 }
 
-Void IntraPrediction::addCrossColorResi(const ComponentID compID, PelBuf &piPred, const TransformUnit &tu, const CPelBuf &pResiCb)
+void IntraPrediction::addCrossColorResi(const ComponentID compID, PelBuf &piPred, const TransformUnit &tu, const CPelBuf &pResiCb)
 {
   const CompArea& chromaArea = tu.block(compID);
 
@@ -700,7 +700,7 @@ Void IntraPrediction::addCrossColorResi(const ComponentID compID, PelBuf &piPred
 #endif
 #endif
 
-Void IntraPrediction::xFilterGroup(Pel* pMulDst[], Int i, Pel const * const piSrc, Int iRecStride, Bool bAboveAvaillable, Bool bLeftAvaillable)
+void IntraPrediction::xFilterGroup(Pel* pMulDst[], Int i, Pel const * const piSrc, Int iRecStride, Bool bAboveAvaillable, Bool bLeftAvaillable)
 {
   pMulDst[0][i] = (piSrc[1] + piSrc[iRecStride + 1] + 1) >> 1;
 
@@ -718,7 +718,7 @@ Void IntraPrediction::xFilterGroup(Pel* pMulDst[], Int i, Pel const * const piSr
  */
 
 //NOTE: Bit-Limit - 24-bit source
-Void IntraPrediction::xPredIntraPlanar( const CPelBuf &pSrc, PelBuf &pDst, const SPS& sps )
+void IntraPrediction::xPredIntraPlanar( const CPelBuf &pSrc, PelBuf &pDst, const SPS& sps )
 {
   const UInt width  = pDst.width;
   const UInt height = pDst.height;
@@ -776,7 +776,7 @@ Void IntraPrediction::xPredIntraPlanar( const CPelBuf &pSrc, PelBuf &pDst, const
 
 
 
-Void IntraPrediction::xPredIntraDc( const CPelBuf &pSrc, PelBuf &pDst, const ChannelType channelType, const bool enableBoundaryFilter )
+void IntraPrediction::xPredIntraDc( const CPelBuf &pSrc, PelBuf &pDst, const ChannelType channelType, const bool enableBoundaryFilter )
 {
   const Pel dcval = xGetPredValDc( pSrc, pDst );
   pDst.fill( dcval );
@@ -792,7 +792,7 @@ Void IntraPrediction::xPredIntraDc( const CPelBuf &pSrc, PelBuf &pDst, const Cha
 #if HEVC_USE_DC_PREDFILTERING
 /** Function for filtering intra DC predictor. This function performs filtering left and top edges of the prediction samples for DC mode (intra coding).
  */
-Void IntraPrediction::xDCPredFiltering(const CPelBuf &pSrc, PelBuf &pDst, const ChannelType &channelType)
+void IntraPrediction::xDCPredFiltering(const CPelBuf &pSrc, PelBuf &pDst, const ChannelType &channelType)
 {
   UInt iWidth = pDst.width;
   UInt iHeight = pDst.height;
@@ -834,9 +834,9 @@ Void IntraPrediction::xDCPredFiltering(const CPelBuf &pSrc, PelBuf &pDst, const 
 */
 //NOTE: Bit-Limit - 25-bit source
 #if HEVC_USE_HOR_VER_PREDFILTERING
-Void IntraPrediction::xPredIntraAng( const CPelBuf &pSrc, PelBuf &pDst, const ChannelType channelType, const UInt dirMode, const ClpRng& clpRng, const Bool bEnableEdgeFilters, const SPS& sps, const bool enableBoundaryFilter )
+void IntraPrediction::xPredIntraAng( const CPelBuf &pSrc, PelBuf &pDst, const ChannelType channelType, const UInt dirMode, const ClpRng& clpRng, const Bool bEnableEdgeFilters, const SPS& sps, const bool enableBoundaryFilter )
 #else
-Void IntraPrediction::xPredIntraAng( const CPelBuf &pSrc, PelBuf &pDst, const ChannelType channelType, const UInt dirMode, const ClpRng& clpRng, const SPS& sps, const bool enableBoundaryFilter )
+void IntraPrediction::xPredIntraAng( const CPelBuf &pSrc, PelBuf &pDst, const ChannelType channelType, const UInt dirMode, const ClpRng& clpRng, const SPS& sps, const bool enableBoundaryFilter )
 #endif
 {
   Int width =Int(pDst.width);
@@ -1114,7 +1114,7 @@ Void IntraPrediction::xPredIntraAng( const CPelBuf &pSrc, PelBuf &pDst, const Ch
 }
 #if JEM_TOOLS && JEM_USE_INTRA_BOUNDARY
 
-Void IntraPrediction::xIntraPredFilteringMode34(const CPelBuf &pSrc, PelBuf &pDst)
+void IntraPrediction::xIntraPredFilteringMode34(const CPelBuf &pSrc, PelBuf &pDst)
 {
   UInt iWidth  = pDst.width;
   UInt iHeight = pDst.height;
@@ -1135,7 +1135,7 @@ Void IntraPrediction::xIntraPredFilteringMode34(const CPelBuf &pSrc, PelBuf &pDs
   }
 }
 
-Void IntraPrediction::xIntraPredFilteringMode02(const CPelBuf &pSrc, PelBuf &pDst)
+void IntraPrediction::xIntraPredFilteringMode02(const CPelBuf &pSrc, PelBuf &pDst)
 {
   UInt iWidth  = pDst.width;
   UInt iHeight = pDst.height;
@@ -1155,7 +1155,7 @@ Void IntraPrediction::xIntraPredFilteringMode02(const CPelBuf &pSrc, PelBuf &pDs
   }
 }
 
-Void IntraPrediction::xIntraPredFilteringModeDGL(const CPelBuf &pSrc, PelBuf &pDst, UInt uiMode)
+void IntraPrediction::xIntraPredFilteringModeDGL(const CPelBuf &pSrc, PelBuf &pDst, UInt uiMode)
 {
   UInt iWidth = pDst.width;
   UInt iHeight = pDst.height;
@@ -1310,7 +1310,7 @@ inline Int  isLeftAvailable       ( const CodingUnit &cu, const ChannelType &chT
 inline Int  isAboveRightAvailable ( const CodingUnit &cu, const ChannelType &chType, const Position &posRT, const UInt uiNumUnitsInPU, const UInt unitHeight, Bool *validFlags );
 inline Int  isBelowLeftAvailable  ( const CodingUnit &cu, const ChannelType &chType, const Position &posLB, const UInt uiNumUnitsInPU, const UInt unitHeight, Bool *validFlags );
 
-Void IntraPrediction::initIntraPatternChType(const CodingUnit &cu, const CompArea &area, const Bool bFilterRefSamples)
+void IntraPrediction::initIntraPatternChType(const CodingUnit &cu, const CompArea &area, const Bool bFilterRefSamples)
 {
   const CodingStructure& cs   = *cu.cs;
 
@@ -1815,7 +1815,7 @@ Int isBelowLeftAvailable(const CodingUnit &cu, const ChannelType &chType, const 
 }
 #if JEM_TOOLS||JVET_K0190
 // LumaRecPixels
-Void IntraPrediction::xGetLumaRecPixels(const PredictionUnit &pu, CompArea chromaArea)
+void IntraPrediction::xGetLumaRecPixels(const PredictionUnit &pu, CompArea chromaArea)
 {
   Int iDstStride = 0;
   Pel* pDst0 = 0;
@@ -2554,7 +2554,7 @@ Int IntraPrediction::xGetMMLMParameters(const PredictionUnit& pu, const Componen
 #endif
 
 #if JEM_TOOLS||JVET_K0190
-Void IntraPrediction::xGetLMParameters(const PredictionUnit &pu, const ComponentID compID, const CompArea& chromaArea,
+void IntraPrediction::xGetLMParameters(const PredictionUnit &pu, const ComponentID compID, const CompArea& chromaArea,
 #if !JVET_K0190
   Int iPredType,
 #endif

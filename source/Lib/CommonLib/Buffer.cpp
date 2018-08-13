@@ -112,7 +112,7 @@ PelBufferOps g_pelBufOP = PelBufferOps();
 
 
 template<>
-Void AreaBuf<Pel>::addAvg( const AreaBuf<const Pel> &other1, const AreaBuf<const Pel> &other2, const ClpRng& clpRng)
+void AreaBuf<Pel>::addAvg( const AreaBuf<const Pel> &other1, const AreaBuf<const Pel> &other2, const ClpRng& clpRng)
 {
   const Pel* src0 = other1.buf;
   const Pel* src2 = other2.buf;
@@ -151,7 +151,7 @@ Void AreaBuf<Pel>::addAvg( const AreaBuf<const Pel> &other1, const AreaBuf<const
 }
 
 template<>
-Void AreaBuf<Pel>::toLast( const ClpRng& clpRng )
+void AreaBuf<Pel>::toLast( const ClpRng& clpRng )
 {
         Pel* src       = buf;
   const UInt srcStride = stride;

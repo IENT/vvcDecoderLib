@@ -63,10 +63,10 @@ AQpLayer::~AQpLayer()
 
 /** Analyze source picture and compute local image characteristics used for QP adaptation
  * \param pcEPic Picture object to be analyzed
- * \return Void
+ * \return void
  */
 
-Void AQpPreanalyzer::preanalyze( Picture* pcEPic )
+void AQpPreanalyzer::preanalyze( Picture* pcEPic )
 {
   const CPelBuf lumaPlane = pcEPic->getOrigBuf().Y();
   const Int iWidth  = lumaPlane.width;

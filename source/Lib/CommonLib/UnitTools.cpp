@@ -2845,7 +2845,7 @@ static bool deriveScaledMotionTemporal( const Slice&      slice,
 }
 
 #if JVET_K0346
-Void clipColBlkMv(int& mvX, int& mvY, const PredictionUnit& pu)
+void clipColBlkMv(int& mvX, int& mvY, const PredictionUnit& pu)
 {
   Position puPos = pu.lumaPos();
   Size     puSize = pu.lumaSize();
@@ -3686,7 +3686,7 @@ bool PU::isAffineMrgFlagCoded( const PredictionUnit &pu )
   return getFirstAvailableAffineNeighbour( pu ) != nullptr;
 }
 
-Void PU::getAffineMergeCand( const PredictionUnit &pu, MvField (*mvFieldNeighbours)[3], unsigned char &interDirNeighbours, int &numValidMergeCand )
+void PU::getAffineMergeCand( const PredictionUnit &pu, MvField (*mvFieldNeighbours)[3], unsigned char &interDirNeighbours, int &numValidMergeCand )
 {
   for ( Int mvNum = 0; mvNum < 3; mvNum++ )
   {
@@ -3736,7 +3736,7 @@ Void PU::getAffineMergeCand( const PredictionUnit &pu, MvField (*mvFieldNeighbou
   }
 }
 
-Void PU::setAllAffineMvField( PredictionUnit &pu, MvField *mvField, RefPicList eRefList )
+void PU::setAllAffineMvField( PredictionUnit &pu, MvField *mvField, RefPicList eRefList )
 {
   // Set Mv
   Mv mv[3];
@@ -3751,7 +3751,7 @@ Void PU::setAllAffineMvField( PredictionUnit &pu, MvField *mvField, RefPicList e
   pu.refIdx[eRefList] = mvField[0].refIdx;
 }
 
-Void PU::setAllAffineMv( PredictionUnit& pu, Mv affLT, Mv affRT, Mv affLB, RefPicList eRefList )
+void PU::setAllAffineMv( PredictionUnit& pu, Mv affLT, Mv affRT, Mv affLB, RefPicList eRefList )
 {
   int width  = pu.Y().width;
   int shift = MAX_CU_DEPTH;
@@ -3912,7 +3912,7 @@ static bool deriveScaledMotionTemporal( const Slice&      slice,
 }
 
 #if JVET_K0346
-Void clipColBlkMv(int& mvX, int& mvY, const PredictionUnit& pu)
+void clipColBlkMv(int& mvX, int& mvY, const PredictionUnit& pu)
 {
   Position puPos = pu.lumaPos();
   Size     puSize = pu.lumaSize();
@@ -4375,7 +4375,7 @@ void PU::spanLICFlags( PredictionUnit &pu, const bool LICFlag )
 }
 #endif
 #if JVET_K0357_AMVR
-Void PU::applyImv( PredictionUnit& pu, MergeCtx &mrgCtx, InterPrediction *interPred )
+void PU::applyImv( PredictionUnit& pu, MergeCtx &mrgCtx, InterPrediction *interPred )
 {
   if( !pu.mergeFlag )
   {

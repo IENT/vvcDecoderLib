@@ -74,7 +74,7 @@ WeightPrediction::WeightPrediction()
 
 
 
-Void  WeightPrediction::getWpScaling(const Slice                *pcSlice,
+void  WeightPrediction::getWpScaling(const Slice                *pcSlice,
                                      const Int                  &iRefIdx0,
                                      const Int                  &iRefIdx1,
                                            WPScalingParam      *&wp0,
@@ -154,7 +154,7 @@ Void  WeightPrediction::getWpScaling(const Slice                *pcSlice,
   }
 }
 
-Void WeightPrediction::addWeightBi(const CPelUnitBuf          &pcYuvSrc0,
+void WeightPrediction::addWeightBi(const CPelUnitBuf          &pcYuvSrc0,
                                    const CPelUnitBuf          &pcYuvSrc1,
                                    const ClpRngs              &clpRngs,
                                    const WPScalingParam *const wp0,
@@ -215,7 +215,7 @@ Void WeightPrediction::addWeightBi(const CPelUnitBuf          &pcYuvSrc0,
   } // compID loop
 }
 
-Void  WeightPrediction::addWeightUni(const CPelUnitBuf          &pcYuvSrc0,
+void  WeightPrediction::addWeightUni(const CPelUnitBuf          &pcYuvSrc0,
                                      const ClpRngs              &clpRngs,
                                      const WPScalingParam *const wp0,
                                            PelUnitBuf           &rpcYuvDst,
@@ -310,7 +310,7 @@ Void  WeightPrediction::addWeightUni(const CPelUnitBuf          &pcYuvSrc0,
   }
 }
 
-Void  WeightPrediction::xWeightedPredictionUni(const PredictionUnit       &pu,
+void  WeightPrediction::xWeightedPredictionUni(const PredictionUnit       &pu,
                                                const CPelUnitBuf          &pcYuvSrc,
                                                const RefPicList           &eRefPicList,
                                                      PelUnitBuf           &pcYuvPred,
@@ -338,7 +338,7 @@ Void  WeightPrediction::xWeightedPredictionUni(const PredictionUnit       &pu,
   addWeightUni(pcYuvSrc, pu.cu->slice->clpRngs(), pwp, pcYuvPred, maxNumComp);
 }
 
-Void  WeightPrediction::xWeightedPredictionBi(const PredictionUnit       &pu,
+void  WeightPrediction::xWeightedPredictionBi(const PredictionUnit       &pu,
                                               const CPelUnitBuf          &pcYuvSrc0,
                                               const CPelUnitBuf          &pcYuvSrc1,
                                                     PelUnitBuf           &rpcYuvDst,

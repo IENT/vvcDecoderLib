@@ -2436,7 +2436,7 @@ Distortion RdCost::xGetHADs_SIMD( const DistParam &rcDtParam )
 }
 
 template <X86_VEXT vext>
-Void RdCost::_initRdCostX86()
+void RdCost::_initRdCostX86()
 {
   /* SIMD SSE implementation shifts the final sum instead of every addend
    * resulting in slightly different result compared to the scalar impl. */
@@ -2472,7 +2472,7 @@ Void RdCost::_initRdCostX86()
   m_afpDistortFunc[DF_HAD16N]  = RdCost::xGetHADs_SIMD<Pel, Pel, vext>;
 }
 
-template Void RdCost::_initRdCostX86<SIMDX86>();
+template void RdCost::_initRdCostX86<SIMDX86>();
 
 #endif //#if TARGET_SIMD_X86
 //! \}

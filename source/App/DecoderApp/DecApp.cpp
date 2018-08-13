@@ -268,7 +268,7 @@ UInt DecApp::decode()
 // Protected member functions
 // ====================================================================================================================
 
-Void DecApp::xCreateDecLib()
+void DecApp::xCreateDecLib()
 {
   initROM();
 
@@ -289,7 +289,7 @@ Void DecApp::xCreateDecLib()
   }
 }
 
-Void DecApp::xDestroyDecLib()
+void DecApp::xDestroyDecLib()
 {
   if ( !m_reconFileName.empty() )
   {
@@ -304,7 +304,7 @@ Void DecApp::xDestroyDecLib()
 /** \param pcListPic list of pictures to be written to file
     \param tId       temporal sub-layer ID
  */
-Void DecApp::xWriteOutput( PicList* pcListPic, UInt tId )
+void DecApp::xWriteOutput( PicList* pcListPic, UInt tId )
 {
   if (pcListPic->empty())
   {
@@ -472,7 +472,7 @@ Void DecApp::xWriteOutput( PicList* pcListPic, UInt tId )
 
 /** \param pcListPic list of pictures to be written to file
  */
-Void DecApp::xFlushOutput( PicList* pcListPic )
+void DecApp::xFlushOutput( PicList* pcListPic )
 {
   if(!pcListPic || pcListPic->empty())
   {

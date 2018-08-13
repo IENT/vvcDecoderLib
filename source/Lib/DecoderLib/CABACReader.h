@@ -203,7 +203,7 @@ private:
   Int         alfGolombDecode(Int k);
 #endif
 
-  Void        xReadTruncBinCode   ( UInt& ruiSymbol, UInt uiMaxSymbol );
+  void        xReadTruncBinCode   ( UInt& ruiSymbol, UInt uiMaxSymbol );
   UInt        xReadEpExGolomb     ( UInt uiCount );
 
 #endif

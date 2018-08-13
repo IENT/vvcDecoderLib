@@ -106,7 +106,7 @@ InterPrediction::~InterPrediction()
   destroy();
 }
 
-Void InterPrediction::destroy()
+void InterPrediction::destroy()
 {
   for( UInt i = 0; i < NUM_REF_PIC_LIST_01; i++ )
   {
@@ -152,7 +152,7 @@ Void InterPrediction::destroy()
 #endif
 }
 
-Void InterPrediction::init( RdCost* pcRdCost, ChromaFormat chromaFormatIDC )
+void InterPrediction::init( RdCost* pcRdCost, ChromaFormat chromaFormatIDC )
 {
   m_pcRdCost = pcRdCost;
 
@@ -332,7 +332,7 @@ Bool InterPrediction::xCheckIdenticalMotion( const PredictionUnit &pu )
 }
 
 #if JEM_TOOLS || JVET_K0346
-Void InterPrediction::xSubPuMC( PredictionUnit& pu, PelUnitBuf& predBuf, const RefPicList &eRefPicList /*= REF_PIC_LIST_X*/ )
+void InterPrediction::xSubPuMC( PredictionUnit& pu, PelUnitBuf& predBuf, const RefPicList &eRefPicList /*= REF_PIC_LIST_X*/ )
 {
 #if !JVET_K0346
   const SPSNext& spsNext  = pu.cs->sps->getSpsNext();
@@ -456,9 +456,9 @@ Void InterPrediction::xSubPuMC( PredictionUnit& pu, PelUnitBuf& predBuf, const R
 #endif
 
 #if JEM_TOOLS
-Void InterPrediction::xPredInterUni(const PredictionUnit& pu, const RefPicList& eRefPicList, PelUnitBuf& pcYuvPred, const Bool& bi, const Bool& bBIOApplied /*= false*/, const Bool& bDMVRApplied /*= false*/ )
+void InterPrediction::xPredInterUni(const PredictionUnit& pu, const RefPicList& eRefPicList, PelUnitBuf& pcYuvPred, const Bool& bi, const Bool& bBIOApplied /*= false*/, const Bool& bDMVRApplied /*= false*/ )
 #else
-Void InterPrediction::xPredInterUni(const PredictionUnit& pu, const RefPicList& eRefPicList, PelUnitBuf& pcYuvPred, const Bool& bi )
+void InterPrediction::xPredInterUni(const PredictionUnit& pu, const RefPicList& eRefPicList, PelUnitBuf& pcYuvPred, const Bool& bi )
 #endif
 {
   const SPS &sps = *pu.cs->sps;
@@ -519,9 +519,9 @@ Void InterPrediction::xPredInterUni(const PredictionUnit& pu, const RefPicList& 
 }
 
 #if JEM_TOOLS
-Void InterPrediction::xPredInterBi(PredictionUnit& pu, PelUnitBuf &pcYuvPred, Bool obmc)
+void InterPrediction::xPredInterBi(PredictionUnit& pu, PelUnitBuf &pcYuvPred, Bool obmc)
 #else
-Void InterPrediction::xPredInterBi(PredictionUnit& pu, PelUnitBuf &pcYuvPred)
+void InterPrediction::xPredInterBi(PredictionUnit& pu, PelUnitBuf &pcYuvPred)
 #endif
 {
   const PPS   &pps   = *pu.cs->pps;
@@ -661,7 +661,7 @@ Void InterPrediction::xPredInterBi(PredictionUnit& pu, PelUnitBuf &pcYuvPred)
 }
 
 
-Void InterPrediction::xPredInterBlk ( const ComponentID& compID, const PredictionUnit& pu, const Picture* refPic, const Mv& _mv, PelUnitBuf& dstPic, const Bool& bi, const ClpRng& clpRng
+void InterPrediction::xPredInterBlk ( const ComponentID& compID, const PredictionUnit& pu, const Picture* refPic, const Mv& _mv, PelUnitBuf& dstPic, const Bool& bi, const ClpRng& clpRng
 #if JEM_TOOLS
                                       , const Bool& bBIOApplied /*=false*/, const Bool& bDMVRApplied /*= false*/, const Int& nFRUCMode /*= FRUC_MERGE_OFF*/, const Bool& doLic /*= true*/
 #endif
@@ -813,9 +813,9 @@ Void InterPrediction::xPredInterBlk ( const ComponentID& compID, const Predictio
 
 #if JEM_TOOLS || JVET_K_AFFINE
 #if !JEM_TOOLS
-Void InterPrediction::xPredAffineBlk( const ComponentID& compID, const PredictionUnit& pu, const Picture* refPic, const Mv* _mv, PelUnitBuf& dstPic, const Bool& bi, const ClpRng& clpRng )
+void InterPrediction::xPredAffineBlk( const ComponentID& compID, const PredictionUnit& pu, const Picture* refPic, const Mv* _mv, PelUnitBuf& dstPic, const Bool& bi, const ClpRng& clpRng )
 #else
-Void InterPrediction::xPredAffineBlk( const ComponentID& compID, const PredictionUnit& pu, const Picture* refPic, const Mv* _mv, PelUnitBuf& dstPic, const Bool& bi, const ClpRng& clpRng, const Bool& bBIOApplied /*= false*/ )
+void InterPrediction::xPredAffineBlk( const ComponentID& compID, const PredictionUnit& pu, const Picture* refPic, const Mv* _mv, PelUnitBuf& dstPic, const Bool& bi, const ClpRng& clpRng, const Bool& bBIOApplied /*= false*/ )
 #endif
 {
 #if JVET_K0337_AFFINE_6PARA
@@ -1318,9 +1318,9 @@ void InterPrediction::applyBiOptFlow( const PredictionUnit &pu, const CPelUnitBu
 #endif
 
 #if JEM_TOOLS
-Void InterPrediction::xWeightedAverage( const PredictionUnit& pu, const CPelUnitBuf& pcYuvSrc0, const CPelUnitBuf& pcYuvSrc1, PelUnitBuf& pcYuvDst, const BitDepths& clipBitDepths, const ClpRngs& clpRngs, const Bool& bBIOApplied )
+void InterPrediction::xWeightedAverage( const PredictionUnit& pu, const CPelUnitBuf& pcYuvSrc0, const CPelUnitBuf& pcYuvSrc1, PelUnitBuf& pcYuvDst, const BitDepths& clipBitDepths, const ClpRngs& clpRngs, const Bool& bBIOApplied )
 #else
-Void InterPrediction::xWeightedAverage( const PredictionUnit& pu, const CPelUnitBuf& pcYuvSrc0, const CPelUnitBuf& pcYuvSrc1, PelUnitBuf& pcYuvDst, const BitDepths& clipBitDepths, const ClpRngs& clpRngs )
+void InterPrediction::xWeightedAverage( const PredictionUnit& pu, const CPelUnitBuf& pcYuvSrc0, const CPelUnitBuf& pcYuvSrc1, PelUnitBuf& pcYuvDst, const BitDepths& clipBitDepths, const ClpRngs& clpRngs )
 #endif
 {
   const int iRefIdx0 = pu.refIdx[0];
@@ -1348,7 +1348,7 @@ Void InterPrediction::xWeightedAverage( const PredictionUnit& pu, const CPelUnit
   }
 }
 
-Void InterPrediction::motionCompensation( PredictionUnit &pu, PelUnitBuf &predBuf, const RefPicList &eRefPicList )
+void InterPrediction::motionCompensation( PredictionUnit &pu, PelUnitBuf &predBuf, const RefPicList &eRefPicList )
 {
         CodingStructure &cs = *pu.cs;
   const PPS &pps            = *cs.pps;
@@ -1392,7 +1392,7 @@ Void InterPrediction::motionCompensation( PredictionUnit &pu, PelUnitBuf &predBu
   return;
 }
 
-Void InterPrediction::motionCompensation( CodingUnit &cu, const RefPicList &eRefPicList )
+void InterPrediction::motionCompensation( CodingUnit &cu, const RefPicList &eRefPicList )
 {
   for( auto &pu : CU::traversePUs( cu ) )
   {
@@ -1407,7 +1407,7 @@ Void InterPrediction::motionCompensation( CodingUnit &cu, const RefPicList &eRef
   }
 }
 
-Void InterPrediction::motionCompensation( PredictionUnit &pu, const RefPicList &eRefPicList /*= REF_PIC_LIST_X*/ )
+void InterPrediction::motionCompensation( PredictionUnit &pu, const RefPicList &eRefPicList /*= REF_PIC_LIST_X*/ )
 {
   PelUnitBuf predBuf = pu.cs->getPredBuf( pu );
   motionCompensation( pu, predBuf, eRefPicList );
@@ -1421,7 +1421,7 @@ Void InterPrediction::motionCompensation( PredictionUnit &pu, const RefPicList &
 * 2. Before motion estimation, subtract (scaled) predictors generated by applying neighboring motions to current CU/PU from the original signal of current CU/PU,
 *    to make the motion estimation biased to OBMC.
 */
-Void InterPrediction::subBlockOBMC( CodingUnit  &cu )
+void InterPrediction::subBlockOBMC( CodingUnit  &cu )
 {
   if( !cu.cs->sps->getSpsNext().getUseOBMC() || !cu.obmcFlag )
   {
@@ -1434,7 +1434,7 @@ Void InterPrediction::subBlockOBMC( CodingUnit  &cu )
   }
 }
 
-Void InterPrediction::subBlockOBMC( PredictionUnit  &pu, PelUnitBuf* pDst, Bool bOBMC4ME )
+void InterPrediction::subBlockOBMC( PredictionUnit  &pu, PelUnitBuf* pDst, Bool bOBMC4ME )
 {
   if( !pu.cs->sps->getSpsNext().getUseOBMC() || !pu.cu->obmcFlag )
   {
@@ -1600,7 +1600,7 @@ Void InterPrediction::subBlockOBMC( PredictionUnit  &pu, PelUnitBuf* pDst, Bool 
 
 
 // Function for (weighted) averaging predictors of current block and predictors generated by applying neighboring motions to current block.
-Void InterPrediction::xSubblockOBMC(const ComponentID eComp, PredictionUnit &pu, PelUnitBuf &pcYuvPredDst, PelUnitBuf &pcYuvPredSrc, Int iDir, Bool bOBMCSimp)
+void InterPrediction::xSubblockOBMC(const ComponentID eComp, PredictionUnit &pu, PelUnitBuf &pcYuvPredDst, PelUnitBuf &pcYuvPredSrc, Int iDir, Bool bOBMCSimp)
 {
   int iWidth  = pu.blocks[eComp].width;
   int iHeight = pu.blocks[eComp].height;
@@ -1690,7 +1690,7 @@ Void InterPrediction::xSubblockOBMC(const ComponentID eComp, PredictionUnit &pu,
 }
 
 // Function for subtracting (scaled) predictors generated by applying neighboring motions to current block from the original signal of current block.
-Void InterPrediction::xSubtractOBMC( PredictionUnit &pu, PelUnitBuf &pcYuvPredDst, PelUnitBuf &pcYuvPredSrc, Int iDir, Bool bOBMCSimp )
+void InterPrediction::xSubtractOBMC( PredictionUnit &pu, PelUnitBuf &pcYuvPredDst, PelUnitBuf &pcYuvPredSrc, Int iDir, Bool bOBMCSimp )
 {
   int iWidth  = pu.lwidth();
   int iHeight = pu.lheight();
@@ -1773,7 +1773,7 @@ Void InterPrediction::xSubtractOBMC( PredictionUnit &pu, PelUnitBuf &pcYuvPredDs
 #endif
 
 #if JEM_TOOLS
-Void InterPrediction::xSubBlockMotionCompensation( PredictionUnit &pu, PelUnitBuf &pcYuvPred )
+void InterPrediction::xSubBlockMotionCompensation( PredictionUnit &pu, PelUnitBuf &pcYuvPred )
 {
   if( xCheckIdenticalMotion( pu ) )
   {
@@ -1787,7 +1787,7 @@ Void InterPrediction::xSubBlockMotionCompensation( PredictionUnit &pu, PelUnitBu
 #endif
 
 #if JEM_TOOLS
-Void InterPrediction::xGradFilterX( const Pel* piRefY, Int iRefStride, Pel* piDstY, Int iDstStride, Int iWidth, Int iHeight, Int iMVyFrac, Int iMVxFrac, const Int bitDepth )
+void InterPrediction::xGradFilterX( const Pel* piRefY, Int iRefStride, Pel* piDstY, Int iDstStride, Int iWidth, Int iHeight, Int iMVyFrac, Int iMVxFrac, const Int bitDepth )
 {
   static const int iBIOGradShift = 4;
   if( iMVyFrac == 0 )
@@ -1806,7 +1806,7 @@ Void InterPrediction::xGradFilterX( const Pel* piRefY, Int iRefStride, Pel* piDs
   JVET_J0090_SET_CACHE_ENABLE( true );
 }
 
-Void InterPrediction::xGradFilterY( const Pel* piRefY, Int iRefStride, Pel* piDstY, Int iDstStride, Int iWidth, Int iHeight, Int iMVyFrac, Int iMVxFrac, const Int bitDepth )
+void InterPrediction::xGradFilterY( const Pel* piRefY, Int iRefStride, Pel* piDstY, Int iDstStride, Int iWidth, Int iHeight, Int iMVyFrac, Int iMVxFrac, const Int bitDepth )
 {
   static const Int iBIOGradShift = 4;
   if( iMVxFrac == 0 )
@@ -1888,7 +1888,7 @@ const Short m_lumaInterpolationFilter[4<<VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STOR
   {       0,      -2,       4,      64,      -3,       1 }    //15-->-->
 };
 
-inline Void InterPrediction::gradFilter2DVer( const Pel* piSrc, Int iSrcStride,  Int width, Int height, Int iDstStride, Pel*& rpiDst, Int iMV, const Int iShift )
+inline void InterPrediction::gradFilter2DVer( const Pel* piSrc, Int iSrcStride,  Int width, Int height, Int iDstStride, Pel*& rpiDst, Int iMV, const Int iShift )
 {
   Pel*        piDst         = rpiDst;
   int         iSum          = 0;
@@ -1935,7 +1935,7 @@ inline Void InterPrediction::gradFilter2DVer( const Pel* piSrc, Int iSrcStride, 
   }
 }
 
-inline Void InterPrediction::gradFilter1DVer( const Pel* piSrc, Int iSrcStride, Int width, Int height, Int iDstStride, Pel*& rpiDst, Int iMV, const Int iShift )
+inline void InterPrediction::gradFilter1DVer( const Pel* piSrc, Int iSrcStride, Int width, Int height, Int iDstStride, Pel*& rpiDst, Int iMV, const Int iShift )
 {
   Pel*        piDst         = rpiDst;
   int         iSum          = 0;
@@ -1982,7 +1982,7 @@ inline Void InterPrediction::gradFilter1DVer( const Pel* piSrc, Int iSrcStride, 
   }
 }
 
-inline Void InterPrediction::gradFilter1DHor( const Pel* piSrc, Int iSrcStride, Int width, Int height, Int iDstStride, Pel*& rpiDst, Int iMV, const Int iShift )
+inline void InterPrediction::gradFilter1DHor( const Pel* piSrc, Int iSrcStride, Int width, Int height, Int iDstStride, Pel*& rpiDst, Int iMV, const Int iShift )
 {
   Pel*        piDst         = rpiDst;
   int         iSum          = 0;
@@ -2018,7 +2018,7 @@ inline Void InterPrediction::gradFilter1DHor( const Pel* piSrc, Int iSrcStride, 
   }
 }
 
-inline Void InterPrediction::gradFilter2DHor( const Pel* piSrc, Int iSrcStride, Int width, Int height, Int iDstStride, Pel*& rpiDst, Int iMV, const Int iShift)
+inline void InterPrediction::gradFilter2DHor( const Pel* piSrc, Int iSrcStride, Int width, Int height, Int iDstStride, Pel*& rpiDst, Int iMV, const Int iShift)
 {
   Pel*        piDst         = rpiDst;
   Int         iSum          = 0;
@@ -2054,7 +2054,7 @@ inline Void InterPrediction::gradFilter2DHor( const Pel* piSrc, Int iSrcStride, 
   }
 }
 
-inline Void InterPrediction::fracFilter2DVer( const Pel* piSrc, Int iSrcStride, Int width, Int height, Int iDstStride, Pel*& rpiDst, Int iMV, const Int iShift )
+inline void InterPrediction::fracFilter2DVer( const Pel* piSrc, Int iSrcStride, Int width, Int height, Int iDstStride, Pel*& rpiDst, Int iMV, const Int iShift )
 {
   Pel*        piDst         = rpiDst;
   int         iSum          = 0;
@@ -2100,7 +2100,7 @@ inline Void InterPrediction::fracFilter2DVer( const Pel* piSrc, Int iSrcStride, 
   }
 }
 
-inline Void InterPrediction::fracFilter2DHor( const Pel* piSrc, Int iSrcStride, Int width, Int height, Int iDstStride, Pel*& rpiDst, Int iMV, const Int iShift )
+inline void InterPrediction::fracFilter2DHor( const Pel* piSrc, Int iSrcStride, Int width, Int height, Int iDstStride, Pel*& rpiDst, Int iMV, const Int iShift )
 {
   Pel*        piDst         = rpiDst;
   int         iSum          = 0;
@@ -2197,7 +2197,7 @@ inline Int64 InterPrediction::divide64( Int64 numer, Int64 denom )
   return d;
 }
 
-Void InterPrediction::calcBlkGradient( Int sx, Int sy, Int64 *arraysGx2, Int64 *arraysGxGy, Int64 *arraysGxdI, Int64 *arraysGy2, Int64 *arraysGydI, Int64 &sGx2, Int64 &sGy2, Int64 &sGxGy, Int64 &sGxdI, Int64 &sGydI, Int iWidth, Int iHeight )
+void InterPrediction::calcBlkGradient( Int sx, Int sy, Int64 *arraysGx2, Int64 *arraysGxGy, Int64 *arraysGxdI, Int64 *arraysGy2, Int64 *arraysGydI, Int64 &sGx2, Int64 &sGy2, Int64 &sGxGy, Int64 &sGxdI, Int64 &sGydI, Int iWidth, Int iHeight )
 {
   static const UInt weightTbl[8][8] = { {1, 2, 3, 4, 4, 3, 2, 1},
       {2, 4, 6, 8, 8, 6, 4, 2},
@@ -2385,7 +2385,7 @@ Bool InterPrediction::xFrucIsInList( const MvField & rMvField , std::list<MvFiel
   return( false );
 }
 
-Void InterPrediction::xFrucInsertMv2StartList( const MvField & rMvField , std::list<MvField> & rList, Bool setHighPrec )
+void InterPrediction::xFrucInsertMv2StartList( const MvField & rMvField , std::list<MvField> & rList, Bool setHighPrec )
 {
   CHECK( rMvField.refIdx < 0, "invalid ref idx" );
 
@@ -2400,7 +2400,7 @@ Void InterPrediction::xFrucInsertMv2StartList( const MvField & rMvField , std::l
     rList.push_back( mf );
 }
 
-Void InterPrediction::xFrucCollectBlkStartMv( PredictionUnit& pu, const MergeCtx& mergeCtx, RefPicList eTargetRefList, Int nTargetRefIdx, AMVPInfo* pInfo )
+void InterPrediction::xFrucCollectBlkStartMv( PredictionUnit& pu, const MergeCtx& mergeCtx, RefPicList eTargetRefList, Int nTargetRefIdx, AMVPInfo* pInfo )
 {
   // add merge candidates to the list
   m_listMVFieldCand[0].clear();
@@ -2516,7 +2516,7 @@ Void InterPrediction::xFrucCollectBlkStartMv( PredictionUnit& pu, const MergeCtx
   }
 }
 
-Void InterPrediction::xFrucCollectSubBlkStartMv( PredictionUnit& pu, const MergeCtx& mergeCtx, RefPicList eRefPicList , const MvField& rMvStart , Int nSubBlkWidth , Int nSubBlkHeight, Position basePuPos )
+void InterPrediction::xFrucCollectSubBlkStartMv( PredictionUnit& pu, const MergeCtx& mergeCtx, RefPicList eRefPicList , const MvField& rMvStart , Int nSubBlkWidth , Int nSubBlkHeight, Position basePuPos )
 {
   std::list<MvField> & rStartMvList = m_listMVFieldCand[eRefPicList];
   rStartMvList.clear();
@@ -3296,7 +3296,7 @@ Bool InterPrediction::xFrucIsLeftTempAvailable( PredictionUnit& pu )
   return ( puLeft && pu.cu !=puLeft->cu );
 }
 
-Void InterPrediction::xFrucUpdateTemplate( PredictionUnit& pu, Int nWidth, Int nHeight, RefPicList eCurRefPicList, const MvField& rCurMvField )
+void InterPrediction::xFrucUpdateTemplate( PredictionUnit& pu, Int nWidth, Int nHeight, RefPicList eCurRefPicList, const MvField& rCurMvField )
 {
   const Int nMVUnit = 2;
 
@@ -3340,7 +3340,7 @@ Void InterPrediction::xFrucUpdateTemplate( PredictionUnit& pu, Int nWidth, Int n
   }
 }
 
-Void InterPrediction::xPredInterLines( const PredictionUnit& pu, const Picture* refPic, Mv &_mv, PelUnitBuf &dstPic, const Bool &bi, const ClpRng& clpRng )
+void InterPrediction::xPredInterLines( const PredictionUnit& pu, const Picture* refPic, Mv &_mv, PelUnitBuf &dstPic, const Bool &bi, const ClpRng& clpRng )
 {
   clipMv( _mv, pu.lumaPos(), *pu.cs->sps );
 
@@ -3395,7 +3395,7 @@ Void InterPrediction::xPredInterLines( const PredictionUnit& pu, const Picture* 
   }
 }
 
-Void InterPrediction::xFillPredBlckAndBorder( const PredictionUnit& pu, RefPicList eRefPicList, Int iWidth, Int iHeight, PelBuf &cTmpY )
+void InterPrediction::xFillPredBlckAndBorder( const PredictionUnit& pu, RefPicList eRefPicList, Int iWidth, Int iHeight, PelBuf &cTmpY )
 {
   Int iRefIdx = pu.refIdx[eRefPicList];
   Mv  mvOrg   = pu.mv[eRefPicList];
@@ -3455,11 +3455,11 @@ UInt InterPrediction::xDirectMCCost( Int iBitDepth, Pel* pRef, UInt uiRefStride,
 }
 
 #if DISTORTION_TYPE_BUGFIX
-Void InterPrediction::xBIPMVRefine(PredictionUnit &pu, RefPicList eRefPicList, Int iWidth, Int iHeight,
+void InterPrediction::xBIPMVRefine(PredictionUnit &pu, RefPicList eRefPicList, Int iWidth, Int iHeight,
                                    const CPelUnitBuf &pcYuvOrg, UInt uiMaxSearchRounds, UInt nSearchStepShift,
                                    Distortion &uiMinCost, Bool fullPel /*= true*/)
 #else
-Void InterPrediction::xBIPMVRefine( PredictionUnit& pu, RefPicList eRefPicList, Int iWidth, Int iHeight, const CPelUnitBuf &pcYuvOrg, UInt uiMaxSearchRounds, UInt nSearchStepShift, UInt& uiMinCost, Bool fullPel /*= true*/ )
+void InterPrediction::xBIPMVRefine( PredictionUnit& pu, RefPicList eRefPicList, Int iWidth, Int iHeight, const CPelUnitBuf &pcYuvOrg, UInt uiMaxSearchRounds, UInt nSearchStepShift, UInt& uiMinCost, Bool fullPel /*= true*/ )
 #endif
 {
   const Mv mvSearchOffsetSquare[8] = { Mv(-1 , 1) , Mv(0 , 1) , Mv(1 , 1) , Mv(1 , 0) , Mv(1 , -1) , Mv(0 , -1) , Mv(-1 , -1) , Mv(-1 , 0) };
@@ -3552,7 +3552,7 @@ Void InterPrediction::xBIPMVRefine( PredictionUnit& pu, RefPicList eRefPicList, 
   pu.mv[eRefPicList] = cBestMv;
 }
 
-Void InterPrediction::xProcessDMVR( PredictionUnit& pu, PelUnitBuf &pcYuvDst, const ClpRngs &clpRngs, const bool bBIOApplied )
+void InterPrediction::xProcessDMVR( PredictionUnit& pu, PelUnitBuf &pcYuvDst, const ClpRngs &clpRngs, const bool bBIOApplied )
 {
   const int iRefIdx0  = pu.refIdx[0];
   const int iRefIdx1  = pu.refIdx[1];

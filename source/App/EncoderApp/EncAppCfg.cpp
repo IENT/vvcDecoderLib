@@ -144,11 +144,11 @@ EncAppCfg::~EncAppCfg()
 #endif
 }
 
-Void EncAppCfg::create()
+void EncAppCfg::create()
 {
 }
 
-Void EncAppCfg::destroy()
+void EncAppCfg::destroy()
 {
 }
 
@@ -554,7 +554,7 @@ static inline istream& operator >> (std::istream &in, EncAppCfg::OptionalValue<T
 }
 #endif
 
-static Void
+static void
 automaticallySelectRExtProfile(const Bool bUsingGeneralRExtTools,
                                const Bool bUsingChromaQPAdjustment,
                                const Bool bUsingExtendedPrecision,
@@ -3062,7 +3062,7 @@ const TChar *profileToString(const Profile::Name profile)
   return "";
 }
 
-Void EncAppCfg::xPrintParameter()
+void EncAppCfg::xPrintParameter()
 {
   //msg( DETAILS, "\n" );
   msg( DETAILS, "Input          File                    : %s\n", m_inputFileName.c_str() );

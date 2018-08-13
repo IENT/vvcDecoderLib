@@ -536,7 +536,7 @@ void xITrMxN( const int bitDepth, const TCoeff *coeff, Pel *residual, size_t str
 #endif // !JVET_K1000_SIMPLIFIED_EMT
 
 
-Void TrQuant::xDeQuant(const TransformUnit &tu,
+void TrQuant::xDeQuant(const TransformUnit &tu,
                              CoeffBuf      &dstCoeff,
                        const ComponentID   &compID,
                        const QpParam       &cQP)
@@ -544,7 +544,7 @@ Void TrQuant::xDeQuant(const TransformUnit &tu,
   m_quant->dequant( tu, dstCoeff, compID, cQP );
 }
 
-Void TrQuant::init( const Quant* otherQuant,
+void TrQuant::init( const Quant* otherQuant,
                     const UInt uiMaxTrSize,
                     const bool bUseRDOQ,
                     const bool bUseRDOQTS,
@@ -609,7 +609,7 @@ Void TrQuant::init( const Quant* otherQuant,
 }
 
 #if JEM_TOOLS
-Void TrQuant::FwdNsstNxN( Int* src, const UInt uiMode, const UInt uiIndex, const UInt uiSize )
+void TrQuant::FwdNsstNxN( Int* src, const UInt uiMode, const UInt uiIndex, const UInt uiSize )
 {
   const int   rnd = uiSize >> 1;
   const int   shl = 5;
@@ -666,7 +666,7 @@ Void TrQuant::FwdNsstNxN( Int* src, const UInt uiMode, const UInt uiIndex, const
   }
 }
 
-Void TrQuant::InvNsstNxN( Int* src, const UInt uiMode, const UInt uiIndex, const UInt uiSize )
+void TrQuant::InvNsstNxN( Int* src, const UInt uiMode, const UInt uiIndex, const UInt uiSize )
 {
   const int   rnd = uiSize >> 1;
   const int   shl = 5;
@@ -723,7 +723,7 @@ Void TrQuant::InvNsstNxN( Int* src, const UInt uiMode, const UInt uiIndex, const
   }
 }
 
-Void TrQuant::xInvNsst( const TransformUnit &tu, const ComponentID compID )
+void TrQuant::xInvNsst( const TransformUnit &tu, const ComponentID compID )
 {
   const CompArea& area   = tu.blocks[compID];
   const UInt width       = area.width;
@@ -827,7 +827,7 @@ Void TrQuant::xInvNsst( const TransformUnit &tu, const ComponentID compID )
   }
 }
 
-Void TrQuant::xFwdNsst( const TransformUnit &tu, const ComponentID compID )
+void TrQuant::xFwdNsst( const TransformUnit &tu, const ComponentID compID )
 {
   const CompArea& area   = tu.blocks[compID];
   const UInt width       = area.width;
@@ -934,7 +934,7 @@ Void TrQuant::xFwdNsst( const TransformUnit &tu, const ComponentID compID )
 #endif // JEM_TOOLS
 
 
-Void TrQuant::invTransformNxN( TransformUnit &tu, const ComponentID &compID, PelBuf &pResi, const QpParam &cQP )
+void TrQuant::invTransformNxN( TransformUnit &tu, const ComponentID &compID, PelBuf &pResi, const QpParam &cQP )
 {
   const CompArea &area    = tu.blocks[compID];
   const UInt uiWidth      = area.width;
@@ -987,7 +987,7 @@ Void TrQuant::invTransformNxN( TransformUnit &tu, const ComponentID &compID, Pel
   invRdpcmNxN(tu, compID, pResi);
 }
 
-Void TrQuant::invRdpcmNxN(TransformUnit& tu, const ComponentID &compID, PelBuf &pcResidual)
+void TrQuant::invRdpcmNxN(TransformUnit& tu, const ComponentID &compID, PelBuf &pcResidual)
 {
   const CompArea &area    = tu.blocks[compID];
 
@@ -1201,7 +1201,7 @@ void TrQuant::xIT( const TransformUnit &tu, const ComponentID &compID, const CCo
 
 /** Wrapper function between HM interface and core NxN transform skipping
  */
-Void TrQuant::xITransformSkip(const CCoeffBuf     &pCoeff,
+void TrQuant::xITransformSkip(const CCoeffBuf     &pCoeff,
                                     PelBuf        &pResidual,
                               const TransformUnit &tu,
                               const ComponentID   &compID)
@@ -1255,7 +1255,7 @@ Void TrQuant::xITransformSkip(const CCoeffBuf     &pCoeff,
   }
 }
 
-Void TrQuant::xQuant(TransformUnit &tu, const ComponentID &compID, const CCoeffBuf &pSrc, TCoeff &uiAbsSum, const QpParam &cQP, const Ctx& ctx)
+void TrQuant::xQuant(TransformUnit &tu, const ComponentID &compID, const CCoeffBuf &pSrc, TCoeff &uiAbsSum, const QpParam &cQP, const Ctx& ctx)
 {
   m_quant->quant( tu, compID, pSrc, uiAbsSum, cQP, ctx );
 }
@@ -1326,7 +1326,7 @@ UChar TrQuant::getEmtMode( TransformUnit tu, const ComponentID compID )
 }
 #endif
 
-Void TrQuant::transformNxN(TransformUnit &tu, const ComponentID &compID, const QpParam &cQP, TCoeff &uiAbsSum, const Ctx &ctx)
+void TrQuant::transformNxN(TransformUnit &tu, const ComponentID &compID, const QpParam &cQP, TCoeff &uiAbsSum, const Ctx &ctx)
 {
         CodingStructure &cs = *tu.cs;
   const SPS &sps            = *cs.sps;
@@ -1407,7 +1407,7 @@ Void TrQuant::transformNxN(TransformUnit &tu, const ComponentID &compID, const Q
 #endif
 }
 
-Void TrQuant::applyForwardRDPCM(TransformUnit &tu, const ComponentID &compID, const QpParam &cQP, TCoeff &uiAbsSum, const RDPCMMode &mode)
+void TrQuant::applyForwardRDPCM(TransformUnit &tu, const ComponentID &compID, const QpParam &cQP, TCoeff &uiAbsSum, const RDPCMMode &mode)
 {
   const Bool bLossless      = tu.cu->transQuantBypass;
   const UInt uiWidth        = tu.blocks[compID].width;
@@ -1464,7 +1464,7 @@ Void TrQuant::applyForwardRDPCM(TransformUnit &tu, const ComponentID &compID, co
   }
 }
 
-Void TrQuant::rdpcmNxN(TransformUnit &tu, const ComponentID &compID, const QpParam &cQP, TCoeff &uiAbsSum, RDPCMMode &rdpcmMode)
+void TrQuant::rdpcmNxN(TransformUnit &tu, const ComponentID &compID, const QpParam &cQP, TCoeff &uiAbsSum, RDPCMMode &rdpcmMode)
 {
   if (!CU::isRDPCMEnabled(*tu.cu) || (!tu.transformSkip[compID] && !tu.cu->transQuantBypass))
   {
@@ -1528,7 +1528,7 @@ Void TrQuant::rdpcmNxN(TransformUnit &tu, const ComponentID &compID, const QpPar
   tu.rdpcm[compID] = rdpcmMode;
 }
 
-Void TrQuant::xTransformSkip(const TransformUnit &tu, const ComponentID &compID, const CPelBuf &resi, TCoeff* psCoeff)
+void TrQuant::xTransformSkip(const TransformUnit &tu, const ComponentID &compID, const CPelBuf &resi, TCoeff* psCoeff)
 {
   const SPS &sps            = *tu.cs->sps;
   const CompArea &rect      = tu.blocks[compID];

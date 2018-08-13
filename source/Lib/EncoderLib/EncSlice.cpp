@@ -65,11 +65,11 @@ EncSlice::~EncSlice()
   destroy();
 }
 
-Void EncSlice::create( Int iWidth, Int iHeight, ChromaFormat chromaFormat, UInt iMaxCUWidth, UInt iMaxCUHeight, UChar uhTotalDepth )
+void EncSlice::create( Int iWidth, Int iHeight, ChromaFormat chromaFormat, UInt iMaxCUWidth, UInt iMaxCUHeight, UChar uhTotalDepth )
 {
 }
 
-Void EncSlice::destroy()
+void EncSlice::destroy()
 {
   // free lambda and QP arrays
   m_vdRdPicLambda.clear();
@@ -77,7 +77,7 @@ Void EncSlice::destroy()
   m_viRdPicQp.clear();
 }
 
-Void EncSlice::init( EncLib* pcEncLib, const SPS& sps )
+void EncSlice::init( EncLib* pcEncLib, const SPS& sps )
 {
   m_pcCfg             = pcEncLib;
   m_pcLib             = pcEncLib;
@@ -101,7 +101,7 @@ Void EncSlice::init( EncLib* pcEncLib, const SPS& sps )
   m_pcRateCtrl        = pcEncLib->getRateCtrl();
 }
 
-Void
+void
 EncSlice::setUpLambda( Slice* slice, const Double dLambda, Int iQP)
 {
   // store lambda
@@ -160,7 +160,7 @@ EncSlice::setUpLambda( Slice* slice, const Double dLambda, Int iQP)
  \param isField       true for field coding
  */
 
-Void EncSlice::initEncSlice( Picture* pcPic, const Int pocLast, const Int pocCurr, const Int iGOPid, Slice*& rpcSlice, const Bool isField )
+void EncSlice::initEncSlice( Picture* pcPic, const Int pocLast, const Int pocCurr, const Int iGOPid, Slice*& rpcSlice, const Bool isField )
 {
   Double dQP;
   Double dLambda;
@@ -673,7 +673,7 @@ Double EncSlice::calculateLambda( const Slice*     slice,
 }
 #endif
 
-Void EncSlice::resetQP( Picture* pic, Int sliceQP, Double lambda )
+void EncSlice::resetQP( Picture* pic, Int sliceQP, Double lambda )
 {
   Slice* slice = pic->slices[0];
 
@@ -927,7 +927,7 @@ static bool applyQPAdaptation (Picture* const pcPic, Slice* const pcSlice,    co
 // ====================================================================================================================
 
 //! set adaptive search range based on poc difference
-Void EncSlice::setSearchRange( Slice* pcSlice )
+void EncSlice::setSearchRange( Slice* pcSlice )
 {
   Int iCurrPOC = pcSlice->getPOC();
   Int iRefPOC;
@@ -959,7 +959,7 @@ Void EncSlice::setSearchRange( Slice* pcSlice )
 
  \param pcPic    picture class
  */
-Void EncSlice::precompressSlice( Picture* pcPic )
+void EncSlice::precompressSlice( Picture* pcPic )
 {
   // if deltaQP RD is not used, simply return
   if ( m_pcCfg->getDeltaQpRD() == 0 )
@@ -1048,7 +1048,7 @@ Void EncSlice::precompressSlice( Picture* pcPic )
   setUpLambda(pcSlice, m_vdRdPicLambda[uiQpIdxBest], m_viRdPicQp    [uiQpIdxBest]);
 }
 
-Void EncSlice::calCostSliceI(Picture* pcPic) // TODO: this only analyses the first slice segment. What about the others?
+void EncSlice::calCostSliceI(Picture* pcPic) // TODO: this only analyses the first slice segment. What about the others?
 {
   Double         iSumHadSlice      = 0;
   Slice * const  pcSlice           = pcPic->slices[getSliceSegmentIdx()];
@@ -1093,7 +1093,7 @@ Void EncSlice::calCostSliceI(Picture* pcPic) // TODO: this only analyses the fir
 
 /** \param pcPic   picture class
  */
-Void EncSlice::compressSlice( Picture* pcPic, const Bool bCompressEntireSlice, const Bool bFastDeltaQP )
+void EncSlice::compressSlice( Picture* pcPic, const Bool bCompressEntireSlice, const Bool bFastDeltaQP )
 {
   // if bCompressEntireSlice is true, then the entire slice (not slice segment) is compressed,
   //   effectively disabling the slice-segment-mode.
@@ -1782,7 +1782,7 @@ void EncSlice::encodeCtus( Picture* pcPic, const Bool bCompressEntireSlice, cons
 
 }
 
-Void EncSlice::encodeSlice   ( Picture* pcPic, OutputBitstream* pcSubstreams, UInt &numBinsCoded )
+void EncSlice::encodeSlice   ( Picture* pcPic, OutputBitstream* pcSubstreams, UInt &numBinsCoded )
 {
 
   Slice *const pcSlice               = pcPic->slices[getSliceSegmentIdx()];
@@ -2000,10 +2000,10 @@ Void EncSlice::encodeSlice   ( Picture* pcPic, OutputBitstream* pcSubstreams, UI
 }
 
 #if HEVC_TILES_WPP
-Void EncSlice::calculateBoundingCtuTsAddrForSlice(UInt &startCtuTSAddrSlice, UInt &boundingCtuTSAddrSlice, Bool &haveReachedTileBoundary,
+void EncSlice::calculateBoundingCtuTsAddrForSlice(UInt &startCtuTSAddrSlice, UInt &boundingCtuTSAddrSlice, Bool &haveReachedTileBoundary,
                                                    Picture* pcPic, const Int sliceMode, const Int sliceArgument)
 #else
-Void EncSlice::calculateBoundingCtuTsAddrForSlice(UInt &startCtuTSAddrSlice, UInt &boundingCtuTSAddrSlice,
+void EncSlice::calculateBoundingCtuTsAddrForSlice(UInt &startCtuTSAddrSlice, UInt &boundingCtuTSAddrSlice,
                                                    Picture* pcPic, const Int sliceMode, const Int sliceArgument)
 #endif
 {
@@ -2104,7 +2104,7 @@ Void EncSlice::calculateBoundingCtuTsAddrForSlice(UInt &startCtuTSAddrSlice, UIn
 
  * Updates startCtuTsAddr, boundingCtuTsAddr with appropriate CTU address
  */
-Void EncSlice::xDetermineStartAndBoundingCtuTsAddr  ( UInt& startCtuTsAddr, UInt& boundingCtuTsAddr, Picture* pcPic )
+void EncSlice::xDetermineStartAndBoundingCtuTsAddr  ( UInt& startCtuTsAddr, UInt& boundingCtuTsAddr, Picture* pcPic )
 {
   Slice* pcSlice                 = pcPic->slices[getSliceSegmentIdx()];
 

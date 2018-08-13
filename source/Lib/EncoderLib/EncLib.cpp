@@ -80,7 +80,7 @@ EncLib::~EncLib()
 {
 }
 
-Void EncLib::create ()
+void EncLib::create ()
 {
   // initialize global variables
   initROM();
@@ -161,7 +161,7 @@ Void EncLib::create ()
 
 }
 
-Void EncLib::destroy ()
+void EncLib::destroy ()
 {
   // destroy processing unit classes
   m_cGOPEncoder.        destroy();
@@ -224,7 +224,7 @@ Void EncLib::destroy ()
   return;
 }
 
-Void EncLib::init( Bool isFieldCoding, AUWriterIf* auWriterIf )
+void EncLib::init( Bool isFieldCoding, AUWriterIf* auWriterIf )
 {
   m_AUWriterIf = auWriterIf;
 
@@ -418,7 +418,7 @@ Void EncLib::init( Bool isFieldCoding, AUWriterIf* auWriterIf )
 }
 
 #if HEVC_USE_SCALING_LISTS
-Void EncLib::xInitScalingLists(SPS &sps, PPS &pps)
+void EncLib::xInitScalingLists(SPS &sps, PPS &pps)
 {
   // Initialise scaling lists
   // The encoder will only use the SPS scaling lists. The PPS will never be marked present.
@@ -504,7 +504,7 @@ Void EncLib::xInitScalingLists(SPS &sps, PPS &pps)
 // Public member functions
 // ====================================================================================================================
 
-Void EncLib::deletePicBuffer()
+void EncLib::deletePicBuffer()
 {
   PicList::iterator iterPic = m_cListPic.begin();
   Int iSize = Int( m_cListPic.size() );
@@ -539,7 +539,7 @@ Void EncLib::deletePicBuffer()
  \retval  accessUnitsOut      list of output access units
  \retval  iNumEncoded         number of encoded pictures
  */
-Void EncLib::encode( Bool flush, PelStorage* pcPicYuvOrg, PelStorage* cPicYuvTrueOrg, const InputColourSpaceConversion snrCSC, std::list<PelUnitBuf*>& rcListPicYuvRecOut,
+void EncLib::encode( Bool flush, PelStorage* pcPicYuvOrg, PelStorage* cPicYuvTrueOrg, const InputColourSpaceConversion snrCSC, std::list<PelUnitBuf*>& rcListPicYuvRecOut,
                      Int& iNumEncoded )
 {
   //PROF_ACCUM_AND_START_NEW_SET( getProfilerPic(), P_GOP_LEVEL );
@@ -608,7 +608,7 @@ Void EncLib::encode( Bool flush, PelStorage* pcPicYuvOrg, PelStorage* cPicYuvTru
 /**------------------------------------------------
  Separate interlaced frame into two fields
  -------------------------------------------------**/
-Void separateFields(Pel* org, Pel* dstField, UInt stride, UInt width, UInt height, Bool isTop)
+void separateFields(Pel* org, Pel* dstField, UInt stride, UInt width, UInt height, Bool isTop)
 {
   if (!isTop)
   {
@@ -627,7 +627,7 @@ Void separateFields(Pel* org, Pel* dstField, UInt stride, UInt width, UInt heigh
 
 }
 
-Void EncLib::encode( Bool flush, PelStorage* pcPicYuvOrg, PelStorage* pcPicYuvTrueOrg, const InputColourSpaceConversion snrCSC, std::list<PelUnitBuf*>& rcListPicYuvRecOut,
+void EncLib::encode( Bool flush, PelStorage* pcPicYuvOrg, PelStorage* pcPicYuvTrueOrg, const InputColourSpaceConversion snrCSC, std::list<PelUnitBuf*>& rcListPicYuvRecOut,
                      Int& iNumEncoded, Bool isTff )
 {
   iNumEncoded = 0;
@@ -703,7 +703,7 @@ Void EncLib::encode( Bool flush, PelStorage* pcPicYuvOrg, PelStorage* pcPicYuvTr
  .
  \retval rpcPic obtained picture buffer
  */
-Void EncLib::xGetNewPicBuffer ( std::list<PelUnitBuf*>& rcListPicYuvRecOut, Picture*& rpcPic, Int ppsId )
+void EncLib::xGetNewPicBuffer ( std::list<PelUnitBuf*>& rcListPicYuvRecOut, Picture*& rpcPic, Int ppsId )
 {
   // rotate he output buffer
   rcListPicYuvRecOut.push_back( rcListPicYuvRecOut.front() ); rcListPicYuvRecOut.pop_front();
@@ -777,7 +777,7 @@ Void EncLib::xGetNewPicBuffer ( std::list<PelUnitBuf*>& rcListPicYuvRecOut, Pict
 
 
 #if HEVC_VPS
-Void EncLib::xInitVPS(VPS &vps, const SPS &sps)
+void EncLib::xInitVPS(VPS &vps, const SPS &sps)
 {
   // The SPS must have already been set up.
   // set the VPS profile information.
@@ -796,7 +796,7 @@ Void EncLib::xInitVPS(VPS &vps, const SPS &sps)
 }
 #endif
 
-Void EncLib::xInitSPS(SPS &sps)
+void EncLib::xInitSPS(SPS &sps)
 {
   ProfileTierLevel& profileTierLevel = *sps.getPTL()->getGeneralPTL();
   profileTierLevel.setLevelIdc                    (m_level);
@@ -1081,7 +1081,7 @@ Int calcScale(Int x)
   return ScaleValue;
 }
 #endif
-Void EncLib::xInitHrdParameters(SPS &sps)
+void EncLib::xInitHrdParameters(SPS &sps)
 {
   Bool useSubCpbParams = (getSliceMode() > 0) || (getSliceSegmentMode() > 0);
   Int  bitRate         = getTargetBitrate();
@@ -1237,7 +1237,7 @@ Void EncLib::xInitHrdParameters(SPS &sps)
   }
 }
 
-Void EncLib::xInitPPS(PPS &pps, const SPS &sps)
+void EncLib::xInitPPS(PPS &pps, const SPS &sps)
 {
   // pps ID already initialised.
   pps.setSPSId(sps.getSPSId());
@@ -1453,7 +1453,7 @@ Void EncLib::xInitPPS(PPS &pps, const SPS &sps)
 }
 
 //Function for initializing m_RPSList, a list of ReferencePictureSet, based on the GOPEntry objects read from the config file.
-Void EncLib::xInitRPS(SPS &sps, Bool isFieldCoding)
+void EncLib::xInitRPS(SPS &sps, Bool isFieldCoding)
 {
   ReferencePictureSet*      rps;
 
@@ -1604,7 +1604,7 @@ Void EncLib::xInitRPS(SPS &sps, Bool isFieldCoding)
    // This is a function that
    // determines what Reference Picture Set to use
    // for a specific slice (with POC = POCCurr)
-Void EncLib::selectReferencePictureSet(Slice* slice, Int POCCurr, Int GOPid )
+void EncLib::selectReferencePictureSet(Slice* slice, Int POCCurr, Int GOPid )
 {
   slice->setRPSidx(GOPid);
 
@@ -1671,7 +1671,7 @@ Int EncLib::getReferencePictureSetIdxForSOP(Int POCCurr, Int GOPid )
 }
 
 #if HEVC_TILES_WPP
-Void  EncLib::xInitPPSforTiles(PPS &pps)
+void  EncLib::xInitPPSforTiles(PPS &pps)
 {
   pps.setTileUniformSpacingFlag( m_tileUniformSpacingFlag );
   pps.setNumTileColumnsMinus1( m_iNumColumnsMinus1 );
@@ -1687,7 +1687,7 @@ Void  EncLib::xInitPPSforTiles(PPS &pps)
 }
 #endif
 
-Void  EncCfg::xCheckGSParameters()
+void  EncCfg::xCheckGSParameters()
 {
 #if HEVC_TILES_WPP
   Int   iWidthInCU = ( m_iSourceWidth%m_maxCUWidth ) ? m_iSourceWidth/m_maxCUWidth + 1 : m_iSourceWidth/m_maxCUWidth;

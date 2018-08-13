@@ -76,7 +76,7 @@ private:
                                     const bool            bValue,
                                     const bool            EdgeIdx = false );
 #if JEM_TOOLS
-  Void xSetEdgefilterMultipleSubPu( const CodingUnit&    cu,
+  void xSetEdgefilterMultipleSubPu( const CodingUnit&    cu,
                                           DeblockEdgeDir edgeDir,
                                     const Area&          area,
                                     const Position       subPuPos,

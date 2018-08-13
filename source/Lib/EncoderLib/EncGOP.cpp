@@ -311,13 +311,13 @@ EncGOP::~EncGOP()
 
 /** Create list to contain pointers to CTU start addresses of slice.
  */
-Void  EncGOP::create()
+void  EncGOP::create()
 {
   m_bLongtermTestPictureHasBeenCoded = 0;
   m_bLongtermTestPictureHasBeenCoded2 = 0;
 }
 
-Void  EncGOP::destroy()
+void  EncGOP::destroy()
 {
 #if W0038_DB_OPT
   if (m_pcDeblockingTempPicYuv)
@@ -329,7 +329,7 @@ Void  EncGOP::destroy()
 #endif
 }
 
-Void EncGOP::init ( EncLib* pcEncLib )
+void EncGOP::init ( EncLib* pcEncLib )
 {
   m_pcEncLib     = pcEncLib;
   m_pcCfg                = pcEncLib;
@@ -419,7 +419,7 @@ Int EncGOP::xWriteParameterSets (AccessUnit &accessUnit, Slice *slice, const Boo
   return actualTotalBits;
 }
 
-Void EncGOP::xWriteAccessUnitDelimiter (AccessUnit &accessUnit, Slice *slice)
+void EncGOP::xWriteAccessUnitDelimiter (AccessUnit &accessUnit, Slice *slice)
 {
   AUDWriter audWriter;
   OutputNALUnit nalu(NAL_UNIT_ACCESS_UNIT_DELIMITER);
@@ -431,7 +431,7 @@ Void EncGOP::xWriteAccessUnitDelimiter (AccessUnit &accessUnit, Slice *slice)
 }
 
 // write SEI list into one NAL unit and add it to the Access unit at auPos
-Void EncGOP::xWriteSEI (NalUnitType naluType, SEIMessages& seiMessages, AccessUnit &accessUnit, AccessUnit::iterator &auPos, Int temporalId, const SPS *sps)
+void EncGOP::xWriteSEI (NalUnitType naluType, SEIMessages& seiMessages, AccessUnit &accessUnit, AccessUnit::iterator &auPos, Int temporalId, const SPS *sps)
 {
   // don't do anything, if we get an empty list
   if (seiMessages.empty())
@@ -444,7 +444,7 @@ Void EncGOP::xWriteSEI (NalUnitType naluType, SEIMessages& seiMessages, AccessUn
   auPos++;
 }
 
-Void EncGOP::xWriteSEISeparately (NalUnitType naluType, SEIMessages& seiMessages, AccessUnit &accessUnit, AccessUnit::iterator &auPos, Int temporalId, const SPS *sps)
+void EncGOP::xWriteSEISeparately (NalUnitType naluType, SEIMessages& seiMessages, AccessUnit &accessUnit, AccessUnit::iterator &auPos, Int temporalId, const SPS *sps)
 {
   // don't do anything, if we get an empty list
   if (seiMessages.empty())
@@ -462,7 +462,7 @@ Void EncGOP::xWriteSEISeparately (NalUnitType naluType, SEIMessages& seiMessages
   }
 }
 
-Void EncGOP::xClearSEIs(SEIMessages& seiMessages, Bool deleteMessages)
+void EncGOP::xClearSEIs(SEIMessages& seiMessages, Bool deleteMessages)
 {
   if (deleteMessages)
   {
@@ -475,7 +475,7 @@ Void EncGOP::xClearSEIs(SEIMessages& seiMessages, Bool deleteMessages)
 }
 
 // write SEI messages as separate NAL units ordered
-Void EncGOP::xWriteLeadingSEIOrdered (SEIMessages& seiMessages, SEIMessages& duInfoSeiMessages, AccessUnit &accessUnit, Int temporalId, const SPS *sps, Bool testWrite)
+void EncGOP::xWriteLeadingSEIOrdered (SEIMessages& seiMessages, SEIMessages& duInfoSeiMessages, AccessUnit &accessUnit, Int temporalId, const SPS *sps, Bool testWrite)
 {
   AccessUnit::iterator itNalu = accessUnit.begin();
 
@@ -545,7 +545,7 @@ Void EncGOP::xWriteLeadingSEIOrdered (SEIMessages& seiMessages, SEIMessages& duI
 }
 
 
-Void EncGOP::xWriteLeadingSEIMessages (SEIMessages& seiMessages, SEIMessages& duInfoSeiMessages, AccessUnit &accessUnit, Int temporalId, const SPS *sps, std::deque<DUData> &duData)
+void EncGOP::xWriteLeadingSEIMessages (SEIMessages& seiMessages, SEIMessages& duInfoSeiMessages, AccessUnit &accessUnit, Int temporalId, const SPS *sps, std::deque<DUData> &duData)
 {
   AccessUnit testAU;
   SEIMessages picTimingSEIs = getSeisByType(seiMessages, SEI::PICTURE_TIMING);
@@ -564,7 +564,7 @@ Void EncGOP::xWriteLeadingSEIMessages (SEIMessages& seiMessages, SEIMessages& du
   // testAU will automatically be cleaned up when losing scope
 }
 
-Void EncGOP::xWriteTrailingSEIMessages (SEIMessages& seiMessages, AccessUnit &accessUnit, Int temporalId, const SPS *sps)
+void EncGOP::xWriteTrailingSEIMessages (SEIMessages& seiMessages, AccessUnit &accessUnit, Int temporalId, const SPS *sps)
 {
   // Note: using accessUnit.end() works only as long as this function is called after slice coding and before EOS/EOB NAL units
   AccessUnit::iterator pos = accessUnit.end();
@@ -572,7 +572,7 @@ Void EncGOP::xWriteTrailingSEIMessages (SEIMessages& seiMessages, AccessUnit &ac
   deleteSEIs(seiMessages);
 }
 
-Void EncGOP::xWriteDuSEIMessages (SEIMessages& duInfoSeiMessages, AccessUnit &accessUnit, Int temporalId, const SPS *sps, std::deque<DUData> &duData)
+void EncGOP::xWriteDuSEIMessages (SEIMessages& duInfoSeiMessages, AccessUnit &accessUnit, Int temporalId, const SPS *sps, std::deque<DUData> &duData)
 {
   const HRD *hrd = sps->getVuiParameters()->getHrdParameters();
 
@@ -616,7 +616,7 @@ Void EncGOP::xWriteDuSEIMessages (SEIMessages& duInfoSeiMessages, AccessUnit &ac
 }
 
 
-Void EncGOP::xCreateIRAPLeadingSEIMessages (SEIMessages& seiMessages, const SPS *sps, const PPS *pps)
+void EncGOP::xCreateIRAPLeadingSEIMessages (SEIMessages& seiMessages, const SPS *sps, const PPS *pps)
 {
   OutputNALUnit nalu(NAL_UNIT_PREFIX_SEI);
 
@@ -705,7 +705,7 @@ Void EncGOP::xCreateIRAPLeadingSEIMessages (SEIMessages& seiMessages, const SPS 
 #endif
 }
 
-Void EncGOP::xCreatePerPictureSEIMessages (Int picInGOP, SEIMessages& seiMessages, SEIMessages& nestedSeiMessages, Slice *slice)
+void EncGOP::xCreatePerPictureSEIMessages (Int picInGOP, SEIMessages& seiMessages, SEIMessages& nestedSeiMessages, Slice *slice)
 {
   if( ( m_pcCfg->getBufferingPeriodSEIEnabled() ) && ( slice->getSliceType() == I_SLICE ) &&
     ( slice->getSPS()->getVuiParametersPresentFlag() ) &&
@@ -777,7 +777,7 @@ Void EncGOP::xCreatePerPictureSEIMessages (Int picInGOP, SEIMessages& seiMessage
   }
 }
 
-Void EncGOP::xCreateScalableNestingSEI (SEIMessages& seiMessages, SEIMessages& nestedSeiMessages)
+void EncGOP::xCreateScalableNestingSEI (SEIMessages& seiMessages, SEIMessages& nestedSeiMessages)
 {
   SEIMessages tmpMessages;
   while (!nestedSeiMessages.empty())
@@ -792,7 +792,7 @@ Void EncGOP::xCreateScalableNestingSEI (SEIMessages& seiMessages, SEIMessages& n
   }
 }
 
-Void EncGOP::xCreatePictureTimingSEI  (Int IRAPGOPid, SEIMessages& seiMessages, SEIMessages& nestedSeiMessages, SEIMessages& duInfoSeiMessages, Slice *slice, Bool isField, std::deque<DUData> &duData)
+void EncGOP::xCreatePictureTimingSEI  (Int IRAPGOPid, SEIMessages& seiMessages, SEIMessages& nestedSeiMessages, SEIMessages& duInfoSeiMessages, Slice *slice, Bool isField, std::deque<DUData> &duData)
 {
   const VUI *vui = slice->getSPS()->getVuiParameters();
   const HRD *hrd = vui->getHrdParameters();
@@ -930,7 +930,7 @@ Void EncGOP::xCreatePictureTimingSEI  (Int IRAPGOPid, SEIMessages& seiMessages, 
   }
 }
 
-Void EncGOP::xUpdateDuData(AccessUnit &testAU, std::deque<DUData> &duData)
+void EncGOP::xUpdateDuData(AccessUnit &testAU, std::deque<DUData> &duData)
 {
   if (duData.empty())
   {
@@ -967,7 +967,7 @@ Void EncGOP::xUpdateDuData(AccessUnit &testAU, std::deque<DUData> &duData)
   }
 
 }
-Void EncGOP::xUpdateTimingSEI(SEIPictureTiming *pictureTimingSEI, std::deque<DUData> &duData, const SPS *sps)
+void EncGOP::xUpdateTimingSEI(SEIPictureTiming *pictureTimingSEI, std::deque<DUData> &duData, const SPS *sps)
 {
   if (!pictureTimingSEI)
   {
@@ -1039,7 +1039,7 @@ Void EncGOP::xUpdateTimingSEI(SEIPictureTiming *pictureTimingSEI, std::deque<DUD
     }
   }
 }
-Void EncGOP::xUpdateDuInfoSEI(SEIMessages &duInfoSeiMessages, SEIPictureTiming *pictureTimingSEI)
+void EncGOP::xUpdateDuInfoSEI(SEIMessages &duInfoSeiMessages, SEIPictureTiming *pictureTimingSEI)
 {
   if (duInfoSeiMessages.empty() || (pictureTimingSEI == NULL))
   {
@@ -1058,7 +1058,7 @@ Void EncGOP::xUpdateDuInfoSEI(SEIMessages &duInfoSeiMessages, SEIPictureTiming *
   }
 }
 
-static Void
+static void
 cabac_zero_word_padding(Slice *const pcSlice, Picture *const pcPic, const std::size_t binCountsInNalUnits, const std::size_t numBytesInVclNalUnits, std::ostringstream &nalUnitData, const Bool cabacZeroWordPaddingEnabled)
 {
   const SPS &sps=*(pcSlice->getSPS());
@@ -1113,14 +1113,14 @@ class EfficientFieldIRAPMapping
       swapIRAPForward(false)
     { }
 
-    Void initialize(const Bool isField, const Int gopSize, const Int POCLast, const Int numPicRcvd, const Int lastIDR, EncGOP *pEncGop, EncCfg *pCfg);
+    void initialize(const Bool isField, const Int gopSize, const Int POCLast, const Int numPicRcvd, const Int lastIDR, EncGOP *pEncGop, EncCfg *pCfg);
 
     Int adjustGOPid(const Int gopID);
     Int restoreGOPid(const Int gopID);
     Int GetIRAPGOPid() const { return IRAPGOPid; }
 };
 
-Void EfficientFieldIRAPMapping::initialize(const Bool isField, const Int gopSize, const Int POCLast, const Int numPicRcvd, const Int lastIDR, EncGOP *pEncGop, EncCfg *pCfg )
+void EfficientFieldIRAPMapping::initialize(const Bool isField, const Int gopSize, const Int POCLast, const Int numPicRcvd, const Int lastIDR, EncGOP *pEncGop, EncCfg *pCfg )
 {
   if(isField)
   {
@@ -1288,7 +1288,7 @@ static UInt calculateCollocatedFromL1Flag(EncCfg *pCfg, const Int GOPid, const I
 #endif
 
 
-static Void
+static void
 printHash(const HashType hashType, const std::string &digestStr)
 {
   const TChar *decodedPictureHashModeName;
@@ -1484,7 +1484,7 @@ void trySkipOrDecodePicture( bool& decPic, bool& encPic, const EncCfg& cfg, Pict
 // ====================================================================================================================
 // Public member functions
 // ====================================================================================================================
-Void EncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic,
+void EncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic,
                           std::list<PelUnitBuf*>& rcListPicYuvRecOut,
                           Bool isField, Bool isTff, const InputColourSpaceConversion snr_conversion, const Bool printFrameMSE )
 {
@@ -2630,7 +2630,7 @@ Void EncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic,
 
 }
 
-Void EncGOP::printOutSummary(UInt uiNumAllPicCoded, Bool isField, const Bool printMSEBasedSNR, const Bool printSequenceMSE, const BitDepths &bitDepths)
+void EncGOP::printOutSummary(UInt uiNumAllPicCoded, Bool isField, const Bool printMSEBasedSNR, const Bool printSequenceMSE, const BitDepths &bitDepths)
 {
 #if ENABLE_QPA
   const bool    useWPSNR = m_pcEncLib->getUseWPSNR();
@@ -2761,7 +2761,7 @@ UInt64 EncGOP::preLoopFilterPicAndCalcDist( Picture* pcPic )
 // ====================================================================================================================
 
 
-Void EncGOP::xInitGOP( Int iPOCLast, Int iNumPicRcvd, Bool isField )
+void EncGOP::xInitGOP( Int iPOCLast, Int iNumPicRcvd, Bool isField )
 {
   CHECK(!( iNumPicRcvd > 0 ), "Unspecified error");
   //  Exception for the first frames
@@ -2779,7 +2779,7 @@ Void EncGOP::xInitGOP( Int iPOCLast, Int iNumPicRcvd, Bool isField )
 }
 
 
-Void EncGOP::xGetBuffer( PicList&                  rcListPic,
+void EncGOP::xGetBuffer( PicList&                  rcListPic,
                          std::list<PelUnitBuf*>&   rcListPicYuvRecOut,
                          Int                       iNumPicRcvd,
                          Int                       iTimeOffset,
@@ -3034,7 +3034,7 @@ Double EncGOP::xFindDistortionPlaneWPSNR(const CPelBuf& pic0, const CPelBuf& pic
 }
 #endif
 
-Void EncGOP::xCalculateAddPSNRs( const Bool isField, const Bool isFieldTopFieldFirst, const Int iGOPid, Picture* pcPic, const AccessUnit&accessUnit, PicList &rcListPic, const int64_t dEncTime, const InputColourSpaceConversion snr_conversion, const Bool printFrameMSE, Double* PSNR_Y )
+void EncGOP::xCalculateAddPSNRs( const Bool isField, const Bool isFieldTopFieldFirst, const Int iGOPid, Picture* pcPic, const AccessUnit&accessUnit, PicList &rcListPic, const int64_t dEncTime, const InputColourSpaceConversion snr_conversion, const Bool printFrameMSE, Double* PSNR_Y )
 {
   xCalculateAddPSNR( pcPic, pcPic->getRecoBuf(), accessUnit, (double) dEncTime, snr_conversion, printFrameMSE, PSNR_Y );
 
@@ -3101,7 +3101,7 @@ Void EncGOP::xCalculateAddPSNRs( const Bool isField, const Bool isFieldTopFieldF
   }
 }
 
-Void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUnit& accessUnit, Double dEncTime, const InputColourSpaceConversion conversion, const Bool printFrameMSE, Double* PSNR_Y )
+void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUnit& accessUnit, Double dEncTime, const InputColourSpaceConversion conversion, const Bool printFrameMSE, Double* PSNR_Y )
 {
   const SPS&         sps = *pcPic->cs->sps;
   const CPelUnitBuf& pic = cPicD;
@@ -3329,7 +3329,7 @@ Void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUn
   }
 }
 
-Void EncGOP::xCalculateInterlacedAddPSNR( Picture* pcPicOrgFirstField, Picture* pcPicOrgSecondField,
+void EncGOP::xCalculateInterlacedAddPSNR( Picture* pcPicOrgFirstField, Picture* pcPicOrgSecondField,
                                           PelUnitBuf cPicRecFirstField, PelUnitBuf cPicRecSecondField,
                                           const InputColourSpaceConversion conversion, const Bool printFrameMSE, Double* PSNR_Y )
 {
@@ -3476,7 +3476,7 @@ NalUnitType EncGOP::getNalUnitType(Int pocCurr, Int lastIDR, Bool isField)
   return NAL_UNIT_CODED_SLICE_TRAIL_R;
 }
 
-Void EncGOP::xUpdateRasInit(Slice* slice)
+void EncGOP::xUpdateRasInit(Slice* slice)
 {
   slice->setPendingRasInit( false );
   if ( slice->getPOC() > m_lastRasPoc )
@@ -3542,7 +3542,7 @@ Double EncGOP::xCalculateRVM()
  *  \param codedSliceData contains the coded slice data (bitstream) to be concatenated to rNalu
  *  \param rNalu          target NAL unit
  */
-Void EncGOP::xAttachSliceDataToNalUnit (OutputNALUnit& rNalu, OutputBitstream* codedSliceData)
+void EncGOP::xAttachSliceDataToNalUnit (OutputNALUnit& rNalu, OutputBitstream* codedSliceData)
 {
   // Byte-align
   rNalu.m_Bitstream.writeByteAlignment();   // Slice header byte-alignment
@@ -3557,7 +3557,7 @@ Void EncGOP::xAttachSliceDataToNalUnit (OutputNALUnit& rNalu, OutputBitstream* c
 
 // Function will arrange the long-term pictures in the decreasing order of poc_lsb_lt,
 // and among the pictures with the same lsb, it arranges them in increasing delta_poc_msb_cycle_lt value
-Void EncGOP::arrangeLongtermPicturesInRPS(Slice *pcSlice, PicList& rcListPic)
+void EncGOP::arrangeLongtermPicturesInRPS(Slice *pcSlice, PicList& rcListPic)
 {
   if(pcSlice->getRPS()->getNumberOfLongtermPictures() == 0)
   {
@@ -3662,7 +3662,7 @@ Void EncGOP::arrangeLongtermPicturesInRPS(Slice *pcSlice, PicList& rcListPic)
   }
 }
 
-Void EncGOP::applyDeblockingFilterMetric( Picture* pcPic, UInt uiNumSlices )
+void EncGOP::applyDeblockingFilterMetric( Picture* pcPic, UInt uiNumSlices )
 {
   PelBuf cPelBuf = pcPic->getRecoBuf().get( COMPONENT_Y );
   Pel* Rec    = cPelBuf.buf;
@@ -3787,7 +3787,7 @@ Void EncGOP::applyDeblockingFilterMetric( Picture* pcPic, UInt uiNumSlices )
 }
 
 #if W0038_DB_OPT
-Void EncGOP::applyDeblockingFilterParameterSelection( Picture* pcPic, const UInt numSlices, const Int gopID )
+void EncGOP::applyDeblockingFilterParameterSelection( Picture* pcPic, const UInt numSlices, const Int gopID )
 {
   enum DBFltParam
   {

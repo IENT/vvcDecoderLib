@@ -277,81 +277,81 @@ public:
   ALFParam  m_acStoredAlfPara[E0104_ALF_MAX_TEMPLAYERID][C806_ALF_TEMPPRED_NUM];
 protected:
   /// ALF for luma component
-  Void xALFLuma( CodingStructure& cs, ALFParam* pcAlfParam, PelUnitBuf& recSrcExt, PelUnitBuf& recDst );
+  void xALFLuma( CodingStructure& cs, ALFParam* pcAlfParam, PelUnitBuf& recSrcExt, PelUnitBuf& recDst );
 
 
-  Void reconstructFilterCoeffs(ALFParam* pcAlfParam,int **pfilterCoeffSym );
-  Void getCurrentFilter(int **filterCoeffSym,ALFParam* pcAlfParam);
-  Void xFilterFrame  (PelUnitBuf& recSrcExt, PelUnitBuf& recDst, AlfFilterType filtType
+  void reconstructFilterCoeffs(ALFParam* pcAlfParam,int **pfilterCoeffSym );
+  void getCurrentFilter(int **filterCoeffSym,ALFParam* pcAlfParam);
+  void xFilterFrame  (PelUnitBuf& recSrcExt, PelUnitBuf& recDst, AlfFilterType filtType
     );
-  Void xFilterBlkGalf(PelUnitBuf &recDst, const CPelUnitBuf& recSrcExt, const Area& blk, AlfFilterType filtType, const ComponentID compId);
-  Void xFilterBlkAlf (PelBuf &recDst, const CPelBuf& recSrc, const Area& blk, AlfFilterType filtType);
+  void xFilterBlkGalf(PelUnitBuf &recDst, const CPelUnitBuf& recSrcExt, const Area& blk, AlfFilterType filtType, const ComponentID compId);
+  void xFilterBlkAlf (PelBuf &recDst, const CPelBuf& recSrc, const Area& blk, AlfFilterType filtType);
 
-  Void xClassify                 (Pel** classes, const CPelBuf& recSrcBuf, Int pad_size, Int fl);
-  Void xClassifyByGeoLaplacian   (Pel** classes, const CPelBuf& srcLumaBuf, Int pad_size, Int fl, const Area& blk);
-  Void xClassifyByGeoLaplacianBlk(Pel** classes, const CPelBuf& srcLumaBuf, Int pad_size, Int fl, const Area& blk);
+  void xClassify                 (Pel** classes, const CPelBuf& recSrcBuf, Int pad_size, Int fl);
+  void xClassifyByGeoLaplacian   (Pel** classes, const CPelBuf& srcLumaBuf, Int pad_size, Int fl, const Area& blk);
+  void xClassifyByGeoLaplacianBlk(Pel** classes, const CPelBuf& srcLumaBuf, Int pad_size, Int fl, const Area& blk);
   Int  selectTransposeVarInd     (Int varInd, Int *transpose);
 
-  Void xClassifyByLaplacian      (Pel** classes, const CPelBuf& srcLumaBuf, Int pad_size, Int fl, const Area& blk);
-  Void xClassifyByLaplacianBlk   (Pel** classes, const CPelBuf& srcLumaBuf, Int pad_size, Int fl, const Area& blk);
-  Void xDecodeFilter( ALFParam* pcAlfParam );
+  void xClassifyByLaplacian      (Pel** classes, const CPelBuf& srcLumaBuf, Int pad_size, Int fl, const Area& blk);
+  void xClassifyByLaplacianBlk   (Pel** classes, const CPelBuf& srcLumaBuf, Int pad_size, Int fl, const Area& blk);
+  void xDecodeFilter( ALFParam* pcAlfParam );
 
   // memory allocation
-  Void destroyMatrix_short(short **m2D);
-  Void initMatrix_short(short ***m2D, int d1, int d2);
-  Void destroyMatrix_Pel(Pel **m2D);
-  Void destroyMatrix_int(int **m2D);
-  Void initMatrix_int(int ***m2D, int d1, int d2);
-  Void initMatrix_Pel(Pel ***m2D, int d1, int d2);
-  Void destroyMatrix4D_double(double ****m4D, int d1, int d2);
-  Void destroyMatrix3D_double(double ***m3D, int d1);
-  Void destroyMatrix_double(double **m2D);
-  Void initMatrix4D_double(double *****m4D, int d1, int d2, int d3, int d4);
-  Void initMatrix3D_double(double ****m3D, int d1, int d2, int d3);
-  Void initMatrix_double(double ***m2D, int d1, int d2);
-  Void free_mem2Dpel(Pel **array2D);
-  Void get_mem2Dpel(Pel ***array2D, int rows, int columns);
-  Void no_mem_exit(const char *where);
-  Void xError(const char *text, int code);
-  Void calcVar(Pel **imgY_var, Pel *imgY_pad, int pad_size, int fl, int img_height, int img_width, int img_stride, int start_width = 0 , int start_height = 0 );
-  Void xCalcVar(Pel **imgY_var, Pel *imgY_pad, int pad_size, int fl, int img_height, int img_width, int img_stride, int start_width , int start_height );
+  void destroyMatrix_short(short **m2D);
+  void initMatrix_short(short ***m2D, int d1, int d2);
+  void destroyMatrix_Pel(Pel **m2D);
+  void destroyMatrix_int(int **m2D);
+  void initMatrix_int(int ***m2D, int d1, int d2);
+  void initMatrix_Pel(Pel ***m2D, int d1, int d2);
+  void destroyMatrix4D_double(double ****m4D, int d1, int d2);
+  void destroyMatrix3D_double(double ***m3D, int d1);
+  void destroyMatrix_double(double **m2D);
+  void initMatrix4D_double(double *****m4D, int d1, int d2, int d3, int d4);
+  void initMatrix3D_double(double ****m3D, int d1, int d2, int d3);
+  void initMatrix_double(double ***m2D, int d1, int d2);
+  void free_mem2Dpel(Pel **array2D);
+  void get_mem2Dpel(Pel ***array2D, int rows, int columns);
+  void no_mem_exit(const char *where);
+  void xError(const char *text, int code);
+  void calcVar(Pel **imgY_var, Pel *imgY_pad, int pad_size, int fl, int img_height, int img_width, int img_stride, int start_width = 0 , int start_height = 0 );
+  void xCalcVar(Pel **imgY_var, Pel *imgY_pad, int pad_size, int fl, int img_height, int img_width, int img_stride, int start_width , int start_height );
 
-  Void xCUAdaptive( CodingStructure& cs, const PelUnitBuf &recExtBuf, PelUnitBuf &recBuf, ALFParam* pcAlfParam
+  void xCUAdaptive( CodingStructure& cs, const PelUnitBuf &recExtBuf, PelUnitBuf &recBuf, ALFParam* pcAlfParam
     );
 
   /// ALF for chroma component
-  Void xALFChroma   ( ALFParam* pcAlfParam,const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf );
-  Void xFrameChromaGalf(ALFParam* pcAlfParam, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, ComponentID compID);
-  Void xFrameChromaAlf (ALFParam* pcAlfParam, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, ComponentID compID );
+  void xALFChroma   ( ALFParam* pcAlfParam,const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf );
+  void xFrameChromaGalf(ALFParam* pcAlfParam, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, ComponentID compID);
+  void xFrameChromaAlf (ALFParam* pcAlfParam, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, ComponentID compID );
 
 public:
   AdaptiveLoopFilter();
   virtual ~AdaptiveLoopFilter() {}
 
   // initialize & destroy temporary buffer
-  Void create( const Int iPicWidth, Int iPicHeight, const ChromaFormat chromaFormatIDC, const Int uiMaxCUWidth, const UInt uiMaxCUHeight, const UInt uiMaxCUDepth, const Int nInputBitDepth, const Int nInternalBitDepth, const Int numberOfCTUs );
-  Void destroy ();
+  void create( const Int iPicWidth, Int iPicHeight, const ChromaFormat chromaFormatIDC, const Int uiMaxCUWidth, const UInt uiMaxCUHeight, const UInt uiMaxCUDepth, const Int nInputBitDepth, const Int nInternalBitDepth, const Int numberOfCTUs );
+  void destroy ();
 
-  Void ALFProcess     ( CodingStructure& cs, ALFParam* pcAlfParam
+  void ALFProcess     ( CodingStructure& cs, ALFParam* pcAlfParam
                       ); ///< interface function for ALF process
 
   // alloc & free & set functions //TODO move to ALFParam class
-  Void allocALFParam  ( ALFParam* pAlfParam );
-  Void freeALFParam   ( ALFParam* pAlfParam );
-  Void copyALFParam   ( ALFParam* pDesAlfParam, ALFParam* pSrcAlfParam, Bool max_depth_copy = true );
+  void allocALFParam  ( ALFParam* pAlfParam );
+  void freeALFParam   ( ALFParam* pAlfParam );
+  void copyALFParam   ( ALFParam* pDesAlfParam, ALFParam* pSrcAlfParam, Bool max_depth_copy = true );
 
   void storeALFParam  ( ALFParam* pAlfParam, bool isISlice, unsigned tLayer, unsigned tLayerMax );
   void loadALFParam   ( ALFParam* pAlfParam, unsigned idx, unsigned tLayer );
 
-  Void resetALFParam  ( ALFParam* pDesAlfParam);
-  Void resetALFPredParam(ALFParam *pAlfParam, Bool bIntra);
-  Void setNumCUsInFrame(UInt uiNumCUsInFrame);
+  void resetALFParam  ( ALFParam* pDesAlfParam);
+  void resetALFPredParam(ALFParam *pAlfParam, Bool bIntra);
+  void setNumCUsInFrame(UInt uiNumCUsInFrame);
 
   // predict filter coefficients
-  Void predictALFCoeffChroma  ( ALFParam* pAlfParam );                  ///< prediction of chroma ALF coefficients
-  Void initVarForChroma(ALFParam* pcAlfParam, Bool bUpdatedDCCoef);
+  void predictALFCoeffChroma  ( ALFParam* pAlfParam );                  ///< prediction of chroma ALF coefficients
+  void initVarForChroma(ALFParam* pcAlfParam, Bool bUpdatedDCCoef);
 
-  Void refreshAlfTempPred();
+  void refreshAlfTempPred();
 
   static Int ALFTapHToTapV     ( Int tapH );
   static Int ALFTapHToNumCoeff ( Int tapH );

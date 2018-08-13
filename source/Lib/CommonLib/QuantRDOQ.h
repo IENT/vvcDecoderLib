@@ -62,25 +62,25 @@ public:
 
 public:
 #if HEVC_USE_SCALING_LISTS
-  Void setFlatScalingList   ( const Int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths );
-  Void setScalingList       ( ScalingList *scalingList, const Int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths);
+  void setFlatScalingList   ( const Int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths );
+  void setScalingList       ( ScalingList *scalingList, const Int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths);
 #endif
   // quantization
-  Void quant                ( TransformUnit &tu, const ComponentID &compID, const CCoeffBuf &pSrc, TCoeff &uiAbsSum, const QpParam &cQP, const Ctx& ctx );
+  void quant                ( TransformUnit &tu, const ComponentID &compID, const CCoeffBuf &pSrc, TCoeff &uiAbsSum, const QpParam &cQP, const Ctx& ctx );
 
 private:
 #if HEVC_USE_SCALING_LISTS
   Double* xGetErrScaleCoeff              ( UInt list, UInt sizeX, UInt sizeY, Int qp ) { return m_errScale             [sizeX][sizeY][list][qp]; };  //!< get Error Scale Coefficent
   Double& xGetErrScaleCoeffNoScalingList ( UInt list, UInt sizeX, UInt sizeY, Int qp ) { return m_errScaleNoScalingList[sizeX][sizeY][list][qp]; };  //!< get Error Scale Coefficent
-  Void    xInitScalingList               ( const QuantRDOQ* other );
-  Void    xDestroyScalingList            ();
-  Void    xSetErrScaleCoeff              ( UInt list, UInt sizeX, UInt sizeY, Int qp, const Int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths );
+  void    xInitScalingList               ( const QuantRDOQ* other );
+  void    xDestroyScalingList            ();
+  void    xSetErrScaleCoeff              ( UInt list, UInt sizeX, UInt sizeY, Int qp, const Int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths );
 #else
   Double  xGetErrScaleCoeff              ( SizeType width, SizeType height, Int qp, const Int maxLog2TrDynamicRange, const Int channelBitDepth);
 #endif
 
   // RDOQ functions
-  Void xRateDistOptQuant(TransformUnit &tu, const ComponentID &compID, const CCoeffBuf &pSrc, TCoeff &uiAbsSum, const QpParam &cQP, const Ctx &ctx);
+  void xRateDistOptQuant(TransformUnit &tu, const ComponentID &compID, const CCoeffBuf &pSrc, TCoeff &uiAbsSum, const QpParam &cQP, const Ctx &ctx);
 
 #if JVET_K0072
   inline UInt xGetCodedLevel( Double&            rd64CodedCost,

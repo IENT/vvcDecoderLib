@@ -1568,20 +1568,20 @@ AdaptiveLoopFilter::AdaptiveLoopFilter()
 
 }
 
-Void AdaptiveLoopFilter:: xError(const char *text, int code)
+void AdaptiveLoopFilter:: xError(const char *text, int code)
 {
   fprintf(stderr, "%s\n", text);
   exit(code);
 }
 
-Void AdaptiveLoopFilter:: no_mem_exit(const char *where)
+void AdaptiveLoopFilter:: no_mem_exit(const char *where)
 {
   char errortext[200];
   sprintf(errortext, "Could not allocate memory: %s",where);
   xError (errortext, 100);
 }
 
-Void AdaptiveLoopFilter::initMatrix_Pel(Pel ***m2D, int d1, int d2)
+void AdaptiveLoopFilter::initMatrix_Pel(Pel ***m2D, int d1, int d2)
 {
   int i;
 
@@ -1594,7 +1594,7 @@ Void AdaptiveLoopFilter::initMatrix_Pel(Pel ***m2D, int d1, int d2)
     (*m2D)[i] = (*m2D)[i-1] + d2;
 }
 
-Void AdaptiveLoopFilter::initMatrix_int(int ***m2D, int d1, int d2)
+void AdaptiveLoopFilter::initMatrix_int(int ***m2D, int d1, int d2)
 {
   int i;
 
@@ -1607,7 +1607,7 @@ Void AdaptiveLoopFilter::initMatrix_int(int ***m2D, int d1, int d2)
     (*m2D)[i] = (*m2D)[i-1] + d2;
 }
 
-Void AdaptiveLoopFilter::initMatrix_short(short ***m2D, int d1, int d2)
+void AdaptiveLoopFilter::initMatrix_short(short ***m2D, int d1, int d2)
 {
   int i;
 
@@ -1620,7 +1620,7 @@ Void AdaptiveLoopFilter::initMatrix_short(short ***m2D, int d1, int d2)
     (*m2D)[i] = (*m2D)[i-1] + d2;
 }
 
-Void AdaptiveLoopFilter::destroyMatrix_short(short **m2D)
+void AdaptiveLoopFilter::destroyMatrix_short(short **m2D)
 {
   if(m2D)
   {
@@ -1632,7 +1632,7 @@ Void AdaptiveLoopFilter::destroyMatrix_short(short **m2D)
   }
 }
 
-Void AdaptiveLoopFilter::destroyMatrix_int(int **m2D)
+void AdaptiveLoopFilter::destroyMatrix_int(int **m2D)
 {
   if(m2D)
   {
@@ -1644,7 +1644,7 @@ Void AdaptiveLoopFilter::destroyMatrix_int(int **m2D)
   }
 }
 
-Void AdaptiveLoopFilter::destroyMatrix_Pel(Pel **m2D)
+void AdaptiveLoopFilter::destroyMatrix_Pel(Pel **m2D)
 {
   if(m2D)
   {
@@ -1656,7 +1656,7 @@ Void AdaptiveLoopFilter::destroyMatrix_Pel(Pel **m2D)
   }
 }
 
-Void AdaptiveLoopFilter::get_mem2Dpel(Pel ***array2D, int rows, int columns)
+void AdaptiveLoopFilter::get_mem2Dpel(Pel ***array2D, int rows, int columns)
 {
   int i;
 
@@ -1669,7 +1669,7 @@ Void AdaptiveLoopFilter::get_mem2Dpel(Pel ***array2D, int rows, int columns)
     (*array2D)[i] =  (*array2D)[i-1] + columns  ;
 }
 
-Void AdaptiveLoopFilter::free_mem2Dpel(Pel **array2D)
+void AdaptiveLoopFilter::free_mem2Dpel(Pel **array2D)
 {
   if (array2D)
   {
@@ -1681,7 +1681,7 @@ Void AdaptiveLoopFilter::free_mem2Dpel(Pel **array2D)
   }
 }
 
-Void AdaptiveLoopFilter::initMatrix_double(double ***m2D, int d1, int d2)
+void AdaptiveLoopFilter::initMatrix_double(double ***m2D, int d1, int d2)
 {
   int i;
 
@@ -1694,7 +1694,7 @@ Void AdaptiveLoopFilter::initMatrix_double(double ***m2D, int d1, int d2)
     (*m2D)[i] = (*m2D)[i-1] + d2;
 }
 
-Void AdaptiveLoopFilter::initMatrix3D_double(double ****m3D, int d1, int d2, int d3)
+void AdaptiveLoopFilter::initMatrix3D_double(double ****m3D, int d1, int d2, int d3)
 {
   int  j;
 
@@ -1706,7 +1706,7 @@ Void AdaptiveLoopFilter::initMatrix3D_double(double ****m3D, int d1, int d2, int
 }
 
 
-Void AdaptiveLoopFilter::initMatrix4D_double(double *****m4D, int d1, int d2, int d3, int d4)
+void AdaptiveLoopFilter::initMatrix4D_double(double *****m4D, int d1, int d2, int d3, int d4)
 {
   int  j;
 
@@ -1718,7 +1718,7 @@ Void AdaptiveLoopFilter::initMatrix4D_double(double *****m4D, int d1, int d2, in
 }
 
 
-Void AdaptiveLoopFilter::destroyMatrix_double(double **m2D)
+void AdaptiveLoopFilter::destroyMatrix_double(double **m2D)
 {
   if(m2D)
   {
@@ -1734,7 +1734,7 @@ Void AdaptiveLoopFilter::destroyMatrix_double(double **m2D)
   }
 }
 
-Void AdaptiveLoopFilter::destroyMatrix3D_double(double ***m3D, int d1)
+void AdaptiveLoopFilter::destroyMatrix3D_double(double ***m3D, int d1)
 {
   int i;
 
@@ -1751,7 +1751,7 @@ Void AdaptiveLoopFilter::destroyMatrix3D_double(double ***m3D, int d1)
 }
 
 
-Void AdaptiveLoopFilter::destroyMatrix4D_double(double ****m4D, int d1, int d2)
+void AdaptiveLoopFilter::destroyMatrix4D_double(double ****m4D, int d1, int d2)
 {
   int  j;
 
@@ -1767,7 +1767,7 @@ Void AdaptiveLoopFilter::destroyMatrix4D_double(double ****m4D, int d1, int d2)
   }
 }
 
-Void AdaptiveLoopFilter::create( const Int iPicWidth, const Int iPicHeight, const ChromaFormat chromaFormatIDC, const Int uiMaxCUWidth, const UInt uiMaxCUHeight, const UInt uiMaxCUDepth, const Int nInputBitDepth, const Int nInternalBitDepth, const Int numberOfCTUs )
+void AdaptiveLoopFilter::create( const Int iPicWidth, const Int iPicHeight, const ChromaFormat chromaFormatIDC, const Int uiMaxCUWidth, const UInt uiMaxCUHeight, const UInt uiMaxCUDepth, const Int nInputBitDepth, const Int nInternalBitDepth, const Int numberOfCTUs )
 {
   m_nInputBitDepth    = nInputBitDepth;
   m_nInternalBitDepth = nInternalBitDepth;
@@ -1823,7 +1823,7 @@ Void AdaptiveLoopFilter::create( const Int iPicWidth, const Int iPicHeight, cons
   m_wasCreated = true;
 }
 
-Void AdaptiveLoopFilter::destroy()
+void AdaptiveLoopFilter::destroy()
 {
   if( !m_wasCreated )
     return;
@@ -1897,7 +1897,7 @@ Int AdaptiveLoopFilter::ALFTapHToNumCoeff(Int tapH)
 // allocate / free / copy functions
 // --------------------------------------------------------------------------------------------------------------------
 
-Void AdaptiveLoopFilter::allocALFParam(ALFParam* pAlfParam)
+void AdaptiveLoopFilter::allocALFParam(ALFParam* pAlfParam)
 {
   pAlfParam->alf_flag = 0;
   pAlfParam->cu_control_flag = 0;
@@ -1935,7 +1935,7 @@ Void AdaptiveLoopFilter::allocALFParam(ALFParam* pAlfParam)
   }
 }
 
-Void AdaptiveLoopFilter::freeALFParam(ALFParam* pAlfParam)
+void AdaptiveLoopFilter::freeALFParam(ALFParam* pAlfParam)
 {
   if( pAlfParam == nullptr )
     return;
@@ -1981,7 +1981,7 @@ Void AdaptiveLoopFilter::freeALFParam(ALFParam* pAlfParam)
   }
 }
 
-Void AdaptiveLoopFilter::copyALFParam(ALFParam* pDesAlfParam, ALFParam* pSrcAlfParam, Bool max_depth_copy )
+void AdaptiveLoopFilter::copyALFParam(ALFParam* pDesAlfParam, ALFParam* pSrcAlfParam, Bool max_depth_copy )
 {
 #if COM16_C806_ALF_TEMPPRED_NUM
   if (!pDesAlfParam->temporalPredFlag)
@@ -2067,7 +2067,7 @@ Void AdaptiveLoopFilter::copyALFParam(ALFParam* pDesAlfParam, ALFParam* pSrcAlfP
 #endif
 }
 
-Void AdaptiveLoopFilter::resetALFParam(ALFParam* pDesAlfParam)
+void AdaptiveLoopFilter::resetALFParam(ALFParam* pDesAlfParam)
 {
   if( pDesAlfParam->coeffmulti == nullptr )
   {
@@ -2140,7 +2140,7 @@ Void AdaptiveLoopFilter::resetALFParam(ALFParam* pDesAlfParam)
  \param cs            coding structure (CodingStructure) class (input/output)
  \param pcAlfParam    ALF parameter
 */
-Void AdaptiveLoopFilter::ALFProcess( CodingStructure& cs, ALFParam* pcAlfParam
+void AdaptiveLoopFilter::ALFProcess( CodingStructure& cs, ALFParam* pcAlfParam
                                     )
 {
 
@@ -2200,7 +2200,7 @@ Void AdaptiveLoopFilter::ALFProcess( CodingStructure& cs, ALFParam* pcAlfParam
 // --------------------------------------------------------------------------------------------------------------------
 // ALF for luma
 // --------------------------------------------------------------------------------------------------------------------
-Void AdaptiveLoopFilter::xALFLuma( CodingStructure& cs, ALFParam* pcAlfParam, PelUnitBuf& recSrcExt, PelUnitBuf& recDst )
+void AdaptiveLoopFilter::xALFLuma( CodingStructure& cs, ALFParam* pcAlfParam, PelUnitBuf& recSrcExt, PelUnitBuf& recDst )
 {
   //Decode and reconst filter coefficients
   xDecodeFilter( pcAlfParam );
@@ -2223,7 +2223,7 @@ Void AdaptiveLoopFilter::xALFLuma( CodingStructure& cs, ALFParam* pcAlfParam, Pe
 // ALF for chroma
 // --------------------------------------------------------------------------------------------------------------------
 
-Void AdaptiveLoopFilter::xALFChroma( ALFParam* pcAlfParam,  const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf )
+void AdaptiveLoopFilter::xALFChroma( ALFParam* pcAlfParam,  const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf )
 {
   if((pcAlfParam->chroma_idc>>1) & 0x01)
   {
@@ -2252,7 +2252,7 @@ Void AdaptiveLoopFilter::xALFChroma( ALFParam* pcAlfParam,  const PelUnitBuf& re
   }
 }
 
-Void AdaptiveLoopFilter::xFilterFrame(PelUnitBuf& recSrcExt, PelUnitBuf& recDst, AlfFilterType filtType
+void AdaptiveLoopFilter::xFilterFrame(PelUnitBuf& recSrcExt, PelUnitBuf& recDst, AlfFilterType filtType
   )
 {
   Int i, j;
@@ -2279,7 +2279,7 @@ Void AdaptiveLoopFilter::xFilterFrame(PelUnitBuf& recSrcExt, PelUnitBuf& recDst,
   }
 }
 
-Void AdaptiveLoopFilter::xCUAdaptive( CodingStructure& cs, const PelUnitBuf &recExtBuf, PelUnitBuf &recBuf, ALFParam* pcAlfParam
+void AdaptiveLoopFilter::xCUAdaptive( CodingStructure& cs, const PelUnitBuf &recExtBuf, PelUnitBuf &recBuf, ALFParam* pcAlfParam
   )
 {
   const SPS*     sps            = cs.slice->getSPS();
@@ -2355,7 +2355,7 @@ Void AdaptiveLoopFilter::xCUAdaptive( CodingStructure& cs, const PelUnitBuf &rec
 // ------------------------------------
 
 //copy filter to m_filterCoeffPrevSelected
-Void AdaptiveLoopFilter::getCurrentFilter( Int **filterCoeffSym, ALFParam* pcAlfParam )
+void AdaptiveLoopFilter::getCurrentFilter( Int **filterCoeffSym, ALFParam* pcAlfParam )
 {
   int i, k, varInd;
   const int *patternMapTab[3]={ m_pattern5x5Sym_Quart, m_pattern7x7Sym_Quart, m_pattern9x9Sym_Quart  };
@@ -2482,7 +2482,7 @@ Void AdaptiveLoopFilter::getCurrentFilter( Int **filterCoeffSym, ALFParam* pcAlf
 
 
 
-Void AdaptiveLoopFilter::xDecodeFilter( ALFParam* pcAlfParam )
+void AdaptiveLoopFilter::xDecodeFilter( ALFParam* pcAlfParam )
 {
   Int **pfilterCoeffSym = m_filterCoeffSym;
 #if COM16_C806_ALF_TEMPPRED_NUM
@@ -2595,7 +2595,7 @@ Void AdaptiveLoopFilter::xDecodeFilter( ALFParam* pcAlfParam )
 }
 
 
-Void AdaptiveLoopFilter::reconstructFilterCoeffs( ALFParam* pcAlfParam, int **pfilterCoeffSym )
+void AdaptiveLoopFilter::reconstructFilterCoeffs( ALFParam* pcAlfParam, int **pfilterCoeffSym )
 {
   //todo true only if not forceCoeff0
 //  CHECK( pcAlfParam->forceCoeff0, "ForceCoeff0 not implemented yet" )
@@ -2661,7 +2661,7 @@ Void AdaptiveLoopFilter::reconstructFilterCoeffs( ALFParam* pcAlfParam, int **pf
   }
 }
 
-Void AdaptiveLoopFilter::initVarForChroma(ALFParam* pcAlfParam, Bool bUpdatedDCCoef)
+void AdaptiveLoopFilter::initVarForChroma(ALFParam* pcAlfParam, Bool bUpdatedDCCoef)
 {
   Int k, i;
   //initilization for clip operation in subfilterFrame()
@@ -2695,7 +2695,7 @@ Void AdaptiveLoopFilter::initVarForChroma(ALFParam* pcAlfParam, Bool bUpdatedDCC
   }
 }
 
-Void AdaptiveLoopFilter::predictALFCoeffChroma( ALFParam* pAlfParam )
+void AdaptiveLoopFilter::predictALFCoeffChroma( ALFParam* pAlfParam )
 {
   Int i, sum, pred, tap, N;
   const Int* pFiltMag = NULL;
@@ -2726,7 +2726,7 @@ Void AdaptiveLoopFilter::predictALFCoeffChroma( ALFParam* pAlfParam )
   pAlfParam->coeff_chroma[N-1]=pred-pAlfParam->coeff_chroma[N-1];
 }
 
-Void AdaptiveLoopFilter::resetALFPredParam(ALFParam *pAlfParam, Bool bIntra)
+void AdaptiveLoopFilter::resetALFPredParam(ALFParam *pAlfParam, Bool bIntra)
 {
   //reset to 9x9 filter shape
   pAlfParam->filterType = (AlfFilterType)2;
@@ -2734,7 +2734,7 @@ Void AdaptiveLoopFilter::resetALFPredParam(ALFParam *pAlfParam, Bool bIntra)
   pAlfParam->num_coeff = AdaptiveLoopFilter::m_SQR_FILT_LENGTH_9SYM;
 }
 
-Void AdaptiveLoopFilter::setNumCUsInFrame(UInt uiNumCUsInFrame)
+void AdaptiveLoopFilter::setNumCUsInFrame(UInt uiNumCUsInFrame)
 {
   m_uiNumCUsInFrame = uiNumCUsInFrame;
 }
@@ -2747,7 +2747,7 @@ Void AdaptiveLoopFilter::setNumCUsInFrame(UInt uiNumCUsInFrame)
 // CLASSIFICATION
 //***********************************
 
-Void AdaptiveLoopFilter::xClassify(Pel** classes, const CPelBuf& recSrcBuf, Int pad_size, Int fl)
+void AdaptiveLoopFilter::xClassify(Pel** classes, const CPelBuf& recSrcBuf, Int pad_size, Int fl)
 {
   Area blk(0, 0, recSrcBuf.width, recSrcBuf.height);
 #if GALF
@@ -2762,7 +2762,7 @@ static Pel Clip_post(int high, int val)
   return (Pel)(((val > high)? high: val));
 }
 
-Void AdaptiveLoopFilter::xClassifyByGeoLaplacian(Pel** classes, const CPelBuf& srcLumaBuf, Int pad_size, Int fl, const Area& blk)
+void AdaptiveLoopFilter::xClassifyByGeoLaplacian(Pel** classes, const CPelBuf& srcLumaBuf, Int pad_size, Int fl, const Area& blk)
 {
   Int i, j;
 
@@ -2782,7 +2782,7 @@ Void AdaptiveLoopFilter::xClassifyByGeoLaplacian(Pel** classes, const CPelBuf& s
     }
   }
 }
-Void AdaptiveLoopFilter::xClassifyByGeoLaplacianBlk(Pel** classes, const CPelBuf& srcLumaBuf, Int pad_size, Int fl, const Area& blk)
+void AdaptiveLoopFilter::xClassifyByGeoLaplacianBlk(Pel** classes, const CPelBuf& srcLumaBuf, Int pad_size, Int fl, const Area& blk)
 {
   const Int img_stride = srcLumaBuf.stride;
   const Pel* srcExt = srcLumaBuf.buf;
@@ -2939,7 +2939,7 @@ Int AdaptiveLoopFilter::selectTransposeVarInd(Int varInd, Int *transpose)
   return(varIndMod);
 }
 
-Void AdaptiveLoopFilter::xClassifyByLaplacian(Pel** classes, const CPelBuf& srcLumaBuf, Int pad_size, Int fl, const Area& blk)
+void AdaptiveLoopFilter::xClassifyByLaplacian(Pel** classes, const CPelBuf& srcLumaBuf, Int pad_size, Int fl, const Area& blk)
 {
   Int i, j;
 
@@ -2958,7 +2958,7 @@ Void AdaptiveLoopFilter::xClassifyByLaplacian(Pel** classes, const CPelBuf& srcL
   }
 }
 
-Void AdaptiveLoopFilter::xClassifyByLaplacianBlk(Pel** classes, const CPelBuf& srcLumaBuf, Int pad_size, Int fl, const Area& blk)
+void AdaptiveLoopFilter::xClassifyByLaplacianBlk(Pel** classes, const CPelBuf& srcLumaBuf, Int pad_size, Int fl, const Area& blk)
 {
   const Int img_stride = srcLumaBuf.stride;
   const Pel* srcExt = srcLumaBuf.buf;
@@ -3040,7 +3040,7 @@ Void AdaptiveLoopFilter::xClassifyByLaplacianBlk(Pel** classes, const CPelBuf& s
   }
 }
 
-Void AdaptiveLoopFilter::xFilterBlkGalf(PelUnitBuf &recDst, const CPelUnitBuf& recSrcExt, const Area& blk, AlfFilterType filtType, const ComponentID compId)
+void AdaptiveLoopFilter::xFilterBlkGalf(PelUnitBuf &recDst, const CPelUnitBuf& recSrcExt, const Area& blk, AlfFilterType filtType, const ComponentID compId)
 {
   const bool bChroma = compId != COMPONENT_Y;
   if( bChroma )
@@ -3453,7 +3453,7 @@ Void AdaptiveLoopFilter::xFilterBlkGalf(PelUnitBuf &recDst, const CPelUnitBuf& r
   }
 }
 
-Void AdaptiveLoopFilter::xFilterBlkAlf(PelBuf &recDst, const CPelBuf& recSrc, const Area& blk, AlfFilterType filtType)
+void AdaptiveLoopFilter::xFilterBlkAlf(PelBuf &recDst, const CPelBuf& recSrc, const Area& blk, AlfFilterType filtType)
 {
   const Int srcStride = recSrc.stride;
   const Int dstStride = recDst.stride;
@@ -3654,14 +3654,14 @@ Void AdaptiveLoopFilter::xFilterBlkAlf(PelBuf &recDst, const CPelBuf& recSrc, co
  \param iTap        filter tap
  \param iColor      0 for Cb and 1 for Cr
  */
-Void AdaptiveLoopFilter::xFrameChromaGalf(ALFParam* pcAlfParam, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, ComponentID compID)
+void AdaptiveLoopFilter::xFrameChromaGalf(ALFParam* pcAlfParam, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, ComponentID compID)
 {
   Int iHeight = recUnitBuf.get(compID).height;
   Int iWidth = recUnitBuf.get(compID).width;
   xFilterBlkGalf(recUnitBuf, recExtBuf, Area(0, 0, iWidth, iHeight), (AlfFilterType)0, compID);
 }
 
-Void AdaptiveLoopFilter::xFrameChromaAlf( ALFParam* pcAlfParam, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, ComponentID compID )
+void AdaptiveLoopFilter::xFrameChromaAlf( ALFParam* pcAlfParam, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, ComponentID compID )
 {
   Int iTap = pcAlfParam->tap_chroma;
   Int *qh  = pcAlfParam->coeff_chroma;
@@ -3952,7 +3952,7 @@ Void AdaptiveLoopFilter::xFrameChromaAlf( ALFParam* pcAlfParam, const PelUnitBuf
   }
 }
 
-Void AdaptiveLoopFilter::refreshAlfTempPred()
+void AdaptiveLoopFilter::refreshAlfTempPred()
 {
   ::memset( m_storedAlfParaNum, 0, sizeof(m_storedAlfParaNum));
 }

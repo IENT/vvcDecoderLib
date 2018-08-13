@@ -81,13 +81,13 @@ public:
    * append uiNumberOfBits least significant bits of uiBits to
    * the current bitstream
    */
-  Void        write           ( UInt uiBits, UInt uiNumberOfBits );
+  void        write           ( UInt uiBits, UInt uiNumberOfBits );
 
   /** insert one bits until the bitstream is byte-aligned */
-  Void        writeAlignOne   ();
+  void        writeAlignOne   ();
 
   /** insert zero bits until the bitstream is byte-aligned */
-  Void        writeAlignZero  ();
+  void        writeAlignZero  ();
 
   // utility functions
 
@@ -107,7 +107,7 @@ public:
   /**
    * Reset all internal state.
    */
-  Void clear();
+  void clear();
 
   /**
    * returns the number of bits that need to be written to
@@ -120,7 +120,7 @@ public:
    */
   UInt getNumberOfWrittenBits() const { return UInt(m_fifo.size()) * 8 + m_num_held_bits; }
 
-  Void insertAt(const OutputBitstream& src, UInt pos);
+  void insertAt(const OutputBitstream& src, UInt pos);
 
   /**
    * Return a reference to the internal fifo
@@ -133,8 +133,8 @@ public:
   /** Return a reference to the internal fifo */
   const std::vector<uint8_t>& getFIFO() const { return m_fifo; }
 
-  Void          addSubstream    ( OutputBitstream* pcSubstream );
-  Void writeByteAlignment();
+  void          addSubstream    ( OutputBitstream* pcSubstream );
+  void writeByteAlignment();
 
   //! returns the number of start code emulations contained in the current buffer
   Int countStartCodeEmulations();
@@ -164,12 +164,12 @@ public:
   virtual ~InputBitstream() { }
   InputBitstream(const InputBitstream &src);
 
-  Void resetToStart();
+  void resetToStart();
 
   // interface for decoding
-  Void        pseudoRead      ( UInt uiNumberOfBits, UInt& ruiBits );
-  Void        read            ( UInt uiNumberOfBits, UInt& ruiBits );
-  Void        readByte        ( UInt &ruiBits )
+  void        pseudoRead      ( UInt uiNumberOfBits, UInt& ruiBits );
+  void        read            ( UInt uiNumberOfBits, UInt& ruiBits );
+  void        readByte        ( UInt &ruiBits )
   {
     CHECK( m_fifo_idx >= m_fifo.size(), "FIFO exceeded" );
     ruiBits = m_fifo[m_fifo_idx++];
@@ -178,7 +178,7 @@ public:
 #endif
   }
 
-  Void        peekPreviousByte( UInt &byte )
+  void        peekPreviousByte( UInt &byte )
   {
     CHECK( m_fifo_idx == 0, "FIFO empty" );
     byte = m_fifo[m_fifo_idx - 1];
@@ -201,12 +201,12 @@ public:
   UInt  getNumBitsRead()            { return m_numBitsRead; }
   UInt  readByteAlignment();
 
-  Void      pushEmulationPreventionByteLocation ( UInt pos )                         { m_emulationPreventionByteLocation.push_back( pos ); }
+  void      pushEmulationPreventionByteLocation ( UInt pos )                         { m_emulationPreventionByteLocation.push_back( pos ); }
   UInt      numEmulationPreventionBytesRead     ()                                   { return (UInt) m_emulationPreventionByteLocation.size();    }
   const std::vector<UInt> &getEmulationPreventionByteLocation  () const              { return m_emulationPreventionByteLocation;           }
   UInt      getEmulationPreventionByteLocation  ( UInt idx )                         { return m_emulationPreventionByteLocation[ idx ];    }
-  Void      clearEmulationPreventionByteLocation()                                   { m_emulationPreventionByteLocation.clear();          }
-  Void      setEmulationPreventionByteLocation  ( const std::vector<UInt> &vec )     { m_emulationPreventionByteLocation = vec;            }
+  void      clearEmulationPreventionByteLocation()                                   { m_emulationPreventionByteLocation.clear();          }
+  void      setEmulationPreventionByteLocation  ( const std::vector<UInt> &vec )     { m_emulationPreventionByteLocation = vec;            }
 
   const std::vector<uint8_t> &getFifo() const { return m_fifo; }
         std::vector<uint8_t> &getFifo()       { return m_fifo; }

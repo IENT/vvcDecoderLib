@@ -75,19 +75,19 @@ protected:
   VLCWriter() : m_pcBitIf(NULL) {}
   virtual ~VLCWriter() {}
 
-  Void  setBitstream          ( OutputBitstream* p )  { m_pcBitIf = p;  }
+  void  setBitstream          ( OutputBitstream* p )  { m_pcBitIf = p;  }
 
-  Void  xWriteCode            ( UInt uiCode, UInt uiLength );
-  Void  xWriteUvlc            ( UInt uiCode );
-  Void  xWriteSvlc            ( Int  iCode   );
-  Void  xWriteFlag            ( UInt uiCode );
+  void  xWriteCode            ( UInt uiCode, UInt uiLength );
+  void  xWriteUvlc            ( UInt uiCode );
+  void  xWriteSvlc            ( Int  iCode   );
+  void  xWriteFlag            ( UInt uiCode );
 #if ENABLE_TRACING
-  Void  xWriteCodeTr          ( UInt value, UInt  length, const TChar *pSymbolName);
-  Void  xWriteUvlcTr          ( UInt value,               const TChar *pSymbolName);
-  Void  xWriteSvlcTr          ( Int  value,               const TChar *pSymbolName);
-  Void  xWriteFlagTr          ( UInt value,               const TChar *pSymbolName);
+  void  xWriteCodeTr          ( UInt value, UInt  length, const TChar *pSymbolName);
+  void  xWriteUvlcTr          ( UInt value,               const TChar *pSymbolName);
+  void  xWriteSvlcTr          ( Int  value,               const TChar *pSymbolName);
+  void  xWriteFlagTr          ( UInt value,               const TChar *pSymbolName);
 #endif
-  Void  xWriteRbspTrailingBits();
+  void  xWriteRbspTrailingBits();
 };
 
 
@@ -98,7 +98,7 @@ public:
   AUDWriter() {};
   virtual ~AUDWriter() {};
 
-  Void  codeAUD(OutputBitstream& bs, const Int pictureType);
+  void  codeAUD(OutputBitstream& bs, const Int pictureType);
 };
 
 
@@ -113,34 +113,34 @@ public:
   void  init( CABACDataStore& cabacDataStore ) { m_CABACDataStore = &cabacDataStore; }
 #endif
 private:
-  Void xCodeShortTermRefPicSet  ( const ReferencePictureSet* pcRPS, Bool calledFromSliceHeader, Int idx );
+  void xCodeShortTermRefPicSet  ( const ReferencePictureSet* pcRPS, Bool calledFromSliceHeader, Int idx );
   Bool xFindMatchingLTRP        ( Slice* pcSlice, UInt *ltrpsIndex, Int ltrpPOC, Bool usedFlag );
-  Void xCodePredWeightTable     ( Slice* pcSlice );
+  void xCodePredWeightTable     ( Slice* pcSlice );
 #if HEVC_USE_SCALING_LISTS
-  Void xCodeScalingList         ( const ScalingList* scalingList, UInt sizeId, UInt listId);
+  void xCodeScalingList         ( const ScalingList* scalingList, UInt sizeId, UInt listId);
 #endif
 #if JEM_TOOLS
   void xCodeCABACWSizes         ( Slice* pcSlice );
 #endif
 public:
-  Void  setBitstream            ( OutputBitstream* p )  { m_pcBitIf = p;  }
+  void  setBitstream            ( OutputBitstream* p )  { m_pcBitIf = p;  }
   UInt  getNumberOfWrittenBits  ()                      { return m_pcBitIf->getNumberOfWrittenBits();  }
-  Void  codeVUI                 ( const VUI *pcVUI, const SPS* pcSPS );
-  Void  codeSPSNext             ( const SPSNext& spsNext, const bool usePCM );
-  Void  codeSPS                 ( const SPS* pcSPS );
-  Void  codePPS                 ( const PPS* pcPPS );
+  void  codeVUI                 ( const VUI *pcVUI, const SPS* pcSPS );
+  void  codeSPSNext             ( const SPSNext& spsNext, const bool usePCM );
+  void  codeSPS                 ( const SPS* pcSPS );
+  void  codePPS                 ( const PPS* pcPPS );
 #if HEVC_VPS
-  Void  codeVPS                 ( const VPS* pcVPS );
+  void  codeVPS                 ( const VPS* pcVPS );
 #endif
-  Void  codeSliceHeader         ( Slice* pcSlice );
-  Void  codePTL                 ( const PTL* pcPTL, Bool profilePresentFlag, Int maxNumSubLayersMinus1);
-  Void  codeProfileTier         ( const ProfileTierLevel* ptl, const Bool bIsSubLayer );
-  Void  codeHrdParameters       ( const HRD *hrd, Bool commonInfPresentFlag, UInt maxNumSubLayersMinus1 );
+  void  codeSliceHeader         ( Slice* pcSlice );
+  void  codePTL                 ( const PTL* pcPTL, Bool profilePresentFlag, Int maxNumSubLayersMinus1);
+  void  codeProfileTier         ( const ProfileTierLevel* ptl, const Bool bIsSubLayer );
+  void  codeHrdParameters       ( const HRD *hrd, Bool commonInfPresentFlag, UInt maxNumSubLayersMinus1 );
 #if HEVC_TILES_WPP
-  Void  codeTilesWPPEntryPoint  ( Slice* pSlice );
+  void  codeTilesWPPEntryPoint  ( Slice* pSlice );
 #endif
 #if HEVC_USE_SCALING_LISTS
-  Void  codeScalingList         ( const ScalingList &scalingList );
+  void  codeScalingList         ( const ScalingList &scalingList );
 #endif
 
 #if JVET_K0371_ALF

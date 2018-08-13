@@ -64,7 +64,7 @@
 // Full-pel copy 8-bit/16-bit
 // ===========================
 template<typename Tsrc, Int N, Bool isFirst, Bool isLast>
-static Void fullPelCopySSE( const ClpRng& clpRng, const Void*_src, Int srcStride, Short *dst, Int dstStride, Int width, Int height )
+static void fullPelCopySSE( const ClpRng& clpRng, const void*_src, Int srcStride, Short *dst, Int dstStride, Int width, Int height )
 {
   Tsrc* src = (Tsrc*)_src;
 
@@ -193,7 +193,7 @@ static void fullPelCopyAVX2( const ClpRng& clpRng, const void*_src, int srcStrid
 
 
 template<X86_VEXT vext, Bool isFirst, Bool isLast>
-static Void simdFilterCopy( const ClpRng& clpRng, const Pel* src, Int srcStride, Short* dst, Int dstStride, Int width, Int height )
+static void simdFilterCopy( const ClpRng& clpRng, const Pel* src, Int srcStride, Short* dst, Int dstStride, Int width, Int height )
 {
 #if !HM_JEM_CLIP_PEL
   if( vext >= AVX2 && ( width % 16 ) == 0 )
@@ -218,7 +218,7 @@ static Void simdFilterCopy( const ClpRng& clpRng, const Pel* src, Int srcStride,
 
 // SIMD interpolation horizontal, block width modulo 4
 template<X86_VEXT vext, Int N, bool shiftBack>
-static Void simdInterpolateHorM4( const Short* src, Int srcStride, Short *dst, Int dstStride, Int width, Int height, Int shift, Int offset, const ClpRng& clpRng, Short const *coeff )
+static void simdInterpolateHorM4( const Short* src, Int srcStride, Short *dst, Int dstStride, Int width, Int height, Int shift, Int offset, const ClpRng& clpRng, Short const *coeff )
 {
   _mm_prefetch( (const char*)src + srcStride, _MM_HINT_T0 );
   __m128i voffset = _mm_set1_epi32( offset );
@@ -288,7 +288,7 @@ static Void simdInterpolateHorM4( const Short* src, Int srcStride, Short *dst, I
 
 // SIMD interpolation horizontal, block width modulo 8
 template<X86_VEXT vext, Int N, bool shiftBack>
-static Void simdInterpolateHorM8( const Short* src, Int srcStride, Short *dst, Int dstStride, Int width, Int height, Int shift, Int offset, const ClpRng& clpRng, Short const *coeff )
+static void simdInterpolateHorM8( const Short* src, Int srcStride, Short *dst, Int dstStride, Int width, Int height, Int shift, Int offset, const ClpRng& clpRng, Short const *coeff )
 {
   const Int filterSpan = ( N - 1 );
   _mm_prefetch( (const char*)src + srcStride, _MM_HINT_T0 );
@@ -565,7 +565,7 @@ static void simdInterpolateHorM16_AVX2( const Short* src, Int srcStride, Short *
 
 
 template<X86_VEXT vext, Int N, bool shiftBack>
-static Void simdInterpolateVerM4( const Short *src, Int srcStride, Short *dst, Int dstStride, Int width, Int height, Int shift, Int offset, const ClpRng& clpRng, Short const *coeff )
+static void simdInterpolateVerM4( const Short *src, Int srcStride, Short *dst, Int dstStride, Int width, Int height, Int shift, Int offset, const ClpRng& clpRng, Short const *coeff )
 {
   const Short *srcOrig = src;
   Short *dstOrig = dst;
@@ -633,7 +633,7 @@ static Void simdInterpolateVerM4( const Short *src, Int srcStride, Short *dst, I
 
 
 template<X86_VEXT vext, Int N, bool shiftBack>
-static Void simdInterpolateVerM8( const Short *src, Int srcStride, Short *dst, Int dstStride, Int width, Int height, Int shift, Int offset, const ClpRng& clpRng, Short const *coeff )
+static void simdInterpolateVerM8( const Short *src, Int srcStride, Short *dst, Int dstStride, Int width, Int height, Int shift, Int offset, const ClpRng& clpRng, Short const *coeff )
 {
 //   src -= ( N / 2 - 1 ) * srcStride;
   const Pel *srcOrig = src;
@@ -715,7 +715,7 @@ static Void simdInterpolateVerM8( const Short *src, Int srcStride, Short *dst, I
 // template<typename Tdst, int N, bool shiftBack, bool biPred, bool bWeight, bool bChromaIntl>
 // static void qpelV16AVX2M8( const short* src, int srcStride, Tdst *dst, int dstStride, int width, int height, int shift, int bitdepth, short const *coeff, wpPredParam *pwp1=NULL, wpPredParam *pwp2=NULL )
 template<X86_VEXT vext, Int N, bool shiftBack>
-static Void simdInterpolateVerM8_AVX2( const Short *src, Int srcStride, Short *dst, Int dstStride, Int width, Int height, Int shift, Int offset, const ClpRng& clpRng, Short const *coeff )
+static void simdInterpolateVerM8_AVX2( const Short *src, Int srcStride, Short *dst, Int dstStride, Int width, Int height, Int shift, Int offset, const ClpRng& clpRng, Short const *coeff )
 {
 #ifdef USE_AVX2
 
@@ -781,7 +781,7 @@ static Void simdInterpolateVerM8_AVX2( const Short *src, Int srcStride, Short *d
 // template<typename Tdst, int N, bool shiftBack, bool biPred, bool bWeight, bool bChromaIntl>
 // static void qpelV16AVX2M16( const short *src, int srcStride, Tdst *dst, int dstStride, int width, int height, int shift, int bitdepth, short const *coeff, wpPredParam *pwp1=NULL, wpPredParam *pwp2=NULL )
 template<X86_VEXT vext, Int N, bool shiftBack>
-static Void simdInterpolateVerM16_AVX2( const Short *src, Int srcStride, Short *dst, Int dstStride, Int width, Int height, Int shift, Int offset, const ClpRng& clpRng, Short const *coeff )
+static void simdInterpolateVerM16_AVX2( const Short *src, Int srcStride, Short *dst, Int dstStride, Int width, Int height, Int shift, Int offset, const ClpRng& clpRng, Short const *coeff )
 {
 #ifdef USE_AVX2
   __m256i voffset    = _mm256_set1_epi32( offset );
@@ -929,7 +929,7 @@ static inline __m128i simdClip3( __m128i mmMin, __m128i mmMax, __m128i mmPix )
 }
 
 template<X86_VEXT vext, bool isLast>
-static Void simdInterpolateN2_M8( const Short* src, Int srcStride, Short *dst, Int dstStride, Int cStride, Int width, Int height, Int shift, Int offset, const ClpRng& clpRng, Short const *c )
+static void simdInterpolateN2_M8( const Short* src, Int srcStride, Short *dst, Int dstStride, Int cStride, Int width, Int height, Int shift, Int offset, const ClpRng& clpRng, Short const *c )
 {
   Int row, col;
   __m128i mmOffset = _mm_set1_epi32( offset );
@@ -955,7 +955,7 @@ static Void simdInterpolateN2_M8( const Short* src, Int srcStride, Short *dst, I
 }
 
 template<X86_VEXT vext, bool isLast>
-static Void simdInterpolateN2_M4( const Short* src, Int srcStride, Short *dst, Int dstStride, Int cStride, Int width, Int height, Int shift, Int offset, const ClpRng& clpRng, Short const *c )
+static void simdInterpolateN2_M4( const Short* src, Int srcStride, Short *dst, Int dstStride, Int cStride, Int width, Int height, Int shift, Int offset, const ClpRng& clpRng, Short const *c )
 {
   Int row, col;
   __m128i mmOffset = _mm_set1_epi32( offset );
@@ -981,7 +981,7 @@ static Void simdInterpolateN2_M4( const Short* src, Int srcStride, Short *dst, I
 }
 
 template<X86_VEXT vext, Int N, Bool isVertical, Bool isFirst, Bool isLast>
-static Void simdFilter( const ClpRng& clpRng, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, TFilterCoeff const *coeff )
+static void simdFilter( const ClpRng& clpRng, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, TFilterCoeff const *coeff )
 {
   Int row, col;
 
@@ -1125,7 +1125,7 @@ static Void simdFilter( const ClpRng& clpRng, Pel const *src, Int srcStride, Pel
 }
 
 template <X86_VEXT vext>
-Void InterpolationFilter::_initInterpolationFilterX86()
+void InterpolationFilter::_initInterpolationFilterX86()
 {
   // [taps][bFirst][bLast]
   m_filterHor[0][0][0] = simdFilter<vext, 8, false, false, false>;
@@ -1164,7 +1164,7 @@ Void InterpolationFilter::_initInterpolationFilterX86()
   m_filterCopy[1][1]   = simdFilterCopy<vext, true, true>;
 }
 
-template Void InterpolationFilter::_initInterpolationFilterX86<SIMDX86>();
+template void InterpolationFilter::_initInterpolationFilterX86<SIMDX86>();
 
 #endif //#ifdef TARGET_SIMD_X86
 //! \}

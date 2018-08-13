@@ -158,7 +158,7 @@ struct CompArea : public Area
 
 private:
 
-  Void xRecalcLumaToChroma();
+  void xRecalcLumaToChroma();
 };
 
 inline CompArea clipArea(const CompArea &compArea, const Area &boundingBox)
@@ -214,7 +214,7 @@ struct UnitArea
     return true;
   }
 
-  Void repositionTo(const UnitArea& unit);
+  void repositionTo(const UnitArea& unit);
 
   const Bool operator!=(const UnitArea &other) const { return !(*this == other); }
 
@@ -334,7 +334,7 @@ struct CodingUnit : public UnitArea
 
   CodingUnit& operator=( const CodingUnit& other );
 
-  Void initData();
+  void initData();
 
   unsigned    idx;
   CodingUnit *next;
@@ -391,7 +391,7 @@ struct PredictionUnit : public UnitArea, public IntraPredictionData, public Inte
   PredictionUnit(const UnitArea &unit);
   PredictionUnit(const ChromaFormat _chromaFormat, const Area &area);
 
-  Void initData();
+  void initData();
 
   PredictionUnit& operator=(const IntraPredictionData& predData);
   PredictionUnit& operator=(const InterPredictionData& predData);
@@ -444,15 +444,15 @@ struct TransformUnit : public UnitArea
   TransformUnit(const UnitArea& unit);
   TransformUnit(const ChromaFormat _chromaFormat, const Area &area);
 
-  Void initData();
+  void initData();
 
   unsigned       idx;
   TransformUnit *next;
 
-  Void init(TCoeff **coeffs, Pel **pcmbuf);
+  void init(TCoeff **coeffs, Pel **pcmbuf);
 
   TransformUnit& operator=(const TransformUnit& other);
-  Void copyComponentFrom  (const TransformUnit& other, const ComponentID compID);
+  void copyComponentFrom  (const TransformUnit& other, const ComponentID compID);
 
          CoeffBuf getCoeffs(const ComponentID id);
   const CCoeffBuf getCoeffs(const ComponentID id) const;

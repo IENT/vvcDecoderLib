@@ -45,9 +45,9 @@ std::string hashToString(const PictureHash &digest, Int numChar);
 //! \{
 
 #if HEVC_VPS
-Void SEIEncoder::initSEIActiveParameterSets (SEIActiveParameterSets *seiActiveParameterSets, const VPS *vps, const SPS *sps)
+void SEIEncoder::initSEIActiveParameterSets (SEIActiveParameterSets *seiActiveParameterSets, const VPS *vps, const SPS *sps)
 #else
-Void SEIEncoder::initSEIActiveParameterSets (SEIActiveParameterSets *seiActiveParameterSets, const SPS *sps)
+void SEIEncoder::initSEIActiveParameterSets (SEIActiveParameterSets *seiActiveParameterSets, const SPS *sps)
 #endif
 {
   CHECK(!(m_isInitialized), "Unspecified error");
@@ -67,7 +67,7 @@ Void SEIEncoder::initSEIActiveParameterSets (SEIActiveParameterSets *seiActivePa
   seiActiveParameterSets->activeSeqParameterSetId[0] = sps->getSPSId();
 }
 
-Void SEIEncoder::initSEIFramePacking(SEIFramePacking *seiFramePacking, Int currPicNum)
+void SEIEncoder::initSEIFramePacking(SEIFramePacking *seiFramePacking, Int currPicNum)
 {
   CHECK(!(m_isInitialized), "Unspecified error");
   CHECK(!(seiFramePacking!=NULL), "Unspecified error");
@@ -93,7 +93,7 @@ Void SEIEncoder::initSEIFramePacking(SEIFramePacking *seiFramePacking, Int currP
   seiFramePacking->m_upsampledAspectRatio = 0;
 }
 
-Void SEIEncoder::initSEISegmentedRectFramePacking(SEISegmentedRectFramePacking *seiSegmentedRectFramePacking)
+void SEIEncoder::initSEISegmentedRectFramePacking(SEISegmentedRectFramePacking *seiSegmentedRectFramePacking)
 {
   CHECK(!(m_isInitialized), "Unspecified error");
   CHECK(!(seiSegmentedRectFramePacking!=NULL), "Unspecified error");
@@ -103,7 +103,7 @@ Void SEIEncoder::initSEISegmentedRectFramePacking(SEISegmentedRectFramePacking *
   seiSegmentedRectFramePacking->m_arrangementPersistenceFlag = m_pcCfg->getSegmentedRectFramePackingArrangementSEIPersistence();
 }
 
-Void SEIEncoder::initSEIDisplayOrientation(SEIDisplayOrientation* seiDisplayOrientation)
+void SEIEncoder::initSEIDisplayOrientation(SEIDisplayOrientation* seiDisplayOrientation)
 {
   CHECK(!(m_isInitialized), "Unspecified error");
   CHECK(!(seiDisplayOrientation!=NULL), "Unspecified error");
@@ -114,7 +114,7 @@ Void SEIEncoder::initSEIDisplayOrientation(SEIDisplayOrientation* seiDisplayOrie
   seiDisplayOrientation->anticlockwiseRotation = m_pcCfg->getDisplayOrientationSEIAngle();
 }
 
-Void SEIEncoder::initSEIToneMappingInfo(SEIToneMappingInfo *seiToneMappingInfo)
+void SEIEncoder::initSEIToneMappingInfo(SEIToneMappingInfo *seiToneMappingInfo)
 {
   CHECK(!(m_isInitialized), "Unspecified error");
   CHECK(!(seiToneMappingInfo!=NULL), "Unspecified error");
@@ -204,7 +204,7 @@ Void SEIEncoder::initSEIToneMappingInfo(SEIToneMappingInfo *seiToneMappingInfo)
   }
 }
 
-Void SEIEncoder::initSEISOPDescription(SEISOPDescription *sopDescriptionSEI, Slice *slice, Int picInGOP, Int lastIdr, Int currGOPSize)
+void SEIEncoder::initSEISOPDescription(SEISOPDescription *sopDescriptionSEI, Slice *slice, Int picInGOP, Int lastIdr, Int currGOPSize)
 {
   CHECK(!(m_isInitialized), "Unspecified error");
   CHECK(!(sopDescriptionSEI != NULL), "Unspecified error");
@@ -234,7 +234,7 @@ Void SEIEncoder::initSEISOPDescription(SEISOPDescription *sopDescriptionSEI, Sli
   sopDescriptionSEI->m_numPicsInSopMinus1 = i - 1;
 }
 
-Void SEIEncoder::initSEIBufferingPeriod(SEIBufferingPeriod *bufferingPeriodSEI, Slice *slice)
+void SEIEncoder::initSEIBufferingPeriod(SEIBufferingPeriod *bufferingPeriodSEI, Slice *slice)
 {
   CHECK(!(m_isInitialized), "Unspecified error");
   CHECK(!(bufferingPeriodSEI != NULL), "Unspecified error");
@@ -268,7 +268,7 @@ Void SEIEncoder::initSEIBufferingPeriod(SEIBufferingPeriod *bufferingPeriodSEI, 
 //! initialize scalable nesting SEI message.
 //! Note: The SEI message structures input into this function will become part of the scalable nesting SEI and will be
 //!       automatically freed, when the nesting SEI is disposed.
-Void SEIEncoder::initSEIScalableNesting(SEIScalableNesting *scalableNestingSEI, SEIMessages &nestedSEIs)
+void SEIEncoder::initSEIScalableNesting(SEIScalableNesting *scalableNestingSEI, SEIMessages &nestedSEIs)
 {
   CHECK(!(m_isInitialized), "Unspecified error");
   CHECK(!(scalableNestingSEI != NULL), "Unspecified error");
@@ -288,7 +288,7 @@ Void SEIEncoder::initSEIScalableNesting(SEIScalableNesting *scalableNestingSEI, 
   }
 }
 
-Void SEIEncoder::initSEIRecoveryPoint(SEIRecoveryPoint *recoveryPointSEI, Slice *slice)
+void SEIEncoder::initSEIRecoveryPoint(SEIRecoveryPoint *recoveryPointSEI, Slice *slice)
 {
   CHECK(!(m_isInitialized), "Unspecified error");
   CHECK(!(recoveryPointSEI != NULL), "Unspecified error");
@@ -301,7 +301,7 @@ Void SEIEncoder::initSEIRecoveryPoint(SEIRecoveryPoint *recoveryPointSEI, Slice 
 
 
 //! calculate hashes for entire reconstructed picture
-Void SEIEncoder::initDecodedPictureHashSEI(SEIDecodedPictureHash *decodedPictureHashSEI, PelUnitBuf& pic, std::string &rHashString, const BitDepths &bitDepths)
+void SEIEncoder::initDecodedPictureHashSEI(SEIDecodedPictureHash *decodedPictureHashSEI, PelUnitBuf& pic, std::string &rHashString, const BitDepths &bitDepths)
 {
   CHECK(!(m_isInitialized), "Unspecified error");
   CHECK(!(decodedPictureHashSEI!=NULL), "Unspecified error");
@@ -331,7 +331,7 @@ Void SEIEncoder::initDecodedPictureHashSEI(SEIDecodedPictureHash *decodedPicture
   }
 }
 
-Void SEIEncoder::initTemporalLevel0IndexSEI(SEITemporalLevel0Index *temporalLevel0IndexSEI, Slice *slice)
+void SEIEncoder::initTemporalLevel0IndexSEI(SEITemporalLevel0Index *temporalLevel0IndexSEI, Slice *slice)
 {
   CHECK(!(m_isInitialized), "Unspecified error");
   CHECK(!(temporalLevel0IndexSEI!=NULL), "Unspecified error");
@@ -351,7 +351,7 @@ Void SEIEncoder::initTemporalLevel0IndexSEI(SEITemporalLevel0Index *temporalLeve
 }
 
 #if HEVC_TILES_WPP
-Void SEIEncoder::initSEITempMotionConstrainedTileSets (SEITempMotionConstrainedTileSets *sei, const PPS *pps)
+void SEIEncoder::initSEITempMotionConstrainedTileSets (SEITempMotionConstrainedTileSets *sei, const PPS *pps)
 {
   CHECK(!(m_isInitialized), "Unspecified error");
   CHECK(!(sei!=NULL), "Unspecified error");
@@ -386,7 +386,7 @@ Void SEIEncoder::initSEITempMotionConstrainedTileSets (SEITempMotionConstrainedT
 }
 #endif
 
-Void SEIEncoder::initSEIKneeFunctionInfo(SEIKneeFunctionInfo *seiKneeFunctionInfo)
+void SEIEncoder::initSEIKneeFunctionInfo(SEIKneeFunctionInfo *seiKneeFunctionInfo)
 {
   CHECK(!(m_isInitialized), "Unspecified error");
   CHECK(!(seiKneeFunctionInfo!=NULL), "Unspecified error");
@@ -418,7 +418,7 @@ Void SEIEncoder::initSEIKneeFunctionInfo(SEIKneeFunctionInfo *seiKneeFunctionInf
 }
 
 template <typename T>
-static Void readTokenValue(T            &returnedValue, /// value returned
+static void readTokenValue(T            &returnedValue, /// value returned
                            Bool         &failed,        /// used and updated
                            std::istream &is,            /// stream to read token from
                            const TChar  *pToken)        /// token string
@@ -467,7 +467,7 @@ static Void readTokenValue(T            &returnedValue, /// value returned
 }
 
 template <typename T>
-static Void readTokenValueAndValidate(T            &returnedValue, /// value returned
+static void readTokenValueAndValidate(T            &returnedValue, /// value returned
                                       Bool         &failed,        /// used and updated
                                       std::istream &is,            /// stream to read token from
                                       const TChar  *pToken,        /// token string
@@ -486,7 +486,7 @@ static Void readTokenValueAndValidate(T            &returnedValue, /// value ret
 }
 
 // Bool version does not have maximum and minimum values.
-static Void readTokenValueAndValidate(Bool         &returnedValue, /// value returned
+static void readTokenValueAndValidate(Bool         &returnedValue, /// value returned
                                       Bool         &failed,        /// used and updated
                                       std::istream &is,            /// stream to read token from
                                       const TChar  *pToken)        /// token string
@@ -588,7 +588,7 @@ Bool SEIEncoder::initSEIColourRemappingInfo(SEIColourRemappingInfo* seiColourRem
   return true;
 }
 
-Void SEIEncoder::initSEIChromaResamplingFilterHint(SEIChromaResamplingFilterHint *seiChromaResamplingFilterHint, Int iHorFilterIndex, Int iVerFilterIndex)
+void SEIEncoder::initSEIChromaResamplingFilterHint(SEIChromaResamplingFilterHint *seiChromaResamplingFilterHint, Int iHorFilterIndex, Int iVerFilterIndex)
 {
   CHECK(!(m_isInitialized), "Unspecified error");
   CHECK(!(seiChromaResamplingFilterHint!=NULL), "Unspecified error");
@@ -653,7 +653,7 @@ Void SEIEncoder::initSEIChromaResamplingFilterHint(SEIChromaResamplingFilterHint
   }
 }
 
-Void SEIEncoder::initSEITimeCode(SEITimeCode *seiTimeCode)
+void SEIEncoder::initSEITimeCode(SEITimeCode *seiTimeCode)
 {
   CHECK(!(m_isInitialized), "Unspecified error");
   CHECK(!(seiTimeCode!=NULL), "Unspecified error");
@@ -666,7 +666,7 @@ Void SEIEncoder::initSEITimeCode(SEITimeCode *seiTimeCode)
 }
 
 #if U0033_ALTERNATIVE_TRANSFER_CHARACTERISTICS_SEI
-Void SEIEncoder::initSEIAlternativeTransferCharacteristics(SEIAlternativeTransferCharacteristics *seiAltTransCharacteristics)
+void SEIEncoder::initSEIAlternativeTransferCharacteristics(SEIAlternativeTransferCharacteristics *seiAltTransCharacteristics)
 {
   CHECK(!(m_isInitialized), "Unspecified error");
   CHECK(!(seiAltTransCharacteristics!=NULL), "Unspecified error");
@@ -675,7 +675,7 @@ Void SEIEncoder::initSEIAlternativeTransferCharacteristics(SEIAlternativeTransfe
 }
 #endif
 
-Void SEIEncoder::initSEIGreenMetadataInfo(SEIGreenMetadataInfo *seiGreenMetadataInfo, UInt u)
+void SEIEncoder::initSEIGreenMetadataInfo(SEIGreenMetadataInfo *seiGreenMetadataInfo, UInt u)
 {
     CHECK(!(m_isInitialized), "Unspecified error");
     CHECK(!(seiGreenMetadataInfo!=NULL), "Unspecified error");

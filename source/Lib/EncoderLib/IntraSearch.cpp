@@ -90,7 +90,7 @@ IntraSearch::IntraSearch()
 }
 
 
-Void IntraSearch::destroy()
+void IntraSearch::destroy()
 {
   CHECK( !m_isInitialized, "Not initialized" );
 
@@ -190,7 +190,7 @@ IntraSearch::~IntraSearch()
   }
 }
 
-Void IntraSearch::init( EncCfg*        pcEncCfg,
+void IntraSearch::init( EncCfg*        pcEncCfg,
                         TrQuant*       pcTrQuant,
                         RdCost*        pcRdCost,
 #if JEM_TOOLS
@@ -300,7 +300,7 @@ Void IntraSearch::init( EncCfg*        pcEncCfg,
 // INTRA PREDICTION
 //////////////////////////////////////////////////////////////////////////
 
-Void IntraSearch::estIntraPredLumaQT( CodingUnit &cu, Partitioner &partitioner )
+void IntraSearch::estIntraPredLumaQT( CodingUnit &cu, Partitioner &partitioner )
 {
   CodingStructure       &cs            = *cu.cs;
   const SPS             &sps           = *cs.sps;
@@ -897,7 +897,7 @@ Void IntraSearch::estIntraPredLumaQT( CodingUnit &cu, Partitioner &partitioner )
   m_CABACEstimator->getCtx() = ctxStart;
 }
 
-Void IntraSearch::estIntraPredChromaQT(CodingUnit &cu, Partitioner &partitioner)
+void IntraSearch::estIntraPredChromaQT(CodingUnit &cu, Partitioner &partitioner)
 {
   const ChromaFormat format   = cu.chromaFormat;
   const UInt    numberValidComponents = getNumberValidComponents(format);
@@ -1164,7 +1164,7 @@ Void IntraSearch::estIntraPredChromaQT(CodingUnit &cu, Partitioner &partitioner)
   m_CABACEstimator->getCtx() = ctxStart;
 }
 
-Void IntraSearch::IPCMSearch(CodingStructure &cs, Partitioner& partitioner)
+void IntraSearch::IPCMSearch(CodingStructure &cs, Partitioner& partitioner)
 {
   for (UInt ch = 0; ch < getNumberValidTBlocks( *cs.pcv ); ch++)
   {
@@ -1185,7 +1185,7 @@ Void IntraSearch::IPCMSearch(CodingStructure &cs, Partitioner& partitioner)
   cs.picture->getRecoBuf(cs.area).copyFrom(cs.getRecoBuf());
 }
 
-Void IntraSearch::xEncPCM(CodingStructure &cs, Partitioner& partitioner, const ComponentID &compID)
+void IntraSearch::xEncPCM(CodingStructure &cs, Partitioner& partitioner, const ComponentID &compID)
 {
   TransformUnit &tu = *cs.getTU( partitioner.chType );
 
@@ -1217,7 +1217,7 @@ Void IntraSearch::xEncPCM(CodingStructure &cs, Partitioner& partitioner, const C
 // Intra search
 // -------------------------------------------------------------------------------------------------------------------
 
-Void IntraSearch::xEncIntraHeader(CodingStructure &cs, Partitioner &partitioner, const Bool &bLuma, const Bool &bChroma)
+void IntraSearch::xEncIntraHeader(CodingStructure &cs, Partitioner &partitioner, const Bool &bLuma, const Bool &bChroma)
 {
   CodingUnit &cu = *cs.getCU( partitioner.chType );
 
@@ -1278,7 +1278,7 @@ Void IntraSearch::xEncIntraHeader(CodingStructure &cs, Partitioner &partitioner,
   }
 }
 
-Void IntraSearch::xEncSubdivCbfQT(CodingStructure &cs, Partitioner &partitioner, const Bool &bLuma, const Bool &bChroma)
+void IntraSearch::xEncSubdivCbfQT(CodingStructure &cs, Partitioner &partitioner, const Bool &bLuma, const Bool &bChroma)
 {
   const UnitArea &currArea = partitioner.currArea();
   TransformUnit &currTU    = *cs.getTU( currArea.blocks[partitioner.chType], partitioner.chType );
@@ -1379,7 +1379,7 @@ Void IntraSearch::xEncSubdivCbfQT(CodingStructure &cs, Partitioner &partitioner,
   }
 }
 
-Void IntraSearch::xEncCoeffQT(CodingStructure &cs, Partitioner &partitioner, const ComponentID &compID)
+void IntraSearch::xEncCoeffQT(CodingStructure &cs, Partitioner &partitioner, const ComponentID &compID)
 {
   const UnitArea &currArea  = partitioner.currArea();
   TransformUnit &currTU     = *cs.getTU( currArea.blocks[partitioner.chType], partitioner.chType );
@@ -1468,7 +1468,7 @@ UInt64 IntraSearch::xGetIntraFracBitsQTChroma(TransformUnit& currTU, const Compo
   return fracBits;
 }
 
-Void IntraSearch::xIntraCodingTUBlock(TransformUnit &tu, const ComponentID &compID, const Bool &checkCrossCPrediction, Distortion& ruiDist, const Int &default0Save1Load2, UInt* numSig )
+void IntraSearch::xIntraCodingTUBlock(TransformUnit &tu, const ComponentID &compID, const Bool &checkCrossCPrediction, Distortion& ruiDist, const Int &default0Save1Load2, UInt* numSig )
 {
   if (!tu.blocks[compID].valid())
   {
@@ -1684,7 +1684,7 @@ Void IntraSearch::xIntraCodingTUBlock(TransformUnit &tu, const ComponentID &comp
   }
 }
 
-Void IntraSearch::xRecurIntraCodingLumaQT( CodingStructure &cs, Partitioner &partitioner )
+void IntraSearch::xRecurIntraCodingLumaQT( CodingStructure &cs, Partitioner &partitioner )
 {
   const UnitArea &currArea = partitioner.currArea();
   const CodingUnit &cu     = *cs.getCU(currArea.lumaPos(), partitioner.chType);

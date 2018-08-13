@@ -444,7 +444,7 @@ public:
   SEIColourRemappingInfo() {}
   ~SEIColourRemappingInfo() {}
 
-  Void copyFrom( const SEIColourRemappingInfo &seiCriInput)
+  void copyFrom( const SEIColourRemappingInfo &seiCriInput)
   {
     (*this) = seiCriInput;
   }
@@ -503,7 +503,7 @@ SEIMessages getSeisByType(SEIMessages &seiList, SEI::PayloadType seiType);
 SEIMessages extractSeisByType(SEIMessages &seiList, SEI::PayloadType seiType);
 
 /// delete list of SEI messages (freeing the referenced objects)
-Void deleteSEIs (SEIMessages &seiList);
+void deleteSEIs (SEIMessages &seiList);
 
 class SEIScalableNesting : public SEI
 {
@@ -562,7 +562,7 @@ class SEITempMotionConstrainedTileSets: public SEI
       Bool    m_mcts_tier_flag;
       Int     m_mcts_level_idc;
 
-      Void setNumberOfTileRects(const Int number)
+      void setNumberOfTileRects(const Int number)
       {
         m_top_left_tile_index    .resize(number);
         m_bottom_right_tile_index.resize(number);
@@ -594,7 +594,7 @@ public:
 
   PayloadType payloadType() const { return TEMP_MOTION_CONSTRAINED_TILE_SETS; }
 
-  Void setNumberOfTileSets(const Int number)       { m_tile_set_data.resize(number);     }
+  void setNumberOfTileSets(const Int number)       { m_tile_set_data.resize(number);     }
   Int  getNumberOfTileSets()                 const { return Int(m_tile_set_data.size()); }
 
         TileSetData &tileSetData (const Int index)       { return m_tile_set_data[index]; }
@@ -604,8 +604,8 @@ public:
 #endif
 
 #if ENABLE_TRACING
-Void xTraceSEIHeader();
-Void xTraceSEIMessageType( SEI::PayloadType payloadType );
+void xTraceSEIHeader();
+void xTraceSEIMessageType( SEI::PayloadType payloadType );
 #endif
 
 #if U0033_ALTERNATIVE_TRANSFER_CHARACTERISTICS_SEI

@@ -65,14 +65,14 @@ class SampleAdaptiveOffset
 public:
   SampleAdaptiveOffset();
   virtual ~SampleAdaptiveOffset();
-  Void SAOProcess( CodingStructure& cs, SAOBlkParam* saoBlkParams
+  void SAOProcess( CodingStructure& cs, SAOBlkParam* saoBlkParams
                    );
-  Void create( Int picWidth, Int picHeight, ChromaFormat format, UInt maxCUWidth, UInt maxCUHeight, UInt maxCUDepth, UInt lumaBitShift, UInt chromaBitShift );
-  Void destroy();
+  void create( Int picWidth, Int picHeight, ChromaFormat format, UInt maxCUWidth, UInt maxCUHeight, UInt maxCUDepth, UInt lumaBitShift, UInt chromaBitShift );
+  void destroy();
   static Int getMaxOffsetQVal(const Int channelBitDepth) { return (1<<(std::min<Int>(channelBitDepth,MAX_SAO_TRUNCATED_BITDEPTH)-5))-1; } //Table 9-32, inclusive
 
 protected:
-  Void deriveLoopFilterBoundaryAvailibility(CodingStructure& cs, const Position &pos,
+  void deriveLoopFilterBoundaryAvailibility(CodingStructure& cs, const Position &pos,
     Bool& isLeftAvail,
     Bool& isRightAvail,
     Bool& isAboveAvail,
@@ -83,16 +83,16 @@ protected:
     Bool& isBelowRightAvail
     ) const;
 
-  Void offsetBlock(const Int channelBitDepth, const ClpRng& clpRng, Int typeIdx, Int* offset, const Pel* srcBlk, Pel* resBlk, Int srcStride, Int resStride,  Int width, Int height
+  void offsetBlock(const Int channelBitDepth, const ClpRng& clpRng, Int typeIdx, Int* offset, const Pel* srcBlk, Pel* resBlk, Int srcStride, Int resStride,  Int width, Int height
                   , Bool isLeftAvail, Bool isRightAvail, Bool isAboveAvail, Bool isBelowAvail, Bool isAboveLeftAvail, Bool isAboveRightAvail, Bool isBelowLeftAvail, Bool isBelowRightAvail);
-  Void invertQuantOffsets(ComponentID compIdx, Int typeIdc, Int typeAuxInfo, Int* dstOffsets, Int* srcOffsets);
-  Void reconstructBlkSAOParam(SAOBlkParam& recParam, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES]);
+  void invertQuantOffsets(ComponentID compIdx, Int typeIdc, Int typeAuxInfo, Int* dstOffsets, Int* srcOffsets);
+  void reconstructBlkSAOParam(SAOBlkParam& recParam, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES]);
   Int  getMergeList(CodingStructure& cs, Int ctuRsAddr, SAOBlkParam* blkParams, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES]);
-  Void offsetCTU(const UnitArea& area, const CPelUnitBuf& src, PelUnitBuf& res, SAOBlkParam& saoblkParam, CodingStructure& cs);
-  Void xPCMLFDisableProcess(CodingStructure& cs);
-  Void xPCMCURestoration(CodingStructure& cs, const UnitArea &ctuArea);
-  Void xPCMSampleRestoration(CodingUnit& cu, const ComponentID compID);
-  Void xReconstructBlkSAOParams(CodingStructure& cs, SAOBlkParam* saoBlkParams);
+  void offsetCTU(const UnitArea& area, const CPelUnitBuf& src, PelUnitBuf& res, SAOBlkParam& saoblkParam, CodingStructure& cs);
+  void xPCMLFDisableProcess(CodingStructure& cs);
+  void xPCMCURestoration(CodingStructure& cs, const UnitArea &ctuArea);
+  void xPCMSampleRestoration(CodingUnit& cu, const ComponentID compID);
+  void xReconstructBlkSAOParams(CodingStructure& cs, SAOBlkParam* saoBlkParams);
 
 protected:
   UInt m_offsetStepLog2[MAX_NUM_COMPONENT]; //offset step

@@ -584,15 +584,15 @@ protected:
 
   // internal member functions
   Bool  xCheckParameter ();                                   ///< check validity of configuration values
-  Void  xPrintParameter ();                                   ///< print configuration values
-  Void  xPrintUsage     ();                                   ///< print usage
+  void  xPrintParameter ();                                   ///< print configuration values
+  void  xPrintUsage     ();                                   ///< print usage
 public:
   EncAppCfg();
   virtual ~EncAppCfg();
 
 public:
-  Void  create    ();                                         ///< create option handling class
-  Void  destroy   ();                                         ///< destroy option handling class
+  void  create    ();                                         ///< create option handling class
+  void  destroy   ();                                         ///< destroy option handling class
   Bool  parseCfg  ( Int argc, TChar* argv[] );                ///< parse configuration file to fill member variables
 
 };// END CLASS DEFINITION EncAppCfg

@@ -356,7 +356,6 @@
 // Basic type redefinition
 // ====================================================================================================================
 
-typedef       void                Void;
 typedef       bool                Bool;
 
 typedef       char                TChar; // Used for text/characters
@@ -1046,7 +1045,7 @@ struct SAOOffset
 
   SAOOffset();
   ~SAOOffset();
-  Void reset();
+  void reset();
 
   const SAOOffset& operator= (const SAOOffset& src);
 };
@@ -1056,7 +1055,7 @@ struct SAOBlkParam
 
   SAOBlkParam();
   ~SAOBlkParam();
-  Void reset();
+  void reset();
   const SAOBlkParam& operator= (const SAOBlkParam& src);
   SAOOffset& operator[](Int compIdx){ return offsetParam[compIdx];}
   const SAOOffset& operator[](Int compIdx) const { return offsetParam[compIdx];}

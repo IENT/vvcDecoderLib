@@ -74,7 +74,7 @@ struct OutputNALUnit : public NALUnit
   OutputBitstream m_Bitstream;
 };
 
-Void write(std::ostream& out, OutputNALUnit& nalu);
+void write(std::ostream& out, OutputNALUnit& nalu);
 
 inline NALUnitEBSP::NALUnitEBSP(OutputNALUnit& nalu)
   : NALUnit(nalu)

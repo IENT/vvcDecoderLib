@@ -46,7 +46,7 @@ using namespace std;
 
 static const UChar emulation_prevention_three_byte[] = {3};
 
-Void writeNalUnitHeader(ostream& out, OutputNALUnit& nalu)       // nal_unit_header()
+void writeNalUnitHeader(ostream& out, OutputNALUnit& nalu)       // nal_unit_header()
 {
 OutputBitstream bsNALUHeader;
 
@@ -61,7 +61,7 @@ OutputBitstream bsNALUHeader;
  * write nalu to bytestream out, performing RBSP anti startcode
  * emulation as required.  nalu.m_RBSPayload must be byte aligned.
  */
-Void write(ostream& out, OutputNALUnit& nalu)
+void write(ostream& out, OutputNALUnit& nalu)
 {
   writeNalUnitHeader(out, nalu);
   /* write out rsbp_byte's, inserting any required

@@ -58,7 +58,7 @@ protected:
 
 public:
 
-  static Void crossComponentPrediction(       TransformUnit &tu,
+  static void crossComponentPrediction(       TransformUnit &tu,
                                         const ComponentID   &compID,
                                         const CPelBuf       &piResiL,
                                         const CPelBuf       &piResiC,

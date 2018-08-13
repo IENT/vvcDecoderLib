@@ -56,7 +56,7 @@ using namespace std;
 
 //! \ingroup DecoderLib
 //! \{
-static Void convertPayloadToRBSP(vector<uint8_t>& nalUnitBuf, InputBitstream *bitstream, Bool isVclNalUnit)
+static void convertPayloadToRBSP(vector<uint8_t>& nalUnitBuf, InputBitstream *bitstream, Bool isVclNalUnit)
 {
   UInt zeroCount = 0;
   vector<uint8_t>::iterator it_read, it_write;
@@ -118,7 +118,7 @@ static void xTraceNalUnitHeader(InputNALUnit& nalu)
 }
 #endif
 
-Void readNalUnitHeader(InputNALUnit& nalu)
+void readNalUnitHeader(InputNALUnit& nalu)
 {
   InputBitstream& bs = nalu.getBitstream();
 
@@ -179,7 +179,7 @@ Void readNalUnitHeader(InputNALUnit& nalu)
  * create a NALunit structure with given header values and storage for
  * a bitstream
  */
-Void read(InputNALUnit& nalu)
+void read(InputNALUnit& nalu)
 {
   InputBitstream &bitstream = nalu.getBitstream();
   vector<uint8_t>& nalUnitBuf=bitstream.getFifo();

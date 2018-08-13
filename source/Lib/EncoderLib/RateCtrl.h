@@ -99,14 +99,14 @@ public:
   ~EncRCSeq();
 
 public:
-  Void create( Int totalFrames, Int targetBitrate, Int frameRate, Int GOPSize, Int picWidth, Int picHeight, Int LCUWidth, Int LCUHeight, Int numberOfLevel, Bool useLCUSeparateModel, Int adaptiveBit );
-  Void destroy();
-  Void initBitsRatio( Int bitsRatio[] );
-  Void initGOPID2Level( Int GOPID2Level[] );
-  Void initPicPara( TRCParameter* picPara  = NULL );    // NULL to initial with default value
-  Void initLCUPara( TRCParameter** LCUPara = NULL );    // NULL to initial with default value
-  Void updateAfterPic ( Int bits );
-  Void setAllBitRatio( Double basicLambda, Double* equaCoeffA, Double* equaCoeffB );
+  void create( Int totalFrames, Int targetBitrate, Int frameRate, Int GOPSize, Int picWidth, Int picHeight, Int LCUWidth, Int LCUHeight, Int numberOfLevel, Bool useLCUSeparateModel, Int adaptiveBit );
+  void destroy();
+  void initBitsRatio( Int bitsRatio[] );
+  void initGOPID2Level( Int GOPID2Level[] );
+  void initPicPara( TRCParameter* picPara  = NULL );    // NULL to initial with default value
+  void initLCUPara( TRCParameter** LCUPara = NULL );    // NULL to initial with default value
+  void updateAfterPic ( Int bits );
+  void setAllBitRatio( Double basicLambda, Double* equaCoeffA, Double* equaCoeffB );
 
 public:
   Int  getTotalFrames()                 { return m_totalFrames; }
@@ -131,11 +131,11 @@ public:
   Int  getGOPID2Level( Int ID )         { CHECK(!( ID < m_GOPSize ), "Idx exceeds GOP size"); return m_GOPID2Level[ID]; }
   TRCParameter*  getPicPara()                                   { return m_picPara; }
   TRCParameter   getPicPara( Int level )                        { CHECK(!( level < m_numberOfLevel ), "Level too big"); return m_picPara[level]; }
-  Void           setPicPara( Int level, TRCParameter para )     { CHECK(!( level < m_numberOfLevel ), "Level too big"); m_picPara[level] = para; }
+  void           setPicPara( Int level, TRCParameter para )     { CHECK(!( level < m_numberOfLevel ), "Level too big"); m_picPara[level] = para; }
   TRCParameter** getLCUPara()                                   { return m_LCUPara; }
   TRCParameter*  getLCUPara( Int level )                        { CHECK(!( level < m_numberOfLevel ), "Level too big"); return m_LCUPara[level]; }
   TRCParameter   getLCUPara( Int level, Int LCUIdx )            { CHECK(!( LCUIdx  < m_numberOfLCU ), "LCU id exceeds number of LCU"); return getLCUPara(level)[LCUIdx]; }
-  Void           setLCUPara( Int level, Int LCUIdx, TRCParameter para ) { CHECK(!( level < m_numberOfLevel ), "Level too big"); CHECK(!( LCUIdx  < m_numberOfLCU ), "LCU id exceeds number of LCU"); m_LCUPara[level][LCUIdx] = para; }
+  void           setLCUPara( Int level, Int LCUIdx, TRCParameter para ) { CHECK(!( level < m_numberOfLevel ), "Level too big"); CHECK(!( LCUIdx  < m_numberOfLCU ), "LCU id exceeds number of LCU"); m_LCUPara[level][LCUIdx] = para; }
 
   Int  getFramesLeft()                  { return m_framesLeft; }
   Int64  getBitsLeft()                  { return m_bitsLeft; }
@@ -146,7 +146,7 @@ public:
 
   Int    getAdaptiveBits()              { return m_adaptiveBit;  }
   Double getLastLambda()                { return m_lastLambda;   }
-  Void   setLastLambda( Double lamdba ) { m_lastLambda = lamdba; }
+  void   setLastLambda( Double lamdba ) { m_lastLambda = lamdba; }
 
 private:
   Int m_totalFrames;
@@ -186,13 +186,13 @@ public:
   ~EncRCGOP();
 
 public:
-  Void create( EncRCSeq* encRCSeq, Int numPic );
-  Void destroy();
-  Void updateAfterPicture( Int bitsCost );
+  void create( EncRCSeq* encRCSeq, Int numPic );
+  void destroy();
+  void updateAfterPicture( Int bitsCost );
 
 private:
   Int  xEstGOPTargetBits( EncRCSeq* encRCSeq, Int GOPSize );
-  Void   xCalEquaCoeff( EncRCSeq* encRCSeq, Double* lambdaRatio, Double* equaCoeffA, Double* equaCoeffB, Int GOPSize );
+  void   xCalEquaCoeff( EncRCSeq* encRCSeq, Double* lambdaRatio, Double* equaCoeffA, Double* equaCoeffB, Int GOPSize );
   Double xSolveEqua( Double targetBpp, Double* equaCoeffA, Double* equaCoeffB, Int GOPSize );
 
 public:
@@ -219,25 +219,25 @@ public:
   ~EncRCPic();
 
 public:
-  Void create( EncRCSeq* encRCSeq, EncRCGOP* encRCGOP, Int frameLevel, list<EncRCPic*>& listPreviousPictures );
-  Void destroy();
+  void create( EncRCSeq* encRCSeq, EncRCGOP* encRCGOP, Int frameLevel, list<EncRCPic*>& listPreviousPictures );
+  void destroy();
 
   Int    estimatePicQP    ( Double lambda, list<EncRCPic*>& listPreviousPictures );
   Int    getRefineBitsForIntra(Int orgBits);
   Double calculateLambdaIntra(Double alpha, Double beta, Double MADPerPixel, Double bitsPerPixel);
   Double estimatePicLambda( list<EncRCPic*>& listPreviousPictures, SliceType eSliceType);
 
-  Void   updateAlphaBetaIntra(Double *alpha, Double *beta);
+  void   updateAlphaBetaIntra(Double *alpha, Double *beta);
 
   Double getLCUTargetBpp(SliceType eSliceType);
   Double getLCUEstLambdaAndQP(Double bpp, Int clipPicQP, Int *estQP);
   Double getLCUEstLambda( Double bpp );
   Int    getLCUEstQP( Double lambda, Int clipPicQP );
 
-  Void updateAfterCTU( Int LCUIdx, Int bits, Int QP, Double lambda, Bool updateLCUParameter = true );
-  Void updateAfterPicture( Int actualHeaderBits, Int actualTotalBits, Double averageQP, Double averageLambda, SliceType eSliceType);
+  void updateAfterCTU( Int LCUIdx, Int bits, Int QP, Double lambda, Bool updateLCUParameter = true );
+  void updateAfterPicture( Int actualHeaderBits, Int actualTotalBits, Double averageQP, Double averageLambda, SliceType eSliceType);
 
-  Void addToPictureLsit( list<EncRCPic*>& listPreviousPictures );
+  void addToPictureLsit( list<EncRCPic*>& listPreviousPictures );
   Double calAverageQP();
   Double calAverageLambda();
 
@@ -269,19 +269,19 @@ public:
   TRCLCU& getLCU( Int LCUIdx )                            { return m_LCUs[LCUIdx]; }
   Int  getPicActualHeaderBits()                           { return m_picActualHeaderBits; }
 #if U0132_TARGET_BITS_SATURATION
-  Void setBitLeft(Int bits)                               { m_bitsLeft = bits; }
+  void setBitLeft(Int bits)                               { m_bitsLeft = bits; }
 #endif
-  Void setTargetBits( Int bits )                          { m_targetBits = bits; m_bitsLeft = bits;}
-  Void setTotalIntraCost(Double cost)                     { m_totalCostIntra = cost; }
-  Void getLCUInitTargetBits();
+  void setTargetBits( Int bits )                          { m_targetBits = bits; m_bitsLeft = bits;}
+  void setTotalIntraCost(Double cost)                     { m_totalCostIntra = cost; }
+  void getLCUInitTargetBits();
 
   Int  getPicActualBits()                                 { return m_picActualBits; }
   Int  getPicActualQP()                                   { return m_picQP; }
   Double getPicActualLambda()                             { return m_picLambda; }
   Int  getPicEstQP()                                      { return m_estPicQP; }
-  Void setPicEstQP( Int QP )                              { m_estPicQP = QP; }
+  void setPicEstQP( Int QP )                              { m_estPicQP = QP; }
   Double getPicEstLambda()                                { return m_estPicLambda; }
-  Void setPicEstLambda( Double lambda )                   { m_picLambda = lambda; }
+  void setPicEstLambda( Double lambda )                   { m_picLambda = lambda; }
 
 private:
   EncRCSeq* m_encRCSeq;
@@ -318,14 +318,14 @@ public:
   ~RateCtrl();
 
 public:
-  Void init( Int totalFrames, Int targetBitrate, Int frameRate, Int GOPSize, Int picWidth, Int picHeight, Int LCUWidth, Int LCUHeight, Int keepHierBits, Bool useLCUSeparateModel, GOPEntry GOPList[MAX_GOP] );
-  Void destroy();
-  Void initRCPic( Int frameLevel );
-  Void initRCGOP( Int numberOfPictures );
-  Void destroyRCGOP();
+  void init( Int totalFrames, Int targetBitrate, Int frameRate, Int GOPSize, Int picWidth, Int picHeight, Int LCUWidth, Int LCUHeight, Int keepHierBits, Bool useLCUSeparateModel, GOPEntry GOPList[MAX_GOP] );
+  void destroy();
+  void initRCPic( Int frameLevel );
+  void initRCGOP( Int numberOfPictures );
+  void destroyRCGOP();
 
 public:
-  Void       setRCQP ( Int QP ) { m_RCQP = QP;   }
+  void       setRCQP ( Int QP ) { m_RCQP = QP;   }
   Int        getRCQP () const   { return m_RCQP; }
   EncRCSeq* getRCSeq()          { CHECK( m_encRCSeq == NULL, "Object does not exist" ); return m_encRCSeq; }
   EncRCGOP* getRCGOP()          { CHECK( m_encRCGOP == NULL, "Object does not exist" ); return m_encRCGOP; }
@@ -337,7 +337,7 @@ public:
   UInt       getCpbSize()               { return m_cpbSize;        }
   UInt       getBufferingRate()         { return m_bufferingRate;  }
   Int        updateCpbState(Int actualBits);
-  Void       initHrdParam(const HRD* pcHrd, Int iFrameRate, Double fInitialCpbFullness);
+  void       initHrdParam(const HRD* pcHrd, Int iFrameRate, Double fInitialCpbFullness);
 #endif
 
 private:

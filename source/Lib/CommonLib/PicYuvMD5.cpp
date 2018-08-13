@@ -43,7 +43,7 @@
  * OUTBIT_BITDEPTH_DIV8.
  */
 template<UInt OUTPUT_BITDEPTH_DIV8>
-static Void md5_block(MD5& md5, const Pel* plane, UInt n)
+static void md5_block(MD5& md5, const Pel* plane, UInt n)
 {
   /* create a 64 byte buffer for packing Pel's into */
   UChar buf[64/OUTPUT_BITDEPTH_DIV8][OUTPUT_BITDEPTH_DIV8];
@@ -64,7 +64,7 @@ static Void md5_block(MD5& md5, const Pel* plane, UInt n)
  * is adjusted to OUTBIT_BITDEPTH_DIV8.
  */
 template<UInt OUTPUT_BITDEPTH_DIV8>
-static Void md5_plane(MD5& md5, const Pel* plane, UInt width, UInt height, UInt stride)
+static void md5_plane(MD5& md5, const Pel* plane, UInt width, UInt height, UInt stride)
 {
   /* N is the number of samples to process per md5 update.
    * All N samples must fit in buf */
@@ -188,7 +188,7 @@ UInt calcChecksum(const CPelUnitBuf& pic, PictureHash &digest, const BitDepths &
 UInt calcMD5(const CPelUnitBuf& pic, PictureHash &digest, const BitDepths &bitDepths)
 {
   /* choose an md5_plane packing function based on the system bitdepth */
-  typedef Void (*MD5PlaneFunc)(MD5&, const Pel*, UInt, UInt, UInt);
+  typedef void (*MD5PlaneFunc)(MD5&, const Pel*, UInt, UInt, UInt);
   MD5PlaneFunc md5_plane_func;
 
   MD5 md5[MAX_NUM_COMPONENT];

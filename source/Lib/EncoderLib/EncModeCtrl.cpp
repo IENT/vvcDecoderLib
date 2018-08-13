@@ -49,7 +49,7 @@
 
 #include <cmath>
 
-Void EncModeCtrl::init( EncCfg *pCfg, RateCtrl *pRateCtrl, RdCost* pRdCost )
+void EncModeCtrl::init( EncCfg *pCfg, RateCtrl *pRateCtrl, RdCost* pRdCost )
 {
   m_pcEncCfg      = pCfg;
   m_pcRateCtrl    = pRateCtrl;
@@ -81,7 +81,7 @@ void EncModeCtrl::setEarlySkipDetected()
   m_ComprCUCtxList.back().earlySkip = true;
 }
 
-Void EncModeCtrl::xExtractFeatures( const EncTestMode encTestmode, CodingStructure& cs )
+void EncModeCtrl::xExtractFeatures( const EncTestMode encTestmode, CodingStructure& cs )
 {
   CHECK( cs.features.size() < NUM_ENC_FEATURES, "Features vector is not initialized" );
 
@@ -228,7 +228,7 @@ int EncModeCtrl::xComputeDQP( const CodingStructure &cs, const Partitioner &part
 
 
 #if SHARP_LUMA_DELTA_QP
-Void EncModeCtrl::initLumaDeltaQpLUT()
+void EncModeCtrl::initLumaDeltaQpLUT()
 {
   const LumaLevelToDeltaQPMapping &mapping = m_pcEncCfg->getLumaLevelToDeltaQPMapping();
 
@@ -964,7 +964,7 @@ void EncModeCtrlMTnoRQT::destroy()
 }
 
 #endif
-Void EncModeCtrlMTnoRQT::initCTUEncoding( const Slice &slice )
+void EncModeCtrlMTnoRQT::initCTUEncoding( const Slice &slice )
 {
   CacheBlkInfoCtrl::init( slice );
 #if REUSE_CU_RESULTS

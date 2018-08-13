@@ -462,7 +462,7 @@ Int CABACReader::parseAlfSvlc()
 }
 #endif
 
-Void CABACReader::xReadTruncBinCode(UInt& ruiSymbol, UInt uiMaxSymbol)
+void CABACReader::xReadTruncBinCode(UInt& ruiSymbol, UInt uiMaxSymbol)
 {
   UInt uiThresh;
   if (uiMaxSymbol > 256)
@@ -614,7 +614,7 @@ void CABACReader::alf( CodingStructure& cs )
   alf_cu_ctrl( alfParam );
 }
 
-Void CABACReader::alf_aux( ALFParam& alfParam, bool isGALF )
+void CABACReader::alf_aux( ALFParam& alfParam, bool isGALF )
 {
   Int FiltTab[3] = {5, 7, 9};
   Int sqrFiltLengthTab[3] = {AdaptiveLoopFilter::m_SQR_FILT_LENGTH_5SYM, AdaptiveLoopFilter::m_SQR_FILT_LENGTH_7SYM, AdaptiveLoopFilter::m_SQR_FILT_LENGTH_9SYM };
@@ -751,7 +751,7 @@ Void CABACReader::alf_aux( ALFParam& alfParam, bool isGALF )
 
 }
 
-Void CABACReader::alf_filter( ALFParam& alfParam, bool isGALF, bool bChroma )
+void CABACReader::alf_filter( ALFParam& alfParam, bool isGALF, bool bChroma )
 {
   UInt uiSymbol;
   int ind, scanPos, i;
@@ -870,7 +870,7 @@ Void CABACReader::alf_filter( ALFParam& alfParam, bool isGALF, bool bChroma )
   }
 }
 
-Void CABACReader::alf_cu_ctrl( ALFParam& alfParam )
+void CABACReader::alf_cu_ctrl( ALFParam& alfParam )
 {
   alfParam.cu_control_flag = m_BinDecoder.decodeBinEP();
   if( alfParam.cu_control_flag )
@@ -918,7 +918,7 @@ Void CABACReader::alf_cu_ctrl( ALFParam& alfParam )
 }
 
 
-Void CABACReader::alf_chroma( ALFParam& alfParam )
+void CABACReader::alf_chroma( ALFParam& alfParam )
 {
 
   //alfParam.chroma_idc = unary_max_eqprob( 3 );
@@ -1451,7 +1451,7 @@ void CABACReader::cu_lic_flag( CodingUnit& cu )
   }
 }
 
-Void CABACReader::obmc_flag( CodingUnit& cu )
+void CABACReader::obmc_flag( CodingUnit& cu )
 {
   RExt__DECODER_DEBUG_BIT_STATISTICS_CREATE_SET( STATS__CABAC_BITS__OTHER );
 
@@ -2866,7 +2866,7 @@ void CABACReader::transform_skip_flag( TransformUnit& tu, ComponentID compID )
 }
 
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
-Void CABACReader::emt_tu_index( TransformUnit& tu )
+void CABACReader::emt_tu_index( TransformUnit& tu )
 {
   int maxSizeEmtIntra, maxSizeEmtInter;
   if( tu.cs->pcv->noRQT )
@@ -2905,7 +2905,7 @@ Void CABACReader::emt_tu_index( TransformUnit& tu )
   tu.emtIdx = trIdx;
 }
 
-Void CABACReader::emt_cu_flag( CodingUnit& cu )
+void CABACReader::emt_cu_flag( CodingUnit& cu )
 {
   const CodingStructure &cs = *cu.cs;
 

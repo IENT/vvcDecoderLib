@@ -89,7 +89,7 @@ public:
   virtual ~Quant();
 
   // initialize class
-  virtual Void init( UInt uiMaxTrSize,
+  virtual void init( UInt uiMaxTrSize,
                      Bool useRDOQ = false,
                      Bool useRDOQTS = false,
 #if JVET_K0072
@@ -105,36 +105,36 @@ public:
 
 public:
 
-  Void   transformSkipQuantOneSample(TransformUnit &tu, const ComponentID &compID, const TCoeff &resiDiff, TCoeff &coeff,    const UInt &uiPos, const QpParam &cQP, const Bool bUseHalfRoundingPoint);
-  Void   invTrSkipDeQuantOneSample  (TransformUnit &tu, const ComponentID &compID, const TCoeff &pcCoeff,  Pel &reconSample, const UInt &uiPos, const QpParam &cQP);
+  void   transformSkipQuantOneSample(TransformUnit &tu, const ComponentID &compID, const TCoeff &resiDiff, TCoeff &coeff,    const UInt &uiPos, const QpParam &cQP, const Bool bUseHalfRoundingPoint);
+  void   invTrSkipDeQuantOneSample  (TransformUnit &tu, const ComponentID &compID, const TCoeff &pcCoeff,  Pel &reconSample, const UInt &uiPos, const QpParam &cQP);
 
 #if RDOQ_CHROMA_LAMBDA
-  Void   setLambdas              ( const Double lambdas[MAX_NUM_COMPONENT] )   { for (UInt component = 0; component < MAX_NUM_COMPONENT; component++) m_lambdas[component] = lambdas[component]; }
-  Void   selectLambda            ( const ComponentID compIdx )                 { m_dLambda = m_lambdas[ MAP_CHROMA(compIdx) ]; }
-  Void   getLambdas              ( Double (&lambdas)[MAX_NUM_COMPONENT]) const { for (UInt component = 0; component < MAX_NUM_COMPONENT; component++) lambdas[component] = m_lambdas[component]; }
+  void   setLambdas              ( const Double lambdas[MAX_NUM_COMPONENT] )   { for (UInt component = 0; component < MAX_NUM_COMPONENT; component++) m_lambdas[component] = lambdas[component]; }
+  void   selectLambda            ( const ComponentID compIdx )                 { m_dLambda = m_lambdas[ MAP_CHROMA(compIdx) ]; }
+  void   getLambdas              ( Double (&lambdas)[MAX_NUM_COMPONENT]) const { for (UInt component = 0; component < MAX_NUM_COMPONENT; component++) lambdas[component] = m_lambdas[component]; }
 #endif
-  Void   setLambda               ( const Double dLambda )                      { m_dLambda = dLambda; }
+  void   setLambda               ( const Double dLambda )                      { m_dLambda = dLambda; }
   Double getLambda               () const                                      { return m_dLambda; }
 
 #if HEVC_USE_SCALING_LISTS
   Int* getQuantCoeff             ( UInt list, Int qp, UInt sizeX, UInt sizeY ) { return m_quantCoef            [sizeX][sizeY][list][qp]; };  //!< get Quant Coefficent
   Int* getDequantCoeff           ( UInt list, Int qp, UInt sizeX, UInt sizeY ) { return m_dequantCoef          [sizeX][sizeY][list][qp]; };  //!< get DeQuant Coefficent
 
-  Void setUseScalingList         ( Bool bUseScalingList){ m_scalingListEnabledFlag = bUseScalingList; };
+  void setUseScalingList         ( Bool bUseScalingList){ m_scalingListEnabledFlag = bUseScalingList; };
   Bool getUseScalingList         ( const UInt width, const UInt height, const Bool isTransformSkip){ return m_scalingListEnabledFlag && (!isTransformSkip || ((width == 4) && (height == 4))); };
 
-  Void setScalingListDec         ( const ScalingList &scalingList);
-  Void processScalingListEnc     ( Int *coeff, Int *quantcoeff, Int quantScales, UInt height, UInt width, UInt ratio, Int sizuNum, UInt dc);
-  Void processScalingListDec     ( const Int *coeff, Int *dequantcoeff, Int invQuantScales, UInt height, UInt width, UInt ratio, Int sizuNum, UInt dc);
+  void setScalingListDec         ( const ScalingList &scalingList);
+  void processScalingListEnc     ( Int *coeff, Int *quantcoeff, Int quantScales, UInt height, UInt width, UInt ratio, Int sizuNum, UInt dc);
+  void processScalingListDec     ( const Int *coeff, Int *dequantcoeff, Int invQuantScales, UInt height, UInt width, UInt ratio, Int sizuNum, UInt dc);
 
-  virtual Void setFlatScalingList( const Int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths);
-  virtual Void setScalingList    ( ScalingList *scalingList, const Int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths);
+  virtual void setFlatScalingList( const Int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths);
+  virtual void setScalingList    ( ScalingList *scalingList, const Int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths);
 #endif
 
   // quantization
-  virtual Void quant             ( TransformUnit &tu, const ComponentID &compID, const CCoeffBuf &pSrc, TCoeff &uiAbsSum, const QpParam &cQP, const Ctx& ctx );
+  virtual void quant             ( TransformUnit &tu, const ComponentID &compID, const CCoeffBuf &pSrc, TCoeff &uiAbsSum, const QpParam &cQP, const Ctx& ctx );
   // de-quantization
-  virtual Void dequant           ( const TransformUnit &tu, CoeffBuf &dstCoeff, const ComponentID &compID, const QpParam &cQP );
+  virtual void dequant           ( const TransformUnit &tu, CoeffBuf &dstCoeff, const ComponentID &compID, const QpParam &cQP );
 
 #if ENABLE_SPLIT_PARALLELISM
   virtual void copyState         ( const Quant& other );
@@ -161,15 +161,15 @@ protected:
 #endif
 #if HEVC_USE_SCALING_LISTS
 private:
-  Void xInitScalingList   ( const Quant* other );
-  Void xDestroyScalingList();
-  Void xSetFlatScalingList( UInt list, UInt sizeX, UInt sizeY, Int qp );
-  Void xSetScalingListEnc ( ScalingList *scalingList, UInt list, UInt size, Int qp );
-  Void xSetScalingListDec ( const ScalingList &scalingList, UInt list, UInt size, Int qp );
+  void xInitScalingList   ( const Quant* other );
+  void xDestroyScalingList();
+  void xSetFlatScalingList( UInt list, UInt sizeX, UInt sizeY, Int qp );
+  void xSetScalingListEnc ( ScalingList *scalingList, UInt list, UInt size, Int qp );
+  void xSetScalingListDec ( const ScalingList &scalingList, UInt list, UInt size, Int qp );
 #endif
 #if HEVC_USE_SIGN_HIDING
 private:
-  Void xSignBitHidingHDQ  (TCoeff* pQCoef, const TCoeff* pCoef, TCoeff* deltaU, const CoeffCodingContext& cctx, const Int maxLog2TrDynamicRange);
+  void xSignBitHidingHDQ  (TCoeff* pQCoef, const TCoeff* pCoef, TCoeff* deltaU, const CoeffCodingContext& cctx, const Int maxLog2TrDynamicRange);
 #endif
 
 private:

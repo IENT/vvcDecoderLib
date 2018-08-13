@@ -82,7 +82,7 @@ InputBitstream::InputBitstream(const InputBitstream &src)
 // Public member functions
 // ====================================================================================================================
 
-Void InputBitstream::resetToStart()
+void InputBitstream::resetToStart()
 {
   m_fifo_idx=0;
   m_num_held_bits=0;
@@ -100,14 +100,14 @@ UInt OutputBitstream::getByteStreamLength()
   return UInt(m_fifo.size());
 }
 
-Void OutputBitstream::clear()
+void OutputBitstream::clear()
 {
   m_fifo.clear();
   m_held_bits = 0;
   m_num_held_bits = 0;
 }
 
-Void OutputBitstream::write   ( UInt uiBits, UInt uiNumberOfBits )
+void OutputBitstream::write   ( UInt uiBits, UInt uiNumberOfBits )
 {
   CHECK( uiNumberOfBits > 32, "Number of bits is exceeds '32'" );
   CHECK( uiNumberOfBits != 32 && (uiBits & (~0 << uiNumberOfBits)) != 0, "Unsupported parameters" );
@@ -151,14 +151,14 @@ Void OutputBitstream::write   ( UInt uiBits, UInt uiNumberOfBits )
   m_num_held_bits = next_num_held_bits;
 }
 
-Void OutputBitstream::writeAlignOne()
+void OutputBitstream::writeAlignOne()
 {
   UInt num_bits = getNumBitsUntilByteAligned();
   write((1 << num_bits) - 1, num_bits);
   return;
 }
 
-Void OutputBitstream::writeAlignZero()
+void OutputBitstream::writeAlignZero()
 {
   if (0 == m_num_held_bits)
   {
@@ -174,7 +174,7 @@ Void OutputBitstream::writeAlignZero()
  .
  \param  pcSubstream  substream to be added
  */
-Void   OutputBitstream::addSubstream( OutputBitstream* pcSubstream )
+void   OutputBitstream::addSubstream( OutputBitstream* pcSubstream )
 {
   UInt uiNumBits = pcSubstream->getNumberOfWrittenBits();
 
@@ -189,7 +189,7 @@ Void   OutputBitstream::addSubstream( OutputBitstream* pcSubstream )
   }
 }
 
-Void OutputBitstream::writeByteAlignment()
+void OutputBitstream::writeByteAlignment()
 {
   write( 1, 1);
   writeAlignZero();
@@ -235,7 +235,7 @@ Int OutputBitstream::countStartCodeEmulations()
  * the bitstream is effectively padded with sufficient zero-bits to
  * avoid the overrun.
  */
-Void InputBitstream::pseudoRead ( UInt uiNumberOfBits, UInt& ruiBits )
+void InputBitstream::pseudoRead ( UInt uiNumberOfBits, UInt& ruiBits )
 {
   UInt saved_num_held_bits = m_num_held_bits;
   UChar saved_held_bits = m_held_bits;
@@ -251,7 +251,7 @@ Void InputBitstream::pseudoRead ( UInt uiNumberOfBits, UInt& ruiBits )
 }
 
 
-Void InputBitstream::read (UInt uiNumberOfBits, UInt& ruiBits)
+void InputBitstream::read (UInt uiNumberOfBits, UInt& ruiBits)
 {
   CHECK( uiNumberOfBits > 32, "Too many bits read" );
 
@@ -317,7 +317,7 @@ Void InputBitstream::read (UInt uiNumberOfBits, UInt& ruiBits)
  * insert the contents of the bytealigned (and flushed) bitstream src
  * into this at byte position pos.
  */
-Void OutputBitstream::insertAt(const OutputBitstream& src, UInt pos)
+void OutputBitstream::insertAt(const OutputBitstream& src, UInt pos)
 {
   CHECK(0 != src.getNumberOfWrittenBits() % 8, "Number of written bits is not a multiple of 8");
 

@@ -61,7 +61,7 @@ SAOOffset::~SAOOffset()
 
 }
 
-Void SAOOffset::reset()
+void SAOOffset::reset()
 {
   modeIdc = SAO_MODE_OFF;
   typeIdc = -1;
@@ -90,7 +90,7 @@ SAOBlkParam::~SAOBlkParam()
 
 }
 
-Void SAOBlkParam::reset()
+void SAOBlkParam::reset()
 {
   for(Int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++)
   {
@@ -123,7 +123,7 @@ SampleAdaptiveOffset::~SampleAdaptiveOffset()
   m_signLineBuf2.clear();
 }
 
-Void SampleAdaptiveOffset::create( Int picWidth, Int picHeight, ChromaFormat format, UInt maxCUWidth, UInt maxCUHeight, UInt maxCUDepth, UInt lumaBitShift, UInt chromaBitShift )
+void SampleAdaptiveOffset::create( Int picWidth, Int picHeight, ChromaFormat format, UInt maxCUWidth, UInt maxCUHeight, UInt maxCUDepth, UInt lumaBitShift, UInt chromaBitShift )
 {
   //temporary picture buffer
   UnitArea picArea(format, Area(0, 0, picWidth, picHeight));
@@ -139,12 +139,12 @@ Void SampleAdaptiveOffset::create( Int picWidth, Int picHeight, ChromaFormat for
   m_numberOfComponents = getNumberValidComponents(format);
 }
 
-Void SampleAdaptiveOffset::destroy()
+void SampleAdaptiveOffset::destroy()
 {
   m_tempBuf.destroy();
 }
 
-Void SampleAdaptiveOffset::invertQuantOffsets(ComponentID compIdx, Int typeIdc, Int typeAuxInfo, Int* dstOffsets, Int* srcOffsets)
+void SampleAdaptiveOffset::invertQuantOffsets(ComponentID compIdx, Int typeIdc, Int typeAuxInfo, Int* dstOffsets, Int* srcOffsets)
 {
   Int codedOffset[MAX_NUM_SAO_CLASSES];
 
@@ -226,7 +226,7 @@ Int SampleAdaptiveOffset::getMergeList(CodingStructure& cs, Int ctuRsAddr, SAOBl
 }
 
 
-Void SampleAdaptiveOffset::reconstructBlkSAOParam(SAOBlkParam& recParam, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES])
+void SampleAdaptiveOffset::reconstructBlkSAOParam(SAOBlkParam& recParam, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES])
 {
   const Int numberOfComponents = m_numberOfComponents;
   for(Int compIdx = 0; compIdx < numberOfComponents; compIdx++)
@@ -262,7 +262,7 @@ Void SampleAdaptiveOffset::reconstructBlkSAOParam(SAOBlkParam& recParam, SAOBlkP
   }
 }
 
-Void SampleAdaptiveOffset::xReconstructBlkSAOParams(CodingStructure& cs, SAOBlkParam* saoBlkParams)
+void SampleAdaptiveOffset::xReconstructBlkSAOParams(CodingStructure& cs, SAOBlkParam* saoBlkParams)
 {
   for(UInt compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++)
   {
@@ -289,7 +289,7 @@ Void SampleAdaptiveOffset::xReconstructBlkSAOParams(CodingStructure& cs, SAOBlkP
 }
 
 
-Void SampleAdaptiveOffset::offsetBlock(const Int channelBitDepth, const ClpRng& clpRng, Int typeIdx, Int* offset
+void SampleAdaptiveOffset::offsetBlock(const Int channelBitDepth, const ClpRng& clpRng, Int typeIdx, Int* offset
                                           , const Pel* srcBlk, Pel* resBlk, Int srcStride, Int resStride,  Int width, Int height
                                           , Bool isLeftAvail,  Bool isRightAvail, Bool isAboveAvail, Bool isBelowAvail, Bool isAboveLeftAvail, Bool isAboveRightAvail, Bool isBelowLeftAvail, Bool isBelowRightAvail)
 {
@@ -507,7 +507,7 @@ Void SampleAdaptiveOffset::offsetBlock(const Int channelBitDepth, const ClpRng& 
   }
 }
 
-Void SampleAdaptiveOffset::offsetCTU( const UnitArea& area, const CPelUnitBuf& src, PelUnitBuf& res, SAOBlkParam& saoblkParam, CodingStructure& cs)
+void SampleAdaptiveOffset::offsetCTU( const UnitArea& area, const CPelUnitBuf& src, PelUnitBuf& res, SAOBlkParam& saoblkParam, CodingStructure& cs)
 {
   const UInt numberOfComponents = getNumberValidComponents( area.chromaFormat );
   Bool bAllOff=true;
@@ -561,7 +561,7 @@ Void SampleAdaptiveOffset::offsetCTU( const UnitArea& area, const CPelUnitBuf& s
   } //compIdx
 }
 
-Void SampleAdaptiveOffset::SAOProcess( CodingStructure& cs, SAOBlkParam* saoBlkParams
+void SampleAdaptiveOffset::SAOProcess( CodingStructure& cs, SAOBlkParam* saoBlkParams
                                       )
 {
   CHECK(!saoBlkParams, "No parameters present");
@@ -611,7 +611,7 @@ Void SampleAdaptiveOffset::SAOProcess( CodingStructure& cs, SAOBlkParam* saoBlkP
   xPCMLFDisableProcess(cs);
 }
 
-Void SampleAdaptiveOffset::xPCMLFDisableProcess(CodingStructure& cs)
+void SampleAdaptiveOffset::xPCMLFDisableProcess(CodingStructure& cs)
 {
   const PreCalcValues& pcv = *cs.pcv;
   const Bool bPCMFilter = (cs.sps->getUsePCM() && cs.sps->getPCMFilterDisableFlag()) ? true : false;
@@ -631,7 +631,7 @@ Void SampleAdaptiveOffset::xPCMLFDisableProcess(CodingStructure& cs)
   }
 }
 
-Void SampleAdaptiveOffset::xPCMCURestoration(CodingStructure& cs, const UnitArea &ctuArea)
+void SampleAdaptiveOffset::xPCMCURestoration(CodingStructure& cs, const UnitArea &ctuArea)
 {
   const SPS& sps = *cs.sps;
 
@@ -650,7 +650,7 @@ Void SampleAdaptiveOffset::xPCMCURestoration(CodingStructure& cs, const UnitArea
   }
 }
 
-Void SampleAdaptiveOffset::xPCMSampleRestoration(CodingUnit& cu, const ComponentID compID)
+void SampleAdaptiveOffset::xPCMSampleRestoration(CodingUnit& cu, const ComponentID compID)
 {
   const CompArea& ca = cu.block(compID);
 
@@ -682,7 +682,7 @@ Void SampleAdaptiveOffset::xPCMSampleRestoration(CodingUnit& cu, const Component
   }
 }
 
-Void SampleAdaptiveOffset::deriveLoopFilterBoundaryAvailibility(CodingStructure& cs, const Position &pos,
+void SampleAdaptiveOffset::deriveLoopFilterBoundaryAvailibility(CodingStructure& cs, const Position &pos,
   Bool& isLeftAvail,
   Bool& isRightAvail,
   Bool& isAboveAvail,

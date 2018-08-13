@@ -302,7 +302,7 @@ public:
     Int64 sum;
     Int64 classCount;
 
-    Void clear() { bits = 0; count = 0; sum = 0; classCount = 0; }
+    void clear() { bits = 0; count = 0; sum = 0; classCount = 0; }
 
     SStat &operator+=( const SStat &src )
     {
@@ -327,7 +327,7 @@ private:
   {
   }
 
-  static Void OutputLine( const TChar *pName, const TChar sep, UInt wIdx, UInt hIdx, const TChar *pSubClassStr, const SStat &sCABAC, const SStat &sEP )
+  static void OutputLine( const TChar *pName, const TChar sep, UInt wIdx, UInt hIdx, const TChar *pSubClassStr, const SStat &sCABAC, const SStat &sEP )
   {
     if( wIdx == 0 && hIdx == 0 )
     {
@@ -349,7 +349,7 @@ private:
       printf( " %12lld %12lld %12lld %12lld (%12lld)%c\n", sEP.count, sEP.sum, sEP.bits, sCABAC.bits + sEP.bits, ( sCABAC.bits + sEP.bits ) / 8, sep == '~' ? ']' : ' ' );
     }
   }
-  static Void OutputLine( const TChar *pName, const TChar sep, const TChar *pWidthString, const TChar *pHeightString, const TChar *pSubClassStr, const SStat &sCABAC, const SStat &sEP )
+  static void OutputLine( const TChar *pName, const TChar sep, const TChar *pWidthString, const TChar *pHeightString, const TChar *pSubClassStr, const SStat &sCABAC, const SStat &sEP )
   {
     printf( "%c%-45s%c  %6s %6s %6s ", sep == '~' ? '[' : ' ', pName, sep, pWidthString, pHeightString, pSubClassStr );
     if( sCABAC.count > 0 )
@@ -364,14 +364,14 @@ private:
     }
     printf( " %12lld %12lld %12lld %12lld (%12lld)%c\n", sEP.count, sEP.sum, sEP.bits, sCABAC.bits + sEP.bits, ( sCABAC.bits + sEP.bits ) / 8, sep == '~' ? ']' : ' ' );
   }
-  static Void OutputLine( const TChar *pName, const TChar sep, const TChar *pWidthString, const TChar *pHeightString, const TChar *pSubClassStr, const SStat &sEP )
+  static void OutputLine( const TChar *pName, const TChar sep, const TChar *pWidthString, const TChar *pHeightString, const TChar *pSubClassStr, const SStat &sEP )
   {
     printf( "%c%-45s%c  %6s %6s %6s          -/- %12s %12s %12s %9s-/- %12lld %12lld %12lld %12lld (%12lld)%c\n",
             sep == '~' ? '[' : ' ', pName, sep, pWidthString, pHeightString, pSubClassStr,
             "", "", "", "", sEP.count, sEP.sum, sEP.bits, sEP.bits, ( sEP.bits ) / 8, sep == '~' ? ']' : ' ' );
   }
 
-  static Void OutputDashedLine( const TChar *pText )
+  static void OutputDashedLine( const TChar *pText )
   {
     printf( "--%s", pText );
     UInt tot = 0;
@@ -591,7 +591,7 @@ public:
 
   static const CodingStatisticsData &GetStatistics()                        { return GetSingletonInstance().data; }
 
-  static Void SetStatistics       ( const CodingStatisticsData &src )       { GetSingletonInstance().data = src; }
+  static void SetStatistics       ( const CodingStatisticsData &src )       { GetSingletonInstance().data = src; }
 
   static SStat &GetStatisticEP    ( const CodingStatisticsClassType &stat ) { return GetSingletonInstance().data.statistics_ep[stat.type][stat.subClass]; }
 
@@ -612,7 +612,7 @@ public:
     return count;
   }
 
-  static Void IncrementStatisticEP( const CodingStatisticsClassType &stat, const Int numBits, const Int value )
+  static void IncrementStatisticEP( const CodingStatisticsClassType &stat, const Int numBits, const Int value )
   {
     CHECK( stat.type == STATS__CABAC_BITS__INVALID, "Should never be used." );
     SStat &s = GetStatisticEP( stat );
@@ -621,7 +621,7 @@ public:
     s.sum   += getNumOnes( value );
   }
 
-  static Void IncrementStatisticEP( const std::string &str, const Int numBits, const Int value )
+  static void IncrementStatisticEP( const std::string &str, const Int numBits, const Int value )
   {
     SStat &s = GetStatisticEP( str );
     s.bits  += numBits;
@@ -629,7 +629,7 @@ public:
     s.sum   += getNumOnes( value );
   }
 
-  static Void IncrementStatisticEP( const TChar *pKey, const Int numBits, const Int value )
+  static void IncrementStatisticEP( const TChar *pKey, const Int numBits, const Int value )
   {
     SStat &s = GetStatisticEP( pKey );
     s.bits  += numBits;
@@ -639,7 +639,7 @@ public:
 
   StatLogValue values;
 
-  static Void UpdateCABACStat( const CodingStatisticsClassType &stat, UInt uiRangeBefore, UInt uiRangeAfter, Int val )
+  static void UpdateCABACStat( const CodingStatisticsClassType &stat, UInt uiRangeBefore, UInt uiRangeAfter, Int val )
   {
     CHECK( stat.type == STATS__CABAC_BITS__INVALID, "Should never be used." );
     CodingStatistics &inst = GetSingletonInstance();

@@ -220,7 +220,7 @@ void AdaptiveDepthPartitioner::setMaxMinDepth( unsigned& minDepth, unsigned& max
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
-Void QTBTPartitioner::initCtu( const UnitArea& ctuArea, const ChannelType _chType, const Slice& slice )
+void QTBTPartitioner::initCtu( const UnitArea& ctuArea, const ChannelType _chType, const Slice& slice )
 {
 #if _DEBUG
   m_currArea = ctuArea;
@@ -241,7 +241,7 @@ Void QTBTPartitioner::initCtu( const UnitArea& ctuArea, const ChannelType _chTyp
   m_partStack.push_back( PartLevel( CTU_LEVEL, Partitioning{ ctuArea } ) );
 }
 
-Void QTBTPartitioner::splitCurrArea( const PartSplit split, const CodingStructure& cs )
+void QTBTPartitioner::splitCurrArea( const PartSplit split, const CodingStructure& cs )
 {
   CHECKD( !canSplit( split, cs ), "Trying to apply a prohibited split!" );
 
@@ -559,7 +559,7 @@ PartSplit QTBTPartitioner::getImplicitSplit( const CodingStructure &cs )
   return split;
 }
 
-Void QTBTPartitioner::exitCurrSplit()
+void QTBTPartitioner::exitCurrSplit()
 {
   PartSplit currSplit = m_partStack.back().split;
   unsigned  currIdx = m_partStack.back().idx;

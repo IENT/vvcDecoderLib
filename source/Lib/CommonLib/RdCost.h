@@ -127,8 +127,8 @@ public:
   Double        calcRdCost            ( uint64_t fracBits, Distortion distortion );
 #endif
 
-  Void          setDistortionWeight   ( const ComponentID compID, const Double distortionWeight ) { m_distortionWeight[compID] = distortionWeight; }
-  Void          setLambda             ( Double dLambda, const BitDepths &bitDepths );
+  void          setDistortionWeight   ( const ComponentID compID, const Double distortionWeight ) { m_distortionWeight[compID] = distortionWeight; }
+  void          setLambda             ( Double dLambda, const BitDepths &bitDepths );
 
 #if WCG_EXT
   Double        getLambda( bool unadj = false )
@@ -138,25 +138,25 @@ public:
 #endif
   Double        getChromaWeight()     { return ((m_distortionWeight[COMPONENT_Cb] + m_distortionWeight[COMPONENT_Cr]) / 2.0); }
 
-  Void          setCostMode(CostMode m) { m_costMode = m; }
+  void          setCostMode(CostMode m) { m_costMode = m; }
 
-  Void          setUseQtbt(bool b)    { m_useQtbt = b; }
+  void          setUseQtbt(bool b)    { m_useQtbt = b; }
 
   // Distortion Functions
-  Void          init();
+  void          init();
 #ifdef TARGET_SIMD_X86
-  Void          initRdCostX86();
+  void          initRdCostX86();
   template <X86_VEXT vext>
-  Void          _initRdCostX86();
+  void          _initRdCostX86();
 #endif
 
-  Void           setDistParam( DistParam &rcDP, const CPelBuf &org, const Pel* piRefY , Int iRefStride, Int bitDepth, ComponentID compID, Int subShiftMode = 0, Int step = 1, Bool useHadamard = false );
-  Void           setDistParam( DistParam &rcDP, const CPelBuf &org, const CPelBuf &cur, Int bitDepth, ComponentID compID, Bool useHadamard = false );
-  Void           setDistParam( DistParam &rcDP, const Pel* pOrg, const Pel* piRefY, Int iOrgStride, Int iRefStride, Int bitDepth, ComponentID compID, Int width, Int height, Int subShiftMode = 0, Int step = 1, Bool useHadamard = false );
+  void           setDistParam( DistParam &rcDP, const CPelBuf &org, const Pel* piRefY , Int iRefStride, Int bitDepth, ComponentID compID, Int subShiftMode = 0, Int step = 1, Bool useHadamard = false );
+  void           setDistParam( DistParam &rcDP, const CPelBuf &org, const CPelBuf &cur, Int bitDepth, ComponentID compID, Bool useHadamard = false );
+  void           setDistParam( DistParam &rcDP, const Pel* pOrg, const Pel* piRefY, Int iOrgStride, Int iRefStride, Int bitDepth, ComponentID compID, Int width, Int height, Int subShiftMode = 0, Int step = 1, Bool useHadamard = false );
 
   double         getMotionLambda          ( bool bIsTransquantBypass ) { return m_dLambdaMotionSAD[(bIsTransquantBypass && m_costMode==COST_MIXED_LOSSLESS_LOSSY_CODING)?1:0]; }
-  Void           selectMotionLambda       ( bool bIsTransquantBypass ) { m_motionLambda = getMotionLambda( bIsTransquantBypass ); }
-  Void           setPredictor             ( const Mv& rcMv )
+  void           selectMotionLambda       ( bool bIsTransquantBypass ) { m_motionLambda = getMotionLambda( bIsTransquantBypass ); }
+  void           setPredictor             ( const Mv& rcMv )
   {
     m_mvPredictor = rcMv;
 #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
@@ -166,7 +166,7 @@ public:
     }
 #endif
   }
-  Void           setCostScale             ( Int iCostScale )           { m_iCostScale = iCostScale; }
+  void           setCostScale             ( Int iCostScale )           { m_iCostScale = iCostScale; }
   Distortion     getCost                  ( UInt b )                   { return Distortion( m_motionLambda * b ); }
 
 #if ENABLE_SPLIT_PARALLELISM
@@ -195,8 +195,8 @@ public:
   UInt           getBitsOfVectorWithPredictor( const Int x, const Int y )  { return xGetExpGolombNumberOfBits(((x << m_iCostScale) - m_mvPredictor.getHor())) + xGetExpGolombNumberOfBits(((y << m_iCostScale) - m_mvPredictor.getVer())); }
 #endif
 #if WCG_EXT
-         Void    saveUnadjustedLambda       ();
-         Void    initLumaLevelToWeightTable ();
+         void    saveUnadjustedLambda       ();
+         void    initLumaLevelToWeightTable ();
   inline Double  getWPSNRLumaLevelWeight    (Int val) { return m_lumaLevelToWeightPLUT[val]; }
 #endif
 

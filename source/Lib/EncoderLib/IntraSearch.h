@@ -123,7 +123,7 @@ public:
   IntraSearch();
   ~IntraSearch();
 
-  Void init                       ( EncCfg*        pcEncCfg,
+  void init                       ( EncCfg*        pcEncCfg,
                                     TrQuant*       pcTrQuant,
                                     RdCost*        pcRdCost,
 #if JEM_TOOLS
@@ -137,7 +137,7 @@ public:
                                     const UInt     maxTotalCUDepth
                                   );
 
-  Void destroy                    ();
+  void destroy                    ();
 
   CodingStructure****getSplitCSBuf() { return m_pSplitCS; }
   CodingStructure****getFullCSBuf () { return m_pFullCS; }
@@ -149,9 +149,9 @@ public:
 #endif
 public:
 
-  Void estIntraPredLumaQT         ( CodingUnit &cu, Partitioner& pm );
-  Void estIntraPredChromaQT       (CodingUnit &cu, Partitioner& pm);
-  Void IPCMSearch                 (CodingStructure &cs, Partitioner& partitioner);
+  void estIntraPredLumaQT         ( CodingUnit &cu, Partitioner& pm );
+  void estIntraPredChromaQT       (CodingUnit &cu, Partitioner& pm);
+  void IPCMSearch                 (CodingStructure &cs, Partitioner& partitioner);
 
 protected:
 
@@ -159,26 +159,26 @@ protected:
   // T & Q & Q-1 & T-1
   // -------------------------------------------------------------------------------------------------------------------
 
-  Void xEncPCM                    (CodingStructure &cs, Partitioner& partitioner, const ComponentID &compID);
+  void xEncPCM                    (CodingStructure &cs, Partitioner& partitioner, const ComponentID &compID);
 
   // -------------------------------------------------------------------------------------------------------------------
   // Intra search
   // -------------------------------------------------------------------------------------------------------------------
 
-  Void xEncIntraHeader            (CodingStructure &cs, Partitioner& pm, const Bool &bLuma, const Bool &bChroma);
-  Void xEncSubdivCbfQT            (CodingStructure &cs, Partitioner& pm, const Bool &bLuma, const Bool &bChroma);
+  void xEncIntraHeader            (CodingStructure &cs, Partitioner& pm, const Bool &bLuma, const Bool &bChroma);
+  void xEncSubdivCbfQT            (CodingStructure &cs, Partitioner& pm, const Bool &bLuma, const Bool &bChroma);
   UInt64 xGetIntraFracBitsQT      (CodingStructure &cs, Partitioner& pm, const Bool &bLuma, const Bool &bChroma);
 
   UInt64 xGetIntraFracBitsQTChroma(TransformUnit& tu, const ComponentID &compID);
-  Void xEncCoeffQT                (CodingStructure &cs, Partitioner& pm, const ComponentID &compID);
+  void xEncCoeffQT                (CodingStructure &cs, Partitioner& pm, const ComponentID &compID);
 
   UInt64 xFracModeBitsIntra       (PredictionUnit &pu, const UInt &uiMode, const ChannelType &compID);
 
-  Void xIntraCodingTUBlock        (TransformUnit &tu, const ComponentID &compID, const Bool &checkCrossCPrediction, Distortion& ruiDist, const Int &default0Save1Load2 = 0, UInt* numSig = nullptr );
+  void xIntraCodingTUBlock        (TransformUnit &tu, const ComponentID &compID, const Bool &checkCrossCPrediction, Distortion& ruiDist, const Int &default0Save1Load2 = 0, UInt* numSig = nullptr );
 
   ChromaCbfs xRecurIntraChromaCodingQT  (CodingStructure &cs, Partitioner& pm);
 
-  Void xRecurIntraCodingLumaQT    ( CodingStructure &cs, Partitioner& pm );
+  void xRecurIntraCodingLumaQT    ( CodingStructure &cs, Partitioner& pm );
 
 
   void encPredIntraDPCM( const ComponentID &compID, PelBuf &pOrg, PelBuf &pDst, const UInt &uiDirMode );

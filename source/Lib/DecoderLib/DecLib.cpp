@@ -389,13 +389,13 @@ DecLib::~DecLib()
   }
 }
 
-Void DecLib::create()
+void DecLib::create()
 {
   m_apcSlicePilot = new Slice;
   m_uiSliceSegmentIdx = 0;
 }
 
-Void DecLib::destroy()
+void DecLib::destroy()
 {
   delete m_apcSlicePilot;
   m_apcSlicePilot = NULL;
@@ -423,7 +423,7 @@ void DecLib::init(
   DTRACE_UPDATE( g_trace_ctx, std::make_pair( "final", 1 ) );
 }
 
-Void DecLib::deletePicBuffer ( )
+void DecLib::deletePicBuffer ( )
 {
   PicList::iterator  iterPic   = m_cListPic.begin();
   Int iSize = Int( m_cListPic.size() );
@@ -510,7 +510,7 @@ Picture* DecLib::xGetNewPicBuffer ( const SPS &sps, const PPS &pps, const UInt t
 }
 
 
-Void DecLib::executeLoopFilters()
+void DecLib::executeLoopFilters()
 {
   if( !m_pcPic )
   {
@@ -558,7 +558,7 @@ Void DecLib::executeLoopFilters()
 #endif
 }
 
-Void DecLib::finishPictureLight(Int& poc, PicList*& rpcListPic )
+void DecLib::finishPictureLight(Int& poc, PicList*& rpcListPic )
 {
   Slice*  pcSlice = m_pcPic->cs->slice;
 
@@ -570,7 +570,7 @@ Void DecLib::finishPictureLight(Int& poc, PicList*& rpcListPic )
   rpcListPic          = &m_cListPic;
 }
 
-Void DecLib::finishPicture(Int& poc, PicList*& rpcListPic, MsgLevel msgl )
+void DecLib::finishPicture(Int& poc, PicList*& rpcListPic, MsgLevel msgl )
 {
   Slice*  pcSlice = m_pcPic->cs->slice;
 #if JEM_TOOLS && !JVET_K0371_ALF
@@ -630,7 +630,7 @@ Void DecLib::finishPicture(Int& poc, PicList*& rpcListPic, MsgLevel msgl )
   m_pcPic->cs->releaseIntermediateData();
 }
 
-Void DecLib::checkNoOutputPriorPics (PicList* pcListPic)
+void DecLib::checkNoOutputPriorPics (PicList* pcListPic)
 {
   if (!pcListPic || !m_isNoOutputPriorPics)
   {
@@ -649,7 +649,7 @@ Void DecLib::checkNoOutputPriorPics (PicList* pcListPic)
   }
 }
 
-Void DecLib::xUpdateRasInit(Slice* slice)
+void DecLib::xUpdateRasInit(Slice* slice)
 {
   slice->setPendingRasInit( false );
   if ( slice->getPOC() > m_lastRasPoc )
@@ -663,7 +663,7 @@ Void DecLib::xUpdateRasInit(Slice* slice)
   }
 }
 
-Void DecLib::xCreateLostPicture(Int iLostPoc)
+void DecLib::xCreateLostPicture(Int iLostPoc)
 {
   msg( INFO, "\ninserting lost poc : %d\n",iLostPoc);
   Picture *cFillPic = xGetNewPicBuffer(*(m_parameterSetManager.getFirstSPS()), *(m_parameterSetManager.getFirstPPS()), 0);
@@ -708,7 +708,7 @@ Void DecLib::xCreateLostPicture(Int iLostPoc)
 }
 
 
-Void DecLib::xActivateParameterSets()
+void DecLib::xActivateParameterSets()
 {
   if (m_bFirstSliceInPicture)
   {
@@ -885,7 +885,7 @@ Void DecLib::xActivateParameterSets()
 }
 
 
-Void DecLib::xParsePrefixSEIsForUnknownVCLNal()
+void DecLib::xParsePrefixSEIsForUnknownVCLNal()
 {
   while (!m_prefixSEINALUs.empty())
   {
@@ -897,7 +897,7 @@ Void DecLib::xParsePrefixSEIsForUnknownVCLNal()
 }
 
 
-Void DecLib::xParsePrefixSEImessages()
+void DecLib::xParsePrefixSEImessages()
 {
   while (!m_prefixSEINALUs.empty())
   {
@@ -1254,7 +1254,7 @@ Bool DecLib::xDecodeSlice(InputNALUnit &nalu, Int &iSkipFrame, Int iPOCLastDispl
 }
 
 #if HEVC_VPS
-Void DecLib::xDecodeVPS( InputNALUnit& nalu )
+void DecLib::xDecodeVPS( InputNALUnit& nalu )
 {
   VPS* vps = new VPS();
   m_HLSReader.setBitstream( &nalu.getBitstream() );
@@ -1263,7 +1263,7 @@ Void DecLib::xDecodeVPS( InputNALUnit& nalu )
 }
 #endif
 
-Void DecLib::xDecodeSPS( InputNALUnit& nalu )
+void DecLib::xDecodeSPS( InputNALUnit& nalu )
 {
   SPS* sps = new SPS();
   m_HLSReader.setBitstream( &nalu.getBitstream() );
@@ -1273,7 +1273,7 @@ Void DecLib::xDecodeSPS( InputNALUnit& nalu )
   DTRACE( g_trace_ctx, D_QP_PER_CTU, "CTU Size: %dx%d", sps->getMaxCUWidth(), sps->getMaxCUHeight() );
 }
 
-Void DecLib::xDecodePPS( InputNALUnit& nalu )
+void DecLib::xDecodePPS( InputNALUnit& nalu )
 {
   PPS* pps = new PPS();
   m_HLSReader.setBitstream( &nalu.getBitstream() );

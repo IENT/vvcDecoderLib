@@ -224,7 +224,7 @@ InterpolationFilter::InterpolationFilter()
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<Bool isFirst, Bool isLast>
-Void InterpolationFilter::filterCopy( const ClpRng& clpRng, const Pel *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height )
+void InterpolationFilter::filterCopy( const ClpRng& clpRng, const Pel *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height )
 {
   Int row, col;
 
@@ -309,7 +309,7 @@ Void InterpolationFilter::filterCopy( const ClpRng& clpRng, const Pel *src, Int 
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<Int N, Bool isVertical, Bool isFirst, Bool isLast>
-Void InterpolationFilter::filter(const ClpRng& clpRng, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, TFilterCoeff const *coeff)
+void InterpolationFilter::filter(const ClpRng& clpRng, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, TFilterCoeff const *coeff)
 {
   Int row, col;
 
@@ -414,7 +414,7 @@ Void InterpolationFilter::filter(const ClpRng& clpRng, Pel const *src, Int srcSt
  * \param  coeff      Pointer to filter taps
  */
 template<Int N>
-Void InterpolationFilter::filterHor(const ClpRng& clpRng, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Bool isLast, TFilterCoeff const *coeff)
+void InterpolationFilter::filterHor(const ClpRng& clpRng, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Bool isLast, TFilterCoeff const *coeff)
 {
 //#if ENABLE_SIMD_OPT_MCIF
   if( N == 8 )
@@ -451,7 +451,7 @@ Void InterpolationFilter::filterHor(const ClpRng& clpRng, Pel const *src, Int sr
  * \param  coeff      Pointer to filter taps
  */
 template<Int N>
-Void InterpolationFilter::filterVer(const ClpRng& clpRng, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Bool isFirst, Bool isLast, TFilterCoeff const *coeff)
+void InterpolationFilter::filterVer(const ClpRng& clpRng, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Bool isFirst, Bool isLast, TFilterCoeff const *coeff)
 {
 //#if ENABLE_SIMD_OPT_MCIF
   if( N == 8 )
@@ -491,9 +491,9 @@ Void InterpolationFilter::filterVer(const ClpRng& clpRng, Pel const *src, Int sr
  * \param  bitDepth   Bit depth
  */
 #if JEM_TOOLS
-Void InterpolationFilter::filterHor( const ComponentID compID, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Int frac, Bool isLast, const ChromaFormat fmt, const ClpRng& clpRng, Int nFilterIdx )
+void InterpolationFilter::filterHor( const ComponentID compID, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Int frac, Bool isLast, const ChromaFormat fmt, const ClpRng& clpRng, Int nFilterIdx )
 #else
-Void InterpolationFilter::filterHor( const ComponentID compID, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Int frac, Bool isLast, const ChromaFormat fmt, const ClpRng& clpRng )
+void InterpolationFilter::filterHor( const ComponentID compID, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Int frac, Bool isLast, const ChromaFormat fmt, const ClpRng& clpRng )
 #endif
 {
   if( frac == 0 )
@@ -548,9 +548,9 @@ Void InterpolationFilter::filterHor( const ComponentID compID, Pel const *src, I
  * \param  bitDepth   Bit depth
  */
 #if JEM_TOOLS
-Void InterpolationFilter::filterVer( const ComponentID compID, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Int frac, Bool isFirst, Bool isLast, const ChromaFormat fmt, const ClpRng& clpRng, Int nFilterIdx )
+void InterpolationFilter::filterVer( const ComponentID compID, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Int frac, Bool isFirst, Bool isLast, const ChromaFormat fmt, const ClpRng& clpRng, Int nFilterIdx )
 #else
-Void InterpolationFilter::filterVer( const ComponentID compID, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Int frac, Bool isFirst, Bool isLast, const ChromaFormat fmt, const ClpRng& clpRng )
+void InterpolationFilter::filterVer( const ComponentID compID, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Int frac, Bool isFirst, Bool isLast, const ChromaFormat fmt, const ClpRng& clpRng )
 #endif
 {
   if( frac == 0 )

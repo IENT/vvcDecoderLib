@@ -219,9 +219,9 @@ public:
   void        cross_comp_pred           ( const TransformUnit&          tu,       ComponentID       compID );
 
 #if JVET_K0371_ALF
-  Void        codeAlfCtuEnableFlags     ( CodingStructure& cs, ChannelType channel, AlfSliceParam* alfParam);
-  Void        codeAlfCtuEnableFlags     ( CodingStructure& cs, ComponentID compID, AlfSliceParam* alfParam);
-  Void        codeAlfCtuEnableFlag      ( CodingStructure& cs, UInt ctuRsAddr, const Int compIdx, AlfSliceParam* alfParam = NULL );
+  void        codeAlfCtuEnableFlags     ( CodingStructure& cs, ChannelType channel, AlfSliceParam* alfParam);
+  void        codeAlfCtuEnableFlags     ( CodingStructure& cs, ComponentID compID, AlfSliceParam* alfParam);
+  void        codeAlfCtuEnableFlag      ( CodingStructure& cs, UInt ctuRsAddr, const Int compIdx, AlfSliceParam* alfParam = NULL );
 #endif
 
 private:
@@ -246,9 +246,9 @@ private:
   unsigned    get_num_written_bits()    { return m_BinEncoder.getNumWrittenBits(); }
 
 #if JEM_TOOLS
-  Void  xWriteTruncBinCode(UInt uiSymbol, UInt uiMaxSymbol);
+  void  xWriteTruncBinCode(UInt uiSymbol, UInt uiMaxSymbol);
 #if JVET_C0038_NO_PREV_FILTERS
-  Void  xWriteEpExGolomb(UInt uiSymbol, UInt uiCount);
+  void  xWriteEpExGolomb(UInt uiSymbol, UInt uiCount);
 #endif
 
 #endif

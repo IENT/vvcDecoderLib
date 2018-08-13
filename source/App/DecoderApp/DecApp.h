@@ -76,10 +76,10 @@ public:
   UInt  decode            (); ///< main decoding function
 
 private:
-  Void  xCreateDecLib     (); ///< create internal classes
-  Void  xDestroyDecLib    (); ///< destroy internal classes
-  Void  xWriteOutput      ( PicList* pcListPic , UInt tId); ///< write YUV to file
-  Void  xFlushOutput      ( PicList* pcListPic ); ///< flush all remaining decoded pictures to file
+  void  xCreateDecLib     (); ///< create internal classes
+  void  xDestroyDecLib    (); ///< destroy internal classes
+  void  xWriteOutput      ( PicList* pcListPic , UInt tId); ///< write YUV to file
+  void  xFlushOutput      ( PicList* pcListPic ); ///< flush all remaining decoded pictures to file
   Bool  isNaluWithinTargetDecLayerIdSet ( InputNALUnit* nalu ); ///< check whether given Nalu is within targetDecLayerIdSet
 };
 

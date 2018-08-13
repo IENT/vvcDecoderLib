@@ -54,8 +54,8 @@
 // Initialize / destroy functions
 // ====================================================================================================================
 
-Void         initROM();
-Void         destroyROM();
+void         initROM();
+void         destroyROM();
 
 void         generateTrafoBlockSizeScaling( SizeIndexInfo& sizeIdxInfo );
 

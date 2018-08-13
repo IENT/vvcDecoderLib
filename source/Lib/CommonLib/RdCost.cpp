@@ -73,7 +73,7 @@ Double RdCost::calcRdCost( uint64_t fracBits, Distortion distortion )
 #endif
 }
 
-Void RdCost::setLambda( Double dLambda, const BitDepths &bitDepths )
+void RdCost::setLambda( Double dLambda, const BitDepths &bitDepths )
 {
   m_dLambda             = dLambda;
   m_DistScale           = double(1<<SCALE_BITS) / m_dLambda;
@@ -97,7 +97,7 @@ Void RdCost::setLambda( Double dLambda, const BitDepths &bitDepths )
 
 
 // Initialize Function Pointer by [eDFunc]
-Void RdCost::init()
+void RdCost::init()
 {
   m_afpDistortFunc[DF_SSE    ] = RdCost::xGetSSE;
   m_afpDistortFunc[DF_SSE2   ] = RdCost::xGetSSE;
@@ -201,7 +201,7 @@ void RdCost::copyState( const RdCost& other )
 }
 #endif
 
-Void RdCost::setDistParam( DistParam &rcDP, const CPelBuf &org, const Pel* piRefY, Int iRefStride, Int bitDepth, ComponentID compID, Int subShiftMode, Int step, Bool useHadamard )
+void RdCost::setDistParam( DistParam &rcDP, const CPelBuf &org, const Pel* piRefY, Int iRefStride, Int bitDepth, ComponentID compID, Int subShiftMode, Int step, Bool useHadamard )
 {
   rcDP.bitDepth   = bitDepth;
   rcDP.compID     = compID;
@@ -283,7 +283,7 @@ Void RdCost::setDistParam( DistParam &rcDP, const CPelBuf &org, const Pel* piRef
   }
 }
 
-Void RdCost::setDistParam( DistParam &rcDP, const CPelBuf &org, const CPelBuf &cur, Int bitDepth, ComponentID compID, Bool useHadamard )
+void RdCost::setDistParam( DistParam &rcDP, const CPelBuf &org, const CPelBuf &cur, Int bitDepth, ComponentID compID, Bool useHadamard )
 {
   rcDP.isQtbt       = m_useQtbt;
   rcDP.org          = org;
@@ -326,7 +326,7 @@ Void RdCost::setDistParam( DistParam &rcDP, const CPelBuf &org, const CPelBuf &c
   rcDP.maximumDistortionForEarlyExit = std::numeric_limits<Distortion>::max();
 }
 
-Void RdCost::setDistParam( DistParam &rcDP, const Pel* pOrg, const Pel* piRefY, Int iOrgStride, Int iRefStride, Int bitDepth, ComponentID compID, Int width, Int height, Int subShiftMode, Int step, Bool useHadamard )
+void RdCost::setDistParam( DistParam &rcDP, const Pel* pOrg, const Pel* piRefY, Int iOrgStride, Int iRefStride, Int bitDepth, ComponentID compID, Int width, Int height, Int subShiftMode, Int step, Bool useHadamard )
 {
   rcDP.bitDepth   = bitDepth;
   rcDP.compID     = compID;
@@ -2977,13 +2977,13 @@ Distortion RdCost::xGetHADs( const DistParam &rcDtParam )
 #if WCG_EXT
 Double RdCost::m_lumaLevelToWeightPLUT[LUMA_LEVEL_TO_DQP_LUT_MAXSIZE];
 
-Void RdCost::saveUnadjustedLambda()
+void RdCost::saveUnadjustedLambda()
 {
   m_dLambda_unadjusted = m_dLambda;
   m_DistScaleUnadjusted = m_DistScale;
 }
 
-Void RdCost::initLumaLevelToWeightTable()
+void RdCost::initLumaLevelToWeightTable()
 {
   for (Int i = 0; i < LUMA_LEVEL_TO_DQP_LUT_MAXSIZE; i++) {
     Double x = i;

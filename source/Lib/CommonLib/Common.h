@@ -55,8 +55,8 @@ struct Position
 
   Position offset(const Position pos)                 const { return Position(x + pos.x, y + pos.y); }
   Position offset(const PosType _x, const PosType _y) const { return Position(x + _x   , y + _y   ); }
-  Void     repositionTo(const Position newPos)              { x  = newPos.x; y  = newPos.y; }
-  Void     relativeTo  (const Position origin)              { x -= origin.x; y -= origin.y; }
+  void     repositionTo(const Position newPos)              { x  = newPos.x; y  = newPos.y; }
+  void     relativeTo  (const Position origin)              { x -= origin.x; y -= origin.y; }
 
   Position operator-( const Position &other )         const { return{ x - other.x, y - other.y }; }
 };

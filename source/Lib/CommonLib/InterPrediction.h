@@ -119,17 +119,17 @@ protected:
 #define BIO_FILTER_LENGTH_MINUS_1         (BIO_FILTER_LENGTH-1)
 #define BIO_FILTER_HALF_LENGTH_MINUS_1    ((BIO_FILTER_LENGTH>>1)-1)
 
-  Void          xGradFilterX    ( const Pel* piRefY, Int iRefStride, Pel*  piDstY, Int iDstStride, Int iWidth, Int iHeight, Int iMVyFrac, Int iMVxFrac, const Int bitDepth );
-  Void          xGradFilterY    ( const Pel* piRefY, Int iRefStride, Pel*  piDstY, Int iDstStride, Int iWidth, Int iHeight, Int iMVyFrac, Int iMVxFrac, const Int bitDepth );
-  inline Void   gradFilter2DVer ( const Pel* piSrc, Int iSrcStride, Int iWidth, Int iHeight, Int iDstStride, Pel*& rpiDst, Int iMv, const Int iShift );
-  inline Void   gradFilter2DHor ( const Pel* piSrc, Int iSrcStride, Int iWidth, Int iHeight, Int iDstStride, Pel*& rpiDst, Int iMV, const Int iShift );
-  inline Void   fracFilter2DHor ( const Pel* piSrc, Int iSrcStride, Int iWidth, Int iHeight, Int iDstStride, Pel*& rpiDst, Int iMV, const Int iShift );
-  inline Void   fracFilter2DVer ( const Pel* piSrc, Int iSrcStride, Int iWidth, Int iHeight, Int iDstStride, Pel*& rpiDst, Int iMv, const Int iShift );
-  inline Void   gradFilter1DHor ( const Pel* piSrc, Int iSrcStride, Int iWidth, Int iHeight, Int iDstStride, Pel*& rpiDst, Int iMV, const Int iShift );
-  inline Void   gradFilter1DVer ( const Pel* piSrc, Int iSrcStride, Int iWidth, Int iHeight, Int iDstStride, Pel*& rpiDst, Int iMV, const Int iShift );
+  void          xGradFilterX    ( const Pel* piRefY, Int iRefStride, Pel*  piDstY, Int iDstStride, Int iWidth, Int iHeight, Int iMVyFrac, Int iMVxFrac, const Int bitDepth );
+  void          xGradFilterY    ( const Pel* piRefY, Int iRefStride, Pel*  piDstY, Int iDstStride, Int iWidth, Int iHeight, Int iMVyFrac, Int iMVxFrac, const Int bitDepth );
+  inline void   gradFilter2DVer ( const Pel* piSrc, Int iSrcStride, Int iWidth, Int iHeight, Int iDstStride, Pel*& rpiDst, Int iMv, const Int iShift );
+  inline void   gradFilter2DHor ( const Pel* piSrc, Int iSrcStride, Int iWidth, Int iHeight, Int iDstStride, Pel*& rpiDst, Int iMV, const Int iShift );
+  inline void   fracFilter2DHor ( const Pel* piSrc, Int iSrcStride, Int iWidth, Int iHeight, Int iDstStride, Pel*& rpiDst, Int iMV, const Int iShift );
+  inline void   fracFilter2DVer ( const Pel* piSrc, Int iSrcStride, Int iWidth, Int iHeight, Int iDstStride, Pel*& rpiDst, Int iMv, const Int iShift );
+  inline void   gradFilter1DHor ( const Pel* piSrc, Int iSrcStride, Int iWidth, Int iHeight, Int iDstStride, Pel*& rpiDst, Int iMV, const Int iShift );
+  inline void   gradFilter1DVer ( const Pel* piSrc, Int iSrcStride, Int iWidth, Int iHeight, Int iDstStride, Pel*& rpiDst, Int iMV, const Int iShift );
 
   inline Int64  divide64        ( Int64 numer, Int64 denom);
-  inline Void   calcBlkGradient ( Int sx, Int sy, Int64 *arraysGx2, Int64 *arraysGxGy, Int64 *arraysGxdI, Int64 *arraysGy2, Int64 *arraysGydI, Int64 &sGx2, Int64 &sGy2, Int64 &sGxGy, Int64 &sGxdI, Int64 &sGydI, Int iWidth, Int iHeight);
+  inline void   calcBlkGradient ( Int sx, Int sy, Int64 *arraysGx2, Int64 *arraysGxGy, Int64 *arraysGxdI, Int64 *arraysGy2, Int64 *arraysGydI, Int64 &sGx2, Int64 &sGy2, Int64 &sGxGy, Int64 &sGxdI, Int64 &sGydI, Int iWidth, Int iHeight);
 
   Pel  optical_flow_averaging   ( Int64 s1, Int64 s2, Int64 s3, Int64 s5, Int64 s6,
                                   Pel pGradX0, Pel pGradX1, Pel pGradY0, Pel pGradY1, Pel pSrcY0Temp, Pel pSrcY1Temp,
@@ -138,45 +138,45 @@ protected:
 #endif
 
 #if JEM_TOOLS
-  Void xPredInterUni            ( const PredictionUnit& pu, const RefPicList& eRefPicList, PelUnitBuf& pcYuvPred, const Bool& bi, const Bool& bBIOApplied = false, const Bool& bDMVRApplied = false );
-  Void xPredInterBi             ( PredictionUnit& pu, PelUnitBuf &pcYuvPred, Bool obmc = false );
+  void xPredInterUni            ( const PredictionUnit& pu, const RefPicList& eRefPicList, PelUnitBuf& pcYuvPred, const Bool& bi, const Bool& bBIOApplied = false, const Bool& bDMVRApplied = false );
+  void xPredInterBi             ( PredictionUnit& pu, PelUnitBuf &pcYuvPred, Bool obmc = false );
 #else
-  Void xPredInterUni            ( const PredictionUnit& pu, const RefPicList& eRefPicList, PelUnitBuf& pcYuvPred, const Bool& bi );
-  Void xPredInterBi             ( PredictionUnit& pu, PelUnitBuf &pcYuvPred );
+  void xPredInterUni            ( const PredictionUnit& pu, const RefPicList& eRefPicList, PelUnitBuf& pcYuvPred, const Bool& bi );
+  void xPredInterBi             ( PredictionUnit& pu, PelUnitBuf &pcYuvPred );
 #endif
-  Void xPredInterBlk            ( const ComponentID& compID, const PredictionUnit& pu, const Picture* refPic, const Mv& _mv, PelUnitBuf& dstPic, const Bool& bi, const ClpRng& clpRng
+  void xPredInterBlk            ( const ComponentID& compID, const PredictionUnit& pu, const Picture* refPic, const Mv& _mv, PelUnitBuf& dstPic, const Bool& bi, const ClpRng& clpRng
 #if JEM_TOOLS
                                   , const Bool& bBIOApplied = false, const Bool& bDMVRApplied = false, const Int& nFRUCMode = FRUC_MERGE_OFF, const Bool& doLic = true
 #endif
                                  );
   
 #if JEM_TOOLS
-  Void xPredAffineBlk           ( const ComponentID& compID, const PredictionUnit& pu, const Picture* refPic, const Mv* _mv, PelUnitBuf& dstPic, const Bool& bi, const ClpRng& clpRng, const Bool& bBIOApplied = false );
+  void xPredAffineBlk           ( const ComponentID& compID, const PredictionUnit& pu, const Picture* refPic, const Mv* _mv, PelUnitBuf& dstPic, const Bool& bi, const ClpRng& clpRng, const Bool& bBIOApplied = false );
   void xGetLICParams            ( const CodingUnit& cu, const ComponentID compID, const Picture& refPic, const Mv& mv, int& shift, int& scale, int& offset );
   void xLocalIlluComp           ( const PredictionUnit& pu, const ComponentID compID, const Picture& refPic, const Mv& mv, const bool biPred, PelBuf& dstBuf );
-  Void xWeightedAverage         ( const PredictionUnit& pu, const CPelUnitBuf& pcYuvSrc0, const CPelUnitBuf& pcYuvSrc1, PelUnitBuf& pcYuvDst, const BitDepths& clipBitDepths, const ClpRngs& clpRngs, const Bool& bBIOApplied );
+  void xWeightedAverage         ( const PredictionUnit& pu, const CPelUnitBuf& pcYuvSrc0, const CPelUnitBuf& pcYuvSrc1, PelUnitBuf& pcYuvDst, const BitDepths& clipBitDepths, const ClpRngs& clpRngs, const Bool& bBIOApplied );
 #else
-  Void xWeightedAverage         ( const PredictionUnit& pu, const CPelUnitBuf& pcYuvSrc0, const CPelUnitBuf& pcYuvSrc1, PelUnitBuf& pcYuvDst, const BitDepths& clipBitDepths, const ClpRngs& clpRngs );
+  void xWeightedAverage         ( const PredictionUnit& pu, const CPelUnitBuf& pcYuvSrc0, const CPelUnitBuf& pcYuvSrc1, PelUnitBuf& pcYuvDst, const BitDepths& clipBitDepths, const ClpRngs& clpRngs );
 #endif
 #if !JEM_TOOLS && JVET_K_AFFINE
-  Void xPredAffineBlk( const ComponentID& compID, const PredictionUnit& pu, const Picture* refPic, const Mv* _mv, PelUnitBuf& dstPic, const Bool& bi, const ClpRng& clpRng );
+  void xPredAffineBlk( const ComponentID& compID, const PredictionUnit& pu, const Picture* refPic, const Mv* _mv, PelUnitBuf& dstPic, const Bool& bi, const ClpRng& clpRng );
 #endif
 
   static Bool xCheckIdenticalMotion( const PredictionUnit& pu );
 
 #if JEM_TOOLS
-  Void xSubPuMC                 ( PredictionUnit& pu, PelUnitBuf& predBuf, const RefPicList &eRefPicList = REF_PIC_LIST_X );
-  Void xSubblockOBMC            ( const ComponentID eComp, PredictionUnit &pu, PelUnitBuf &pcYuvPredDst, PelUnitBuf &pcYuvPredSrc, Int iDir, Bool bOBMCSimp );
-  Void xSubtractOBMC            ( PredictionUnit &pu, PelUnitBuf &pcYuvPredDst, PelUnitBuf &pcYuvPredSrc, Int iDir, Bool bOBMCSimp );
+  void xSubPuMC                 ( PredictionUnit& pu, PelUnitBuf& predBuf, const RefPicList &eRefPicList = REF_PIC_LIST_X );
+  void xSubblockOBMC            ( const ComponentID eComp, PredictionUnit &pu, PelUnitBuf &pcYuvPredDst, PelUnitBuf &pcYuvPredSrc, Int iDir, Bool bOBMCSimp );
+  void xSubtractOBMC            ( PredictionUnit &pu, PelUnitBuf &pcYuvPredDst, PelUnitBuf &pcYuvPredSrc, Int iDir, Bool bOBMCSimp );
 #endif
 #if !JEM_TOOLS && JVET_K0346
-  Void xSubPuMC(PredictionUnit& pu, PelUnitBuf& predBuf, const RefPicList &eRefPicList = REF_PIC_LIST_X);
+  void xSubPuMC(PredictionUnit& pu, PelUnitBuf& predBuf, const RefPicList &eRefPicList = REF_PIC_LIST_X);
 #endif
 #if JEM_TOOLS
-  Void xSubBlockMotionCompensation( PredictionUnit &pu, PelUnitBuf &pcYuvPred );
+  void xSubBlockMotionCompensation( PredictionUnit &pu, PelUnitBuf &pcYuvPred );
 #endif
 
-  Void destroy();
+  void destroy();
 
 #if JEM_TOOLS
   MotionInfo      m_SubPuMiBuf   [( MAX_CU_SIZE * MAX_CU_SIZE ) >> ( MIN_CU_LOG2 << 1 )];
@@ -190,8 +190,8 @@ protected:
   Bool xFrucFindBlkMv           (PredictionUnit& pu, const MergeCtx& mergeCtx );
   Bool xFrucRefineSubBlkMv      (PredictionUnit& pu, const MergeCtx& mergeCtx, Bool bTM);
 
-  Void xFrucCollectBlkStartMv   (PredictionUnit& pu, const MergeCtx& mergeCtx, RefPicList eTargetRefList = REF_PIC_LIST_0, Int nTargetRefIdx = -1, AMVPInfo* pInfo = NULL);
-  Void xFrucCollectSubBlkStartMv(PredictionUnit& pu, const MergeCtx& mergeCtx, RefPicList eRefPicList , const MvField& rMvStart , Int nSubBlkWidth , Int nSubBlkHeight, Position basePuPos);
+  void xFrucCollectBlkStartMv   (PredictionUnit& pu, const MergeCtx& mergeCtx, RefPicList eTargetRefList = REF_PIC_LIST_0, Int nTargetRefIdx = -1, AMVPInfo* pInfo = NULL);
+  void xFrucCollectSubBlkStartMv(PredictionUnit& pu, const MergeCtx& mergeCtx, RefPicList eRefPicList , const MvField& rMvStart , Int nSubBlkWidth , Int nSubBlkHeight, Position basePuPos);
 #if DISTORTION_TYPE_BUGFIX
   Distortion xFrucFindBestMvFromList(MvField *pBestMvField, RefPicList &rBestRefPicList, PredictionUnit &pu,
                                      const MvField &rMvStart, Int nBlkWidth, Int nBlkHeight, Bool bTM, Bool bMvCost);
@@ -225,10 +225,10 @@ protected:
   UInt xFrucGetBilaMatchCost    (PredictionUnit& pu, Int nWidth, Int nHeight, RefPicList eCurRefPicList, const MvField& rCurMvField, MvField& rPairMVField, UInt uiMVCost );
   UInt xFrucGetTempMatchCost    (PredictionUnit& pu, Int nWidth, Int nHeight, RefPicList eCurRefPicList, const MvField& rCurMvField, UInt uiMVCost );
 #endif
-  Void xFrucUpdateTemplate      (PredictionUnit& pu, Int nWidth, Int nHeight, RefPicList eCurRefPicList, const MvField& rCurMvField );
+  void xFrucUpdateTemplate      (PredictionUnit& pu, Int nWidth, Int nHeight, RefPicList eCurRefPicList, const MvField& rCurMvField );
 
 
-  Void xFrucInsertMv2StartList  (const MvField & rMvField, std::list<MvField> & rList,Bool setHighPrec);
+  void xFrucInsertMv2StartList  (const MvField & rMvField, std::list<MvField> & rList,Bool setHighPrec);
   Bool xFrucIsInList            (const MvField & rMvField, std::list<MvField> & rList);
 
   Bool xFrucGetCurBlkTemplate   (PredictionUnit& pu, Int nCurBlkWidth , Int nCurBlkHeight);
@@ -237,18 +237,18 @@ protected:
   Int  xFrucGetSubBlkSize       (PredictionUnit& pu, Int nBlkWidth, Int nBlkHeight);
 
 #if DISTORTION_TYPE_BUGFIX
-  Void xBIPMVRefine(PredictionUnit &pu, RefPicList eRefPicList, Int iWidth, Int iHeight, const CPelUnitBuf &pcYuvOrg,
+  void xBIPMVRefine(PredictionUnit &pu, RefPicList eRefPicList, Int iWidth, Int iHeight, const CPelUnitBuf &pcYuvOrg,
                     UInt uiMaxSearchRounds, UInt nSearchStepShift, Distortion &uiMinCost, Bool fullPel = true);
   Distortion xDirectMCCost(Int iBitDepth, Pel *pRef, UInt uiRefStride, const Pel *pOrg, UInt uiOrgStride, Int iWidth,
                            Int iHeight);
 #else
-  Void xBIPMVRefine(PredictionUnit &pu, RefPicList eRefPicList, Int iWidth, Int iHeight, const CPelUnitBuf &pcYuvOrg,
+  void xBIPMVRefine(PredictionUnit &pu, RefPicList eRefPicList, Int iWidth, Int iHeight, const CPelUnitBuf &pcYuvOrg,
                     UInt uiMaxSearchRounds, UInt nSearchStepShift, UInt &uiMinCost, Bool fullPel = true);
   UInt xDirectMCCost            (Int iBitDepth, Pel* pRef, UInt uiRefStride, const Pel* pOrg, UInt uiOrgStride, Int iWidth, Int iHeight);
 #endif
-  Void xPredInterLines          (const PredictionUnit& pu, const Picture* refPic, Mv &mv, PelUnitBuf &dstPic, const Bool &bi, const ClpRng& clpRng );
-  Void xFillPredBlckAndBorder   (const PredictionUnit& pu, RefPicList eRefPicList, Int iWidth, Int iHeight, PelBuf &cTmpY );
-  Void xProcessDMVR             (      PredictionUnit& pu, PelUnitBuf &pcYuvDst, const ClpRngs &clpRngs, const bool bBIOApplied);
+  void xPredInterLines          (const PredictionUnit& pu, const Picture* refPic, Mv &mv, PelUnitBuf &dstPic, const Bool &bi, const ClpRng& clpRng );
+  void xFillPredBlckAndBorder   (const PredictionUnit& pu, RefPicList eRefPicList, Int iWidth, Int iHeight, PelBuf &cTmpY );
+  void xProcessDMVR             (      PredictionUnit& pu, PelUnitBuf &pcYuvDst, const ClpRngs &clpRngs, const bool bBIOApplied);
 #endif
 
 #if !JEM_TOOLS && JVET_K0346
@@ -259,16 +259,16 @@ public:
   InterPrediction();
   virtual ~InterPrediction();
 
-  Void    init                (RdCost* pcRdCost, ChromaFormat chromaFormatIDC);
+  void    init                (RdCost* pcRdCost, ChromaFormat chromaFormatIDC);
 
   // inter
-  Void    motionCompensation  (PredictionUnit &pu, PelUnitBuf& predBuf, const RefPicList &eRefPicList = REF_PIC_LIST_X);
-  Void    motionCompensation  (PredictionUnit &pu, const RefPicList &eRefPicList = REF_PIC_LIST_X);
-  Void    motionCompensation  (CodingUnit &cu,     const RefPicList &eRefPicList = REF_PIC_LIST_X);
+  void    motionCompensation  (PredictionUnit &pu, PelUnitBuf& predBuf, const RefPicList &eRefPicList = REF_PIC_LIST_X);
+  void    motionCompensation  (PredictionUnit &pu, const RefPicList &eRefPicList = REF_PIC_LIST_X);
+  void    motionCompensation  (CodingUnit &cu,     const RefPicList &eRefPicList = REF_PIC_LIST_X);
 
 #if JEM_TOOLS
-  Void    subBlockOBMC        (CodingUnit      &cu);
-  Void    subBlockOBMC        (PredictionUnit  &pu, PelUnitBuf *pDst = nullptr, Bool bOBMC4ME = false);
+  void    subBlockOBMC        (CodingUnit      &cu);
+  void    subBlockOBMC        (PredictionUnit  &pu, PelUnitBuf *pDst = nullptr, Bool bOBMC4ME = false);
 
   Bool    deriveFRUCMV        (PredictionUnit &pu);
   Bool    frucFindBlkMv4Pred  (PredictionUnit& pu, RefPicList eTargetRefPicList, const Int nTargetRefIdx, AMVPInfo* pInfo = NULL);

@@ -52,7 +52,7 @@
 
 #if ENABLE_TRACING
 
-Void  VLCReader::xReadCodeTr(UInt length, UInt& rValue, const TChar *pSymbolName)
+void  VLCReader::xReadCodeTr(UInt length, UInt& rValue, const TChar *pSymbolName)
 {
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
   xReadCode (length, rValue, pSymbolName);
@@ -69,7 +69,7 @@ Void  VLCReader::xReadCodeTr(UInt length, UInt& rValue, const TChar *pSymbolName
   }
 }
 
-Void  VLCReader::xReadUvlcTr(UInt& rValue, const TChar *pSymbolName)
+void  VLCReader::xReadUvlcTr(UInt& rValue, const TChar *pSymbolName)
 {
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
   xReadUvlc (rValue, pSymbolName);
@@ -79,7 +79,7 @@ Void  VLCReader::xReadUvlcTr(UInt& rValue, const TChar *pSymbolName)
   DTRACE( g_trace_ctx, D_HEADER, "%-50s ue(v) : %u\n", pSymbolName, rValue );
 }
 
-Void  VLCReader::xReadSvlcTr(Int& rValue, const TChar *pSymbolName)
+void  VLCReader::xReadSvlcTr(Int& rValue, const TChar *pSymbolName)
 {
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
   xReadSvlc (rValue, pSymbolName);
@@ -89,7 +89,7 @@ Void  VLCReader::xReadSvlcTr(Int& rValue, const TChar *pSymbolName)
   DTRACE( g_trace_ctx, D_HEADER, "%-50s se(v) : %d\n", pSymbolName, rValue );
 }
 
-Void  VLCReader::xReadFlagTr(UInt& rValue, const TChar *pSymbolName)
+void  VLCReader::xReadFlagTr(UInt& rValue, const TChar *pSymbolName)
 {
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
   xReadFlag (rValue, pSymbolName);
@@ -99,7 +99,7 @@ Void  VLCReader::xReadFlagTr(UInt& rValue, const TChar *pSymbolName)
   DTRACE( g_trace_ctx, D_HEADER, "%-50s u(1)  : %d\n", pSymbolName, rValue );
 }
 
-Void xTraceFillerData ()
+void xTraceFillerData ()
 {
   DTRACE( g_trace_ctx, D_HEADER, "=========== Filler Data ===========\n");
 }
@@ -111,9 +111,9 @@ Void xTraceFillerData ()
 // Protected member functions
 // ====================================================================================================================
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
-Void VLCReader::xReadCode (UInt uiLength, UInt& ruiCode, const TChar *pSymbolName)
+void VLCReader::xReadCode (UInt uiLength, UInt& ruiCode, const TChar *pSymbolName)
 #else
-Void VLCReader::xReadCode (UInt uiLength, UInt& ruiCode)
+void VLCReader::xReadCode (UInt uiLength, UInt& ruiCode)
 #endif
 {
   CHECK( uiLength == 0, "Reading a code of lenght '0'" );
@@ -124,9 +124,9 @@ Void VLCReader::xReadCode (UInt uiLength, UInt& ruiCode)
 }
 
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
-Void VLCReader::xReadUvlc( UInt& ruiVal, const TChar *pSymbolName)
+void VLCReader::xReadUvlc( UInt& ruiVal, const TChar *pSymbolName)
 #else
-Void VLCReader::xReadUvlc( UInt& ruiVal)
+void VLCReader::xReadUvlc( UInt& ruiVal)
 #endif
 {
   UInt uiVal = 0;
@@ -162,9 +162,9 @@ Void VLCReader::xReadUvlc( UInt& ruiVal)
 }
 
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
-Void VLCReader::xReadSvlc( Int& riVal, const TChar *pSymbolName)
+void VLCReader::xReadSvlc( Int& riVal, const TChar *pSymbolName)
 #else
-Void VLCReader::xReadSvlc( Int& riVal)
+void VLCReader::xReadSvlc( Int& riVal)
 #endif
 {
   UInt uiBits = 0;
@@ -200,9 +200,9 @@ Void VLCReader::xReadSvlc( Int& riVal)
 }
 
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
-Void VLCReader::xReadFlag (UInt& ruiCode, const TChar *pSymbolName)
+void VLCReader::xReadFlag (UInt& ruiCode, const TChar *pSymbolName)
 #else
-Void VLCReader::xReadFlag (UInt& ruiCode)
+void VLCReader::xReadFlag (UInt& ruiCode)
 #endif
 {
   m_pcBitstream->read( 1, ruiCode );
@@ -211,7 +211,7 @@ Void VLCReader::xReadFlag (UInt& ruiCode)
 #endif
 }
 
-Void VLCReader::xReadRbspTrailingBits()
+void VLCReader::xReadRbspTrailingBits()
 {
   UInt bit;
   READ_FLAG( bit, "rbsp_stop_one_bit");
@@ -226,7 +226,7 @@ Void VLCReader::xReadRbspTrailingBits()
   CHECK(cnt >= 8, "Read more than '8' trailing bits");
 }
 
-Void AUDReader::parseAccessUnitDelimiter(InputBitstream* bs, UInt &picType)
+void AUDReader::parseAccessUnitDelimiter(InputBitstream* bs, UInt &picType)
 {
   setBitstream(bs);
 
@@ -238,7 +238,7 @@ Void AUDReader::parseAccessUnitDelimiter(InputBitstream* bs, UInt &picType)
   xReadRbspTrailingBits();
 }
 
-Void FDReader::parseFillerData(InputBitstream* bs, UInt &fdSize)
+void FDReader::parseFillerData(InputBitstream* bs, UInt &fdSize)
 {
   setBitstream(bs);
 #if ENABLE_TRACING
@@ -275,7 +275,7 @@ HLSyntaxReader::~HLSyntaxReader()
 // Public member functions
 // ====================================================================================================================
 
-Void HLSyntaxReader::parseShortTermRefPicSet( SPS* sps, ReferencePictureSet* rps, Int idx )
+void HLSyntaxReader::parseShortTermRefPicSet( SPS* sps, ReferencePictureSet* rps, Int idx )
 {
   UInt code;
   UInt interRPSPred;
@@ -374,7 +374,7 @@ Void HLSyntaxReader::parseShortTermRefPicSet( SPS* sps, ReferencePictureSet* rps
   rps->printDeltaPOC();
 }
 
-Void HLSyntaxReader::parsePPS( PPS* pcPPS )
+void HLSyntaxReader::parsePPS( PPS* pcPPS )
 {
 #if ENABLE_TRACING
   xTracePPSHeader ();
@@ -618,7 +618,7 @@ Void HLSyntaxReader::parsePPS( PPS* pcPPS )
   xReadRbspTrailingBits();
 }
 
-Void  HLSyntaxReader::parseVUI(VUI* pcVUI, SPS *pcSPS)
+void  HLSyntaxReader::parseVUI(VUI* pcVUI, SPS *pcSPS)
 {
 #if ENABLE_TRACING
   DTRACE( g_trace_ctx, D_HEADER, "----------- vui_parameters -----------\n");
@@ -715,7 +715,7 @@ Void  HLSyntaxReader::parseVUI(VUI* pcVUI, SPS *pcSPS)
   }
 }
 
-Void HLSyntaxReader::parseHrdParameters(HRD *hrd, Bool commonInfPresentFlag, UInt maxNumSubLayersMinus1)
+void HLSyntaxReader::parseHrdParameters(HRD *hrd, Bool commonInfPresentFlag, UInt maxNumSubLayersMinus1)
 {
   UInt  uiCode;
   if( commonInfPresentFlag )
@@ -1012,7 +1012,7 @@ void HLSyntaxReader::parseSPSNext( SPSNext& spsNext, const bool usePCM )
   // ADD_NEW_TOOL : (sps extension parser) read tool enabling flags and associated parameters here
 }
 
-Void HLSyntaxReader::parseSPS(SPS* pcSPS)
+void HLSyntaxReader::parseSPS(SPS* pcSPS)
 {
 #if ENABLE_TRACING
   xTraceSPSHeader ();
@@ -1266,7 +1266,7 @@ Void HLSyntaxReader::parseSPS(SPS* pcSPS)
 }
 
 #if HEVC_VPS
-Void HLSyntaxReader::parseVPS(VPS* pcVPS)
+void HLSyntaxReader::parseVPS(VPS* pcVPS)
 {
 #if ENABLE_TRACING
   xTraceVPSHeader ();
@@ -1362,7 +1362,7 @@ Void HLSyntaxReader::parseVPS(VPS* pcVPS)
 }
 #endif
 
-Void HLSyntaxReader::parseSliceHeader (Slice* pcSlice, ParameterSetManager *parameterSetManager, const Int prevTid0POC)
+void HLSyntaxReader::parseSliceHeader (Slice* pcSlice, ParameterSetManager *parameterSetManager, const Int prevTid0POC)
 {
   UInt  uiCode;
   Int   iCode;
@@ -2130,7 +2130,7 @@ void HLSyntaxReader::xParseCABACWSizes( Slice* pcSlice, const SPS* sps )
 }
 #endif
 
-Void HLSyntaxReader::parsePTL( PTL *rpcPTL, Bool profilePresentFlag, Int maxNumSubLayersMinus1 )
+void HLSyntaxReader::parsePTL( PTL *rpcPTL, Bool profilePresentFlag, Int maxNumSubLayersMinus1 )
 {
   UInt uiCode;
   if(profilePresentFlag)
@@ -2168,10 +2168,10 @@ Void HLSyntaxReader::parsePTL( PTL *rpcPTL, Bool profilePresentFlag, Int maxNumS
 }
 
 #if ENABLE_TRACING|| RExt__DECODER_DEBUG_BIT_STATISTICS
-Void HLSyntaxReader::parseProfileTier(ProfileTierLevel *ptl, const Bool bIsSubLayer)
+void HLSyntaxReader::parseProfileTier(ProfileTierLevel *ptl, const Bool bIsSubLayer)
 #define PTL_TRACE_TEXT(txt) bIsSubLayer?("sub_layer_" txt) : ("general_" txt)
 #else
-Void HLSyntaxReader::parseProfileTier(ProfileTierLevel *ptl, const Bool /*bIsSubLayer*/)
+void HLSyntaxReader::parseProfileTier(ProfileTierLevel *ptl, const Bool /*bIsSubLayer*/)
 #define PTL_TRACE_TEXT(txt) txt
 #endif
 {
@@ -2238,7 +2238,7 @@ Void HLSyntaxReader::parseProfileTier(ProfileTierLevel *ptl, const Bool /*bIsSub
 #undef PTL_TRACE_TEXT
 }
 
-Void HLSyntaxReader::parseTerminatingBit( UInt& ruiBit )
+void HLSyntaxReader::parseTerminatingBit( UInt& ruiBit )
 {
   ruiBit = false;
   Int iBitsLeft = m_pcBitstream->getNumBitsLeft();
@@ -2252,7 +2252,7 @@ Void HLSyntaxReader::parseTerminatingBit( UInt& ruiBit )
   }
 }
 
-Void HLSyntaxReader::parseRemainingBytes( Bool noTrailingBytesExpected )
+void HLSyntaxReader::parseRemainingBytes( Bool noTrailingBytesExpected )
 {
   if (noTrailingBytesExpected)
   {
@@ -2280,7 +2280,7 @@ Void HLSyntaxReader::parseRemainingBytes( Bool noTrailingBytesExpected )
 // ====================================================================================================================
 
 //! parse explicit wp tables
-Void HLSyntaxReader::parsePredWeightTable( Slice* pcSlice, const SPS *sps )
+void HLSyntaxReader::parsePredWeightTable( Slice* pcSlice, const SPS *sps )
 {
   WPScalingParam *wp;
   const ChromaFormat    chFmt        = sps->getChromaFormatIdc();
@@ -2403,7 +2403,7 @@ Void HLSyntaxReader::parsePredWeightTable( Slice* pcSlice, const SPS *sps )
 /** decode quantization matrix
 * \param scalingList quantization matrix information
 */
-Void HLSyntaxReader::parseScalingList(ScalingList* scalingList)
+void HLSyntaxReader::parseScalingList(ScalingList* scalingList)
 {
   UInt  code, sizeId, listId;
   Bool scalingListPredModeFlag;
@@ -2461,7 +2461,7 @@ Void HLSyntaxReader::parseScalingList(ScalingList* scalingList)
 * \param sizeId size index
 * \param listId list index
 */
-Void HLSyntaxReader::decodeScalingList(ScalingList *scalingList, UInt sizeId, UInt listId)
+void HLSyntaxReader::decodeScalingList(ScalingList *scalingList, UInt sizeId, UInt listId)
 {
   Int i,coefNum = std::min(MAX_MATRIX_COEF_NUM,(Int)g_scalingListSize[sizeId]);
   Int data;

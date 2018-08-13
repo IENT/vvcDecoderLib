@@ -405,7 +405,7 @@ void LoopFilter::xSetEdgefilterMultiple( const CodingUnit&    cu,
   }
 }
 #if JEM_TOOLS
-Void LoopFilter::xSetEdgefilterMultipleSubPu(const CodingUnit& cu,
+void LoopFilter::xSetEdgefilterMultipleSubPu(const CodingUnit& cu,
                                              DeblockEdgeDir edgeDir,
                                              const Area&    area,
                                              const Position subPuPos,
@@ -574,7 +574,7 @@ unsigned LoopFilter::xGetBoundaryStrengthSingle ( const CodingUnit& cu, const De
   return ( ( abs( mvQ0.getHor() - mvP0.getHor() ) >= nThreshold ) || ( abs( mvQ0.getVer() - mvP0.getVer() ) >= nThreshold ) ) ? 1 : 0;
 }
 
-Void LoopFilter::xEdgeFilterLuma(const CodingUnit& cu, const DeblockEdgeDir edgeDir, const int iEdge)
+void LoopFilter::xEdgeFilterLuma(const CodingUnit& cu, const DeblockEdgeDir edgeDir, const int iEdge)
 {
   const CompArea&  lumaArea = cu.block(COMPONENT_Y);
   const PreCalcValues& pcv = *cu.cs->pcv;

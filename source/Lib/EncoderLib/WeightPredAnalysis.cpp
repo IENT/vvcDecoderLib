@@ -78,7 +78,7 @@ Int64 xCalcSADvalueWPOptionalClip(const Int   bitDepth,
 
 //! calculate Histogram for array of pixels
 static
-Void xCalcHistogram(const Pel  *pPel,
+void xCalcHistogram(const Pel  *pPel,
                     std::vector<Int> &histogram,
                     const Int   width,
                     const Int   height,
@@ -242,7 +242,7 @@ WeightPredAnalysis::WeightPredAnalysis()
 
 
 //! calculate AC and DC values for current original image
-Void WeightPredAnalysis::xCalcACDCParamSlice(Slice *const slice)
+void WeightPredAnalysis::xCalcACDCParamSlice(Slice *const slice)
 {
   //===== calculate AC/DC value =====
 //  PicYuv*   pPic = slice->getPic()->getPicYuvOrg();
@@ -302,7 +302,7 @@ Void WeightPredAnalysis::xCalcACDCParamSlice(Slice *const slice)
 
 
 //! check weighted pred or non-weighted pred
-Void  WeightPredAnalysis::xCheckWPEnable(Slice *const slice)
+void  WeightPredAnalysis::xCheckWPEnable(Slice *const slice)
 {
 //  const PicYuv *pPic = slice->getPic()->getPicYuvOrg();
 
@@ -350,7 +350,7 @@ Void  WeightPredAnalysis::xCheckWPEnable(Slice *const slice)
 
 
 //! estimate wp tables for explicit wp
-Void WeightPredAnalysis::xEstimateWPParamSlice(Slice *const slice, const WeightedPredictionMethod method)
+void WeightPredAnalysis::xEstimateWPParamSlice(Slice *const slice, const WeightedPredictionMethod method)
 {
   Int  iDenom         = 6;
   Bool validRangeFlag = false;

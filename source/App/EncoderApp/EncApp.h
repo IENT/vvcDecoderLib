@@ -68,24 +68,24 @@ private:
 
 private:
   // initialization
-  Void xCreateLib  ( std::list<PelUnitBuf*>& recBufList
+  void xCreateLib  ( std::list<PelUnitBuf*>& recBufList
                     );                           ///< create files & encoder class
-  Void xInitLibCfg ();                           ///< initialize internal variables
-  Void xInitLib    (Bool isFieldCoding);         ///< initialize encoder class
-  Void xDestroyLib ();                           ///< destroy encoder class
+  void xInitLibCfg ();                           ///< initialize internal variables
+  void xInitLib    (Bool isFieldCoding);         ///< initialize encoder class
+  void xDestroyLib ();                           ///< destroy encoder class
 
   // file I/O
-  Void xWriteOutput     ( Int iNumEncoded, std::list<PelUnitBuf*>& recBufList
+  void xWriteOutput     ( Int iNumEncoded, std::list<PelUnitBuf*>& recBufList
                          );                      ///< write bitstream to file
-  Void rateStatsAccum   ( const AccessUnit& au, const std::vector<UInt>& stats);
-  Void printRateSummary ();
-  Void printChromaFormat();
+  void rateStatsAccum   ( const AccessUnit& au, const std::vector<UInt>& stats);
+  void printRateSummary ();
+  void printChromaFormat();
 
 public:
   EncApp();
   virtual ~EncApp();
 
-  Void  encode();                               ///< main encoding function
+  void  encode();                               ///< main encoding function
 
   void  outputAU( const AccessUnit& au );
 

@@ -84,7 +84,7 @@ public:
   virtual ~Analyze()  {}
   Analyze() { clear(); }
 
-  Void  addResult( Double psnr[MAX_NUM_COMPONENT], Double bits, const Double MSEyuvframe[MAX_NUM_COMPONENT])
+  void  addResult( Double psnr[MAX_NUM_COMPONENT], Double bits, const Double MSEyuvframe[MAX_NUM_COMPONENT])
   {
     m_dAddBits  += bits;
     for(UInt i=0; i<MAX_NUM_COMPONENT; i++)
@@ -97,8 +97,8 @@ public:
   }
 #if ENABLE_QPA
  #if FRAME_WEIGHTING
-  Void    addWeightedSSD(const double dWeightedSSD, const ComponentID compID) { m_sumWSSD[compID] += dWeightedSSD; }
-  Void    addWeight     (const double dWeight) { m_sumW += dWeight; }
+  void    addWeightedSSD(const double dWeightedSSD, const ComponentID compID) { m_sumWSSD[compID] += dWeightedSSD; }
+  void    addWeight     (const double dWeight) { m_sumW += dWeight; }
   Double  getWPSNR      (const ComponentID compID) const { return (m_sumWSSD[compID] > 0.0 ? 10.0 * log10(m_sumW / m_sumWSSD[compID]) : 999.99); }
  #else
   Double  getWPSNR      (const ComponentID compID) const { return m_dPSNRSum[compID] / (double)m_uiNumPic; }
@@ -106,14 +106,14 @@ public:
 #endif
   Double  getPsnr(ComponentID compID) const { return  m_dPSNRSum[compID];  }
   Double  getBits()                   const { return  m_dAddBits;   }
-  Void    setBits(Double numBits)     { m_dAddBits = numBits; }
+  void    setBits(Double numBits)     { m_dAddBits = numBits; }
   UInt    getNumPic()                 const { return  m_uiNumPic;   }
 #if EXTENSION_360_VIDEO
   TExt360EncAnalyze& getExt360Info() { return m_ext360; }
 #endif
 
-  Void    setFrmRate  (Double dFrameRate) { m_dFrmRate = dFrameRate; } //--CFG_KDY
-  Void    clear()
+  void    setFrmRate  (Double dFrameRate) { m_dFrmRate = dFrameRate; } //--CFG_KDY
+  void    clear()
   {
     m_dAddBits = 0;
     for(UInt i=0; i<MAX_NUM_COMPONENT; i++)
@@ -134,7 +134,7 @@ public:
   }
 
 
-  Void calculateCombinedValues(const ChromaFormat chFmt, Double &PSNRyuv, Double &MSEyuv, const BitDepths &bitDepths)
+  void calculateCombinedValues(const ChromaFormat chFmt, Double &PSNRyuv, Double &MSEyuv, const BitDepths &bitDepths)
   {
     MSEyuv    = 0;
     Int scale = 0;
@@ -175,9 +175,9 @@ public:
 
 
 #if ENABLE_QPA || WCG_WPSNR
-  Void    printOut ( TChar cDelim, const ChromaFormat chFmt, const Bool printMSEBasedSNR, const Bool printSequenceMSE, const BitDepths &bitDepths, const bool useWPSNR = false )
+  void    printOut ( TChar cDelim, const ChromaFormat chFmt, const Bool printMSEBasedSNR, const Bool printSequenceMSE, const BitDepths &bitDepths, const bool useWPSNR = false )
 #else
-  Void    printOut ( TChar cDelim, const ChromaFormat chFmt, const Bool printMSEBasedSNR, const Bool printSequenceMSE, const BitDepths &bitDepths )
+  void    printOut ( TChar cDelim, const ChromaFormat chFmt, const Bool printMSEBasedSNR, const Bool printSequenceMSE, const BitDepths &bitDepths )
 #endif
   {
 #if !WCG_WPSNR
@@ -427,7 +427,7 @@ public:
   }
 
 
-  Void    printSummary(const ChromaFormat chFmt, const Bool printSequenceMSE, const BitDepths &bitDepths, const std::string &sFilename)
+  void    printSummary(const ChromaFormat chFmt, const Bool printSequenceMSE, const BitDepths &bitDepths, const std::string &sFilename)
   {
     FILE* pFile = fopen (sFilename.c_str(), "at");
 

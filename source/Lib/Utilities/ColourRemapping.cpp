@@ -75,16 +75,16 @@ ColourRemapping::~ColourRemapping()
   reset();
 }
 
-Void ColourRemapping::reset()
+void ColourRemapping::reset()
 {
   delete m_pcSeiColourRemappingInfoPrevious;
   m_pcSeiColourRemappingInfoPrevious = NULL;
 }
 
 
-Void applyColourRemapping(const PelUnitBuf& pic, SEIColourRemappingInfo& criSEI, const SPS &activeSPS, std::ofstream& outstream);
+void applyColourRemapping(const PelUnitBuf& pic, SEIColourRemappingInfo& criSEI, const SPS &activeSPS, std::ofstream& outstream);
 
-Void ColourRemapping::outputColourRemapPic(Picture* pcPic, std::ofstream& outstream)
+void ColourRemapping::outputColourRemapPic(Picture* pcPic, std::ofstream& outstream)
 {
   const SPS &sps=*pcPic->cs->sps;
   SEIMessages colourRemappingInfo = getSeisByType(pcPic->SEIs, SEI::COLOUR_REMAPPING_INFO );
@@ -182,7 +182,7 @@ initColourRemappingInfoLut(const Int                                          bi
   return retLut;
 }
 
-static Void
+static void
 initColourRemappingInfoLuts(std::vector<Int>      (&preLut)[3],
                             std::vector<Int>      (&postLut)[3],
                             SEIColourRemappingInfo &pCriSEI,
@@ -220,7 +220,7 @@ applyColourRemappingInfoMatrix(const Int (&colourRemapCoeffs)[3], const Int post
   return YUVMat;
 }
 
-static Void
+static void
 setColourRemappingInfoMatrixOffset(Int (&matrixOffset)[3], Int offset0, Int offset1, Int offset2)
 {
   matrixOffset[0] = offset0;
@@ -228,7 +228,7 @@ setColourRemappingInfoMatrixOffset(Int (&matrixOffset)[3], Int offset0, Int offs
   matrixOffset[2] = offset2;
 }
 
-static Void
+static void
 setColourRemappingInfoMatrixOffsets(      Int  (&matrixInputOffset)[3],
                                           Int  (&matrixOutputOffset)[3],
                                     const Int  bitDepth,
@@ -285,7 +285,7 @@ setColourRemappingInfoMatrixOffsets(      Int  (&matrixInputOffset)[3],
   setColourRemappingInfoMatrixOffset(matrixOutputOffset, crOffsetLuma, crOffsetChroma, crOffsetChroma);
 }
 
-Void applyColourRemapping(const PelUnitBuf& pic, SEIColourRemappingInfo& criSEI, const SPS &activeSPS, std::ofstream& outstream)
+void applyColourRemapping(const PelUnitBuf& pic, SEIColourRemappingInfo& criSEI, const SPS &activeSPS, std::ofstream& outstream)
 {
   const Int maxBitDepth = 16;
 

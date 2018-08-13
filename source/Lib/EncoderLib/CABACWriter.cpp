@@ -481,7 +481,7 @@ Int CABACWriter::alf_lengthGolomb(int coeffVal, int k)
     return(q + 1 + k);
 }
 
-Void CABACWriter::codeAlfUvlc( UInt uiCode )
+void CABACWriter::codeAlfUvlc( UInt uiCode )
 {
   Int i;
   if ( uiCode == 0 )
@@ -499,7 +499,7 @@ Void CABACWriter::codeAlfUvlc( UInt uiCode )
   }
 }
 
-Void CABACWriter::codeAlfSvlc( Int iCode )
+void CABACWriter::codeAlfSvlc( Int iCode )
 {
   Int i;
   if ( iCode == 0 )
@@ -531,7 +531,7 @@ Void CABACWriter::codeAlfSvlc( Int iCode )
 }
 #endif
 
-Void CABACWriter::xWriteTruncBinCode(UInt uiSymbol, UInt uiMaxSymbol)
+void CABACWriter::xWriteTruncBinCode(UInt uiSymbol, UInt uiMaxSymbol)
 {
   UInt uiThresh;
   if (uiMaxSymbol > 256)
@@ -573,7 +573,7 @@ Void CABACWriter::xWriteTruncBinCode(UInt uiSymbol, UInt uiMaxSymbol)
 
 #if !JVET_K0371_ALF
 #if JVET_C0038_NO_PREV_FILTERS
-Void CABACWriter::xWriteEpExGolomb(UInt uiSymbol, UInt uiCount)
+void CABACWriter::xWriteEpExGolomb(UInt uiSymbol, UInt uiCount)
 {
   UInt bins = 0;
   Int numBins = 0;
@@ -596,7 +596,7 @@ Void CABACWriter::xWriteEpExGolomb(UInt uiSymbol, UInt uiCount)
 }
 #endif
 
-Void CABACWriter::alfGolombEncode(int coeff, int k)
+void CABACWriter::alfGolombEncode(int coeff, int k)
 {
   int q, i, m;
   int symbol = abs(coeff);
@@ -681,7 +681,7 @@ void CABACWriter::alf( const ALFParam& alfParam, SliceType sliceType, bool isGAL
   alf_cu_ctrl( alfParam );
 }
 
-Void CABACWriter::alf_aux( const ALFParam& alfParam, bool isGALF )
+void CABACWriter::alf_aux( const ALFParam& alfParam, bool isGALF )
 {
   Int iNoVarBins = AdaptiveLoopFilter::m_NO_VAR_BINS;
 #if GALF
@@ -750,7 +750,7 @@ Void CABACWriter::alf_aux( const ALFParam& alfParam, bool isGALF )
   }
 }
 
-Void CABACWriter::alf_filter( const ALFParam& alfParam, bool isGALF, bool bChroma )
+void CABACWriter::alf_filter( const ALFParam& alfParam, bool isGALF, bool bChroma )
 {
   Int filters_per_group;
   Int sqrFiltLength;
@@ -930,7 +930,7 @@ Void CABACWriter::alf_filter( const ALFParam& alfParam, bool isGALF, bool bChrom
   }
 }
 
-Void CABACWriter::alf_cu_ctrl( const ALFParam& alfParam )
+void CABACWriter::alf_cu_ctrl( const ALFParam& alfParam )
 {
   m_BinEncoder.encodeBinEP( alfParam.cu_control_flag );
   if( alfParam.cu_control_flag)
@@ -975,7 +975,7 @@ Void CABACWriter::alf_cu_ctrl( const ALFParam& alfParam )
   }
 }
 
-Void CABACWriter::alf_chroma( const ALFParam& alfParam )
+void CABACWriter::alf_chroma( const ALFParam& alfParam )
 {
   codeAlfUvlc( alfParam.chroma_idc );
   if( alfParam.chroma_idc && !alfParam.temporalPredFlag )
@@ -3035,7 +3035,7 @@ void CABACWriter::transform_skip_flag( const TransformUnit& tu, ComponentID comp
 }
 
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
-Void CABACWriter::emt_tu_index( const TransformUnit& tu )
+void CABACWriter::emt_tu_index( const TransformUnit& tu )
 {
   int maxSizeEmtIntra, maxSizeEmtInter;
   if( tu.cs->pcv->noRQT )
@@ -3064,8 +3064,8 @@ Void CABACWriter::emt_tu_index( const TransformUnit& tu )
   }
 }
 
-//Void CABACWriter::emt_cu_flag(const CodingUnit& cu, UInt depth, bool codeCuFlag, const int tuWidth,const int tuHeight)
-Void CABACWriter::emt_cu_flag( const CodingUnit& cu )
+//void CABACWriter::emt_cu_flag(const CodingUnit& cu, UInt depth, bool codeCuFlag, const int tuWidth,const int tuHeight)
+void CABACWriter::emt_cu_flag( const CodingUnit& cu )
 {
   const CodingStructure& cs = *cu.cs;
 
@@ -3907,7 +3907,7 @@ void CABACWriter::encode_sparse_dt( DecisionTree& dt, unsigned toCodeId )
 }
 
 #if JVET_K0371_ALF
-Void CABACWriter::codeAlfCtuEnableFlags( CodingStructure& cs, ChannelType channel, AlfSliceParam* alfParam)
+void CABACWriter::codeAlfCtuEnableFlags( CodingStructure& cs, ChannelType channel, AlfSliceParam* alfParam)
 {
   if( isLuma( channel ) )
   {
@@ -3922,7 +3922,7 @@ Void CABACWriter::codeAlfCtuEnableFlags( CodingStructure& cs, ChannelType channe
       codeAlfCtuEnableFlags( cs, COMPONENT_Cr, alfParam );
   }
 }
-Void CABACWriter::codeAlfCtuEnableFlags( CodingStructure& cs, ComponentID compID, AlfSliceParam* alfParam)
+void CABACWriter::codeAlfCtuEnableFlags( CodingStructure& cs, ComponentID compID, AlfSliceParam* alfParam)
 {
   UInt numCTUs = cs.pcv->sizeInCtus;
 
@@ -3932,7 +3932,7 @@ Void CABACWriter::codeAlfCtuEnableFlags( CodingStructure& cs, ComponentID compID
   }
 }
 
-Void CABACWriter::codeAlfCtuEnableFlag( CodingStructure& cs, UInt ctuRsAddr, const Int compIdx, AlfSliceParam* alfParam)
+void CABACWriter::codeAlfCtuEnableFlag( CodingStructure& cs, UInt ctuRsAddr, const Int compIdx, AlfSliceParam* alfParam)
 {
   AlfSliceParam& alfSliceParam = alfParam ? (*alfParam) : cs.slice->getAlfSliceParam();
 

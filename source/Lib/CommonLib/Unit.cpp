@@ -50,7 +50,7 @@
  // block method definitions
  // ---------------------------------------------------------------------------
 
-Void CompArea::xRecalcLumaToChroma()
+void CompArea::xRecalcLumaToChroma()
 {
   const UInt csx = getComponentScaleX(compID, chromaFormat);
   const UInt csy = getComponentScaleY(compID, chromaFormat);
@@ -189,7 +189,7 @@ Bool UnitArea::contains( const UnitArea& other, const ChannelType chType ) const
   return any && ret;
 }
 
-Void UnitArea::repositionTo(const UnitArea& unitArea)
+void UnitArea::repositionTo(const UnitArea& unitArea)
 {
   for(UInt i = 0; i < blocks.size(); i++)
   {
@@ -288,7 +288,7 @@ CodingUnit& CodingUnit::operator=( const CodingUnit& other )
   return *this;
 }
 
-Void CodingUnit::initData()
+void CodingUnit::initData()
 {
   predMode          = NUMBER_OF_PREDICTION_MODES;
   partSize          = NUMBER_OF_PART_SIZES;
@@ -339,7 +339,7 @@ Void CodingUnit::initData()
 PredictionUnit::PredictionUnit(const UnitArea &unit)                                : UnitArea(unit)                , cu(nullptr), cs(nullptr), chType( CH_L ), next(nullptr) { initData(); }
 PredictionUnit::PredictionUnit(const ChromaFormat _chromaFormat, const Area &_area) : UnitArea(_chromaFormat, _area), cu(nullptr), cs(nullptr), chType( CH_L ), next(nullptr) { initData(); }
 
-Void PredictionUnit::initData()
+void PredictionUnit::initData()
 {
   // intra data - need this default initialization for PCM
   intraDir[0] = DC_IDX;
@@ -519,7 +519,7 @@ TransformUnit::TransformUnit(const ChromaFormat _chromaFormat, const Area &_area
   initData();
 }
 
-Void TransformUnit::initData()
+void TransformUnit::initData()
 {
   for( unsigned i = 0; i < MAX_NUM_TBLOCKS; i++ )
   {
@@ -537,7 +537,7 @@ Void TransformUnit::initData()
 
 }
 
-Void TransformUnit::init(TCoeff **coeffs, Pel **pcmbuf)
+void TransformUnit::init(TCoeff **coeffs, Pel **pcmbuf)
 {
   UInt numBlocks = getNumberValidTBlocks(*cs->pcv);
 
@@ -576,7 +576,7 @@ TransformUnit& TransformUnit::operator=(const TransformUnit& other)
   return *this;
 }
 
-Void TransformUnit::copyComponentFrom(const TransformUnit& other, const ComponentID i)
+void TransformUnit::copyComponentFrom(const TransformUnit& other, const ComponentID i)
 {
   CHECK( chromaFormat != other.chromaFormat, "Incompatible formats" );
 

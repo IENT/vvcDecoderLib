@@ -468,7 +468,7 @@ void EncAdaptiveLoopFilter::alfEncoder( CodingStructure& cs, AlfSliceParam& alfS
   }
 }
 
-Void EncAdaptiveLoopFilter::copyAlfSliceParam( AlfSliceParam& alfSliceParamDst, AlfSliceParam& alfSliceParamSrc, ChannelType channel )
+void EncAdaptiveLoopFilter::copyAlfSliceParam( AlfSliceParam& alfSliceParamDst, AlfSliceParam& alfSliceParamSrc, ChannelType channel )
 {
   if( isLuma( channel ) )
   {
@@ -1713,7 +1713,7 @@ void EncAdaptiveLoopFilter::copyCtuEnableFlag( UChar** ctuFlagsDst, UChar** ctuF
   }
 }
 
-Void EncAdaptiveLoopFilter::setCtuEnableFlag( UChar** ctuFlags, ChannelType channel, UChar val )
+void EncAdaptiveLoopFilter::setCtuEnableFlag( UChar** ctuFlags, ChannelType channel, UChar val )
 {
   if( isLuma( channel ) )
   {
@@ -1868,7 +1868,7 @@ EncAdaptiveLoopFilter::EncAdaptiveLoopFilter()
 // Public member functions
 // ====================================================================================================================
 
-Void EncAdaptiveLoopFilter::create( const Int iPicWidth, Int iPicHeight, const ChromaFormat chromaFormatIDC, const Int uiMaxCUWidth, const UInt uiMaxCUHeight, const UInt uiMaxCUDepth, const Int nInputBitDepth, const Int nInternalBitDepth, const Int numberOfCTUs )
+void EncAdaptiveLoopFilter::create( const Int iPicWidth, Int iPicHeight, const ChromaFormat chromaFormatIDC, const Int uiMaxCUWidth, const UInt uiMaxCUHeight, const UInt uiMaxCUDepth, const Int nInputBitDepth, const Int nInternalBitDepth, const Int numberOfCTUs )
 {
   AdaptiveLoopFilter::create( iPicWidth, iPicHeight, chromaFormatIDC, uiMaxCUWidth, uiMaxCUHeight, uiMaxCUDepth, nInputBitDepth, nInternalBitDepth, numberOfCTUs );
 
@@ -1926,7 +1926,7 @@ Void EncAdaptiveLoopFilter::create( const Int iPicWidth, Int iPicHeight, const C
 }
 
 
-Void EncAdaptiveLoopFilter::init( CodingStructure& cs, CABACDataStore* cabacDataStore, CABACEncoder* cabacEncoder )
+void EncAdaptiveLoopFilter::init( CodingStructure& cs, CABACDataStore* cabacDataStore, CABACEncoder* cabacEncoder )
 {
   m_CABACEstimator = cabacEncoder->getCABACEstimator( cs.slice->getSPS() );
   m_CABACDataStore = cabacDataStore;
@@ -1940,7 +1940,7 @@ Void EncAdaptiveLoopFilter::init( CodingStructure& cs, CABACDataStore* cabacData
   xInitParam();
 }
 
-Void EncAdaptiveLoopFilter::destroy()
+void EncAdaptiveLoopFilter::destroy()
 {
   if( !m_wasCreated )
     return;
@@ -2015,7 +2015,7 @@ Void EncAdaptiveLoopFilter::destroy()
  \retval ruiBits             required bits
  \retval ruiMaxAlfCtrlDepth  optimal partition depth
  */
-Void EncAdaptiveLoopFilter::ALFProcess(CodingStructure& cs, ALFParam* pcAlfParam, Double dLambdaLuma, Double dLambdaChroma )
+void EncAdaptiveLoopFilter::ALFProcess(CodingStructure& cs, ALFParam* pcAlfParam, Double dLambdaLuma, Double dLambdaChroma )
 {
 #if COM16_C806_ALF_TEMPPRED_NUM
   const Int tidx = cs.slice->getTLayer();
@@ -2177,7 +2177,7 @@ Void EncAdaptiveLoopFilter::ALFProcess(CodingStructure& cs, ALFParam* pcAlfParam
 // ====================================================================================================================
 // LUMA
 // ====================================================================================================================
-Void EncAdaptiveLoopFilter::xEncALFLuma( const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, UInt64& ruiMinRate, UInt64& ruiMinDist, Double& rdMinCost, const Slice* pSlice)
+void EncAdaptiveLoopFilter::xEncALFLuma( const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, UInt64& ruiMinRate, UInt64& ruiMinDist, Double& rdMinCost, const Slice* pSlice)
 {
   m_updateMatrix = true;
 #if JVET_C0038_NO_PREV_FILTERS
@@ -2252,7 +2252,7 @@ Void EncAdaptiveLoopFilter::xEncALFLuma( const PelUnitBuf& orgUnitBuf, const Pel
 // CHROMA
 // ====================================================================================================================
 
-Void EncAdaptiveLoopFilter::xstoreInBlockMatrixForChroma(const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, Int tap, Int chroma_idc)
+void EncAdaptiveLoopFilter::xstoreInBlockMatrixForChroma(const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, Int tap, Int chroma_idc)
 {
   Pel* ImgOrg;
   Pel* ImgDec;
@@ -2410,7 +2410,7 @@ Double EncAdaptiveLoopFilter::xTestFixedFilter(const Pel *imgY_Rec, const Pel *i
   return(error);
 }
 
-Void EncAdaptiveLoopFilter::xPreFilterFr(Int** imgY_preFilter, const Pel* imgY_rec, const Pel * imgY_org, const Pel* imgY_append, Int usePrevFilt[], Int Stride, Int filtType)
+void EncAdaptiveLoopFilter::xPreFilterFr(Int** imgY_preFilter, const Pel* imgY_rec, const Pel * imgY_org, const Pel* imgY_append, Int usePrevFilt[], Int Stride, Int filtType)
 {
 
   Int i, j;
@@ -2440,7 +2440,7 @@ Void EncAdaptiveLoopFilter::xPreFilterFr(Int** imgY_preFilter, const Pel* imgY_r
   }
   }
 #endif
-Void EncAdaptiveLoopFilter::xEncALFChroma(UInt64 uiLumaRate, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, UInt64& ruiDist, UInt64& ruiBits, const Slice* pSlice)
+void EncAdaptiveLoopFilter::xEncALFChroma(UInt64 uiLumaRate, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, UInt64& ruiDist, UInt64& ruiBits, const Slice* pSlice)
 {
   // restriction for non-referenced B-slice
   if( m_eSliceType == B_SLICE && m_iPicNalReferenceIdc == 0 )
@@ -2547,7 +2547,7 @@ Void EncAdaptiveLoopFilter::xEncALFChroma(UInt64 uiLumaRate, const PelUnitBuf& o
   }
 }
 
-Void EncAdaptiveLoopFilter::xInitFixedFilters()
+void EncAdaptiveLoopFilter::xInitFixedFilters()
 {
   Int maxFilterLength = m_MAX_SQR_FILT_LENGTH / 2 + 1;
 #if JVET_C0038_NO_PREV_FILTERS
@@ -2564,7 +2564,7 @@ Void EncAdaptiveLoopFilter::xInitFixedFilters()
   m_filterCoeffDefault[maxFilterLength - 1] = 1.0;
 }
 
-Void EncAdaptiveLoopFilter::xCheckReUseFilterSet( CodingStructure& cs, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& dstUnitBuf, Double& rdMinCost, ALFParam& filterSet, Int filterSetIdx )
+void EncAdaptiveLoopFilter::xCheckReUseFilterSet( CodingStructure& cs, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& dstUnitBuf, Double& rdMinCost, ALFParam& filterSet, Int filterSetIdx )
 {
   ALFParam cFrmAlfParam;
   allocALFParam(&cFrmAlfParam);
@@ -2660,7 +2660,7 @@ Void EncAdaptiveLoopFilter::xCheckReUseFilterSet( CodingStructure& cs, const Pel
 // Private member functions
 // ====================================================================================================================
 
-Void EncAdaptiveLoopFilter::xInitParam()
+void EncAdaptiveLoopFilter::xInitParam()
 {
   Int i, j;
 
@@ -2704,7 +2704,7 @@ Void EncAdaptiveLoopFilter::xInitParam()
   }
 }
 
-Void EncAdaptiveLoopFilter::xUninitParam()
+void EncAdaptiveLoopFilter::xUninitParam()
 {
   Int i;
 
@@ -2740,7 +2740,7 @@ Void EncAdaptiveLoopFilter::xUninitParam()
 
 //TODO needs cleanup:
 //NOT USED IN THIS VERSION / Coefficents are calculated in xCheckFilterMerging
-Void EncAdaptiveLoopFilter::xFindFilterCoeffsLuma(const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, AlfFilterType filtType
+void EncAdaptiveLoopFilter::xFindFilterCoeffsLuma(const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, AlfFilterType filtType
 #if COM16_C806_ALF_TEMPPRED_NUM
   , ALFParam* pcAlfParam
 #endif
@@ -2884,7 +2884,7 @@ Double EncAdaptiveLoopFilter::xCalcDistForce0(
 }
 #endif
 
-Void EncAdaptiveLoopFilter::xStoreInBlockMatrix(const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, AlfFilterType filtType)
+void EncAdaptiveLoopFilter::xStoreInBlockMatrix(const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, AlfFilterType filtType)
 {
   const CPelBuf orgLuma = orgUnitBuf.get(COMPONENT_Y);
   const Pel*    orgBuf = orgLuma.buf;
@@ -3022,7 +3022,7 @@ Void EncAdaptiveLoopFilter::xStoreInBlockMatrix(const PelUnitBuf& orgUnitBuf, co
   }
 }
 
-Void EncAdaptiveLoopFilter::calcMatrixE(int *ELocal, const Pel *recBufExt, const int *p_pattern, int i, int j, int flV, int fl, int transpose, int recStrideExt)
+void EncAdaptiveLoopFilter::calcMatrixE(int *ELocal, const Pel *recBufExt, const int *p_pattern, int i, int j, int flV, int fl, int transpose, int recStrideExt)
 {
   int ii, jj, k = 0;
 
@@ -3701,7 +3701,7 @@ Int EncAdaptiveLoopFilter::xFilterPixel(const Pel *ImgDec, Int* varIndBeforeMapp
 }
 
 
-Void EncAdaptiveLoopFilter::xcalcPredFilterCoeff(AlfFilterType filtType
+void EncAdaptiveLoopFilter::xcalcPredFilterCoeff(AlfFilterType filtType
 #if COM16_C806_ALF_TEMPPRED_NUM
   , ALFParam* alfParam
 #endif
@@ -3973,7 +3973,7 @@ Double EncAdaptiveLoopFilter::xSolveAndQuant(Double *filterCoeff, Int *filterCoe
 }
 
 
-Void EncAdaptiveLoopFilter::roundFiltCoeff(Int *filterCoeffQuant, Double *filterCoeff, Int sqrFiltLength, Int factor)
+void EncAdaptiveLoopFilter::roundFiltCoeff(Int *filterCoeffQuant, Double *filterCoeff, Int sqrFiltLength, Int factor)
 {
   int i;
   double diff;
@@ -3988,7 +3988,7 @@ Void EncAdaptiveLoopFilter::roundFiltCoeff(Int *filterCoeffQuant, Double *filter
   }
 }
 
-Void EncAdaptiveLoopFilter::xCheckFilterMergingGalf(ALFParam& alfParam
+void EncAdaptiveLoopFilter::xCheckFilterMergingGalf(ALFParam& alfParam
 #if JVET_C0038_NO_PREV_FILTERS
   , const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf
 #endif
@@ -4204,7 +4204,7 @@ Void EncAdaptiveLoopFilter::xCheckFilterMergingGalf(ALFParam& alfParam
   }
 }
 
-Void EncAdaptiveLoopFilter::xCheckFilterMergingAlf(ALFParam& alfParam
+void EncAdaptiveLoopFilter::xCheckFilterMergingAlf(ALFParam& alfParam
 #if JVET_C0038_NO_PREV_FILTERS
   , const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf
 #endif
@@ -4326,7 +4326,7 @@ Void EncAdaptiveLoopFilter::xCheckFilterMergingAlf(ALFParam& alfParam
   }
 }
 
-Void EncAdaptiveLoopFilter::xMergeFiltersGreedyGalf(Double ***EGlobalSeq, Double **yGlobalSeq, Double *pixAccGlobalSeq, Int intervalBest[m_NO_VAR_BINS][m_NO_VAR_BINS], Int sqrFiltLength)
+void EncAdaptiveLoopFilter::xMergeFiltersGreedyGalf(Double ***EGlobalSeq, Double **yGlobalSeq, Double *pixAccGlobalSeq, Int intervalBest[m_NO_VAR_BINS][m_NO_VAR_BINS], Int sqrFiltLength)
 {
   Int first, ind, ind1, ind2, noRemaining, i, j, exist, indexList[m_NO_VAR_BINS], indexListTemp[m_NO_VAR_BINS], available[m_NO_VAR_BINS], bestToMerge[2];
   Double error, error1, error2, errorMin;
@@ -4594,7 +4594,7 @@ Double EncAdaptiveLoopFilter::xMergeFiltersGreedy(Double ***EGlobalSeq, Double *
 // CLASSIFICATION
 //********************************
 
-Void EncAdaptiveLoopFilter::xSetInitialMask( const CPelBuf& recBufExt )
+void EncAdaptiveLoopFilter::xSetInitialMask( const CPelBuf& recBufExt )
 {
   xClassify(m_varImg, recBufExt, 9 / 2, m_VAR_SIZE);
   m_maskBuf.fill( 1 );
@@ -4605,7 +4605,7 @@ Void EncAdaptiveLoopFilter::xSetInitialMask( const CPelBuf& recBufExt )
 //********************************
 // CU Adaptation
 //********************************
-Void EncAdaptiveLoopFilter::xCheckCUAdaptation( CodingStructure& cs, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, UInt64& ruiMinRate, UInt64& ruiMinDist, Double& rdMinCost )
+void EncAdaptiveLoopFilter::xCheckCUAdaptation( CodingStructure& cs, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, UInt64& ruiMinRate, UInt64& ruiMinDist, Double& rdMinCost )
 {
   ALFParam cFrmAlfParam;
   allocALFParam(&cFrmAlfParam);
@@ -4685,7 +4685,7 @@ Void EncAdaptiveLoopFilter::xCheckCUAdaptation( CodingStructure& cs, const PelUn
 }
 
 
-Void EncAdaptiveLoopFilter::xSetCUAlfCtrlFlags( CodingStructure& cs, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, UInt64& ruiDist, UInt uiAlfCtrlDepth, ALFParam *pAlfParam )
+void EncAdaptiveLoopFilter::xSetCUAlfCtrlFlags( CodingStructure& cs, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, UInt64& ruiDist, UInt uiAlfCtrlDepth, ALFParam *pAlfParam )
 {
   ruiDist = 0;
   pAlfParam->num_alf_cu_flag = 0;
@@ -4733,7 +4733,7 @@ Void EncAdaptiveLoopFilter::xSetCUAlfCtrlFlags( CodingStructure& cs, const PelUn
 }
 
 
-Void EncAdaptiveLoopFilter::xSetCUAlfCtrlFlag( CodingStructure& cs, const UnitArea alfCtrlArea, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, UInt64& ruiDist, ALFParam *pAlfParam)
+void EncAdaptiveLoopFilter::xSetCUAlfCtrlFlag( CodingStructure& cs, const UnitArea alfCtrlArea, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, UInt64& ruiDist, ALFParam *pAlfParam)
 {
 
   const Position& blkPos   = alfCtrlArea.lumaPos();
@@ -4764,7 +4764,7 @@ Void EncAdaptiveLoopFilter::xSetCUAlfCtrlFlag( CodingStructure& cs, const UnitAr
 //********************************
 // FILTER FRAME
 //********************************
-Void EncAdaptiveLoopFilter::xFilterFrame_en(PelUnitBuf& recDstBuf, const PelUnitBuf& recExtBuf, ALFParam& alfParam, const ClpRng& clpRng)
+void EncAdaptiveLoopFilter::xFilterFrame_en(PelUnitBuf& recDstBuf, const PelUnitBuf& recExtBuf, ALFParam& alfParam, const ClpRng& clpRng)
 {
   AlfFilterType filtType = alfParam.filterType;
   xDecodeFilter( &alfParam );
@@ -4788,7 +4788,7 @@ Void EncAdaptiveLoopFilter::xFilterFrame_en(PelUnitBuf& recDstBuf, const PelUnit
 }
 
 //using filter coefficients in m_filterCoeffSym
-Void EncAdaptiveLoopFilter::xFilterFrame_enGalf(PelUnitBuf& recDstBuf, const PelUnitBuf& recExtBuf, AlfFilterType filtType,
+void EncAdaptiveLoopFilter::xFilterFrame_enGalf(PelUnitBuf& recDstBuf, const PelUnitBuf& recExtBuf, AlfFilterType filtType,
   #if COM16_C806_ALF_TEMPPRED_NUM
     ALFParam *alfParam, Bool updateFilterCoef,
 #endif
@@ -4836,7 +4836,7 @@ Void EncAdaptiveLoopFilter::xFilterFrame_enGalf(PelUnitBuf& recDstBuf, const Pel
 }
 
 //using filter coefficients in m_filterCoeffSym
-Void EncAdaptiveLoopFilter::xFilterFrame_enAlf(PelUnitBuf& recDstBuf, const PelUnitBuf& recExtBuf, AlfFilterType filtType,
+void EncAdaptiveLoopFilter::xFilterFrame_enAlf(PelUnitBuf& recDstBuf, const PelUnitBuf& recExtBuf, AlfFilterType filtType,
   #if COM16_C806_ALF_TEMPPRED_NUM
     ALFParam *alfParam, Bool updateFilterCoef,
 #endif
@@ -4967,7 +4967,7 @@ Void EncAdaptiveLoopFilter::xFilterFrame_enAlf(PelUnitBuf& recDstBuf, const PelU
   }
 }
 
-Void EncAdaptiveLoopFilter::xfindBestFilterPredictor(
+void EncAdaptiveLoopFilter::xfindBestFilterPredictor(
 #if JVET_C0038_NO_PREV_FILTERS
   Double ***E_temp, Double**y_temp, Double *pixAcc_temp, Int filtType, const Pel* ImgOrg, const Pel* ImgDec, Int orgStride, Int recStride,
   Int* usePrevFiltBest, Int sqrFiltLength, Int iFixedFilters
@@ -5136,7 +5136,7 @@ Int EncAdaptiveLoopFilter::gnsCholeskyDec(double **inpMatr, double outMatr[m_MAX
   return(1); /* Signal that Cholesky factorization is successfully performed */
 }
 
-Void EncAdaptiveLoopFilter::gnsTransposeBacksubstitution(double U[m_MAX_SQR_FILT_LENGTH][m_MAX_SQR_FILT_LENGTH], double rhs[], double x[], int order)
+void EncAdaptiveLoopFilter::gnsTransposeBacksubstitution(double U[m_MAX_SQR_FILT_LENGTH][m_MAX_SQR_FILT_LENGTH], double rhs[], double x[], int order)
 {
   int
   i,j;              /* Looping variables */
@@ -5157,7 +5157,7 @@ Void EncAdaptiveLoopFilter::gnsTransposeBacksubstitution(double U[m_MAX_SQR_FILT
 
 
 
-Void EncAdaptiveLoopFilter::gnsBacksubstitution(double R[m_MAX_SQR_FILT_LENGTH][m_MAX_SQR_FILT_LENGTH], double z[m_MAX_SQR_FILT_LENGTH], int R_size, double A[m_MAX_SQR_FILT_LENGTH])
+void EncAdaptiveLoopFilter::gnsBacksubstitution(double R[m_MAX_SQR_FILT_LENGTH][m_MAX_SQR_FILT_LENGTH], double z[m_MAX_SQR_FILT_LENGTH], int R_size, double A[m_MAX_SQR_FILT_LENGTH])
 {
   int i, j;
   double sum;
@@ -5231,7 +5231,7 @@ Int EncAdaptiveLoopFilter::gnsSolveByChol( Double **LHS, Double *rhs, Double *x,
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-Void EncAdaptiveLoopFilter::add_A_galf(Double **Amerged, Double ***A, Int interval[], Int filtNo, Int size)
+void EncAdaptiveLoopFilter::add_A_galf(Double **Amerged, Double ***A, Int interval[], Int filtNo, Int size)
 {
   Int i, j, ind;
 
@@ -5251,7 +5251,7 @@ Void EncAdaptiveLoopFilter::add_A_galf(Double **Amerged, Double ***A, Int interv
   }
 }
 
-Void EncAdaptiveLoopFilter::add_b_galf(Double *bmerged, Double **b, Int interval[], Int filtNo, Int size)
+void EncAdaptiveLoopFilter::add_b_galf(Double *bmerged, Double **b, Int interval[], Int filtNo, Int size)
 {
   Int i, ind;
 
@@ -5268,7 +5268,7 @@ Void EncAdaptiveLoopFilter::add_b_galf(Double *bmerged, Double **b, Int interval
   }
 }
 
-Void EncAdaptiveLoopFilter::add_A(double **Amerged, double ***A, int start, int stop, int size)
+void EncAdaptiveLoopFilter::add_A(double **Amerged, double ***A, int start, int stop, int size)
 {
   int
   i, j, ind;          /* Looping variable */
@@ -5286,7 +5286,7 @@ Void EncAdaptiveLoopFilter::add_A(double **Amerged, double ***A, int start, int 
   }
 }
 
-Void EncAdaptiveLoopFilter::add_b(double *bmerged, double **b, int start, int stop, int size)
+void EncAdaptiveLoopFilter::add_b(double *bmerged, double **b, int start, int stop, int size)
 {
   int
   i, ind;          /* Looping variable */
@@ -5396,7 +5396,7 @@ Int EncAdaptiveLoopFilter::xCalcBitsForce0(Int **pDiffQFilterCoeffIntPP, Int fil
 #endif
 
 #if COM16_C806_ALF_TEMPPRED_NUM
-Void EncAdaptiveLoopFilter::xcopyFilterCoeff(int filtNo, int **filterCoeff)
+void EncAdaptiveLoopFilter::xcopyFilterCoeff(int filtNo, int **filterCoeff)
 {
   int varInd, i, k;
   const int *patternMap = m_patternMapTab[filtNo];
@@ -5634,7 +5634,7 @@ Int EncAdaptiveLoopFilter::lengthFilterCoeffs( int sqrFiltLength, int filters_pe
 // Filter Type Decsion
 //###################################
 
-Void EncAdaptiveLoopFilter::xFilterTypeDecision(  CodingStructure& cs, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, UInt64& ruiMinRate, UInt64& ruiMinDist, Double& rdMinCost, const Slice*  slice)
+void EncAdaptiveLoopFilter::xFilterTypeDecision(  CodingStructure& cs, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, UInt64& ruiMinRate, UInt64& ruiMinDist, Double& rdMinCost, const Slice*  slice)
 {
 
   // restriction for non-referenced B-slice
@@ -5712,7 +5712,7 @@ Void EncAdaptiveLoopFilter::xFilterTypeDecision(  CodingStructure& cs, const Pel
 }
 
 //redesign using m_pcTempAlfParameter
-Void EncAdaptiveLoopFilter::xReDesignFilterCoeff( const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& dstUnitBuf,
+void EncAdaptiveLoopFilter::xReDesignFilterCoeff( const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& dstUnitBuf,
 #if COM16_C806_ALF_TEMPPRED_NUM
   ALFParam* alfParam,
 #endif
@@ -5751,7 +5751,7 @@ Void EncAdaptiveLoopFilter::xReDesignFilterCoeff( const PelUnitBuf& orgUnitBuf, 
 }
 
 
-Void EncAdaptiveLoopFilter::xCalcRDCost( const UInt64 uiDist, ALFParam* pAlfParam, UInt64& ruiRate,  Double& rdCost )
+void EncAdaptiveLoopFilter::xCalcRDCost( const UInt64 uiDist, ALFParam* pAlfParam, UInt64& ruiRate,  Double& rdCost )
 {
   if(pAlfParam != NULL)
   {
@@ -5768,7 +5768,7 @@ Void EncAdaptiveLoopFilter::xCalcRDCost( const UInt64 uiDist, ALFParam* pAlfPara
 }
 
 
-Void EncAdaptiveLoopFilter::xCalcRDCostLuma( const CPelUnitBuf& orgUnitBuf, const CPelUnitBuf& recBuf, ALFParam* pAlfParam, UInt64& ruiRate, UInt64& ruiDist, Double& rdCost )
+void EncAdaptiveLoopFilter::xCalcRDCostLuma( const CPelUnitBuf& orgUnitBuf, const CPelUnitBuf& recBuf, ALFParam* pAlfParam, UInt64& ruiRate, UInt64& ruiDist, Double& rdCost )
 {
   if(pAlfParam != NULL)
   {
@@ -5823,7 +5823,7 @@ UInt64 EncAdaptiveLoopFilter::xCalcSSD(const CPelBuf& refBuf, const CPelBuf& cmp
 //   CHROMA RELATED
 //####################################
 
-Void EncAdaptiveLoopFilter::xCalcRDCostChroma( const CPelUnitBuf& orgUnitBuf, const CPelUnitBuf& recBuf, ALFParam* pAlfParam, UInt64& ruiRate, UInt64& ruiDist, Double& rdCost )
+void EncAdaptiveLoopFilter::xCalcRDCostChroma( const CPelUnitBuf& orgUnitBuf, const CPelUnitBuf& recBuf, ALFParam* pAlfParam, UInt64& ruiRate, UInt64& ruiDist, Double& rdCost )
 {
   if( pAlfParam->chroma_idc )
   {
@@ -5855,7 +5855,7 @@ Void EncAdaptiveLoopFilter::xCalcRDCostChroma( const CPelUnitBuf& orgUnitBuf, co
 }
 
 
-Void EncAdaptiveLoopFilter::xFilteringFrameChroma(  const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf )
+void EncAdaptiveLoopFilter::xFilteringFrameChroma(  const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf )
 {
   Int tap;
   Int* qh;
@@ -5960,7 +5960,7 @@ Void EncAdaptiveLoopFilter::xFilteringFrameChroma(  const PelUnitBuf& orgUnitBuf
 }
 
 #if FORCE0
-Void EncAdaptiveLoopFilter::xcollectStatCodeFilterCoeffForce0(int **pDiffQFilterCoeffIntPP, int filtType, int sqrFiltLength,
+void EncAdaptiveLoopFilter::xcollectStatCodeFilterCoeffForce0(int **pDiffQFilterCoeffIntPP, int filtType, int sqrFiltLength,
   int filters_per_group, int bitsVarBin[])
 {
   int i, k, kMin, kStart, minBits, ind, scanPos, maxScanVal, coeffVal,
@@ -6041,7 +6041,7 @@ Void EncAdaptiveLoopFilter::xcollectStatCodeFilterCoeffForce0(int **pDiffQFilter
   }
 }
 
-Void EncAdaptiveLoopFilter::xdecideCoeffForce0(Int codedVarBins[m_NO_VAR_BINS], Double *distForce0, Double errorForce0CoeffTab[m_NO_VAR_BINS][2], Int bitsVarBin[m_NO_VAR_BINS], Double lambda, Int filters_per_fr)
+void EncAdaptiveLoopFilter::xdecideCoeffForce0(Int codedVarBins[m_NO_VAR_BINS], Double *distForce0, Double errorForce0CoeffTab[m_NO_VAR_BINS][2], Int bitsVarBin[m_NO_VAR_BINS], Double lambda, Int filters_per_fr)
 {
   int filtNo;
   int ind;
@@ -6061,7 +6061,7 @@ Void EncAdaptiveLoopFilter::xdecideCoeffForce0(Int codedVarBins[m_NO_VAR_BINS], 
 }
 #endif
 
-Void EncAdaptiveLoopFilter::xCalcCorrelationFunc(const CPelBuf& rcOrgBuf, const CPelBuf& rcCmpBuf, Int iTap)
+void EncAdaptiveLoopFilter::xCalcCorrelationFunc(const CPelBuf& rcOrgBuf, const CPelBuf& rcCmpBuf, Int iTap)
 {
   Int iTapV   = AdaptiveLoopFilter::ALFTapHToTapV(iTap);
   Int N       = (iTap * iTapV + 1) >> 1;
@@ -6171,7 +6171,7 @@ Int EncAdaptiveLoopFilter::xGauss(Double **a, Int N)
   return 0;
 }
 
-Void EncAdaptiveLoopFilter::xClearFilterCoefInt(Int* qh, Int N)
+void EncAdaptiveLoopFilter::xClearFilterCoefInt(Int* qh, Int N)
 {
   // clear
   memset( qh, 0, sizeof( Int ) * N );
@@ -6181,7 +6181,7 @@ Void EncAdaptiveLoopFilter::xClearFilterCoefInt(Int* qh, Int N)
 }
 
 
-Void EncAdaptiveLoopFilter::xQuantFilterCoefChroma(Double* h, Int* qh, Int tap, int bit_depth)
+void EncAdaptiveLoopFilter::xQuantFilterCoefChroma(Double* h, Int* qh, Int tap, int bit_depth)
 {
   Int i, N;
   Int max_value, min_value;
@@ -6311,7 +6311,7 @@ Void EncAdaptiveLoopFilter::xQuantFilterCoefChroma(Double* h, Int* qh, Int tap, 
   nc = NULL;
 }
 
-Void EncAdaptiveLoopFilter::xFilterCoefQuickSort( Double *coef_data, Int *coef_num, Int upper, Int lower )
+void EncAdaptiveLoopFilter::xFilterCoefQuickSort( Double *coef_data, Int *coef_num, Int upper, Int lower )
 {
   Double mid, tmp_data;
   Int i, j, tmp_num;
@@ -6471,7 +6471,7 @@ Bool EncAdaptiveLoopFilter::xFilteringLumaChroma(CodingStructure& cs, ALFParam *
 }
 #endif
 
-Void EncAdaptiveLoopFilter::xDeriveGlobalEyFromLgrTapFilter(Double **E0, Double *y0, Double **E1, Double *y1, const Int *pattern0, const Int *pattern1)
+void EncAdaptiveLoopFilter::xDeriveGlobalEyFromLgrTapFilter(Double **E0, Double *y0, Double **E1, Double *y1, const Int *pattern0, const Int *pattern1)
 {
   Int i, j, l, k = 0;
   for (i = 0; i < m_MAX_SQR_FILT_LENGTH; i++)
@@ -6498,7 +6498,7 @@ Void EncAdaptiveLoopFilter::xDeriveGlobalEyFromLgrTapFilter(Double **E0, Double 
     }
   }
 }
-Void EncAdaptiveLoopFilter::xDeriveLocalEyFromLgrTapFilter(Double *y0, Double *y1, const Int *pattern0, const Int *pattern1)
+void EncAdaptiveLoopFilter::xDeriveLocalEyFromLgrTapFilter(Double *y0, Double *y1, const Int *pattern0, const Int *pattern1)
 {
   Int i, k = 0;
   for (i = 0; i < m_MAX_SQR_FILT_LENGTH; i++)

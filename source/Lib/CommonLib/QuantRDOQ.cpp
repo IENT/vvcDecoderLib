@@ -469,7 +469,7 @@ inline Double QuantRDOQ::xGetIEPRate      (                                     
  * \param maxLog2TrDynamicRange
  * \param bitDepths              reference to bit depth array for all channels
  */
-Void QuantRDOQ::setScalingList(ScalingList *scalingList, const Int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths)
+void QuantRDOQ::setScalingList(ScalingList *scalingList, const Int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths)
 {
   Quant::setScalingList( scalingList, maxLog2TrDynamicRange, bitDepths );
 
@@ -533,7 +533,7 @@ Double QuantRDOQ::xGetErrScaleCoeff( SizeType width, SizeType height, Int qp, co
  * \param maxLog2TrDynamicRange
  * \param bitDepths              reference to bit depth array for all channels
  */
-Void QuantRDOQ::xSetErrScaleCoeff( UInt list, UInt sizeX, UInt sizeY, Int qp, const Int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths )
+void QuantRDOQ::xSetErrScaleCoeff( UInt list, UInt sizeX, UInt sizeY, Int qp, const Int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths )
 {
   const Int width = g_scalingListSizeX[sizeX];
   const Int height = g_scalingListSizeX[sizeY];
@@ -589,7 +589,7 @@ Void QuantRDOQ::xSetErrScaleCoeff( UInt list, UInt sizeX, UInt sizeY, Int qp, co
 
 /** set flat matrix value to quantized coefficient
  */
-Void QuantRDOQ::setFlatScalingList(const Int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths)
+void QuantRDOQ::setFlatScalingList(const Int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths)
 {
   Quant::setFlatScalingList( maxLog2TrDynamicRange, bitDepths );
 
@@ -613,7 +613,7 @@ Void QuantRDOQ::setFlatScalingList(const Int maxLog2TrDynamicRange[MAX_NUM_CHANN
 
 /** initialization process of scaling list array
  */
-Void QuantRDOQ::xInitScalingList( const QuantRDOQ* other )
+void QuantRDOQ::xInitScalingList( const QuantRDOQ* other )
 {
   m_isErrScaleListOwner = other == nullptr;
 
@@ -641,7 +641,7 @@ Void QuantRDOQ::xInitScalingList( const QuantRDOQ* other )
 
 /** destroy quantization matrix array
  */
-Void QuantRDOQ::xDestroyScalingList()
+void QuantRDOQ::xDestroyScalingList()
 {
   if( !m_isErrScaleListOwner ) return;
 
@@ -666,7 +666,7 @@ Void QuantRDOQ::xDestroyScalingList()
 #endif
 
 
-Void QuantRDOQ::quant(TransformUnit &tu, const ComponentID &compID, const CCoeffBuf &pSrc, TCoeff &uiAbsSum, const QpParam &cQP, const Ctx& ctx)
+void QuantRDOQ::quant(TransformUnit &tu, const ComponentID &compID, const CCoeffBuf &pSrc, TCoeff &uiAbsSum, const QpParam &cQP, const Ctx& ctx)
 {
   const CompArea &rect      = tu.blocks[compID];
   const UInt uiWidth        = rect.width;
@@ -708,7 +708,7 @@ Void QuantRDOQ::quant(TransformUnit &tu, const ComponentID &compID, const CCoeff
 
 
 
-Void QuantRDOQ::xRateDistOptQuant(TransformUnit &tu, const ComponentID &compID, const CCoeffBuf &pSrc, TCoeff &uiAbsSum, const QpParam &cQP, const Ctx &ctx)
+void QuantRDOQ::xRateDistOptQuant(TransformUnit &tu, const ComponentID &compID, const CCoeffBuf &pSrc, TCoeff &uiAbsSum, const QpParam &cQP, const Ctx &ctx)
 {
   const FracBitsAccess& fracBits = ctx.getFracBitsAcess();
 

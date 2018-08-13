@@ -49,7 +49,7 @@
 #ifdef TARGET_SIMD_X86
 
 template< X86_VEXT vext, int W >
-Void addAvg_SSE( const Short* src0, Int src0Stride, const Short* src1, Int src1Stride, Short *dst, Int dstStride, Int width, Int height, Int shift, Int offset, const ClpRng& clpRng )
+void addAvg_SSE( const Short* src0, Int src0Stride, const Short* src1, Int src1Stride, Short *dst, Int dstStride, Int width, Int height, Int shift, Int offset, const ClpRng& clpRng )
 {
   if( W == 8 )
   {
@@ -129,7 +129,7 @@ Void addAvg_SSE( const Short* src0, Int src0Stride, const Short* src1, Int src1S
 }
 
 template< X86_VEXT vext, int W >
-Void reco_SSE( const Short* src0, Int src0Stride, const Short* src1, Int src1Stride, Short *dst, Int dstStride, Int width, Int height, const ClpRng& clpRng )
+void reco_SSE( const Short* src0, Int src0Stride, const Short* src1, Int src1Stride, Short *dst, Int dstStride, Int width, Int height, const ClpRng& clpRng )
 {
   if( W == 8 )
   {
@@ -255,7 +255,7 @@ template<> inline void do_clip<true,  __m256i>( __m256i& vreg, __m256i& vbdmin, 
 
 
 template<X86_VEXT vext, int W, bool doAdd, bool mult, bool doShift, bool shiftR, bool clip>
-Void linTf_SSE( const Pel* src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Int scale, Int shift, Int offset, const ClpRng& clpRng )
+void linTf_SSE( const Pel* src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Int scale, Int shift, Int offset, const ClpRng& clpRng )
 {
   if( vext >= AVX2 && ( width & 7 ) == 0 && W == 8 )
   {
@@ -318,7 +318,7 @@ Void linTf_SSE( const Pel* src, Int srcStride, Pel *dst, Int dstStride, Int widt
 }
 
 template<X86_VEXT vext, int W>
-Void linTf_SSE_entry( const Pel* src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Int scale, Int shift, Int offset, const ClpRng& clpRng, bool clip )
+void linTf_SSE_entry( const Pel* src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Int scale, Int shift, Int offset, const ClpRng& clpRng, bool clip )
 {
   int fn = ( offset == 0 ? 16 : 0 ) + ( scale == 1 ? 8 : 0 ) + ( shift == 0 ? 4 : 0 ) + ( shift < 0 ? 2 : 0 ) + ( !clip ? 1 : 0 );
 
@@ -363,7 +363,7 @@ Void linTf_SSE_entry( const Pel* src, Int srcStride, Pel *dst, Int dstStride, In
 }
 
 template<X86_VEXT vext>
-Void PelBufferOps::_initPelBufOpsX86()
+void PelBufferOps::_initPelBufOpsX86()
 {
   addAvg8 = addAvg_SSE<vext, 8>;
   addAvg4 = addAvg_SSE<vext, 4>;
@@ -375,7 +375,7 @@ Void PelBufferOps::_initPelBufOpsX86()
   linTf4 = linTf_SSE_entry<vext, 4>;
 }
 
-template Void PelBufferOps::_initPelBufOpsX86<SIMDX86>();
+template void PelBufferOps::_initPelBufOpsX86<SIMDX86>();
 
 #endif // TARGET_SIMD_X86
 #endif

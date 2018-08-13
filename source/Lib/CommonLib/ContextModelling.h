@@ -571,7 +571,7 @@ public:
   MotionBuf     subPuMvpMiBuf;
   MotionBuf     subPuMvpExtMiBuf;
 #endif
-  Void setMergeInfo( PredictionUnit& pu, int candIdx );
+  void setMergeInfo( PredictionUnit& pu, int candIdx );
 };
 
 

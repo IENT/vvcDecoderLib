@@ -153,30 +153,30 @@ public:
 #endif
 
 protected:
-  Void  xGetNewPicBuffer  ( std::list<PelUnitBuf*>& rcListPicYuvRecOut, Picture*& rpcPic, Int ppsId ); ///< get picture buffer which will be processed. If ppsId<0, then the ppsMap will be queried for the first match.
+  void  xGetNewPicBuffer  ( std::list<PelUnitBuf*>& rcListPicYuvRecOut, Picture*& rpcPic, Int ppsId ); ///< get picture buffer which will be processed. If ppsId<0, then the ppsMap will be queried for the first match.
 #if HEVC_VPS
-  Void  xInitVPS          (VPS &vps, const SPS &sps); ///< initialize VPS from encoder options
+  void  xInitVPS          (VPS &vps, const SPS &sps); ///< initialize VPS from encoder options
 #endif
-  Void  xInitSPS          (SPS &sps);                 ///< initialize SPS from encoder options
-  Void  xInitPPS          (PPS &pps, const SPS &sps); ///< initialize PPS from encoder options
+  void  xInitSPS          (SPS &sps);                 ///< initialize SPS from encoder options
+  void  xInitPPS          (PPS &pps, const SPS &sps); ///< initialize PPS from encoder options
 #if HEVC_USE_SCALING_LISTS
-  Void  xInitScalingLists (SPS &sps, PPS &pps);   ///< initialize scaling lists
+  void  xInitScalingLists (SPS &sps, PPS &pps);   ///< initialize scaling lists
 #endif
-  Void  xInitHrdParameters(SPS &sps);                 ///< initialize HRD parameters
+  void  xInitHrdParameters(SPS &sps);                 ///< initialize HRD parameters
 
 #if HEVC_TILES_WPP
-  Void  xInitPPSforTiles  (PPS &pps);
+  void  xInitPPSforTiles  (PPS &pps);
 #endif
-  Void  xInitRPS          (SPS &sps, Bool isFieldCoding);           ///< initialize PPS from encoder options
+  void  xInitRPS          (SPS &sps, Bool isFieldCoding);           ///< initialize PPS from encoder options
 
 public:
   EncLib();
   virtual ~EncLib();
 
-  Void      create          ();
-  Void      destroy         ();
-  Void      init            ( Bool isFieldCoding, AUWriterIf* auWriterIf );
-  Void      deletePicBuffer ();
+  void      create          ();
+  void      destroy         ();
+  void      init            ( Bool isFieldCoding, AUWriterIf* auWriterIf );
+  void      deletePicBuffer ();
 
   // -------------------------------------------------------------------------------------------------------------------
   // member access functions
@@ -230,7 +230,7 @@ public:
 #endif
   RateCtrl*               getRateCtrl           ()              { return  &m_cRateCtrl;            }
 
-  Void selectReferencePictureSet(Slice* slice, Int POCCurr, Int GOPid );
+  void selectReferencePictureSet(Slice* slice, Int POCCurr, Int GOPid );
   Int getReferencePictureSetIdxForSOP(Int POCCurr, Int GOPid );
 
   Bool                   PPSNeedsWriting(Int ppsId);
@@ -247,21 +247,21 @@ public:
   // -------------------------------------------------------------------------------------------------------------------
 
   /// encode several number of pictures until end-of-sequence
-  Void encode( Bool bEos,
+  void encode( Bool bEos,
                PelStorage* pcPicYuvOrg,
                PelStorage* pcPicYuvTrueOrg, const InputColourSpaceConversion snrCSC, // used for SNR calculations. Picture in original colour space.
                std::list<PelUnitBuf*>& rcListPicYuvRecOut,
                Int& iNumEncoded );
 
   /// encode several number of pictures until end-of-sequence
-  Void encode( Bool bEos,
+  void encode( Bool bEos,
                PelStorage* pcPicYuvOrg,
                PelStorage* pcPicYuvTrueOrg, const InputColourSpaceConversion snrCSC, // used for SNR calculations. Picture in original colour space.
                std::list<PelUnitBuf*>& rcListPicYuvRecOut,
                Int& iNumEncoded, Bool isTff );
 
 
-  Void printSummary(Bool isField) { m_cGOPEncoder.printOutSummary (m_uiNumAllPicCoded, isField, m_printMSEBasedSequencePSNR, m_printSequenceMSE, m_spsMap.getFirstPS()->getBitDepths()); }
+  void printSummary(Bool isField) { m_cGOPEncoder.printOutSummary (m_uiNumAllPicCoded, isField, m_printMSEBasedSequencePSNR, m_printSequenceMSE, m_spsMap.getFirstPS()->getBitDepths()); }
 
 };
 

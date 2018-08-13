@@ -59,9 +59,9 @@ public:
   WeightPredAnalysis();
 
   // WP analysis :
-  Void  xCalcACDCParamSlice  (Slice *const slice);
-  Void  xEstimateWPParamSlice(Slice *const slice, const WeightedPredictionMethod method);
-  Void  xCheckWPEnable       (Slice *const slice);
+  void  xCalcACDCParamSlice  (Slice *const slice);
+  void  xEstimateWPParamSlice(Slice *const slice, const WeightedPredictionMethod method);
+  void  xCheckWPEnable       (Slice *const slice);
 };
 
 #endif // __WEIGHTPREDANALYSIS__

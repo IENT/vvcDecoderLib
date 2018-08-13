@@ -73,7 +73,7 @@ EncRCSeq::~EncRCSeq()
   destroy();
 }
 
-Void EncRCSeq::create( Int totalFrames, Int targetBitrate, Int frameRate, Int GOPSize, Int picWidth, Int picHeight, Int LCUWidth, Int LCUHeight, Int numberOfLevel, Bool useLCUSeparateModel, Int adaptiveBit )
+void EncRCSeq::create( Int totalFrames, Int targetBitrate, Int frameRate, Int GOPSize, Int picWidth, Int picHeight, Int LCUWidth, Int LCUHeight, Int numberOfLevel, Bool useLCUSeparateModel, Int adaptiveBit )
 {
   destroy();
   m_totalFrames         = totalFrames;
@@ -160,7 +160,7 @@ Void EncRCSeq::create( Int totalFrames, Int targetBitrate, Int frameRate, Int GO
   m_lastLambda = 0.0;
 }
 
-Void EncRCSeq::destroy()
+void EncRCSeq::destroy()
 {
   if (m_bitsRatio != NULL)
   {
@@ -191,7 +191,7 @@ Void EncRCSeq::destroy()
   }
 }
 
-Void EncRCSeq::initBitsRatio( Int bitsRatio[])
+void EncRCSeq::initBitsRatio( Int bitsRatio[])
 {
   for (Int i=0; i<m_GOPSize; i++)
   {
@@ -199,7 +199,7 @@ Void EncRCSeq::initBitsRatio( Int bitsRatio[])
   }
 }
 
-Void EncRCSeq::initGOPID2Level( Int GOPID2Level[] )
+void EncRCSeq::initGOPID2Level( Int GOPID2Level[] )
 {
   for ( Int i=0; i<m_GOPSize; i++ )
   {
@@ -207,7 +207,7 @@ Void EncRCSeq::initGOPID2Level( Int GOPID2Level[] )
   }
 }
 
-Void EncRCSeq::initPicPara( TRCParameter* picPara )
+void EncRCSeq::initPicPara( TRCParameter* picPara )
 {
   CHECK( m_picPara == NULL, "Object does not exist" );
 
@@ -236,7 +236,7 @@ Void EncRCSeq::initPicPara( TRCParameter* picPara )
   }
 }
 
-Void EncRCSeq::initLCUPara( TRCParameter** LCUPara )
+void EncRCSeq::initLCUPara( TRCParameter** LCUPara )
 {
   if ( m_LCUPara == NULL )
   {
@@ -265,13 +265,13 @@ Void EncRCSeq::initLCUPara( TRCParameter** LCUPara )
   }
 }
 
-Void EncRCSeq::updateAfterPic ( Int bits )
+void EncRCSeq::updateAfterPic ( Int bits )
 {
   m_bitsLeft -= bits;
   m_framesLeft--;
 }
 
-Void EncRCSeq::setAllBitRatio( Double basicLambda, Double* equaCoeffA, Double* equaCoeffB )
+void EncRCSeq::setAllBitRatio( Double basicLambda, Double* equaCoeffA, Double* equaCoeffB )
 {
   Int* bitsRatio = new Int[m_GOPSize];
   for ( Int i=0; i<m_GOPSize; i++ )
@@ -298,7 +298,7 @@ EncRCGOP::~EncRCGOP()
   destroy();
 }
 
-Void EncRCGOP::create( EncRCSeq* encRCSeq, Int numPic )
+void EncRCGOP::create( EncRCSeq* encRCSeq, Int numPic )
 {
   destroy();
   Int targetBits = xEstGOPTargetBits( encRCSeq, numPic );
@@ -384,7 +384,7 @@ Void EncRCGOP::create( EncRCSeq* encRCSeq, Int numPic )
   m_bitsLeft     = m_targetBits;
 }
 
-Void EncRCGOP::xCalEquaCoeff( EncRCSeq* encRCSeq, Double* lambdaRatio, Double* equaCoeffA, Double* equaCoeffB, Int GOPSize )
+void EncRCGOP::xCalEquaCoeff( EncRCSeq* encRCSeq, Double* lambdaRatio, Double* equaCoeffA, Double* equaCoeffB, Int GOPSize )
 {
   for ( Int i=0; i<GOPSize; i++ )
   {
@@ -430,7 +430,7 @@ Double EncRCGOP::xSolveEqua( Double targetBpp, Double* equaCoeffA, Double* equaC
   return solution;
 }
 
-Void EncRCGOP::destroy()
+void EncRCGOP::destroy()
 {
   m_encRCSeq = NULL;
   if ( m_picTargetBitInGOP != NULL )
@@ -440,7 +440,7 @@ Void EncRCGOP::destroy()
   }
 }
 
-Void EncRCGOP::updateAfterPicture( Int bitsCost )
+void EncRCGOP::updateAfterPicture( Int bitsCost )
 {
   m_bitsLeft -= bitsCost;
   m_picLeft--;
@@ -584,7 +584,7 @@ Int EncRCPic::xEstPicLowerBound(EncRCSeq* encRCSeq, EncRCGOP* encRCGOP)
 }
 #endif
 
-Void EncRCPic::addToPictureLsit( list<EncRCPic*>& listPreviousPictures )
+void EncRCPic::addToPictureLsit( list<EncRCPic*>& listPreviousPictures )
 {
   if ( listPreviousPictures.size() > g_RCMaxPicListSize )
   {
@@ -597,7 +597,7 @@ Void EncRCPic::addToPictureLsit( list<EncRCPic*>& listPreviousPictures )
   listPreviousPictures.push_back( this );
 }
 
-Void EncRCPic::create( EncRCSeq* encRCSeq, EncRCGOP* encRCGOP, Int frameLevel, list<EncRCPic*>& listPreviousPictures )
+void EncRCPic::create( EncRCSeq* encRCSeq, EncRCGOP* encRCGOP, Int frameLevel, list<EncRCPic*>& listPreviousPictures )
 {
   destroy();
   m_encRCSeq = encRCSeq;
@@ -656,7 +656,7 @@ Void EncRCPic::create( EncRCSeq* encRCSeq, EncRCGOP* encRCGOP, Int frameLevel, l
   m_picLambda           = 0.0;
 }
 
-Void EncRCPic::destroy()
+void EncRCPic::destroy()
 {
   if( m_LCUs != NULL )
   {
@@ -924,7 +924,7 @@ Int EncRCPic::getLCUEstQP( Double lambda, Int clipPicQP )
   return estQP;
 }
 
-Void EncRCPic::updateAfterCTU( Int LCUIdx, Int bits, Int QP, Double lambda, Bool updateLCUParameter )
+void EncRCPic::updateAfterCTU( Int LCUIdx, Int bits, Int QP, Double lambda, Bool updateLCUParameter )
 {
   m_LCUs[LCUIdx].m_actualBits = bits;
   m_LCUs[LCUIdx].m_QP         = QP;
@@ -1040,7 +1040,7 @@ Double EncRCPic::calAverageLambda()
 }
 
 
-Void EncRCPic::updateAfterPicture( Int actualHeaderBits, Int actualTotalBits, Double averageQP, Double averageLambda, SliceType eSliceType)
+void EncRCPic::updateAfterPicture( Int actualHeaderBits, Int actualTotalBits, Double averageQP, Double averageLambda, SliceType eSliceType)
 {
   m_picActualHeaderBits = actualHeaderBits;
   m_picActualBits       = actualTotalBits;
@@ -1134,7 +1134,7 @@ Double EncRCPic::calculateLambdaIntra(Double alpha, Double beta, Double MADPerPi
   return ( (alpha/256.0) * pow( MADPerPixel/bitsPerPixel, beta ) );
 }
 
-Void EncRCPic::updateAlphaBetaIntra(Double *alpha, Double *beta)
+void EncRCPic::updateAlphaBetaIntra(Double *alpha, Double *beta)
 {
   Double lnbpp = log(pow(m_totalCostIntra / (Double)m_numberOfPixel, BETA1));
   Double diffLambda = (*beta)*(log((Double)m_picActualBits)-log((Double)m_targetBits));
@@ -1145,7 +1145,7 @@ Void EncRCPic::updateAlphaBetaIntra(Double *alpha, Double *beta)
 }
 
 
-Void EncRCPic::getLCUInitTargetBits()
+void EncRCPic::getLCUInitTargetBits()
 {
   Int iAvgBits     = 0;
 
@@ -1211,7 +1211,7 @@ RateCtrl::~RateCtrl()
   destroy();
 }
 
-Void RateCtrl::destroy()
+void RateCtrl::destroy()
 {
   if ( m_encRCSeq != NULL )
   {
@@ -1231,7 +1231,7 @@ Void RateCtrl::destroy()
   }
 }
 
-Void RateCtrl::init( Int totalFrames, Int targetBitrate, Int frameRate, Int GOPSize, Int picWidth, Int picHeight, Int LCUWidth, Int LCUHeight, Int keepHierBits, Bool useLCUSeparateModel, GOPEntry  GOPList[MAX_GOP] )
+void RateCtrl::init( Int totalFrames, Int targetBitrate, Int frameRate, Int GOPSize, Int picWidth, Int picHeight, Int LCUWidth, Int LCUHeight, Int keepHierBits, Bool useLCUSeparateModel, GOPEntry  GOPList[MAX_GOP] )
 {
   destroy();
 
@@ -1431,13 +1431,13 @@ Void RateCtrl::init( Int totalFrames, Int targetBitrate, Int frameRate, Int GOPS
   delete[] GOPID2Level;
 }
 
-Void RateCtrl::initRCPic( Int frameLevel )
+void RateCtrl::initRCPic( Int frameLevel )
 {
   m_encRCPic = new EncRCPic;
   m_encRCPic->create( m_encRCSeq, m_encRCGOP, frameLevel, m_listRCPictures );
 }
 
-Void RateCtrl::initRCGOP( Int numberOfPictures )
+void RateCtrl::initRCGOP( Int numberOfPictures )
 {
   m_encRCGOP = new EncRCGOP;
   m_encRCGOP->create( m_encRCSeq, numberOfPictures );
@@ -1463,7 +1463,7 @@ Int  RateCtrl::updateCpbState(Int actualBits)
   return cpbState;
 }
 
-Void RateCtrl::initHrdParam(const HRD* pcHrd, Int iFrameRate, Double fInitialCpbFullness)
+void RateCtrl::initHrdParam(const HRD* pcHrd, Int iFrameRate, Double fInitialCpbFullness)
 {
   m_CpbSaturationEnabled = true;
   m_cpbSize = (pcHrd->getCpbSizeValueMinus1(0, 0, 0) + 1) << (4 + pcHrd->getCpbSizeScale());
@@ -1473,7 +1473,7 @@ Void RateCtrl::initHrdParam(const HRD* pcHrd, Int iFrameRate, Double fInitialCpb
 }
 #endif
 
-Void RateCtrl::destroyRCGOP()
+void RateCtrl::destroyRCGOP()
 {
   delete m_encRCGOP;
   m_encRCGOP = NULL;

@@ -213,7 +213,7 @@ const Int g_ipred_mode_table[] = { 1,1,1,2,2,2,3,3,3,4,4,4,5,5,5,6,6,6,7,7,7,8,8
 #endif
 
 // initialize ROM variables
-Void initROM()
+void initROM()
 {
   Int i, c;
 
@@ -467,7 +467,7 @@ Void initROM()
 #endif
 }
 
-Void destroyROM()
+void destroyROM()
 {
   unsigned numWidths = gp_sizeIdxInfo->numAllWidths();
   unsigned numHeights = gp_sizeIdxInfo->numAllHeights();

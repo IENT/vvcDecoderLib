@@ -198,7 +198,7 @@ Slice::~Slice()
 }
 
 
-Void Slice::initSlice()
+void Slice::initSlice()
 {
   for(UInt i=0; i<NUM_REF_PIC_LIST_01; i++)
   {
@@ -230,7 +230,7 @@ Void Slice::initSlice()
 #endif
 }
 
-Void Slice::setDefaultClpRng( const SPS& sps )
+void Slice::setDefaultClpRng( const SPS& sps )
 {
   m_clpRngs.comp[COMPONENT_Y].min = m_clpRngs.comp[COMPONENT_Cb].min  = m_clpRngs.comp[COMPONENT_Cr].min = 0;
   m_clpRngs.comp[COMPONENT_Y].max                                     = (1<< sps.getBitDepth(CHANNEL_TYPE_LUMA))-1;
@@ -254,7 +254,7 @@ Bool Slice::getRapPicFlag() const
 }
 
 
-Void  Slice::sortPicList        (PicList& rcListPic)
+void  Slice::sortPicList        (PicList& rcListPic)
 {
   Picture*    pcPicExtract;
   Picture*    pcPicInsert;
@@ -353,7 +353,7 @@ Picture* Slice::xGetLongTermRefPic( PicList& rcListPic, Int poc, Bool pocHasMsb)
   return pcStPic;
 }
 
-Void Slice::setRefPOCList       ()
+void Slice::setRefPOCList       ()
 {
   for (Int iDir = 0; iDir < NUM_REF_PIC_LIST_01; iDir++)
   {
@@ -365,7 +365,7 @@ Void Slice::setRefPOCList       ()
 
 }
 
-Void Slice::setList1IdxToList0Idx()
+void Slice::setList1IdxToList0Idx()
 {
   Int idxL0, idxL1;
   for ( idxL1 = 0; idxL1 < getNumRefIdx( REF_PIC_LIST_1 ); idxL1++ )
@@ -382,7 +382,7 @@ Void Slice::setList1IdxToList0Idx()
   }
 }
 
-Void Slice::setRefPicList( PicList& rcListPic, Bool checkNumPocTotalCurr, Bool bCopyL0toL1ErrorCase )
+void Slice::setRefPicList( PicList& rcListPic, Bool checkNumPocTotalCurr, Bool bCopyL0toL1ErrorCase )
 {
   if ( m_eSliceType == I_SLICE)
   {
@@ -561,7 +561,7 @@ Int Slice::getNumRpsCurrTempList() const
   return numRpsCurrTempList;
 }
 
-Void Slice::initEqualRef()
+void Slice::initEqualRef()
 {
   for (Int iDir = 0; iDir < NUM_REF_PIC_LIST_01; iDir++)
   {
@@ -575,7 +575,7 @@ Void Slice::initEqualRef()
   }
 }
 
-Void Slice::checkColRefIdx(UInt curSliceSegmentIdx, const Picture* pic)
+void Slice::checkColRefIdx(UInt curSliceSegmentIdx, const Picture* pic)
 {
   Int i;
   Slice* curSlice = pic->slices[curSliceSegmentIdx];
@@ -599,7 +599,7 @@ Void Slice::checkColRefIdx(UInt curSliceSegmentIdx, const Picture* pic)
   }
 }
 
-Void Slice::checkCRA(const ReferencePictureSet *pReferencePictureSet, Int& pocCRA, NalUnitType& associatedIRAPType, PicList& rcListPic)
+void Slice::checkCRA(const ReferencePictureSet *pReferencePictureSet, Int& pocCRA, NalUnitType& associatedIRAPType, PicList& rcListPic)
 {
   for(Int i = 0; i < pReferencePictureSet->getNumberOfNegativePictures()+pReferencePictureSet->getNumberOfPositivePictures(); i++)
   {
@@ -659,7 +659,7 @@ Void Slice::checkCRA(const ReferencePictureSet *pReferencePictureSet, Int& pocCR
  * Note that the current picture is already placed in the reference list and its marking is not changed.
  * If the current picture has a nal_ref_idc that is not 0, it will remain marked as "used for reference".
  */
-Void Slice::decodingRefreshMarking(Int& pocCRA, Bool& bRefreshPending, PicList& rcListPic, const bool bEfficientFieldIRAPEnabled)
+void Slice::decodingRefreshMarking(Int& pocCRA, Bool& bRefreshPending, PicList& rcListPic, const bool bEfficientFieldIRAPEnabled)
 {
   Picture* rpcPic;
   Int      pocCurr = getPOC();
@@ -736,7 +736,7 @@ Void Slice::decodingRefreshMarking(Int& pocCRA, Bool& bRefreshPending, PicList& 
   }
 }
 
-Void Slice::copySliceInfo(Slice *pSrc, bool cpyAlmostAll)
+void Slice::copySliceInfo(Slice *pSrc, bool cpyAlmostAll)
 {
   CHECK(!pSrc, "Source is NULL");
 
@@ -900,7 +900,7 @@ Bool Slice::isStepwiseTemporalLayerSwitchingPointCandidate(PicList& rcListPic) c
 }
 
 
-Void Slice::checkLeadingPictureRestrictions(PicList& rcListPic) const
+void Slice::checkLeadingPictureRestrictions(PicList& rcListPic) const
 {
   Int nalUnitType = this->getNalUnitType();
 
@@ -1066,7 +1066,7 @@ Void Slice::checkLeadingPictureRestrictions(PicList& rcListPic) const
 
 /** Function for applying picture marking based on the Reference Picture Set in pReferencePictureSet.
 */
-Void Slice::applyReferencePictureSet( PicList& rcListPic, const ReferencePictureSet *pReferencePictureSet) const
+void Slice::applyReferencePictureSet( PicList& rcListPic, const ReferencePictureSet *pReferencePictureSet) const
 {
   Int i, isReference;
 
@@ -1343,7 +1343,7 @@ Int Slice::checkThatAllRefPicsAreAvailable( PicList& rcListPic, const ReferenceP
 
 /** Function for constructing an explicit Reference Picture Set out of the available pictures in a referenced Reference Picture Set
 */
-Void Slice::createExplicitReferencePictureSetFromReference( PicList& rcListPic, const ReferencePictureSet *pReferencePictureSet, Bool isRAP, Int pocRandomAccess, Bool bUseRecoveryPoint, const Bool bEfficientFieldIRAPEnabled)
+void Slice::createExplicitReferencePictureSetFromReference( PicList& rcListPic, const ReferencePictureSet *pReferencePictureSet, Bool isRAP, Int pocRandomAccess, Bool bUseRecoveryPoint, const Bool bEfficientFieldIRAPEnabled)
 {
   Picture* rpcPic;
   Int i, j;
@@ -1462,13 +1462,13 @@ Void Slice::createExplicitReferencePictureSetFromReference( PicList& rcListPic, 
 }
 
 //! get AC and DC values for weighted pred
-Void  Slice::getWpAcDcParam(const WPACDCParam *&wp) const
+void  Slice::getWpAcDcParam(const WPACDCParam *&wp) const
 {
   wp = m_weightACDCParam;
 }
 
 //! init AC and DC values for weighted pred
-Void  Slice::initWpAcDcParam()
+void  Slice::initWpAcDcParam()
 {
   for(Int iComp = 0; iComp < MAX_NUM_COMPONENT; iComp++ )
   {
@@ -1478,14 +1478,14 @@ Void  Slice::initWpAcDcParam()
 }
 
 //! get tables for weighted prediction
-Void  Slice::getWpScaling( RefPicList e, Int iRefIdx, WPScalingParam *&wp ) const
+void  Slice::getWpScaling( RefPicList e, Int iRefIdx, WPScalingParam *&wp ) const
 {
   CHECK(e>=NUM_REF_PIC_LIST_01, "Invalid picture reference list");
   wp = (WPScalingParam*) m_weightPredTable[e][iRefIdx];
 }
 
 //! reset Default WP tables settings : no weight.
-Void  Slice::resetWpScaling()
+void  Slice::resetWpScaling()
 {
   for ( Int e=0 ; e<NUM_REF_PIC_LIST_01 ; e++ )
   {
@@ -1505,7 +1505,7 @@ Void  Slice::resetWpScaling()
 }
 
 //! init WP table
-Void  Slice::initWpScaling(const SPS *sps)
+void  Slice::initWpScaling(const SPS *sps)
 {
   const Bool bUseHighPrecisionPredictionWeighting = sps->getSpsRangeExtension().getHighPrecisionOffsetsEnabledFlag();
   for ( Int e=0 ; e<NUM_REF_PIC_LIST_01 ; e++ )
@@ -1906,7 +1906,7 @@ SPS::~SPS()
   m_RPSList.destroy();
 }
 
-Void  SPS::createRPSList( Int numRPS )
+void  SPS::createRPSList( Int numRPS )
 {
   m_RPSList.destroy();
   m_RPSList.create(numRPS);
@@ -2003,17 +2003,17 @@ ReferencePictureSet::~ReferencePictureSet()
 {
 }
 
-Void ReferencePictureSet::setUsed(Int bufferNum, Bool used)
+void ReferencePictureSet::setUsed(Int bufferNum, Bool used)
 {
   m_used[bufferNum] = used;
 }
 
-Void ReferencePictureSet::setDeltaPOC(Int bufferNum, Int deltaPOC)
+void ReferencePictureSet::setDeltaPOC(Int bufferNum, Int deltaPOC)
 {
   m_deltaPOC[bufferNum] = deltaPOC;
 }
 
-Void ReferencePictureSet::setNumberOfPictures(Int numberOfPictures)
+void ReferencePictureSet::setNumberOfPictures(Int numberOfPictures)
 {
   m_numberOfPictures = numberOfPictures;
 }
@@ -2038,7 +2038,7 @@ Int ReferencePictureSet::getPOC(Int bufferNum) const
   return m_POC[bufferNum];
 }
 
-Void ReferencePictureSet::setPOC(Int bufferNum, Int POC)
+void ReferencePictureSet::setPOC(Int bufferNum, Int POC)
 {
   m_POC[bufferNum] = POC;
 }
@@ -2048,13 +2048,13 @@ Bool ReferencePictureSet::getCheckLTMSBPresent(Int bufferNum) const
   return m_bCheckLTMSB[bufferNum];
 }
 
-Void ReferencePictureSet::setCheckLTMSBPresent(Int bufferNum, Bool b)
+void ReferencePictureSet::setCheckLTMSBPresent(Int bufferNum, Bool b)
 {
   m_bCheckLTMSB[bufferNum] = b;
 }
 
 //! set the reference idc value at uiBufferNum entry to the value of iRefIdc
-Void ReferencePictureSet::setRefIdc(Int bufferNum, Int refIdc)
+void ReferencePictureSet::setRefIdc(Int bufferNum, Int refIdc)
 {
   m_refIdc[bufferNum] = refIdc;
 }
@@ -2068,9 +2068,9 @@ Int  ReferencePictureSet::getRefIdc(Int bufferNum) const
 /** Sorts the deltaPOC and Used by current values in the RPS based on the deltaPOC values.
  *  deltaPOC values are sorted with -ve values before the +ve values.  -ve values are in decreasing order.
  *  +ve values are in increasing order.
- * \returns Void
+ * \returns void
  */
-Void ReferencePictureSet::sortDeltaPOC()
+void ReferencePictureSet::sortDeltaPOC()
 {
   // sort in increasing order (smallest first)
   for(Int j=1; j < getNumberOfPictures(); j++)
@@ -2104,9 +2104,9 @@ Void ReferencePictureSet::sortDeltaPOC()
 
 /** Prints the deltaPOC and RefIdc (if available) values in the RPS.
  *  A "*" is added to the deltaPOC value if it is Used bu current.
- * \returns Void
+ * \returns void
  */
-Void ReferencePictureSet::printDeltaPOC() const
+void ReferencePictureSet::printDeltaPOC() const
 {
   DTRACE( g_trace_ctx, D_RPSINFO, "DeltaPOC = { " );
   for(Int j=0; j < getNumberOfPictures(); j++)
@@ -2150,7 +2150,7 @@ ScalingList::ScalingList()
 
 /** set default quantization matrix to array
 */
-Void ScalingList::setDefaultScalingList()
+void ScalingList::setDefaultScalingList()
 {
   for(UInt sizeId = 0; sizeId < SCALING_LIST_SIZE_NUM; sizeId++)
   {
@@ -2187,12 +2187,12 @@ Bool ScalingList::checkDefaultScalingList()
  * \param listId    index of input matrix
  * \param refListId index of reference matrix
  */
-Void ScalingList::processRefMatrix( UInt sizeId, UInt listId , UInt refListId )
+void ScalingList::processRefMatrix( UInt sizeId, UInt listId , UInt refListId )
 {
   ::memcpy(getScalingListAddress(sizeId, listId),((listId == refListId)? getScalingListDefaultAddress(sizeId, refListId): getScalingListAddress(sizeId, refListId)),sizeof(Int)*std::min(MAX_MATRIX_COEF_NUM,(Int)g_scalingListSize[sizeId]));
 }
 
-Void ScalingList::checkPredMode(UInt sizeId, UInt listId)
+void ScalingList::checkPredMode(UInt sizeId, UInt listId)
 {
   Int predListStep = (sizeId == SCALING_LIST_32x32? (SCALING_LIST_NUM/NUMBER_OF_PREDICTION_MODES) : 1); // if 32x32, skip over chroma entries.
 
@@ -2210,7 +2210,7 @@ Void ScalingList::checkPredMode(UInt sizeId, UInt listId)
   setScalingListPredModeFlag(sizeId, listId, true);
 }
 
-static Void outputScalingListHelp(std::ostream &os)
+static void outputScalingListHelp(std::ostream &os)
 {
   os << "The scaling list file specifies all matrices and their DC values; none can be missing,\n"
          "but their order is arbitrary.\n\n"
@@ -2240,7 +2240,7 @@ static Void outputScalingListHelp(std::ostream &os)
   }
 }
 
-Void ScalingList::outputScalingLists(std::ostream &os) const
+void ScalingList::outputScalingLists(std::ostream &os) const
 {
   for(UInt sizeIdc = 0; sizeIdc < SCALING_LIST_SIZE_NUM; sizeIdc++)
   {
@@ -2425,7 +2425,7 @@ const Int* ScalingList::getScalingListDefaultAddress(UInt sizeId, UInt listId)
  * \param sizeId size index
  * \param listId index of input matrix
  */
-Void ScalingList::processDefaultMatrix(UInt sizeId, UInt listId)
+void ScalingList::processDefaultMatrix(UInt sizeId, UInt listId)
 {
   ::memcpy(getScalingListAddress(sizeId, listId),getScalingListDefaultAddress(sizeId,listId),sizeof(Int)*std::min(MAX_MATRIX_COEF_NUM,(Int)g_scalingListSize[sizeId]));
   setScalingListDC(sizeId,listId,SCALING_LIST_DC);
@@ -2433,7 +2433,7 @@ Void ScalingList::processDefaultMatrix(UInt sizeId, UInt listId)
 
 /** check DC value of matrix for default matrix signaling
  */
-Void ScalingList::checkDcOfMatrix()
+void ScalingList::checkDcOfMatrix()
 {
   for(UInt sizeId = 0; sizeId < SCALING_LIST_SIZE_NUM; sizeId++)
   {
@@ -2568,13 +2568,13 @@ Bool ParameterSetManager::activatePPS(Int ppsId, Bool isIRAP)
 }
 
 template <>
-Void ParameterSetMap<PPS>::setID(PPS* parameterSet, const Int psId)
+void ParameterSetMap<PPS>::setID(PPS* parameterSet, const Int psId)
 {
   parameterSet->setPPSId(psId);
 }
 
 template <>
-Void ParameterSetMap<SPS>::setID(SPS* parameterSet, const Int psId)
+void ParameterSetMap<SPS>::setID(SPS* parameterSet, const Int psId)
 {
   parameterSet->setSPSId(psId);
 }
@@ -2598,7 +2598,7 @@ PTL::PTL()
   ::memset(m_subLayerLevelPresentFlag,   0, sizeof(m_subLayerLevelPresentFlag  ));
 }
 
-Void calculateParameterSetChangedFlag(Bool &bChanged, const std::vector<UChar> *pOldData, const std::vector<UChar> *pNewData)
+void calculateParameterSetChangedFlag(Bool &bChanged, const std::vector<UChar> *pOldData, const std::vector<UChar> *pNewData)
 {
   if (!bChanged)
   {

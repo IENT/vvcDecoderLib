@@ -78,7 +78,7 @@ public:
 
   Double                 getAvgActivity()        { return m_dAvgActivity;        }
 
-  Void                   setAvgActivity( Double d )  { m_dAvgActivity = d; }
+  void                   setAvgActivity( Double d )  { m_dAvgActivity = d; }
 };
 
 /// Source picture analyzer class
@@ -88,7 +88,7 @@ protected:
   AQpPreanalyzer() {}
   virtual ~AQpPreanalyzer() {}
 public:
-  static Void preanalyze( Picture* picture );
+  static void preanalyze( Picture* picture );
 };
 
 //! \}

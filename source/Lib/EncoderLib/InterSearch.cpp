@@ -116,7 +116,7 @@ InterSearch::InterSearch()
 }
 
 
-Void InterSearch::destroy()
+void InterSearch::destroy()
 {
   CHECK(!m_isInitialized, "Not initialized");
   if ( m_pTempPel )
@@ -154,7 +154,7 @@ Void InterSearch::destroy()
   m_isInitialized = false;
 }
 
-Void InterSearch::setTempBuffers( CodingStructure ****pSplitCS, CodingStructure ****pFullCS, CodingStructure **pSaveCS )
+void InterSearch::setTempBuffers( CodingStructure ****pSplitCS, CodingStructure ****pFullCS, CodingStructure **pSaveCS )
 {
   m_pSplitCS = pSplitCS;
   m_pFullCS  = pFullCS;
@@ -162,7 +162,7 @@ Void InterSearch::setTempBuffers( CodingStructure ****pSplitCS, CodingStructure 
 }
 
 #if ENABLE_SPLIT_PARALLELISM
-Void InterSearch::copyState( const InterSearch& other )
+void InterSearch::copyState( const InterSearch& other )
 {
   if( !m_pcEncCfg->getQTBT() )
   {
@@ -181,7 +181,7 @@ InterSearch::~InterSearch()
   }
 }
 
-Void InterSearch::init( EncCfg*        pcEncCfg,
+void InterSearch::init( EncCfg*        pcEncCfg,
                         TrQuant*       pcTrQuant,
 #if JEM_TOOLS
                         BilateralFilter*
@@ -265,7 +265,7 @@ Void InterSearch::init( EncCfg*        pcEncCfg,
 }
 
 
-inline Void InterSearch::xTZSearchHelp( IntTZSearchStruct& rcStruct, const Int iSearchX, const Int iSearchY, const UChar ucPointNr, const UInt uiDistance )
+inline void InterSearch::xTZSearchHelp( IntTZSearchStruct& rcStruct, const Int iSearchX, const Int iSearchY, const UChar ucPointNr, const UInt uiDistance )
 {
   Distortion  uiSad = 0;
 
@@ -365,7 +365,7 @@ inline Void InterSearch::xTZSearchHelp( IntTZSearchStruct& rcStruct, const Int i
 
 
 
-inline Void InterSearch::xTZ2PointSearch( IntTZSearchStruct& rcStruct )
+inline void InterSearch::xTZ2PointSearch( IntTZSearchStruct& rcStruct )
 {
   const SearchRange& sr = rcStruct.searchRange;
 
@@ -393,7 +393,7 @@ inline Void InterSearch::xTZ2PointSearch( IntTZSearchStruct& rcStruct )
 }
 
 
-inline Void InterSearch::xTZ8PointSquareSearch( IntTZSearchStruct& rcStruct, const Int iStartX, const Int iStartY, const Int iDist )
+inline void InterSearch::xTZ8PointSquareSearch( IntTZSearchStruct& rcStruct, const Int iStartX, const Int iStartY, const Int iDist )
 {
   const SearchRange& sr = rcStruct.searchRange;
   // 8 point search,                   //   1 2 3
@@ -447,7 +447,7 @@ inline Void InterSearch::xTZ8PointSquareSearch( IntTZSearchStruct& rcStruct, con
 
 
 
-inline Void InterSearch::xTZ8PointDiamondSearch( IntTZSearchStruct& rcStruct,
+inline void InterSearch::xTZ8PointDiamondSearch( IntTZSearchStruct& rcStruct,
                                                  const Int iStartX,
                                                  const Int iStartY,
                                                  const Int iDist,
@@ -721,7 +721,7 @@ Distortion InterSearch::xGetInterPredictionError( PredictionUnit& pu, PelUnitBuf
 }
 
 //! estimation of best merge coding
-Void InterSearch::xMergeEstimation( PredictionUnit& pu, PelUnitBuf& origBuf, Int iPUIdx, UInt& uiMergeIdx, Distortion& ruiCost, MergeCtx &mergeCtx )
+void InterSearch::xMergeEstimation( PredictionUnit& pu, PelUnitBuf& origBuf, Int iPUIdx, UInt& uiMergeIdx, Distortion& ruiCost, MergeCtx &mergeCtx )
 {
   PartSize partSize = pu.cu->partSize;
 
@@ -771,7 +771,7 @@ Void InterSearch::xMergeEstimation( PredictionUnit& pu, PelUnitBuf& origBuf, Int
 }
 
 #if JEM_TOOLS
-Void InterSearch::xFRUCMrgEstimation( PredictionUnit& pu, PelUnitBuf& origBuf, Distortion& ruiMinCost, UChar& ruhFRUCMode, MergeCtx &mrgCtx )
+void InterSearch::xFRUCMrgEstimation( PredictionUnit& pu, PelUnitBuf& origBuf, Distortion& ruiMinCost, UChar& ruhFRUCMode, MergeCtx &mrgCtx )
 {
   ruiMinCost = std::numeric_limits<Distortion>::max();
 
@@ -814,7 +814,7 @@ Void InterSearch::xFRUCMrgEstimation( PredictionUnit& pu, PelUnitBuf& origBuf, D
 #endif
 
 //! search of the best candidate for inter prediction
-Void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
+void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
 {
   CodingStructure& cs = *cu.cs;
 
@@ -1577,7 +1577,7 @@ Void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
 
 
 // AMVP
-Void InterSearch::xEstimateMvPredAMVP( PredictionUnit& pu, PelUnitBuf& origBuf, RefPicList eRefPicList, Int iRefIdx, Mv& rcMvPred, AMVPInfo& rAMVPInfo, Bool bFilled, Distortion* puiDistBiP )
+void InterSearch::xEstimateMvPredAMVP( PredictionUnit& pu, PelUnitBuf& origBuf, RefPicList eRefPicList, Int iRefIdx, Mv& rcMvPred, AMVPInfo& rAMVPInfo, Bool bFilled, Distortion* puiDistBiP )
 {
   Mv         cBestMv;
   Int        iBestIdx   = 0;
@@ -1651,7 +1651,7 @@ UInt InterSearch::xGetMvpIdxBits(Int iIdx, Int iNum)
   return uiLength;
 }
 
-Void InterSearch::xGetBlkBits( PartSize eCUMode, Bool bPSlice, Int iPartIdx, UInt uiLastMode, UInt uiBlkBit[3])
+void InterSearch::xGetBlkBits( PartSize eCUMode, Bool bPSlice, Int iPartIdx, UInt uiLastMode, UInt uiBlkBit[3])
 {
   if ( eCUMode == SIZE_2Nx2N )
   {
@@ -1665,7 +1665,7 @@ Void InterSearch::xGetBlkBits( PartSize eCUMode, Bool bPSlice, Int iPartIdx, UIn
   }
 }
 
-Void InterSearch::xCopyAMVPInfo (AMVPInfo* pSrc, AMVPInfo* pDst)
+void InterSearch::xCopyAMVPInfo (AMVPInfo* pSrc, AMVPInfo* pDst)
 {
   pDst->numCand = pSrc->numCand;
   for (Int i = 0; i < pSrc->numCand; i++)
@@ -1675,9 +1675,9 @@ Void InterSearch::xCopyAMVPInfo (AMVPInfo* pSrc, AMVPInfo* pDst)
 }
 
 #if JVET_K0357_AMVR
-Void InterSearch::xCheckBestMVP ( RefPicList eRefPicList, Mv cMv, Mv& rcMvPred, Int& riMVPIdx, AMVPInfo& amvpInfo, UInt& ruiBits, Distortion& ruiCost, const UChar imv )
+void InterSearch::xCheckBestMVP ( RefPicList eRefPicList, Mv cMv, Mv& rcMvPred, Int& riMVPIdx, AMVPInfo& amvpInfo, UInt& ruiBits, Distortion& ruiCost, const UChar imv )
 #else
-Void InterSearch::xCheckBestMVP ( RefPicList eRefPicList, Mv cMv, Mv& rcMvPred, Int& riMVPIdx, AMVPInfo& amvpInfo, UInt& ruiBits, Distortion& ruiCost )
+void InterSearch::xCheckBestMVP ( RefPicList eRefPicList, Mv cMv, Mv& rcMvPred, Int& riMVPIdx, AMVPInfo& amvpInfo, UInt& ruiBits, Distortion& ruiCost )
 #endif
 {
 #if JVET_K0357_AMVR
@@ -1813,7 +1813,7 @@ Distortion InterSearch::xGetAffineTemplateCost( PredictionUnit& pu, PelUnitBuf& 
 }
 #endif
 
-Void InterSearch::xMotionEstimation(PredictionUnit& pu, PelUnitBuf& origBuf, RefPicList eRefPicList, Mv& rcMvPred, Int iRefIdxPred, Mv& rcMv, Int& riMVPIdx, UInt& ruiBits, Distortion& ruiCost, const AMVPInfo& amvpInfo, Bool bBi)
+void InterSearch::xMotionEstimation(PredictionUnit& pu, PelUnitBuf& origBuf, RefPicList eRefPicList, Mv& rcMvPred, Int iRefIdxPred, Mv& rcMv, Int& riMVPIdx, UInt& ruiBits, Distortion& ruiCost, const AMVPInfo& amvpInfo, Bool bBi)
 {
   Mv cMvHalf, cMvQter;
 
@@ -1963,7 +1963,7 @@ Void InterSearch::xMotionEstimation(PredictionUnit& pu, PelUnitBuf& origBuf, Ref
 
 
 
-Void InterSearch::xSetSearchRange ( const PredictionUnit& pu,
+void InterSearch::xSetSearchRange ( const PredictionUnit& pu,
                                     const Mv& cMvPred,
                                     const Int iSrchRng,
                                     SearchRange& sr )
@@ -1997,7 +1997,7 @@ Void InterSearch::xSetSearchRange ( const PredictionUnit& pu,
 }
 
 
-Void InterSearch::xPatternSearch( IntTZSearchStruct&    cStruct,
+void InterSearch::xPatternSearch( IntTZSearchStruct&    cStruct,
                                   Mv&            rcMv,
                                   Distortion&    ruiSAD )
 {
@@ -2054,7 +2054,7 @@ Void InterSearch::xPatternSearch( IntTZSearchStruct&    cStruct,
 }
 
 
-Void InterSearch::xPatternSearchFast( const PredictionUnit& pu,
+void InterSearch::xPatternSearchFast( const PredictionUnit& pu,
                                       IntTZSearchStruct&    cStruct,
                                       Mv&                   rcMv,
                                       Distortion&           ruiSAD,
@@ -2081,7 +2081,7 @@ Void InterSearch::xPatternSearchFast( const PredictionUnit& pu,
 }
 
 
-Void InterSearch::xTZSearch( const PredictionUnit& pu,
+void InterSearch::xTZSearch( const PredictionUnit& pu,
                              IntTZSearchStruct&    cStruct,
                              Mv&                   rcMv,
                              Distortion&           ruiSAD,
@@ -2361,7 +2361,7 @@ Void InterSearch::xTZSearch( const PredictionUnit& pu,
 }
 
 
-Void InterSearch::xTZSearchSelective( const PredictionUnit& pu,
+void InterSearch::xTZSearchSelective( const PredictionUnit& pu,
                                       IntTZSearchStruct&    cStruct,
                                       Mv                    &rcMv,
                                       Distortion            &ruiSAD,
@@ -2510,7 +2510,7 @@ Void InterSearch::xTZSearchSelective( const PredictionUnit& pu,
 }
 
 #if JVET_K0357_AMVR
-Void InterSearch::xPatternSearchIntRefine(PredictionUnit& pu, IntTZSearchStruct&  cStruct, Mv& rcMv, Mv& rcMvPred, Int& riMVPIdx, UInt& ruiBits, Distortion& ruiCost, const AMVPInfo& amvpInfo, Double fWeight)
+void InterSearch::xPatternSearchIntRefine(PredictionUnit& pu, IntTZSearchStruct&  cStruct, Mv& rcMv, Mv& rcMvPred, Int& riMVPIdx, UInt& ruiBits, Distortion& ruiCost, const AMVPInfo& amvpInfo, Double fWeight)
 {
 
   CHECK( pu.cu->imv == 0,                       "xPatternSearchIntRefine(): IMV not used.");
@@ -2605,7 +2605,7 @@ Void InterSearch::xPatternSearchIntRefine(PredictionUnit& pu, IntTZSearchStruct&
 }
 #endif
 
-Void InterSearch::xPatternSearchFracDIF(
+void InterSearch::xPatternSearchFracDIF(
   const PredictionUnit& pu,
   RefPicList            eRefPicList,
   Int                   iRefIdx,
@@ -2654,7 +2654,7 @@ Void InterSearch::xPatternSearchFracDIF(
 
 #if JEM_TOOLS || JVET_K_AFFINE
 
-Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
+void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
                                           PelUnitBuf&           origBuf,
                                           Int                   puIdx,
                                           UInt&                 lastMode,
@@ -3197,7 +3197,7 @@ Void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
   }
 }
 
-Void solveEqual( Double** dEqualCoeff, Int iOrder, Double* dAffinePara )
+void solveEqual( Double** dEqualCoeff, Int iOrder, Double* dAffinePara )
 {
 #if JVET_K_AFFINE_BUG_FIXES
   for ( int k = 0; k < iOrder; k++ )
@@ -3276,7 +3276,7 @@ Void solveEqual( Double** dEqualCoeff, Int iOrder, Double* dAffinePara )
   }
 }
 
-Void InterSearch::xCheckBestAffineMVP( PredictionUnit &pu, AffineAMVPInfo &affineAMVPInfo, RefPicList eRefPicList, Mv acMv[3], Mv acMvPred[3], Int& riMVPIdx, UInt& ruiBits, Distortion& ruiCost )
+void InterSearch::xCheckBestAffineMVP( PredictionUnit &pu, AffineAMVPInfo &affineAMVPInfo, RefPicList eRefPicList, Mv acMv[3], Mv acMvPred[3], Int& riMVPIdx, UInt& ruiBits, Distortion& ruiCost )
 {
   if ( affineAMVPInfo.numCand < 2 )
   {
@@ -3381,7 +3381,7 @@ Void InterSearch::xCheckBestAffineMVP( PredictionUnit &pu, AffineAMVPInfo &affin
   }
 }
 
-Void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
+void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
                                            PelUnitBuf&     origBuf,
                                            RefPicList      eRefPicList,
                                            Mv              acMvPred[3],
@@ -3838,7 +3838,7 @@ Void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
 
 }
 
-Void InterSearch::xEstimateAffineAMVP( PredictionUnit&  pu,
+void InterSearch::xEstimateAffineAMVP( PredictionUnit&  pu,
                                        AffineAMVPInfo&  affineAMVPInfo,
                                        PelUnitBuf&      origBuf,
                                        RefPicList       eRefPicList,
@@ -3889,7 +3889,7 @@ Void InterSearch::xEstimateAffineAMVP( PredictionUnit&  pu,
   DTRACE( g_trace_ctx, D_COMMON, "#estAffi=%d \n", affineAMVPInfo.numCand );
 }
 
-Void InterSearch::xCopyAffineAMVPInfo (AffineAMVPInfo& src, AffineAMVPInfo& dst)
+void InterSearch::xCopyAffineAMVPInfo (AffineAMVPInfo& src, AffineAMVPInfo& dst)
 {
   dst.numCand = src.numCand;
   DTRACE( g_trace_ctx, D_COMMON, " (%d) #copyAffi=%d \n", DTRACE_GET_COUNTER( g_trace_ctx, D_COMMON ), src.numCand );
@@ -3906,7 +3906,7 @@ Void InterSearch::xCopyAffineAMVPInfo (AffineAMVPInfo& src, AffineAMVPInfo& dst)
 * \param pattern Reference picture ROI
 * \param biPred    Flag indicating whether block is for biprediction
 */
-Void InterSearch::xExtDIFUpSamplingH( CPelBuf* pattern )
+void InterSearch::xExtDIFUpSamplingH( CPelBuf* pattern )
 {
   const ClpRng& clpRng = m_lumaClpRng;
   Int width      = pattern->width;
@@ -3975,7 +3975,7 @@ Void InterSearch::xExtDIFUpSamplingH( CPelBuf* pattern )
 * \param halfPelRef Half-pel mv
 * \param biPred     Flag indicating whether block is for biprediction
 */
-Void InterSearch::xExtDIFUpSamplingQ( CPelBuf* pattern, Mv halfPelRef )
+void InterSearch::xExtDIFUpSamplingQ( CPelBuf* pattern, Mv halfPelRef )
 {
   const ClpRng& clpRng = m_lumaClpRng;
   Int width      = pattern->width;
@@ -4193,7 +4193,7 @@ Void InterSearch::xExtDIFUpSamplingQ( CPelBuf* pattern, Mv halfPelRef )
 
 
 //! set wp tables
-Void InterSearch::setWpScalingDistParam( Int iRefIdx, RefPicList eRefPicListCur, Slice *pcSlice )
+void InterSearch::setWpScalingDistParam( Int iRefIdx, RefPicList eRefPicListCur, Slice *pcSlice )
 {
   if ( iRefIdx<0 )
   {
@@ -4236,7 +4236,7 @@ Void InterSearch::setWpScalingDistParam( Int iRefIdx, RefPicList eRefPicListCur,
   }
 }
 
-Void InterSearch::xEncodeInterResidualQT(CodingStructure &cs, Partitioner &partitioner, const ComponentID &compID)
+void InterSearch::xEncodeInterResidualQT(CodingStructure &cs, Partitioner &partitioner, const ComponentID &compID)
 {
   const UnitArea& currArea    = partitioner.currArea();
   const TransformUnit &currTU = *cs.getTU(currArea.lumaPos(), partitioner.chType);
@@ -4358,7 +4358,7 @@ Void InterSearch::xEncodeInterResidualQT(CodingStructure &cs, Partitioner &parti
 #endif
 }
 
-Void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &partitioner, Distortion *puiZeroDist /*= NULL*/)
+void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &partitioner, Distortion *puiZeroDist /*= NULL*/)
 {
   const UnitArea& currArea = partitioner.currArea();
   const SPS &sps           = *cs.sps;
@@ -4865,7 +4865,7 @@ Void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &par
 #endif
 }
 
-Void InterSearch::encodeResAndCalcRdInterCU(CodingStructure &cs, Partitioner &partitioner, const Bool &skipResidual)
+void InterSearch::encodeResAndCalcRdInterCU(CodingStructure &cs, Partitioner &partitioner, const Bool &skipResidual)
 {
   CodingUnit &cu = *cs.getCU( partitioner.chType );
 

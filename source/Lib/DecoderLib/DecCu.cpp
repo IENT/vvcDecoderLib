@@ -64,7 +64,7 @@ DecCu::~DecCu()
 #endif
 }
 
-Void DecCu::init( TrQuant* pcTrQuant, IntraPrediction* pcIntra, InterPrediction* pcInter)
+void DecCu::init( TrQuant* pcTrQuant, IntraPrediction* pcIntra, InterPrediction* pcInter)
 {
   m_pcTrQuant       = pcTrQuant;
   m_pcIntraPred     = pcIntra;
@@ -79,7 +79,7 @@ Void DecCu::init( TrQuant* pcTrQuant, IntraPrediction* pcIntra, InterPrediction*
 // Public member functions
 // ====================================================================================================================
 
-Void DecCu::decompressCtu( CodingStructure& cs, const UnitArea& ctuArea )
+void DecCu::decompressCtu( CodingStructure& cs, const UnitArea& ctuArea )
 {
   const int maxNumChannelType = cs.pcv->chrFormat != CHROMA_400 && CS::isDualITree( cs ) ? 2 : 1;
 
@@ -117,7 +117,7 @@ Void DecCu::decompressCtu( CodingStructure& cs, const UnitArea& ctuArea )
 // Protected member functions
 // ====================================================================================================================
 
-Void DecCu::xIntraRecBlk( TransformUnit& tu, const ComponentID compID )
+void DecCu::xIntraRecBlk( TransformUnit& tu, const ComponentID compID )
 {
   if( !tu.blocks[ compID ].valid() )
   {
@@ -216,7 +216,7 @@ Void DecCu::xIntraRecBlk( TransformUnit& tu, const ComponentID compID )
 #endif
 }
 
-Void DecCu::xReconIntraQT( CodingUnit &cu )
+void DecCu::xReconIntraQT( CodingUnit &cu )
 {
   if( cu.ipcm )
   {
@@ -244,9 +244,9 @@ Void DecCu::xReconIntraQT( CodingUnit &cu )
 * \param uiWidth CU width
 * \param uiHeight CU height
 * \param compID colour component ID
-* \returns Void
+* \returns void
 */
-Void DecCu::xDecodePCMTexture(TransformUnit &tu, const ComponentID compID)
+void DecCu::xDecodePCMTexture(TransformUnit &tu, const ComponentID compID)
 {
   const CompArea &area         = tu.blocks[compID];
         PelBuf piPicReco       = tu.cs->getRecoBuf( area );
@@ -269,9 +269,9 @@ Void DecCu::xDecodePCMTexture(TransformUnit &tu, const ComponentID compID)
 /** Function for reconstructing a PCM mode CU.
 * \param pcCU pointer to current CU
 * \param uiDepth CU Depth
-* \returns Void
+* \returns void
 */
-Void DecCu::xReconPCM(TransformUnit &tu)
+void DecCu::xReconPCM(TransformUnit &tu)
 {
   for (UInt ch = 0; ch < tu.blocks.size(); ch++)
   {
@@ -291,7 +291,7 @@ Void DecCu::xReconPCM(TransformUnit &tu)
 \ This function derives reconstructed PU/CU chroma samples with QTree recursive structure
 */
 
-Void
+void
 DecCu::xIntraRecQT(CodingUnit &cu, const ChannelType chType)
 {
   for( auto &currTU : CU::traverseTUs( cu ) )
@@ -316,7 +316,7 @@ DecCu::xIntraRecQT(CodingUnit &cu, const ChannelType chType)
 * \param pCU   pointer to current CU
 * \param depth CU Depth
 */
-Void DecCu::xFillPCMBuffer(CodingUnit &cu)
+void DecCu::xFillPCMBuffer(CodingUnit &cu)
 {
   for( auto &currTU : CU::traverseTUs( cu ) )
   {
@@ -334,7 +334,7 @@ Void DecCu::xFillPCMBuffer(CodingUnit &cu)
 
 #include "CommonLib/dtrace_buffer.h"
 
-Void DecCu::xReconInter(CodingUnit &cu)
+void DecCu::xReconInter(CodingUnit &cu)
 {
   // inter prediction
   m_pcInterPred->motionCompensation( cu );
@@ -371,7 +371,7 @@ Void DecCu::xReconInter(CodingUnit &cu)
   cs.setDecomp(cu);
 }
 
-Void DecCu::xDecodeInterTU( TransformUnit & currTU, const ComponentID compID )
+void DecCu::xDecodeInterTU( TransformUnit & currTU, const ComponentID compID )
 {
   if( !currTU.blocks[compID].valid() ) return;
 
@@ -407,7 +407,7 @@ Void DecCu::xDecodeInterTU( TransformUnit & currTU, const ComponentID compID )
   }
 }
 
-Void DecCu::xDecodeInterTexture(CodingUnit &cu)
+void DecCu::xDecodeInterTexture(CodingUnit &cu)
 {
   if( !cu.rootCbf )
   {
@@ -428,7 +428,7 @@ Void DecCu::xDecodeInterTexture(CodingUnit &cu)
 }
 
 #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
-Void DecCu::xDeriveCUMV( CodingUnit &cu )
+void DecCu::xDeriveCUMV( CodingUnit &cu )
 {
   for( auto &pu : CU::traversePUs( cu ) )
   {
@@ -619,7 +619,7 @@ Void DecCu::xDeriveCUMV( CodingUnit &cu )
   }
 }
 #else
-Void DecCu::xDeriveCUMV( CodingUnit &cu )
+void DecCu::xDeriveCUMV( CodingUnit &cu )
 {
   for( auto &pu : CU::traversePUs( cu ) )
   {

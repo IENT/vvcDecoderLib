@@ -68,7 +68,7 @@ SEIRemovalApp::SEIRemovalApp()
  - returns the number of mismatching pictures
  */
 
-Void read2(InputNALUnit& nalu)
+void read2(InputNALUnit& nalu)
 {
   InputBitstream& bs = nalu.getBitstream();
 

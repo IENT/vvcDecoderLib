@@ -52,7 +52,7 @@
 
 #if ENABLE_TRACING
 
-Void  VLCWriter::xWriteCodeTr (UInt value, UInt  length, const TChar *pSymbolName)
+void  VLCWriter::xWriteCodeTr (UInt value, UInt  length, const TChar *pSymbolName)
 {
   xWriteCode (value,length);
 
@@ -69,7 +69,7 @@ Void  VLCWriter::xWriteCodeTr (UInt value, UInt  length, const TChar *pSymbolNam
   }
 }
 
-Void  VLCWriter::xWriteUvlcTr (UInt value, const TChar *pSymbolName)
+void  VLCWriter::xWriteUvlcTr (UInt value, const TChar *pSymbolName)
 {
   xWriteUvlc (value);
   if( g_HLSTraceEnable )
@@ -78,7 +78,7 @@ Void  VLCWriter::xWriteUvlcTr (UInt value, const TChar *pSymbolName)
   }
 }
 
-Void  VLCWriter::xWriteSvlcTr (Int value, const TChar *pSymbolName)
+void  VLCWriter::xWriteSvlcTr (Int value, const TChar *pSymbolName)
 {
   xWriteSvlc(value);
   if( g_HLSTraceEnable )
@@ -87,7 +87,7 @@ Void  VLCWriter::xWriteSvlcTr (Int value, const TChar *pSymbolName)
   }
 }
 
-Void  VLCWriter::xWriteFlagTr(UInt value, const TChar *pSymbolName)
+void  VLCWriter::xWriteFlagTr(UInt value, const TChar *pSymbolName)
 {
   xWriteFlag(value);
   if( g_HLSTraceEnable )
@@ -101,13 +101,13 @@ bool g_HLSTraceEnable = true;
 #endif
 
 
-Void VLCWriter::xWriteCode     ( UInt uiCode, UInt uiLength )
+void VLCWriter::xWriteCode     ( UInt uiCode, UInt uiLength )
 {
   CHECK( uiLength == 0, "Code of lenght '0' not supported" );
   m_pcBitIf->write( uiCode, uiLength );
 }
 
-Void VLCWriter::xWriteUvlc     ( UInt uiCode )
+void VLCWriter::xWriteUvlc     ( UInt uiCode )
 {
   UInt uiLength = 1;
   UInt uiTemp = ++uiCode;
@@ -124,18 +124,18 @@ Void VLCWriter::xWriteUvlc     ( UInt uiCode )
   m_pcBitIf->write( uiCode, (uiLength+1) >> 1);
 }
 
-Void VLCWriter::xWriteSvlc     ( Int iCode )
+void VLCWriter::xWriteSvlc     ( Int iCode )
 {
   UInt uiCode = UInt( iCode <= 0 ? (-iCode)<<1 : (iCode<<1)-1);
   xWriteUvlc( uiCode );
 }
 
-Void VLCWriter::xWriteFlag( UInt uiCode )
+void VLCWriter::xWriteFlag( UInt uiCode )
 {
   m_pcBitIf->write( uiCode, 1 );
 }
 
-Void VLCWriter::xWriteRbspTrailingBits()
+void VLCWriter::xWriteRbspTrailingBits()
 {
   WRITE_FLAG( 1, "rbsp_stop_one_bit");
   Int cnt = 0;
@@ -147,7 +147,7 @@ Void VLCWriter::xWriteRbspTrailingBits()
   CHECK(cnt>=8, "More than '8' alignment bytes read");
 }
 
-Void AUDWriter::codeAUD(OutputBitstream& bs, const Int pictureType)
+void AUDWriter::codeAUD(OutputBitstream& bs, const Int pictureType)
 {
 #if ENABLE_TRACING
   xTraceAccessUnitDelimiter();
@@ -159,7 +159,7 @@ Void AUDWriter::codeAUD(OutputBitstream& bs, const Int pictureType)
   xWriteRbspTrailingBits();
 }
 
-Void HLSWriter::xCodeShortTermRefPicSet( const ReferencePictureSet* rps, Bool calledFromSliceHeader, Int idx)
+void HLSWriter::xCodeShortTermRefPicSet( const ReferencePictureSet* rps, Bool calledFromSliceHeader, Int idx)
 {
   //Int lastBits = getNumberOfWrittenBits();
 
@@ -212,7 +212,7 @@ Void HLSWriter::xCodeShortTermRefPicSet( const ReferencePictureSet* rps, Bool ca
   rps->printDeltaPOC();
 }
 
-Void HLSWriter::codePPS( const PPS* pcPPS )
+void HLSWriter::codePPS( const PPS* pcPPS )
 {
 #if ENABLE_TRACING
   xTracePPSHeader ();
@@ -373,7 +373,7 @@ Void HLSWriter::codePPS( const PPS* pcPPS )
   xWriteRbspTrailingBits();
 }
 
-Void HLSWriter::codeVUI( const VUI *pcVUI, const SPS* pcSPS )
+void HLSWriter::codeVUI( const VUI *pcVUI, const SPS* pcSPS )
 {
 #if ENABLE_TRACING
   DTRACE( g_trace_ctx, D_HEADER, "----------- vui_parameters -----------\n");
@@ -461,7 +461,7 @@ Void HLSWriter::codeVUI( const VUI *pcVUI, const SPS* pcSPS )
   }
 }
 
-Void HLSWriter::codeHrdParameters( const HRD *hrd, Bool commonInfPresentFlag, UInt maxNumSubLayersMinus1 )
+void HLSWriter::codeHrdParameters( const HRD *hrd, Bool commonInfPresentFlag, UInt maxNumSubLayersMinus1 )
 {
   if( commonInfPresentFlag )
   {
@@ -533,7 +533,7 @@ Void HLSWriter::codeHrdParameters( const HRD *hrd, Bool commonInfPresentFlag, UI
 }
 
 
-Void HLSWriter::codeSPSNext( const SPSNext& spsNext, const bool usePCM )
+void HLSWriter::codeSPSNext( const SPSNext& spsNext, const bool usePCM )
 {
   // tool enabling flags
   WRITE_FLAG( spsNext.getUseQTBT() ? 1 : 0,                                                     "qtbt_flag" );
@@ -731,7 +731,7 @@ Void HLSWriter::codeSPSNext( const SPSNext& spsNext, const bool usePCM )
   // ADD_NEW_TOOL : (sps extension writer) write tool enabling flags and associated parameters here
 }
 
-Void HLSWriter::codeSPS( const SPS* pcSPS )
+void HLSWriter::codeSPS( const SPS* pcSPS )
 {
 
   const ChromaFormat format                = pcSPS->getChromaFormatIdc();
@@ -922,7 +922,7 @@ Void HLSWriter::codeSPS( const SPS* pcSPS )
 }
 
 #if HEVC_VPS
-Void HLSWriter::codeVPS( const VPS* pcVPS )
+void HLSWriter::codeVPS( const VPS* pcVPS )
 {
 #if ENABLE_TRACING
   xTraceVPSHeader();
@@ -997,7 +997,7 @@ Void HLSWriter::codeVPS( const VPS* pcVPS )
 }
 #endif
 
-Void HLSWriter::codeSliceHeader         ( Slice* pcSlice )
+void HLSWriter::codeSliceHeader         ( Slice* pcSlice )
 {
 #if ENABLE_TRACING
   xTraceSliceHeader ();
@@ -1537,7 +1537,7 @@ void HLSWriter::xCodeCABACWSizes( Slice* pcSlice )
 }
 #endif
 
-Void HLSWriter::codePTL( const PTL* pcPTL, Bool profilePresentFlag, Int maxNumSubLayersMinus1)
+void HLSWriter::codePTL( const PTL* pcPTL, Bool profilePresentFlag, Int maxNumSubLayersMinus1)
 {
   if(profilePresentFlag)
   {
@@ -1573,10 +1573,10 @@ Void HLSWriter::codePTL( const PTL* pcPTL, Bool profilePresentFlag, Int maxNumSu
 }
 
 #if ENABLE_TRACING || RExt__DECODER_DEBUG_BIT_STATISTICS
-Void HLSWriter::codeProfileTier( const ProfileTierLevel* ptl, const Bool bIsSubLayer )
+void HLSWriter::codeProfileTier( const ProfileTierLevel* ptl, const Bool bIsSubLayer )
 #define PTL_TRACE_TEXT(txt) bIsSubLayer?("sub_layer_" txt) : ("general_" txt)
 #else
-Void HLSWriter::codeProfileTier( const ProfileTierLevel* ptl, const Bool /*bIsSubLayer*/ )
+void HLSWriter::codeProfileTier( const ProfileTierLevel* ptl, const Bool /*bIsSubLayer*/ )
 #define PTL_TRACE_TEXT(txt) txt
 #endif
 {
@@ -1626,7 +1626,7 @@ Void HLSWriter::codeProfileTier( const ProfileTierLevel* ptl, const Bool /*bIsSu
 *
 * \param pSlice Slice structure that contains the substream size information.
 */
-Void  HLSWriter::codeTilesWPPEntryPoint( Slice* pSlice )
+void  HLSWriter::codeTilesWPPEntryPoint( Slice* pSlice )
 {
   if (!pSlice->getPPS()->getTilesEnabledFlag() && !pSlice->getPPS()->getEntropyCodingSyncEnabledFlag())
   {
@@ -1669,7 +1669,7 @@ Void  HLSWriter::codeTilesWPPEntryPoint( Slice* pSlice )
 // ====================================================================================================================
 
 //! Code weighted prediction tables
-Void HLSWriter::xCodePredWeightTable( Slice* pcSlice )
+void HLSWriter::xCodePredWeightTable( Slice* pcSlice )
 {
   WPScalingParam  *wp;
   const ChromaFormat    format                = pcSlice->getSPS()->getChromaFormatIdc();
@@ -1754,7 +1754,7 @@ Void HLSWriter::xCodePredWeightTable( Slice* pcSlice )
 /** code quantization matrix
 *  \param scalingList quantization matrix information
 */
-Void HLSWriter::codeScalingList( const ScalingList &scalingList )
+void HLSWriter::codeScalingList( const ScalingList &scalingList )
 {
   //for each size
   for(UInt sizeId = SCALING_LIST_FIRST_CODED; sizeId <= SCALING_LIST_LAST_CODED; sizeId++)
@@ -1790,7 +1790,7 @@ Void HLSWriter::codeScalingList( const ScalingList &scalingList )
 * \param sizeId      size index
 * \param listId      list index
 */
-Void HLSWriter::xCodeScalingList(const ScalingList* scalingList, UInt sizeId, UInt listId)
+void HLSWriter::xCodeScalingList(const ScalingList* scalingList, UInt sizeId, UInt listId)
 {
   Int coefNum = std::min( MAX_MATRIX_COEF_NUM, ( Int ) g_scalingListSize[sizeId] );
   UInt* scan = g_scanOrder[SCAN_UNGROUPED][SCAN_DIAG][gp_sizeIdxInfo->idxFrom( 1 << ( sizeId == SCALING_LIST_FIRST_CODED ? 2 : 3 ) )][gp_sizeIdxInfo->idxFrom( 1 << ( sizeId == SCALING_LIST_FIRST_CODED ? 2 : 3 ) )];

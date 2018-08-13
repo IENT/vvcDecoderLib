@@ -87,28 +87,28 @@ protected:
   virtual ~VLCReader() {};
 
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
-  Void  xReadCode    ( UInt   length, UInt& val, const TChar *pSymbolName );
-  Void  xReadUvlc    (                UInt& val, const TChar *pSymbolName );
-  Void  xReadSvlc    (                 Int& val, const TChar *pSymbolName );
-  Void  xReadFlag    (                UInt& val, const TChar *pSymbolName );
+  void  xReadCode    ( UInt   length, UInt& val, const TChar *pSymbolName );
+  void  xReadUvlc    (                UInt& val, const TChar *pSymbolName );
+  void  xReadSvlc    (                 Int& val, const TChar *pSymbolName );
+  void  xReadFlag    (                UInt& val, const TChar *pSymbolName );
 #else
-  Void  xReadCode    ( UInt   length, UInt& val );
-  Void  xReadUvlc    (                UInt& val );
-  Void  xReadSvlc    (                 Int& val );
-  Void  xReadFlag    (                UInt& val );
+  void  xReadCode    ( UInt   length, UInt& val );
+  void  xReadUvlc    (                UInt& val );
+  void  xReadSvlc    (                 Int& val );
+  void  xReadFlag    (                UInt& val );
 #endif
 #if ENABLE_TRACING
-  Void  xReadCodeTr  ( UInt  length, UInt& rValue, const TChar *pSymbolName );
-  Void  xReadUvlcTr  (               UInt& rValue, const TChar *pSymbolName );
-  Void  xReadSvlcTr  (                Int& rValue, const TChar *pSymbolName );
-  Void  xReadFlagTr  (               UInt& rValue, const TChar *pSymbolName );
+  void  xReadCodeTr  ( UInt  length, UInt& rValue, const TChar *pSymbolName );
+  void  xReadUvlcTr  (               UInt& rValue, const TChar *pSymbolName );
+  void  xReadSvlcTr  (                Int& rValue, const TChar *pSymbolName );
+  void  xReadFlagTr  (               UInt& rValue, const TChar *pSymbolName );
 #endif
 public:
-  Void  setBitstream ( InputBitstream* p )   { m_pcBitstream = p; }
+  void  setBitstream ( InputBitstream* p )   { m_pcBitstream = p; }
   InputBitstream* getBitstream() { return m_pcBitstream; }
 
 protected:
-  Void xReadRbspTrailingBits();
+  void xReadRbspTrailingBits();
 };
 
 
@@ -118,7 +118,7 @@ class AUDReader: public VLCReader
 public:
   AUDReader() {};
   virtual ~AUDReader() {};
-  Void parseAccessUnitDelimiter(InputBitstream* bs, UInt &picType);
+  void parseAccessUnitDelimiter(InputBitstream* bs, UInt &picType);
 };
 
 
@@ -128,7 +128,7 @@ class FDReader: public VLCReader
 public:
   FDReader() {};
   virtual ~FDReader() {};
-  Void parseFillerData(InputBitstream* bs, UInt &fdSize);
+  void parseFillerData(InputBitstream* bs, UInt &fdSize);
 };
 
 
@@ -143,28 +143,28 @@ public:
   void  init( CABACDataStore& cabacDataStore ) { m_CABACDataStore = &cabacDataStore; }
 #endif
 protected:
-  Void  parseShortTermRefPicSet            (SPS* pcSPS, ReferencePictureSet* pcRPS, Int idx);
+  void  parseShortTermRefPicSet            (SPS* pcSPS, ReferencePictureSet* pcRPS, Int idx);
 
 public:
-  Void  setBitstream        ( InputBitstream* p )   { m_pcBitstream = p; }
+  void  setBitstream        ( InputBitstream* p )   { m_pcBitstream = p; }
 #if HEVC_VPS
-  Void  parseVPS            ( VPS* pcVPS );
+  void  parseVPS            ( VPS* pcVPS );
 #endif
   void  parseSPSNext        ( SPSNext& spsNext, const bool usePCM );
-  Void  parseSPS            ( SPS* pcSPS );
-  Void  parsePPS            ( PPS* pcPPS );
-  Void  parseVUI            ( VUI* pcVUI, SPS* pcSPS );
-  Void  parsePTL            ( PTL *rpcPTL, Bool profilePresentFlag, Int maxNumSubLayersMinus1 );
-  Void  parseProfileTier    ( ProfileTierLevel *ptl, const Bool bIsSubLayer );
-  Void  parseHrdParameters  ( HRD *hrd, Bool cprms_present_flag, UInt tempLevelHigh );
-  Void  parseSliceHeader    ( Slice* pcSlice, ParameterSetManager *parameterSetManager, const Int prevTid0POC );
-  Void  parseTerminatingBit ( UInt& ruiBit );
-  Void  parseRemainingBytes ( Bool noTrailingBytesExpected );
+  void  parseSPS            ( SPS* pcSPS );
+  void  parsePPS            ( PPS* pcPPS );
+  void  parseVUI            ( VUI* pcVUI, SPS* pcSPS );
+  void  parsePTL            ( PTL *rpcPTL, Bool profilePresentFlag, Int maxNumSubLayersMinus1 );
+  void  parseProfileTier    ( ProfileTierLevel *ptl, const Bool bIsSubLayer );
+  void  parseHrdParameters  ( HRD *hrd, Bool cprms_present_flag, UInt tempLevelHigh );
+  void  parseSliceHeader    ( Slice* pcSlice, ParameterSetManager *parameterSetManager, const Int prevTid0POC );
+  void  parseTerminatingBit ( UInt& ruiBit );
+  void  parseRemainingBytes ( Bool noTrailingBytesExpected );
 
-  Void  parsePredWeightTable( Slice* pcSlice, const SPS *sps );
+  void  parsePredWeightTable( Slice* pcSlice, const SPS *sps );
 #if HEVC_USE_SCALING_LISTS
-  Void  parseScalingList    ( ScalingList* scalingList );
-  Void  decodeScalingList   ( ScalingList *scalingList, UInt sizeId, UInt listId);
+  void  parseScalingList    ( ScalingList* scalingList );
+  void  decodeScalingList   ( ScalingList *scalingList, UInt sizeId, UInt listId);
 #endif
 
 #if JVET_K0371_ALF

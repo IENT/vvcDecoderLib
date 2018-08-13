@@ -770,7 +770,7 @@ void EncCu::xCompressCU( CodingStructure *&tempCS, CodingStructure *&bestCS, Par
 }
 
 #if SHARP_LUMA_DELTA_QP
-Void EncCu::updateLambda( Slice* slice, Double dQP )
+void EncCu::updateLambda( Slice* slice, Double dQP )
 {
 #if WCG_EXT
   Int    NumberBFrames = ( m_pcEncCfg->getGOPSize() - 1 );

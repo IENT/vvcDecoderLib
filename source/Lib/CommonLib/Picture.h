@@ -128,15 +128,15 @@ public:
   Tile();
   virtual ~Tile();
 
-  Void      setTileWidthInCtus     ( UInt i )            { m_tileWidthInCtus = i; }
+  void      setTileWidthInCtus     ( UInt i )            { m_tileWidthInCtus = i; }
   UInt      getTileWidthInCtus     () const              { return m_tileWidthInCtus; }
-  Void      setTileHeightInCtus    ( UInt i )            { m_tileHeightInCtus = i; }
+  void      setTileHeightInCtus    ( UInt i )            { m_tileHeightInCtus = i; }
   UInt      getTileHeightInCtus    () const              { return m_tileHeightInCtus; }
-  Void      setRightEdgePosInCtus  ( UInt i )            { m_rightEdgePosInCtus = i; }
+  void      setRightEdgePosInCtus  ( UInt i )            { m_rightEdgePosInCtus = i; }
   UInt      getRightEdgePosInCtus  () const              { return m_rightEdgePosInCtus; }
-  Void      setBottomEdgePosInCtus ( UInt i )            { m_bottomEdgePosInCtus = i; }
+  void      setBottomEdgePosInCtus ( UInt i )            { m_bottomEdgePosInCtus = i; }
   UInt      getBottomEdgePosInCtus () const              { return m_bottomEdgePosInCtus; }
-  Void      setFirstCtuRsAddr      ( UInt i )            { m_firstCtuRsAddr = i; }
+  void      setFirstCtuRsAddr      ( UInt i )            { m_firstCtuRsAddr = i; }
   UInt      getFirstCtuRsAddr      () const              { return m_firstCtuRsAddr; }
 };
 
@@ -145,8 +145,8 @@ struct TileMap
 {
   TileMap();
 
-  Void create( const SPS& sps, const PPS& pps );
-  Void destroy();
+  void create( const SPS& sps, const PPS& pps );
+  void destroy();
 
   UInt getTileIdxMap( UInt ctuRsAddr )       const { return *(tileIdxMap + ctuRsAddr); }
   UInt getTileIdxMap( const Position& pos )  const { return getTileIdxMap( ( pos.x / pcv->maxCUWidth ) + ( pos.y / pcv->maxCUHeight ) * pcv->widthInCtus ); };
@@ -180,11 +180,11 @@ struct Picture : public UnitArea
   UInt margin;
   Picture();
 
-  Void create(const ChromaFormat &_chromaFormat, const Size &size, const unsigned _maxCUSize, const unsigned margin, const bool bDecoder);
-  Void destroy();
+  void create(const ChromaFormat &_chromaFormat, const Size &size, const unsigned _maxCUSize, const unsigned margin, const bool bDecoder);
+  void destroy();
 
-  Void createTempBuffers( const unsigned _maxCUSize );
-  Void destroyTempBuffers();
+  void createTempBuffers( const unsigned _maxCUSize );
+  void destroyTempBuffers();
 
          PelBuf     getOrigBuf(const CompArea &blk);
   const CPelBuf     getOrigBuf(const CompArea &blk) const;
@@ -223,7 +223,7 @@ struct Picture : public UnitArea
   void finalInit( const SPS& sps, const PPS& pps );
 
   int  getPOC()                               const { return poc; }
-  Void setBorderExtension( bool bFlag)              { m_bIsBorderExtended = bFlag;}
+  void setBorderExtension( bool bFlag)              { m_bIsBorderExtended = bFlag;}
   Pel* getOrigin( const PictureType &type, const ComponentID compID ) const;
 public:
   bool m_bIsBorderExtended;
@@ -254,7 +254,7 @@ public:
   std::deque<Slice*> slices;
   SEIMessages        SEIs;
 
-  Void         allocateNewSlice();
+  void         allocateNewSlice();
   Slice        *swapSliceObject(Slice * p, UInt i);
   void         clearSliceBuffer();
 
@@ -300,7 +300,7 @@ public:
   std::vector<UChar> m_alfCtuEnableFlag[MAX_NUM_COMPONENT];
   UChar* getAlfCtuEnableFlag( Int compIdx ) { return m_alfCtuEnableFlag[compIdx].data(); }
   std::vector<UChar>* getAlfCtuEnableFlag() { return m_alfCtuEnableFlag; }
-  Void resizeAlfCtuEnableFlag( Int numEntries )
+  void resizeAlfCtuEnableFlag( Int numEntries )
   {
     for( Int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++ )
     {

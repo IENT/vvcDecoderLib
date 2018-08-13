@@ -68,7 +68,7 @@ EncApp::~EncApp()
 {
 }
 
-Void EncApp::xInitLibCfg()
+void EncApp::xInitLibCfg()
 {
 #if HEVC_VPS
   VPS vps;
@@ -590,7 +590,7 @@ Void EncApp::xInitLibCfg()
 #endif
 }
 
-Void EncApp::xCreateLib( std::list<PelUnitBuf*>& recBufList
+void EncApp::xCreateLib( std::list<PelUnitBuf*>& recBufList
                         )
 {
   // Video I/O
@@ -615,7 +615,7 @@ Void EncApp::xCreateLib( std::list<PelUnitBuf*>& recBufList
   }
 }
 
-Void EncApp::xDestroyLib()
+void EncApp::xDestroyLib()
 {
   // Video I/O
   m_cVideoIOYuvInputFile.close();
@@ -625,7 +625,7 @@ Void EncApp::xDestroyLib()
   m_cEncLib.destroy();
 }
 
-Void EncApp::xInitLib(Bool isFieldCoding)
+void EncApp::xInitLib(Bool isFieldCoding)
 {
   m_cEncLib.init(isFieldCoding, this );
 }
@@ -642,7 +642,7 @@ Void EncApp::xInitLib(Bool isFieldCoding)
  - destroy internal class
  .
  */
-Void EncApp::encode()
+void EncApp::encode()
 {
   m_bitstream.open(m_bitstreamFileName.c_str(), fstream::binary | fstream::out);
   if (!m_bitstream)
@@ -768,7 +768,7 @@ Void EncApp::encode()
   \param iNumEncoded    number of encoded frames
   \param accessUnits    list of access units to be written
  */
-Void EncApp::xWriteOutput( Int iNumEncoded, std::list<PelUnitBuf*>& recBufList
+void EncApp::xWriteOutput( Int iNumEncoded, std::list<PelUnitBuf*>& recBufList
                           )
 {
   const InputColourSpaceConversion ipCSC = (!m_outputInternalColourSpace) ? m_inputColourSpaceConvert : IPCOLOURSPACE_UNCHANGED;
@@ -820,7 +820,7 @@ void EncApp::outputAU( const AccessUnit& au )
 /**
  *
  */
-Void EncApp::rateStatsAccum(const AccessUnit& au, const std::vector<UInt>& annexBsizes)
+void EncApp::rateStatsAccum(const AccessUnit& au, const std::vector<UInt>& annexBsizes)
 {
   AccessUnit::const_iterator it_au = au.begin();
   vector<UInt>::const_iterator it_stats = annexBsizes.begin();
@@ -860,7 +860,7 @@ Void EncApp::rateStatsAccum(const AccessUnit& au, const std::vector<UInt>& annex
   }
 }
 
-Void EncApp::printRateSummary()
+void EncApp::printRateSummary()
 {
   Double time = (Double) m_iFrameRcvd / m_iFrameRate * m_temporalSubsampleRatio;
   msg( DETAILS,"Bytes written to file: %u (%.3f kbps)\n", m_totalBytes, 0.008 * m_totalBytes / time );
@@ -870,7 +870,7 @@ Void EncApp::printRateSummary()
   }
 }
 
-Void EncApp::printChromaFormat()
+void EncApp::printChromaFormat()
 {
   if( g_verbosity >= DETAILS )
   {

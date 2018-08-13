@@ -139,7 +139,7 @@ Quant::~Quant()
 
 #if HEVC_USE_SIGN_HIDING
 // To minimize the distortion only. No rate is considered.
-Void Quant::xSignBitHidingHDQ( TCoeff* pQCoef, const TCoeff* pCoef, TCoeff* deltaU, const CoeffCodingContext& cctx, const Int maxLog2TrDynamicRange )
+void Quant::xSignBitHidingHDQ( TCoeff* pQCoef, const TCoeff* pCoef, TCoeff* deltaU, const CoeffCodingContext& cctx, const Int maxLog2TrDynamicRange )
 {
   const UInt width     = cctx.width();
   const UInt height    = cctx.height();
@@ -274,7 +274,7 @@ Void Quant::xSignBitHidingHDQ( TCoeff* pQCoef, const TCoeff* pCoef, TCoeff* delt
 }
 #endif
 
-Void Quant::dequant(const TransformUnit &tu,
+void Quant::dequant(const TransformUnit &tu,
                              CoeffBuf      &dstCoeff,
                        const ComponentID   &compID,
                        const QpParam       &cQP)
@@ -427,7 +427,7 @@ Void Quant::dequant(const TransformUnit &tu,
 #endif
 }
 
-Void Quant::init( UInt uiMaxTrSize,
+void Quant::init( UInt uiMaxTrSize,
                   Bool bUseRDOQ,
                   Bool bUseRDOQTS,
 #if JVET_K0072
@@ -474,7 +474,7 @@ void Quant::copyState( const Quant& other )
  * \param maxLog2TrDynamicRange
  * \param bitDepths              reference to bit depth array for all channels
  */
-Void Quant::setScalingList(ScalingList *scalingList, const Int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths)
+void Quant::setScalingList(ScalingList *scalingList, const Int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths)
 {
   const Int minimumQp = 0;
   const Int maximumQp = SCALING_LIST_REM_NUM;
@@ -495,7 +495,7 @@ Void Quant::setScalingList(ScalingList *scalingList, const Int maxLog2TrDynamicR
  * \param scalingList quantized matrix address
  * \param format      chroma format
  */
-Void Quant::setScalingListDec(const ScalingList &scalingList)
+void Quant::setScalingListDec(const ScalingList &scalingList)
 {
   const Int minimumQp = 0;
   const Int maximumQp = SCALING_LIST_REM_NUM;
@@ -520,7 +520,7 @@ Void Quant::setScalingListDec(const ScalingList &scalingList)
  * \param qp Quantization parameter
  * \param format chroma format
  */
-Void Quant::xSetScalingListEnc(ScalingList *scalingList, UInt listId, UInt sizeId, Int qp)
+void Quant::xSetScalingListEnc(ScalingList *scalingList, UInt listId, UInt sizeId, Int qp)
 {
   UInt width  = g_scalingListSizeX[sizeId];
   UInt height = g_scalingListSizeX[sizeId];
@@ -546,7 +546,7 @@ Void Quant::xSetScalingListEnc(ScalingList *scalingList, UInt listId, UInt sizeI
  * \param qp Quantization parameter
  * \param format chroma format
  */
-Void Quant::xSetScalingListDec(const ScalingList &scalingList, UInt listId, UInt sizeId, Int qp)
+void Quant::xSetScalingListDec(const ScalingList &scalingList, UInt listId, UInt sizeId, Int qp)
 {
   UInt width  = g_scalingListSizeX[sizeId];
   UInt height = g_scalingListSizeX[sizeId];
@@ -568,7 +568,7 @@ Void Quant::xSetScalingListDec(const ScalingList &scalingList, UInt listId, UInt
 
 /** set flat matrix value to quantized coefficient
  */
-Void Quant::setFlatScalingList(const Int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths)
+void Quant::setFlatScalingList(const Int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths)
 {
   const Int minimumQp = 0;
   const Int maximumQp = SCALING_LIST_REM_NUM;
@@ -594,7 +594,7 @@ Void Quant::setFlatScalingList(const Int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_T
  * \param qp Quantization parameter
  * \param format chroma format
  */
-Void Quant::xSetFlatScalingList(UInt list, UInt sizeX, UInt sizeY, Int qp)
+void Quant::xSetFlatScalingList(UInt list, UInt sizeX, UInt sizeY, Int qp)
 {
   UInt i,num = g_scalingListSizeX[sizeX]*g_scalingListSizeX[sizeY];
   Int *quantcoeff;
@@ -623,7 +623,7 @@ Void Quant::xSetFlatScalingList(UInt list, UInt sizeX, UInt sizeY, Int qp)
  * \param sizuNum matrix size
  * \param dc dc parameter
  */
-Void Quant::processScalingListEnc( Int *coeff, Int *quantcoeff, Int quantScales, UInt height, UInt width, UInt ratio, Int sizuNum, UInt dc)
+void Quant::processScalingListEnc( Int *coeff, Int *quantcoeff, Int quantScales, UInt height, UInt width, UInt ratio, Int sizuNum, UInt dc)
 {
   for(UInt j=0;j<height;j++)
   {
@@ -649,7 +649,7 @@ Void Quant::processScalingListEnc( Int *coeff, Int *quantcoeff, Int quantScales,
  * \param sizuNum matrix size
  * \param dc dc parameter
  */
-Void Quant::processScalingListDec( const Int *coeff, Int *dequantcoeff, Int invQuantScales, UInt height, UInt width, UInt ratio, Int sizuNum, UInt dc)
+void Quant::processScalingListDec( const Int *coeff, Int *dequantcoeff, Int invQuantScales, UInt height, UInt width, UInt ratio, Int sizuNum, UInt dc)
 {
   for(UInt j=0;j<height;j++)
   {
@@ -667,7 +667,7 @@ Void Quant::processScalingListDec( const Int *coeff, Int *dequantcoeff, Int invQ
 
 /** initialization process of scaling list array
  */
-Void Quant::xInitScalingList( const Quant* other )
+void Quant::xInitScalingList( const Quant* other )
 {
   m_isScalingListOwner = other == nullptr;
 
@@ -697,7 +697,7 @@ Void Quant::xInitScalingList( const Quant* other )
 
 /** destroy quantization matrix array
  */
-Void Quant::xDestroyScalingList()
+void Quant::xDestroyScalingList()
 {
   if( !m_isScalingListOwner ) return;
 
@@ -724,7 +724,7 @@ Void Quant::xDestroyScalingList()
 }
 #endif
 
-Void Quant::quant(TransformUnit &tu, const ComponentID &compID, const CCoeffBuf &pSrc, TCoeff &uiAbsSum, const QpParam &cQP, const Ctx& ctx)
+void Quant::quant(TransformUnit &tu, const ComponentID &compID, const CCoeffBuf &pSrc, TCoeff &uiAbsSum, const QpParam &cQP, const Ctx& ctx)
 {
   const SPS &sps            = *tu.cs->sps;
 #if JVET_K0072
@@ -913,7 +913,7 @@ Bool Quant::xNeedRDOQ(TransformUnit &tu, const ComponentID &compID, const CCoeff
 }
 
 
-Void Quant::transformSkipQuantOneSample(TransformUnit &tu, const ComponentID &compID, const TCoeff &resiDiff, TCoeff &coeff, const UInt &uiPos, const QpParam &cQP, const Bool bUseHalfRoundingPoint)
+void Quant::transformSkipQuantOneSample(TransformUnit &tu, const ComponentID &compID, const TCoeff &resiDiff, TCoeff &coeff, const UInt &uiPos, const QpParam &cQP, const Bool bUseHalfRoundingPoint)
 {
   const SPS           &sps = *tu.cs->sps;
   const CompArea      &rect                           = tu.blocks[compID];
@@ -981,7 +981,7 @@ Void Quant::transformSkipQuantOneSample(TransformUnit &tu, const ComponentID &co
   coeff = Clip3<TCoeff>( entropyCodingMinimum, entropyCodingMaximum, quantisedCoefficient );
 }
 
-Void Quant::invTrSkipDeQuantOneSample(TransformUnit &tu, const ComponentID &compID, const TCoeff &inSample, Pel &reconSample, const UInt &uiPos, const QpParam &cQP)
+void Quant::invTrSkipDeQuantOneSample(TransformUnit &tu, const ComponentID &compID, const TCoeff &inSample, Pel &reconSample, const UInt &uiPos, const QpParam &cQP)
 {
   const SPS           &sps                    = *tu.cs->sps;
   const CompArea      &rect                   = tu.blocks[compID];

@@ -66,7 +66,7 @@ using namespace std;
  * @param minval  minimum clipping value when dividing.
  * @param maxval  maximum clipping value when dividing.
  */
-static Void scalePlane( PelBuf& areaBuf, const Int shiftbits, const Pel minval, const Pel maxval)
+static void scalePlane( PelBuf& areaBuf, const Int shiftbits, const Pel minval, const Pel maxval)
 {
   const unsigned width  = areaBuf.width;
   const unsigned height = areaBuf.height;
@@ -124,7 +124,7 @@ static Void scalePlane( PelBuf& areaBuf, const Int shiftbits, const Pel minval, 
  * \param MSBExtendedBitDepth
  * \param internalBitDepth bit-depth array to scale image data to/from when reading/writing.
  */
-Void VideoIOYuv::open( const std::string &fileName, Bool bWriteMode, const Int fileBitDepth[MAX_NUM_CHANNEL_TYPE], const Int MSBExtendedBitDepth[MAX_NUM_CHANNEL_TYPE], const Int internalBitDepth[MAX_NUM_CHANNEL_TYPE] )
+void VideoIOYuv::open( const std::string &fileName, Bool bWriteMode, const Int fileBitDepth[MAX_NUM_CHANNEL_TYPE], const Int MSBExtendedBitDepth[MAX_NUM_CHANNEL_TYPE], const Int internalBitDepth[MAX_NUM_CHANNEL_TYPE] )
 {
   //NOTE: files cannot have bit depth greater than 16
   for(UInt ch=0; ch<MAX_NUM_CHANNEL_TYPE; ch++)
@@ -168,7 +168,7 @@ Void VideoIOYuv::open( const std::string &fileName, Bool bWriteMode, const Int f
   return;
 }
 
-Void VideoIOYuv::close()
+void VideoIOYuv::close()
 {
   m_cHandle.close();
 }
@@ -190,9 +190,9 @@ Bool VideoIOYuv::isFail()
  * seekable, by consuming bytes.
  */
 #if EXTENSION_360_VIDEO
-Void VideoIOYuv::skipFrames(Int numFrames, UInt width, UInt height, ChromaFormat format)
+void VideoIOYuv::skipFrames(Int numFrames, UInt width, UInt height, ChromaFormat format)
 #else
-Void VideoIOYuv::skipFrames(UInt numFrames, UInt width, UInt height, ChromaFormat format)
+void VideoIOYuv::skipFrames(UInt numFrames, UInt width, UInt height, ChromaFormat format)
 #endif
 {
   if (!numFrames)
@@ -966,7 +966,7 @@ Bool VideoIOYuv::write( const CPelUnitBuf& picTop, const CPelUnitBuf& picBottom,
 
 
 // static member
-Void VideoIOYuv::ColourSpaceConvert(const CPelUnitBuf &src, PelUnitBuf &dest, const InputColourSpaceConversion conversion, Bool bIsForwards)
+void VideoIOYuv::ColourSpaceConvert(const CPelUnitBuf &src, PelUnitBuf &dest, const InputColourSpaceConversion conversion, Bool bIsForwards)
 {
   const ChromaFormat  format       = src.chromaFormat;
   const UInt          numValidComp = ::getNumberValidComponents(format);

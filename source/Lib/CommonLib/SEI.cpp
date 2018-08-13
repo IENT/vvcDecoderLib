@@ -41,12 +41,12 @@
 #include "dtrace_next.h"
 
 #if ENABLE_TRACING
-Void xTraceSEIHeader()
+void xTraceSEIHeader()
 {
   DTRACE( g_trace_ctx, D_HEADER, "=========== SEI message ===========\n" );
 }
 
-Void xTraceSEIMessageType( SEI::PayloadType payloadType )
+void xTraceSEIMessageType( SEI::PayloadType payloadType )
 {
   DTRACE( g_trace_ctx, D_HEADER, "=========== %s SEI message ===========\n", SEI::getSEIMessageString( payloadType ) );
 }
@@ -87,7 +87,7 @@ SEIMessages extractSeisByType(SEIMessages &seiList, SEI::PayloadType seiType)
 }
 
 
-Void deleteSEIs (SEIMessages &seiList)
+void deleteSEIs (SEIMessages &seiList)
 {
   for (SEIMessages::iterator it=seiList.begin(); it!=seiList.end(); it++)
   {
