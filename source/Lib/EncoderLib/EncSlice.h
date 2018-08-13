@@ -85,8 +85,8 @@ private:
   CABACWriter*            m_CABACEstimator;
   uint64_t                  m_uiPicTotalBits;                     ///< total bits for the picture
   uint64_t                  m_uiPicDist;                          ///< total distortion for the picture
-  std::vector<Double>     m_vdRdPicLambda;                      ///< array of lambda candidates
-  std::vector<Double>     m_vdRdPicQp;                          ///< array of picture QP candidates (double-type for lambda)
+  std::vector<double>     m_vdRdPicLambda;                      ///< array of lambda candidates
+  std::vector<double>     m_vdRdPicQp;                          ///< array of picture QP candidates (double-type for lambda)
   std::vector<Int>        m_viRdPicQp;                          ///< array of picture QP candidates (Int-type)
   RateCtrl*               m_pcRateCtrl;                         ///< Rate control manager
   UInt                    m_uiSliceSegmentIdx;
@@ -107,15 +107,15 @@ private:
 #if SHARP_LUMA_DELTA_QP
 public:
   Int getGopId()        const { return m_gopID; }
-  Double  calculateLambda( const Slice* slice, const Int GOPid, const Int depth, const Double refQP, const Double dQP, Int &iQP );
+  double  calculateLambda( const Slice* slice, const Int GOPid, const Int depth, const double refQP, const double dQP, Int &iQP );
 #if WCG_EXT
-  void    setUpLambda( Slice* slice, const Double dLambda, Int iQP );
+  void    setUpLambda( Slice* slice, const double dLambda, Int iQP );
 #endif
   
 private:
 #endif
 #if !WCG_EXT
-  void    setUpLambda( Slice* slice, const Double dLambda, Int iQP );
+  void    setUpLambda( Slice* slice, const double dLambda, Int iQP );
 #endif
 #if HEVC_TILES_WPP
   void    calculateBoundingCtuTsAddrForSlice( UInt &startCtuTSAddrSlice, UInt &boundingCtuTSAddrSlice, bool &haveReachedTileBoundary, Picture* pcPic, const Int sliceMode, const Int sliceArgument );
@@ -135,7 +135,7 @@ public:
   /// preparation of slice encoding (reference marking, QP and lambda)
   void    initEncSlice        ( Picture*  pcPic, const Int pocLast, const Int pocCurr,
                                 const Int iGOPid,   Slice*& rpcSlice, const bool isField );
-  void    resetQP             ( Picture* pic, Int sliceQP, Double lambda );
+  void    resetQP             ( Picture* pic, Int sliceQP, double lambda );
 
   // compress and encode slice
   void    precompressSlice    ( Picture* pcPic                                     );      ///< precompress slice for multi-loop slice-level QP opt.
@@ -160,7 +160,7 @@ public:
   SliceType getEncCABACTableIdx() const             { return m_encCABACTableIdx;        }
 
 private:
-  Double  xGetQPValueAccordingToLambda ( Double lambda );
+  double  xGetQPValueAccordingToLambda ( double lambda );
 };
 
 //! \}

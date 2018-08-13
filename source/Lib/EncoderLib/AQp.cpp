@@ -79,9 +79,9 @@ void AQpPreanalyzer::preanalyze( Picture* pcEPic )
     AQpLayer* pcAQLayer = pcEPic->aqlayer[d];
     const UInt uiAQPartWidth = pcAQLayer->getAQPartWidth();
     const UInt uiAQPartHeight = pcAQLayer->getAQPartHeight();
-    Double* pcAQU = &pcAQLayer->getQPAdaptationUnit()[0];
+    double* pcAQU = &pcAQLayer->getQPAdaptationUnit()[0];
 
-    Double dSumAct = 0.0;
+    double dSumAct = 0.0;
     for ( UInt y = 0; y < iHeight; y += uiAQPartHeight )
     {
       const UInt uiCurrAQPartHeight = std::min(uiAQPartHeight, iHeight-y);
@@ -129,13 +129,13 @@ void AQpPreanalyzer::preanalyze( Picture* pcEPic )
         const UInt pixelHeightOfQuadrants = uiCurrAQPartHeight>>1;
         const UInt numPixInAQPart         = pixelWidthOfQuadrants * pixelHeightOfQuadrants;
 
-        Double dMinVar = DBL_MAX;
+        double dMinVar = DBL_MAX;
         if (numPixInAQPart!=0)
         {
           for ( Int i=0; i<4; i++)
           {
-            const Double dAverage = Double(uiSum[i]) / numPixInAQPart;
-            const Double dVariance = Double(uiSumSq[i]) / numPixInAQPart - dAverage * dAverage;
+            const double dAverage = double(uiSum[i]) / numPixInAQPart;
+            const double dVariance = double(uiSumSq[i]) / numPixInAQPart - dAverage * dAverage;
             dMinVar = std::min(dMinVar, dVariance);
           }
         }
@@ -143,14 +143,14 @@ void AQpPreanalyzer::preanalyze( Picture* pcEPic )
         {
           dMinVar = 0.0;
         }
-        const Double dActivity = 1.0 + dMinVar;
+        const double dActivity = 1.0 + dMinVar;
         *pcAQU = dActivity;
         dSumAct += dActivity;
       }
       pLineY += iStride * uiCurrAQPartHeight;
     }
 
-    const Double dAvgAct = dSumAct / (pcAQLayer->getNumAQPartInWidth() * pcAQLayer->getNumAQPartInHeight());
+    const double dAvgAct = dSumAct / (pcAQLayer->getNumAQPartInWidth() * pcAQLayer->getNumAQPartInHeight());
     pcAQLayer->setAvgActivity( dAvgAct );
   }
 }

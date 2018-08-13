@@ -194,7 +194,7 @@ ClpRngs encodeDecodeClipPrmIntra(const ClpRngs &prm, CodingStructure& cs)
 
 ClpRngs codingChoice(const ClpRngs &prm_tocode, CodingStructure& cs, bool bDecide,
                           Int delta_disto_luma,Int delta_disto_chroma,
-                          Double lambda_luma,Double lambda_chroma,int tbd
+                          double lambda_luma,double lambda_chroma,int tbd
                           )
 {
   ClpRngs prm;
@@ -223,10 +223,10 @@ ClpRngs codingChoice(const ClpRngs &prm_tocode, CodingStructure& cs, bool bDecid
 
     // only luma 0
     bool chroma_on = false;
-    Double best_rd = -delta_disto_luma  +lambda_luma   * dR_luma_only;
+    double best_rd = -delta_disto_luma  +lambda_luma   * dR_luma_only;
 
     // add chroma
-    Double rd=-delta_disto_luma  +lambda_luma*dR_luma_only-delta_disto_chroma+lambda_chroma*dR_chroma;
+    double rd=-delta_disto_luma  +lambda_luma*dR_luma_only-delta_disto_chroma+lambda_chroma*dR_chroma;
     if(rd < best_rd)
     {
       best_rd =rd;
@@ -814,7 +814,7 @@ void EncGOP::xCreatePictureTimingSEI  (Int IRAPGOPid, SEIMessages& seiMessages, 
       pictureTimingSEI->m_numNalusInDuMinus1.resize( numDU );
       pictureTimingSEI->m_duCpbRemovalDelayMinus1.resize( numDU );
     }
-    pictureTimingSEI->m_auCpbRemovalDelay = std::min<Int>(std::max<Int>(1, m_totalCoded - m_lastBPSEI), static_cast<Int>(pow(2, static_cast<Double>(hrd->getCpbRemovalDelayLengthMinus1()+1)))); // Syntax element signalled as minus, hence the .
+    pictureTimingSEI->m_auCpbRemovalDelay = std::min<Int>(std::max<Int>(1, m_totalCoded - m_lastBPSEI), static_cast<Int>(pow(2, static_cast<double>(hrd->getCpbRemovalDelayLengthMinus1()+1)))); // Syntax element signalled as minus, hence the .
     pictureTimingSEI->m_picDpbOutputDelay = slice->getSPS()->getNumReorderPics(slice->getSPS()->getMaxTLayers()-1) + slice->getPOC() - m_totalCoded;
     if(m_pcCfg->getEfficientFieldIRAPEnabled() && IRAPGOPid > 0 && IRAPGOPid < m_iGopSize)
     {
@@ -1778,7 +1778,7 @@ void EncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic,
 
         if( refLayer >= 0 && m_uiNumBlk[refLayer] != 0 )
         {
-          Double dBlkSize = sqrt( ( Double ) m_uiBlkSize[refLayer] / m_uiNumBlk[refLayer] );
+          double dBlkSize = sqrt( ( double ) m_uiBlkSize[refLayer] / m_uiNumBlk[refLayer] );
           if( dBlkSize < AMAXBT_TH32 )
           {
             pcSlice->setMaxBTSize( 32 > MAX_BT_SIZE_INTER ? MAX_BT_SIZE_INTER : 32 );
@@ -1963,7 +1963,7 @@ void EncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic,
 #endif
 
 
-    Double lambda            = 0.0;
+    double lambda            = 0.0;
     Int actualHeadBits       = 0;
     Int actualTotalBits      = 0;
     Int estimatedBits        = 0;
@@ -2011,8 +2011,8 @@ void EncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic,
       if ( ( pcSlice->getPOC() == 0 && m_pcCfg->getInitialQP() > 0 ) || ( frameLevel == 0 && m_pcCfg->getForceIntraQP() ) ) // QP is specified
       {
         Int    NumberBFrames = ( m_pcCfg->getGOPSize() - 1 );
-        Double dLambda_scale = 1.0 - Clip3( 0.0, 0.5, 0.05*(Double)NumberBFrames );
-        Double dQPFactor     = 0.57*dLambda_scale;
+        double dLambda_scale = 1.0 - Clip3( 0.0, 0.5, 0.05*(double)NumberBFrames );
+        double dQPFactor     = 0.57*dLambda_scale;
         Int    SHIFT_QP      = 12;
 #if DISTORTION_LAMBDA_BUGFIX
         Int bitdepth_luma_qp_scale =
@@ -2026,7 +2026,7 @@ void EncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic,
         Int    bitdepth_luma_qp_scale = 0;
 #endif
 #endif
-        Double qp_temp = (Double) sliceQP + bitdepth_luma_qp_scale - SHIFT_QP;
+        double qp_temp = (double) sliceQP + bitdepth_luma_qp_scale - SHIFT_QP;
         lambda = dQPFactor*pow( 2.0, qp_temp/3.0 );
       }
       else if ( frameLevel == 0 )   // intra case, but use the model
@@ -2546,7 +2546,7 @@ void EncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic,
 
       m_pcCfg->setEncodedFlag(iGOPid, true);
 
-      Double PSNR_Y;
+      double PSNR_Y;
       xCalculateAddPSNRs( isField, isTff, iGOPid, pcPic, accessUnit, rcListPic, encTime, snr_conversion, printFrameMSE, &PSNR_Y );
 
       // Only produce the Green Metadata SEI message with the last picture.
@@ -2563,8 +2563,8 @@ void EncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic,
 
       if ( m_pcCfg->getUseRateCtrl() )
       {
-        Double avgQP     = m_pcRateCtrl->getRCPic()->calAverageQP();
-        Double avgLambda = m_pcRateCtrl->getRCPic()->calAverageLambda();
+        double avgQP     = m_pcRateCtrl->getRCPic()->calAverageQP();
+        double avgLambda = m_pcRateCtrl->getRCPic()->calAverageLambda();
         if ( avgLambda < 0.0 )
         {
           avgLambda = lambda;
@@ -2646,14 +2646,14 @@ void EncGOP::printOutSummary(UInt uiNumAllPicCoded, bool isField, const bool pri
 
   //--CFG_KDY
   const Int rateMultiplier=(isField?2:1);
-  m_gcAnalyzeAll.setFrmRate( m_pcCfg->getFrameRate()*rateMultiplier / (Double)m_pcCfg->getTemporalSubsampleRatio());
-  m_gcAnalyzeI.setFrmRate( m_pcCfg->getFrameRate()*rateMultiplier / (Double)m_pcCfg->getTemporalSubsampleRatio());
-  m_gcAnalyzeP.setFrmRate( m_pcCfg->getFrameRate()*rateMultiplier / (Double)m_pcCfg->getTemporalSubsampleRatio());
-  m_gcAnalyzeB.setFrmRate( m_pcCfg->getFrameRate()*rateMultiplier / (Double)m_pcCfg->getTemporalSubsampleRatio());
+  m_gcAnalyzeAll.setFrmRate( m_pcCfg->getFrameRate()*rateMultiplier / (double)m_pcCfg->getTemporalSubsampleRatio());
+  m_gcAnalyzeI.setFrmRate( m_pcCfg->getFrameRate()*rateMultiplier / (double)m_pcCfg->getTemporalSubsampleRatio());
+  m_gcAnalyzeP.setFrmRate( m_pcCfg->getFrameRate()*rateMultiplier / (double)m_pcCfg->getTemporalSubsampleRatio());
+  m_gcAnalyzeB.setFrmRate( m_pcCfg->getFrameRate()*rateMultiplier / (double)m_pcCfg->getTemporalSubsampleRatio());
 #if WCG_WPSNR
   if (useLumaWPSNR)
   {
-    m_gcAnalyzeWPSNR.setFrmRate(m_pcCfg->getFrameRate()*rateMultiplier / (Double)m_pcCfg->getTemporalSubsampleRatio());
+    m_gcAnalyzeWPSNR.setFrmRate(m_pcCfg->getFrameRate()*rateMultiplier / (double)m_pcCfg->getTemporalSubsampleRatio());
   }
 #endif
   
@@ -2704,7 +2704,7 @@ void EncGOP::printOutSummary(UInt uiNumAllPicCoded, bool isField, const bool pri
   if(isField)
   {
     //-- interlaced summary
-    m_gcAnalyzeAll_in.setFrmRate( m_pcCfg->getFrameRate() / (Double)m_pcCfg->getTemporalSubsampleRatio());
+    m_gcAnalyzeAll_in.setFrmRate( m_pcCfg->getFrameRate() / (double)m_pcCfg->getTemporalSubsampleRatio());
     m_gcAnalyzeAll_in.setBits(m_gcAnalyzeAll.getBits());
     // prior to the above statement, the interlace analyser does not contain the correct total number of bits.
 
@@ -2981,7 +2981,7 @@ uint64_t EncGOP::xFindDistortionPlane(const CPelBuf& pic0, const CPelBuf& pic1, 
   return uiTotalDiff;
 }
 #if WCG_WPSNR
-Double EncGOP::xFindDistortionPlaneWPSNR(const CPelBuf& pic0, const CPelBuf& pic1, const UInt rshift, const CPelBuf& picLuma0, 
+double EncGOP::xFindDistortionPlaneWPSNR(const CPelBuf& pic0, const CPelBuf& pic1, const UInt rshift, const CPelBuf& picLuma0, 
   ComponentID compID, const ChromaFormat chfmt    )
 {
   const bool    useLumaWPSNR = m_pcEncLib->getLumaLevelToDeltaQPMapping().isEnabled();
@@ -2990,7 +2990,7 @@ Double EncGOP::xFindDistortionPlaneWPSNR(const CPelBuf& pic0, const CPelBuf& pic
     return 0;
   }
 
-  Double uiTotalDiffWPSNR;
+  double uiTotalDiffWPSNR;
   const  Pel*  pSrc0 = pic0.bufAt(0, 0);
   const  Pel*  pSrc1 = pic1.bufAt(0, 0);
   const  Pel*  pSrcLuma = picLuma0.bufAt(0, 0);
@@ -3005,8 +3005,8 @@ Double EncGOP::xFindDistortionPlaneWPSNR(const CPelBuf& pic0, const CPelBuf& pic
       for (Int x = 0; x < pic0.width; x++)
       {
         Intermediate_Int iTemp = pSrc0[x] - pSrc1[x];
-        Double dW = m_pcEncLib->getRdCost()->getWPSNRLumaLevelWeight(pSrcLuma[(x << getComponentScaleX(compID, chfmt))]);
-        uiTotalDiffWPSNR += ((dW * (Double)iTemp * (Double)iTemp)) * (Double)(1 >> rshift);
+        double dW = m_pcEncLib->getRdCost()->getWPSNRLumaLevelWeight(pSrcLuma[(x << getComponentScaleX(compID, chfmt))]);
+        uiTotalDiffWPSNR += ((dW * (double)iTemp * (double)iTemp)) * (double)(1 >> rshift);
       }
       pSrc0 += pic0.stride;
       pSrc1 += pic1.stride;
@@ -3021,8 +3021,8 @@ Double EncGOP::xFindDistortionPlaneWPSNR(const CPelBuf& pic0, const CPelBuf& pic
       for (Int x = 0; x < pic0.width; x++)
       {
         Intermediate_Int iTemp = pSrc0[x] - pSrc1[x];
-        Double dW = m_pcEncLib->getRdCost()->getWPSNRLumaLevelWeight(pSrcLuma[x << getComponentScaleX(compID, chfmt)]);
-        uiTotalDiffWPSNR += dW * (Double)iTemp * (Double)iTemp;
+        double dW = m_pcEncLib->getRdCost()->getWPSNRLumaLevelWeight(pSrcLuma[x << getComponentScaleX(compID, chfmt)]);
+        uiTotalDiffWPSNR += dW * (double)iTemp * (double)iTemp;
       }
       pSrc0 += pic0.stride;
       pSrc1 += pic1.stride;
@@ -3034,7 +3034,7 @@ Double EncGOP::xFindDistortionPlaneWPSNR(const CPelBuf& pic0, const CPelBuf& pic
 }
 #endif
 
-void EncGOP::xCalculateAddPSNRs( const bool isField, const bool isFieldTopFieldFirst, const Int iGOPid, Picture* pcPic, const AccessUnit&accessUnit, PicList &rcListPic, const int64_t dEncTime, const InputColourSpaceConversion snr_conversion, const bool printFrameMSE, Double* PSNR_Y )
+void EncGOP::xCalculateAddPSNRs( const bool isField, const bool isFieldTopFieldFirst, const Int iGOPid, Picture* pcPic, const AccessUnit&accessUnit, PicList &rcListPic, const int64_t dEncTime, const InputColourSpaceConversion snr_conversion, const bool printFrameMSE, double* PSNR_Y )
 {
   xCalculateAddPSNR( pcPic, pcPic->getRecoBuf(), accessUnit, (double) dEncTime, snr_conversion, printFrameMSE, PSNR_Y );
 
@@ -3101,7 +3101,7 @@ void EncGOP::xCalculateAddPSNRs( const bool isField, const bool isFieldTopFieldF
   }
 }
 
-void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUnit& accessUnit, Double dEncTime, const InputColourSpaceConversion conversion, const bool printFrameMSE, Double* PSNR_Y )
+void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUnit& accessUnit, double dEncTime, const InputColourSpaceConversion conversion, const bool printFrameMSE, double* PSNR_Y )
 {
   const SPS&         sps = *pcPic->cs->sps;
   const CPelUnitBuf& pic = cPicD;
@@ -3111,11 +3111,11 @@ void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUn
 #if ENABLE_QPA
   const bool    useWPSNR = m_pcEncLib->getUseWPSNR();
 #endif
-  Double  dPSNR[MAX_NUM_COMPONENT];
+  double  dPSNR[MAX_NUM_COMPONENT];
 #if WCG_WPSNR
   const bool    useLumaWPSNR = m_pcEncLib->getLumaLevelToDeltaQPMapping().isEnabled();
-  Double  dPSNRWeighted[MAX_NUM_COMPONENT];
-  Double  MSEyuvframeWeighted[MAX_NUM_COMPONENT];
+  double  dPSNRWeighted[MAX_NUM_COMPONENT];
+  double  MSEyuvframeWeighted[MAX_NUM_COMPONENT];
 #endif
   for(Int i=0; i<MAX_NUM_COMPONENT; i++)
   {
@@ -3137,7 +3137,7 @@ void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUn
   const CPelUnitBuf& picC = (conversion == IPCOLOURSPACE_UNCHANGED) ? pic : interm;
 
   //===== calculate PSNR =====
-  Double MSEyuvframe[MAX_NUM_COMPONENT] = {0, 0, 0};
+  double MSEyuvframe[MAX_NUM_COMPONENT] = {0, 0, 0};
   const ChromaFormat formatD = pic.chromaFormat;
   const ChromaFormat format  = sps.getChromaFormatIdc();
 
@@ -3171,19 +3171,19 @@ void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUn
 #else
     const uint64_t uiSSDtemp = xFindDistortionPlane(recPB, orgPB, 0);
 #if WCG_WPSNR
-  const Double uiSSDtempWeighted = xFindDistortionPlaneWPSNR(recPB, orgPB, 0, org.get(COMPONENT_Y), compID, format);
+  const double uiSSDtempWeighted = xFindDistortionPlaneWPSNR(recPB, orgPB, 0, org.get(COMPONENT_Y), compID, format);
 #endif
     const UInt maxval = 255 << (bitDepth - 8);
 #endif
     const UInt size   = width * height;
-    const Double fRefValue = (Double)maxval * maxval * size;
-    dPSNR[comp]       = uiSSDtemp ? 10.0 * log10(fRefValue / (Double)uiSSDtemp) : 999.99;
-    MSEyuvframe[comp] = (Double)uiSSDtemp / size;
+    const double fRefValue = (double)maxval * maxval * size;
+    dPSNR[comp]       = uiSSDtemp ? 10.0 * log10(fRefValue / (double)uiSSDtemp) : 999.99;
+    MSEyuvframe[comp] = (double)uiSSDtemp / size;
 #if WCG_WPSNR
     if (useLumaWPSNR)
     {
-      dPSNRWeighted[comp] = uiSSDtempWeighted ? 10.0 * log10(fRefValue / (Double)uiSSDtempWeighted) : 999.99;
-      MSEyuvframeWeighted[comp] = (Double)uiSSDtempWeighted / size;
+      dPSNRWeighted[comp] = uiSSDtempWeighted ? 10.0 * log10(fRefValue / (double)uiSSDtempWeighted) : 999.99;
+      MSEyuvframeWeighted[comp] = (double)uiSSDtempWeighted / size;
     }
 #endif
 
@@ -3230,13 +3230,13 @@ void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUn
   m_vRVM_RP.push_back( uibits );
 
   //===== add PSNR =====
-  m_gcAnalyzeAll.addResult (dPSNR, (Double)uibits, MSEyuvframe);
+  m_gcAnalyzeAll.addResult (dPSNR, (double)uibits, MSEyuvframe);
 #if EXTENSION_360_VIDEO
   m_ext360.addResult(m_gcAnalyzeAll);
 #endif
   if (pcSlice->isIntra())
   {
-    m_gcAnalyzeI.addResult (dPSNR, (Double)uibits, MSEyuvframe);
+    m_gcAnalyzeI.addResult (dPSNR, (double)uibits, MSEyuvframe);
     *PSNR_Y = dPSNR[COMPONENT_Y];
 #if EXTENSION_360_VIDEO
     m_ext360.addResult(m_gcAnalyzeI);
@@ -3244,7 +3244,7 @@ void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUn
   }
   if (pcSlice->isInterP())
   {
-    m_gcAnalyzeP.addResult (dPSNR, (Double)uibits, MSEyuvframe);
+    m_gcAnalyzeP.addResult (dPSNR, (double)uibits, MSEyuvframe);
     *PSNR_Y = dPSNR[COMPONENT_Y];
 #if EXTENSION_360_VIDEO
     m_ext360.addResult(m_gcAnalyzeP);
@@ -3252,7 +3252,7 @@ void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUn
   }
   if (pcSlice->isInterB())
   {
-    m_gcAnalyzeB.addResult (dPSNR, (Double)uibits, MSEyuvframe);
+    m_gcAnalyzeB.addResult (dPSNR, (double)uibits, MSEyuvframe);
     *PSNR_Y = dPSNR[COMPONENT_Y];
 #if EXTENSION_360_VIDEO
     m_ext360.addResult(m_gcAnalyzeB);
@@ -3261,7 +3261,7 @@ void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUn
 #if WCG_WPSNR
   if (useLumaWPSNR)
   {
-    m_gcAnalyzeWPSNR.addResult(dPSNRWeighted, (Double)uibits, MSEyuvframeWeighted);
+    m_gcAnalyzeWPSNR.addResult(dPSNRWeighted, (double)uibits, MSEyuvframeWeighted);
   }
 #endif
 
@@ -3331,11 +3331,11 @@ void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUn
 
 void EncGOP::xCalculateInterlacedAddPSNR( Picture* pcPicOrgFirstField, Picture* pcPicOrgSecondField,
                                           PelUnitBuf cPicRecFirstField, PelUnitBuf cPicRecSecondField,
-                                          const InputColourSpaceConversion conversion, const bool printFrameMSE, Double* PSNR_Y )
+                                          const InputColourSpaceConversion conversion, const bool printFrameMSE, double* PSNR_Y )
 {
   const SPS &sps = *pcPicOrgFirstField->cs->sps;
   const ChromaFormat format = sps.getChromaFormatIdc();
-  Double  dPSNR[MAX_NUM_COMPONENT];
+  double  dPSNR[MAX_NUM_COMPONENT];
   Picture    *apcPicOrgFields[2] = {pcPicOrgFirstField, pcPicOrgSecondField};
   PelUnitBuf acPicRecFields[2]   = {cPicRecFirstField, cPicRecSecondField};
 #if ENABLE_QPA
@@ -3359,7 +3359,7 @@ void EncGOP::xCalculateInterlacedAddPSNR( Picture* pcPicOrgFirstField, Picture* 
   }
 
   //===== calculate PSNR =====
-  Double MSEyuvframe[MAX_NUM_COMPONENT] = {0, 0, 0};
+  double MSEyuvframe[MAX_NUM_COMPONENT] = {0, 0, 0};
 
   CHECK(!(acPicRecFields[0].chromaFormat==acPicRecFields[1].chromaFormat), "Unspecified error");
   const UInt numValidComponents = ::getNumberValidComponents( acPicRecFields[0].chromaFormat );
@@ -3396,9 +3396,9 @@ void EncGOP::xCalculateInterlacedAddPSNR( Picture* pcPicOrgFirstField, Picture* 
     const UInt maxval = 255 << (bitDepth - 8);
 #endif
     const UInt size   = width * height * 2;
-    const Double fRefValue = (Double)maxval * maxval * size;
-    dPSNR[ch]         = uiSSDtemp ? 10.0 * log10(fRefValue / (Double)uiSSDtemp) : 999.99;
-    MSEyuvframe[ch]   = (Double)uiSSDtemp / size;
+    const double fRefValue = (double)maxval * maxval * size;
+    dPSNR[ch]         = uiSSDtemp ? 10.0 * log10(fRefValue / (double)uiSSDtemp) : 999.99;
+    MSEyuvframe[ch]   = (double)uiSSDtemp / size;
 #if ENABLE_QPA && FRAME_WEIGHTING
     if (useWPSNR) m_gcAnalyzeAll_in.addWeightedSSD(frameWeight * (double)uiSSDtemp / fRefValue, ch);
 #endif
@@ -3407,7 +3407,7 @@ void EncGOP::xCalculateInterlacedAddPSNR( Picture* pcPicOrgFirstField, Picture* 
   UInt uibits = 0; // the number of bits for the pair is not calculated here - instead the overall total is used elsewhere.
 
   //===== add PSNR =====
-  m_gcAnalyzeAll_in.addResult (dPSNR, (Double)uibits, MSEyuvframe);
+  m_gcAnalyzeAll_in.addResult (dPSNR, (double)uibits, MSEyuvframe);
 
   *PSNR_Y = dPSNR[COMPONENT_Y];
 
@@ -3490,20 +3490,20 @@ void EncGOP::xUpdateRasInit(Slice* slice)
   }
 }
 
-Double EncGOP::xCalculateRVM()
+double EncGOP::xCalculateRVM()
 {
-  Double dRVM = 0;
+  double dRVM = 0;
 
   if( m_pcCfg->getGOPSize() == 1 && m_pcCfg->getIntraPeriod() != 1 && m_pcCfg->getFramesToBeEncoded() > RVM_VCEGAM10_M * 2 )
   {
     // calculate RVM only for lowdelay configurations
-    std::vector<Double> vRL , vB;
+    std::vector<double> vRL , vB;
     size_t N = m_vRVM_RP.size();
     vRL.resize( N );
     vB.resize( N );
 
     Int i;
-    Double dRavg = 0 , dBavg = 0;
+    double dRavg = 0 , dBavg = 0;
     vB[RVM_VCEGAM10_M] = 0;
     for( i = RVM_VCEGAM10_M + 1 ; i < N - RVM_VCEGAM10_M + 1 ; i++ )
     {
@@ -3521,15 +3521,15 @@ Double EncGOP::xCalculateRVM()
     dRavg /= ( N - 2 * RVM_VCEGAM10_M );
     dBavg /= ( N - 2 * RVM_VCEGAM10_M );
 
-    Double dSigamB = 0;
+    double dSigamB = 0;
     for( i = RVM_VCEGAM10_M + 1 ; i < N - RVM_VCEGAM10_M + 1 ; i++ )
     {
-      Double tmp = vB[i] - dBavg;
+      double tmp = vB[i] - dBavg;
       dSigamB += tmp * tmp;
     }
     dSigamB = sqrt( dSigamB / ( N - 2 * RVM_VCEGAM10_M ) );
 
-    Double f = sqrt( 12.0 * ( RVM_VCEGAM10_M - 1 ) / ( RVM_VCEGAM10_M + 1 ) );
+    double f = sqrt( 12.0 * ( RVM_VCEGAM10_M - 1 ) / ( RVM_VCEGAM10_M + 1 ) );
 
     dRVM = dSigamB / dRavg * f;
   }

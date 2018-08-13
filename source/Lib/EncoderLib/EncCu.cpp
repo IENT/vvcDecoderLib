@@ -770,12 +770,12 @@ void EncCu::xCompressCU( CodingStructure *&tempCS, CodingStructure *&bestCS, Par
 }
 
 #if SHARP_LUMA_DELTA_QP
-void EncCu::updateLambda( Slice* slice, Double dQP )
+void EncCu::updateLambda( Slice* slice, double dQP )
 {
 #if WCG_EXT
   Int    NumberBFrames = ( m_pcEncCfg->getGOPSize() - 1 );
   Int    SHIFT_QP = 12;
-  Double dLambda_scale = 1.0 - Clip3( 0.0, 0.5, 0.05*(Double)(slice->getPic()->fieldPic ? NumberBFrames/2 : NumberBFrames) );
+  double dLambda_scale = 1.0 - Clip3( 0.0, 0.5, 0.05*(double)(slice->getPic()->fieldPic ? NumberBFrames/2 : NumberBFrames) );
 
 #if DISTORTION_LAMBDA_BUGFIX
   Int bitdepth_luma_qp_scale = 6
@@ -788,9 +788,9 @@ void EncCu::updateLambda( Slice* slice, Double dQP )
   Int    bitdepth_luma_qp_scale = 0;
 #endif
 #endif
-  Double qp_temp = (Double) dQP + bitdepth_luma_qp_scale - SHIFT_QP;
+  double qp_temp = (double) dQP + bitdepth_luma_qp_scale - SHIFT_QP;
   
-  Double dQPFactor = m_pcEncCfg->getGOPEntry( m_pcSliceEncoder->getGopId() ).m_QPFactor;
+  double dQPFactor = m_pcEncCfg->getGOPEntry( m_pcSliceEncoder->getGopId() ).m_QPFactor;
   
   if( slice->getSliceType() == I_SLICE )
   {
@@ -815,7 +815,7 @@ void EncCu::updateLambda( Slice* slice, Double dQP )
     dQPFactor = 0.57*dQPFactor;
   }
 
-  Double dLambda = dQPFactor*pow( 2.0, qp_temp/3.0 );
+  double dLambda = dQPFactor*pow( 2.0, qp_temp/3.0 );
   Int depth = slice->getDepth();
 
   if( !m_pcEncCfg->getLambdaFromQPEnable() && depth>0 )
@@ -829,8 +829,8 @@ void EncCu::updateLambda( Slice* slice, Double dQP )
   }
 
   const Int temporalId = m_pcEncCfg->getGOPEntry( m_pcSliceEncoder->getGopId() ).m_temporalId;
-  const std::vector<Double> &intraLambdaModifiers = m_pcEncCfg->getIntraLambdaModifier();
-  Double lambdaModifier;
+  const std::vector<double> &intraLambdaModifiers = m_pcEncCfg->getIntraLambdaModifier();
+  double lambdaModifier;
   if( slice->getSliceType( ) != I_SLICE || intraLambdaModifiers.empty())
   {
     lambdaModifier = m_pcEncCfg->getLambdaModifier(temporalId);
@@ -847,12 +847,12 @@ void EncCu::updateLambda( Slice* slice, Double dQP )
 
 #else
   Int iQP = (Int)dQP;
-  const Double oldQP     = (Double)slice->getSliceQpBase();
-  const Double oldLambda = m_pcSliceEncoder->calculateLambda (slice, m_pcSliceEncoder->getGopId(), slice->getDepth(), oldQP, oldQP, iQP);
-  const Double newLambda = oldLambda * pow (2.0, (dQP - oldQP) / 3.0);
+  const double oldQP     = (double)slice->getSliceQpBase();
+  const double oldLambda = m_pcSliceEncoder->calculateLambda (slice, m_pcSliceEncoder->getGopId(), slice->getDepth(), oldQP, oldQP, iQP);
+  const double newLambda = oldLambda * pow (2.0, (dQP - oldQP) / 3.0);
 #if RDOQ_CHROMA_LAMBDA
-  const Double chromaLambda = newLambda / m_pcRdCost->getChromaWeight();
-  const Double lambdaArray[MAX_NUM_COMPONENT] = {newLambda, chromaLambda, chromaLambda};
+  const double chromaLambda = newLambda / m_pcRdCost->getChromaWeight();
+  const double lambdaArray[MAX_NUM_COMPONENT] = {newLambda, chromaLambda, chromaLambda};
   m_pcTrQuant->setLambdas (lambdaArray);
 #else
   m_pcTrQuant->setLambda (newLambda);
@@ -1733,7 +1733,7 @@ void EncCu::xCheckRDCostMerge2Nx2N( CodingStructure *&tempCS, CodingStructure *&
         {
           uiBitsCand--;
         }
-        Double cost     = (Double)uiSad + (Double)uiBitsCand * sqrtLambdaForFirstPass;
+        double cost     = (double)uiSad + (double)uiBitsCand * sqrtLambdaForFirstPass;
 
         updateCandList( uiMergeCand, cost, RdModeList, candCostList, uiNumMrgSATDCand );
 
@@ -2065,7 +2065,7 @@ void EncCu::xCheckRDCostInterWoOBMC( CodingStructure *&tempCS, CodingStructure *
   const UInt uiSADOBMCOn  = m_pcRdCost->getDistPart(tempCS->getOrgBuf(cu->Y()), CSWoOBMC->getPredBuf(cu->Y()),
                                                    sps.getBitDepth(CHANNEL_TYPE_LUMA), COMPONENT_Y, DF_SAD_FULL_NBIT);
 #endif
-  const Double    dOBMCThOff = 1.0;
+  const double    dOBMCThOff = 1.0;
   const bool   bCheckOBMCOff = uiSADOBMCOff * dOBMCThOff < uiSADOBMCOn;
 
   if( !bCheckOBMCOff )

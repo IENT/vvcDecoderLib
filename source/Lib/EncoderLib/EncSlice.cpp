@@ -102,20 +102,20 @@ void EncSlice::init( EncLib* pcEncLib, const SPS& sps )
 }
 
 void
-EncSlice::setUpLambda( Slice* slice, const Double dLambda, Int iQP)
+EncSlice::setUpLambda( Slice* slice, const double dLambda, Int iQP)
 {
   // store lambda
   m_pcRdCost ->setLambda( dLambda, slice->getSPS()->getBitDepths() );
 
   // for RDO
   // in RdCost there is only one lambda because the luma and chroma bits are not separated, instead we weight the distortion of chroma.
-  Double dLambdas[MAX_NUM_COMPONENT] = { dLambda };
+  double dLambdas[MAX_NUM_COMPONENT] = { dLambda };
   for( UInt compIdx = 1; compIdx < MAX_NUM_COMPONENT; compIdx++ )
   {
     const ComponentID compID = ComponentID( compIdx );
     Int chromaQPOffset       = slice->getPPS()->getQpOffset( compID ) + slice->getSliceChromaQpDelta( compID );
     Int qpc                  = ( iQP + chromaQPOffset < 0 ) ? iQP : getScaledChromaQP( iQP + chromaQPOffset, m_pcCfg->getChromaFormatIdc() );
-    Double tmpWeight         = pow( 2.0, ( iQP - qpc ) / 3.0 );  // takes into account of the chroma qp mapping and chroma qp Offset
+    double tmpWeight         = pow( 2.0, ( iQP - qpc ) / 3.0 );  // takes into account of the chroma qp mapping and chroma qp Offset
 #if JVET_K0072
     if( m_pcCfg->getDepQuantEnabledFlag() )
     {
@@ -162,8 +162,8 @@ EncSlice::setUpLambda( Slice* slice, const Double dLambda, Int iQP)
 
 void EncSlice::initEncSlice( Picture* pcPic, const Int pocLast, const Int pocCurr, const Int iGOPid, Slice*& rpcSlice, const bool isField )
 {
-  Double dQP;
-  Double dLambda;
+  double dQP;
+  double dLambda;
 
   rpcSlice = pcPic->slices[0];
   rpcSlice->setSliceBits(0);
@@ -304,11 +304,11 @@ void EncSlice::initEncSlice( Picture* pcPic, const Int pocLast, const Int pocCur
 #if X0038_LAMBDA_FROM_QP_CAPABILITY
   const Int temporalId=m_pcCfg->getGOPEntry(iGOPid).m_temporalId;
 #if !SHARP_LUMA_DELTA_QP
-  const std::vector<Double> &intraLambdaModifiers=m_pcCfg->getIntraLambdaModifier();
+  const std::vector<double> &intraLambdaModifiers=m_pcCfg->getIntraLambdaModifier();
 #endif
 #endif
   Int iQP;
-  Double dOrigQP = dQP;
+  double dOrigQP = dQP;
 
   // pre-compute lambda and QP values for all possible QP candidates
   for ( Int iDQpIdx = 0; iDQpIdx < 2 * m_pcCfg->getDeltaQpRD() + 1; iDQpIdx++ )
@@ -334,12 +334,12 @@ void EncSlice::initEncSlice( Picture* pcPic, const Int pocLast, const Int pocCur
     Int    bitdepth_luma_qp_scale = 0;
 #endif
 #endif
-    Double qp_temp = (Double) dQP + bitdepth_luma_qp_scale - SHIFT_QP;
+    double qp_temp = (double) dQP + bitdepth_luma_qp_scale - SHIFT_QP;
 #if FULL_NBIT
-    Double qp_temp_orig = (Double) dQP - SHIFT_QP;
+    double qp_temp_orig = (double) dQP - SHIFT_QP;
 #endif
     // Case #1: I or P-slices (key-frame)
-    Double dQPFactor = m_pcCfg->getGOPEntry(iGOPid).m_QPFactor;
+    double dQPFactor = m_pcCfg->getGOPEntry(iGOPid).m_QPFactor;
     if ( eSliceType==I_SLICE )
     {
       if (m_pcCfg->getIntraQpFactor()>=0.0 && m_pcCfg->getGOPEntry(iGOPid).m_sliceType != I_SLICE)
@@ -356,7 +356,7 @@ void EncSlice::initEncSlice( Picture* pcPic, const Int pocLast, const Int pocCur
         else
         {
 #endif
-        Double dLambda_scale = 1.0 - Clip3( 0.0, 0.5, 0.05*(Double)(isField ? NumberBFrames/2 : NumberBFrames) );
+        double dLambda_scale = 1.0 - Clip3( 0.0, 0.5, 0.05*(double)(isField ? NumberBFrames/2 : NumberBFrames) );
 
         dQPFactor=0.57*dLambda_scale;
 #if X0038_LAMBDA_FROM_QP_CAPABILITY
@@ -393,7 +393,7 @@ void EncSlice::initEncSlice( Picture* pcPic, const Int pocLast, const Int pocCur
     }
 
 #if X0038_LAMBDA_FROM_QP_CAPABILITY
-    Double lambdaModifier;
+    double lambdaModifier;
     if( rpcSlice->getSliceType( ) != I_SLICE || intraLambdaModifiers.empty())
     {
       lambdaModifier = m_pcCfg->getLambdaModifier( temporalId );
@@ -420,7 +420,7 @@ void EncSlice::initEncSlice( Picture* pcPic, const Int pocLast, const Int pocCur
 
 #if !X0038_LAMBDA_FROM_QP_CAPABILITY
   const Int temporalId=m_pcCfg->getGOPEntry(iGOPid).m_temporalId;
-  const std::vector<Double> &intraLambdaModifiers=m_pcCfg->getIntraLambdaModifier();
+  const std::vector<double> &intraLambdaModifiers=m_pcCfg->getIntraLambdaModifier();
 #endif
 
 #if W0038_CQP_ADJ
@@ -445,7 +445,7 @@ void EncSlice::initEncSlice( Picture* pcPic, const Int pocLast, const Int pocCur
 #endif
 
 #if !X0038_LAMBDA_FROM_QP_CAPABILITY
-  Double lambdaModifier;
+  double lambdaModifier;
   if( rpcSlice->getSliceType( ) != I_SLICE || intraLambdaModifiers.empty())
   {
     lambdaModifier = m_pcCfg->getLambdaModifier( temporalId );
@@ -558,11 +558,11 @@ void EncSlice::initEncSlice( Picture* pcPic, const Int pocLast, const Int pocCur
 
 
 #if SHARP_LUMA_DELTA_QP
-Double EncSlice::calculateLambda( const Slice*     slice,
+double EncSlice::calculateLambda( const Slice*     slice,
                                   const Int        GOPid, // entry in the GOP table
                                   const Int        depth, // slice GOP hierarchical depth.
-                                  const Double     refQP, // initial slice-level QP
-                                  const Double     dQP,   // initial double-precision QP
+                                  const double     refQP, // initial slice-level QP
+                                  const double     dQP,   // initial double-precision QP
                                         Int       &iQP )  // returned integer QP.
 {
   enum   SliceType eSliceType    = slice->getSliceType();
@@ -571,7 +571,7 @@ Double EncSlice::calculateLambda( const Slice*     slice,
   const  Int       SHIFT_QP      = 12;
 #if X0038_LAMBDA_FROM_QP_CAPABILITY
   const Int temporalId=m_pcCfg->getGOPEntry(GOPid).m_temporalId;
-  const std::vector<Double> &intraLambdaModifiers=m_pcCfg->getIntraLambdaModifier();
+  const std::vector<double> &intraLambdaModifiers=m_pcCfg->getIntraLambdaModifier();
 #endif
 
 #if DISTORTION_LAMBDA_BUGFIX
@@ -585,9 +585,9 @@ Double EncSlice::calculateLambda( const Slice*     slice,
   Int    bitdepth_luma_qp_scale = 0;
 #endif
 #endif
-  Double qp_temp = dQP + bitdepth_luma_qp_scale - SHIFT_QP;
+  double qp_temp = dQP + bitdepth_luma_qp_scale - SHIFT_QP;
   // Case #1: I or P-slices (key-frame)
-  Double dQPFactor = m_pcCfg->getGOPEntry(GOPid).m_QPFactor;
+  double dQPFactor = m_pcCfg->getGOPEntry(GOPid).m_QPFactor;
   if ( eSliceType==I_SLICE )
   {
     if (m_pcCfg->getIntraQpFactor()>=0.0 && m_pcCfg->getGOPEntry(GOPid).m_sliceType != I_SLICE)
@@ -604,7 +604,7 @@ Double EncSlice::calculateLambda( const Slice*     slice,
       else
       {
 #endif
-        Double dLambda_scale = 1.0 - Clip3( 0.0, 0.5, 0.05*(Double)(isField ? NumberBFrames/2 : NumberBFrames) );
+        double dLambda_scale = 1.0 - Clip3( 0.0, 0.5, 0.05*(double)(isField ? NumberBFrames/2 : NumberBFrames) );
         dQPFactor=0.57*dLambda_scale;
 #if X0038_LAMBDA_FROM_QP_CAPABILITY
       }
@@ -618,7 +618,7 @@ Double EncSlice::calculateLambda( const Slice*     slice,
   }
 #endif
 
-  Double dLambda = dQPFactor*pow( 2.0, qp_temp/3.0 );
+  double dLambda = dQPFactor*pow( 2.0, qp_temp/3.0 );
 
 #if X0038_LAMBDA_FROM_QP_CAPABILITY
   if( !(m_pcCfg->getLambdaFromQPEnable()) && depth>0 )
@@ -627,14 +627,14 @@ Double EncSlice::calculateLambda( const Slice*     slice,
 #endif
   {
 #if DISTORTION_LAMBDA_BUGFIX
-    Double qp_temp_ref = refQP + bitdepth_luma_qp_scale - SHIFT_QP;
+    double qp_temp_ref = refQP + bitdepth_luma_qp_scale - SHIFT_QP;
     dLambda *= Clip3(2.00, 4.00, (qp_temp_ref / 6.0));   // (j == B_SLICE && p_cur_frm->layer != 0 )
 #else
 #if FULL_NBIT
-      Double qp_temp_ref_orig = refQP - SHIFT_QP;
+      double qp_temp_ref_orig = refQP - SHIFT_QP;
       dLambda *= Clip3( 2.00, 4.00, (qp_temp_ref_orig / 6.0) ); // (j == B_SLICE && p_cur_frm->layer != 0 )
 #else
-      Double qp_temp_ref = refQP + bitdepth_luma_qp_scale - SHIFT_QP;
+      double qp_temp_ref = refQP + bitdepth_luma_qp_scale - SHIFT_QP;
       dLambda *= Clip3( 2.00, 4.00, (qp_temp_ref / 6.0) ); // (j == B_SLICE && p_cur_frm->layer != 0 )
 #endif
 #endif
@@ -647,7 +647,7 @@ Double EncSlice::calculateLambda( const Slice*     slice,
   }
 
 #if X0038_LAMBDA_FROM_QP_CAPABILITY
-  Double lambdaModifier;
+  double lambdaModifier;
   if( eSliceType != I_SLICE || intraLambdaModifiers.empty())
   {
     lambdaModifier = m_pcCfg->getLambdaModifier( temporalId );
@@ -673,7 +673,7 @@ Double EncSlice::calculateLambda( const Slice*     slice,
 }
 #endif
 
-void EncSlice::resetQP( Picture* pic, Int sliceQP, Double lambda )
+void EncSlice::resetQP( Picture* pic, Int sliceQP, double lambda )
 {
   Slice* slice = pic->slices[0];
 
@@ -989,10 +989,10 @@ void EncSlice::precompressSlice( Picture* pcPic )
     THROW( "Unable to optimise Slice-level QP if Slice Mode is set to FIXED_NUMBER_OF_BYTES\n" );
   }
 
-  Double     dPicRdCostBest = MAX_DOUBLE;
+  double     dPicRdCostBest = MAX_DOUBLE;
   UInt       uiQpIdxBest = 0;
 
-  Double dFrameLambda;
+  double dFrameLambda;
 #if DISTORTION_LAMBDA_BUGFIX
   Int SHIFT_QP = 12
                  + 6
@@ -1050,7 +1050,7 @@ void EncSlice::precompressSlice( Picture* pcPic )
 
 void EncSlice::calCostSliceI(Picture* pcPic) // TODO: this only analyses the first slice segment. What about the others?
 {
-  Double         iSumHadSlice      = 0;
+  double         iSumHadSlice      = 0;
   Slice * const  pcSlice           = pcPic->slices[getSliceSegmentIdx()];
 #if HEVC_TILES_WPP
   const TileMap &tileMap           = *pcPic->tileMap;
@@ -1593,14 +1593,14 @@ void EncSlice::encodeCtus( Picture* pcPic, const bool bCompressEntireSlice, cons
 #endif
 
 #if RDOQ_CHROMA_LAMBDA && ENABLE_QPA
-    Double oldLambdaArray[MAX_NUM_COMPONENT] = {0.0};
+    double oldLambdaArray[MAX_NUM_COMPONENT] = {0.0};
 #endif
-    const Double oldLambda = pRdCost->getLambda();
+    const double oldLambda = pRdCost->getLambda();
     if ( pCfg->getUseRateCtrl() )
     {
       Int estQP        = pcSlice->getSliceQp();
-      Double estLambda = -1.0;
-      Double bpp       = -1.0;
+      double estLambda = -1.0;
+      double bpp       = -1.0;
 
       if( ( pcPic->slices[0]->getSliceType() == I_SLICE && pCfg->getForceIntraQP() ) || !pCfg->getLCULevelRC() )
       {
@@ -1625,8 +1625,8 @@ void EncSlice::encodeCtus( Picture* pcPic, const bool bCompressEntireSlice, cons
 
 #if RDOQ_CHROMA_LAMBDA
         // set lambda for RDOQ
-        const Double chromaLambda = estLambda / pRdCost->getChromaWeight();
-        const Double lambdaArray[MAX_NUM_COMPONENT] = { estLambda, chromaLambda, chromaLambda };
+        const double chromaLambda = estLambda / pRdCost->getChromaWeight();
+        const double lambdaArray[MAX_NUM_COMPONENT] = { estLambda, chromaLambda, chromaLambda };
         pTrQuant->setLambdas( lambdaArray );
 #else
         pTrQuant->setLambda( estLambda );
@@ -1639,11 +1639,11 @@ void EncSlice::encodeCtus( Picture* pcPic, const bool bCompressEntireSlice, cons
     else if (pCfg->getUsePerceptQPA() && pcSlice->getPPS()->getUseDQP())
     {
       iSrcOffset = pcPic->m_iOffsetCtu[ctuRsAddr];
-      const Double newLambda = oldLambda * pow (2.0, Double(iSrcOffset - iQPIndex) / 3.0);
+      const double newLambda = oldLambda * pow (2.0, double(iSrcOffset - iQPIndex) / 3.0);
 #if RDOQ_CHROMA_LAMBDA
       pTrQuant->getLambdas (oldLambdaArray); // save the old lambdas
-      const Double chromaLambda = newLambda / pRdCost->getChromaWeight();
-      const Double lambdaArray[MAX_NUM_COMPONENT] = {newLambda, chromaLambda, chromaLambda};
+      const double chromaLambda = newLambda / pRdCost->getChromaWeight();
+      const double lambdaArray[MAX_NUM_COMPONENT] = {newLambda, chromaLambda, chromaLambda};
       pTrQuant->setLambdas (lambdaArray);
 #else
       pTrQuant->setLambda (newLambda);
@@ -1728,7 +1728,7 @@ void EncSlice::encodeCtus( Picture* pcPic, const bool bCompressEntireSlice, cons
       Int actualBits      = int( cs.fracBits >> SCALE_BITS );
 #endif
       Int actualQP        = g_RCInvalidQPValue;
-      Double actualLambda = pRdCost->getLambda();
+      double actualLambda = pRdCost->getLambda();
       Int numberOfEffectivePixels    = 0;
 
       for( auto &cu : cs.traverseCUs( ctuArea, CH_L ) )
@@ -2154,7 +2154,7 @@ void EncSlice::xDetermineStartAndBoundingCtuTsAddr  ( UInt& startCtuTsAddr, UInt
 #endif
 }
 
-Double EncSlice::xGetQPValueAccordingToLambda ( Double lambda )
+double EncSlice::xGetQPValueAccordingToLambda ( double lambda )
 {
   return 4.2005*log(lambda) + 13.7122;
 }

@@ -56,8 +56,8 @@ private:
   UInt                  m_uiAQPartHeight;
   UInt                  m_uiNumAQPartInWidth;
   UInt                  m_uiNumAQPartInHeight;
-  Double                m_dAvgActivity;
-  std::vector<Double>   m_acEncAQU;
+  double                m_dAvgActivity;
+  std::vector<double>   m_acEncAQU;
 
 public:
   AQpLayer( Int iWidth, Int iHeight, UInt uiAQPartWidth, UInt uiAQPartHeight );
@@ -68,17 +68,17 @@ public:
   UInt                   getNumAQPartInWidth()   { return m_uiNumAQPartInWidth;  }
   UInt                   getNumAQPartInHeight()  { return m_uiNumAQPartInHeight; }
   UInt                   getAQPartStride()       { return m_uiNumAQPartInWidth;  }
-  std::vector<Double>&   getQPAdaptationUnit()   { return m_acEncAQU;           }
-  Double getActivity( const Position& pos)
+  std::vector<double>&   getQPAdaptationUnit()   { return m_acEncAQU;           }
+  double getActivity( const Position& pos)
   {
     UInt uiAQUPosX = pos.x / m_uiAQPartWidth;
     UInt uiAQUPosY = pos.y / m_uiAQPartHeight;
     return m_acEncAQU[uiAQUPosY * m_uiNumAQPartInWidth + uiAQUPosX];
   }
 
-  Double                 getAvgActivity()        { return m_dAvgActivity;        }
+  double                 getAvgActivity()        { return m_dAvgActivity;        }
 
-  void                   setAvgActivity( Double d )  { m_dAvgActivity = d; }
+  void                   setAvgActivity( double d )  { m_dAvgActivity = d; }
 };
 
 /// Source picture analyzer class

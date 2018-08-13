@@ -74,9 +74,9 @@ protected:
   std::string m_reconFileName;                                ///< output reconstruction file
 
   // Lambda modifiers
-  Double    m_adLambdaModifier[ MAX_TLAYER ];                 ///< Lambda modifier array for each temporal layer
-  std::vector<Double> m_adIntraLambdaModifier;                ///< Lambda modifier for Intra pictures, one for each temporal layer. If size>temporalLayer, then use [temporalLayer], else if size>0, use [size()-1], else use m_adLambdaModifier.
-  Double    m_dIntraQpFactor;                                 ///< Intra Q Factor. If negative, use a default equation: 0.57*(1.0 - Clip3( 0.0, 0.5, 0.05*(Double)(isField ? (GopSize-1)/2 : GopSize-1) ))
+  double    m_adLambdaModifier[ MAX_TLAYER ];                 ///< Lambda modifier array for each temporal layer
+  std::vector<double> m_adIntraLambdaModifier;                ///< Lambda modifier for Intra pictures, one for each temporal layer. If size>temporalLayer, then use [temporalLayer], else if size>0, use [size()-1], else use m_adLambdaModifier.
+  double    m_dIntraQpFactor;                                 ///< Intra Q Factor. If negative, use a default equation: 0.57*(1.0 - Clip3( 0.0, 0.5, 0.05*(double)(isField ? (GopSize-1)/2 : GopSize-1) ))
 
   // source specification
   Int       m_iFrameRate;                                     ///< source frame-rates (Hz)
@@ -155,7 +155,7 @@ protected:
 #if QP_SWITCHING_FOR_PARALLEL
   OptionalValue<UInt> m_qpIncrementAtSourceFrame;             ///< Optional source frame number at which all subsequent frames are to use an increased internal QP.
 #else
-  Double    m_fQP;                                            ///< QP value of key-picture (floating point)
+  double    m_fQP;                                            ///< QP value of key-picture (floating point)
 #endif
   Int       m_iQP;                                            ///< QP value of key-picture (integer)
 #if X0038_LAMBDA_FROM_QP_CAPABILITY
@@ -333,8 +333,8 @@ protected:
   // coding tool (SAO)
   bool      m_bUseSAO;
   bool      m_bTestSAODisableAtPictureLevel;
-  Double    m_saoEncodingRate;                                ///< When >0 SAO early picture termination is enabled for luma and chroma
-  Double    m_saoEncodingRateChroma;                          ///< The SAO early picture termination rate to use for chroma (when m_SaoEncodingRate is >0). If <=0, use results for luma.
+  double    m_saoEncodingRate;                                ///< When >0 SAO early picture termination is enabled for luma and chroma
+  double    m_saoEncodingRateChroma;                          ///< The SAO early picture termination rate to use for chroma (when m_SaoEncodingRate is >0). If <=0, use results for luma.
   Int       m_maxNumOffsetsPerPic;                            ///< SAO maximun number of offset per picture
   bool      m_saoCtuBoundary;                                 ///< SAO parameter estimation using non-deblocked pixels for CTU bottom and right boundary areas
 #if K0238_SAO_GREEDY_MERGE_ENCODING
@@ -498,7 +498,7 @@ protected:
 #if U0132_TARGET_BITS_SATURATION
   bool      m_RCCpbSaturationEnabled;             ///< enable target bits saturation to avoid CPB overflow and underflow
   UInt      m_RCCpbSize;                          ///< CPB size
-  Double    m_RCInitialCpbFullness;               ///< initial CPB fullness
+  double    m_RCInitialCpbFullness;               ///< initial CPB fullness
 #endif
 #if HEVC_USE_SCALING_LISTS
   ScalingListMode m_useScalingListId;                         ///< using quantization matrix

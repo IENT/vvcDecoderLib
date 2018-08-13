@@ -52,14 +52,14 @@ struct GOPEntry
   Int m_POC;
   Int m_QPOffset;
 #if X0038_LAMBDA_FROM_QP_CAPABILITY
-  Double m_QPOffsetModelOffset;
-  Double m_QPOffsetModelScale;
+  double m_QPOffsetModelOffset;
+  double m_QPOffsetModelScale;
 #endif
 #if W0038_CQP_ADJ
   Int m_CbQPoffset;
   Int m_CrQPoffset;
 #endif
-  Double m_QPFactor;
+  double m_QPFactor;
   Int m_tcOffsetDiv2;
   Int m_betaOffsetDiv2;
   Int m_temporalId;
@@ -124,9 +124,9 @@ protected:
   Int       m_iSourceHeight;
   Window    m_conformanceWindow;
   Int       m_framesToBeEncoded;
-  Double    m_adLambdaModifier[ MAX_TLAYER ];
-  std::vector<Double> m_adIntraLambdaModifier;
-  Double    m_dIntraQpFactor;                                 ///< Intra Q Factor. If negative, use a default equation: 0.57*(1.0 - Clip3( 0.0, 0.5, 0.05*(Double)(isField ? (GopSize-1)/2 : GopSize-1) ))
+  double    m_adLambdaModifier[ MAX_TLAYER ];
+  std::vector<double> m_adIntraLambdaModifier;
+  double    m_dIntraQpFactor;                                 ///< Intra Q Factor. If negative, use a default equation: 0.57*(1.0 - Clip3( 0.0, 0.5, 0.05*(double)(isField ? (GopSize-1)/2 : GopSize-1) ))
 
   bool      m_printMSEBasedSequencePSNR;
   bool      m_printHexPsnr;
@@ -301,8 +301,8 @@ protected:
 #endif
   bool      m_bUseSAO;
   bool      m_bTestSAODisableAtPictureLevel;
-  Double    m_saoEncodingRate;       // When non-0 SAO early picture termination is enabled for luma and chroma
-  Double    m_saoEncodingRateChroma; // The SAO early picture termination rate to use for chroma (when m_SaoEncodingRate is >0). If <=0, use results for luma.
+  double    m_saoEncodingRate;       // When non-0 SAO early picture termination is enabled for luma and chroma
+  double    m_saoEncodingRateChroma; // The SAO early picture termination rate to use for chroma (when m_SaoEncodingRate is >0). If <=0, use results for luma.
   Int       m_maxNumOffsetsPerPic;
   bool      m_saoCtuBoundary;
 
@@ -507,7 +507,7 @@ protected:
 #if U0132_TARGET_BITS_SATURATION
   bool      m_RCCpbSaturationEnabled;
   UInt      m_RCCpbSize;
-  Double    m_RCInitialCpbFullness;
+  double    m_RCInitialCpbFullness;
 #endif
   bool      m_TransquantBypassEnabledFlag;                    ///< transquant_bypass_enabled_flag setting in PPS.
   bool      m_CUTransquantBypassFlagForce;                    ///< if transquant_bypass_enabled_flag, then, if true, all CU transquant bypass flags will be set to true.
@@ -938,12 +938,12 @@ public:
   Int       getFramesToBeEncoded            () const     { return  m_framesToBeEncoded; }
 
   //====== Lambda Modifiers ========
-  void      setLambdaModifier               ( UInt uiIndex, Double dValue ) { m_adLambdaModifier[ uiIndex ] = dValue; }
-  Double    getLambdaModifier               ( UInt uiIndex )          const { return m_adLambdaModifier[ uiIndex ]; }
-  void      setIntraLambdaModifier          ( const std::vector<Double> &dValue )               { m_adIntraLambdaModifier = dValue;       }
-  const std::vector<Double>& getIntraLambdaModifier()                        const { return m_adIntraLambdaModifier;         }
-  void      setIntraQpFactor                ( Double dValue )               { m_dIntraQpFactor = dValue;              }
-  Double    getIntraQpFactor                ()                        const { return m_dIntraQpFactor;                }
+  void      setLambdaModifier               ( UInt uiIndex, double dValue ) { m_adLambdaModifier[ uiIndex ] = dValue; }
+  double    getLambdaModifier               ( UInt uiIndex )          const { return m_adLambdaModifier[ uiIndex ]; }
+  void      setIntraLambdaModifier          ( const std::vector<double> &dValue )               { m_adIntraLambdaModifier = dValue;       }
+  const std::vector<double>& getIntraLambdaModifier()                        const { return m_adIntraLambdaModifier;         }
+  void      setIntraQpFactor                ( double dValue )               { m_dIntraQpFactor = dValue;              }
+  double    getIntraQpFactor                ()                        const { return m_dIntraQpFactor;                }
 
   //==== Coding Structure ========
   UInt      getIntraPeriod                  () const     { return  m_uiIntraPeriod; }
@@ -1107,10 +1107,10 @@ public:
   void  setTestSAODisableAtPictureLevel (bool bVal)                  { m_bTestSAODisableAtPictureLevel = bVal; }
   bool  getTestSAODisableAtPictureLevel ( ) const                    { return m_bTestSAODisableAtPictureLevel; }
 
-  void   setSaoEncodingRate(Double v)                                { m_saoEncodingRate = v; }
-  Double getSaoEncodingRate() const                                  { return m_saoEncodingRate; }
-  void   setSaoEncodingRateChroma(Double v)                          { m_saoEncodingRateChroma = v; }
-  Double getSaoEncodingRateChroma() const                            { return m_saoEncodingRateChroma; }
+  void   setSaoEncodingRate(double v)                                { m_saoEncodingRate = v; }
+  double getSaoEncodingRate() const                                  { return m_saoEncodingRate; }
+  void   setSaoEncodingRateChroma(double v)                          { m_saoEncodingRateChroma = v; }
+  double getSaoEncodingRateChroma() const                            { return m_saoEncodingRateChroma; }
   void  setMaxNumOffsetsPerPic                   (Int iVal)          { m_maxNumOffsetsPerPic = iVal; }
   Int   getMaxNumOffsetsPerPic                   ()                  { return m_maxNumOffsetsPerPic; }
   void  setSaoCtuBoundary              (bool val)                    { m_saoCtuBoundary = val; }
@@ -1326,8 +1326,8 @@ public:
   void         setCpbSaturationEnabled( bool b )                     { m_RCCpbSaturationEnabled = b;   }
   UInt         getCpbSize             ()                             { return m_RCCpbSize;}
   void         setCpbSize             ( UInt ui )                    { m_RCCpbSize = ui;   }
-  Double       getInitialCpbFullness  ()                             { return m_RCInitialCpbFullness;  }
-  void         setInitialCpbFullness  (Double f)                     { m_RCInitialCpbFullness = f;     }
+  double       getInitialCpbFullness  ()                             { return m_RCInitialCpbFullness;  }
+  void         setInitialCpbFullness  (double f)                     { m_RCInitialCpbFullness = f;     }
 #endif
   bool         getTransquantBypassEnabledFlag()                      { return m_TransquantBypassEnabledFlag; }
   void         setTransquantBypassEnabledFlag(bool flag)             { m_TransquantBypassEnabledFlag = flag; }

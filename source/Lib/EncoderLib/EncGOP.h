@@ -205,11 +205,11 @@ protected:
   void  xGetBuffer        ( PicList& rcListPic, std::list<PelUnitBuf*>& rcListPicYuvRecOut,
                             Int iNumPicRcvd, Int iTimeOffset, Picture*& rpcPic, Int pocCurr, bool isField );
 
-  void  xCalculateAddPSNRs         ( const bool isField, const bool isFieldTopFieldFirst, const Int iGOPid, Picture* pcPic, const AccessUnit&accessUnit, PicList &rcListPic, int64_t dEncTime, const InputColourSpaceConversion snr_conversion, const bool printFrameMSE, Double* PSNR_Y );
-  void  xCalculateAddPSNR          ( Picture* pcPic, PelUnitBuf cPicD, const AccessUnit&, Double dEncTime, const InputColourSpaceConversion snr_conversion, const bool printFrameMSE, Double* PSNR_Y );
+  void  xCalculateAddPSNRs         ( const bool isField, const bool isFieldTopFieldFirst, const Int iGOPid, Picture* pcPic, const AccessUnit&accessUnit, PicList &rcListPic, int64_t dEncTime, const InputColourSpaceConversion snr_conversion, const bool printFrameMSE, double* PSNR_Y );
+  void  xCalculateAddPSNR          ( Picture* pcPic, PelUnitBuf cPicD, const AccessUnit&, double dEncTime, const InputColourSpaceConversion snr_conversion, const bool printFrameMSE, double* PSNR_Y );
   void  xCalculateInterlacedAddPSNR( Picture* pcPicOrgFirstField, Picture* pcPicOrgSecondField,
                                      PelUnitBuf cPicRecFirstField, PelUnitBuf cPicRecSecondField,
-                                     const InputColourSpaceConversion snr_conversion, const bool printFrameMSE, Double* PSNR_Y );
+                                     const InputColourSpaceConversion snr_conversion, const bool printFrameMSE, double* PSNR_Y );
 
   uint64_t xFindDistortionPlane(const CPelBuf& pic0, const CPelBuf& pic1, const UInt rshift
 #if ENABLE_QPA
@@ -217,9 +217,9 @@ protected:
 #endif
                              );
 #if WCG_WPSNR
-  Double xFindDistortionPlaneWPSNR(const CPelBuf& pic0, const CPelBuf& pic1, const UInt rshift, const CPelBuf& picLuma0, ComponentID compID, const ChromaFormat chfmt );
+  double xFindDistortionPlaneWPSNR(const CPelBuf& pic0, const CPelBuf& pic1, const UInt rshift, const CPelBuf& picLuma0, ComponentID compID, const ChromaFormat chfmt );
 #endif
-  Double xCalculateRVM();
+  double xCalculateRVM();
 
   void xUpdateRasInit(Slice* slice);
 

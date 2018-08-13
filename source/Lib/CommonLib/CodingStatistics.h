@@ -282,13 +282,13 @@ public:
     UInt values[512 + 1];
     StatLogValue()
     {
-      const Double es = Double( CODINGSTATISTICS_ENTROPYSCALE );
+      const double es = double( CODINGSTATISTICS_ENTROPYSCALE );
 
       values[0] = 0;
 
       for( UInt i = 1; i < sizeof( values ) / sizeof( UInt ); i++ )
       {
-        values[i] = UInt( log( Double( i ) )*es / log( 2.0 ) );
+        values[i] = UInt( log( double( i ) )*es / log( 2.0 ) );
       }
     }
   };
@@ -338,8 +338,8 @@ private:
       printf( "%c%-45s%c  %6d %6d %6s ", sep == '~' ? '[' : ' ', pName, sep, gp_sizeIdxInfo->sizeFrom( wIdx ), gp_sizeIdxInfo->sizeFrom( hIdx ), pSubClassStr );
       if( sCABAC.count > 0 )
       {
-        const Double quote = 100.0 * sCABAC.count / ( Double ) sCABAC.classCount;
-        const Double ratio = 100.0 * sCABAC.bits / ( Double ) sCABAC.count;
+        const double quote = 100.0 * sCABAC.count / ( double ) sCABAC.classCount;
+        const double ratio = 100.0 * sCABAC.bits / ( double ) sCABAC.count;
         printf( "%11.2f%% %12lld %12lld %12lld %11.2f%%", quote, sCABAC.count, sCABAC.sum, sCABAC.bits, ratio );
       }
       else
@@ -354,8 +354,8 @@ private:
     printf( "%c%-45s%c  %6s %6s %6s ", sep == '~' ? '[' : ' ', pName, sep, pWidthString, pHeightString, pSubClassStr );
     if( sCABAC.count > 0 )
     {
-      const Double quote = 100.0 * sCABAC.count / ( Double ) sCABAC.classCount;
-      const Double ratio = 100.0 * sCABAC.bits / ( Double ) sCABAC.count;
+      const double quote = 100.0 * sCABAC.count / ( double ) sCABAC.classCount;
+      const double ratio = 100.0 * sCABAC.bits / ( double ) sCABAC.count;
       printf( "%11.2f%% %12lld %12lld %12lld %11.2f%%", quote, sCABAC.count, sCABAC.sum, sCABAC.bits, ratio );
     }
     else

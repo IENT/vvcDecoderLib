@@ -41,7 +41,7 @@
 #include "WeightPredAnalysis.h"
 #include <limits>
 
-static const Double WEIGHT_PRED_SAD_RELATIVE_TO_NON_WEIGHT_PRED_SAD=0.99; // NOTE: U0040 used 0.95
+static const double WEIGHT_PRED_SAD_RELATIVE_TO_NON_WEIGHT_PRED_SAD=0.99; // NOTE: U0040 used 0.95
 
 //! calculate SAD values for both WP version and non-WP version.
 static
@@ -432,8 +432,8 @@ bool WeightPredAnalysis::xUpdatingWPParameters(Slice *const slice, const Int log
         const int64_t refAC  = refWeightACDCParam[comp].iAC;
 
         // calculating iWeight and iOffset params
-        const Double dWeight = (refAC==0) ? (Double)1.0 : Clip3( -16.0, 15.0, ((Double)currAC / (Double)refAC) );
-        const Int weight     = (Int)( 0.5 + dWeight * (Double)(1<<log2Denom) );
+        const double dWeight = (refAC==0) ? (double)1.0 : Clip3( -16.0, 15.0, ((double)currAC / (double)refAC) );
+        const Int weight     = (Int)( 0.5 + dWeight * (double)(1<<log2Denom) );
         const Int offset     = (Int)( ((currDC<<log2Denom) - ((int64_t)weight * refDC) + (int64_t)realOffset) >> realLog2Denom );
 
         Int clippedOffset;
@@ -514,9 +514,9 @@ bool WeightPredAnalysis::xSelectWPHistExtClip(Slice *const slice, const Int log2
         if (SADnoWP > 0)
         {
           const int64_t SADWP   = xCalcSADvalueWPOptionalClip(bitDepth, pOrg, pRef, width, height, orgStride, refStride, log2Denom, weight,   offset, useHighPrecision, bClipInitialSADWP);
-          const Double dRatioSAD = (Double)SADWP / (Double)SADnoWP;
-          Double dRatioSr0SAD = std::numeric_limits<Double>::max();
-          Double dRatioSrSAD  = std::numeric_limits<Double>::max();
+          const double dRatioSAD = (double)SADWP / (double)SADnoWP;
+          double dRatioSr0SAD = std::numeric_limits<double>::max();
+          double dRatioSrSAD  = std::numeric_limits<double>::max();
 
           if (bUseHistogram)
           {
@@ -532,7 +532,7 @@ bool WeightPredAnalysis::xSelectWPHistExtClip(Slice *const slice, const Int log2
             xSearchHistogram(histogramOrg, histogramRef, searchedHistogram, bitDepth, log2Denom, weight, offset, useHighPrecision, compID);
             // calculate updated WP SAD
             const int64_t SADSrWP = xCalcSADvalueWP(bitDepth, pOrg, pRef, width, height, orgStride, refStride, log2Denom, weight, offset, useHighPrecision);
-            dRatioSrSAD  = (Double)SADSrWP  / (Double)SADnoWP;
+            dRatioSrSAD  = (double)SADSrWP  / (double)SADnoWP;
 
             if (bDoEnhancement)
             {
@@ -540,7 +540,7 @@ bool WeightPredAnalysis::xSelectWPHistExtClip(Slice *const slice, const Int log2
               xSearchHistogram(histogramOrg, histogramRef, searchedHistogram, bitDepth, log2Denom, weightDef, offsetDef, useHighPrecision, compID);
               // calculate updated WP SAD
               const int64_t SADSr0WP = xCalcSADvalueWP(bitDepth, pOrg, pRef, width, height, orgStride, refStride, log2Denom, weightDef, offsetDef, useHighPrecision);
-              dRatioSr0SAD = (Double)SADSr0WP / (Double)SADnoWP;
+              dRatioSr0SAD = (double)SADSr0WP / (double)SADnoWP;
             }
           }
 
@@ -628,11 +628,11 @@ bool WeightPredAnalysis::xSelectWP(Slice *const slice, const Int log2Denom)
         SADnoWP += xCalcSADvalueWP(bitDepth, pOrg, pRef, width, height, orgStride, refStride, log2Denom, defaultWeight, 0, useHighPrecisionPredictionWeighting);
       }
 
-      const Double dRatio     = SADnoWP > 0 ? (((Double)SADWP / (Double)SADnoWP)) : std::numeric_limits<Double>::max();
+      const double dRatio     = SADnoWP > 0 ? (((double)SADWP / (double)SADnoWP)) : std::numeric_limits<double>::max();
 #if JEM_TOOLS
-      const Double dMaxRatio  = Double( slice->getSPS()->getSpsNext().getLICMode() ? 0.85 : 0.99 );
+      const double dMaxRatio  = double( slice->getSPS()->getSpsNext().getLICMode() ? 0.85 : 0.99 );
 #else
-      const Double dMaxRatio  = Double( 0.99 );
+      const double dMaxRatio  = double( 0.99 );
 #endif
       if(dRatio >= dMaxRatio)
       {

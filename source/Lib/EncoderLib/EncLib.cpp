@@ -155,7 +155,7 @@ void EncLib::create ()
 
   if ( m_RCEnableRateControl )
   {
-    m_cRateCtrl.init( m_framesToBeEncoded, m_RCTargetBitrate, (Int)( (Double)m_iFrameRate/m_temporalSubsampleRatio + 0.5), m_iGOPSize, m_iSourceWidth, m_iSourceHeight,
+    m_cRateCtrl.init( m_framesToBeEncoded, m_RCTargetBitrate, (Int)( (double)m_iFrameRate/m_temporalSubsampleRatio + 0.5), m_iGOPSize, m_iSourceWidth, m_iSourceHeight,
                       m_maxCUWidth, m_maxCUHeight,m_RCKeepHierarchicalBit, m_RCUseLCUSeparateModel, m_GOPList );
   }
 
@@ -1127,7 +1127,7 @@ void EncLib::xInitHrdParameters(SPS &sps)
   if (getTemporalSubsampleRatio()>1)
   {
     UInt temporalSubsampleRatio = getTemporalSubsampleRatio();
-    if ( Double(timingInfo->getNumUnitsInTick()) * temporalSubsampleRatio > std::numeric_limits<UInt>::max() )
+    if ( double(timingInfo->getNumUnitsInTick()) * temporalSubsampleRatio > std::numeric_limits<UInt>::max() )
     {
       timingInfo->setTimeScale( timingInfo->getTimeScale() / temporalSubsampleRatio );
     }
@@ -1322,9 +1322,9 @@ void EncLib::xInitPPS(PPS &pps, const SPS &sps)
   if (getWCGChromaQPControl().isEnabled())
   {
     const Int baseQp=m_iQP+pps.getPPSId();
-    const Double chromaQp = m_wcgChromaQpControl.chromaQpScale * baseQp + m_wcgChromaQpControl.chromaQpOffset;
-    const Double dcbQP = m_wcgChromaQpControl.chromaCbQpScale * chromaQp;
-    const Double dcrQP = m_wcgChromaQpControl.chromaCrQpScale * chromaQp;
+    const double chromaQp = m_wcgChromaQpControl.chromaQpScale * baseQp + m_wcgChromaQpControl.chromaQpOffset;
+    const double dcbQP = m_wcgChromaQpControl.chromaCbQpScale * chromaQp;
+    const double dcrQP = m_wcgChromaQpControl.chromaCrQpScale * chromaQp;
     const Int cbQP =(Int)(dcbQP + ( dcbQP < 0 ? -0.5 : 0.5) );
     const Int crQP =(Int)(dcrQP + ( dcrQP < 0 ? -0.5 : 0.5) );
     pps.setQpOffset(COMPONENT_Cb, Clip3( -12, 12, min(0, cbQP) + m_chromaCbQpOffset ));
@@ -1810,8 +1810,8 @@ Int EncCfg::getQPForPicture(const UInt gopIndex, const Slice *pSlice) const
         qp +=gopEntry.m_QPOffset;
 
         // adjust QP according to QPOffsetModel for the GOP entry.
-        Double dqpOffset=qp*gopEntry.m_QPOffsetModelScale+gopEntry.m_QPOffsetModelOffset+0.5;
-        Int qpOffset = (Int)floor(Clip3<Double>(0.0, 3.0, dqpOffset));
+        double dqpOffset=qp*gopEntry.m_QPOffsetModelScale+gopEntry.m_QPOffsetModelOffset+0.5;
+        Int qpOffset = (Int)floor(Clip3<double>(0.0, 3.0, dqpOffset));
         qp += qpOffset ;
       }
     }

@@ -122,21 +122,21 @@ public:
   virtual ~RdCost();
 
 #if WCG_EXT
-  Double        calcRdCost            ( uint64_t fracBits, Distortion distortion, bool useUnadjustedLambda = true );
+  double        calcRdCost            ( uint64_t fracBits, Distortion distortion, bool useUnadjustedLambda = true );
 #else
-  Double        calcRdCost            ( uint64_t fracBits, Distortion distortion );
+  double        calcRdCost            ( uint64_t fracBits, Distortion distortion );
 #endif
 
-  void          setDistortionWeight   ( const ComponentID compID, const Double distortionWeight ) { m_distortionWeight[compID] = distortionWeight; }
-  void          setLambda             ( Double dLambda, const BitDepths &bitDepths );
+  void          setDistortionWeight   ( const ComponentID compID, const double distortionWeight ) { m_distortionWeight[compID] = distortionWeight; }
+  void          setLambda             ( double dLambda, const BitDepths &bitDepths );
 
 #if WCG_EXT
-  Double        getLambda( bool unadj = false )
+  double        getLambda( bool unadj = false )
                                       { return unadj ? m_dLambda_unadjusted : m_dLambda; }
 #else
-  Double        getLambda()           { return m_dLambda; }
+  double        getLambda()           { return m_dLambda; }
 #endif
-  Double        getChromaWeight()     { return ((m_distortionWeight[COMPONENT_Cb] + m_distortionWeight[COMPONENT_Cr]) / 2.0); }
+  double        getChromaWeight()     { return ((m_distortionWeight[COMPONENT_Cb] + m_distortionWeight[COMPONENT_Cr]) / 2.0); }
 
   void          setCostMode(CostMode m) { m_costMode = m; }
 
@@ -197,7 +197,7 @@ public:
 #if WCG_EXT
          void    saveUnadjustedLambda       ();
          void    initLumaLevelToWeightTable ();
-  inline Double  getWPSNRLumaLevelWeight    (Int val) { return m_lumaLevelToWeightPLUT[val]; }
+  inline double  getWPSNRLumaLevelWeight    (Int val) { return m_lumaLevelToWeightPLUT[val]; }
 #endif
 
 private:

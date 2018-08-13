@@ -88,7 +88,7 @@ private:
   int*            m_tmpAffiDeri[2];
 #else
   Int*            m_tmpAffiError;
-  Double*         m_tmpAffiDeri[2];
+  double*         m_tmpAffiDeri[2];
 #endif
 
   CodingStructure ****m_pSplitCS;
@@ -339,7 +339,7 @@ protected:
                                     UInt&               ruiBits,
                                     Distortion&         ruiCost,
                                     const AMVPInfo&     amvpInfo,
-                                    Double              fWeight
+                                    double              fWeight
                                   );
 
   void xPatternSearchFracDIF      ( const PredictionUnit& pu,

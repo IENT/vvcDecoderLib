@@ -86,8 +86,8 @@ private:
 #endif
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   //cost variables for the EMT algorithm and new modes list
-  Double m_bestModeCostStore[4];                                    // RD cost of the best mode for each PU using DCT2
-  Double m_modeCostStore    [4][NUM_LUMA_MODE];                         // RD cost of each mode for each PU using DCT2
+  double m_bestModeCostStore[4];                                    // RD cost of the best mode for each PU using DCT2
+  double m_modeCostStore    [4][NUM_LUMA_MODE];                         // RD cost of each mode for each PU using DCT2
   UInt   m_savedRdModeList  [4][NUM_LUMA_MODE], m_savedNumRdModes[4];
 
 #endif
@@ -95,8 +95,8 @@ private:
   static_vector<UInt,   FAST_UDI_MAX_RDMODE_NUM> m_uiSavedRdModeListNSST;
   UInt                                           m_uiSavedNumRdModesNSST;
   static_vector<UInt,   FAST_UDI_MAX_RDMODE_NUM> m_uiSavedHadModeListNSST;
-  static_vector<Double, FAST_UDI_MAX_RDMODE_NUM> m_dSavedModeCostNSST;
-  static_vector<Double, FAST_UDI_MAX_RDMODE_NUM> m_dSavedHadListNSST;
+  static_vector<double, FAST_UDI_MAX_RDMODE_NUM> m_dSavedModeCostNSST;
+  static_vector<double, FAST_UDI_MAX_RDMODE_NUM> m_dSavedHadListNSST;
 
 #endif
 protected:

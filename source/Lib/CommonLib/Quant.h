@@ -109,12 +109,12 @@ public:
   void   invTrSkipDeQuantOneSample  (TransformUnit &tu, const ComponentID &compID, const TCoeff &pcCoeff,  Pel &reconSample, const UInt &uiPos, const QpParam &cQP);
 
 #if RDOQ_CHROMA_LAMBDA
-  void   setLambdas              ( const Double lambdas[MAX_NUM_COMPONENT] )   { for (UInt component = 0; component < MAX_NUM_COMPONENT; component++) m_lambdas[component] = lambdas[component]; }
+  void   setLambdas              ( const double lambdas[MAX_NUM_COMPONENT] )   { for (UInt component = 0; component < MAX_NUM_COMPONENT; component++) m_lambdas[component] = lambdas[component]; }
   void   selectLambda            ( const ComponentID compIdx )                 { m_dLambda = m_lambdas[ MAP_CHROMA(compIdx) ]; }
-  void   getLambdas              ( Double (&lambdas)[MAX_NUM_COMPONENT]) const { for (UInt component = 0; component < MAX_NUM_COMPONENT; component++) lambdas[component] = m_lambdas[component]; }
+  void   getLambdas              ( double (&lambdas)[MAX_NUM_COMPONENT]) const { for (UInt component = 0; component < MAX_NUM_COMPONENT; component++) lambdas[component] = m_lambdas[component]; }
 #endif
-  void   setLambda               ( const Double dLambda )                      { m_dLambda = dLambda; }
-  Double getLambda               () const                                      { return m_dLambda; }
+  void   setLambda               ( const double dLambda )                      { m_dLambda = dLambda; }
+  double getLambda               () const                                      { return m_dLambda; }
 
 #if HEVC_USE_SCALING_LISTS
   Int* getQuantCoeff             ( UInt list, Int qp, UInt sizeX, UInt sizeY ) { return m_quantCoef            [sizeX][sizeY][list][qp]; };  //!< get Quant Coefficent
@@ -146,7 +146,7 @@ protected:
   bool xNeedRDOQ                 ( TransformUnit &tu, const ComponentID &compID, const CCoeffBuf &pSrc, const QpParam &cQP );
 #endif
 
-  Double   m_dLambda;
+  double   m_dLambda;
   UInt     m_uiMaxTrSize;
   bool     m_useRDOQ;
   bool     m_useRDOQTS;
@@ -174,7 +174,7 @@ private:
 
 private:
 #if RDOQ_CHROMA_LAMBDA
-  Double   m_lambdas[MAX_NUM_COMPONENT];
+  double   m_lambdas[MAX_NUM_COMPONENT];
 #endif
 #if HEVC_USE_SCALING_LISTS
   bool     m_scalingListEnabledFlag;

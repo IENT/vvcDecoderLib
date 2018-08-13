@@ -378,8 +378,8 @@ void IntraSearch::estIntraPredLumaQT( CodingUnit &cu, Partitioner &partitioner )
 #endif
 
   static_vector<UInt,   FAST_UDI_MAX_RDMODE_NUM> uiHadModeList;
-  static_vector<Double, FAST_UDI_MAX_RDMODE_NUM> CandCostList;
-  static_vector<Double, FAST_UDI_MAX_RDMODE_NUM> CandHadList;
+  static_vector<double, FAST_UDI_MAX_RDMODE_NUM> CandCostList;
+  static_vector<double, FAST_UDI_MAX_RDMODE_NUM> CandHadList;
 
   auto &pu = *cu.firstPU;
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
@@ -491,13 +491,13 @@ void IntraSearch::estIntraPredLumaQT( CodingUnit &cu, Partitioner &partitioner )
 
             uint64_t fracModeBits = xFracModeBitsIntra(pu, uiMode, CHANNEL_TYPE_LUMA);
 
-            Double cost = ( Double ) uiSad + ( Double ) fracModeBits * sqrtLambdaForFirstPass;
+            double cost = ( double ) uiSad + ( double ) fracModeBits * sqrtLambdaForFirstPass;
 
             DTRACE( g_trace_ctx, D_INTRA_COST, "IntraHAD: %u, %llu, %f (%d)\n", uiSad, fracModeBits, cost, uiMode );
 
             updateCandList( uiMode, cost,  uiRdModeList, CandCostList, numModesForFullRD + extraModes );
 #if DISTORTION_TYPE_BUGFIX
-            updateCandList(uiMode, (Double) uiSad, uiHadModeList, CandHadList, 3 + extraModes);
+            updateCandList(uiMode, (double) uiSad, uiHadModeList, CandHadList, 3 + extraModes);
 #else
             updateCandList( uiMode, uiSad, uiHadModeList, CandHadList, 3                 + extraModes );
 #endif
@@ -668,11 +668,11 @@ void IntraSearch::estIntraPredLumaQT( CodingUnit &cu, Partitioner &partitioner )
 
                   uint64_t fracModeBits = xFracModeBitsIntra( pu, uiMode, CHANNEL_TYPE_LUMA );
 
-                  Double cost = ( Double ) uiSad + ( Double ) fracModeBits * sqrtLambdaForFirstPass;
+                  double cost = ( double ) uiSad + ( double ) fracModeBits * sqrtLambdaForFirstPass;
 
                   updateCandList( uiMode, cost,  uiRdModeList,  CandCostList, numModesForFullRD );
 #if DISTORTION_TYPE_BUGFIX
-                  updateCandList(uiMode, (Double) uiSad, uiHadModeList, CandHadList, 3);
+                  updateCandList(uiMode, (double) uiSad, uiHadModeList, CandHadList, 3);
 #else
                   updateCandList( uiMode, uiSad, uiHadModeList, CandHadList,  3 );
 #endif
@@ -816,7 +816,7 @@ void IntraSearch::estIntraPredLumaQT( CodingUnit &cu, Partitioner &partitioner )
     //===== check modes (using r-d costs) =====
 #if ENABLE_RQT_INTRA_SPEEDUP_MOD
     UInt   uiSecondBestMode  = MAX_UINT;
-    Double dSecondBestPUCost = MAX_DOUBLE;
+    double dSecondBestPUCost = MAX_DOUBLE;
 #endif
     UInt       uiBestPUMode  = 0;
 
@@ -911,7 +911,7 @@ void IntraSearch::estIntraPredChromaQT(CodingUnit &cu, Partitioner &partitioner)
   {
     UInt       uiBestMode = 0;
     Distortion uiBestDist = 0;
-    Double     dBestCost = MAX_DOUBLE;
+    double     dBestCost = MAX_DOUBLE;
 
     //----- init mode list ----
     {
@@ -1110,7 +1110,7 @@ void IntraSearch::estIntraPredChromaQT(CodingUnit &cu, Partitioner &partitioner)
 
         uint64_t fracBits   = xGetIntraFracBitsQT( cs, partitioner, false, true );
         Distortion uiDist = cs.dist;
-        Double    dCost   = m_pcRdCost->calcRdCost( fracBits, uiDist - baseDist );
+        double    dCost   = m_pcRdCost->calcRdCost( fracBits, uiDist - baseDist );
 
         //----- compare -----
         if( dCost < dBestCost )
@@ -1713,7 +1713,7 @@ void IntraSearch::xRecurIntraCodingLumaQT( CodingStructure &cs, Partitioner &par
 
   bool    checkInitTrDepth = false, checkInitTrDepthTransformSkipWinner = false;
 
-  Double     dSingleCost                        = MAX_DOUBLE;
+  double     dSingleCost                        = MAX_DOUBLE;
   Distortion uiSingleDistLuma                   = 0;
   uint64_t     singleFracBits                     = 0;
   bool       checkTransformSkip                 = pps.getUseTransformSkip();
@@ -1777,7 +1777,7 @@ void IntraSearch::xRecurIntraCodingLumaQT( CodingStructure &cs, Partitioner &par
 
     Distortion singleDistTmpLuma = 0;
     uint64_t     singleTmpFracBits = 0;
-    Double     singleCostTmp     = 0;
+    double     singleCostTmp     = 0;
     Int        firstCheckId      = 0;
 
     //we add the EMT candidates to the loop. TransformSkip will still be the last one to be checked (when modeId == lastCheckId) as long as checkTransformSkip is true
@@ -2103,11 +2103,11 @@ ChromaCbfs IntraSearch::xRecurIntraChromaCodingQT(CodingStructure &cs, Partition
       const ComponentID compID  = ComponentID(c);
       const CompArea&   area    = currTU.blocks[compID];
 
-      Double     dSingleCost    = MAX_DOUBLE;
+      double     dSingleCost    = MAX_DOUBLE;
       Int        bestModeId     = 0;
       Distortion singleDistC    = 0;
       Distortion singleDistCTmp = 0;
-      Double     singleCostTmp  = 0;
+      double     singleCostTmp  = 0;
 
       const bool checkCrossComponentPrediction = PU::isChromaIntraModeCrossCheckMode( pu ) && pps.getPpsRangeExtension().getCrossComponentPredictionEnabledFlag() && TU::getCbf( currTU, COMPONENT_Y );
 

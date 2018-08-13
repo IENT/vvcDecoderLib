@@ -59,16 +59,16 @@ using namespace std;
 const Int g_RCInvalidQPValue = -999;
 const Int g_RCSmoothWindowSize = 40;
 const Int g_RCMaxPicListSize = 32;
-const Double g_RCWeightPicTargetBitInGOP    = 0.9;
-const Double g_RCWeightPicRargetBitInBuffer = 1.0 - g_RCWeightPicTargetBitInGOP;
+const double g_RCWeightPicTargetBitInGOP    = 0.9;
+const double g_RCWeightPicRargetBitInBuffer = 1.0 - g_RCWeightPicTargetBitInGOP;
 const Int g_RCIterationNum = 20;
-const Double g_RCWeightHistoryLambda = 0.5;
-const Double g_RCWeightCurrentLambda = 1.0 - g_RCWeightHistoryLambda;
+const double g_RCWeightHistoryLambda = 0.5;
+const double g_RCWeightCurrentLambda = 1.0 - g_RCWeightHistoryLambda;
 const Int g_RCLCUSmoothWindowSize = 4;
-const Double g_RCAlphaMinValue = 0.05;
-const Double g_RCAlphaMaxValue = 500.0;
-const Double g_RCBetaMinValue  = -3.0;
-const Double g_RCBetaMaxValue  = -0.1;
+const double g_RCAlphaMinValue = 0.05;
+const double g_RCAlphaMaxValue = 500.0;
+const double g_RCBetaMinValue  = -3.0;
+const double g_RCBetaMaxValue  = -0.1;
 
 #define ALPHA     6.7542;
 #define BETA1     1.2517
@@ -79,17 +79,17 @@ struct TRCLCU
   Int m_actualBits;
   Int m_QP;     // QP of skip mode is set to g_RCInvalidQPValue
   Int m_targetBits;
-  Double m_lambda;
-  Double m_bitWeight;
+  double m_lambda;
+  double m_bitWeight;
   Int m_numberOfPixel;
-  Double m_costIntra;
+  double m_costIntra;
   Int m_targetBitsLeft;
 };
 
 struct TRCParameter
 {
-  Double m_alpha;
-  Double m_beta;
+  double m_alpha;
+  double m_beta;
 };
 
 class EncRCSeq
@@ -106,7 +106,7 @@ public:
   void initPicPara( TRCParameter* picPara  = NULL );    // NULL to initial with default value
   void initLCUPara( TRCParameter** LCUPara = NULL );    // NULL to initial with default value
   void updateAfterPic ( Int bits );
-  void setAllBitRatio( Double basicLambda, Double* equaCoeffA, Double* equaCoeffB );
+  void setAllBitRatio( double basicLambda, double* equaCoeffA, double* equaCoeffB );
 
 public:
   Int  getTotalFrames()                 { return m_totalFrames; }
@@ -140,13 +140,13 @@ public:
   Int  getFramesLeft()                  { return m_framesLeft; }
   int64_t  getBitsLeft()                  { return m_bitsLeft; }
 
-  Double getSeqBpp()                    { return m_seqTargetBpp; }
-  Double getAlphaUpdate()               { return m_alphaUpdate; }
-  Double getBetaUpdate()                { return m_betaUpdate; }
+  double getSeqBpp()                    { return m_seqTargetBpp; }
+  double getAlphaUpdate()               { return m_alphaUpdate; }
+  double getBetaUpdate()                { return m_betaUpdate; }
 
   Int    getAdaptiveBits()              { return m_adaptiveBit;  }
-  Double getLastLambda()                { return m_lastLambda;   }
-  void   setLastLambda( Double lamdba ) { m_lastLambda = lamdba; }
+  double getLastLambda()                { return m_lastLambda;   }
+  void   setLastLambda( double lamdba ) { m_lastLambda = lamdba; }
 
 private:
   Int m_totalFrames;
@@ -170,13 +170,13 @@ private:
 
   Int m_framesLeft;
   int64_t m_bitsLeft;
-  Double m_seqTargetBpp;
-  Double m_alphaUpdate;
-  Double m_betaUpdate;
+  double m_seqTargetBpp;
+  double m_alphaUpdate;
+  double m_betaUpdate;
   bool m_useLCUSeparateModel;
 
   Int m_adaptiveBit;
-  Double m_lastLambda;
+  double m_lastLambda;
 };
 
 class EncRCGOP
@@ -192,8 +192,8 @@ public:
 
 private:
   Int  xEstGOPTargetBits( EncRCSeq* encRCSeq, Int GOPSize );
-  void   xCalEquaCoeff( EncRCSeq* encRCSeq, Double* lambdaRatio, Double* equaCoeffA, Double* equaCoeffB, Int GOPSize );
-  Double xSolveEqua( Double targetBpp, Double* equaCoeffA, Double* equaCoeffB, Int GOPSize );
+  void   xCalEquaCoeff( EncRCSeq* encRCSeq, double* lambdaRatio, double* equaCoeffA, double* equaCoeffB, Int GOPSize );
+  double xSolveEqua( double targetBpp, double* equaCoeffA, double* equaCoeffB, Int GOPSize );
 
 public:
   EncRCSeq* getEncRCSeq()        { return m_encRCSeq; }
@@ -222,24 +222,24 @@ public:
   void create( EncRCSeq* encRCSeq, EncRCGOP* encRCGOP, Int frameLevel, list<EncRCPic*>& listPreviousPictures );
   void destroy();
 
-  Int    estimatePicQP    ( Double lambda, list<EncRCPic*>& listPreviousPictures );
+  Int    estimatePicQP    ( double lambda, list<EncRCPic*>& listPreviousPictures );
   Int    getRefineBitsForIntra(Int orgBits);
-  Double calculateLambdaIntra(Double alpha, Double beta, Double MADPerPixel, Double bitsPerPixel);
-  Double estimatePicLambda( list<EncRCPic*>& listPreviousPictures, SliceType eSliceType);
+  double calculateLambdaIntra(double alpha, double beta, double MADPerPixel, double bitsPerPixel);
+  double estimatePicLambda( list<EncRCPic*>& listPreviousPictures, SliceType eSliceType);
 
-  void   updateAlphaBetaIntra(Double *alpha, Double *beta);
+  void   updateAlphaBetaIntra(double *alpha, double *beta);
 
-  Double getLCUTargetBpp(SliceType eSliceType);
-  Double getLCUEstLambdaAndQP(Double bpp, Int clipPicQP, Int *estQP);
-  Double getLCUEstLambda( Double bpp );
-  Int    getLCUEstQP( Double lambda, Int clipPicQP );
+  double getLCUTargetBpp(SliceType eSliceType);
+  double getLCUEstLambdaAndQP(double bpp, Int clipPicQP, Int *estQP);
+  double getLCUEstLambda( double bpp );
+  Int    getLCUEstQP( double lambda, Int clipPicQP );
 
-  void updateAfterCTU( Int LCUIdx, Int bits, Int QP, Double lambda, bool updateLCUParameter = true );
-  void updateAfterPicture( Int actualHeaderBits, Int actualTotalBits, Double averageQP, Double averageLambda, SliceType eSliceType);
+  void updateAfterCTU( Int LCUIdx, Int bits, Int QP, double lambda, bool updateLCUParameter = true );
+  void updateAfterPicture( Int actualHeaderBits, Int actualTotalBits, double averageQP, double averageLambda, SliceType eSliceType);
 
   void addToPictureLsit( list<EncRCPic*>& listPreviousPictures );
-  Double calAverageQP();
-  Double calAverageLambda();
+  double calAverageQP();
+  double calAverageLambda();
 
 private:
   Int xEstPicTargetBits( EncRCSeq* encRCSeq, EncRCGOP* encRCGOP );
@@ -272,16 +272,16 @@ public:
   void setBitLeft(Int bits)                               { m_bitsLeft = bits; }
 #endif
   void setTargetBits( Int bits )                          { m_targetBits = bits; m_bitsLeft = bits;}
-  void setTotalIntraCost(Double cost)                     { m_totalCostIntra = cost; }
+  void setTotalIntraCost(double cost)                     { m_totalCostIntra = cost; }
   void getLCUInitTargetBits();
 
   Int  getPicActualBits()                                 { return m_picActualBits; }
   Int  getPicActualQP()                                   { return m_picQP; }
-  Double getPicActualLambda()                             { return m_picLambda; }
+  double getPicActualLambda()                             { return m_picLambda; }
   Int  getPicEstQP()                                      { return m_estPicQP; }
   void setPicEstQP( Int QP )                              { m_estPicQP = QP; }
-  Double getPicEstLambda()                                { return m_estPicLambda; }
-  void setPicEstLambda( Double lambda )                   { m_picLambda = lambda; }
+  double getPicEstLambda()                                { return m_estPicLambda; }
+  void setPicEstLambda( double lambda )                   { m_picLambda = lambda; }
 
 private:
   EncRCSeq* m_encRCSeq;
@@ -296,7 +296,7 @@ private:
 #if V0078_ADAPTIVE_LOWER_BOUND
   Int m_lowerBound;
 #endif
-  Double m_estPicLambda;
+  double m_estPicLambda;
 
   Int m_LCULeft;
   Int m_bitsLeft;
@@ -304,11 +304,11 @@ private:
 
   TRCLCU* m_LCUs;
   Int m_picActualHeaderBits;    // only SH and potential APS
-  Double m_totalCostIntra;
-  Double m_remainingCostIntra;
+  double m_totalCostIntra;
+  double m_remainingCostIntra;
   Int m_picActualBits;          // the whole picture, including header
   Int m_picQP;                  // in integer form
-  Double m_picLambda;
+  double m_picLambda;
 };
 
 class RateCtrl
@@ -337,7 +337,7 @@ public:
   UInt       getCpbSize()               { return m_cpbSize;        }
   UInt       getBufferingRate()         { return m_bufferingRate;  }
   Int        updateCpbState(Int actualBits);
-  void       initHrdParam(const HRD* pcHrd, Int iFrameRate, Double fInitialCpbFullness);
+  void       initHrdParam(const HRD* pcHrd, Int iFrameRate, double fInitialCpbFullness);
 #endif
 
 private:

@@ -363,7 +363,6 @@ typedef       short               Short;
 typedef       unsigned short      UShort;
 typedef       int                 Int;
 typedef       unsigned int        UInt;
-typedef       double              Double;
 
 
 // ====================================================================================================================
@@ -1218,7 +1217,7 @@ struct SEIMasteringDisplay
 struct LumaLevelToDeltaQPMapping
 {
   LumaLevelToDQPMode                 mode;             ///< use deltaQP determined by block luma level
-  Double                             maxMethodWeight;  ///< weight of max luma value when mode = 2
+  double                             maxMethodWeight;  ///< weight of max luma value when mode = 2
   std::vector< std::pair<Int, Int> > mapping;          ///< first=luma level, second=delta QP.
 #if ENABLE_QPA
   bool isEnabled() const { return (mode != LUMALVL_TO_DQP_DISABLED && mode != LUMALVL_TO_DQP_NUM_MODES); }
@@ -1233,10 +1232,10 @@ struct WCGChromaQPControl
 {
   bool isEnabled() const { return enabled; }
   bool   enabled;         ///< Enabled flag (0:default)
-  Double chromaCbQpScale; ///< Chroma Cb QP Scale (1.0:default)
-  Double chromaCrQpScale; ///< Chroma Cr QP Scale (1.0:default)
-  Double chromaQpScale;   ///< Chroma QP Scale (0.0:default)
-  Double chromaQpOffset;  ///< Chroma QP Offset (0.0:default)
+  double chromaCbQpScale; ///< Chroma Cb QP Scale (1.0:default)
+  double chromaCrQpScale; ///< Chroma Cr QP Scale (1.0:default)
+  double chromaQpScale;   ///< Chroma QP Scale (0.0:default)
+  double chromaQpOffset;  ///< Chroma QP Offset (0.0:default)
 };
 #endif
 

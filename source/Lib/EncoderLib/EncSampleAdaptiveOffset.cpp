@@ -55,7 +55,7 @@
 
 
 //! rounding with IBDI
-inline Double xRoundIbdi2(Int bitDepth, Double x)
+inline double xRoundIbdi2(Int bitDepth, double x)
 {
 #if DISTORTION_LAMBDA_BUGFIX
 #if FULL_NBIT
@@ -74,7 +74,7 @@ inline Double xRoundIbdi2(Int bitDepth, Double x)
 #endif
 }
 
-inline Double xRoundIbdi(Int bitDepth, Double x)
+inline double xRoundIbdi(Int bitDepth, double x)
 {
   return (bitDepth > 8 ? xRoundIbdi2(bitDepth, (x)) : ((x)>=0 ? ((Int)((x)+0.5)) : ((Int)((x)-0.5)))) ;
 }
@@ -219,9 +219,9 @@ void EncSampleAdaptiveOffset::initCABACEstimator( CABACEncoder* cabacEncoder, Ct
 
 
 #if K0238_SAO_GREEDY_MERGE_ENCODING
-void EncSampleAdaptiveOffset::SAOProcess(CodingStructure& cs, bool* sliceEnabled, const Double *lambdas, const bool bTestSAODisableAtPictureLevel, const Double saoEncodingRate, const Double saoEncodingRateChroma, bool isPreDBFSamplesUsed, bool isGreedymergeEncoding )
+void EncSampleAdaptiveOffset::SAOProcess(CodingStructure& cs, bool* sliceEnabled, const double *lambdas, const bool bTestSAODisableAtPictureLevel, const double saoEncodingRate, const double saoEncodingRateChroma, bool isPreDBFSamplesUsed, bool isGreedymergeEncoding )
 #else
-void EncSampleAdaptiveOffset::SAOProcess(CodingStructure& cs, bool* sliceEnabled, const Double *lambdas, const bool bTestSAODisableAtPictureLevel, const Double saoEncodingRate, const Double saoEncodingRateChroma, bool isPreDBFSamplesUsed )
+void EncSampleAdaptiveOffset::SAOProcess(CodingStructure& cs, bool* sliceEnabled, const double *lambdas, const bool bTestSAODisableAtPictureLevel, const double saoEncodingRate, const double saoEncodingRateChroma, bool isPreDBFSamplesUsed )
 #endif
 {
   PelUnitBuf org = cs.getOrgBuf();
@@ -337,7 +337,7 @@ void EncSampleAdaptiveOffset::getStatistics(std::vector<SAOStatData**>& blkStats
   }
 }
 
-void EncSampleAdaptiveOffset::decidePicParams(const Slice& slice, bool* sliceEnabled, const Double saoEncodingRate, const Double saoEncodingRateChroma)
+void EncSampleAdaptiveOffset::decidePicParams(const Slice& slice, bool* sliceEnabled, const double saoEncodingRate, const double saoEncodingRateChroma)
 {
   if ( slice.getPendingRasInit() )
   { // reset
@@ -434,11 +434,11 @@ inline int64_t EncSampleAdaptiveOffset::estSaoDist(int64_t count, int64_t offset
 }
 
 
-inline Int EncSampleAdaptiveOffset::estIterOffset(Int typeIdx, Double lambda, Int offsetInput, int64_t count, int64_t diffSum, Int shift, Int bitIncrease, int64_t& bestDist, Double& bestCost, Int offsetTh )
+inline Int EncSampleAdaptiveOffset::estIterOffset(Int typeIdx, double lambda, Int offsetInput, int64_t count, int64_t diffSum, Int shift, Int bitIncrease, int64_t& bestDist, double& bestCost, Int offsetTh )
 {
   Int iterOffset, tempOffset;
   int64_t tempDist, tempRate;
-  Double tempCost, tempMinCost;
+  double tempCost, tempMinCost;
   Int offsetOutput = 0;
   iterOffset = offsetInput;
   // Assuming sending quantized value 0 results in zero offset and sending the value zero needs 1 bit. entropy coder can be used to measure the exact rate here.
@@ -454,7 +454,7 @@ inline Int EncSampleAdaptiveOffset::estIterOffset(Int typeIdx, Double lambda, In
     // Do the dequantization before distortion calculation
     tempOffset  = iterOffset << bitIncrease;
     tempDist    = estSaoDist( count, tempOffset, diffSum, shift);
-    tempCost    = ((Double)tempDist + lambda * (Double) tempRate);
+    tempCost    = ((double)tempDist + lambda * (double) tempRate);
     if(tempCost < tempMinCost)
     {
       tempMinCost = tempCost;
@@ -495,12 +495,12 @@ void EncSampleAdaptiveOffset::deriveOffsets(ComponentID compIdx, const Int chann
 
 #if DISTORTION_LAMBDA_BUGFIX
     quantOffsets[classIdx] =
-      (Int) xRoundIbdi(bitDepth, (Double)(statData.diff[classIdx] << DISTORTION_PRECISION_ADJUSTMENT(bitDepth))
-                                   / (Double)(statData.count[classIdx] << m_offsetStepLog2[compIdx]));
+      (Int) xRoundIbdi(bitDepth, (double)(statData.diff[classIdx] << DISTORTION_PRECISION_ADJUSTMENT(bitDepth))
+                                   / (double)(statData.count[classIdx] << m_offsetStepLog2[compIdx]));
 #else
     quantOffsets[classIdx] =
-      (Int) xRoundIbdi(bitDepth, (Double)(statData.diff[classIdx] << (bitDepth - 8))
-                                   / (Double)(statData.count[classIdx] << m_offsetStepLog2[compIdx]));
+      (Int) xRoundIbdi(bitDepth, (double)(statData.diff[classIdx] << (bitDepth - 8))
+                                   / (double)(statData.count[classIdx] << m_offsetStepLog2[compIdx]));
 #endif
     quantOffsets[classIdx] = Clip3(-offsetTh, offsetTh, quantOffsets[classIdx]);
   }
@@ -514,7 +514,7 @@ void EncSampleAdaptiveOffset::deriveOffsets(ComponentID compIdx, const Int chann
     case SAO_TYPE_EO_45:
       {
         int64_t classDist;
-        Double classCost;
+        double classCost;
         for(Int classIdx=0; classIdx<NUM_SAO_EO_CLASSES; classIdx++)
         {
           if(classIdx==SAO_CLASS_EO_FULL_VALLEY && quantOffsets[classIdx] < 0)
@@ -546,7 +546,7 @@ void EncSampleAdaptiveOffset::deriveOffsets(ComponentID compIdx, const Int chann
     case SAO_TYPE_BO:
       {
         int64_t  distBOClasses[NUM_SAO_BO_CLASSES];
-        Double costBOClasses[NUM_SAO_BO_CLASSES];
+        double costBOClasses[NUM_SAO_BO_CLASSES];
         ::memset(distBOClasses, 0, sizeof(int64_t)*NUM_SAO_BO_CLASSES);
         for(Int classIdx=0; classIdx< NUM_SAO_BO_CLASSES; classIdx++)
         {
@@ -558,7 +558,7 @@ void EncSampleAdaptiveOffset::deriveOffsets(ComponentID compIdx, const Int chann
         }
 
         //decide the starting band index
-        Double minCost = MAX_DOUBLE, cost;
+        double minCost = MAX_DOUBLE, cost;
         for(Int band=0; band< NUM_SAO_BO_CLASSES- 4+ 1; band++)
         {
           cost  = costBOClasses[band  ];
@@ -593,9 +593,9 @@ void EncSampleAdaptiveOffset::deriveOffsets(ComponentID compIdx, const Int chann
 
 }
 
-void EncSampleAdaptiveOffset::deriveModeNewRDO(const BitDepths &bitDepths, Int ctuRsAddr, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES], bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, SAOBlkParam& modeParam, Double& modeNormCost )
+void EncSampleAdaptiveOffset::deriveModeNewRDO(const BitDepths &bitDepths, Int ctuRsAddr, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES], bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, SAOBlkParam& modeParam, double& modeNormCost )
 {
-  Double minCost, cost;
+  double minCost, cost;
   uint64_t previousFracBits;
   const Int numberOfComponents = m_numberOfComponents;
 
@@ -622,7 +622,7 @@ void EncSampleAdaptiveOffset::deriveModeNewRDO(const BitDepths &bitDepths, Int c
     m_CABACEstimator->resetBits();
     m_CABACEstimator->sao_offset_pars( modeParam[compIdx], compIdx, sliceEnabled[compIdx], bitDepths.recon[CHANNEL_TYPE_LUMA] );
     modeDist[compIdx] = 0;
-    minCost= m_lambda[compIdx]*(FracBitsScale*(Double)m_CABACEstimator->getEstFracBits());
+    minCost= m_lambda[compIdx]*(FracBitsScale*(double)m_CABACEstimator->getEstFracBits());
     ctxBestLuma = SAOCtx( m_CABACEstimator->getCtx() );
     if(sliceEnabled[compIdx])
     {
@@ -645,7 +645,7 @@ void EncSampleAdaptiveOffset::deriveModeNewRDO(const BitDepths &bitDepths, Int c
         m_CABACEstimator->resetBits();
         m_CABACEstimator->sao_offset_pars( testOffset[compIdx], compIdx, sliceEnabled[compIdx], bitDepths.recon[CHANNEL_TYPE_LUMA] );
         double rate = FracBitsScale*(double)m_CABACEstimator->getEstFracBits();
-        cost = (Double)dist[compIdx] + m_lambda[compIdx]*rate;
+        cost = (double)dist[compIdx] + m_lambda[compIdx]*rate;
         if(cost < minCost)
         {
           minCost = cost;
@@ -724,7 +724,7 @@ void EncSampleAdaptiveOffset::deriveModeNewRDO(const BitDepths &bitDepths, Int c
   modeNormCost = 0;
   for(UInt componentIndex = COMPONENT_Y; componentIndex < numberOfComponents; componentIndex++)
   {
-    modeNormCost += (Double)modeDist[componentIndex] / m_lambda[componentIndex];
+    modeNormCost += (double)modeDist[componentIndex] / m_lambda[componentIndex];
   }
 
   m_CABACEstimator->getCtx() = SAOCtx( ctxStartBlk );
@@ -733,11 +733,11 @@ void EncSampleAdaptiveOffset::deriveModeNewRDO(const BitDepths &bitDepths, Int c
   modeNormCost += FracBitsScale*(double)m_CABACEstimator->getEstFracBits();
 }
 
-void EncSampleAdaptiveOffset::deriveModeMergeRDO(const BitDepths &bitDepths, Int ctuRsAddr, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES], bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, SAOBlkParam& modeParam, Double& modeNormCost )
+void EncSampleAdaptiveOffset::deriveModeMergeRDO(const BitDepths &bitDepths, Int ctuRsAddr, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES], bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, SAOBlkParam& modeParam, double& modeNormCost )
 {
   modeNormCost = MAX_DOUBLE;
 
-  Double cost;
+  double cost;
   SAOBlkParam testBlkParam;
   const Int numberOfComponents = m_numberOfComponents;
 
@@ -753,7 +753,7 @@ void EncSampleAdaptiveOffset::deriveModeMergeRDO(const BitDepths &bitDepths, Int
 
     testBlkParam = *(mergeList[mergeType]);
     //normalized distortion
-    Double normDist=0;
+    double normDist=0;
     for(Int compIdx = 0; compIdx < numberOfComponents; compIdx++)
     {
       testBlkParam[compIdx].modeIdc = SAO_MODE_MERGE;
@@ -764,7 +764,7 @@ void EncSampleAdaptiveOffset::deriveModeMergeRDO(const BitDepths &bitDepths, Int
       if( mergedOffsetParam.modeIdc != SAO_MODE_OFF)
       {
         //offsets have been reconstructed. Don't call inversed quantization function.
-        normDist += (((Double)getDistortion(bitDepths.recon[toChannelType(ComponentID(compIdx))], mergedOffsetParam.typeIdc, mergedOffsetParam.typeAuxInfo, mergedOffsetParam.offset, blkStats[ctuRsAddr][compIdx][mergedOffsetParam.typeIdc]))
+        normDist += (((double)getDistortion(bitDepths.recon[toChannelType(ComponentID(compIdx))], mergedOffsetParam.typeIdc, mergedOffsetParam.typeAuxInfo, mergedOffsetParam.offset, blkStats[ctuRsAddr][compIdx][mergedOffsetParam.typeIdc]))
                        /m_lambda[compIdx] );
       }
     }
@@ -792,9 +792,9 @@ void EncSampleAdaptiveOffset::deriveModeMergeRDO(const BitDepths &bitDepths, Int
 void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, PelUnitBuf& srcYuv, PelUnitBuf& resYuv,
                                                SAOBlkParam* reconParams, SAOBlkParam* codedParams, const bool bTestSAODisableAtPictureLevel,
 #if K0238_SAO_GREEDY_MERGE_ENCODING
-                                               const Double saoEncodingRate, const Double saoEncodingRateChroma, const bool isGreedymergeEncoding)
+                                               const double saoEncodingRate, const double saoEncodingRateChroma, const bool isGreedymergeEncoding)
 #else
-                                               const Double saoEncodingRate, const Double saoEncodingRateChroma)
+                                               const double saoEncodingRate, const double saoEncodingRateChroma)
 #endif
 
 {
@@ -812,7 +812,7 @@ void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, bool* sliceEn
   const TempCtx ctxPicStart ( m_CtxCache, SAOCtx( m_CABACEstimator->getCtx() ) );
 
   SAOBlkParam modeParam;
-  Double minCost, modeCost;
+  double minCost, modeCost;
 
 #if K0238_SAO_GREEDY_MERGE_ENCODING 
   double minCost2 = 0;
@@ -841,7 +841,7 @@ void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, bool* sliceEn
   TempCtx ctxAfterMerge(m_CtxCache);
 #endif
 
-  Double totalCost = 0; // Used if bTestSAODisableAtPictureLevel==true
+  double totalCost = 0; // Used if bTestSAODisableAtPictureLevel==true
 
   int ctuRsAddr = 0;
   for( UInt yPos = 0; yPos < pcv.lumaHeight; yPos += pcv.maxCUHeight )
@@ -1093,7 +1093,7 @@ void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, bool* sliceEn
   EncSampleAdaptiveOffset::disabledRate( cs, reconParams, saoEncodingRate, saoEncodingRateChroma );
 }
 
-void EncSampleAdaptiveOffset::disabledRate( CodingStructure& cs, SAOBlkParam* reconParams, const Double saoEncodingRate, const Double saoEncodingRateChroma )
+void EncSampleAdaptiveOffset::disabledRate( CodingStructure& cs, SAOBlkParam* reconParams, const double saoEncodingRate, const double saoEncodingRateChroma )
 {
   if (saoEncodingRate > 0.0)
   {
@@ -1117,12 +1117,12 @@ void EncSampleAdaptiveOffset::disabledRate( CodingStructure& cs, SAOBlkParam* re
     {
       for (Int compIdx = 0; compIdx < numberOfComponents; compIdx++)
       {
-        m_saoDisabledRate[compIdx][picTempLayer] = (Double)numCtusForSAOOff[compIdx]/(Double)pcv.sizeInCtus;
+        m_saoDisabledRate[compIdx][picTempLayer] = (double)numCtusForSAOOff[compIdx]/(double)pcv.sizeInCtus;
       }
     }
     else if (picTempLayer == 0)
     {
-      m_saoDisabledRate[COMPONENT_Y][0] = (Double)(numCtusForSAOOff[COMPONENT_Y]+numCtusForSAOOff[COMPONENT_Cb]+numCtusForSAOOff[COMPONENT_Cr])/(Double)(pcv.sizeInCtus *3);
+      m_saoDisabledRate[COMPONENT_Y][0] = (double)(numCtusForSAOOff[COMPONENT_Y]+numCtusForSAOOff[COMPONENT_Cb]+numCtusForSAOOff[COMPONENT_Cr])/(double)(pcv.sizeInCtus *3);
     }
   }
 }

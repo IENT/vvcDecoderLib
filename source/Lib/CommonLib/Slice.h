@@ -1765,7 +1765,7 @@ private:
   UInt                       m_colRefIdx;
   UInt                       m_maxNumMergeCand;
 
-  Double                     m_lambdas[MAX_NUM_COMPONENT];
+  double                     m_lambdas[MAX_NUM_COMPONENT];
 
   bool                       m_abEqualRef  [NUM_REF_PIC_LIST_01][MAX_NUM_REF][MAX_NUM_REF];
   UInt                       m_uiTLayer;
@@ -1817,7 +1817,7 @@ private:
   SliceType                  m_encCABACTableIdx;           // Used to transmit table selection across slices.
 
   clock_t                    m_iProcessingStartTime;
-  Double                     m_dProcessingTime;
+  double                     m_dProcessingTime;
   UInt                       m_uiMaxBTSize;
 
 #if JVET_K0371_ALF
@@ -1934,8 +1934,8 @@ public:
   bool                        isInterB() const                                       { return m_eSliceType == B_SLICE;                               }
   bool                        isInterP() const                                       { return m_eSliceType == P_SLICE;                               }
 
-  void                        setLambdas( const Double lambdas[MAX_NUM_COMPONENT] )  { for (Int component = 0; component < MAX_NUM_COMPONENT; component++) m_lambdas[component] = lambdas[component]; }
-  const Double*               getLambdas() const                                     { return m_lambdas;                                             }
+  void                        setLambdas( const double lambdas[MAX_NUM_COMPONENT] )  { for (Int component = 0; component < MAX_NUM_COMPONENT; component++) m_lambdas[component] = lambdas[component]; }
+  const double*               getLambdas() const                                     { return m_lambdas;                                             }
 
   void                        setMaxBTSize(Int i)                                    { m_uiMaxBTSize = i; }
   UInt                        getMaxBTSize() const                                   { return m_uiMaxBTSize; }

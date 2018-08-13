@@ -253,8 +253,8 @@ void InterSearch::init( EncCfg*        pcEncCfg,
   m_tmpAffiDeri[1] = new int[MAX_CU_SIZE * MAX_CU_SIZE];
 #else
   m_tmpAffiError   = new Int   [MAX_CU_SIZE * MAX_CU_SIZE];
-  m_tmpAffiDeri[0] = new Double[MAX_CU_SIZE * MAX_CU_SIZE];
-  m_tmpAffiDeri[1] = new Double[MAX_CU_SIZE * MAX_CU_SIZE];
+  m_tmpAffiDeri[0] = new double[MAX_CU_SIZE * MAX_CU_SIZE];
+  m_tmpAffiDeri[1] = new double[MAX_CU_SIZE * MAX_CU_SIZE];
 #endif
 #if JEM_TOOLS
   m_obmcOrgMod.create( UnitArea( cform, Area( 0, 0, MAX_CU_SIZE, MAX_CU_SIZE ) ) );
@@ -1821,7 +1821,7 @@ void InterSearch::xMotionEstimation(PredictionUnit& pu, PelUnitBuf& origBuf, Ref
   m_iSearchRange = m_aaiAdaptSR[eRefPicList][iRefIdxPred];
 
   Int    iSrchRng   = (bBi ? m_bipredSearchRange : m_iSearchRange);
-  Double fWeight    = 1.0;
+  double fWeight    = 1.0;
 
   PelUnitBuf  origBufTmp = m_tmpStorageLCU.getBuf( UnitAreaRelative(*pu.cu, pu) );
   PelUnitBuf* pBuf       = &origBuf;
@@ -1948,7 +1948,7 @@ void InterSearch::xMotionEstimation(PredictionUnit& pu, PelUnitBuf& origBuf, Ref
     UInt uiMvBits = m_pcRdCost->getBitsOfVectorWithPredictor( rcMv.getHor(), rcMv.getVer() );
 #endif
     ruiBits += uiMvBits;
-    ruiCost = ( Distortion ) ( floor( fWeight * ( ( Double ) ruiCost - ( Double ) m_pcRdCost->getCost( uiMvBits ) ) ) + ( Double ) m_pcRdCost->getCost( ruiBits ) );
+    ruiCost = ( Distortion ) ( floor( fWeight * ( ( double ) ruiCost - ( double ) m_pcRdCost->getCost( uiMvBits ) ) ) + ( double ) m_pcRdCost->getCost( ruiBits ) );
   }
 #if JVET_K0357_AMVR
   else // integer refinement for integer-pel and 4-pel resolution
@@ -2510,7 +2510,7 @@ void InterSearch::xTZSearchSelective( const PredictionUnit& pu,
 }
 
 #if JVET_K0357_AMVR
-void InterSearch::xPatternSearchIntRefine(PredictionUnit& pu, IntTZSearchStruct&  cStruct, Mv& rcMv, Mv& rcMvPred, Int& riMVPIdx, UInt& ruiBits, Distortion& ruiCost, const AMVPInfo& amvpInfo, Double fWeight)
+void InterSearch::xPatternSearchIntRefine(PredictionUnit& pu, IntTZSearchStruct&  cStruct, Mv& rcMv, Mv& rcMvPred, Int& riMVPIdx, UInt& ruiBits, Distortion& ruiCost, const AMVPInfo& amvpInfo, double fWeight)
 {
 
   CHECK( pu.cu->imv == 0,                       "xPatternSearchIntRefine(): IMV not used.");
@@ -3197,7 +3197,7 @@ void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
   }
 }
 
-void solveEqual( Double** dEqualCoeff, Int iOrder, Double* dAffinePara )
+void solveEqual( double** dEqualCoeff, Int iOrder, double* dAffinePara )
 {
 #if JVET_K_AFFINE_BUG_FIXES
   for ( int k = 0; k < iOrder; k++ )
@@ -3210,7 +3210,7 @@ void solveEqual( Double** dEqualCoeff, Int iOrder, Double* dAffinePara )
   for ( Int i = 1; i < iOrder; i++ )
   {
     // find column max
-    Double temp = fabs(dEqualCoeff[i][i-1]);
+    double temp = fabs(dEqualCoeff[i][i-1]);
     Int tempIdx = i;
     for ( Int j = i+1; j < iOrder+1; j++ )
     {
@@ -3267,7 +3267,7 @@ void solveEqual( Double** dEqualCoeff, Int iOrder, Double* dAffinePara )
       return;
     }
 #endif
-    Double temp = 0;
+    double temp = 0;
     for ( Int j = i+1; j < iOrder; j++ )
     {
       temp += dEqualCoeff[i+1][j] * dAffinePara[j];
@@ -3398,7 +3398,7 @@ void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
 
   // Set Origin YUV: pcYuv
   PelUnitBuf*   pBuf = &origBuf;
-  Double        fWeight       = 1.0;
+  double        fWeight       = 1.0;
 
   PelUnitBuf  origBufTmp = m_tmpStorageLCU.getBuf( UnitAreaRelative( *pu.cu, pu ) );
 
@@ -3433,11 +3433,11 @@ void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
 #else
   static const Int iParaNum = 5;
 #endif
-  Double **pdEqualCoeff;
-  pdEqualCoeff = new Double *[iParaNum];
+  double **pdEqualCoeff;
+  pdEqualCoeff = new double *[iParaNum];
   for ( Int i = 0; i < iParaNum; i++ )
   {
-    pdEqualCoeff[i] = new Double[iParaNum];
+    pdEqualCoeff[i] = new double[iParaNum];
   }
 
 #if JVET_K0367_AFFINE_FIX_POINT
@@ -3446,7 +3446,7 @@ void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
   Int    *pdDerivate[2];
 #else
   Int    *piError = m_tmpAffiError;
-  Double *pdDerivate[2];
+  double *pdDerivate[2];
 #endif
   pdDerivate[0] = m_tmpAffiDeri[0];
   pdDerivate[1] = m_tmpAffiDeri[1];
@@ -3504,7 +3504,7 @@ void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
 #endif
     DTRACE( g_trace_ctx, D_COMMON, " (%d) yy uiBitsBest=%d\n", DTRACE_GET_COUNTER(g_trace_ctx,D_COMMON), uiBitsBest );
   }
-  uiCostBest = (UInt)( floor( fWeight * (Double)uiCostBest ) + (Double)m_pcRdCost->getCost( uiBitsBest ) );
+  uiCostBest = (UInt)( floor( fWeight * (double)uiCostBest ) + (double)m_pcRdCost->getCost( uiBitsBest ) );
 
   DTRACE( g_trace_ctx, D_COMMON, " (%d) uiBitsBest=%d, uiCostBest=%d\n", DTRACE_GET_COUNTER(g_trace_ctx,D_COMMON), uiBitsBest, uiCostBest );
 
@@ -3562,7 +3562,7 @@ void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
       for ( Int k = 1; k < width-1; k++ )
       {
         Int iCenter = j*predBufStride + k;
-        pdDerivate[0][j*width + k] = (Double)( pPred[iCenter + 1 - predBufStride] - pPred[iCenter - 1 - predBufStride]
+        pdDerivate[0][j*width + k] = (double)( pPred[iCenter + 1 - predBufStride] - pPred[iCenter - 1 - predBufStride]
                                                   + ( pPred[iCenter + 1] << 1 )      - ( pPred[iCenter - 1] << 1 )
                                                   + pPred[iCenter + 1 + predBufStride] - pPred[iCenter - 1 + predBufStride] ) / 8 ;
       }
@@ -3594,7 +3594,7 @@ void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
       for ( Int j = 1; j < height-1; j++ )
       {
         Int iCenter = j*predBufStride + k;
-        pdDerivate[1][j*width + k] = (Double)( pPred[iCenter + predBufStride - 1]    -   pPred[iCenter - predBufStride - 1]
+        pdDerivate[1][j*width + k] = (double)( pPred[iCenter + predBufStride - 1]    -   pPred[iCenter - predBufStride - 1]
                                            + ( pPred[iCenter + predBufStride] << 1 ) - ( pPred[iCenter - predBufStride] << 1 )
                                            +   pPred[iCenter + predBufStride + 1]    -   pPred[iCenter - predBufStride + 1] ) / 8;
       }
@@ -3651,7 +3651,7 @@ void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
       {
         Int iIdx = j * width + k;
 #if JVET_K0185_AFFINE_6PARA_ENC
-        Double dC[6];
+        double dC[6];
         if ( pu.cu->affineType )
         {
           dC[0] = pdDerivate[0][iIdx];
@@ -3675,10 +3675,10 @@ void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
           {
             pdEqualCoeff[col + 1][row] += dC[col] * dC[row];
           }
-          pdEqualCoeff[col + 1][affineParaNum] += (Double)(piError[iIdx] * dC[col]);
+          pdEqualCoeff[col + 1][affineParaNum] += (double)(piError[iIdx] * dC[col]);
         }
 #else
-        Double dC[4];
+        double dC[4];
         dC[0] = pdDerivate[0][iIdx];
         dC[1] = k * pdDerivate[0][iIdx] + j * pdDerivate[1][iIdx];
         dC[2] = pdDerivate[1][iIdx];
@@ -3690,7 +3690,7 @@ void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
           {
             pdEqualCoeff[col+1][row] += dC[col] * dC[row];
           }
-          pdEqualCoeff[col+1][4] += (Double)( piError[iIdx] * dC[col] );
+          pdEqualCoeff[col+1][4] += (double)( piError[iIdx] * dC[col] );
         }
 #endif
       }
@@ -3728,11 +3728,11 @@ void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
       acDeltaMv[2] = Mv( (Int)(dDeltaMv[4] * 4 + SIGN( dDeltaMv[4] ) * 0.5) << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, (Int)(dDeltaMv[5] * 4 + SIGN( dDeltaMv[5] ) * 0.5) << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, true );
     }
 #else
-    Double dAffinePara[4];
+    double dAffinePara[4];
     solveEqual( pdEqualCoeff, 4, dAffinePara );
 
     // convert to delta mv
-    Double dDeltaMv[4];
+    double dDeltaMv[4];
     dDeltaMv[0] = dAffinePara[0];
     dDeltaMv[2] = dAffinePara[2];
 
@@ -3816,7 +3816,7 @@ void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
 #endif
     }
 
-    uiCostTemp = (UInt)( floor( fWeight * (Double)uiCostTemp ) + (Double)m_pcRdCost->getCost( uiBitsTemp ) );
+    uiCostTemp = (UInt)( floor( fWeight * (double)uiCostTemp ) + (double)m_pcRdCost->getCost( uiBitsTemp ) );
 
     // store best cost and mv
     if ( uiCostTemp < uiCostBest )
@@ -4410,7 +4410,7 @@ void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &par
     tu.emtIdx         = 0;
 #endif
 
-    Double minCost            [MAX_NUM_TBLOCKS];
+    double minCost            [MAX_NUM_TBLOCKS];
     bool   checkTransformSkip [MAX_NUM_TBLOCKS];
 
     m_CABACEstimator->resetBits();
@@ -4503,10 +4503,10 @@ void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &par
           TCoeff     currAbsSum = 0;
           uint64_t   currCompFracBits = 0;
           Distortion currCompDist = 0;
-          Double     currCompCost = 0;
+          double     currCompCost = 0;
           uint64_t   nonCoeffFracBits = 0;
           Distortion nonCoeffDist = 0;
-          Double     nonCoeffCost = 0;
+          double     nonCoeffCost = 0;
 
           if (bUseCrossCPrediction)
           {
@@ -4969,7 +4969,7 @@ void InterSearch::encodeResAndCalcRdInterCU(CodingStructure &cs, Partitioner &pa
   m_CABACEstimator->resetBits();
   m_CABACEstimator->rqt_root_cbf( cu );
   const uint64_t  zeroFracBits = m_CABACEstimator->getEstFracBits();
-  Double zeroCost;
+  double zeroCost;
   {
 #if WCG_EXT
     if( m_pcEncCfg->getLumaLevelToDeltaQPMapping().isEnabled() )

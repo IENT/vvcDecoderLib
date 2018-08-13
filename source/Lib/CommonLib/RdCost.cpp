@@ -60,9 +60,9 @@ RdCost::~RdCost()
 }
 
 #if WCG_EXT
-Double RdCost::calcRdCost( uint64_t fracBits, Distortion distortion, bool useUnadjustedLambda )
+double RdCost::calcRdCost( uint64_t fracBits, Distortion distortion, bool useUnadjustedLambda )
 #else
-Double RdCost::calcRdCost( uint64_t fracBits, Distortion distortion )
+double RdCost::calcRdCost( uint64_t fracBits, Distortion distortion )
 #endif
 {
 
@@ -73,7 +73,7 @@ Double RdCost::calcRdCost( uint64_t fracBits, Distortion distortion )
 #endif
 }
 
-void RdCost::setLambda( Double dLambda, const BitDepths &bitDepths )
+void RdCost::setLambda( double dLambda, const BitDepths &bitDepths )
 {
   m_dLambda             = dLambda;
   m_DistScale           = double(1<<SCALE_BITS) / m_dLambda;
@@ -2975,7 +2975,7 @@ Distortion RdCost::xGetHADs( const DistParam &rcDtParam )
 
 
 #if WCG_EXT
-Double RdCost::m_lumaLevelToWeightPLUT[LUMA_LEVEL_TO_DQP_LUT_MAXSIZE];
+double RdCost::m_lumaLevelToWeightPLUT[LUMA_LEVEL_TO_DQP_LUT_MAXSIZE];
 
 void RdCost::saveUnadjustedLambda()
 {
@@ -2986,8 +2986,8 @@ void RdCost::saveUnadjustedLambda()
 void RdCost::initLumaLevelToWeightTable()
 {
   for (Int i = 0; i < LUMA_LEVEL_TO_DQP_LUT_MAXSIZE; i++) {
-    Double x = i;
-    Double y;
+    double x = i;
+    double y;
 
 /*
     //always false
@@ -3019,8 +3019,8 @@ Distortion RdCost::getWeightedMSE(Int compIdx, const Pel org, const Pel cur, con
      CHECK(org!=orgLuma, "");
   }
   // use luma to get weight
-  Double weight = m_lumaLevelToWeightPLUT[orgLuma];
-  Intermediate_Int mse = Intermediate_Int(weight*(Double)iTemp*(Double)iTemp+0.5);
+  double weight = m_lumaLevelToWeightPLUT[orgLuma];
+  Intermediate_Int mse = Intermediate_Int(weight*(double)iTemp*(double)iTemp+0.5);
   distortionVal = Distortion( mse >> uiShift);
   return distortionVal;
 }

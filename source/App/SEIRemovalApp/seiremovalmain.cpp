@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
   }
 
   // starting time
-  Double dResult;
+  double dResult;
   clock_t lBefore = clock();
 
   // call decoding function
@@ -114,7 +114,7 @@ int main(int argc, char* argv[])
 #endif
 
   // ending time
-  dResult = (Double)(clock()-lBefore) / CLOCKS_PER_SEC;
+  dResult = (double)(clock()-lBefore) / CLOCKS_PER_SEC;
   printf("\n Total Time: %12.3f sec.\n", dResult);
 
   delete pcDecApp;

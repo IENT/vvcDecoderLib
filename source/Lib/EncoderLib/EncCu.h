@@ -137,7 +137,7 @@ private:
 #endif
 
 #if SHARP_LUMA_DELTA_QP
-  void    updateLambda      ( Slice* slice, Double dQP );
+  void    updateLambda      ( Slice* slice, double dQP );
 #endif
 
 public:

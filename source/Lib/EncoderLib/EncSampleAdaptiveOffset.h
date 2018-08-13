@@ -94,42 +94,42 @@ public:
   void initCABACEstimator( CABACEncoder* cabacEncoder, CtxCache* ctxCache, Slice* pcSlice );
 #endif
 #if K0238_SAO_GREEDY_MERGE_ENCODING
-  void SAOProcess(CodingStructure& cs, bool* sliceEnabled, const Double *lambdas, const bool bTestSAODisableAtPictureLevel, const Double saoEncodingRate, const Double saoEncodingRateChroma, bool isPreDBFSamplesUsed, bool isGreedymergeEncoding);
+  void SAOProcess(CodingStructure& cs, bool* sliceEnabled, const double *lambdas, const bool bTestSAODisableAtPictureLevel, const double saoEncodingRate, const double saoEncodingRateChroma, bool isPreDBFSamplesUsed, bool isGreedymergeEncoding);
 #else
-  void SAOProcess(CodingStructure& cs, bool* sliceEnabled, const Double *lambdas, const bool bTestSAODisableAtPictureLevel, const Double saoEncodingRate, const Double saoEncodingRateChroma, bool isPreDBFSamplesUsed);
+  void SAOProcess(CodingStructure& cs, bool* sliceEnabled, const double *lambdas, const bool bTestSAODisableAtPictureLevel, const double saoEncodingRate, const double saoEncodingRateChroma, bool isPreDBFSamplesUsed);
 #endif
 
-  void disabledRate( CodingStructure& cs, SAOBlkParam* reconParams, const Double saoEncodingRate, const Double saoEncodingRateChroma );
+  void disabledRate( CodingStructure& cs, SAOBlkParam* reconParams, const double saoEncodingRate, const double saoEncodingRateChroma );
   void getPreDBFStatistics(CodingStructure& cs);
 private: //methods
 
   void deriveLoopFilterBoundaryAvailibility(CodingStructure& cs, const Position &pos, bool& isLeftAvail, bool& isAboveAvail, bool& isAboveLeftAvail) const;
   void getStatistics(std::vector<SAOStatData**>& blkStats, PelUnitBuf& orgYuv, PelUnitBuf& srcYuv, CodingStructure& cs, bool isCalculatePreDeblockSamples = false);
-  void decidePicParams(const Slice& slice, bool* sliceEnabled, const Double saoEncodingRate, const Double saoEncodingRateChroma);
+  void decidePicParams(const Slice& slice, bool* sliceEnabled, const double saoEncodingRate, const double saoEncodingRateChroma);
 #if K0238_SAO_GREEDY_MERGE_ENCODING
-  void decideBlkParams(CodingStructure& cs, bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, PelUnitBuf& srcYuv, PelUnitBuf& resYuv, SAOBlkParam* reconParams, SAOBlkParam* codedParams, const bool bTestSAODisableAtPictureLevel, const Double saoEncodingRate, const Double saoEncodingRateChroma, const bool isGreedymergeEncoding);
+  void decideBlkParams(CodingStructure& cs, bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, PelUnitBuf& srcYuv, PelUnitBuf& resYuv, SAOBlkParam* reconParams, SAOBlkParam* codedParams, const bool bTestSAODisableAtPictureLevel, const double saoEncodingRate, const double saoEncodingRateChroma, const bool isGreedymergeEncoding);
 #else
-  void decideBlkParams(CodingStructure& cs, bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, PelUnitBuf& srcYuv, PelUnitBuf& resYuv, SAOBlkParam* reconParams, SAOBlkParam* codedParams, const bool bTestSAODisableAtPictureLevel, const Double saoEncodingRate, const Double saoEncodingRateChroma);
+  void decideBlkParams(CodingStructure& cs, bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, PelUnitBuf& srcYuv, PelUnitBuf& resYuv, SAOBlkParam* reconParams, SAOBlkParam* codedParams, const bool bTestSAODisableAtPictureLevel, const double saoEncodingRate, const double saoEncodingRateChroma);
 #endif
   void getBlkStats(const ComponentID compIdx, const Int channelBitDepth, SAOStatData* statsDataTypes, Pel* srcBlk, Pel* orgBlk, Int srcStride, Int orgStride, Int width, Int height, bool isLeftAvail,  bool isRightAvail, bool isAboveAvail, bool isBelowAvail, bool isAboveLeftAvail, bool isAboveRightAvail, bool isCalculatePreDeblockSamples);
-  void deriveModeNewRDO(const BitDepths &bitDepths, Int ctuRsAddr, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES], bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, SAOBlkParam& modeParam, Double& modeNormCost );
-  void deriveModeMergeRDO(const BitDepths &bitDepths, Int ctuRsAddr, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES], bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, SAOBlkParam& modeParam, Double& modeNormCost );
+  void deriveModeNewRDO(const BitDepths &bitDepths, Int ctuRsAddr, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES], bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, SAOBlkParam& modeParam, double& modeNormCost );
+  void deriveModeMergeRDO(const BitDepths &bitDepths, Int ctuRsAddr, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES], bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, SAOBlkParam& modeParam, double& modeNormCost );
   int64_t getDistortion(const Int channelBitDepth, Int typeIdc, Int typeAuxInfo, Int* offsetVal, SAOStatData& statData);
   void deriveOffsets(ComponentID compIdx, const Int channelBitDepth, Int typeIdc, SAOStatData& statData, Int* quantOffsets, Int& typeAuxInfo);
   inline int64_t estSaoDist(int64_t count, int64_t offset, int64_t diffSum, Int shift);
-  inline Int estIterOffset(Int typeIdx, Double lambda, Int offsetInput, int64_t count, int64_t diffSum, Int shift, Int bitIncrease, int64_t& bestDist, Double& bestCost, Int offsetTh );
+  inline Int estIterOffset(Int typeIdx, double lambda, Int offsetInput, int64_t count, int64_t diffSum, Int shift, Int bitIncrease, int64_t& bestDist, double& bestCost, Int offsetTh );
   void addPreDBFStatistics(std::vector<SAOStatData**>& blkStats);
 private: //members
   //for RDO
   CABACWriter*           m_CABACEstimator;
   CtxCache*              m_CtxCache;
-  Double                 m_lambda[MAX_NUM_COMPONENT];
+  double                 m_lambda[MAX_NUM_COMPONENT];
   const double           FracBitsScale = 1.0 / double( 1 << SCALE_BITS );
 
   //statistics
   std::vector<SAOStatData**>         m_statData; //[ctu][comp][classes]
   std::vector<SAOStatData**>         m_preDBFstatData;
-  Double                 m_saoDisabledRate[MAX_NUM_COMPONENT][MAX_TLAYER];
+  double                 m_saoDisabledRate[MAX_NUM_COMPONENT][MAX_TLAYER];
   Int                    m_skipLinesR[MAX_NUM_COMPONENT][NUM_SAO_NEW_TYPES];
   Int                    m_skipLinesB[MAX_NUM_COMPONENT][NUM_SAO_NEW_TYPES];
 };

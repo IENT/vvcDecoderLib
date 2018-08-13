@@ -220,15 +220,15 @@ void initROM()
 #if RExt__HIGH_BIT_DEPTH_SUPPORT
   {
     c = 64;
-    const Double s = sqrt((Double)c) * (64 << COM16_C806_TRANS_PREC);
+    const double s = sqrt((double)c) * (64 << COM16_C806_TRANS_PREC);
 
 
     for (Int k = 0; k < c; k++)
     {
       for (Int n = 0; n < c; n++)
       {
-        Double w0, v;
-        const Double PI = 3.14159265358979323846;
+        double w0, v;
+        const double PI = 3.14159265358979323846;
 
         // DCT-II
         w0 = k == 0 ? sqrt(0.5) : 1;
@@ -267,12 +267,12 @@ void initROM()
 
   c = 2; //for the 2x2 transforms if QTBT is on
 
-  const Double PI = 3.14159265358979323846;
+  const double PI = 3.14159265358979323846;
 
   for (i = 0; i < g_numTransformMatrixSizes; i++)
   {
     TMatrixCoeff *iT = NULL;
-    const Double s = sqrt((Double)c) * (64 << COM16_C806_TRANS_PREC);
+    const double s = sqrt((double)c) * (64 << COM16_C806_TRANS_PREC);
 
     switch (i)
     {
@@ -292,7 +292,7 @@ void initROM()
     {
       for (Int n = 0; n < c; n++)
       {
-        Double w0, v;
+        double w0, v;
 
         // DCT-II
         w0 = k == 0 ? sqrt(0.5) : 1;
@@ -310,7 +310,7 @@ void initROM()
 #if !JVET_K1000_SIMPLIFIED_EMT
         // DCT-V
         w0 = (k == 0) ? sqrt(0.5) : 1.0;
-        Double w1 = (n == 0) ? sqrt(0.5) : 1.0;
+        double w1 = (n == 0) ? sqrt(0.5) : 1.0;
         v = cos(PI*n*k / (c - 0.5)) * w0 * w1 * sqrt(2.0 / (c - 0.5));
         iT[DCT5*c*c + k*c + n] = (Short)(s * v + (v > 0 ? 0.5 : -0.5));
 
@@ -329,7 +329,7 @@ void initROM()
   generateTrafoBlockSizeScaling(*gp_sizeIdxInfo);
 
 #if JEM_TOOLS
-  const Double scPi = 2.0 * 3.14159265358979323846 / (Double)NSST_HYGT_PTS;
+  const double scPi = 2.0 * 3.14159265358979323846 / (double)NSST_HYGT_PTS;
   for (i = 0; i < NSST_HYGT_PTS; i++)
   {
     g_tabSinCos[i].c = Int(floor(cos(i * scPi) * 1024.0 + 0.5));

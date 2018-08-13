@@ -126,7 +126,7 @@ static const UInt   MAX_UINT =                            0xFFFFFFFFU; ///< max.
 static const Int    MAX_INT =                              2147483647; ///< max. value of signed 32-bit integer
 static const UChar  MAX_UCHAR =                                   255;
 static const UChar  MAX_SCHAR =                                   127;
-static const Double MAX_DOUBLE =                             1.7e+308; ///< max. value of Double-type value
+static const double MAX_DOUBLE =                             1.7e+308; ///< max. value of double-type value
 
 // ====================================================================================================================
 // Coding tool configuration
@@ -330,7 +330,7 @@ static const Int MAX_CU_TILING_PARTITIONS = 1 << ( MAX_LOG2_DIFF_CU_TR_SIZE << 1
 
 static const Int JVET_C0024_ZERO_OUT_TH =                          32;
 #if !JVET_K0220_ENC_CTRL
-static const Double JVET_D0077_SPLIT_DECISION_COST_SCALE =       1.05;
+static const double JVET_D0077_SPLIT_DECISION_COST_SCALE =       1.05;
 #endif
 
 static const Int MAX_NUM_PART_IDXS_IN_CTU_WIDTH = MAX_CU_SIZE/MIN_PU_SIZE; ///< maximum number of partition indices across the width of a CTU (or height of a CTU)
@@ -411,12 +411,12 @@ static const Int    SKIPHORNOVERQT_DEPTH_TH =                       2;
 static const Int    PICTURE_DISTANCE_TH =                           1;
 static const Int    FAST_SKIP_DEPTH =                               2;
 
-static const Double PBINTRA_RATIO     =                             1.1;
+static const double PBINTRA_RATIO     =                             1.1;
 static const Int    NUM_MRG_SATD_CAND =                             4;
-static const Double MRG_FAST_RATIO    =                             1.25;
+static const double MRG_FAST_RATIO    =                             1.25;
 
-static const Double AMAXBT_TH32 =                                  15.0;
-static const Double AMAXBT_TH64 =                                  30.0;
+static const double AMAXBT_TH32 =                                  15.0;
+static const double AMAXBT_TH64 =                                  30.0;
 
 // need to know for static memory allocation
 static const Int MAX_DELTA_QP   =                                   7;      ///< maximum supported delta QP value

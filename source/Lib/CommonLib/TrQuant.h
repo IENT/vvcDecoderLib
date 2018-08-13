@@ -124,12 +124,12 @@ public:
 
   void invRdpcmNxN(TransformUnit& tu, const ComponentID &compID, PelBuf &pcResidual);
 #if RDOQ_CHROMA_LAMBDA
-  void   setLambdas  ( const Double lambdas[MAX_NUM_COMPONENT] )   { m_quant->setLambdas( lambdas ); }
+  void   setLambdas  ( const double lambdas[MAX_NUM_COMPONENT] )   { m_quant->setLambdas( lambdas ); }
   void   selectLambda( const ComponentID compIdx )                 { m_quant->selectLambda( compIdx ); }
-  void   getLambdas  ( Double (&lambdas)[MAX_NUM_COMPONENT]) const { m_quant->getLambdas( lambdas ); }
+  void   getLambdas  ( double (&lambdas)[MAX_NUM_COMPONENT]) const { m_quant->getLambdas( lambdas ); }
 #endif
-  void   setLambda   ( const Double dLambda )                      { m_quant->setLambda( dLambda ); }
-  Double getLambda   () const                                      { return m_quant->getLambda(); }
+  void   setLambda   ( const double dLambda )                      { m_quant->setLambda( dLambda ); }
+  double getLambda   () const                                      { return m_quant->getLambda(); }
 
   Quant* getQuant() { return m_quant;  }
 

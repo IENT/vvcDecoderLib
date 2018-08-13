@@ -59,10 +59,10 @@
 struct coeffGroupRDStats
 {
   Int    iNNZbeforePos0;
-  Double d64CodedLevelandDist; // distortion and level cost only
-  Double d64UncodedDist;    // all zero coded block distortion
-  Double d64SigCost;
-  Double d64SigCost_0;
+  double d64CodedLevelandDist; // distortion and level cost only
+  double d64UncodedDist;    // all zero coded block distortion
+  double d64SigCost;
+  double d64SigCost_0;
 };
 
 #if JVET_K1000_SIMPLIFIED_EMT

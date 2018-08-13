@@ -862,7 +862,7 @@ void EncApp::rateStatsAccum(const AccessUnit& au, const std::vector<UInt>& annex
 
 void EncApp::printRateSummary()
 {
-  Double time = (Double) m_iFrameRcvd / m_iFrameRate * m_temporalSubsampleRatio;
+  double time = (double) m_iFrameRcvd / m_iFrameRate * m_temporalSubsampleRatio;
   msg( DETAILS,"Bytes written to file: %u (%.3f kbps)\n", m_totalBytes, 0.008 * m_totalBytes / time );
   if (m_summaryVerboseness > 0)
   {

@@ -258,8 +258,8 @@ void CacheModel::reportFrame( )
     }
 
     fprintf( stdout, "Cache Statics in frame %d\n", m_frameCount++ );
-    fprintf( stdout, "Hit ratio %5.2f [%%]\n", (100 * (Double)(hitCount)) / m_totalAccess );
-    fprintf( stdout, "Required bandwidth %.1f [MB]\n", ((Double)(m_missHitCount) * m_cacheLineSize) / (1024 * 1024) );
+    fprintf( stdout, "Hit ratio %5.2f [%%]\n", (100 * (double)(hitCount)) / m_totalAccess );
+    fprintf( stdout, "Required bandwidth %.1f [MB]\n", ((double)(m_missHitCount) * m_cacheLineSize) / (1024 * 1024) );
   }
 }
 
@@ -273,13 +273,13 @@ void CacheModel::reportSequence( )
     fprintf( stdout, "Cache way number %d\n\n", m_numWay );
 
     fprintf( stdout, "Cache Statics in total\n" );
-    fprintf( stdout, "Hit ratio %5.2f [%%]\n", (100 * (Double)(m_hitCountSeq)) / m_totalAccessSeq );
+    fprintf( stdout, "Hit ratio %5.2f [%%]\n", (100 * (double)(m_hitCountSeq)) / m_totalAccessSeq );
 #ifdef _MSC_VER
     fprintf( stdout, "Hit count / total %I64d / %I64d\n", m_hitCountSeq, m_totalAccessSeq );
 #else
     fprintf( stdout, "Hit count / total %" PRIi64 " / %" PRIi64 "\n", m_hitCountSeq, m_totalAccessSeq );
 #endif
-    fprintf( stdout, "Required bandwidth %.1f [MB] / frame\n", (((Double)m_missHitCountSeq) * m_cacheLineSize) / (m_frameCount * 1024 * 1024) );
+    fprintf( stdout, "Required bandwidth %.1f [MB] / frame\n", (((double)m_missHitCountSeq) * m_cacheLineSize) / (m_frameCount * 1024 * 1024) );
   }
 }
 

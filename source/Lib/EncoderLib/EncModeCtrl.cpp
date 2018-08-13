@@ -85,12 +85,12 @@ void EncModeCtrl::xExtractFeatures( const EncTestMode encTestmode, CodingStructu
 {
   CHECK( cs.features.size() < NUM_ENC_FEATURES, "Features vector is not initialized" );
 
-  cs.features[ENC_FT_DISTORTION     ] = Double( cs.dist              );
-  cs.features[ENC_FT_FRAC_BITS      ] = Double( cs.fracBits          );
-  cs.features[ENC_FT_RD_COST        ] = Double( cs.cost              );
-  cs.features[ENC_FT_ENC_MODE_TYPE  ] = Double( encTestmode.type     );
-  cs.features[ENC_FT_ENC_MODE_OPTS  ] = Double( encTestmode.opts     );
-  cs.features[ENC_FT_ENC_MODE_PART  ] = Double( encTestmode.partSize );
+  cs.features[ENC_FT_DISTORTION     ] = double( cs.dist              );
+  cs.features[ENC_FT_FRAC_BITS      ] = double( cs.fracBits          );
+  cs.features[ENC_FT_RD_COST        ] = double( cs.cost              );
+  cs.features[ENC_FT_ENC_MODE_TYPE  ] = double( encTestmode.type     );
+  cs.features[ENC_FT_ENC_MODE_OPTS  ] = double( encTestmode.opts     );
+  cs.features[ENC_FT_ENC_MODE_PART  ] = double( encTestmode.partSize );
 }
 
 bool EncModeCtrl::nextMode( const CodingStructure &cs, Partitioner &partitioner )
@@ -254,7 +254,7 @@ void EncModeCtrl::initLumaDeltaQpLUT()
 
 Int EncModeCtrl::calculateLumaDQP( const CPelBuf& rcOrg )
 {
-  Double avg = 0;
+  double avg = 0;
 
   // Get QP offset derived from Luma level
 #if !WCG_EXT
@@ -272,7 +272,7 @@ Int EncModeCtrl::calculateLumaDQP( const CPelBuf& rcOrg )
         sum += rcOrg.at( x, y );
       }
     }
-    avg = ( Double ) sum / rcOrg.area();
+    avg = ( double ) sum / rcOrg.area();
   }
 #if !WCG_EXT
   else
@@ -291,7 +291,7 @@ Int EncModeCtrl::calculateLumaDQP( const CPelBuf& rcOrg )
       }
     }
     // use a percentage of the maxVal
-    avg = ( Double ) maxVal * m_pcEncCfg->getLumaLevelToDeltaQPMapping().maxMethodWeight;
+    avg = ( double ) maxVal * m_pcEncCfg->getLumaLevelToDeltaQPMapping().maxMethodWeight;
   }
 #endif
   Int lumaIdx = Clip3<Int>( 0, Int( LUMA_LEVEL_TO_DQP_LUT_MAXSIZE ) - 1, Int( avg + 0.5 ) );

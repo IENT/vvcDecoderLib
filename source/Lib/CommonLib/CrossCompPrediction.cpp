@@ -68,7 +68,7 @@ SChar CrossComponentPrediction::xCalcCrossComponentPredictionAlpha( TransformUni
 
   if( SSxx != 0 )
   {
-    Double dAlpha = SSxy / Double( SSxx );
+    double dAlpha = SSxy / double( SSxx );
     alpha = SChar( Clip3<Int>( -16, 16, ( Int ) ( dAlpha * 16 ) ) );
 
     static const SChar alphaQuant[17] = { 0, 1, 1, 2, 2, 2, 4, 4, 4, 4, 4, 4, 8, 8, 8, 8, 8 };
