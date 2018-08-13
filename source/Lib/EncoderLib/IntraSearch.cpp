@@ -783,7 +783,7 @@ Void IntraSearch::estIntraPredLumaQT( CodingUnit &cu, Partitioner &partitioner )
     // after this point, don't use numModesForFullRD
 
     // PBINTRA fast
-#if JEM_TOOLS
+#if JVET_K1000_SIMPLIFIED_EMT
     if( m_pcEncCfg->getUsePbIntraFast() && !cs.slice->isIntra() && cu.partSize == SIZE_2Nx2N && uiRdModeList.size() < numModesAvailable && emtUsageFlag != 2 )
 #else
     if( m_pcEncCfg->getUsePbIntraFast() && !cs.slice->isIntra() && cu.partSize == SIZE_2Nx2N && uiRdModeList.size() < numModesAvailable )
@@ -1282,7 +1282,7 @@ Void IntraSearch::xEncSubdivCbfQT(CodingStructure &cs, Partitioner &partitioner,
 {
   const UnitArea &currArea = partitioner.currArea();
   TransformUnit &currTU    = *cs.getTU( currArea.blocks[partitioner.chType], partitioner.chType );
-#if JEM_TOOLS && HM_EMT_NSST_AS_IN_JEM
+#if JVET_K1000_SIMPLIFIED_EMT && HM_EMT_NSST_AS_IN_JEM
   CodingUnit &currCU       = *currTU.cu;
 #endif
 #if ENABLE_BMS
@@ -1336,7 +1336,7 @@ Void IntraSearch::xEncSubdivCbfQT(CodingStructure &cs, Partitioner &partitioner,
 #if ENABLE_BMS
   if (subdiv)
   {
-#if JEM_TOOLS && HM_EMT_NSST_AS_IN_JEM
+#if JVET_K1000_SIMPLIFIED_EMT && HM_EMT_NSST_AS_IN_JEM
     if( currDepth == 0 && bLuma ) m_CABACEstimator->emt_cu_flag( currCU );
 #endif
 
@@ -1359,7 +1359,7 @@ Void IntraSearch::xEncSubdivCbfQT(CodingStructure &cs, Partitioner &partitioner,
   else
 #endif
   {
-#if HM_EMT_NSST_AS_IN_JEM && JEM_TOOLS
+#if HM_EMT_NSST_AS_IN_JEM && JVET_K1000_SIMPLIFIED_EMT
 #if ENABLE_BMS
     if( currDepth == 0 && bLuma && TU::getCbfAtDepth( currTU, COMPONENT_Y, 0 ) ) m_CABACEstimator->emt_cu_flag( currCU );
 #else
@@ -1718,12 +1718,12 @@ Void IntraSearch::xRecurIntraCodingLumaQT( CodingStructure &cs, Partitioner &par
   UInt64     singleFracBits                     = 0;
   Bool       checkTransformSkip                 = pps.getUseTransformSkip();
   Int        bestModeId[MAX_NUM_COMPONENT]      = {0, 0, 0};
-#if JEM_TOOLS
+#if JVET_K1000_SIMPLIFIED_EMT
   UChar      nNumTransformCands                 = cu.emtFlag ? 4 : 1; //4 is the number of transforms of emt
 #else
   UChar      nNumTransformCands                 = 1;
 #endif
-#if JEM_TOOLS
+#if JVET_K1000_SIMPLIFIED_EMT
   Bool       isAllIntra                         = m_pcEncCfg->getIntraPeriod() == 1;
 #endif
 
@@ -1759,7 +1759,7 @@ Void IntraSearch::xRecurIntraCodingLumaQT( CodingStructure &cs, Partitioner &par
 
     checkTransformSkip &= TU::hasTransformSkipFlag( *tu.cs, tu.Y() );
     checkTransformSkip &= !cu.transQuantBypass;
-#if JEM_TOOLS
+#if JVET_K1000_SIMPLIFIED_EMT
     checkTransformSkip &= !cu.emtFlag;
 #endif
 
@@ -1793,7 +1793,7 @@ Void IntraSearch::xRecurIntraCodingLumaQT( CodingStructure &cs, Partitioner &par
       tmpTU = &saveCS.addTU(currArea, partitioner.chType);
     }
 
-#if JEM_TOOLS
+#if JVET_K1000_SIMPLIFIED_EMT
     bool cbfBestMode = false;
 #endif
 
@@ -1809,12 +1809,12 @@ Void IntraSearch::xRecurIntraCodingLumaQT( CodingStructure &cs, Partitioner &par
         }
       }
 
-#if JEM_TOOLS
+#if JVET_K1000_SIMPLIFIED_EMT
       UChar transformIndex = modeId;
 #endif
 
 
-#if JEM_TOOLS
+#if JVET_K1000_SIMPLIFIED_EMT
       if( ( transformIndex < lastCheckId ) || ( ( transformIndex == lastCheckId ) && !checkTransformSkip ) ) //we avoid this if the mode is transformSkip
       {
         // Skip checking other transform candidates if zero CBF is encountered and it is the best transform so far
@@ -1849,8 +1849,11 @@ Void IntraSearch::xRecurIntraCodingLumaQT( CodingStructure &cs, Partitioner &par
         default0Save1Load2 = 2;
       }
 
-#if JEM_TOOLS
-      tu.emtIdx = transformIndex;
+#if JVET_K1000_SIMPLIFIED_EMT
+      if (cu.emtFlag)
+      {
+        tu.emtIdx = transformIndex;
+      }
 #endif
       if( !checkTransformSkip )
       {
@@ -1865,7 +1868,7 @@ Void IntraSearch::xRecurIntraCodingLumaQT( CodingStructure &cs, Partitioner &par
 
       //----- determine rate and r-d cost -----
       //the condition (transformIndex != DCT2_EMT) seems to be irrelevant, since DCT2_EMT=7 and the highest value of transformIndex is 4
-#if JEM_TOOLS
+#if JVET_K1000_SIMPLIFIED_EMT
 #if ENABLE_BMS
       if( ( modeId == lastCheckId && checkTransformSkip && !TU::getCbfAtDepth( tu, COMPONENT_Y, currDepth ) )
         || ( tu.emtIdx > 0 && ( checkTransformSkip ? transformIndex != lastCheckId : true ) && tu.emtIdx != DCT2_EMT && numSig <= g_EmtSigNumThr ) )
@@ -1897,7 +1900,7 @@ Void IntraSearch::xRecurIntraCodingLumaQT( CodingStructure &cs, Partitioner &par
         singleFracBits    = singleTmpFracBits;
 
         bestModeId[COMPONENT_Y] = modeId;
-#if JEM_TOOLS
+#if JVET_K1000_SIMPLIFIED_EMT
 #if ENABLE_BMS
         cbfBestMode       = TU::getCbfAtDepth( tu, COMPONENT_Y, currDepth );
 #else

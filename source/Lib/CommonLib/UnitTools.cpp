@@ -2030,7 +2030,6 @@ void PU::fillMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, const in
     pInfo->numCand++;
   }
 
-#if JEM_TOOLS
   if( pu.cs->sps->getSpsNext().getUseHighPrecMv() )
   {
     for( Mv &mv : pInfo->mvCand )
@@ -2038,7 +2037,6 @@ void PU::fillMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, const in
       if( mv.highPrec ) mv.setLowPrec();
     }
   }
-#endif
 #if JVET_K0357_AMVR
   if (pu.cu->imv != 0)
   {

@@ -1640,6 +1640,17 @@ Bool EncModeCtrlMTnoRQT::tryMode( const EncTestMode& encTestmode, const CodingSt
         return false;
       }
 #endif
+#if JVET_K0357_AMVR
+      else if ((encTestmode.opts & ETO_IMV) != 0)
+      {
+        int imvOpt = (encTestmode.opts & ETO_IMV) >> ETO_IMV_SHIFT;
+
+        if (imvOpt == 3 && cuECtx.get<double>(BEST_NO_IMV_COST) * 1.06 < cuECtx.get<double>(BEST_IMV_COST))
+        {
+          return false;
+        }
+      }
+#endif
 #if JEM_TOOLS
 #if JVET_K0220_ENC_CTRL
       else if( relatedCU.isSkip || relatedCU.isIntra )
@@ -1652,17 +1663,6 @@ Bool EncModeCtrlMTnoRQT::tryMode( const EncTestMode& encTestmode, const CodingSt
 #endif
       {
         return false;
-      }
-#endif
-#if JVET_K0357_AMVR
-      else if( ( encTestmode.opts & ETO_IMV ) != 0 )
-      {
-        int imvOpt = ( encTestmode.opts & ETO_IMV ) >> ETO_IMV_SHIFT;
-
-        if( imvOpt == 3 && cuECtx.get<double>( BEST_NO_IMV_COST ) * 1.06 < cuECtx.get<double>( BEST_IMV_COST ) )
-        {
-          return false;
-        }
       }
 #endif
     }
