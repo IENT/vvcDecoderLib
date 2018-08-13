@@ -339,7 +339,9 @@ Void EncGOP::init ( EncLib* pcEncLib )
   m_HLSWriter            = pcEncLib->getHLSWriter();
   m_pcLoopFilter         = pcEncLib->getLoopFilter();
   m_pcSAO                = pcEncLib->getSAO();
-#if JEM_TOOLS
+#if JVET_K0371_ALF
+  m_pcALF = pcEncLib->getALF();
+#elif JEM_TOOLS
   m_pcALF                = pcEncLib->getALF();
 #if COM16_C806_ALF_TEMPPRED_NUM
   UInt uiMaxCUWidth = m_pcCfg->getMaxCUWidth();
@@ -2129,7 +2131,15 @@ Void EncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic,
       pcPic->resizeSAO( numberOfCtusInFrame, 0 );
       pcPic->resizeSAO( numberOfCtusInFrame, 1 );
     }
-#if JEM_TOOLS
+
+#if JVET_K0371_ALF
+    // it is used for signalling during CTU mode decision, i.e. before ALF processing
+    if( pcSlice->getSPS()->getUseALF() )
+    {
+      pcPic->resizeAlfCtuEnableFlag( numberOfCtusInFrame );
+      std::memset( pcSlice->getAlfSliceParam().enabledFlag, false, sizeof( pcSlice->getAlfSliceParam().enabledFlag ) );
+    }
+#elif JEM_TOOLS
     if (pcSlice->getSPS()->getSpsNext().getALFEnabled())
     {
       m_pcALF->resetALFParam( &pcPic->getALFParam() );
@@ -2270,7 +2280,24 @@ Void EncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic,
           pcPic->slices[s]->setSaoEnabledFlag(CHANNEL_TYPE_CHROMA, sliceEnabled[COMPONENT_Cb]);
         }
       }
+
+#if JVET_K0371_ALF
+      if( pcSlice->getSPS()->getUseALF() )
+      {
+        AlfSliceParam alfSliceParam;
 #if JEM_TOOLS
+        m_pcALF->initCABACEstimator( m_pcEncLib->getCABACDataStore(), m_pcEncLib->getCABACEncoder(), m_pcEncLib->getCtxCache(), pcSlice );
+#else
+        m_pcALF->initCABACEstimator( m_pcEncLib->getCABACEncoder(), m_pcEncLib->getCtxCache(), pcSlice );
+#endif
+        m_pcALF->ALFProcess( cs, pcSlice->getLambdas(), alfSliceParam );
+        //assign ALF slice header
+        for( Int s = 0; s< uiNumSliceSegments; s++ )
+        {
+          pcPic->slices[s]->setAlfSliceParam( alfSliceParam );
+        }
+      }
+#elif JEM_TOOLS
 
       DTRACE_UPDATE( g_trace_ctx, ( std::make_pair( "final", 0 ) ) );
 
@@ -2307,6 +2334,7 @@ Void EncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic,
 #if JEM_TOOLS
       m_pcEncLib->getCABACDataStore()->setSliceWinUpdateMode(pcSlice);
 
+#if !JVET_K0371_ALF
       if( pcSlice->getSPS()->getSpsNext().getALFEnabled() )
       {
         const UInt tidxMAX  = E0104_ALF_MAX_TEMPLAYERID - 1u;
@@ -2319,6 +2347,7 @@ Void EncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic,
           m_pcALF->storeALFParam( &cAlfParam, pcSlice->isIntra(), tidx, tidxMAX );
         }
       }
+#endif
 #endif
 
       if( pcSlice->getSPS()->getUseSAO() )
@@ -2341,7 +2370,7 @@ Void EncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic,
 
     if( encPic || decPic )
     {
-#if JEM_TOOLS
+#if JEM_TOOLS && !JVET_K0371_ALF
       CodingStructure& cs = *pcPic->cs;
 #endif
       pcSlice = pcPic->slices[0];
@@ -2428,7 +2457,7 @@ Void EncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic,
           m_pcSliceEncoder->encodeSlice(pcPic, &(substreamsOut[0]), numBinsCoded);
           binCountsInNalUnits+=numBinsCoded;
         }
-#if JEM_TOOLS
+#if JEM_TOOLS && !JVET_K0371_ALF
         if( pcSlice->getSPS()->getSpsNext().getALFEnabled() )
         {
           m_pcALF->freeALFParam( &cs.picture->getALFParam() );

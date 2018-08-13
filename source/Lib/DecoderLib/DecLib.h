@@ -50,7 +50,7 @@
 #include "CommonLib/InterPrediction.h"
 #include "CommonLib/IntraPrediction.h"
 #include "CommonLib/LoopFilter.h"
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0371_ALF
 #include "CommonLib/AdaptiveLoopFilter.h"
 #endif
 #include "CommonLib/SEI.h"
@@ -98,7 +98,7 @@ private:
   SEIReader               m_seiReader;
   LoopFilter              m_cLoopFilter;
   SampleAdaptiveOffset    m_cSAO;
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0371_ALF
   AdaptiveLoopFilter      m_cALF;
 #endif
   // decoder side RD cost computation

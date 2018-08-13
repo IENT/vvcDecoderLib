@@ -250,7 +250,9 @@ protected:
 #endif
 #if JEM_TOOLS
   int       m_IntraPDPC;
+#if !JVET_K0371_ALF
   int       m_ALF;
+#endif
 #endif
 #if JEM_TOOLS||JVET_K0190
   int       m_LMChroma;
@@ -568,6 +570,10 @@ protected:
   bool        m_stopAfterFFtoPOC;
   bool        m_bs2ModPOCAndType;
   bool        m_forceDecodeBitstream1;
+
+#if JVET_K0371_ALF
+  Bool        m_alf;                                          ///> Adaptive Loop Filter
+#endif
 
 #if EXTENSION_360_VIDEO
   TExt360AppEncCfg m_ext360;

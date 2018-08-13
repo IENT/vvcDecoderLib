@@ -102,7 +102,7 @@ public:
   void        sao                       ( const Slice&                  slice,    unsigned          ctuRsAddr );
   void        sao_block_pars            ( const SAOBlkParam&            saoPars,  const BitDepths&  bitDepths,  bool* sliceEnabled, bool leftMergeAvail, bool aboveMergeAvail, bool onlyEstMergeInfo );
   void        sao_offset_pars           ( const SAOOffset&              ctbPars,  ComponentID       compID,     bool sliceEnabled,  int bitDepth );
-#if JEM_TOOLS
+#if JEM_TOOLS && !JVET_K0371_ALF
   void        alf                       ( const Slice&                  slice,    const ALFParam& alfParam );
   void        alf                       ( const ALFParam&               alfParam, SliceType sliceType, bool isGALF );
 
@@ -218,13 +218,19 @@ public:
   // cross component prediction (clause 7.3.8.12)
   void        cross_comp_pred           ( const TransformUnit&          tu,       ComponentID       compID );
 
+#if JVET_K0371_ALF
+  Void        codeAlfCtuEnableFlags     ( CodingStructure& cs, ChannelType channel, AlfSliceParam* alfParam);
+  Void        codeAlfCtuEnableFlags     ( CodingStructure& cs, ComponentID compID, AlfSliceParam* alfParam);
+  Void        codeAlfCtuEnableFlag      ( CodingStructure& cs, UInt ctuRsAddr, const Int compIdx, AlfSliceParam* alfParam = NULL );
+#endif
+
 private:
   void        unary_max_symbol          ( unsigned symbol, unsigned ctxId0, unsigned ctxIdN, unsigned maxSymbol );
   void        unary_max_eqprob          ( unsigned symbol,                                   unsigned maxSymbol );
   void        exp_golomb_eqprob         ( unsigned symbol, unsigned count );
   void        encode_sparse_dt          ( DecisionTree& dt, unsigned toCodeId );
 
-#if JEM_TOOLS
+#if JEM_TOOLS && !JVET_K0371_ALF
   // alf
   void        alf_aux                   ( const ALFParam&               alfParam, bool isGALF );
   void        alf_filter                ( const ALFParam&               alfParam, bool isGALF, bool bChroma = false );

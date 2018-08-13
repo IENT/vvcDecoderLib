@@ -199,7 +199,7 @@ private:
   TUCache& m_tuCache;
 
   std::vector<SAOBlkParam> m_sao;
-#if JEM_TOOLS
+#if JEM_TOOLS && !JVET_K0371_ALF
   ALFParam m_alfParam;
 #endif
 

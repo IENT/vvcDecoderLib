@@ -42,6 +42,10 @@
 #include "CommonLib/Unit.h"
 #include "CommonLib/Picture.h" // th remove this
 #include "CommonLib/dtrace_next.h"
+#if JVET_K0371_ALF
+#include "EncAdaptiveLoopFilter.h"
+#include "CommonLib/AdaptiveLoopFilter.h"
+#endif
 
 //! \ingroup EncoderLib
 //! \{
@@ -571,7 +575,9 @@ Void HLSWriter::codeSPSNext( const SPSNext& spsNext, const bool usePCM )
 #if JEM_TOOLS
   WRITE_FLAG( spsNext.getLICEnabled() ? 1 : 0,                                                  "lic_enabled_flag" );
   WRITE_FLAG( spsNext.getUseIntraPDPC() ? 1 : 0,                                                "intra_pdpc_enable_flag" );
+#if !JVET_K0371_ALF
   WRITE_FLAG( spsNext.getALFEnabled() ? 1 : 0,                                                  "alf_enabled_flag" );
+#endif
 #endif
 #if JEM_TOOLS||JVET_K0190
   WRITE_FLAG( spsNext.getUseLMChroma() ? 1 : 0,                                                 "lm_chroma_enabled_flag" );
@@ -710,6 +716,7 @@ Void HLSWriter::codeSPSNext( const SPSNext& spsNext, const bool usePCM )
     WRITE_FLAG( spsNext.getIntraPDPCMode() - 1,                                                 "planar_pdpc_flag" );
   }
 
+#if !JVET_K0371_ALF
   if( spsNext.getALFEnabled() )
   {
 #if GALF
@@ -719,6 +726,7 @@ Void HLSWriter::codeSPSNext( const SPSNext& spsNext, const bool usePCM )
 #endif
     WRITE_FLAG( spsNext.getGALFEnabled(),                                                       "galf_enabled_flag" );
   }
+#endif
 #endif
   // ADD_NEW_TOOL : (sps extension writer) write tool enabling flags and associated parameters here
 }
@@ -783,6 +791,9 @@ Void HLSWriter::codeSPS( const SPS* pcSPS )
   WRITE_UVLC( pcSPS->getQuadtreeTULog2MaxSize() - pcSPS->getQuadtreeTULog2MinSize(), "log2_diff_max_min_luma_transform_block_size" );
   WRITE_UVLC( pcSPS->getQuadtreeTUMaxDepthInter() - 1,                               "max_transform_hierarchy_depth_inter" );
   WRITE_UVLC( pcSPS->getQuadtreeTUMaxDepthIntra() - 1,                               "max_transform_hierarchy_depth_intra" );
+#if JVET_K0371_ALF
+  WRITE_FLAG( pcSPS->getUseALF(), "sps_alf_enable_flag" );
+#endif
 #if HEVC_USE_SCALING_LISTS
   WRITE_FLAG( pcSPS->getScalingListFlag() ? 1 : 0,                                   "scaling_list_enabled_flag" );
   if(pcSPS->getScalingListFlag())
@@ -1182,6 +1193,13 @@ Void HLSWriter::codeSliceHeader         ( Slice* pcSlice )
         WRITE_FLAG( pcSlice->getSaoEnabledFlag( CHANNEL_TYPE_CHROMA ), "slice_sao_chroma_flag" );
       }
     }
+
+#if JVET_K0371_ALF
+    if( pcSlice->getSPS()->getUseALF() )
+    {
+      alf( pcSlice->getAlfSliceParam() );
+    }
+#endif
 
     //check if numrefidxes match the defaults. If not, override
 
@@ -1817,5 +1835,206 @@ Bool HLSWriter::xFindMatchingLTRP(Slice* pcSlice, UInt *ltrpsIndex, Int ltrpPOC,
   return false;
 }
 
+#if JVET_K0371_ALF
+void HLSWriter::alf( const AlfSliceParam& alfSliceParam )
+{
+  WRITE_FLAG( alfSliceParam.enabledFlag[COMPONENT_Y], "alf_slice_enable_flag" );
+  if( !alfSliceParam.enabledFlag[COMPONENT_Y] )
+  {
+    return;
+  }
+
+  const int alfChromaIdc = alfSliceParam.enabledFlag[COMPONENT_Cb] * 2 + alfSliceParam.enabledFlag[COMPONENT_Cr];
+  truncatedUnaryEqProb( alfChromaIdc, 3 );   // alf_chroma_idc
+
+  xWriteTruncBinCode( alfSliceParam.numLumaFilters - 1, MAX_NUM_ALF_CLASSES );  //number_of_filters_minus1
+  WRITE_FLAG( alfSliceParam.lumaFilterType == ALF_FILTER_5 ? 1 : 0, "filter_type_flag" );
+
+  if( alfSliceParam.numLumaFilters > 1 )
+  {
+    for( int i = 0; i < MAX_NUM_ALF_CLASSES; i++ )
+    {
+      xWriteTruncBinCode( (UInt)alfSliceParam.filterCoeffDeltaIdx[i], alfSliceParam.numLumaFilters );  //filter_coeff_delta[i]
+    }
+  }
+
+  alfFilter( alfSliceParam, false );
+
+  if( alfChromaIdc )
+  {
+    WRITE_FLAG( alfSliceParam.chromaCtbPresentFlag, "alf_chroma_ctb_present_flag" );
+    alfFilter( alfSliceParam, true );
+  }
+}
+
+void HLSWriter::alfGolombEncode( int coeff, int k )
+{
+  int symbol = abs( coeff );
+
+  int m = (int)pow( 2.0, k );
+  int q = symbol / m;
+
+  for( int i = 0; i < q; i++ )
+  {
+    xWriteFlag( 1 );
+  }
+  xWriteFlag( 0 );
+  // write one zero
+
+  for( int i = 0; i < k; i++ )
+  {
+    xWriteFlag( symbol & 0x01 );
+    symbol >>= 1;
+  }
+
+  if( coeff != 0 )
+  {
+    int sign = ( coeff > 0 ) ? 1 : 0;
+    xWriteFlag( sign );
+  }
+}
+
+void HLSWriter::alfFilter( const AlfSliceParam& alfSliceParam, const bool isChroma )
+{
+  if( !isChroma )
+  {
+    WRITE_FLAG( alfSliceParam.coeffDeltaFlag, "alf_coefficients_delta_flag" );
+    if( !alfSliceParam.coeffDeltaFlag )
+    {
+      if( alfSliceParam.numLumaFilters > 1 )
+      {
+        WRITE_FLAG( alfSliceParam.coeffDeltaPredModeFlag, "coeff_delta_pred_mode_flag" );
+      }
+    }
+  }
+
+  static int bitsCoeffScan[EncAdaptiveLoopFilter::m_MAX_SCAN_VAL][EncAdaptiveLoopFilter::m_MAX_EXP_GOLOMB];
+  memset( bitsCoeffScan, 0, sizeof( bitsCoeffScan ) );
+  AlfFilterShape alfShape( isChroma ? 5 : ( alfSliceParam.lumaFilterType == ALF_FILTER_5 ? 5 : 7 ) );
+  const int maxGolombIdx = AdaptiveLoopFilter::getMaxGolombIdx( alfShape.filterType );
+  const short* coeff = isChroma ? alfSliceParam.chromaCoeff : alfSliceParam.lumaCoeff;
+  const int numFilters = isChroma ? 1 : alfSliceParam.numLumaFilters;
+
+  // vlc for all
+  for( int ind = 0; ind < numFilters; ++ind )
+  {
+    if( isChroma || !alfSliceParam.coeffDeltaFlag || alfSliceParam.filterCoeffFlag[ind] )
+    {
+      for( int i = 0; i < alfShape.numCoeff - 1; i++ )
+      {
+        int coeffVal = abs( coeff[ind * MAX_NUM_ALF_LUMA_COEFF + i] );
+
+        for( int k = 1; k < 15; k++ )
+        {
+          bitsCoeffScan[alfShape.golombIdx[i]][k] += EncAdaptiveLoopFilter::lengthGolomb( coeffVal, k );
+        }
+      }
+    }
+  }
+
+  static int kMinTab[MAX_NUM_ALF_COEFF];
+  int kMin = EncAdaptiveLoopFilter::getGolombKMin( alfShape, numFilters, kMinTab, bitsCoeffScan );
+
+  // Golomb parameters
+  WRITE_UVLC( kMin - 1, "min_golomb_order" );
+
+  for( int idx = 0; idx < maxGolombIdx; idx++ )
+  {
+    bool golombOrderIncreaseFlag = ( kMinTab[idx] != kMin ) ? true : false;
+    CHECK( !( kMinTab[idx] <= kMin + 1 ), "ALF Golomb parameter not consistent" );
+    WRITE_FLAG( golombOrderIncreaseFlag, "golomb_order_increase_flag" );
+    kMin = kMinTab[idx];
+  }
+
+  if( !isChroma )
+  {
+    if( alfSliceParam.coeffDeltaFlag )
+    {
+      for( int ind = 0; ind < numFilters; ++ind )
+      {
+        WRITE_FLAG( alfSliceParam.filterCoeffFlag[ind], "filter_coefficient_flag[i]" );
+      }
+    }
+  }
+
+  // Filter coefficients
+  for( int ind = 0; ind < numFilters; ++ind )
+  {
+    if( !isChroma && !alfSliceParam.filterCoeffFlag[ind] && alfSliceParam.coeffDeltaFlag )
+    {
+      continue;
+    }
+
+    for( int i = 0; i < alfShape.numCoeff - 1; i++ )
+    {
+      alfGolombEncode( coeff[ind* MAX_NUM_ALF_LUMA_COEFF + i], kMinTab[alfShape.golombIdx[i]] );  // alf_coeff_chroma[i], alf_coeff_luma_delta[i][j]
+    }
+  }
+}
+
+void HLSWriter::xWriteTruncBinCode( UInt uiSymbol, const int uiMaxSymbol )
+{
+  int uiThresh;
+  if( uiMaxSymbol > 256 )
+  {
+    int uiThreshVal = 1 << 8;
+    uiThresh = 8;
+    while( uiThreshVal <= uiMaxSymbol )
+    {
+      uiThresh++;
+      uiThreshVal <<= 1;
+    }
+    uiThresh--;
+  }
+  else
+  {
+    uiThresh = g_tbMax[uiMaxSymbol];
+  }
+
+  int uiVal = 1 << uiThresh;
+  assert( uiVal <= uiMaxSymbol );
+  assert( ( uiVal << 1 ) > uiMaxSymbol );
+  assert( uiSymbol < uiMaxSymbol );
+  int b = uiMaxSymbol - uiVal;
+  assert( b < uiVal );
+  if( uiSymbol < uiVal - b )
+  {
+    xWriteCode( uiSymbol, uiThresh );
+  }
+  else
+  {
+    uiSymbol += uiVal - b;
+    assert( uiSymbol < ( uiVal << 1 ) );
+    assert( ( uiSymbol >> 1 ) >= uiVal - b );
+    xWriteCode( uiSymbol, uiThresh + 1 );
+  }
+}
+
+void HLSWriter::truncatedUnaryEqProb( int symbol, const int maxSymbol )
+{
+  if( maxSymbol == 0 )
+  {
+    return;
+  }
+
+  bool codeLast = ( maxSymbol > symbol );
+  int bins = 0;
+  int numBins = 0;
+
+  while( symbol-- )
+  {
+    bins <<= 1;
+    bins++;
+    numBins++;
+  }
+  if( codeLast )
+  {
+    bins <<= 1;
+    numBins++;
+  }
+  CHECK( !( numBins <= 32 ), "Unspecified error" );
+  xWriteCode( bins, numBins );
+}
+#endif
 
 //! \}

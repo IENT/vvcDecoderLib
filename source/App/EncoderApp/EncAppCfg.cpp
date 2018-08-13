@@ -861,7 +861,9 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
 #endif
 #if JEM_TOOLS
   ("IntraPDPC",                                       m_IntraPDPC,                                          0, "Intra PDPC (0:off, 1:on Intra_PDPC, 2: on Planar_PDPC)  [default: off]\n")
+#if !JVET_K0371_ALF
   ("ALF",                                             m_ALF,                                                0, "ALF (0:off, 1:ALF, 2:GALF)\n")
+#endif
 #endif
 #if JVET_K0190
   ("LMChroma",                                        m_LMChroma,                                           1, " LMChroma prediction "
@@ -1329,6 +1331,9 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
   ("EnsureWppBitEqual",                               m_ensureWppBitEqual,                       true, "Ensure the results are equal to results with WPP-style parallelism, even if WPP is off")
 #else
   ("EnsureWppBitEqual",                               m_ensureWppBitEqual,                      false, "Ensure the results are equal to results with WPP-style parallelism, even if WPP is off")
+#endif
+#if JVET_K0371_ALF
+  ( "ALF",                                             m_alf,                                    true, "Adpative Loop Filter\n" )
 #endif
     ;
 
@@ -1992,7 +1997,9 @@ Bool EncAppCfg::xCheckParameter()
 #endif
 #if JEM_TOOLS
     xConfirmPara( m_IntraPDPC, "PDPC is only allowed with NEXT profile" );
+#if !JVET_K0371_ALF
     xConfirmPara( m_ALF, "ALF is only allowed with NEXT profile" );
+#endif
     xConfirmPara( m_OBMC, "OBMC is only allowed in NEXT profile" );
 #endif
     xConfirmPara( m_useFastLCTU, "Fast large CTU can only be applied when encoding with NEXT profile" );
@@ -2131,7 +2138,7 @@ Bool EncAppCfg::xCheckParameter()
 
   xConfirmPara( m_useAMaxBT && !m_QTBT, "AMaxBT can only be used with QTBT!" );
 
-#if JEM_TOOLS
+#if JEM_TOOLS && !JVET_K0371_ALF
 #if GALF
   xConfirmPara( m_ALF == 1, "ALF == 1 not supported with GALF enabled" );
 #else
@@ -3226,6 +3233,9 @@ Void EncAppCfg::xPrintParameter()
 #endif
   msg( VERBOSE, "CIP:%d ", m_bUseConstrainedIntraPred);
   msg( VERBOSE, "SAO:%d ", (m_bUseSAO)?(1):(0));
+#if JVET_K0371_ALF
+  msg( VERBOSE, "ALF:%d ", m_alf ? 1 : 0 );
+#endif
   msg( VERBOSE, "PCM:%d ", (m_usePCM && (1<<m_uiPCMLog2MinSize) <= m_uiMaxCUWidth)? 1 : 0);
 
   if (m_TransquantBypassEnabledFlag && m_CUTransquantBypassFlagForce)
@@ -3329,7 +3339,9 @@ Void EncAppCfg::xPrintParameter()
 #endif
 #if JEM_TOOLS
     msg( VERBOSE, "IntraPDPC:%d ", m_IntraPDPC );
+#if !JVET_K0371_ALF
     msg( VERBOSE, "ALF:%d ", m_ALF );
+#endif
 #endif
 #if JVET_K0190
     msg( VERBOSE, "LMChroma:%d ", m_LMChroma );

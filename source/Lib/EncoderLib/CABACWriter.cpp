@@ -272,6 +272,13 @@ void CABACWriter::coding_tree_unit( CodingStructure& cs, const UnitArea& area, i
     sao( *cs.slice, ctuRsAddr );
   }
 
+#if JVET_K0371_ALF
+  for( Int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++ )
+  {
+    codeAlfCtuEnableFlag( cs, ctuRsAddr, compIdx );
+  }
+#endif
+
 #if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
   if (CS::isDualITree(cs) && cs.pcv->chrFormat != CHROMA_400)
   {
@@ -463,6 +470,7 @@ void CABACWriter::sao_offset_pars( const SAOOffset& ctbPars, ComponentID compID,
 }
 
 #if JEM_TOOLS
+#if !JVET_K0371_ALF
 Int CABACWriter::alf_lengthGolomb(int coeffVal, int k)
 {
   int m = 2 << (k - 1);
@@ -521,6 +529,7 @@ Void CABACWriter::codeAlfSvlc( Int iCode )
       m_BinEncoder.encodeBinEP(0);
     }
 }
+#endif
 
 Void CABACWriter::xWriteTruncBinCode(UInt uiSymbol, UInt uiMaxSymbol)
 {
@@ -562,6 +571,7 @@ Void CABACWriter::xWriteTruncBinCode(UInt uiSymbol, UInt uiMaxSymbol)
   }
 }
 
+#if !JVET_K0371_ALF
 #if JVET_C0038_NO_PREV_FILTERS
 Void CABACWriter::xWriteEpExGolomb(UInt uiSymbol, UInt uiCount)
 {
@@ -978,7 +988,7 @@ Void CABACWriter::alf_chroma( const ALFParam& alfParam )
     }
   }
 }
-
+#endif
 #endif
 
 
@@ -3895,5 +3905,74 @@ void CABACWriter::encode_sparse_dt( DecisionTree& dt, unsigned toCodeId )
   DTRACE( g_trace_ctx, D_DECISIONTREE,    "Found an end-node of the tree\n" );
   return;
 }
+
+#if JVET_K0371_ALF
+Void CABACWriter::codeAlfCtuEnableFlags( CodingStructure& cs, ChannelType channel, AlfSliceParam* alfParam)
+{
+  if( isLuma( channel ) )
+  {
+    if (alfParam->enabledFlag[COMPONENT_Y])
+      codeAlfCtuEnableFlags( cs, COMPONENT_Y, alfParam );
+  }
+  else
+  {
+    if (alfParam->enabledFlag[COMPONENT_Cb])
+      codeAlfCtuEnableFlags( cs, COMPONENT_Cb, alfParam );
+    if (alfParam->enabledFlag[COMPONENT_Cr])
+      codeAlfCtuEnableFlags( cs, COMPONENT_Cr, alfParam );
+  }
+}
+Void CABACWriter::codeAlfCtuEnableFlags( CodingStructure& cs, ComponentID compID, AlfSliceParam* alfParam)
+{
+  UInt numCTUs = cs.pcv->sizeInCtus;
+
+  for( Int ctuIdx = 0; ctuIdx < numCTUs; ctuIdx++ )
+  {
+    codeAlfCtuEnableFlag( cs, ctuIdx, compID, alfParam );
+  }
+}
+
+Void CABACWriter::codeAlfCtuEnableFlag( CodingStructure& cs, UInt ctuRsAddr, const Int compIdx, AlfSliceParam* alfParam)
+{
+  AlfSliceParam& alfSliceParam = alfParam ? (*alfParam) : cs.slice->getAlfSliceParam();
+
+  if( cs.sps->getUseALF() && alfSliceParam.enabledFlag[compIdx] )
+  {
+    const PreCalcValues& pcv = *cs.pcv;
+    Int                 frame_width_in_ctus = pcv.widthInCtus;
+    Int                 ry = ctuRsAddr / frame_width_in_ctus;
+    Int                 rx = ctuRsAddr - ry * frame_width_in_ctus;
+    const Position      pos( rx * cs.pcv->maxCUWidth, ry * cs.pcv->maxCUHeight );
+    const UInt          curSliceIdx = cs.slice->getIndependentSliceIdx();
+#if HEVC_TILES_WPP
+    const UInt          curTileIdx = cs.picture->tileMap->getTileIdxMap( pos );
+    Bool                leftMergeAvail = cs.getCURestricted( pos.offset( -(Int)pcv.maxCUWidth, 0 ), curSliceIdx, curTileIdx, CH_L ) ? true : false;
+    Bool                aboveMergeAvail = cs.getCURestricted( pos.offset( 0, -(Int)pcv.maxCUHeight ), curSliceIdx, curTileIdx, CH_L ) ? true : false;
+#else
+    Bool                leftAvail = cs.getCURestricted( pos.offset( -(Int)pcv.maxCUWidth, 0 ), curSliceIdx, CH_L ) ? true : false;
+    Bool                aboveAvail = cs.getCURestricted( pos.offset( 0, -(Int)pcv.maxCUHeight ), curSliceIdx, CH_L ) ? true : false;
+#endif
+
+    Int leftCTUAddr = leftAvail ? ctuRsAddr - 1 : -1;
+    Int aboveCTUAddr = aboveAvail ? ctuRsAddr - frame_width_in_ctus : -1;
+
+    if( alfSliceParam.enabledFlag[compIdx] )
+    {
+      UChar* ctbAlfFlag = cs.slice->getPic()->getAlfCtuEnableFlag( compIdx );
+      if( alfSliceParam.chromaCtbPresentFlag && compIdx )
+      {
+        CHECK( !ctbAlfFlag[ctuRsAddr], "ALF chroma CTB enable flag must be 1 with chromaCtbPresentFlag = 1" );
+      }
+      else
+      {
+        Int ctx = 0;
+        ctx += leftCTUAddr > -1 ? ( ctbAlfFlag[leftCTUAddr] ? 1 : 0 ) : 0;
+        ctx += aboveCTUAddr > -1 ? ( ctbAlfFlag[aboveCTUAddr] ? 1 : 0 ) : 0;
+        m_BinEncoder.encodeBin( ctbAlfFlag[ctuRsAddr], Ctx::ctbAlfFlag( compIdx * 3 + ctx ) );
+      }
+    }
+  }
+}
+#endif
 
 //! \}

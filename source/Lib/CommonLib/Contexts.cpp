@@ -1320,7 +1320,7 @@ const CtxSet ContextSetCfg::SaoTypeIdx = ContextSetCfg::addCtxSet
   {  200,},
 });
 
-#if JEM_TOOLS
+#if JEM_TOOLS && !JVET_K0371_ALF
 const CtxSet ContextSetCfg::AlfCUCtrlFlags = ContextSetCfg::addCtxSet
 ({
   {  CNU, CNU, CNU,},
@@ -1448,6 +1448,17 @@ const CtxSet ContextSetCfg::FrucMode = ContextSetCfg::addCtxSet
 });
 #endif
 
+#if JVET_K0371_ALF
+const CtxSet ContextSetCfg::ctbAlfFlag =
+{
+  ContextSetCfg::addCtxSet
+  ( {
+    { 100, 100, 100, 100, 100, 100, 100, 100, 100 },
+    { 153, 153, 153, 153, 153, 153, 153, 153, 153 },
+    { 200, 200, 200, 200, 200, 200, 200, 200, 200 },
+    } )
+};
+#endif
 
 
 const unsigned ContextSetCfg::NumberOfContexts = (unsigned)ContextSetCfg::sm_InitTables[0].size();
@@ -1825,6 +1836,7 @@ void CtxWSizeStore::xInitMappingTable( const SPS* sps )
     addCtxSetToMapping    ( m_codeId2ctxId, Ctx::LICFlag,                0, 1 );
   }
 #endif
+#if !JVET_K0371_ALF
   if( true /* ALF_HM3_REFACTOR */ )
   {
     if( spsNext.getGALFEnabled() )
@@ -1840,6 +1852,7 @@ void CtxWSizeStore::xInitMappingTable( const SPS* sps )
       addDummySetToMapping( m_codeId2ctxId,                                 3 );
     }
   }
+#endif
   if( true /* COM16_C806_EMT */ )
   {
     addCtxSetToMapping    ( m_codeId2ctxId, Ctx::EMTTuIndex,             0, 4 );

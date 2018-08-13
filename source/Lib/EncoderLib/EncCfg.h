@@ -196,7 +196,9 @@ protected:
 #endif
 #if JEM_TOOLS
   int       m_IntraPDPC;
+#if !JVET_K0371_ALF
   int       m_ALF;
+#endif
 #endif
 #if JEM_TOOLS
   bool      m_BIF;
@@ -587,6 +589,10 @@ protected:
   bool        m_ensureWppBitEqual;
 #endif
 
+#if JVET_K0371_ALF
+  Bool        m_alf;                                          ///< Adaptive Loop Filter
+#endif
+
 public:
   EncCfg()
  #if HEVC_TILES_WPP
@@ -761,8 +767,10 @@ public:
   void      setIntraPDPC                    ( int n )        { m_IntraPDPC = n; }
   int       getIntraPDPC()                             const { return m_IntraPDPC; }
 
+#if !JVET_K0371_ALF
   void      setALF                          ( int i )        { m_ALF = i; }
   int       getALF                          ()         const { return m_ALF; }
+#endif
 #endif
 
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
@@ -1490,6 +1498,10 @@ public:
   int          getNumWppExtraLines()                           const { return m_numWppExtraLines; }
   void         setEnsureWppBitEqual( bool b)                         { m_ensureWppBitEqual = b; }
   bool         getEnsureWppBitEqual()                          const { return m_ensureWppBitEqual; }
+#endif
+#if JVET_K0371_ALF
+  Void        setUseALF( Bool b ) { m_alf = b; }
+  Bool        getUseALF()                                      const { return m_alf; }
 #endif
 };
 

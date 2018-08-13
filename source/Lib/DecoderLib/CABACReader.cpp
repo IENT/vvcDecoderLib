@@ -162,6 +162,52 @@ bool CABACReader::coding_tree_unit( CodingStructure& cs, const UnitArea& area, i
 
   sao( cs, ctuRsAddr );
 
+#if JVET_K0371_ALF
+  AlfSliceParam& alfSliceParam = cs.slice->getAlfSliceParam();
+
+  if( cs.sps->getUseALF() && ( alfSliceParam.enabledFlag[COMPONENT_Y] || alfSliceParam.enabledFlag[COMPONENT_Cb] || alfSliceParam.enabledFlag[COMPONENT_Cr] ) )
+  {
+
+    const PreCalcValues& pcv = *cs.pcv;
+    Int                 frame_width_in_ctus = pcv.widthInCtus;
+    Int                 ry = ctuRsAddr / frame_width_in_ctus;
+    Int                 rx = ctuRsAddr - ry * frame_width_in_ctus;
+    const Position      pos( rx * cs.pcv->maxCUWidth, ry * cs.pcv->maxCUHeight );
+    const UInt          curSliceIdx = cs.slice->getIndependentSliceIdx();
+#if HEVC_TILES_WPP
+    const UInt          curTileIdx = cs.picture->tileMap->getTileIdxMap( pos );
+    Bool                leftMergeAvail = cs.getCURestricted( pos.offset( -(Int)pcv.maxCUWidth, 0 ), curSliceIdx, curTileIdx, CH_L ) ? true : false;
+    Bool                aboveMergeAvail = cs.getCURestricted( pos.offset( 0, -(Int)pcv.maxCUHeight ), curSliceIdx, curTileIdx, CH_L ) ? true : false;
+#else
+    Bool                leftAvail = cs.getCURestricted( pos.offset( -(Int)pcv.maxCUWidth, 0 ), curSliceIdx, CH_L ) ? true : false;
+    Bool                aboveAvail = cs.getCURestricted( pos.offset( 0, -(Int)pcv.maxCUHeight ), curSliceIdx, CH_L ) ? true : false;
+#endif
+
+    Int leftCTUAddr = leftAvail ? ctuRsAddr - 1 : -1;
+    Int aboveCTUAddr = aboveAvail ? ctuRsAddr - frame_width_in_ctus : -1;
+
+    for( Int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++ )
+    {
+      if( alfSliceParam.enabledFlag[compIdx] )
+      {
+        UChar* ctbAlfFlag = cs.slice->getPic()->getAlfCtuEnableFlag( compIdx );
+        Int ctx = 0;
+        ctx += leftCTUAddr > -1 ? ( ctbAlfFlag[leftCTUAddr] ? 1 : 0 ) : 0;
+        ctx += aboveCTUAddr > -1 ? ( ctbAlfFlag[aboveCTUAddr] ? 1 : 0 ) : 0;
+
+        if( alfSliceParam.chromaCtbPresentFlag && compIdx )
+        {
+          ctbAlfFlag[ctuRsAddr] = 1;
+        }
+        else
+        {
+          ctbAlfFlag[ctuRsAddr] = m_BinDecoder.decodeBin( Ctx::ctbAlfFlag( compIdx * 3 + ctx ) );
+        }
+      }
+    }
+  }
+#endif
+
 #if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
   bool isLast = false;
 
@@ -364,7 +410,7 @@ void CABACReader::sao( CodingStructure& cs, unsigned ctuRsAddr )
 
 
 #if JEM_TOOLS
-
+#if !JVET_K0371_ALF
 UInt CABACReader::parseAlfUvlc ()
 {
   UInt uiCode;
@@ -414,6 +460,7 @@ Int CABACReader::parseAlfSvlc()
   }
   return i*iSign;
 }
+#endif
 
 Void CABACReader::xReadTruncBinCode(UInt& ruiSymbol, UInt uiMaxSymbol)
 {
@@ -447,6 +494,7 @@ Void CABACReader::xReadTruncBinCode(UInt& ruiSymbol, UInt uiMaxSymbol)
   }
 }
 
+#if !JVET_K0371_ALF
 UInt CABACReader::xReadEpExGolomb(UInt uiCount)
 {
   UInt uiSymbol = 0;
@@ -888,6 +936,7 @@ Void CABACReader::alf_chroma( ALFParam& alfParam )
   }
 }
 
+#endif
 #endif
 
 

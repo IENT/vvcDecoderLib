@@ -52,6 +52,8 @@
 
 #define JVET_K1000_SIMPLIFIED_EMT                         1 // EMT with only DCT-2, DCT-8 and DST-7
 
+#define JVET_K0371_ALF                                    1
+
 #define DEBLOCKING_GRID_8x8                               1
 #define DB_TU_FIX                                         1 // fix in JVET_K0307, JVET-K0237, JVET-K0369, JVET-K0232, JVET-K0315
 
@@ -273,6 +275,9 @@
 #if JVET_K0367_AFFINE_FIX_POINT
 #define ENABLE_SIMD_OPT_AFFINE_ME                       ( 1 && ENABLE_SIMD_OPT )                            ///< SIMD optimization for affine ME, no impact on RD performance
 #endif
+#if JVET_K0371_ALF
+#define ENABLE_SIMD_OPT_ALF                             ( 1 && ENABLE_SIMD_OPT )                            ///< SIMD optimization for ALF
+#endif
 // End of SIMD optimizations
 
 
@@ -298,7 +303,7 @@
 #define ENABLE_QPA                                        0
 
 
-#if JEM_TOOLS
+#if JEM_TOOLS && !JVET_K0371_ALF
 #define COM16_C806_ALF_TEMPPRED_NUM                       6 //tbd
 
 #define GALF                                              1 //tbd
@@ -1061,7 +1066,7 @@ private:
 
 };
 
-#if JEM_TOOLS
+#if JEM_TOOLS && !JVET_K0371_ALF
 #if GALF
 
   #define NUM_OF_ALF_CLASSES   25
@@ -1539,6 +1544,142 @@ struct XUCache
 };
 
 #define SIGN(x) ( (x) >= 0 ? 1 : -1 )
+
+#if JVET_K0371_ALF
+#define MAX_NUM_ALF_CLASSES             25
+#define MAX_NUM_ALF_LUMA_COEFF          13
+#define MAX_NUM_ALF_CHROMA_COEFF        7
+#define MAX_ALF_FILTER_LENGTH           7
+#define MAX_NUM_ALF_COEFF               (MAX_ALF_FILTER_LENGTH * MAX_ALF_FILTER_LENGTH / 2 + 1)
+
+enum AlfFilterType
+{
+  ALF_FILTER_5,
+  ALF_FILTER_7,
+  ALF_NUM_OF_FILTER_TYPES
+};
+
+struct AlfFilterShape
+{
+  AlfFilterShape( int size )
+    : filterLength( size ), 
+    numCoeff( size * size / 4 + 1 ), 
+    filterSize( size * size / 2 + 1 )
+  {
+    if( size == 5 )
+    {
+      pattern = {
+                 0,
+             1,  2,  3,
+         4,  5,  6,  5,  4,
+             3,  2,  1,
+                 0
+      };
+
+      weights = {
+                 2,
+              2, 2, 2,
+           2, 2, 1, 1
+      };
+
+      golombIdx = {
+                 0,
+              0, 1, 0,
+           0, 1, 2, 2
+      };
+
+      filterType = ALF_FILTER_5;
+    }
+    else if( size == 7 )
+    {
+      pattern = {
+                     0,
+                 1,  2,  3,
+             4,  5,  6,  7,  8,
+         9, 10, 11, 12, 11, 10, 9,
+             8,  7,  6,  5,  4,
+                 3,  2,  1,
+                     0
+      };
+
+      weights = {
+                    2,
+                2,  2,  2,
+            2,  2,  2,  2,  2,
+        2,  2,  2,  1,  1 
+      };
+
+      golombIdx = {
+                    0,
+                 0, 1, 0,
+              0, 1, 2, 1, 0,
+           0, 1, 2, 3, 3
+      };
+
+      filterType = ALF_FILTER_7;
+    }
+    else
+    {
+      filterType = ALF_NUM_OF_FILTER_TYPES;
+      CHECK( 0, "Wrong ALF filter shape" );
+    }
+  }
+
+  AlfFilterType filterType;
+  int filterLength;
+  int numCoeff;      //TO DO: check whether we need both numCoeff and filterSize
+  int filterSize;
+  std::vector<int> pattern;
+  std::vector<int> weights;
+  std::vector<int> golombIdx;
+};
+
+struct AlfSliceParam
+{
+  bool                         enabledFlag[MAX_NUM_COMPONENT];                          // alf_slice_enable_flag, alf_chroma_idc
+  AlfFilterType                lumaFilterType;                                          // filter_type_flag
+  bool                         chromaCtbPresentFlag;                                    // alf_chroma_ctb_present_flag
+  short                        lumaCoeff[MAX_NUM_ALF_CLASSES * MAX_NUM_ALF_LUMA_COEFF]; // alf_coeff_luma_delta[i][j]
+  short                        chromaCoeff[MAX_NUM_ALF_CHROMA_COEFF];                   // alf_coeff_chroma[i]
+  short                        filterCoeffDeltaIdx[MAX_NUM_ALF_CLASSES];                // filter_coeff_delta[i]
+  bool                         filterCoeffFlag[MAX_NUM_ALF_CLASSES];                    // filter_coefficient_flag[i]
+  int                          numLumaFilters;                                          // number_of_filters_minus1 + 1
+  bool                         coeffDeltaFlag;                                          // alf_coefficients_delta_flag
+  bool                         coeffDeltaPredModeFlag;                                  // coeff_delta_pred_mode_flag
+  std::vector<AlfFilterShape>* filterShapes;
+
+  void reset()
+  {
+    std::memset( enabledFlag, false, sizeof( enabledFlag ) );
+    lumaFilterType = ALF_FILTER_5;
+    std::memset( lumaCoeff, 0, sizeof( lumaCoeff ) );
+    std::memset( chromaCoeff, 0, sizeof( chromaCoeff ) );
+    std::memset( filterCoeffDeltaIdx, 0, sizeof( filterCoeffDeltaIdx ) );
+    std::memset( filterCoeffFlag, true, sizeof( filterCoeffFlag ) );
+    numLumaFilters = 1;
+    coeffDeltaFlag = false;
+    coeffDeltaPredModeFlag = false;
+    chromaCtbPresentFlag = false;
+  }
+
+  const AlfSliceParam& operator = ( const AlfSliceParam& src )
+  {
+    std::memcpy( enabledFlag, src.enabledFlag, sizeof( enabledFlag ) );
+    lumaFilterType = src.lumaFilterType;
+    std::memcpy( lumaCoeff, src.lumaCoeff, sizeof( lumaCoeff ) );
+    std::memcpy( chromaCoeff, src.chromaCoeff, sizeof( chromaCoeff ) );
+    std::memcpy( filterCoeffDeltaIdx, src.filterCoeffDeltaIdx, sizeof( filterCoeffDeltaIdx ) );
+    std::memcpy( filterCoeffFlag, src.filterCoeffFlag, sizeof( filterCoeffFlag ) );
+    numLumaFilters = src.numLumaFilters;
+    coeffDeltaFlag = src.coeffDeltaFlag;
+    coeffDeltaPredModeFlag = src.coeffDeltaPredModeFlag;
+    filterShapes = src.filterShapes;
+    chromaCtbPresentFlag = src.chromaCtbPresentFlag;
+    return *this;
+  }
+};
+#endif
+
 //! \}
 
 #endif
