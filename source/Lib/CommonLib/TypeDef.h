@@ -356,7 +356,6 @@
 // Basic type redefinition
 // ====================================================================================================================
 
-typedef       unsigned short      UShort;
 typedef       int                 Int;
 typedef       unsigned int        UInt;
 
@@ -1205,8 +1204,8 @@ struct SEIMasteringDisplay
   bool      colourVolumeSEIEnabled;
   UInt      maxLuminance;
   UInt      minLuminance;
-  UShort    primaries[3][2];
-  UShort    whitePoint[2];
+  uint16_t    primaries[3][2];
+  uint16_t    whitePoint[2];
 };
 
 #if SHARP_LUMA_DELTA_QP

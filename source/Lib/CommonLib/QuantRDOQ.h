@@ -92,7 +92,7 @@ private:
                               const BinFracBits& fracBitsPar,
                               const BinFracBits& fracBitsGt1,
                               const BinFracBits& fracBitsGt2,
-                              UShort             ui16AbsGoRice,
+                              uint16_t             ui16AbsGoRice,
                               Int                iQBits,
                               double             errorScale,
                               bool               bLast,
@@ -102,7 +102,7 @@ private:
                               const BinFracBits& fracBitsPar,
                               const BinFracBits& fracBitsGt1,
                               const BinFracBits& fracBitsGt2,
-                              const UShort       ui16AbsGoRice,
+                              const uint16_t       ui16AbsGoRice,
                               const bool         useLimitedPrefixLength,
                               const Int          maxLog2TrDynamicRange  ) const;
 #else
@@ -117,7 +117,7 @@ private:
 #if JEM_TOOLS
                                 const bool          useAltRC,
 #endif
-                                UShort              ui16AbsGoRice,
+                                uint16_t              ui16AbsGoRice,
                                 UInt                c1Idx,
                                 UInt                c2Idx,
                                 Int                 iQBits,
@@ -132,7 +132,7 @@ private:
 #if JEM_TOOLS
                            const bool         useAltRC,
 #endif
-                           const UShort       ui16AbsGoRice,
+                           const uint16_t       ui16AbsGoRice,
                            const UInt         c1Idx,
                            const UInt         c2Idx,
                            const bool         useLimitedPrefixLength,

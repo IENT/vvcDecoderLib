@@ -66,7 +66,7 @@ static void simdDeriveClassificationBlk( AlfClassifier** classifier, int** lapla
   const int posY = blk.pos().y;
   const int start_height1 = posY - flplusOne;
 
-  static UShort _temp[( AdaptiveLoopFilter::m_CLASSIFICATION_BLK_SIZE + 4 ) >> 1][AdaptiveLoopFilter::m_CLASSIFICATION_BLK_SIZE + 4];
+  static uint16_t _temp[( AdaptiveLoopFilter::m_CLASSIFICATION_BLK_SIZE + 4 ) >> 1][AdaptiveLoopFilter::m_CLASSIFICATION_BLK_SIZE + 4];
 
   for( int i = 0; i < imgHExtended - 2; i += 2 )
   {

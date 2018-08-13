@@ -458,7 +458,7 @@ static bool writePlane(ostream& fd, const Pel* src, bool is16bit,
         }
         else
         {
-          UShort val(value);
+          uint16_t val(value);
           for (UInt x = 0; x < width_file; x++)
           {
             buf[2*x+0]= (val>>0) & 0xff;
@@ -585,7 +585,7 @@ static bool writeField(ostream& fd, const Pel* top, const Pel* bottom, bool is16
           }
           else
           {
-            UShort val(value);
+            uint16_t val(value);
             for (UInt x = 0; x < width_file; x++)
             {
               fieldBuffer[2*x+0]= (val>>0) & 0xff;

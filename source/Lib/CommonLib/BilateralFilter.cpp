@@ -52,10 +52,10 @@ BilateralFilter::BilateralFilter()
 {
   int numQP = MAX_QP-18+1;
   // allocation
-  m_bilateralFilterTable = new UShort*[numQP];
+  m_bilateralFilterTable = new uint16_t*[numQP];
   for(int i = 0; i < numQP; i++)
   {
-    m_bilateralFilterTable[i] = new UShort[maxPosList[i]+1];
+    m_bilateralFilterTable[i] = new uint16_t[maxPosList[i]+1];
   }
 
   // initialization
@@ -155,7 +155,7 @@ void BilateralFilter::createBilateralFilterTable(int qp)
   for (Int j = 0; j < (maxPosList[qp-18]+1); j++)
   {
     Int temp = j * 25;
-    m_bilateralFilterTable[qp-18][j] = UShort(exp(-(10000.0 / sqrtSpatialSigmaMulTwo) - (temp * temp / (sqrtIntensitySigmaMulTwo * 1.0))) * 65 + 0.5);
+    m_bilateralFilterTable[qp-18][j] = uint16_t(exp(-(10000.0 / sqrtSpatialSigmaMulTwo) - (temp * temp / (sqrtIntensitySigmaMulTwo * 1.0))) * 65 + 0.5);
   }
 }
 
@@ -184,7 +184,7 @@ void BilateralFilter::smoothBlockBilateralFilter(unsigned uiWidth, unsigned uiHe
   }
 
 
-  UShort *lookupTablePtr;
+  uint16_t *lookupTablePtr;
 
   centerWeight = m_bilateralCenterWeightTable[blockLengthIndex + 3 * isInterBlock];
 

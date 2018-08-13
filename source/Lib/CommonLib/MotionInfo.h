@@ -107,7 +107,7 @@ struct MotionInfo
   bool     usesLIC;
 #endif
   char     interDir;
-  UShort   sliceIdx;
+  uint16_t   sliceIdx;
 
   Mv      mv     [ NUM_REF_PIC_LIST_01 ];
   int16_t   refIdx [ NUM_REF_PIC_LIST_01 ];
