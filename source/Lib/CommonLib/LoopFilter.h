@@ -80,7 +80,7 @@ private:
                                           DeblockEdgeDir edgeDir,
                                     const Area&          area,
                                     const Position       subPuPos,
-                                          Bool           bValue );
+                                          bool           bValue );
 #endif
 
   void xEdgeFilterLuma            ( const CodingUnit& cu, const DeblockEdgeDir edgeDir, const int iEdge );

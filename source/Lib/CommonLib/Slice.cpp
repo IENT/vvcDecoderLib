@@ -243,7 +243,7 @@ void Slice::setDefaultClpRng( const SPS& sps )
 }
 
 
-Bool Slice::getRapPicFlag() const
+bool Slice::getRapPicFlag() const
 {
   return getNalUnitType() == NAL_UNIT_CODED_SLICE_IDR_W_RADL
       || getNalUnitType() == NAL_UNIT_CODED_SLICE_IDR_N_LP
@@ -310,7 +310,7 @@ Picture* Slice::xGetRefPic (PicList& rcListPic, Int poc)
 }
 
 
-Picture* Slice::xGetLongTermRefPic( PicList& rcListPic, Int poc, Bool pocHasMsb)
+Picture* Slice::xGetLongTermRefPic( PicList& rcListPic, Int poc, bool pocHasMsb)
 {
   PicList::iterator  iterPic = rcListPic.begin();
   Picture*           pcPic   = *(iterPic);
@@ -382,7 +382,7 @@ void Slice::setList1IdxToList0Idx()
   }
 }
 
-void Slice::setRefPicList( PicList& rcListPic, Bool checkNumPocTotalCurr, Bool bCopyL0toL1ErrorCase )
+void Slice::setRefPicList( PicList& rcListPic, bool checkNumPocTotalCurr, bool bCopyL0toL1ErrorCase )
 {
   if ( m_eSliceType == I_SLICE)
   {
@@ -659,7 +659,7 @@ void Slice::checkCRA(const ReferencePictureSet *pReferencePictureSet, Int& pocCR
  * Note that the current picture is already placed in the reference list and its marking is not changed.
  * If the current picture has a nal_ref_idc that is not 0, it will remain marked as "used for reference".
  */
-void Slice::decodingRefreshMarking(Int& pocCRA, Bool& bRefreshPending, PicList& rcListPic, const bool bEfficientFieldIRAPEnabled)
+void Slice::decodingRefreshMarking(Int& pocCRA, bool& bRefreshPending, PicList& rcListPic, const bool bEfficientFieldIRAPEnabled)
 {
   Picture* rpcPic;
   Int      pocCurr = getPOC();
@@ -862,7 +862,7 @@ void Slice::copySliceInfo(Slice *pSrc, bool cpyAlmostAll)
 
 /** Function for checking if this is a switching-point
 */
-Bool Slice::isTemporalLayerSwitchingPoint(PicList& rcListPic) const
+bool Slice::isTemporalLayerSwitchingPoint(PicList& rcListPic) const
 {
   // loop through all pictures in the reference picture buffer
   PicList::iterator iterPic = rcListPic.begin();
@@ -882,7 +882,7 @@ Bool Slice::isTemporalLayerSwitchingPoint(PicList& rcListPic) const
 
 /** Function for checking if this is a STSA candidate
  */
-Bool Slice::isStepwiseTemporalLayerSwitchingPointCandidate(PicList& rcListPic) const
+bool Slice::isStepwiseTemporalLayerSwitchingPointCandidate(PicList& rcListPic) const
 {
   PicList::iterator iterPic = rcListPic.begin();
   while ( iterPic != rcListPic.end())
@@ -1147,7 +1147,7 @@ void Slice::applyReferencePictureSet( PicList& rcListPic, const ReferencePicture
 
 /** Function for applying picture marking based on the Reference Picture Set in pReferencePictureSet.
 */
-Int Slice::checkThatAllRefPicsAreAvailable( PicList& rcListPic, const ReferencePictureSet *pReferencePictureSet, Bool printErrors, Int pocRandomAccess, Bool bUseRecoveryPoint) const
+Int Slice::checkThatAllRefPicsAreAvailable( PicList& rcListPic, const ReferencePictureSet *pReferencePictureSet, bool printErrors, Int pocRandomAccess, bool bUseRecoveryPoint) const
 {
   Int atLeastOneUnabledByRecoveryPoint = 0;
   Int atLeastOneFlushedByPreviousIDR = 0;
@@ -1343,7 +1343,7 @@ Int Slice::checkThatAllRefPicsAreAvailable( PicList& rcListPic, const ReferenceP
 
 /** Function for constructing an explicit Reference Picture Set out of the available pictures in a referenced Reference Picture Set
 */
-void Slice::createExplicitReferencePictureSetFromReference( PicList& rcListPic, const ReferencePictureSet *pReferencePictureSet, Bool isRAP, Int pocRandomAccess, Bool bUseRecoveryPoint, const Bool bEfficientFieldIRAPEnabled)
+void Slice::createExplicitReferencePictureSetFromReference( PicList& rcListPic, const ReferencePictureSet *pReferencePictureSet, bool isRAP, Int pocRandomAccess, bool bUseRecoveryPoint, const bool bEfficientFieldIRAPEnabled)
 {
   Picture* rpcPic;
   Int i, j;
@@ -1353,7 +1353,7 @@ void Slice::createExplicitReferencePictureSetFromReference( PicList& rcListPic, 
   ReferencePictureSet* pLocalRPS = this->getLocalRPS();
   (*pLocalRPS)=ReferencePictureSet();
 
-  Bool irapIsInRPS = false; // Used when bEfficientFieldIRAPEnabled==true
+  bool irapIsInRPS = false; // Used when bEfficientFieldIRAPEnabled==true
 
   // loop through all pictures in the Reference Picture Set
   for(i=0;i<pReferencePictureSet->getNumberOfPictures();i++)
@@ -1394,7 +1394,7 @@ void Slice::createExplicitReferencePictureSetFromReference( PicList& rcListPic, 
     }
   }
 
-  Bool useNewRPS = false;
+  bool useNewRPS = false;
   // if current picture is complimentary field associated to IRAP, add the IRAP to its RPS.
   if(bEfficientFieldIRAPEnabled && m_pcPic->fieldPic && !irapIsInRPS)
   {
@@ -1507,7 +1507,7 @@ void  Slice::resetWpScaling()
 //! init WP table
 void  Slice::initWpScaling(const SPS *sps)
 {
-  const Bool bUseHighPrecisionPredictionWeighting = sps->getSpsRangeExtension().getHighPrecisionOffsetsEnabledFlag();
+  const bool bUseHighPrecisionPredictionWeighting = sps->getSpsRangeExtension().getHighPrecisionOffsetsEnabledFlag();
   for ( Int e=0 ; e<NUM_REF_PIC_LIST_01 ; e++ )
   {
     for ( Int i=0 ; i<MAX_NUM_REF ; i++ )
@@ -2003,7 +2003,7 @@ ReferencePictureSet::~ReferencePictureSet()
 {
 }
 
-void ReferencePictureSet::setUsed(Int bufferNum, Bool used)
+void ReferencePictureSet::setUsed(Int bufferNum, bool used)
 {
   m_used[bufferNum] = used;
 }
@@ -2043,12 +2043,12 @@ void ReferencePictureSet::setPOC(Int bufferNum, Int POC)
   m_POC[bufferNum] = POC;
 }
 
-Bool ReferencePictureSet::getCheckLTMSBPresent(Int bufferNum) const
+bool ReferencePictureSet::getCheckLTMSBPresent(Int bufferNum) const
 {
   return m_bCheckLTMSB[bufferNum];
 }
 
-void ReferencePictureSet::setCheckLTMSBPresent(Int bufferNum, Bool b)
+void ReferencePictureSet::setCheckLTMSBPresent(Int bufferNum, bool b)
 {
   m_bCheckLTMSB[bufferNum] = b;
 }
@@ -2076,7 +2076,7 @@ void ReferencePictureSet::sortDeltaPOC()
   for(Int j=1; j < getNumberOfPictures(); j++)
   {
     Int deltaPOC = getDeltaPOC(j);
-    Bool used = getUsed(j);
+    bool used = getUsed(j);
     for (Int k=j-1; k >= 0; k--)
     {
       Int temp = getDeltaPOC(k);
@@ -2094,7 +2094,7 @@ void ReferencePictureSet::sortDeltaPOC()
   for(Int j=0, k=numNegPics-1; j < numNegPics>>1; j++, k--)
   {
     Int deltaPOC = getDeltaPOC(j);
-    Bool used = getUsed(j);
+    bool used = getUsed(j);
     setDeltaPOC(j, getDeltaPOC(k));
     setUsed(j, getUsed(k));
     setDeltaPOC(k, deltaPOC);
@@ -2163,7 +2163,7 @@ void ScalingList::setDefaultScalingList()
 /** check if use default quantization matrix
  * \returns true if use default quantization matrix in all size
 */
-Bool ScalingList::checkDefaultScalingList()
+bool ScalingList::checkDefaultScalingList()
 {
   UInt defaultCounter=0;
 
@@ -2269,7 +2269,7 @@ void ScalingList::outputScalingLists(std::ostream &os) const
   }
 }
 
-Bool ScalingList::xParseScalingList(const std::string &fileName)
+bool ScalingList::xParseScalingList(const std::string &fileName)
 {
   static const Int LINE_SIZE=1024;
   FILE *fp = NULL;
@@ -2310,7 +2310,7 @@ Bool ScalingList::xParseScalingList(const std::string &fileName)
       {
         {
           fseek(fp, 0, SEEK_SET);
-          Bool bFound=false;
+          bool bFound=false;
           while ((!feof(fp)) && (!bFound))
           {
             TChar *ret = fgets(line, LINE_SIZE, fp);
@@ -2350,7 +2350,7 @@ Bool ScalingList::xParseScalingList(const std::string &fileName)
         {
           {
             fseek(fp, 0, SEEK_SET);
-            Bool bFound=false;
+            bool bFound=false;
             while ((!feof(fp)) && (!bFound))
             {
               TChar *ret = fgets(line, LINE_SIZE, fp);
@@ -2471,7 +2471,7 @@ ParameterSetManager::~ParameterSetManager()
 
 //! activate a SPS from a active parameter sets SEI message
 //! \returns true, if activation is successful
-//Bool ParameterSetManager::activateSPSWithSEI(Int spsId)
+//bool ParameterSetManager::activateSPSWithSEI(Int spsId)
 //{
 //  SPS *sps = m_spsMap.getPS(spsId);
 //  if (sps)
@@ -2502,7 +2502,7 @@ ParameterSetManager::~ParameterSetManager()
 //! activate a PPS and depending on isIDR parameter also SPS
 #endif
 //! \returns true, if activation is successful
-Bool ParameterSetManager::activatePPS(Int ppsId, Bool isIRAP)
+bool ParameterSetManager::activatePPS(Int ppsId, bool isIRAP)
 {
   PPS *pps = m_ppsMap.getPS(ppsId);
   if (pps)
@@ -2598,7 +2598,7 @@ PTL::PTL()
   ::memset(m_subLayerLevelPresentFlag,   0, sizeof(m_subLayerLevelPresentFlag  ));
 }
 
-void calculateParameterSetChangedFlag(Bool &bChanged, const std::vector<UChar> *pOldData, const std::vector<UChar> *pNewData)
+void calculateParameterSetChangedFlag(bool &bChanged, const std::vector<UChar> *pOldData, const std::vector<UChar> *pNewData)
 {
   if (!bChanged)
   {

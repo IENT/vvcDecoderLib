@@ -268,7 +268,7 @@ int calcAndPrintHashStatus(const CPelUnitBuf& pic, const SEIDecodedPictureHash* 
 
   /* compare digest against received version */
   const TChar* ok = "(unk)";
-  Bool mismatch = false;
+  bool mismatch = false;
 
   if (pictureHashSEI)
   {

@@ -120,9 +120,9 @@ inline Size recalcSize( const ChromaFormat _cf, const ChannelType srcCHt, const 
 struct CompArea : public Area
 {
   CompArea() : Area(), chromaFormat(NUM_CHROMA_FORMAT), compID(MAX_NUM_TBLOCKS)                                                                                                                                 { }
-  CompArea(const ComponentID _compID, const ChromaFormat _cf, const Area &_area, const Bool isLuma = false)                                          : Area(_area),          chromaFormat(_cf), compID(_compID) { if (isLuma) xRecalcLumaToChroma(); }
-  CompArea(const ComponentID _compID, const ChromaFormat _cf, const Position& _pos, const Size& _size, const Bool isLuma = false)                    : Area(_pos, _size),    chromaFormat(_cf), compID(_compID) { if (isLuma) xRecalcLumaToChroma(); }
-  CompArea(const ComponentID _compID, const ChromaFormat _cf, const UInt _x, const UInt _y, const UInt _w, const UInt _h, const Bool isLuma = false) : Area(_x, _y, _w, _h), chromaFormat(_cf), compID(_compID) { if (isLuma) xRecalcLumaToChroma(); }
+  CompArea(const ComponentID _compID, const ChromaFormat _cf, const Area &_area, const bool isLuma = false)                                          : Area(_area),          chromaFormat(_cf), compID(_compID) { if (isLuma) xRecalcLumaToChroma(); }
+  CompArea(const ComponentID _compID, const ChromaFormat _cf, const Position& _pos, const Size& _size, const bool isLuma = false)                    : Area(_pos, _size),    chromaFormat(_cf), compID(_compID) { if (isLuma) xRecalcLumaToChroma(); }
+  CompArea(const ComponentID _compID, const ChromaFormat _cf, const UInt _x, const UInt _y, const UInt _w, const UInt _h, const bool isLuma = false) : Area(_x, _y, _w, _h), chromaFormat(_cf), compID(_compID) { if (isLuma) xRecalcLumaToChroma(); }
 
   ChromaFormat chromaFormat;
   ComponentID compID;
@@ -141,9 +141,9 @@ struct CompArea : public Area
   Position bottomLeftComp (const ComponentID _compID) const { return recalcPosition(chromaFormat, compID, _compID, { x                        , (PosType) (y + height - 1 )}); }
   Position bottomRightComp(const ComponentID _compID) const { return recalcPosition(chromaFormat, compID, _compID, { (PosType) (x + width - 1), (PosType) (y + height - 1 )}); }
 
-  Bool valid() const { return chromaFormat < NUM_CHROMA_FORMAT && compID < MAX_NUM_TBLOCKS && width != 0 && height != 0; }
+  bool valid() const { return chromaFormat < NUM_CHROMA_FORMAT && compID < MAX_NUM_TBLOCKS && width != 0 && height != 0; }
 
-  const Bool operator==(const CompArea &other) const
+  const bool operator==(const CompArea &other) const
   {
     if (chromaFormat != other.chromaFormat) return false;
     if (compID       != other.compID)       return false;
@@ -151,7 +151,7 @@ struct CompArea : public Area
     return Position::operator==(other) && Size::operator==(other);
   }
 
-  const Bool operator!=(const CompArea &other) const { return !(operator==(other)); }
+  const bool operator!=(const CompArea &other) const { return !(operator==(other)); }
 
   void     repositionTo      (const Position& newPos)       { Position::repositionTo(newPos); }
   void     positionRelativeTo(const CompArea& origCompArea) { Position::relativeTo(origCompArea); }
@@ -195,13 +195,13 @@ struct UnitArea
         CompArea& block(const ComponentID comp)       { return blocks[comp]; }
   const CompArea& block(const ComponentID comp) const { return blocks[comp]; }
 
-  Bool contains(const UnitArea& other) const;
-  Bool contains(const UnitArea& other, const ChannelType chType) const;
+  bool contains(const UnitArea& other) const;
+  bool contains(const UnitArea& other, const ChannelType chType) const;
 
         CompArea& operator[]( const int n )       { return blocks[n]; }
   const CompArea& operator[]( const int n ) const { return blocks[n]; }
 
-  const Bool operator==(const UnitArea &other) const
+  const bool operator==(const UnitArea &other) const
   {
     if (chromaFormat != other.chromaFormat)   return false;
     if (blocks.size() != other.blocks.size()) return false;
@@ -216,7 +216,7 @@ struct UnitArea
 
   void repositionTo(const UnitArea& unit);
 
-  const Bool operator!=(const UnitArea &other) const { return !(*this == other); }
+  const bool operator!=(const UnitArea &other) const { return !(*this == other); }
 
   const Position& lumaPos () const { return Y(); }
   const Size&     lumaSize() const { return Y(); }
@@ -233,7 +233,7 @@ struct UnitArea
   const PosType   lx() const { return Y().x; }           /*! luma x-pos */
   const PosType   ly() const { return Y().y; }           /*! luma y-pos */
 
-  Bool valid() const { return chromaFormat != NUM_CHROMA_FORMAT && blocks.size() > 0; }
+  bool valid() const { return chromaFormat != NUM_CHROMA_FORMAT && blocks.size() > 0; }
 };
 
 inline UnitArea clipArea(const UnitArea &area, const UnitArea &boundingBox)
@@ -294,22 +294,22 @@ struct CodingUnit : public UnitArea
   SChar          chromaQpAdj;
   SChar          qp;
   SplitSeries    splitSeries;
-  Bool           skip;
+  bool           skip;
 #if JEM_TOOLS || JVET_K_AFFINE
-  Bool           affine;
+  bool           affine;
 #if JVET_K0337_AFFINE_6PARA
   int            affineType;
 #endif
 #endif
-  Bool           transQuantBypass;
+  bool           transQuantBypass;
 #if JEM_TOOLS
-  Bool           pdpc;
+  bool           pdpc;
 #endif
-  Bool           ipcm;
+  bool           ipcm;
 #if JVET_K0357_AMVR
   UChar          imv;
 #endif
-  Bool           rootCbf;
+  bool           rootCbf;
 #if HEVC_TILES_WPP
   UInt           tileIdx;
 #endif
@@ -320,8 +320,8 @@ struct CodingUnit : public UnitArea
   UInt           nsstIdx;
 #endif
 #if JEM_TOOLS
-  Bool           LICFlag;
-  Bool           obmcFlag;
+  bool           LICFlag;
+  bool           obmcFlag;
 #endif
 
   // needed for fast imv mode decisions
@@ -362,7 +362,7 @@ struct IntraPredictionData
 
 struct InterPredictionData
 {
-  Bool      mergeFlag;
+  bool      mergeFlag;
   UChar     mergeIdx;
   UChar     interDir;
   UChar     mvpIdx  [NUM_REF_PIC_LIST_01];
@@ -373,7 +373,7 @@ struct InterPredictionData
   MergeType mergeType;
 #if JEM_TOOLS
   UChar     frucMrgMode;
-  Bool      mvRefine;
+  bool      mvRefine;
 #endif
 #if JEM_TOOLS || JVET_K_AFFINE
   Mv        mvdAffi [NUM_REF_PIC_LIST_01][3];
@@ -437,7 +437,7 @@ struct TransformUnit : public UnitArea
 #endif
   UChar        cbf          [ MAX_NUM_TBLOCKS ];
   RDPCMMode    rdpcm        [ MAX_NUM_TBLOCKS ];
-  Bool         transformSkip[ MAX_NUM_TBLOCKS ];
+  bool         transformSkip[ MAX_NUM_TBLOCKS ];
   SChar        compAlpha    [ MAX_NUM_TBLOCKS ];
 
   TransformUnit() : chType( CH_L ) { }

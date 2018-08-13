@@ -72,7 +72,7 @@ struct NALUnit
   virtual ~NALUnit() { }
 
   /** returns true if the NALunit is a slice NALunit */
-  Bool isSlice()
+  bool isSlice()
   {
     return m_nalUnitType == NAL_UNIT_CODED_SLICE_TRAIL_R
         || m_nalUnitType == NAL_UNIT_CODED_SLICE_TRAIL_N
@@ -91,13 +91,13 @@ struct NALUnit
         || m_nalUnitType == NAL_UNIT_CODED_SLICE_RASL_N
         || m_nalUnitType == NAL_UNIT_CODED_SLICE_RASL_R;
   }
-  Bool isSei()
+  bool isSei()
   {
     return m_nalUnitType == NAL_UNIT_PREFIX_SEI
         || m_nalUnitType == NAL_UNIT_SUFFIX_SEI;
   }
 
-  Bool isVcl()
+  bool isVcl()
   {
     return ( (UInt)m_nalUnitType < 32 );
   }

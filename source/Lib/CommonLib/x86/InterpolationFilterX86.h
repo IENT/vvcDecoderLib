@@ -63,7 +63,7 @@
 // ===========================
 // Full-pel copy 8-bit/16-bit
 // ===========================
-template<typename Tsrc, Int N, Bool isFirst, Bool isLast>
+template<typename Tsrc, Int N, bool isFirst, bool isLast>
 static void fullPelCopySSE( const ClpRng& clpRng, const void*_src, Int srcStride, Short *dst, Int dstStride, Int width, Int height )
 {
   Tsrc* src = (Tsrc*)_src;
@@ -125,7 +125,7 @@ static void fullPelCopySSE( const ClpRng& clpRng, const void*_src, Int srcStride
 }
 
 
-template<typename Tsrc, int N, Bool isFirst, Bool isLast>
+template<typename Tsrc, int N, bool isFirst, bool isLast>
 static void fullPelCopyAVX2( const ClpRng& clpRng, const void*_src, int srcStride, short *dst, int dstStride, int width, int height )
 {
 #ifdef USE_AVX2
@@ -192,7 +192,7 @@ static void fullPelCopyAVX2( const ClpRng& clpRng, const void*_src, int srcStrid
 }
 
 
-template<X86_VEXT vext, Bool isFirst, Bool isLast>
+template<X86_VEXT vext, bool isFirst, bool isLast>
 static void simdFilterCopy( const ClpRng& clpRng, const Pel* src, Int srcStride, Short* dst, Int dstStride, Int width, Int height )
 {
 #if !HM_JEM_CLIP_PEL
@@ -847,7 +847,7 @@ static void simdInterpolateVerM16_AVX2( const Short *src, Int srcStride, Short *
 }
 
 
-template<Int N, Bool isLast>
+template<Int N, bool isLast>
 inline void interpolate( const Short* src, Int cStride, Short *dst, Int width, Int shift, Int offset, Int bitdepth, Int maxVal, Short const *c )
 {
   for( Int col = 0; col < width; col++ )
@@ -980,7 +980,7 @@ static void simdInterpolateN2_M4( const Short* src, Int srcStride, Short *dst, I
   }
 }
 
-template<X86_VEXT vext, Int N, Bool isVertical, Bool isFirst, Bool isLast>
+template<X86_VEXT vext, Int N, bool isVertical, bool isFirst, bool isLast>
 static void simdFilter( const ClpRng& clpRng, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, TFilterCoeff const *coeff )
 {
   Int row, col;

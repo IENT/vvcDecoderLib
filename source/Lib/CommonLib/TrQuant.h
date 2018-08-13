@@ -119,7 +119,7 @@ public:
   void rdpcmNxN         (TransformUnit &tu, const ComponentID &compID, const QpParam &cQP, TCoeff &uiAbsSum,       RDPCMMode &rdpcmMode);
   void applyForwardRDPCM(TransformUnit &tu, const ComponentID &compID, const QpParam &cQP, TCoeff &uiAbsSum, const RDPCMMode &rdpcmMode);
 
-  void transformSkipQuantOneSample(TransformUnit &tu, const ComponentID &compID, const TCoeff &resiDiff, TCoeff &coeff,    const UInt &uiPos, const QpParam &cQP, const Bool bUseHalfRoundingPoint);
+  void transformSkipQuantOneSample(TransformUnit &tu, const ComponentID &compID, const TCoeff &resiDiff, TCoeff &coeff,    const UInt &uiPos, const QpParam &cQP, const bool bUseHalfRoundingPoint);
   void invTrSkipDeQuantOneSample  (TransformUnit &tu, const ComponentID &compID, const TCoeff &pcCoeff,  Pel &reconSample, const UInt &uiPos, const QpParam &cQP);
 
   void invRdpcmNxN(TransformUnit& tu, const ComponentID &compID, PelBuf &pcResidual);
@@ -141,8 +141,8 @@ public:
 protected:
   TCoeff*  m_plTempCoeff;
   UInt     m_uiMaxTrSize;
-  Bool     m_bEnc;
-  Bool     m_useTransformSkipFast;
+  bool     m_bEnc;
+  bool     m_useTransformSkipFast;
 
 #if !INTRA67_3MPM
 #if JEM_TOOLS
@@ -151,7 +151,7 @@ protected:
 #endif
   bool     m_rectTUs;
 
-  Bool     m_scalingListEnabledFlag;
+  bool     m_scalingListEnabledFlag;
 
 private:
   Quant    *m_quant;          //!< Quantizer

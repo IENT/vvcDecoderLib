@@ -90,7 +90,7 @@ EncSampleAdaptiveOffset::~EncSampleAdaptiveOffset()
   destroyEncData();
 }
 
-void EncSampleAdaptiveOffset::createEncData(Bool isPreDBFSamplesUsed, UInt numCTUsPic)
+void EncSampleAdaptiveOffset::createEncData(bool isPreDBFSamplesUsed, UInt numCTUsPic)
 {
   //statistics
   const UInt sizeInCtus = numCTUsPic;
@@ -219,9 +219,9 @@ void EncSampleAdaptiveOffset::initCABACEstimator( CABACEncoder* cabacEncoder, Ct
 
 
 #if K0238_SAO_GREEDY_MERGE_ENCODING
-void EncSampleAdaptiveOffset::SAOProcess(CodingStructure& cs, Bool* sliceEnabled, const Double *lambdas, const Bool bTestSAODisableAtPictureLevel, const Double saoEncodingRate, const Double saoEncodingRateChroma, Bool isPreDBFSamplesUsed, bool isGreedymergeEncoding )
+void EncSampleAdaptiveOffset::SAOProcess(CodingStructure& cs, bool* sliceEnabled, const Double *lambdas, const bool bTestSAODisableAtPictureLevel, const Double saoEncodingRate, const Double saoEncodingRateChroma, bool isPreDBFSamplesUsed, bool isGreedymergeEncoding )
 #else
-void EncSampleAdaptiveOffset::SAOProcess(CodingStructure& cs, Bool* sliceEnabled, const Double *lambdas, const Bool bTestSAODisableAtPictureLevel, const Double saoEncodingRate, const Double saoEncodingRateChroma, Bool isPreDBFSamplesUsed )
+void EncSampleAdaptiveOffset::SAOProcess(CodingStructure& cs, bool* sliceEnabled, const Double *lambdas, const bool bTestSAODisableAtPictureLevel, const Double saoEncodingRate, const Double saoEncodingRateChroma, bool isPreDBFSamplesUsed )
 #endif
 {
   PelUnitBuf org = cs.getOrgBuf();
@@ -283,9 +283,9 @@ void EncSampleAdaptiveOffset::addPreDBFStatistics(std::vector<SAOStatData**>& bl
   }
 }
 
-void EncSampleAdaptiveOffset::getStatistics(std::vector<SAOStatData**>& blkStats, PelUnitBuf& orgYuv, PelUnitBuf& srcYuv, CodingStructure& cs, Bool isCalculatePreDeblockSamples)
+void EncSampleAdaptiveOffset::getStatistics(std::vector<SAOStatData**>& blkStats, PelUnitBuf& orgYuv, PelUnitBuf& srcYuv, CodingStructure& cs, bool isCalculatePreDeblockSamples)
 {
-  Bool isLeftAvail, isRightAvail, isAboveAvail, isBelowAvail, isAboveLeftAvail, isAboveRightAvail;
+  bool isLeftAvail, isRightAvail, isAboveAvail, isBelowAvail, isAboveLeftAvail, isAboveRightAvail;
 
   const PreCalcValues& pcv = *cs.pcv;
   const Int numberOfComponents = getNumberValidComponents(pcv.chrFormat);
@@ -337,7 +337,7 @@ void EncSampleAdaptiveOffset::getStatistics(std::vector<SAOStatData**>& blkStats
   }
 }
 
-void EncSampleAdaptiveOffset::decidePicParams(const Slice& slice, Bool* sliceEnabled, const Double saoEncodingRate, const Double saoEncodingRateChroma)
+void EncSampleAdaptiveOffset::decidePicParams(const Slice& slice, bool* sliceEnabled, const Double saoEncodingRate, const Double saoEncodingRateChroma)
 {
   if ( slice.getPendingRasInit() )
   { // reset
@@ -593,7 +593,7 @@ void EncSampleAdaptiveOffset::deriveOffsets(ComponentID compIdx, const Int chann
 
 }
 
-void EncSampleAdaptiveOffset::deriveModeNewRDO(const BitDepths &bitDepths, Int ctuRsAddr, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES], Bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, SAOBlkParam& modeParam, Double& modeNormCost )
+void EncSampleAdaptiveOffset::deriveModeNewRDO(const BitDepths &bitDepths, Int ctuRsAddr, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES], bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, SAOBlkParam& modeParam, Double& modeNormCost )
 {
   Double minCost, cost;
   uint64_t previousFracBits;
@@ -733,7 +733,7 @@ void EncSampleAdaptiveOffset::deriveModeNewRDO(const BitDepths &bitDepths, Int c
   modeNormCost += FracBitsScale*(double)m_CABACEstimator->getEstFracBits();
 }
 
-void EncSampleAdaptiveOffset::deriveModeMergeRDO(const BitDepths &bitDepths, Int ctuRsAddr, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES], Bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, SAOBlkParam& modeParam, Double& modeNormCost )
+void EncSampleAdaptiveOffset::deriveModeMergeRDO(const BitDepths &bitDepths, Int ctuRsAddr, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES], bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, SAOBlkParam& modeParam, Double& modeNormCost )
 {
   modeNormCost = MAX_DOUBLE;
 
@@ -789,8 +789,8 @@ void EncSampleAdaptiveOffset::deriveModeMergeRDO(const BitDepths &bitDepths, Int
   }
 }
 
-void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, Bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, PelUnitBuf& srcYuv, PelUnitBuf& resYuv,
-                                               SAOBlkParam* reconParams, SAOBlkParam* codedParams, const Bool bTestSAODisableAtPictureLevel,
+void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, PelUnitBuf& srcYuv, PelUnitBuf& resYuv,
+                                               SAOBlkParam* reconParams, SAOBlkParam* codedParams, const bool bTestSAODisableAtPictureLevel,
 #if K0238_SAO_GREEDY_MERGE_ENCODING
                                                const Double saoEncodingRate, const Double saoEncodingRateChroma, const bool isGreedymergeEncoding)
 #else
@@ -799,7 +799,7 @@ void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, Bool* sliceEn
 
 {
   const PreCalcValues& pcv = *cs.pcv;
-  Bool allBlksDisabled = true;
+  bool allBlksDisabled = true;
   const UInt numberOfComponents = m_numberOfComponents;
   for(UInt compId = COMPONENT_Y; compId < numberOfComponents; compId++)
   {
@@ -1129,8 +1129,8 @@ void EncSampleAdaptiveOffset::disabledRate( CodingStructure& cs, SAOBlkParam* re
 
 void EncSampleAdaptiveOffset::getBlkStats(const ComponentID compIdx, const Int channelBitDepth, SAOStatData* statsDataTypes
                         , Pel* srcBlk, Pel* orgBlk, Int srcStride, Int orgStride, Int width, Int height
-                        , Bool isLeftAvail,  Bool isRightAvail, Bool isAboveAvail, Bool isBelowAvail, Bool isAboveLeftAvail, Bool isAboveRightAvail
-                        , Bool isCalculatePreDeblockSamples
+                        , bool isLeftAvail,  bool isRightAvail, bool isAboveAvail, bool isBelowAvail, bool isAboveLeftAvail, bool isAboveRightAvail
+                        , bool isCalculatePreDeblockSamples
                         )
 {
   Int x,y, startX, startY, endX, endY, edgeType, firstLineStartX, firstLineEndX;
@@ -1497,10 +1497,10 @@ void EncSampleAdaptiveOffset::getBlkStats(const ComponentID compIdx, const Int c
   }
 }
 
-void EncSampleAdaptiveOffset::deriveLoopFilterBoundaryAvailibility(CodingStructure& cs, const Position &pos, Bool& isLeftAvail, Bool& isAboveAvail, Bool& isAboveLeftAvail) const
+void EncSampleAdaptiveOffset::deriveLoopFilterBoundaryAvailibility(CodingStructure& cs, const Position &pos, bool& isLeftAvail, bool& isAboveAvail, bool& isAboveLeftAvail) const
 {
 #if HEVC_TILES_WPP
-  Bool isLoopFiltAcrossTilePPS = cs.pps->getLoopFilterAcrossTilesEnabledFlag();
+  bool isLoopFiltAcrossTilePPS = cs.pps->getLoopFilterAcrossTilesEnabledFlag();
 #endif
 
   const int width = cs.pcv->maxCUWidth;

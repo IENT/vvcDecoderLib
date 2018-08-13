@@ -167,7 +167,7 @@ protected:
 #if HEVC_TILES_WPP
   void  xInitPPSforTiles  (PPS &pps);
 #endif
-  void  xInitRPS          (SPS &sps, Bool isFieldCoding);           ///< initialize PPS from encoder options
+  void  xInitRPS          (SPS &sps, bool isFieldCoding);           ///< initialize PPS from encoder options
 
 public:
   EncLib();
@@ -175,7 +175,7 @@ public:
 
   void      create          ();
   void      destroy         ();
-  void      init            ( Bool isFieldCoding, AUWriterIf* auWriterIf );
+  void      init            ( bool isFieldCoding, AUWriterIf* auWriterIf );
   void      deletePicBuffer ();
 
   // -------------------------------------------------------------------------------------------------------------------
@@ -233,8 +233,8 @@ public:
   void selectReferencePictureSet(Slice* slice, Int POCCurr, Int GOPid );
   Int getReferencePictureSetIdxForSOP(Int POCCurr, Int GOPid );
 
-  Bool                   PPSNeedsWriting(Int ppsId);
-  Bool                   SPSNeedsWriting(Int spsId);
+  bool                   PPSNeedsWriting(Int ppsId);
+  bool                   SPSNeedsWriting(Int spsId);
   const PPS* getPPS( int Id ) { return m_ppsMap.getPS( Id); }
 
 #if ENABLE_SPLIT_PARALLELISM || ENABLE_WPP_PARALLELISM
@@ -247,21 +247,21 @@ public:
   // -------------------------------------------------------------------------------------------------------------------
 
   /// encode several number of pictures until end-of-sequence
-  void encode( Bool bEos,
+  void encode( bool bEos,
                PelStorage* pcPicYuvOrg,
                PelStorage* pcPicYuvTrueOrg, const InputColourSpaceConversion snrCSC, // used for SNR calculations. Picture in original colour space.
                std::list<PelUnitBuf*>& rcListPicYuvRecOut,
                Int& iNumEncoded );
 
   /// encode several number of pictures until end-of-sequence
-  void encode( Bool bEos,
+  void encode( bool bEos,
                PelStorage* pcPicYuvOrg,
                PelStorage* pcPicYuvTrueOrg, const InputColourSpaceConversion snrCSC, // used for SNR calculations. Picture in original colour space.
                std::list<PelUnitBuf*>& rcListPicYuvRecOut,
-               Int& iNumEncoded, Bool isTff );
+               Int& iNumEncoded, bool isTff );
 
 
-  void printSummary(Bool isField) { m_cGOPEncoder.printOutSummary (m_uiNumAllPicCoded, isField, m_printMSEBasedSequencePSNR, m_printSequenceMSE, m_spsMap.getFirstPS()->getBitDepths()); }
+  void printSummary(bool isField) { m_cGOPEncoder.printOutSummary (m_uiNumAllPicCoded, isField, m_printMSEBasedSequencePSNR, m_printSequenceMSE, m_spsMap.getFirstPS()->getBitDepths()); }
 
 };
 

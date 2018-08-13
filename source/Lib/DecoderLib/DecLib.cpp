@@ -106,7 +106,7 @@ bool tryDecodePicture( Picture* pcEncPic, const int expectedPoc, const std::stri
       byteStreamNALUnit( *bytestream, nalu.getBitstream().getFifo(), stats );
 
       // call actual decoding function
-      Bool bNewPicture = false;
+      bool bNewPicture = false;
       if( nalu.getBitstream().getFifo().empty() )
       {
         /* this can happen if the following occur:
@@ -462,7 +462,7 @@ Picture* DecLib::xGetNewPicBuffer ( const SPS &sps, const PPS &pps, const UInt t
     return pcPic;
   }
 
-  Bool bBufferIsAvailable = false;
+  bool bBufferIsAvailable = false;
   for(auto * p: m_cListPic)
   {
     pcPic = p;  // workaround because range-based for-loops don't work with existing variables
@@ -783,8 +783,8 @@ void DecLib::xActivateParameterSets()
 #endif
 
 
-    Bool isField = false;
-    Bool isTopField = false;
+    bool isField = false;
+    bool isTopField = false;
 
     if(!m_SEIs.empty())
     {
@@ -909,7 +909,7 @@ void DecLib::xParsePrefixSEImessages()
 }
 
 
-Bool DecLib::xDecodeSlice(InputNALUnit &nalu, Int &iSkipFrame, Int iPOCLastDisplay )
+bool DecLib::xDecodeSlice(InputNALUnit &nalu, Int &iSkipFrame, Int iPOCLastDisplay )
 {
   m_apcSlicePilot->initSlice(); // the slice pilot is an object to prepare for a new slice
                                 // it is not associated with picture, sps or pps structures.
@@ -927,7 +927,7 @@ Bool DecLib::xDecodeSlice(InputNALUnit &nalu, Int &iSkipFrame, Int iPOCLastDispl
 #endif
 
   m_apcSlicePilot->setNalUnitType(nalu.m_nalUnitType);
-  Bool nonReferenceFlag = (m_apcSlicePilot->getNalUnitType() == NAL_UNIT_CODED_SLICE_TRAIL_N ||
+  bool nonReferenceFlag = (m_apcSlicePilot->getNalUnitType() == NAL_UNIT_CODED_SLICE_TRAIL_N ||
                            m_apcSlicePilot->getNalUnitType() == NAL_UNIT_CODED_SLICE_TSA_N   ||
                            m_apcSlicePilot->getNalUnitType() == NAL_UNIT_CODED_SLICE_STSA_N  ||
                            m_apcSlicePilot->getNalUnitType() == NAL_UNIT_CODED_SLICE_RADL_N  ||
@@ -1144,7 +1144,7 @@ Bool DecLib::xDecodeSlice(InputNALUnit &nalu, Int &iSkipFrame, Int iPOCLastDispl
 
     if (!pcSlice->isIntra())
     {
-      Bool bLowDelay = true;
+      bool bLowDelay = true;
       Int  iCurrPOC  = pcSlice->getPOC();
       Int iRefIdx = 0;
 
@@ -1281,7 +1281,7 @@ void DecLib::xDecodePPS( InputNALUnit& nalu )
   m_parameterSetManager.storePPS( pps, nalu.getBitstream().getFifo() );
 }
 
-Bool DecLib::decode(InputNALUnit& nalu, Int& iSkipFrame, Int& iPOCLastDisplay)
+bool DecLib::decode(InputNALUnit& nalu, Int& iSkipFrame, Int& iPOCLastDisplay)
 {
   bool ret;
   // ignore all NAL units of layers > 0
@@ -1443,7 +1443,7 @@ Bool DecLib::decode(InputNALUnit& nalu, Int& iSkipFrame, Int& iPOCLastDisplay)
 /** Function for checking if picture should be skipped because of association with a previous BLA picture
  *  This function skips all TFD pictures that follow a BLA picture in decoding order and precede it in output order.
  */
-Bool DecLib::isSkipPictureForBLA( Int& iPOCLastDisplay )
+bool DecLib::isSkipPictureForBLA( Int& iPOCLastDisplay )
 {
   if( ( m_associatedIRAPType == NAL_UNIT_CODED_SLICE_BLA_N_LP || m_associatedIRAPType == NAL_UNIT_CODED_SLICE_BLA_W_LP || m_associatedIRAPType == NAL_UNIT_CODED_SLICE_BLA_W_RADL ) &&
         m_apcSlicePilot->getPOC() < m_pocCRA && ( m_apcSlicePilot->getNalUnitType() == NAL_UNIT_CODED_SLICE_RASL_R || m_apcSlicePilot->getNalUnitType() == NAL_UNIT_CODED_SLICE_RASL_N ) )
@@ -1463,7 +1463,7 @@ Bool DecLib::isSkipPictureForBLA( Int& iPOCLastDisplay )
  *  equal to or greater than the random access point POC is attempted. For non IDR/CRA/BLA random
  *  access point there is no guarantee that the decoder will not crash.
  */
-Bool DecLib::isRandomAccessSkipPicture( Int& iSkipFrame, Int& iPOCLastDisplay )
+bool DecLib::isRandomAccessSkipPicture( Int& iSkipFrame, Int& iPOCLastDisplay )
 {
   if (iSkipFrame)
   {

@@ -118,7 +118,7 @@ private:
   void    setUpLambda( Slice* slice, const Double dLambda, Int iQP );
 #endif
 #if HEVC_TILES_WPP
-  void    calculateBoundingCtuTsAddrForSlice( UInt &startCtuTSAddrSlice, UInt &boundingCtuTSAddrSlice, Bool &haveReachedTileBoundary, Picture* pcPic, const Int sliceMode, const Int sliceArgument );
+  void    calculateBoundingCtuTsAddrForSlice( UInt &startCtuTSAddrSlice, UInt &boundingCtuTSAddrSlice, bool &haveReachedTileBoundary, Picture* pcPic, const Int sliceMode, const Int sliceArgument );
 #else
   void    calculateBoundingCtuTsAddrForSlice( UInt &startCtuTSAddrSlice, UInt &boundingCtuTSAddrSlice, Picture* pcPic, const Int sliceMode, const Int sliceArgument );
 #endif
@@ -134,19 +134,19 @@ public:
 
   /// preparation of slice encoding (reference marking, QP and lambda)
   void    initEncSlice        ( Picture*  pcPic, const Int pocLast, const Int pocCurr,
-                                const Int iGOPid,   Slice*& rpcSlice, const Bool isField );
+                                const Int iGOPid,   Slice*& rpcSlice, const bool isField );
   void    resetQP             ( Picture* pic, Int sliceQP, Double lambda );
 
   // compress and encode slice
   void    precompressSlice    ( Picture* pcPic                                     );      ///< precompress slice for multi-loop slice-level QP opt.
-  void    compressSlice       ( Picture* pcPic, const Bool bCompressEntireSlice, const Bool bFastDeltaQP );      ///< analysis stage of slice
+  void    compressSlice       ( Picture* pcPic, const bool bCompressEntireSlice, const bool bFastDeltaQP );      ///< analysis stage of slice
   void    calCostSliceI       ( Picture* pcPic );
 
   void    encodeSlice         ( Picture* pcPic, OutputBitstream* pcSubstreams, UInt &numBinsCoded );
 #if ENABLE_WPP_PARALLELISM
   static
 #endif
-  void    encodeCtus          ( Picture* pcPic, const Bool bCompressEntireSlice, const Bool bFastDeltaQP, UInt startCtuTsAddr, UInt boundingCtuTsAddr, EncLib* pcEncLib );
+  void    encodeCtus          ( Picture* pcPic, const bool bCompressEntireSlice, const bool bFastDeltaQP, UInt startCtuTsAddr, UInt boundingCtuTsAddr, EncLib* pcEncLib );
 
 
   // misc. functions

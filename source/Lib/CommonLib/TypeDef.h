@@ -356,8 +356,6 @@
 // Basic type redefinition
 // ====================================================================================================================
 
-typedef       bool                Bool;
-
 typedef       char                TChar; // Used for text/characters
 typedef       signed char         SChar; // Signed 8-bit values
 typedef       unsigned char       UChar; // Unsigned 8-bit values
@@ -1095,7 +1093,7 @@ struct ALFParam
 
   void destroy();
   void reset();
-  void copyFrom(const ALFParam& src, const Bool isGALF, Bool max_depth_copy = true);
+  void copyFrom(const ALFParam& src, const bool isGALF, bool max_depth_copy = true);
 
   Int alf_flag;                           ///< indicates use of ALF
   Int cu_control_flag;                    ///< coding unit based control flag
@@ -1126,7 +1124,7 @@ struct ALFParam
   //CU Adaptation
   UInt num_alf_cu_flag;
   UInt alf_max_depth;
-  Bool *alf_cu_flag;
+  bool *alf_cu_flag;
 
   //Coeff send related
   UInt num_ctus_in_frame;
@@ -1145,7 +1143,7 @@ struct ALFParam
   Int kMinTab[42];
 
   //Use stored parameter
-  Bool temporalPredFlag;        //indicate whether reuse previous ALF coefficients
+  bool temporalPredFlag;        //indicate whether reuse previous ALF coefficients
   Int  prevIdx;                 //index of the reused ALF coefficients
 };
 #endif
@@ -1159,9 +1157,9 @@ struct BitDepths
 /// parameters for deblocking filter
 struct LFCUParam
 {
-  Bool internalEdge;                     ///< indicates internal edge
-  Bool leftEdge;                         ///< indicates left edge
-  Bool topEdge;                          ///< indicates top edge
+  bool internalEdge;                     ///< indicates internal edge
+  bool leftEdge;                         ///< indicates left edge
+  bool topEdge;                          ///< indicates top edge
 };
 
 
@@ -1170,7 +1168,7 @@ struct PictureHash
 {
   std::vector<UChar> hash;
 
-  Bool operator==(const PictureHash &other) const
+  bool operator==(const PictureHash &other) const
   {
     if (other.hash.size() != hash.size())
     {
@@ -1186,7 +1184,7 @@ struct PictureHash
     return true;
   }
 
-  Bool operator!=(const PictureHash &other) const
+  bool operator!=(const PictureHash &other) const
   {
     return !(*this == other);
   }
@@ -1210,26 +1208,26 @@ struct SEITimeSet
                      timeOffsetLength(0),
                      timeOffsetValue(0)
   { }
-  Bool clockTimeStampFlag;
-  Bool numUnitFieldBasedFlag;
+  bool clockTimeStampFlag;
+  bool numUnitFieldBasedFlag;
   Int  countingType;
-  Bool fullTimeStampFlag;
-  Bool discontinuityFlag;
-  Bool cntDroppedFlag;
+  bool fullTimeStampFlag;
+  bool discontinuityFlag;
+  bool cntDroppedFlag;
   Int  numberOfFrames;
   Int  secondsValue;
   Int  minutesValue;
   Int  hoursValue;
-  Bool secondsFlag;
-  Bool minutesFlag;
-  Bool hoursFlag;
+  bool secondsFlag;
+  bool minutesFlag;
+  bool hoursFlag;
   Int  timeOffsetLength;
   Int  timeOffsetValue;
 };
 
 struct SEIMasteringDisplay
 {
-  Bool      colourVolumeSEIEnabled;
+  bool      colourVolumeSEIEnabled;
   UInt      maxLuminance;
   UInt      minLuminance;
   UShort    primaries[3][2];
@@ -1245,7 +1243,7 @@ struct LumaLevelToDeltaQPMapping
 #if ENABLE_QPA
   bool isEnabled() const { return (mode != LUMALVL_TO_DQP_DISABLED && mode != LUMALVL_TO_DQP_NUM_MODES); }
 #else
-  Bool isEnabled() const { return mode!=LUMALVL_TO_DQP_DISABLED; }
+  bool isEnabled() const { return mode!=LUMALVL_TO_DQP_DISABLED; }
 #endif
 };
 #endif
@@ -1253,8 +1251,8 @@ struct LumaLevelToDeltaQPMapping
 #if ER_CHROMA_QP_WCG_PPS
 struct WCGChromaQPControl
 {
-  Bool isEnabled() const { return enabled; }
-  Bool   enabled;         ///< Enabled flag (0:default)
+  bool isEnabled() const { return enabled; }
+  bool   enabled;         ///< Enabled flag (0:default)
   Double chromaCbQpScale; ///< Chroma Cb QP Scale (1.0:default)
   Double chromaCrQpScale; ///< Chroma Cr QP Scale (1.0:default)
   Double chromaQpScale;   ///< Chroma QP Scale (0.0:default)

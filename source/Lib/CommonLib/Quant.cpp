@@ -290,7 +290,7 @@ void Quant::dequant(const TransformUnit &tu,
   const TCoeff          transformMinimum   = -(1 << maxLog2TrDynamicRange);
   const TCoeff          transformMaximum   =  (1 << maxLog2TrDynamicRange) - 1;
 #if HEVC_USE_SCALING_LISTS
-  const Bool            enableScalingLists = getUseScalingList(uiWidth, uiHeight, (tu.transformSkip[compID] != 0));
+  const bool            enableScalingLists = getUseScalingList(uiWidth, uiHeight, (tu.transformSkip[compID] != 0));
   const Int             scalingListType    = getScalingListType(tu.cu->predMode, compID);
 #endif
   const Int             channelBitDepth    = sps->getBitDepth(toChannelType(compID));
@@ -301,7 +301,7 @@ void Quant::dequant(const TransformUnit &tu,
   CHECK(uiWidth > m_uiMaxTrSize, "Unsupported transformation size");
 
   // Represents scaling through forward transform
-  const Bool bClipTransformShiftTo0 = (tu.transformSkip[compID] != 0) && sps->getSpsRangeExtension().getExtendedPrecisionProcessingFlag();
+  const bool bClipTransformShiftTo0 = (tu.transformSkip[compID] != 0) && sps->getSpsRangeExtension().getExtendedPrecisionProcessingFlag();
   const Int  originalTransformShift = getTransformShift(channelBitDepth, area.size(), maxLog2TrDynamicRange);
   const Int  iTransformShift        = bClipTransformShiftTo0 ? std::max<Int>(0, originalTransformShift) : originalTransformShift;
 
@@ -309,7 +309,7 @@ void Quant::dequant(const TransformUnit &tu,
   const Int QP_rem = cQP.rem;
 
 #if HM_QTBT_AS_IN_JEM_QUANT
-  const Bool needsScalingCorrection = TU::needsBlockSizeTrafoScale( tu.block( compID ) );
+  const bool needsScalingCorrection = TU::needsBlockSizeTrafoScale( tu.block( compID ) );
   const Int  NEScale    = TU::needsSqrt2Scale( tu.blocks[compID] ) ? 181 : 1;
 #if HEVC_USE_SCALING_LISTS
   const Int  rightShift = (needsScalingCorrection ?   8 : 0 ) + (IQUANT_SHIFT - (iTransformShift + QP_per)) + (enableScalingLists ? LOG2_SCALING_LIST_NEUTRAL_VALUE : 0);
@@ -428,8 +428,8 @@ void Quant::dequant(const TransformUnit &tu,
 }
 
 void Quant::init( UInt uiMaxTrSize,
-                  Bool bUseRDOQ,
-                  Bool bUseRDOQTS,
+                  bool bUseRDOQ,
+                  bool bUseRDOQTS,
 #if JVET_K0072
 #else
 #if JEM_TOOLS
@@ -437,7 +437,7 @@ void Quant::init( UInt uiMaxTrSize,
 #endif
 #endif
 #if T0196_SELECTIVE_RDOQ
-                  Bool useSelectiveRDOQ
+                  bool useSelectiveRDOQ
 #endif
                   )
 {
@@ -743,7 +743,7 @@ void Quant::quant(TransformUnit &tu, const ComponentID &compID, const CCoeffBuf 
   const CCoeffBuf &piCoef   = pSrc;
         CoeffBuf   piQCoef  = tu.getCoeffs(compID);
 
-  const Bool useTransformSkip      = tu.transformSkip[compID];
+  const bool useTransformSkip      = tu.transformSkip[compID];
   const Int  maxLog2TrDynamicRange = sps.getMaxLog2TrDynamicRange(toChannelType(compID));
 
   {
@@ -770,7 +770,7 @@ void Quant::quant(TransformUnit &tu, const ComponentID &compID, const CCoeffBuf 
     const UInt uiLog2TrHeight = g_aucLog2[uiHeight];
     Int *piQuantCoeff = getQuantCoeff(scalingListType, cQP.rem, uiLog2TrWidth-1, uiLog2TrHeight-1);
 
-    const Bool enableScalingLists             = getUseScalingList(uiWidth, uiHeight, useTransformSkip);
+    const bool enableScalingLists             = getUseScalingList(uiWidth, uiHeight, useTransformSkip);
 #endif
     const Int  defaultQuantisationCoefficient = g_quantScales[cQP.rem];
 
@@ -838,7 +838,7 @@ void Quant::quant(TransformUnit &tu, const ComponentID &compID, const CCoeffBuf 
   //return;
 }
 
-Bool Quant::xNeedRDOQ(TransformUnit &tu, const ComponentID &compID, const CCoeffBuf &pSrc, const QpParam &cQP)
+bool Quant::xNeedRDOQ(TransformUnit &tu, const ComponentID &compID, const CCoeffBuf &pSrc, const QpParam &cQP)
 {
   const SPS &sps            = *tu.cs->sps;
   const CompArea &rect      = tu.blocks[compID];
@@ -850,7 +850,7 @@ Bool Quant::xNeedRDOQ(TransformUnit &tu, const ComponentID &compID, const CCoeff
 
   const CCoeffBuf piCoef    = pSrc;
 
-  const Bool useTransformSkip      = tu.transformSkip[compID];
+  const bool useTransformSkip      = tu.transformSkip[compID];
   const Int  maxLog2TrDynamicRange = sps.getMaxLog2TrDynamicRange(toChannelType(compID));
 
 #if HEVC_USE_SCALING_LISTS
@@ -861,7 +861,7 @@ Bool Quant::xNeedRDOQ(TransformUnit &tu, const ComponentID &compID, const CCoeff
   const UInt uiLog2TrHeight = g_aucLog2[uiHeight];
   Int *piQuantCoeff         = getQuantCoeff(scalingListType, cQP.rem, uiLog2TrWidth-1, uiLog2TrHeight-1);
 
-  const Bool enableScalingLists             = getUseScalingList(uiWidth, uiHeight, (useTransformSkip != 0));
+  const bool enableScalingLists             = getUseScalingList(uiWidth, uiHeight, (useTransformSkip != 0));
 #endif
   const Int  defaultQuantisationCoefficient = g_quantScales[cQP.rem];
 
@@ -913,7 +913,7 @@ Bool Quant::xNeedRDOQ(TransformUnit &tu, const ComponentID &compID, const CCoeff
 }
 
 
-void Quant::transformSkipQuantOneSample(TransformUnit &tu, const ComponentID &compID, const TCoeff &resiDiff, TCoeff &coeff, const UInt &uiPos, const QpParam &cQP, const Bool bUseHalfRoundingPoint)
+void Quant::transformSkipQuantOneSample(TransformUnit &tu, const ComponentID &compID, const TCoeff &resiDiff, TCoeff &coeff, const UInt &uiPos, const QpParam &cQP, const bool bUseHalfRoundingPoint)
 {
   const SPS           &sps = *tu.cs->sps;
   const CompArea      &rect                           = tu.blocks[compID];
@@ -926,7 +926,7 @@ void Quant::transformSkipQuantOneSample(TransformUnit &tu, const ComponentID &co
   const Int            iTransformShift                = getTransformShift(channelBitDepth, rect.size(), maxLog2TrDynamicRange);
 #if HEVC_USE_SCALING_LISTS
   const Int            scalingListType                = getScalingListType(tu.cu->predMode, compID);
-  const Bool           enableScalingLists             = getUseScalingList(uiWidth, uiHeight, true);
+  const bool           enableScalingLists             = getUseScalingList(uiWidth, uiHeight, true);
 #endif
   const Int            defaultQuantisationCoefficient = g_quantScales[cQP.rem];
 
@@ -996,7 +996,7 @@ void Quant::invTrSkipDeQuantOneSample(TransformUnit &tu, const ComponentID &comp
   const Int            iTransformShift        = getTransformShift(channelBitDepth, rect.size(), maxLog2TrDynamicRange);
 #if HEVC_USE_SCALING_LISTS
   const Int            scalingListType        = getScalingListType(tu.cu->predMode, compID);
-  const Bool           enableScalingLists     = getUseScalingList(uiWidth, uiHeight, true);
+  const bool           enableScalingLists     = getUseScalingList(uiWidth, uiHeight, true);
 
   CHECK(scalingListType >= SCALING_LIST_NUM, "Invalid scaling list");
 

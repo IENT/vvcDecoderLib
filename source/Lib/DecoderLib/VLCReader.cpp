@@ -540,14 +540,14 @@ void HLSyntaxReader::parsePPS( PPS* pcPPS )
       "pps_extension_6bits[5]" };
 #endif
 
-    Bool pps_extension_flags[NUM_PPS_EXTENSION_FLAGS];
+    bool pps_extension_flags[NUM_PPS_EXTENSION_FLAGS];
     for(Int i=0; i<NUM_PPS_EXTENSION_FLAGS; i++)
     {
       READ_FLAG( uiCode, syntaxStrings[i] );
       pps_extension_flags[i] = uiCode!=0;
     }
 
-    Bool bSkipTrailingExtensionBits=false;
+    bool bSkipTrailingExtensionBits=false;
     for(Int i=0; i<NUM_PPS_EXTENSION_FLAGS; i++) // loop used so that the order is determined by the enum.
     {
       if (pps_extension_flags[i])
@@ -715,7 +715,7 @@ void  HLSyntaxReader::parseVUI(VUI* pcVUI, SPS *pcSPS)
   }
 }
 
-void HLSyntaxReader::parseHrdParameters(HRD *hrd, Bool commonInfPresentFlag, UInt maxNumSubLayersMinus1)
+void HLSyntaxReader::parseHrdParameters(HRD *hrd, bool commonInfPresentFlag, UInt maxNumSubLayersMinus1)
 {
   UInt  uiCode;
   if( commonInfPresentFlag )
@@ -1206,7 +1206,7 @@ void HLSyntaxReader::parseSPS(SPS* pcSPS)
       "sps_extension_6bits[4]",
       "sps_extension_6bits[5]" };
 #endif
-    Bool sps_extension_flags[NUM_SPS_EXTENSION_FLAGS];
+    bool sps_extension_flags[NUM_SPS_EXTENSION_FLAGS];
 
     for(Int i=0; i<NUM_SPS_EXTENSION_FLAGS; i++)
     {
@@ -1219,7 +1219,7 @@ void HLSyntaxReader::parseSPS(SPS* pcSPS)
       pcSPS->getSpsNext().setNextToolsEnabled( true );
     }
 
-    Bool bSkipTrailingExtensionBits=false;
+    bool bSkipTrailingExtensionBits=false;
     for(Int i=0; i<NUM_SPS_EXTENSION_FLAGS; i++) // loop used so that the order is determined by the enum.
     {
       if (sps_extension_flags[i])
@@ -1390,7 +1390,7 @@ void HLSyntaxReader::parseSliceHeader (Slice* pcSlice, ParameterSetManager *para
 
   const ChromaFormat chFmt = sps->getChromaFormatIdc();
   const UInt numValidComp=getNumberValidComponents(chFmt);
-  const Bool bChroma=(chFmt!=CHROMA_400);
+  const bool bChroma=(chFmt!=CHROMA_400);
 
 #if HEVC_DEPENDENT_SLICES
   if( pps->getDependentSliceSegmentsEnabledFlag() && ( !firstSliceSegmentInPic ))
@@ -1546,7 +1546,7 @@ void HLSyntaxReader::parseSliceHeader (Slice* pcSlice, ParameterSetManager *para
             {
               READ_CODE(bitsForLtrpInSPS, uiCode, "lt_idx_sps[i]");
             }
-            Bool usedByCurrFromSPS=sps->getUsedByCurrPicLtSPSFlag(uiCode);
+            bool usedByCurrFromSPS=sps->getUsedByCurrPicLtSPSFlag(uiCode);
 
             pocLsbLt = sps->getLtRefPicPocLsbSps(uiCode);
             rps->setUsed(j,usedByCurrFromSPS);
@@ -1557,11 +1557,11 @@ void HLSyntaxReader::parseSliceHeader (Slice* pcSlice, ParameterSetManager *para
             READ_FLAG( uiCode, "used_by_curr_pic_lt_flag");     rps->setUsed(j,uiCode);
           }
           READ_FLAG(uiCode,"delta_poc_msb_present_flag");
-          Bool mSBPresentFlag = uiCode ? true : false;
+          bool mSBPresentFlag = uiCode ? true : false;
           if(mSBPresentFlag)
           {
             READ_UVLC( uiCode, "delta_poc_msb_cycle_lt[i]" );
-            Bool deltaFlag = false;
+            bool deltaFlag = false;
             //            First LTRP                               || First LTRP from SH
             if( (j == offset+rps->getNumberOfLongtermPictures()-1) || (j == offset+(numOfLtrp-numLtrpInSPS)-1) )
             {
@@ -1620,11 +1620,11 @@ void HLSyntaxReader::parseSliceHeader (Slice* pcSlice, ParameterSetManager *para
     }
     if(sps->getUseSAO())
     {
-      READ_FLAG(uiCode, "slice_sao_luma_flag");  pcSlice->setSaoEnabledFlag(CHANNEL_TYPE_LUMA, (Bool)uiCode);
+      READ_FLAG(uiCode, "slice_sao_luma_flag");  pcSlice->setSaoEnabledFlag(CHANNEL_TYPE_LUMA, (bool)uiCode);
 
       if (bChroma)
       {
-        READ_FLAG(uiCode, "slice_sao_chroma_flag");  pcSlice->setSaoEnabledFlag(CHANNEL_TYPE_CHROMA, (Bool)uiCode);
+        READ_FLAG(uiCode, "slice_sao_chroma_flag");  pcSlice->setSaoEnabledFlag(CHANNEL_TYPE_CHROMA, (bool)uiCode);
       }
     }
 
@@ -1915,8 +1915,8 @@ void HLSyntaxReader::parseSliceHeader (Slice* pcSlice, ParameterSetManager *para
       pcSlice->setDeblockingFilterTcOffsetDiv2  ( 0 );
     }
 
-    Bool isSAOEnabled = sps->getUseSAO() && (pcSlice->getSaoEnabledFlag(CHANNEL_TYPE_LUMA) || (bChroma && pcSlice->getSaoEnabledFlag(CHANNEL_TYPE_CHROMA)));
-    Bool isDBFEnabled = (!pcSlice->getDeblockingFilterDisable());
+    bool isSAOEnabled = sps->getUseSAO() && (pcSlice->getSaoEnabledFlag(CHANNEL_TYPE_LUMA) || (bChroma && pcSlice->getSaoEnabledFlag(CHANNEL_TYPE_CHROMA)));
+    bool isDBFEnabled = (!pcSlice->getDeblockingFilterDisable());
 
     if(pps->getLoopFilterAcrossSlicesEnabledFlag() && ( isSAOEnabled || isDBFEnabled ))
     {
@@ -2130,7 +2130,7 @@ void HLSyntaxReader::xParseCABACWSizes( Slice* pcSlice, const SPS* sps )
 }
 #endif
 
-void HLSyntaxReader::parsePTL( PTL *rpcPTL, Bool profilePresentFlag, Int maxNumSubLayersMinus1 )
+void HLSyntaxReader::parsePTL( PTL *rpcPTL, bool profilePresentFlag, Int maxNumSubLayersMinus1 )
 {
   UInt uiCode;
   if(profilePresentFlag)
@@ -2168,10 +2168,10 @@ void HLSyntaxReader::parsePTL( PTL *rpcPTL, Bool profilePresentFlag, Int maxNumS
 }
 
 #if ENABLE_TRACING|| RExt__DECODER_DEBUG_BIT_STATISTICS
-void HLSyntaxReader::parseProfileTier(ProfileTierLevel *ptl, const Bool bIsSubLayer)
+void HLSyntaxReader::parseProfileTier(ProfileTierLevel *ptl, const bool bIsSubLayer)
 #define PTL_TRACE_TEXT(txt) bIsSubLayer?("sub_layer_" txt) : ("general_" txt)
 #else
-void HLSyntaxReader::parseProfileTier(ProfileTierLevel *ptl, const Bool /*bIsSubLayer*/)
+void HLSyntaxReader::parseProfileTier(ProfileTierLevel *ptl, const bool /*bIsSubLayer*/)
 #define PTL_TRACE_TEXT(txt) txt
 #endif
 {
@@ -2252,7 +2252,7 @@ void HLSyntaxReader::parseTerminatingBit( UInt& ruiBit )
   }
 }
 
-void HLSyntaxReader::parseRemainingBytes( Bool noTrailingBytesExpected )
+void HLSyntaxReader::parseRemainingBytes( bool noTrailingBytesExpected )
 {
   if (noTrailingBytesExpected)
   {
@@ -2285,7 +2285,7 @@ void HLSyntaxReader::parsePredWeightTable( Slice* pcSlice, const SPS *sps )
   WPScalingParam *wp;
   const ChromaFormat    chFmt        = sps->getChromaFormatIdc();
   const Int             numValidComp = Int(getNumberValidComponents(chFmt));
-  const Bool            bChroma      = (chFmt!=CHROMA_400);
+  const bool            bChroma      = (chFmt!=CHROMA_400);
   const SliceType       eSliceType   = pcSlice->getSliceType();
   const Int             iNbRef       = (eSliceType == B_SLICE ) ? (2) : (1);
   UInt            uiLog2WeightDenomLuma=0, uiLog2WeightDenomChroma=0;
@@ -2406,7 +2406,7 @@ void HLSyntaxReader::parsePredWeightTable( Slice* pcSlice, const SPS *sps )
 void HLSyntaxReader::parseScalingList(ScalingList* scalingList)
 {
   UInt  code, sizeId, listId;
-  Bool scalingListPredModeFlag;
+  bool scalingListPredModeFlag;
   //for each size
   for(sizeId = SCALING_LIST_FIRST_CODED; sizeId <= SCALING_LIST_LAST_CODED; sizeId++)
   {
@@ -2486,7 +2486,7 @@ void HLSyntaxReader::decodeScalingList(ScalingList *scalingList, UInt sizeId, UI
 }
 #endif
 
-Bool HLSyntaxReader::xMoreRbspData()
+bool HLSyntaxReader::xMoreRbspData()
 {
   Int bitsLeft = m_pcBitstream->getNumBitsLeft();
 

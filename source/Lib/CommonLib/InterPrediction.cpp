@@ -227,9 +227,9 @@ void InterPrediction::init( RdCost* pcRdCost, ChromaFormat chromaFormatIDC )
 }
 
 #if JEM_TOOLS || JVET_K_AFFINE
-Bool checkIdenticalMotion( const PredictionUnit &pu, bool checkAffine )
+bool checkIdenticalMotion( const PredictionUnit &pu, bool checkAffine )
 #else
-Bool checkIdenticalMotion( const PredictionUnit &pu )
+bool checkIdenticalMotion( const PredictionUnit &pu )
 #endif
 {
   const Slice &slice = *pu.cs->slice;
@@ -283,7 +283,7 @@ Bool checkIdenticalMotion( const PredictionUnit &pu )
 // Public member functions
 // ====================================================================================================================
 
-Bool InterPrediction::xCheckIdenticalMotion( const PredictionUnit &pu )
+bool InterPrediction::xCheckIdenticalMotion( const PredictionUnit &pu )
 {
   const Slice &slice = *pu.cs->slice;
 
@@ -456,9 +456,9 @@ void InterPrediction::xSubPuMC( PredictionUnit& pu, PelUnitBuf& predBuf, const R
 #endif
 
 #if JEM_TOOLS
-void InterPrediction::xPredInterUni(const PredictionUnit& pu, const RefPicList& eRefPicList, PelUnitBuf& pcYuvPred, const Bool& bi, const Bool& bBIOApplied /*= false*/, const Bool& bDMVRApplied /*= false*/ )
+void InterPrediction::xPredInterUni(const PredictionUnit& pu, const RefPicList& eRefPicList, PelUnitBuf& pcYuvPred, const bool& bi, const bool& bBIOApplied /*= false*/, const bool& bDMVRApplied /*= false*/ )
 #else
-void InterPrediction::xPredInterUni(const PredictionUnit& pu, const RefPicList& eRefPicList, PelUnitBuf& pcYuvPred, const Bool& bi )
+void InterPrediction::xPredInterUni(const PredictionUnit& pu, const RefPicList& eRefPicList, PelUnitBuf& pcYuvPred, const bool& bi )
 #endif
 {
   const SPS &sps = *pu.cs->sps;
@@ -519,7 +519,7 @@ void InterPrediction::xPredInterUni(const PredictionUnit& pu, const RefPicList& 
 }
 
 #if JEM_TOOLS
-void InterPrediction::xPredInterBi(PredictionUnit& pu, PelUnitBuf &pcYuvPred, Bool obmc)
+void InterPrediction::xPredInterBi(PredictionUnit& pu, PelUnitBuf &pcYuvPred, bool obmc)
 #else
 void InterPrediction::xPredInterBi(PredictionUnit& pu, PelUnitBuf &pcYuvPred)
 #endif
@@ -661,9 +661,9 @@ void InterPrediction::xPredInterBi(PredictionUnit& pu, PelUnitBuf &pcYuvPred)
 }
 
 
-void InterPrediction::xPredInterBlk ( const ComponentID& compID, const PredictionUnit& pu, const Picture* refPic, const Mv& _mv, PelUnitBuf& dstPic, const Bool& bi, const ClpRng& clpRng
+void InterPrediction::xPredInterBlk ( const ComponentID& compID, const PredictionUnit& pu, const Picture* refPic, const Mv& _mv, PelUnitBuf& dstPic, const bool& bi, const ClpRng& clpRng
 #if JEM_TOOLS
-                                      , const Bool& bBIOApplied /*=false*/, const Bool& bDMVRApplied /*= false*/, const Int& nFRUCMode /*= FRUC_MERGE_OFF*/, const Bool& doLic /*= true*/
+                                      , const bool& bBIOApplied /*=false*/, const bool& bDMVRApplied /*= false*/, const Int& nFRUCMode /*= FRUC_MERGE_OFF*/, const bool& doLic /*= true*/
 #endif
                                     )
 {
@@ -813,9 +813,9 @@ void InterPrediction::xPredInterBlk ( const ComponentID& compID, const Predictio
 
 #if JEM_TOOLS || JVET_K_AFFINE
 #if !JEM_TOOLS
-void InterPrediction::xPredAffineBlk( const ComponentID& compID, const PredictionUnit& pu, const Picture* refPic, const Mv* _mv, PelUnitBuf& dstPic, const Bool& bi, const ClpRng& clpRng )
+void InterPrediction::xPredAffineBlk( const ComponentID& compID, const PredictionUnit& pu, const Picture* refPic, const Mv* _mv, PelUnitBuf& dstPic, const bool& bi, const ClpRng& clpRng )
 #else
-void InterPrediction::xPredAffineBlk( const ComponentID& compID, const PredictionUnit& pu, const Picture* refPic, const Mv* _mv, PelUnitBuf& dstPic, const Bool& bi, const ClpRng& clpRng, const Bool& bBIOApplied /*= false*/ )
+void InterPrediction::xPredAffineBlk( const ComponentID& compID, const PredictionUnit& pu, const Picture* refPic, const Mv* _mv, PelUnitBuf& dstPic, const bool& bi, const ClpRng& clpRng, const bool& bBIOApplied /*= false*/ )
 #endif
 {
 #if JVET_K0337_AFFINE_6PARA
@@ -1318,7 +1318,7 @@ void InterPrediction::applyBiOptFlow( const PredictionUnit &pu, const CPelUnitBu
 #endif
 
 #if JEM_TOOLS
-void InterPrediction::xWeightedAverage( const PredictionUnit& pu, const CPelUnitBuf& pcYuvSrc0, const CPelUnitBuf& pcYuvSrc1, PelUnitBuf& pcYuvDst, const BitDepths& clipBitDepths, const ClpRngs& clpRngs, const Bool& bBIOApplied )
+void InterPrediction::xWeightedAverage( const PredictionUnit& pu, const CPelUnitBuf& pcYuvSrc0, const CPelUnitBuf& pcYuvSrc1, PelUnitBuf& pcYuvDst, const BitDepths& clipBitDepths, const ClpRngs& clpRngs, const bool& bBIOApplied )
 #else
 void InterPrediction::xWeightedAverage( const PredictionUnit& pu, const CPelUnitBuf& pcYuvSrc0, const CPelUnitBuf& pcYuvSrc1, PelUnitBuf& pcYuvDst, const BitDepths& clipBitDepths, const ClpRngs& clpRngs )
 #endif
@@ -1434,7 +1434,7 @@ void InterPrediction::subBlockOBMC( CodingUnit  &cu )
   }
 }
 
-void InterPrediction::subBlockOBMC( PredictionUnit  &pu, PelUnitBuf* pDst, Bool bOBMC4ME )
+void InterPrediction::subBlockOBMC( PredictionUnit  &pu, PelUnitBuf* pDst, bool bOBMC4ME )
 {
   if( !pu.cs->sps->getSpsNext().getUseOBMC() || !pu.cu->obmcFlag )
   {
@@ -1462,18 +1462,18 @@ void InterPrediction::subBlockOBMC( PredictionUnit  &pu, PelUnitBuf* pDst, Bool 
   const UInt uiWidhtInCU     = pu.cu->lwidth()  / uiMinCUW;
   const UInt uiStep          = uiOBMCBlkSize    / uiMinCUW;
 
-  const Bool bOBMCSimp       = cs.pcv->only2Nx2N ? uiWidth * uiHeight < 64 : ( pu.cu->lwidth() == 8 && ePartSize != SIZE_2Nx2N );
+  const bool bOBMCSimp       = cs.pcv->only2Nx2N ? uiWidth * uiHeight < 64 : ( pu.cu->lwidth() == 8 && ePartSize != SIZE_2Nx2N );
 
-  const Bool bATMVP          = ( pu.mergeType == MRG_TYPE_SUBPU_ATMVP || pu.mergeType == MRG_TYPE_SUBPU_ATMVP_EXT );
-  const Bool bFruc           = ( pu.frucMrgMode == FRUC_MERGE_TEMPLATE || pu.frucMrgMode == FRUC_MERGE_BILATERALMV );
-  const Bool bAffine         = pu.cu->affine;
+  const bool bATMVP          = ( pu.mergeType == MRG_TYPE_SUBPU_ATMVP || pu.mergeType == MRG_TYPE_SUBPU_ATMVP_EXT );
+  const bool bFruc           = ( pu.frucMrgMode == FRUC_MERGE_TEMPLATE || pu.frucMrgMode == FRUC_MERGE_BILATERALMV );
+  const bool bAffine         = pu.cu->affine;
 
         Int  i1stPUWidth     = -1, i1stPUHeight = -1;
-        Bool b2ndPU          = false;
-  const Bool bVerticalPU     = false;
-  const Bool bHorizontalPU   = false;
+        bool b2ndPU          = false;
+  const bool bVerticalPU     = false;
+  const bool bHorizontalPU   = false;
 
-  const Bool bTwoPUs         = ( bVerticalPU || bHorizontalPU );
+  const bool bTwoPUs         = ( bVerticalPU || bHorizontalPU );
 
   if( bTwoPUs )
   {
@@ -1493,8 +1493,8 @@ void InterPrediction::subBlockOBMC( PredictionUnit  &pu, PelUnitBuf* pDst, Bool 
   const Int avgLength      = ( cs.pcv->rectCUs ) ? 1 << ( ( ( ( int ) log2( pu.cu->lumaSize().width ) + ( int ) log2( pu.cu->lumaSize().height ) - 3 ) >> 1 ) + MIN_CU_LOG2 ) : pu.cu->lumaSize().width;
   const Int nRefineBlkSize = std::max( avgLength >> pu.cs->slice->getSPS()->getSpsNext().getFRUCSmallBlkRefineDepth(), FRUC_MERGE_REFINE_MINBLKSIZE );
 
-  const Bool bNormal2Nx2N  = ePartSize == SIZE_2Nx2N && !bATMVP && !bFruc && !bAffine;
-  const Bool bSubMotion    = ePartSize == SIZE_2Nx2N && ( bATMVP || bFruc || bAffine );
+  const bool bNormal2Nx2N  = ePartSize == SIZE_2Nx2N && !bATMVP && !bFruc && !bAffine;
+  const bool bSubMotion    = ePartSize == SIZE_2Nx2N && ( bATMVP || bFruc || bAffine );
 
   MotionInfo currMi  = pu.getMotionInfo();
   MotionInfo NeighMi = MotionInfo();
@@ -1510,8 +1510,8 @@ void InterPrediction::subBlockOBMC( PredictionUnit  &pu, PelUnitBuf* pDst, Bool 
         continue;
       }
 
-      Bool bCURBoundary = bVerticalPU   ? ( iSubX == uiWidhtInCU  - uiStep ) : b2ndPU ? iSubX + i1stPUWidth   == uiWidhtInCU  - uiStep : ( iSubX == uiWidhtInCU  - uiStep ) ;
-      Bool bCUBBoundary = bHorizontalPU ? ( iSubY == uiHeightInCU - uiStep ) : b2ndPU ? iSubY + i1stPUHeight  == uiHeightInCU - uiStep : ( iSubY == uiHeightInCU - uiStep ) ;
+      bool bCURBoundary = bVerticalPU   ? ( iSubX == uiWidhtInCU  - uiStep ) : b2ndPU ? iSubX + i1stPUWidth   == uiWidhtInCU  - uiStep : ( iSubX == uiWidhtInCU  - uiStep ) ;
+      bool bCUBBoundary = bHorizontalPU ? ( iSubY == uiHeightInCU - uiStep ) : b2ndPU ? iSubY + i1stPUHeight  == uiHeightInCU - uiStep : ( iSubY == uiHeightInCU - uiStep ) ;
 
       for (Int iDir = 0; iDir < maxDir; iDir++) //iDir: 0 - above, 1 - left, 2 - below, 3 - right
       {
@@ -1520,8 +1520,8 @@ void InterPrediction::subBlockOBMC( PredictionUnit  &pu, PelUnitBuf* pDst, Bool 
           continue;
         }
 
-        Bool bVerPUBound = false;
-        Bool bHorPUBound = false;
+        bool bVerPUBound = false;
+        bool bHorPUBound = false;
 
         if( bNormal2Nx2N ) //skip unnecessary check for CU boundary
         {
@@ -1532,7 +1532,7 @@ void InterPrediction::subBlockOBMC( PredictionUnit  &pu, PelUnitBuf* pDst, Bool 
         }
         else
         {
-          Bool bCheckNeig = bSubMotion || ( iSubX == 0 && iDir == 1 ) || ( iSubY == 0 && iDir == 0 ); //CU boundary or NxN or 2nx2n_ATMVP
+          bool bCheckNeig = bSubMotion || ( iSubX == 0 && iDir == 1 ) || ( iSubY == 0 && iDir == 0 ); //CU boundary or NxN or 2nx2n_ATMVP
           if( !bCheckNeig && bTwoPUs )
           {
             bCheckNeig |= bFruc;
@@ -1556,7 +1556,7 @@ void InterPrediction::subBlockOBMC( PredictionUnit  &pu, PelUnitBuf* pDst, Bool 
 #if JVET_K0346
         bool bSubBlockOBMCSimp = (bOBMCSimp || ((pu.mergeType == MRG_TYPE_SUBPU_ATMVP || pu.mergeType == MRG_TYPE_SUBPU_ATMVP_EXT) && (1 << pu.cs->slice->getSubPuMvpSubblkLog2Size()) == 4));
 #else
-        Bool bSubBlockOBMCSimp = ( bOBMCSimp || ( (pu.mergeType == MRG_TYPE_SUBPU_ATMVP || pu.mergeType == MRG_TYPE_SUBPU_ATMVP_EXT ) && ( 1 << pu.cs->sps->getSpsNext().getSubPuMvpLog2Size() ) == 4 ) );
+        bool bSubBlockOBMCSimp = ( bOBMCSimp || ( (pu.mergeType == MRG_TYPE_SUBPU_ATMVP || pu.mergeType == MRG_TYPE_SUBPU_ATMVP_EXT ) && ( 1 << pu.cs->sps->getSpsNext().getSubPuMvpLog2Size() ) == 4 ) );
 #endif
         bSubBlockOBMCSimp |= ( bFruc && nRefineBlkSize == 4 );
         bSubBlockOBMCSimp |= bAffine;
@@ -1600,7 +1600,7 @@ void InterPrediction::subBlockOBMC( PredictionUnit  &pu, PelUnitBuf* pDst, Bool 
 
 
 // Function for (weighted) averaging predictors of current block and predictors generated by applying neighboring motions to current block.
-void InterPrediction::xSubblockOBMC(const ComponentID eComp, PredictionUnit &pu, PelUnitBuf &pcYuvPredDst, PelUnitBuf &pcYuvPredSrc, Int iDir, Bool bOBMCSimp)
+void InterPrediction::xSubblockOBMC(const ComponentID eComp, PredictionUnit &pu, PelUnitBuf &pcYuvPredDst, PelUnitBuf &pcYuvPredSrc, Int iDir, bool bOBMCSimp)
 {
   int iWidth  = pu.blocks[eComp].width;
   int iHeight = pu.blocks[eComp].height;
@@ -1690,7 +1690,7 @@ void InterPrediction::xSubblockOBMC(const ComponentID eComp, PredictionUnit &pu,
 }
 
 // Function for subtracting (scaled) predictors generated by applying neighboring motions to current block from the original signal of current block.
-void InterPrediction::xSubtractOBMC( PredictionUnit &pu, PelUnitBuf &pcYuvPredDst, PelUnitBuf &pcYuvPredSrc, Int iDir, Bool bOBMCSimp )
+void InterPrediction::xSubtractOBMC( PredictionUnit &pu, PelUnitBuf &pcYuvPredDst, PelUnitBuf &pcYuvPredSrc, Int iDir, bool bOBMCSimp )
 {
   int iWidth  = pu.lwidth();
   int iHeight = pu.lheight();
@@ -2373,7 +2373,7 @@ UInt InterPrediction::xFrucGetBilaMatchCost(PredictionUnit &pu, Int nWidth, Int 
   return uiCost;
 }
 
-Bool InterPrediction::xFrucIsInList( const MvField & rMvField , std::list<MvField> & rList )
+bool InterPrediction::xFrucIsInList( const MvField & rMvField , std::list<MvField> & rList )
 {
   std::list<MvField>::iterator pos = rList.begin();
   while( pos != rList.end() )
@@ -2385,7 +2385,7 @@ Bool InterPrediction::xFrucIsInList( const MvField & rMvField , std::list<MvFiel
   return( false );
 }
 
-void InterPrediction::xFrucInsertMv2StartList( const MvField & rMvField , std::list<MvField> & rList, Bool setHighPrec )
+void InterPrediction::xFrucInsertMv2StartList( const MvField & rMvField , std::list<MvField> & rList, bool setHighPrec )
 {
   CHECK( rMvField.refIdx < 0, "invalid ref idx" );
 
@@ -2419,7 +2419,7 @@ void InterPrediction::xFrucCollectBlkStartMv( PredictionUnit& pu, const MergeCtx
 
   for( Int nMergeIndex = 0; nMergeIndex < mergeCtx.numValidMergeCand << 1; nMergeIndex++ )
   {
-    Bool mrgTpDflt = ( pu.cs->sps->getSpsNext().getUseSubPuMvp() ) ? mergeCtx.mrgTypeNeighbours[nMergeIndex>>1] == MRG_TYPE_DEFAULT_N : true;
+    bool mrgTpDflt = ( pu.cs->sps->getSpsNext().getUseSubPuMvp() ) ? mergeCtx.mrgTypeNeighbours[nMergeIndex>>1] == MRG_TYPE_DEFAULT_N : true;
     if( mergeCtx.mvFieldNeighbours[nMergeIndex].refIdx >= 0 && mrgTpDflt )
     {
       if( nTargetRefIdx >= 0 && ( mergeCtx.mvFieldNeighbours[nMergeIndex].refIdx != nTargetRefIdx || ( nMergeIndex & 0x01 ) != ( Int )eTargetRefList ) )
@@ -2666,9 +2666,9 @@ void InterPrediction::xFrucCollectSubBlkStartMv( PredictionUnit& pu, const Merge
 #if DISTORTION_TYPE_BUGFIX
 Distortion InterPrediction::xFrucFindBestMvFromList(MvField *pBestMvField, RefPicList &rBestRefPicList,
                                                     PredictionUnit &pu, const MvField &rMvStart, Int nBlkWidth,
-                                                    Int nBlkHeight, Bool bTM, Bool bMvCost)
+                                                    Int nBlkHeight, bool bTM, bool bMvCost)
 #else
-UInt InterPrediction::xFrucFindBestMvFromList( MvField* pBestMvField, RefPicList& rBestRefPicList, PredictionUnit& pu, const MvField& rMvStart, Int nBlkWidth, Int nBlkHeight, Bool bTM, Bool bMvCost )
+UInt InterPrediction::xFrucFindBestMvFromList( MvField* pBestMvField, RefPicList& rBestRefPicList, PredictionUnit& pu, const MvField& rMvStart, Int nBlkWidth, Int nBlkHeight, bool bTM, bool bMvCost )
 #endif
 {
 #if DISTORTION_TYPE_BUGFIX
@@ -2735,11 +2735,11 @@ UInt InterPrediction::xFrucFindBestMvFromList( MvField* pBestMvField, RefPicList
   return uiMinCost;
 }
 
-Bool InterPrediction::deriveFRUCMV( PredictionUnit &pu )
+bool InterPrediction::deriveFRUCMV( PredictionUnit &pu )
 {
   CHECK( !pu.mergeFlag, "merge mode must be used here" );
 
-  Bool bAvailable = false;
+  bool bAvailable = false;
 
   MergeCtx mrgCtx;
   if( pu.cs->sps->getSpsNext().getUseSubPuMvp() )
@@ -2785,9 +2785,9 @@ UInt InterPrediction::xFrucGetMvCost( const Mv& rMvStart, const Mv& rMvCur, Int 
 #if DISTORTION_TYPE_BUGFIX
 Distortion InterPrediction::xFrucRefineMv(MvField *pBestMvField, RefPicList eCurRefPicList, Distortion uiMinCost,
                                           Int nSearchMethod, PredictionUnit &pu, const MvField &rMvStart, Int nBlkWidth,
-                                          Int nBlkHeight, Bool bTM, Bool bMvCostZero)
+                                          Int nBlkHeight, bool bTM, bool bMvCostZero)
 #else
-UInt InterPrediction::xFrucRefineMv( MvField* pBestMvField, RefPicList eCurRefPicList, UInt uiMinCost, Int nSearchMethod, PredictionUnit& pu, const MvField& rMvStart, Int nBlkWidth, Int nBlkHeight, Bool bTM, Bool bMvCostZero )
+UInt InterPrediction::xFrucRefineMv( MvField* pBestMvField, RefPicList eCurRefPicList, UInt uiMinCost, Int nSearchMethod, PredictionUnit& pu, const MvField& rMvStart, Int nBlkWidth, Int nBlkHeight, bool bTM, bool bMvCostZero )
 #endif
 {
   Int nSearchStepShift = 0;
@@ -2857,11 +2857,11 @@ UInt InterPrediction::xFrucRefineMv( MvField* pBestMvField, RefPicList eCurRefPi
 template<Int SearchPattern>
 Distortion InterPrediction::xFrucRefineMvSearch(MvField *pBestMvField, RefPicList eCurRefPicList, PredictionUnit &pu,
                                                 const MvField &rMvStart, Int nBlkWidth, Int nBlkHeight,
-                                                Distortion uiMinDist, Bool bTM, Int nSearchStepShift,
-                                                UInt uiMaxSearchRounds, Bool bMvCostZero)
+                                                Distortion uiMinDist, bool bTM, Int nSearchStepShift,
+                                                UInt uiMaxSearchRounds, bool bMvCostZero)
 #else
 template<Int SearchPattern>
-UInt InterPrediction::xFrucRefineMvSearch ( MvField* pBestMvField, RefPicList eCurRefPicList, PredictionUnit& pu, const MvField& rMvStart, Int nBlkWidth, Int nBlkHeight, UInt uiMinDist, Bool bTM, Int nSearchStepShift, UInt uiMaxSearchRounds, Bool bMvCostZero )
+UInt InterPrediction::xFrucRefineMvSearch ( MvField* pBestMvField, RefPicList eCurRefPicList, PredictionUnit& pu, const MvField& rMvStart, Int nBlkWidth, Int nBlkHeight, UInt uiMinDist, bool bTM, Int nSearchStepShift, UInt uiMaxSearchRounds, bool bMvCostZero )
 #endif
 {
   const Mv mvSearchOffsetCross  [4] = { Mv(  0 , 1 ) , Mv( 1 , 0 ) , Mv(  0 , -1 ) , Mv( -1 ,  0 ) };
@@ -2982,7 +2982,7 @@ UInt InterPrediction::xFrucRefineMvSearch ( MvField* pBestMvField, RefPicList eC
   return uiMinDist;
 }
 
-Bool InterPrediction::frucFindBlkMv4Pred( PredictionUnit& pu, RefPicList eTargetRefPicList, const Int nTargetRefIdx, AMVPInfo* pInfo )
+bool InterPrediction::frucFindBlkMv4Pred( PredictionUnit& pu, RefPicList eTargetRefPicList, const Int nTargetRefIdx, AMVPInfo* pInfo )
 {
   MergeCtx mrgCtx;
   if( pu.cs->sps->getSpsNext().getUseSubPuMvp() )
@@ -2994,7 +2994,7 @@ Bool InterPrediction::frucFindBlkMv4Pred( PredictionUnit& pu, RefPicList eTarget
 
   PU::getInterMergeCandidates( pu, mrgCtx );
 
-  Bool bAvailable = false;
+  bool bAvailable = false;
   if( pu.cs->slice->getSPS()->getSpsNext().getUseFRUCMrgMode() )
   {
     Int nWidth  = pu.lumaSize().width;
@@ -3025,9 +3025,9 @@ Bool InterPrediction::frucFindBlkMv4Pred( PredictionUnit& pu, RefPicList eTarget
   return bAvailable;
 }
 
-Bool InterPrediction::xFrucFindBlkMv( PredictionUnit& pu, const MergeCtx& mergeCtx )
+bool InterPrediction::xFrucFindBlkMv( PredictionUnit& pu, const MergeCtx& mergeCtx )
 {
-  Bool bAvailable = false;
+  bool bAvailable = false;
   Int nWidth  = pu.lumaSize().width;
   Int nHeight = pu.lumaSize().height;
   MvField mvStart[2] , mvFinal[2];
@@ -3137,7 +3137,7 @@ Bool InterPrediction::xFrucFindBlkMv( PredictionUnit& pu, const MergeCtx& mergeC
   return bAvailable;
 }
 
-Bool InterPrediction::xFrucRefineSubBlkMv( PredictionUnit& pu, const MergeCtx &mergeCtx, Bool bTM )
+bool InterPrediction::xFrucRefineSubBlkMv( PredictionUnit& pu, const MergeCtx &mergeCtx, bool bTM )
 {
   Int nRefineBlockSize = xFrucGetSubBlkSize( pu, pu.lumaSize().width, pu.lumaSize().height );
 
@@ -3241,7 +3241,7 @@ Int InterPrediction::xFrucGetSubBlkSize( PredictionUnit& pu, Int nBlkWidth, Int 
   return( nRefineBlkSize );
 }
 
-Bool InterPrediction::xFrucGetCurBlkTemplate( PredictionUnit& pu, Int nCurBlkWidth, Int nCurBlkHeight )
+bool InterPrediction::xFrucGetCurBlkTemplate( PredictionUnit& pu, Int nCurBlkWidth, Int nCurBlkHeight )
 {
   m_bFrucTemplateAvailabe[0] = xFrucIsTopTempAvailable( pu );
   m_bFrucTemplateAvailabe[1] = xFrucIsLeftTempAvailable( pu );
@@ -3278,7 +3278,7 @@ Bool InterPrediction::xFrucGetCurBlkTemplate( PredictionUnit& pu, Int nCurBlkWid
   return true;
 }
 
-Bool InterPrediction::xFrucIsTopTempAvailable( PredictionUnit& pu )
+bool InterPrediction::xFrucIsTopTempAvailable( PredictionUnit& pu )
 {
   const CodingStructure &cs     = *pu.cs;
         Position posRT          = pu.Y().topRight();
@@ -3287,7 +3287,7 @@ Bool InterPrediction::xFrucIsTopTempAvailable( PredictionUnit& pu )
   return ( puAbove && pu.cu != puAbove->cu );
 }
 
-Bool InterPrediction::xFrucIsLeftTempAvailable( PredictionUnit& pu )
+bool InterPrediction::xFrucIsLeftTempAvailable( PredictionUnit& pu )
 {
   const CodingStructure &cs    = *pu.cs;
         Position posLB         = pu.Y().bottomLeft();
@@ -3340,7 +3340,7 @@ void InterPrediction::xFrucUpdateTemplate( PredictionUnit& pu, Int nWidth, Int n
   }
 }
 
-void InterPrediction::xPredInterLines( const PredictionUnit& pu, const Picture* refPic, Mv &_mv, PelUnitBuf &dstPic, const Bool &bi, const ClpRng& clpRng )
+void InterPrediction::xPredInterLines( const PredictionUnit& pu, const Picture* refPic, Mv &_mv, PelUnitBuf &dstPic, const bool &bi, const ClpRng& clpRng )
 {
   clipMv( _mv, pu.lumaPos(), *pu.cs->sps );
 
@@ -3457,9 +3457,9 @@ UInt InterPrediction::xDirectMCCost( Int iBitDepth, Pel* pRef, UInt uiRefStride,
 #if DISTORTION_TYPE_BUGFIX
 void InterPrediction::xBIPMVRefine(PredictionUnit &pu, RefPicList eRefPicList, Int iWidth, Int iHeight,
                                    const CPelUnitBuf &pcYuvOrg, UInt uiMaxSearchRounds, UInt nSearchStepShift,
-                                   Distortion &uiMinCost, Bool fullPel /*= true*/)
+                                   Distortion &uiMinCost, bool fullPel /*= true*/)
 #else
-void InterPrediction::xBIPMVRefine( PredictionUnit& pu, RefPicList eRefPicList, Int iWidth, Int iHeight, const CPelUnitBuf &pcYuvOrg, UInt uiMaxSearchRounds, UInt nSearchStepShift, UInt& uiMinCost, Bool fullPel /*= true*/ )
+void InterPrediction::xBIPMVRefine( PredictionUnit& pu, RefPicList eRefPicList, Int iWidth, Int iHeight, const CPelUnitBuf &pcYuvOrg, UInt uiMaxSearchRounds, UInt nSearchStepShift, UInt& uiMinCost, bool fullPel /*= true*/ )
 #endif
 {
   const Mv mvSearchOffsetSquare[8] = { Mv(-1 , 1) , Mv(0 , 1) , Mv(1 , 1) , Mv(1 , 0) , Mv(1 , -1) , Mv(0 , -1) , Mv(-1 , -1) , Mv(-1 , 0) };

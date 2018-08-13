@@ -514,7 +514,7 @@ int PU::getIntraMPMs( const PredictionUnit &pu, unsigned* mpm, const ChannelType
     Int  numCand = -1;
     UInt modeIdx =  0;
 
-    Bool includedMode[NUM_INTRA_MODE];
+    bool includedMode[NUM_INTRA_MODE];
     memset(includedMode, false, sizeof(includedMode));
     if ( isChromaMDMS )
     {
@@ -1029,7 +1029,7 @@ int PU::getLMSymbolList(const PredictionUnit &pu, Int *pModeList)
     }
   }
 
-  Bool bNonLMInsert = false;
+  bool bNonLMInsert = false;
   Int iIdx = 0;
 
   pModeList[ iIdx++ ] = LM_CHROMA_IDX;
@@ -1110,7 +1110,7 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx, co
   const UInt maxNumMergeCand = slice.getMaxNumMergeCand();
   const bool canFastExit     = pu.cs->pps->getLog2ParallelMergeLevelMinus2() == 0;
 
-  Bool isCandInter[MRG_MAX_NUM_CANDS];
+  bool isCandInter[MRG_MAX_NUM_CANDS];
 
   for (UInt ui = 0; ui < maxNumMergeCand; ++ui)
   {
@@ -1138,7 +1138,7 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx, co
   //left
   const PredictionUnit* puLeft = cs.getPURestricted( posLB.offset( -1, 0 ), pu, pu.chType );
 
-  const Bool isAvailableA1 = puLeft && isDiffMER( pu, *puLeft ) && pu.cu != puLeft->cu && CU::isInter( *puLeft->cu );
+  const bool isAvailableA1 = puLeft && isDiffMER( pu, *puLeft ) && pu.cu != puLeft->cu && CU::isInter( *puLeft->cu );
 
   if( isAvailableA1 )
   {
@@ -1178,7 +1178,7 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx, co
   // above
   const PredictionUnit *puAbove = cs.getPURestricted( posRT.offset( 0, -1 ), pu, pu.chType );
 
-  Bool isAvailableB1 = puAbove && isDiffMER( pu, *puAbove ) && pu.cu != puAbove->cu && CU::isInter( *puAbove->cu );
+  bool isAvailableB1 = puAbove && isDiffMER( pu, *puAbove ) && pu.cu != puAbove->cu && CU::isInter( *puAbove->cu );
 
   if( isAvailableB1 )
   {
@@ -1219,7 +1219,7 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx, co
   // above right
   const PredictionUnit *puAboveRight = cs.getPURestricted( posRT.offset( 1, -1 ), pu, pu.chType );
 
-  Bool isAvailableB0 = puAboveRight && isDiffMER( pu, *puAboveRight ) && CU::isInter( *puAboveRight->cu );
+  bool isAvailableB0 = puAboveRight && isDiffMER( pu, *puAboveRight ) && CU::isInter( *puAboveRight->cu );
 
   if( isAvailableB0 )
   {
@@ -1263,7 +1263,7 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx, co
   //left bottom
   const PredictionUnit *puLeftBottom = cs.getPURestricted( posLB.offset( -1, 1 ), pu, pu.chType );
 
-  Bool isAvailableA0 = puLeftBottom && isDiffMER( pu, *puLeftBottom ) && CU::isInter( *puLeftBottom->cu );
+  bool isAvailableA0 = puLeftBottom && isDiffMER( pu, *puLeftBottom ) && CU::isInter( *puLeftBottom->cu );
 
   if( isAvailableA0 )
   {
@@ -1324,7 +1324,7 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx, co
 
   if( enableSubPuMvp && slice.getEnableTMVPFlag() )
   {
-    Bool bMrgIdxMatchATMVPCan = ( mrgCandIdx == cnt );
+    bool bMrgIdxMatchATMVPCan = ( mrgCandIdx == cnt );
     bool tmpLICFlag           = false;
 
     isAvailableSubPu = cs.sps->getSpsNext().getUseATMVP() && getInterMergeSubPuMvpCand( pu, mrgCtx, tmpLICFlag, cnt );
@@ -1386,7 +1386,7 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx, co
   {
     const PredictionUnit *puAboveLeft = cs.getPURestricted( posLT.offset( -1, -1 ), pu, pu.chType );
 
-    Bool isAvailableB2 = puAboveLeft && isDiffMER( pu, *puAboveLeft ) && CU::isInter( *puAboveLeft->cu );
+    bool isAvailableB2 = puAboveLeft && isDiffMER( pu, *puAboveLeft ) && CU::isInter( *puAboveLeft->cu );
 
     if( isAvailableB2 )
     {
@@ -1438,7 +1438,7 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx, co
 
     Position posC0;
     Position posC1 = pu.Y().center();
-    Bool C0Avail = false;
+    bool C0Avail = false;
 
     if (((posRB.x + pcv.minCUWidth) < pcv.lumaWidth) && ((posRB.y + pcv.minCUHeight) < pcv.lumaHeight))
     {
@@ -1861,7 +1861,7 @@ void PU::fillMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, const in
   Position posRT = pu.Y().topRight();
   Position posLB = pu.Y().bottomLeft();
 
-  Bool isScaledFlagLX = false; /// variable name from specification; true when the PUs below left or left are available (availableA0 || availableA1).
+  bool isScaledFlagLX = false; /// variable name from specification; true when the PUs below left or left are available (availableA0 || availableA1).
 
   {
     const PredictionUnit* tmpPU = cs.getPURestricted( posLB.offset( -1, 1 ), pu, pu.chType ); // getPUBelowLeft(idx, partIdxLB);
@@ -1877,7 +1877,7 @@ void PU::fillMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, const in
   // Left predictor search
   if( isScaledFlagLX )
   {
-    Bool bAdded = addMVPCandUnscaled( pu, eRefPicList, refIdx, posLB, MD_BELOW_LEFT, *pInfo );
+    bool bAdded = addMVPCandUnscaled( pu, eRefPicList, refIdx, posLB, MD_BELOW_LEFT, *pInfo );
 
     if( !bAdded )
     {
@@ -1897,7 +1897,7 @@ void PU::fillMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, const in
 
   // Above predictor search
   {
-    Bool bAdded = addMVPCandUnscaled( pu, eRefPicList, refIdx, posRT, MD_ABOVE_RIGHT, *pInfo );
+    bool bAdded = addMVPCandUnscaled( pu, eRefPicList, refIdx, posRT, MD_ABOVE_RIGHT, *pInfo );
 
     if( !bAdded )
     {
@@ -1912,7 +1912,7 @@ void PU::fillMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, const in
 
   if( !isScaledFlagLX )
   {
-    Bool bAdded = addMVPCandWithScaling( pu, eRefPicList, refIdx, posRT, MD_ABOVE_RIGHT, *pInfo );
+    bool bAdded = addMVPCandWithScaling( pu, eRefPicList, refIdx, posRT, MD_ABOVE_RIGHT, *pInfo );
 
     if( !bAdded )
     {
@@ -2022,7 +2022,7 @@ void PU::fillMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, const in
   while (pInfo->numCand < AMVP_MAX_NUM_CANDS)
   {
 #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
-    const Bool prec = pInfo->mvCand[pInfo->numCand].highPrec;
+    const bool prec = pInfo->mvCand[pInfo->numCand].highPrec;
     pInfo->mvCand[pInfo->numCand] = Mv( 0, 0, prec );
 #else
     pInfo->mvCand[pInfo->numCand] = Mv( 0, 0 );
@@ -2184,7 +2184,7 @@ void PU::xInheritedAffineMv( const PredictionUnit &pu, const PredictionUnit* puN
 }
 
 #if !JVET_K0337_AFFINE_MVP_IMPROVE
-Bool isValidAffineCandidate( const PredictionUnit &pu, Mv cMv0, Mv cMv1, Mv cMv2, Int& riDV )
+bool isValidAffineCandidate( const PredictionUnit &pu, Mv cMv0, Mv cMv1, Mv cMv2, Int& riDV )
 {
   Mv zeroMv(0, 0);
   Mv deltaHor = cMv1 - cMv0;
@@ -2459,7 +2459,7 @@ void PU::fillAffineMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, co
     {
       for ( Int k = 0; k < amvpInfo2.numCand; k++ )
       {
-        Bool bValid = isValidAffineCandidate( pu, amvpInfo0.mvCand[i], amvpInfo1.mvCand[j], amvpInfo2.mvCand[k], iDV[iCount] );
+        bool bValid = isValidAffineCandidate( pu, amvpInfo0.mvCand[i], amvpInfo1.mvCand[j], amvpInfo2.mvCand[k], iDV[iCount] );
         if ( bValid )
         {
           // Sort
@@ -2632,7 +2632,7 @@ bool PU::addMVPCandUnscaled( const PredictionUnit &pu, const RefPicList &eRefPic
 * \param iRefIdx
 * \param uiPartUnitIdx
 * \param eDir
-* \returns Bool
+* \returns bool
 */
 #if JEM_TOOLS || JVET_K_AFFINE
 bool PU::addMVPCandWithScaling( const PredictionUnit &pu, const RefPicList &eRefPicList, const int &iRefIdx, const Position &pos, const MvpDir &eDir, AMVPInfo &info, bool affine )
@@ -4557,7 +4557,7 @@ void CU::resetMVDandMV2Int( CodingUnit& cu, InterPrediction *interPred )
 #if JEM_TOOLS
       if( pu.frucMrgMode )
       {
-        Bool avail = interPred->deriveFRUCMV( pu );
+        bool avail = interPred->deriveFRUCMV( pu );
         CHECK( !avail, "FRUC not available" );
         continue;
       }
@@ -4670,7 +4670,7 @@ bool CU::isObmcFlagCoded ( const CodingUnit &cu )
 
 
 #if JEM_TOOLS
-bool PU::getNeighborMotion( PredictionUnit &pu, MotionInfo& mi, Position off, Int iDir, Bool bSubPu )
+bool PU::getNeighborMotion( PredictionUnit &pu, MotionInfo& mi, Position off, Int iDir, bool bSubPu )
 {
   PredictionUnit* tmpPu      = nullptr;
   Position posNeighborMotion = Position( 0, 0 );
@@ -4831,8 +4831,8 @@ bool TU::hasTransformSkipFlag(const CodingStructure& cs, const CompArea& area)
 
 UInt TU::getGolombRiceStatisticsIndex(const TransformUnit &tu, const ComponentID &compID)
 {
-  const Bool transformSkip    = tu.transformSkip[compID];
-  const Bool transquantBypass = tu.cu->transQuantBypass;
+  const bool transformSkip    = tu.transformSkip[compID];
+  const bool transquantBypass = tu.cu->transQuantBypass;
 
   //--------
 
@@ -4941,7 +4941,7 @@ bool TU::needsBlockSizeTrafoScale( const Size& size )
   return needsSqrt2Scale( size ) || isNonLog2BlockSize( size );
 }
 #else
-Bool TU::needsQP3Offset(const TransformUnit &tu, const ComponentID &compID)
+bool TU::needsQP3Offset(const TransformUnit &tu, const ComponentID &compID)
 {
   if( tu.cs->pcv->rectCUs && !tu.transformSkip[compID] )
   {

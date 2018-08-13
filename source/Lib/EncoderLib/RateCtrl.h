@@ -99,7 +99,7 @@ public:
   ~EncRCSeq();
 
 public:
-  void create( Int totalFrames, Int targetBitrate, Int frameRate, Int GOPSize, Int picWidth, Int picHeight, Int LCUWidth, Int LCUHeight, Int numberOfLevel, Bool useLCUSeparateModel, Int adaptiveBit );
+  void create( Int totalFrames, Int targetBitrate, Int frameRate, Int GOPSize, Int picWidth, Int picHeight, Int LCUWidth, Int LCUHeight, Int numberOfLevel, bool useLCUSeparateModel, Int adaptiveBit );
   void destroy();
   void initBitsRatio( Int bitsRatio[] );
   void initGOPID2Level( Int GOPID2Level[] );
@@ -120,7 +120,7 @@ public:
   Int  getNumberOfLevel()               { return m_numberOfLevel; }
   Int  getAverageBits()                 { return m_averageBits; }
   Int  getLeftAverageBits()             { CHECK(!( m_framesLeft > 0 ), "No frames left"); return (Int)(m_bitsLeft / m_framesLeft); }
-  Bool getUseLCUSeparateModel()         { return m_useLCUSeparateModel; }
+  bool getUseLCUSeparateModel()         { return m_useLCUSeparateModel; }
 
   Int  getNumPixel()                    { return m_numberOfPixel; }
   Int64  getTargetBits()                { return m_targetBits; }
@@ -173,7 +173,7 @@ private:
   Double m_seqTargetBpp;
   Double m_alphaUpdate;
   Double m_betaUpdate;
-  Bool m_useLCUSeparateModel;
+  bool m_useLCUSeparateModel;
 
   Int m_adaptiveBit;
   Double m_lastLambda;
@@ -234,7 +234,7 @@ public:
   Double getLCUEstLambda( Double bpp );
   Int    getLCUEstQP( Double lambda, Int clipPicQP );
 
-  void updateAfterCTU( Int LCUIdx, Int bits, Int QP, Double lambda, Bool updateLCUParameter = true );
+  void updateAfterCTU( Int LCUIdx, Int bits, Int QP, Double lambda, bool updateLCUParameter = true );
   void updateAfterPicture( Int actualHeaderBits, Int actualTotalBits, Double averageQP, Double averageLambda, SliceType eSliceType);
 
   void addToPictureLsit( list<EncRCPic*>& listPreviousPictures );
@@ -318,7 +318,7 @@ public:
   ~RateCtrl();
 
 public:
-  void init( Int totalFrames, Int targetBitrate, Int frameRate, Int GOPSize, Int picWidth, Int picHeight, Int LCUWidth, Int LCUHeight, Int keepHierBits, Bool useLCUSeparateModel, GOPEntry GOPList[MAX_GOP] );
+  void init( Int totalFrames, Int targetBitrate, Int frameRate, Int GOPSize, Int picWidth, Int picHeight, Int LCUWidth, Int LCUHeight, Int keepHierBits, bool useLCUSeparateModel, GOPEntry GOPList[MAX_GOP] );
   void destroy();
   void initRCPic( Int frameLevel );
   void initRCGOP( Int numberOfPictures );
@@ -332,7 +332,7 @@ public:
   EncRCPic* getRCPic()          { CHECK( m_encRCPic == NULL, "Object does not exist" ); return m_encRCPic; }
   list<EncRCPic*>& getPicList() { return m_listRCPictures; }
 #if U0132_TARGET_BITS_SATURATION
-  Bool       getCpbSaturationEnabled()  { return m_CpbSaturationEnabled;  }
+  bool       getCpbSaturationEnabled()  { return m_CpbSaturationEnabled;  }
   UInt       getCpbState()              { return m_cpbState;       }
   UInt       getCpbSize()               { return m_cpbSize;        }
   UInt       getBufferingRate()         { return m_bufferingRate;  }
@@ -347,7 +347,7 @@ private:
   list<EncRCPic*> m_listRCPictures;
   Int        m_RCQP;
 #if U0132_TARGET_BITS_SATURATION
-  Bool       m_CpbSaturationEnabled;    // Enable target bits saturation to avoid CPB overflow and underflow
+  bool       m_CpbSaturationEnabled;    // Enable target bits saturation to avoid CPB overflow and underflow
   Int        m_cpbState;                // CPB State
   UInt       m_cpbSize;                 // CPB size
   UInt       m_bufferingRate;           // Buffering rate

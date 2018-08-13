@@ -68,7 +68,7 @@ public:
                                 const WPScalingParam *const wp0,
                                 const WPScalingParam *const wp1,
                                       PelUnitBuf           &rpcYuvDst,
-                                const Bool                  bRoundLuma = true,
+                                const bool                  bRoundLuma = true,
                                 const ComponentID           maxNumComp = MAX_NUM_COMPONENT );
 
   void  addWeightUni(           const CPelUnitBuf          &pcYuvSrc0,

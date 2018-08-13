@@ -133,7 +133,7 @@ protected:
 
   Mv              m_integerMv2Nx2N              [NUM_REF_PIC_LIST_01][MAX_NUM_REF];
 
-  Bool            m_isInitialized;
+  bool            m_isInitialized;
 
 #if JEM_TOOLS
   MotionInfo      m_SubPuFrucBuf                [( MAX_CU_SIZE * MAX_CU_SIZE ) >> ( MIN_CU_LOG2 << 1 )];
@@ -171,7 +171,7 @@ public:
 protected:
 
   /// sub-function for motion vector refinement used in fractional-pel accuracy
-  Distortion  xPatternRefinement    ( const CPelBuf* pcPatternKey, Mv baseRefMv, Int iFrac, Mv& rcMvFrac, Bool bAllowUseOfHadamard );
+  Distortion  xPatternRefinement    ( const CPelBuf* pcPatternKey, Mv baseRefMv, Int iFrac, Mv& rcMvFrac, bool bAllowUseOfHadamard );
 
    typedef struct
    {
@@ -203,7 +203,7 @@ protected:
   inline void xTZSearchHelp         ( IntTZSearchStruct& rcStruct, const Int iSearchX, const Int iSearchY, const UChar ucPointNr, const UInt uiDistance );
   inline void xTZ2PointSearch       ( IntTZSearchStruct& rcStruct );
   inline void xTZ8PointSquareSearch ( IntTZSearchStruct& rcStruct, const Int iStartX, const Int iStartY, const Int iDist );
-  inline void xTZ8PointDiamondSearch( IntTZSearchStruct& rcStruct, const Int iStartX, const Int iStartY, const Int iDist, const Bool bCheckCornersAtDist1 );
+  inline void xTZ8PointDiamondSearch( IntTZSearchStruct& rcStruct, const Int iStartX, const Int iStartY, const Int iDist, const bool bCheckCornersAtDist1 );
 
   Distortion xGetInterPredictionError( PredictionUnit& pu, PelUnitBuf& origBuf, const RefPicList &eRefPicList = REF_PIC_LIST_X );
 
@@ -230,7 +230,7 @@ protected:
                                     Int                   iRefIdx,
                                     Mv&                   rcMvPred,
                                     AMVPInfo&             amvpInfo,
-                                    Bool                  bFilled = false,
+                                    bool                  bFilled = false,
                                     Distortion*           puiDistBiP = NULL
                                   );
 
@@ -260,7 +260,7 @@ protected:
 
   void xCopyAMVPInfo              ( AMVPInfo*   pSrc, AMVPInfo* pDst );
   UInt xGetMvpIdxBits             ( Int iIdx, Int iNum );
-  void xGetBlkBits                ( PartSize  eCUMode, Bool bPSlice, Int iPartIdx,  UInt uiLastMode, UInt uiBlkBit[3]);
+  void xGetBlkBits                ( PartSize  eCUMode, bool bPSlice, Int iPartIdx,  UInt uiLastMode, UInt uiBlkBit[3]);
 
   void xMergeEstimation           ( PredictionUnit&       pu,
                                     PelUnitBuf&           origBuf,
@@ -294,7 +294,7 @@ protected:
                                     UInt&                 ruiBits,
                                     Distortion&           ruiCost,
                                     const AMVPInfo&       amvpInfo,
-                                    Bool                  bBi = false
+                                    bool                  bBi = false
                                   );
 
   void xTZSearch                  ( const PredictionUnit& pu,
@@ -302,8 +302,8 @@ protected:
                                     Mv&                   rcMv,
                                     Distortion&           ruiSAD,
                                     const Mv* const       pIntegerMv2Nx2NPred,
-                                    const Bool            bExtendedSettings,
-                                    const Bool            bFastSettings = false
+                                    const bool            bExtendedSettings,
+                                    const bool            bFastSettings = false
                                   );
 
   void xTZSearchSelective         ( const PredictionUnit& pu,
@@ -362,7 +362,7 @@ protected:
                                     Mv                    hevcMv[2][33]
 #else
                                     Mv                    hevcMv[2][33],
-                                    Bool                  bFastSkipBi
+                                    bool                  bFastSkipBi
 #endif
 #if JVET_K0185_AFFINE_6PARA_ENC
                                   , Mv                    mvAffine4Para[2][33][3]
@@ -378,7 +378,7 @@ protected:
                                     Mv              acMv[3],
                                     UInt&           ruiBits,
                                     Distortion&     ruiCost,
-                                    Bool            bBi = false
+                                    bool            bBi = false
                                   );
 
   void xEstimateAffineAMVP        ( PredictionUnit&  pu,
@@ -407,7 +407,7 @@ protected:
 
 public:
 
-  void encodeResAndCalcRdInterCU  (CodingStructure &cs, Partitioner &partitioner, const Bool &skipResidual);
+  void encodeResAndCalcRdInterCU  (CodingStructure &cs, Partitioner &partitioner, const bool &skipResidual);
   void xEncodeInterResidualQT     (CodingStructure &cs, Partitioner &partitioner, const ComponentID &compID);
   void xEstimateInterResidualQT   (CodingStructure &cs, Partitioner &partitioner, Distortion *puiZeroDist = NULL);
   UInt64 xGetSymbolFracBitsInter  (CodingStructure &cs, Partitioner &partitioner);

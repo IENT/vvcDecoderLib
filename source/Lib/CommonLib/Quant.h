@@ -90,8 +90,8 @@ public:
 
   // initialize class
   virtual void init( UInt uiMaxTrSize,
-                     Bool useRDOQ = false,
-                     Bool useRDOQTS = false,
+                     bool useRDOQ = false,
+                     bool useRDOQTS = false,
 #if JVET_K0072
 #else
 #if JEM_TOOLS
@@ -99,13 +99,13 @@ public:
 #endif
 #endif
 #if T0196_SELECTIVE_RDOQ
-                     Bool useSelectiveRDOQ = false
+                     bool useSelectiveRDOQ = false
 #endif
                      );
 
 public:
 
-  void   transformSkipQuantOneSample(TransformUnit &tu, const ComponentID &compID, const TCoeff &resiDiff, TCoeff &coeff,    const UInt &uiPos, const QpParam &cQP, const Bool bUseHalfRoundingPoint);
+  void   transformSkipQuantOneSample(TransformUnit &tu, const ComponentID &compID, const TCoeff &resiDiff, TCoeff &coeff,    const UInt &uiPos, const QpParam &cQP, const bool bUseHalfRoundingPoint);
   void   invTrSkipDeQuantOneSample  (TransformUnit &tu, const ComponentID &compID, const TCoeff &pcCoeff,  Pel &reconSample, const UInt &uiPos, const QpParam &cQP);
 
 #if RDOQ_CHROMA_LAMBDA
@@ -120,8 +120,8 @@ public:
   Int* getQuantCoeff             ( UInt list, Int qp, UInt sizeX, UInt sizeY ) { return m_quantCoef            [sizeX][sizeY][list][qp]; };  //!< get Quant Coefficent
   Int* getDequantCoeff           ( UInt list, Int qp, UInt sizeX, UInt sizeY ) { return m_dequantCoef          [sizeX][sizeY][list][qp]; };  //!< get DeQuant Coefficent
 
-  void setUseScalingList         ( Bool bUseScalingList){ m_scalingListEnabledFlag = bUseScalingList; };
-  Bool getUseScalingList         ( const UInt width, const UInt height, const Bool isTransformSkip){ return m_scalingListEnabledFlag && (!isTransformSkip || ((width == 4) && (height == 4))); };
+  void setUseScalingList         ( bool bUseScalingList){ m_scalingListEnabledFlag = bUseScalingList; };
+  bool getUseScalingList         ( const UInt width, const UInt height, const bool isTransformSkip){ return m_scalingListEnabledFlag && (!isTransformSkip || ((width == 4) && (height == 4))); };
 
   void setScalingListDec         ( const ScalingList &scalingList);
   void processScalingListEnc     ( Int *coeff, Int *quantcoeff, Int quantScales, UInt height, UInt width, UInt ratio, Int sizuNum, UInt dc);
@@ -143,15 +143,15 @@ public:
 protected:
 
 #if T0196_SELECTIVE_RDOQ
-  Bool xNeedRDOQ                 ( TransformUnit &tu, const ComponentID &compID, const CCoeffBuf &pSrc, const QpParam &cQP );
+  bool xNeedRDOQ                 ( TransformUnit &tu, const ComponentID &compID, const CCoeffBuf &pSrc, const QpParam &cQP );
 #endif
 
   Double   m_dLambda;
   UInt     m_uiMaxTrSize;
-  Bool     m_useRDOQ;
-  Bool     m_useRDOQTS;
+  bool     m_useRDOQ;
+  bool     m_useRDOQTS;
 #if T0196_SELECTIVE_RDOQ
-  Bool     m_useSelectiveRDOQ;
+  bool     m_useSelectiveRDOQ;
 #endif
 #if JVET_K0072
 #else
@@ -177,8 +177,8 @@ private:
   Double   m_lambdas[MAX_NUM_COMPONENT];
 #endif
 #if HEVC_USE_SCALING_LISTS
-  Bool     m_scalingListEnabledFlag;
-  Bool     m_isScalingListOwner;
+  bool     m_scalingListEnabledFlag;
+  bool     m_isScalingListOwner;
 
   Int      *m_quantCoef            [SCALING_LIST_SIZE_NUM][SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM][SCALING_LIST_REM_NUM]; ///< array of quantization matrix coefficient 4x4
   Int      *m_dequantCoef          [SCALING_LIST_SIZE_NUM][SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM][SCALING_LIST_REM_NUM]; ///< array of dequantization matrix coefficient 4x4

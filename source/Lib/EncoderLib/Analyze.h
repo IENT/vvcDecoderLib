@@ -175,9 +175,9 @@ public:
 
 
 #if ENABLE_QPA || WCG_WPSNR
-  void    printOut ( TChar cDelim, const ChromaFormat chFmt, const Bool printMSEBasedSNR, const Bool printSequenceMSE, const BitDepths &bitDepths, const bool useWPSNR = false )
+  void    printOut ( TChar cDelim, const ChromaFormat chFmt, const bool printMSEBasedSNR, const bool printSequenceMSE, const BitDepths &bitDepths, const bool useWPSNR = false )
 #else
-  void    printOut ( TChar cDelim, const ChromaFormat chFmt, const Bool printMSEBasedSNR, const Bool printSequenceMSE, const BitDepths &bitDepths )
+  void    printOut ( TChar cDelim, const ChromaFormat chFmt, const bool printMSEBasedSNR, const bool printSequenceMSE, const BitDepths &bitDepths )
 #endif
   {
 #if !WCG_WPSNR
@@ -427,7 +427,7 @@ public:
   }
 
 
-  void    printSummary(const ChromaFormat chFmt, const Bool printSequenceMSE, const BitDepths &bitDepths, const std::string &sFilename)
+  void    printSummary(const ChromaFormat chFmt, const bool printSequenceMSE, const BitDepths &bitDepths, const std::string &sFilename)
   {
     FILE* pFile = fopen (sFilename.c_str(), "at");
 

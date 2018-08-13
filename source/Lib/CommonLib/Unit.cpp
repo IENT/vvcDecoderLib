@@ -155,10 +155,10 @@ UnitArea::UnitArea(const ChromaFormat _chromaFormat, const CompArea &blkY, const
 
 UnitArea::UnitArea(const ChromaFormat _chromaFormat,       CompArea &&blkY,      CompArea &&blkCb,      CompArea &&blkCr) : chromaFormat(_chromaFormat), blocks { std::forward<CompArea>(blkY), std::forward<CompArea>(blkCb), std::forward<CompArea>(blkCr) } {}
 
-Bool UnitArea::contains(const UnitArea& other) const
+bool UnitArea::contains(const UnitArea& other) const
 {
-  Bool ret = true;
-  Bool any = false;
+  bool ret = true;
+  bool any = false;
 
   for( const auto &blk : other.blocks )
   {
@@ -172,10 +172,10 @@ Bool UnitArea::contains(const UnitArea& other) const
   return any && ret;
 }
 
-Bool UnitArea::contains( const UnitArea& other, const ChannelType chType ) const
+bool UnitArea::contains( const UnitArea& other, const ChannelType chType ) const
 {
-  Bool ret = true;
-  Bool any = false;
+  bool ret = true;
+  bool any = false;
 
   for( const auto &blk : other.blocks )
   {

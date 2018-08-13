@@ -232,9 +232,9 @@ static void
 setColourRemappingInfoMatrixOffsets(      Int  (&matrixInputOffset)[3],
                                           Int  (&matrixOutputOffset)[3],
                                     const Int  bitDepth,
-                                    const Bool crInputFullRangeFlag,
+                                    const bool crInputFullRangeFlag,
                                     const Int  crInputMatrixCoefficients,
-                                    const Bool crFullRangeFlag,
+                                    const bool crFullRangeFlag,
                                     const Int  crMatrixCoefficients)
 {
   // set static matrix offsets
@@ -309,9 +309,9 @@ void applyColourRemapping(const PelUnitBuf& pic, SEIColourRemappingInfo& criSEI,
     PelBuf remapCr = cRemapped.Cr();
     const Int  iStrideOut  = remapY.stride;
     const Int  iCStrideOut = remapCb.stride;
-    const Bool b444        = ( pic.chromaFormat == CHROMA_444 );
-    const Bool b422        = ( pic.chromaFormat == CHROMA_422 );
-    const Bool b420        = ( pic.chromaFormat == CHROMA_420 );
+    const bool b444        = ( pic.chromaFormat == CHROMA_444 );
+    const bool b422        = ( pic.chromaFormat == CHROMA_422 );
+    const bool b420        = ( pic.chromaFormat == CHROMA_420 );
 
     std::vector<Int> preLut[3];
     std::vector<Int> postLut[3];
@@ -373,7 +373,7 @@ void applyColourRemapping(const PelUnitBuf& pic, SEIColourRemappingInfo& criSEI,
       for( Int x = 0; x < iWidth; x++ )
       {
         const Int xc = (x>>hs);
-        Bool computeChroma = b444 || ((b422 || !(y&1)) && !(x&1));
+        bool computeChroma = b444 || ((b422 || !(y&1)) && !(x&1));
 
         Int YUVPre_0 = applyColourRemappingInfoLut1D(YUVIn[COMPONENT_Y][x], preLut[0], 0);
         Int YUVPre_1 = applyColourRemappingInfoLut1D(YUVIn[COMPONENT_Cb][xc], preLut[1], 0);

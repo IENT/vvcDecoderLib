@@ -50,8 +50,8 @@ struct Position
   Position()                                   : x(0),  y(0)  { }
   Position(const PosType _x, const PosType _y) : x(_x), y(_y) { }
 
-  Bool operator!=(const Position &other)  const { return x != other.x || y != other.y; }
-  Bool operator==(const Position &other)  const { return x == other.x && y == other.y; }
+  bool operator!=(const Position &other)  const { return x != other.x || y != other.y; }
+  bool operator==(const Position &other)  const { return x == other.x && y == other.y; }
 
   Position offset(const Position pos)                 const { return Position(x + pos.x, y + pos.y); }
   Position offset(const PosType _x, const PosType _y) const { return Position(x + _x   , y + _y   ); }
@@ -69,8 +69,8 @@ struct Size
   Size()                                              : width(0),      height(0)       { }
   Size(const SizeType _width, const SizeType _height) : width(_width), height(_height) { }
 
-  Bool operator!=(const Size &other)      const { return (width != other.width) || (height != other.height); }
-  Bool operator==(const Size &other)      const { return (width == other.width) && (height == other.height); }
+  bool operator!=(const Size &other)      const { return (width != other.width) || (height != other.height); }
+  bool operator==(const Size &other)      const { return (width == other.width) && (height == other.height); }
   UInt area()                             const { return (UInt) width * (UInt) height; }
 };
 
@@ -91,11 +91,11 @@ struct Area : public Position, public Size
         Position  bottomRight()             const { return { (PosType) (x + width - 1), (PosType) (y + height - 1) }; }
         Position  center()                  const { return { (PosType) (x + width / 2), (PosType) (y + height / 2) }; }
 
-  Bool contains(const Position &_pos)       const { return (_pos.x >= x) && (_pos.x < (x + width)) && (_pos.y >= y) && (_pos.y < (y + height)); }
-  Bool contains(const Area &_area)          const { return contains(_area.pos()) && contains(_area.bottomRight()); }
+  bool contains(const Position &_pos)       const { return (_pos.x >= x) && (_pos.x < (x + width)) && (_pos.y >= y) && (_pos.y < (y + height)); }
+  bool contains(const Area &_area)          const { return contains(_area.pos()) && contains(_area.bottomRight()); }
 
-  Bool operator!=(const Area &other)        const { return (Size::operator!=(other)) || (Position::operator!=(other)); }
-  Bool operator==(const Area &other)        const { return (Size::operator==(other)) && (Position::operator==(other)); }
+  bool operator!=(const Area &other)        const { return (Size::operator!=(other)) || (Position::operator!=(other)); }
+  bool operator==(const Area &other)        const { return (Size::operator==(other)) && (Position::operator==(other)); }
 };
 
 struct UnitScale

@@ -54,7 +54,7 @@ class CrossComponentPrediction
 {
 protected:
 
-  SChar xCalcCrossComponentPredictionAlpha( TransformUnit &tu, const ComponentID &compID, Bool useRecoResidual );
+  SChar xCalcCrossComponentPredictionAlpha( TransformUnit &tu, const ComponentID &compID, bool useRecoResidual );
 
 public:
 
@@ -63,7 +63,7 @@ public:
                                         const CPelBuf       &piResiL,
                                         const CPelBuf       &piResiC,
                                               PelBuf        &piResiT,
-                                        const Bool          &reverse );
+                                        const bool          &reverse );
 };
 
 //! \}

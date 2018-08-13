@@ -56,9 +56,9 @@ namespace po = df::program_options_lite;
 /** \param argc number of arguments
     \param argv array of arguments
  */
-Bool DecAppCfg::parseCfg( Int argc, TChar* argv[] )
+bool DecAppCfg::parseCfg( Int argc, TChar* argv[] )
 {
-  Bool do_help = false;
+  bool do_help = false;
   string cfg_TargetDecLayerIdSetFile;
   string outputColourSpaceConvert;
   Int warnUnknowParameter = 0;
@@ -164,7 +164,7 @@ Bool DecAppCfg::parseCfg( Int argc, TChar* argv[] )
     FILE* targetDecLayerIdSetFile = fopen ( cfg_TargetDecLayerIdSetFile.c_str(), "r" );
     if ( targetDecLayerIdSetFile )
     {
-      Bool isLayerIdZeroIncluded = false;
+      bool isLayerIdZeroIncluded = false;
       while ( !feof(targetDecLayerIdSetFile) )
       {
         Int layerIdParsed = 0;

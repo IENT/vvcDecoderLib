@@ -176,11 +176,11 @@ bool CABACReader::coding_tree_unit( CodingStructure& cs, const UnitArea& area, i
     const UInt          curSliceIdx = cs.slice->getIndependentSliceIdx();
 #if HEVC_TILES_WPP
     const UInt          curTileIdx = cs.picture->tileMap->getTileIdxMap( pos );
-    Bool                leftMergeAvail = cs.getCURestricted( pos.offset( -(Int)pcv.maxCUWidth, 0 ), curSliceIdx, curTileIdx, CH_L ) ? true : false;
-    Bool                aboveMergeAvail = cs.getCURestricted( pos.offset( 0, -(Int)pcv.maxCUHeight ), curSliceIdx, curTileIdx, CH_L ) ? true : false;
+    bool                leftMergeAvail = cs.getCURestricted( pos.offset( -(Int)pcv.maxCUWidth, 0 ), curSliceIdx, curTileIdx, CH_L ) ? true : false;
+    bool                aboveMergeAvail = cs.getCURestricted( pos.offset( 0, -(Int)pcv.maxCUHeight ), curSliceIdx, curTileIdx, CH_L ) ? true : false;
 #else
-    Bool                leftAvail = cs.getCURestricted( pos.offset( -(Int)pcv.maxCUWidth, 0 ), curSliceIdx, CH_L ) ? true : false;
-    Bool                aboveAvail = cs.getCURestricted( pos.offset( 0, -(Int)pcv.maxCUHeight ), curSliceIdx, CH_L ) ? true : false;
+    bool                leftAvail = cs.getCURestricted( pos.offset( -(Int)pcv.maxCUWidth, 0 ), curSliceIdx, CH_L ) ? true : false;
+    bool                aboveAvail = cs.getCURestricted( pos.offset( 0, -(Int)pcv.maxCUHeight ), curSliceIdx, CH_L ) ? true : false;
 #endif
 
     Int leftCTUAddr = leftAvail ? ctuRsAddr - 1 : -1;
@@ -1341,7 +1341,7 @@ void CABACReader::imv_mode( CodingUnit& cu, MergeCtx& mrgCtx )
     return;
   }
 
-  Bool bNonZeroMvd = CU::hasSubCUNonZeroMVd( cu );
+  bool bNonZeroMvd = CU::hasSubCUNonZeroMVd( cu );
   if( !bNonZeroMvd )
   {
     return;
@@ -1461,12 +1461,12 @@ void CABACReader::obmc_flag( CodingUnit& cu )
     return;
   }
 
-  Bool bCoded = CU::isObmcFlagCoded( cu );
+  bool bCoded = CU::isObmcFlagCoded( cu );
 
   if( bCoded )
   {
     unsigned obmc = m_BinDecoder.decodeBin( Ctx::ObmcFlag() );
-    cu.obmcFlag = ( Bool ) obmc;
+    cu.obmcFlag = ( bool ) obmc;
   }
 
   DTRACE( g_trace_ctx, D_SYNTAX, "obmc_flag() obmc=%d pos=(%d,%d)\n", cu.obmcFlag ? 1 : 0, cu.lumaPos().x, cu.lumaPos().y );
@@ -2394,9 +2394,9 @@ void CABACReader::transform_tree( CodingStructure &cs, Partitioner &partitioner,
       else
       {
 #if ENABLE_BMS
-        Bool cbfY = cbf_comp( cs, tu.Y(), trDepth );
+        bool cbfY = cbf_comp( cs, tu.Y(), trDepth );
 #else
-        Bool cbfY = cbf_comp( cs, tu.Y() );
+        bool cbfY = cbf_comp( cs, tu.Y() );
 #endif
 #if ENABLE_BMS
         TU::setCbfAtDepth( tu, COMPONENT_Y, trDepth, ( cbfY ? 1 : 0 ) );
@@ -3012,7 +3012,7 @@ void CABACReader::residual_nsst_mode( CodingUnit& cu )
     return;
   }
 
-  Bool bUseThreeNSSTPasses = false;
+  bool bUseThreeNSSTPasses = false;
 
   if( cu.partSize == SIZE_2Nx2N )
   {

@@ -419,7 +419,7 @@ void SEIEncoder::initSEIKneeFunctionInfo(SEIKneeFunctionInfo *seiKneeFunctionInf
 
 template <typename T>
 static void readTokenValue(T            &returnedValue, /// value returned
-                           Bool         &failed,        /// used and updated
+                           bool         &failed,        /// used and updated
                            std::istream &is,            /// stream to read token from
                            const TChar  *pToken)        /// token string
 {
@@ -468,7 +468,7 @@ static void readTokenValue(T            &returnedValue, /// value returned
 
 template <typename T>
 static void readTokenValueAndValidate(T            &returnedValue, /// value returned
-                                      Bool         &failed,        /// used and updated
+                                      bool         &failed,        /// used and updated
                                       std::istream &is,            /// stream to read token from
                                       const TChar  *pToken,        /// token string
                                       const T      &minInclusive,  /// minimum value allowed, inclusive
@@ -485,16 +485,16 @@ static void readTokenValueAndValidate(T            &returnedValue, /// value ret
   }
 }
 
-// Bool version does not have maximum and minimum values.
-static void readTokenValueAndValidate(Bool         &returnedValue, /// value returned
-                                      Bool         &failed,        /// used and updated
+// bool version does not have maximum and minimum values.
+static void readTokenValueAndValidate(bool         &returnedValue, /// value returned
+                                      bool         &failed,        /// used and updated
                                       std::istream &is,            /// stream to read token from
                                       const TChar  *pToken)        /// token string
 {
   readTokenValue(returnedValue, failed, is, pToken);
 }
 
-Bool SEIEncoder::initSEIColourRemappingInfo(SEIColourRemappingInfo* seiColourRemappingInfo, Int currPOC) // returns true on success, false on failure.
+bool SEIEncoder::initSEIColourRemappingInfo(SEIColourRemappingInfo* seiColourRemappingInfo, Int currPOC) // returns true on success, false on failure.
 {
   CHECK(!(m_isInitialized), "Unspecified error");
   CHECK(!(seiColourRemappingInfo!=NULL), "Unspecified error");
@@ -502,7 +502,7 @@ Bool SEIEncoder::initSEIColourRemappingInfo(SEIColourRemappingInfo* seiColourRem
   // reading external Colour Remapping Information SEI message parameters from file
   if( !m_pcCfg->getColourRemapInfoSEIFileRoot().empty())
   {
-    Bool failed=false;
+    bool failed=false;
 
     // building the CRI file name with poc num in prefix "_poc.txt"
     std::string colourRemapSEIFileWithPoc(m_pcCfg->getColourRemapInfoSEIFileRoot());

@@ -315,7 +315,7 @@ private:
   void  xSetCUAlfCtrlFlags         ( CodingStructure& cs, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, UInt64& ruiDist, UInt uiAlfCtrlDepth, ALFParam *pAlfParam );
   void  xSetCUAlfCtrlFlag          ( CodingStructure& cs, const UnitArea alfCtrlArea, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, UInt64& ruiDist, ALFParam *pAlfParam);
 #if COM16_C806_ALF_TEMPPRED_NUM
-  Bool xFilteringLumaChroma(CodingStructure& cs, ALFParam *pAlfParam, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, UInt64& ruiMinRate, UInt64& ruiMinDist, Double& rdMinCost, Int uiIndex, const Slice* pSlice);
+  bool xFilteringLumaChroma(CodingStructure& cs, ALFParam *pAlfParam, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, UInt64& ruiMinRate, UInt64& ruiMinDist, Double& rdMinCost, Int uiIndex, const Slice* pSlice);
   void xcopyFilterCoeff(int filtNo, int **filterCoeff);
 #endif
 
@@ -404,7 +404,7 @@ private:
 #endif
     , const ClpRng& clpRng);
 
-  Double xSolveAndQuant( Double *filterCoeff, Int *filterCoeffQuant, Double **E, Double *y, int sqrFiltLength,const Int *weights, int bit_depth, Bool bChroma = false );
+  Double xSolveAndQuant( Double *filterCoeff, Int *filterCoeffQuant, Double **E, Double *y, int sqrFiltLength,const Int *weights, int bit_depth, bool bChroma = false );
   void   roundFiltCoeff            ( int *FilterCoeffQuan, double *FilterCoeff, int sqrFiltLength, int factor);
 
   void xDeriveGlobalEyFromLgrTapFilter(Double **E0, Double *y0, Double **E1, Double *y1, const Int *pattern0, const Int *pattern1);
@@ -424,12 +424,12 @@ private:
   void xFilterFrame_en             (PelUnitBuf& recDstBuf, const PelUnitBuf& recExtBuf, ALFParam& alfParam,  const ClpRng& clpRng);
   void xFilterFrame_enGalf         (PelUnitBuf& recDstBuf, const PelUnitBuf& recExtBuf, AlfFilterType filtType
 #if COM16_C806_ALF_TEMPPRED_NUM
-    , ALFParam *alfParam, Bool updateFilterCoef
+    , ALFParam *alfParam, bool updateFilterCoef
 #endif
     , const ClpRng& clpRng);
   void xFilterFrame_enAlf          (PelUnitBuf& recDstBuf, const PelUnitBuf& recExtBuf, AlfFilterType filtType
 #if COM16_C806_ALF_TEMPPRED_NUM
-    , ALFParam *alfParam, Bool updateFilterCoef
+    , ALFParam *alfParam, bool updateFilterCoef
 #endif
     , const ClpRng& clpRng);
   void xFilteringFrameChroma       ( const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf );
@@ -470,7 +470,7 @@ private:
   bool       m_updateMatrix;
   UIntBuf    m_maskBestBuf;
 #if JVET_C0038_NO_PREV_FILTERS
-  Bool bFindBestFixedFilter;
+  bool bFindBestFixedFilter;
 #endif
   UIntBuf    m_maskBuf;
 

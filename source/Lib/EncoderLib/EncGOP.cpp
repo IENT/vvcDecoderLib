@@ -222,7 +222,7 @@ ClpRngs codingChoice(const ClpRngs &prm_tocode, CodingStructure& cs, bool bDecid
     // D_on+lamda*R_on < D_off+lamda*R_off -> (D_on-D_off)+lambda*dR<0 -> -dD + lambda * dR <0
 
     // only luma 0
-    Bool chroma_on = false;
+    bool chroma_on = false;
     Double best_rd = -delta_disto_luma  +lambda_luma   * dR_luma_only;
 
     // add chroma
@@ -396,7 +396,7 @@ Int EncGOP::xWritePPS (AccessUnit &accessUnit, const PPS *pps)
 }
 
 
-Int EncGOP::xWriteParameterSets (AccessUnit &accessUnit, Slice *slice, const Bool bSeqFirst)
+Int EncGOP::xWriteParameterSets (AccessUnit &accessUnit, Slice *slice, const bool bSeqFirst)
 {
   Int actualTotalBits = 0;
 
@@ -462,7 +462,7 @@ void EncGOP::xWriteSEISeparately (NalUnitType naluType, SEIMessages& seiMessages
   }
 }
 
-void EncGOP::xClearSEIs(SEIMessages& seiMessages, Bool deleteMessages)
+void EncGOP::xClearSEIs(SEIMessages& seiMessages, bool deleteMessages)
 {
   if (deleteMessages)
   {
@@ -475,7 +475,7 @@ void EncGOP::xClearSEIs(SEIMessages& seiMessages, Bool deleteMessages)
 }
 
 // write SEI messages as separate NAL units ordered
-void EncGOP::xWriteLeadingSEIOrdered (SEIMessages& seiMessages, SEIMessages& duInfoSeiMessages, AccessUnit &accessUnit, Int temporalId, const SPS *sps, Bool testWrite)
+void EncGOP::xWriteLeadingSEIOrdered (SEIMessages& seiMessages, SEIMessages& duInfoSeiMessages, AccessUnit &accessUnit, Int temporalId, const SPS *sps, bool testWrite)
 {
   AccessUnit::iterator itNalu = accessUnit.begin();
 
@@ -764,7 +764,7 @@ void EncGOP::xCreatePerPictureSEIMessages (Int picInGOP, SEIMessages& seiMessage
   if (!m_pcCfg->getColourRemapInfoSEIFileRoot().empty())
   {
     SEIColourRemappingInfo *seiColourRemappingInfo = new SEIColourRemappingInfo();
-    const Bool success = m_seiEncoder.initSEIColourRemappingInfo(seiColourRemappingInfo, slice->getPOC() );
+    const bool success = m_seiEncoder.initSEIColourRemappingInfo(seiColourRemappingInfo, slice->getPOC() );
 
     if(success)
     {
@@ -792,7 +792,7 @@ void EncGOP::xCreateScalableNestingSEI (SEIMessages& seiMessages, SEIMessages& n
   }
 }
 
-void EncGOP::xCreatePictureTimingSEI  (Int IRAPGOPid, SEIMessages& seiMessages, SEIMessages& nestedSeiMessages, SEIMessages& duInfoSeiMessages, Slice *slice, Bool isField, std::deque<DUData> &duData)
+void EncGOP::xCreatePictureTimingSEI  (Int IRAPGOPid, SEIMessages& seiMessages, SEIMessages& nestedSeiMessages, SEIMessages& duInfoSeiMessages, Slice *slice, bool isField, std::deque<DUData> &duData)
 {
   const VUI *vui = slice->getSPS()->getVuiParameters();
   const HRD *hrd = vui->getHrdParameters();
@@ -1059,7 +1059,7 @@ void EncGOP::xUpdateDuInfoSEI(SEIMessages &duInfoSeiMessages, SEIPictureTiming *
 }
 
 static void
-cabac_zero_word_padding(Slice *const pcSlice, Picture *const pcPic, const std::size_t binCountsInNalUnits, const std::size_t numBytesInVclNalUnits, std::ostringstream &nalUnitData, const Bool cabacZeroWordPaddingEnabled)
+cabac_zero_word_padding(Slice *const pcSlice, Picture *const pcPic, const std::size_t binCountsInNalUnits, const std::size_t numBytesInVclNalUnits, std::ostringstream &nalUnitData, const bool cabacZeroWordPaddingEnabled)
 {
   const SPS &sps=*(pcSlice->getSPS());
   const ChromaFormat format = sps.getChromaFormatIdc();
@@ -1103,8 +1103,8 @@ class EfficientFieldIRAPMapping
 {
   private:
     Int  IRAPGOPid;
-    Bool IRAPtoReorder;
-    Bool swapIRAPForward;
+    bool IRAPtoReorder;
+    bool swapIRAPForward;
 
   public:
     EfficientFieldIRAPMapping() :
@@ -1113,14 +1113,14 @@ class EfficientFieldIRAPMapping
       swapIRAPForward(false)
     { }
 
-    void initialize(const Bool isField, const Int gopSize, const Int POCLast, const Int numPicRcvd, const Int lastIDR, EncGOP *pEncGop, EncCfg *pCfg);
+    void initialize(const bool isField, const Int gopSize, const Int POCLast, const Int numPicRcvd, const Int lastIDR, EncGOP *pEncGop, EncCfg *pCfg);
 
     Int adjustGOPid(const Int gopID);
     Int restoreGOPid(const Int gopID);
     Int GetIRAPGOPid() const { return IRAPGOPid; }
 };
 
-void EfficientFieldIRAPMapping::initialize(const Bool isField, const Int gopSize, const Int POCLast, const Int numPicRcvd, const Int lastIDR, EncGOP *pEncGop, EncCfg *pCfg )
+void EfficientFieldIRAPMapping::initialize(const bool isField, const Int gopSize, const Int POCLast, const Int numPicRcvd, const Int lastIDR, EncGOP *pEncGop, EncCfg *pCfg )
 {
   if(isField)
   {
@@ -1486,7 +1486,7 @@ void trySkipOrDecodePicture( bool& decPic, bool& encPic, const EncCfg& cfg, Pict
 // ====================================================================================================================
 void EncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic,
                           std::list<PelUnitBuf*>& rcListPicYuvRecOut,
-                          Bool isField, Bool isTff, const InputColourSpaceConversion snr_conversion, const Bool printFrameMSE )
+                          bool isField, bool isTff, const InputColourSpaceConversion snr_conversion, const bool printFrameMSE )
 {
   // TODO: Split this function up.
 
@@ -1709,7 +1709,7 @@ void EncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic,
       }
       else if(pcSlice->isStepwiseTemporalLayerSwitchingPointCandidate(rcListPic))
       {
-        Bool isSTSA=true;
+        bool isSTSA=true;
         for(Int ii=iGOPid+1;(ii<m_pcCfg->getGOPSize() && isSTSA==true);ii++)
         {
           Int lTid= m_pcCfg->getGOPEntry(ii).m_temporalId;
@@ -1843,7 +1843,7 @@ void EncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic,
 #else
       pcSlice->setColFromL0Flag(1-uiColDir);
 #endif
-      Bool bLowDelay = true;
+      bool bLowDelay = true;
       Int  iCurrPOC  = pcSlice->getPOC();
       Int iRefIdx = 0;
 
@@ -1933,7 +1933,7 @@ void EncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic,
       m_pcSliceEncoder->setSearchRange(pcSlice);
     }
 
-    Bool bGPBcheck=false;
+    bool bGPBcheck=false;
     if ( pcSlice->getSliceType() == B_SLICE)
     {
       if ( pcSlice->getNumRefIdx(RefPicList( 0 ) ) == pcSlice->getNumRefIdx(RefPicList( 1 ) ) )
@@ -2178,7 +2178,7 @@ void EncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic,
         const UInt curSliceSegmentEnd = pcSlice->getSliceSegmentCurEndCtuTsAddr();
         if (curSliceSegmentEnd < numberOfCtusInFrame)
         {
-          const Bool bNextSegmentIsDependentSlice = curSliceSegmentEnd < pcSlice->getSliceCurEndCtuTsAddr();
+          const bool bNextSegmentIsDependentSlice = curSliceSegmentEnd < pcSlice->getSliceCurEndCtuTsAddr();
           const UInt sliceBits                    = pcSlice->getSliceBits();
           UInt independentSliceIdx                = pcSlice->getIndependentSliceIdx();
           pcPic->allocateNewSlice();
@@ -2261,7 +2261,7 @@ void EncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic,
 
       if( pcSlice->getSPS()->getUseSAO() )
       {
-        Bool sliceEnabled[MAX_NUM_COMPONENT];
+        bool sliceEnabled[MAX_NUM_COMPONENT];
 #if JEM_TOOLS
         m_pcSAO->initCABACEstimator( m_pcEncLib->getCABACDataStore(), m_pcEncLib->getCABACEncoder(), m_pcEncLib->getCtxCache(), pcSlice );
 #else
@@ -2495,7 +2495,7 @@ void EncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic,
 
         // If current NALU is the first NALU of slice (containing slice header) and more NALUs exist (due to multiple dependent slices) then buffer it.
         // If current NALU is the last NALU of slice and a NALU was buffered, then (a) Write current NALU (b) Update an write buffered NALU at approproate location in NALU list.
-        Bool bNALUAlignedWrittenToList    = false; // used to ensure current NALU is not written more than once to the NALU list.
+        bool bNALUAlignedWrittenToList    = false; // used to ensure current NALU is not written more than once to the NALU list.
         xAttachSliceDataToNalUnit(nalu, pcBitstreamRedirect);
         accessUnit.push_back(new NALUnitEBSP(nalu));
         actualTotalBits += UInt(accessUnit.back()->m_nalUnitData.str().size()) * 8;
@@ -2630,7 +2630,7 @@ void EncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic,
 
 }
 
-void EncGOP::printOutSummary(UInt uiNumAllPicCoded, Bool isField, const Bool printMSEBasedSNR, const Bool printSequenceMSE, const BitDepths &bitDepths)
+void EncGOP::printOutSummary(UInt uiNumAllPicCoded, bool isField, const bool printMSEBasedSNR, const bool printSequenceMSE, const BitDepths &bitDepths)
 {
 #if ENABLE_QPA
   const bool    useWPSNR = m_pcEncLib->getUseWPSNR();
@@ -2761,7 +2761,7 @@ UInt64 EncGOP::preLoopFilterPicAndCalcDist( Picture* pcPic )
 // ====================================================================================================================
 
 
-void EncGOP::xInitGOP( Int iPOCLast, Int iNumPicRcvd, Bool isField )
+void EncGOP::xInitGOP( Int iPOCLast, Int iNumPicRcvd, bool isField )
 {
   CHECK(!( iNumPicRcvd > 0 ), "Unspecified error");
   //  Exception for the first frames
@@ -2785,7 +2785,7 @@ void EncGOP::xGetBuffer( PicList&                  rcListPic,
                          Int                       iTimeOffset,
                          Picture*&                 rpcPic,
                          Int                       pocCurr,
-                         Bool                      isField )
+                         bool                      isField )
 {
   Int i;
   //  Rec. output
@@ -3034,14 +3034,14 @@ Double EncGOP::xFindDistortionPlaneWPSNR(const CPelBuf& pic0, const CPelBuf& pic
 }
 #endif
 
-void EncGOP::xCalculateAddPSNRs( const Bool isField, const Bool isFieldTopFieldFirst, const Int iGOPid, Picture* pcPic, const AccessUnit&accessUnit, PicList &rcListPic, const int64_t dEncTime, const InputColourSpaceConversion snr_conversion, const Bool printFrameMSE, Double* PSNR_Y )
+void EncGOP::xCalculateAddPSNRs( const bool isField, const bool isFieldTopFieldFirst, const Int iGOPid, Picture* pcPic, const AccessUnit&accessUnit, PicList &rcListPic, const int64_t dEncTime, const InputColourSpaceConversion snr_conversion, const bool printFrameMSE, Double* PSNR_Y )
 {
   xCalculateAddPSNR( pcPic, pcPic->getRecoBuf(), accessUnit, (double) dEncTime, snr_conversion, printFrameMSE, PSNR_Y );
 
   //In case of field coding, compute the interlaced PSNR for both fields
   if(isField)
   {
-    Bool bothFieldsAreEncoded = false;
+    bool bothFieldsAreEncoded = false;
     Int correspondingFieldPOC = pcPic->getPOC();
     Int currentPicGOPPoc = m_pcCfg->getGOPEntry(iGOPid).m_POC;
     if(pcPic->getPOC() == 0)
@@ -3101,7 +3101,7 @@ void EncGOP::xCalculateAddPSNRs( const Bool isField, const Bool isFieldTopFieldF
   }
 }
 
-void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUnit& accessUnit, Double dEncTime, const InputColourSpaceConversion conversion, const Bool printFrameMSE, Double* PSNR_Y )
+void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUnit& accessUnit, Double dEncTime, const InputColourSpaceConversion conversion, const bool printFrameMSE, Double* PSNR_Y )
 {
   const SPS&         sps = *pcPic->cs->sps;
   const CPelUnitBuf& pic = cPicD;
@@ -3331,7 +3331,7 @@ void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUn
 
 void EncGOP::xCalculateInterlacedAddPSNR( Picture* pcPicOrgFirstField, Picture* pcPicOrgSecondField,
                                           PelUnitBuf cPicRecFirstField, PelUnitBuf cPicRecSecondField,
-                                          const InputColourSpaceConversion conversion, const Bool printFrameMSE, Double* PSNR_Y )
+                                          const InputColourSpaceConversion conversion, const bool printFrameMSE, Double* PSNR_Y )
 {
   const SPS &sps = *pcPicOrgFirstField->cs->sps;
   const ChromaFormat format = sps.getChromaFormatIdc();
@@ -3430,7 +3430,7 @@ void EncGOP::xCalculateInterlacedAddPSNR( Picture* pcPicOrgFirstField, Picture* 
  * \returns the NAL unit type of the picture
  * This function checks the configuration and returns the appropriate nal_unit_type for the picture.
  */
-NalUnitType EncGOP::getNalUnitType(Int pocCurr, Int lastIDR, Bool isField)
+NalUnitType EncGOP::getNalUnitType(Int pocCurr, Int lastIDR, bool isField)
 {
   if (pocCurr == 0)
   {
@@ -3571,7 +3571,7 @@ void EncGOP::arrangeLongtermPicturesInRPS(Slice *pcSlice, PicList& rcListPic)
   // and assign values for pocLSBLT and MSB present flag
   Int longtermPicsPoc[MAX_NUM_REF_PICS], longtermPicsLSB[MAX_NUM_REF_PICS], indices[MAX_NUM_REF_PICS];
   Int longtermPicsMSB[MAX_NUM_REF_PICS];
-  Bool mSBPresentFlag[MAX_NUM_REF_PICS];
+  bool mSBPresentFlag[MAX_NUM_REF_PICS];
   ::memset(longtermPicsPoc, 0, sizeof(longtermPicsPoc));    // Store POC values of LTRP
   ::memset(longtermPicsLSB, 0, sizeof(longtermPicsLSB));    // Store POC LSB values of LTRP
   ::memset(longtermPicsMSB, 0, sizeof(longtermPicsMSB));    // Store POC LSB values of LTRP
@@ -3628,7 +3628,7 @@ void EncGOP::arrangeLongtermPicturesInRPS(Slice *pcSlice, PicList& rcListPic)
   }
 
   // tempArray for usedByCurr flag
-  Bool tempArray[MAX_NUM_REF_PICS]; ::memset(tempArray, 0, sizeof(tempArray));
+  bool tempArray[MAX_NUM_REF_PICS]; ::memset(tempArray, 0, sizeof(tempArray));
   for(i = 0; i < numLongPics; i++)
   {
     tempArray[i] = rps->getUsed(indices[i]);
@@ -3819,7 +3819,7 @@ void EncGOP::applyDeblockingFilterParameterSelection( Picture* pcPic, const UInt
   //preserve current reconstruction
   m_pcDeblockingTempPicYuv->copyFrom ( reco );
 
-  const Bool bNoFiltering      = m_DBParam[currQualityLayer][DBFLT_PARAM_AVAILABLE] && m_DBParam[currQualityLayer][DBFLT_DISABLE_FLAG]==false /*&& pcPic->getTLayer()==0*/;
+  const bool bNoFiltering      = m_DBParam[currQualityLayer][DBFLT_PARAM_AVAILABLE] && m_DBParam[currQualityLayer][DBFLT_DISABLE_FLAG]==false /*&& pcPic->getTLayer()==0*/;
   const Int  maxBetaOffsetDiv2 = bNoFiltering? Clip3(MIN_BETA_OFFSET, MAX_BETA_OFFSET, m_DBParam[currQualityLayer][DBFLT_BETA_OFFSETD2]+1) : MAX_BETA_OFFSET;
   const Int  minBetaOffsetDiv2 = bNoFiltering? Clip3(MIN_BETA_OFFSET, MAX_BETA_OFFSET, m_DBParam[currQualityLayer][DBFLT_BETA_OFFSETD2]-1) : MIN_BETA_OFFSET;
   const Int  maxTcOffsetDiv2   = bNoFiltering? Clip3(MIN_TC_OFFSET, MAX_TC_OFFSET, m_DBParam[currQualityLayer][DBFLT_TC_OFFSETD2]+2)       : MAX_TC_OFFSET;
@@ -3827,7 +3827,7 @@ void EncGOP::applyDeblockingFilterParameterSelection( Picture* pcPic, const UInt
 
   UInt64 distBetaPrevious      = std::numeric_limits<UInt64>::max();
   UInt64 distMin               = std::numeric_limits<UInt64>::max();
-  Bool   bDBFilterDisabledBest = true;
+  bool   bDBFilterDisabledBest = true;
   Int    betaOffsetDiv2Best    = 0;
   Int    tcOffsetDiv2Best      = 0;
 

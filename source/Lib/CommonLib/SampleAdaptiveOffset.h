@@ -73,18 +73,18 @@ public:
 
 protected:
   void deriveLoopFilterBoundaryAvailibility(CodingStructure& cs, const Position &pos,
-    Bool& isLeftAvail,
-    Bool& isRightAvail,
-    Bool& isAboveAvail,
-    Bool& isBelowAvail,
-    Bool& isAboveLeftAvail,
-    Bool& isAboveRightAvail,
-    Bool& isBelowLeftAvail,
-    Bool& isBelowRightAvail
+    bool& isLeftAvail,
+    bool& isRightAvail,
+    bool& isAboveAvail,
+    bool& isBelowAvail,
+    bool& isAboveLeftAvail,
+    bool& isAboveRightAvail,
+    bool& isBelowLeftAvail,
+    bool& isBelowRightAvail
     ) const;
 
   void offsetBlock(const Int channelBitDepth, const ClpRng& clpRng, Int typeIdx, Int* offset, const Pel* srcBlk, Pel* resBlk, Int srcStride, Int resStride,  Int width, Int height
-                  , Bool isLeftAvail, Bool isRightAvail, Bool isAboveAvail, Bool isBelowAvail, Bool isAboveLeftAvail, Bool isAboveRightAvail, Bool isBelowLeftAvail, Bool isBelowRightAvail);
+                  , bool isLeftAvail, bool isRightAvail, bool isAboveAvail, bool isBelowAvail, bool isAboveLeftAvail, bool isAboveRightAvail, bool isBelowLeftAvail, bool isBelowRightAvail);
   void invertQuantOffsets(ComponentID compIdx, Int typeIdc, Int typeAuxInfo, Int* dstOffsets, Int* srcOffsets);
   void reconstructBlkSAOParam(SAOBlkParam& recParam, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES]);
   Int  getMergeList(CodingStructure& cs, Int ctuRsAddr, SAOBlkParam* blkParams, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES]);
@@ -102,7 +102,7 @@ protected:
   std::vector<SChar> m_signLineBuf1;
   std::vector<SChar> m_signLineBuf2;
 private:
-  Bool m_picSAOEnabled[MAX_NUM_COMPONENT];
+  bool m_picSAOEnabled[MAX_NUM_COMPONENT];
 };
 
 //! \}

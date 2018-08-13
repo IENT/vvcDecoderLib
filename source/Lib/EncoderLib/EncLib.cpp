@@ -224,7 +224,7 @@ void EncLib::destroy ()
   return;
 }
 
-void EncLib::init( Bool isFieldCoding, AUWriterIf* auWriterIf )
+void EncLib::init( bool isFieldCoding, AUWriterIf* auWriterIf )
 {
   m_AUWriterIf = auWriterIf;
 
@@ -539,7 +539,7 @@ void EncLib::deletePicBuffer()
  \retval  accessUnitsOut      list of output access units
  \retval  iNumEncoded         number of encoded pictures
  */
-void EncLib::encode( Bool flush, PelStorage* pcPicYuvOrg, PelStorage* cPicYuvTrueOrg, const InputColourSpaceConversion snrCSC, std::list<PelUnitBuf*>& rcListPicYuvRecOut,
+void EncLib::encode( bool flush, PelStorage* pcPicYuvOrg, PelStorage* cPicYuvTrueOrg, const InputColourSpaceConversion snrCSC, std::list<PelUnitBuf*>& rcListPicYuvRecOut,
                      Int& iNumEncoded )
 {
   //PROF_ACCUM_AND_START_NEW_SET( getProfilerPic(), P_GOP_LEVEL );
@@ -608,7 +608,7 @@ void EncLib::encode( Bool flush, PelStorage* pcPicYuvOrg, PelStorage* cPicYuvTru
 /**------------------------------------------------
  Separate interlaced frame into two fields
  -------------------------------------------------**/
-void separateFields(Pel* org, Pel* dstField, UInt stride, UInt width, UInt height, Bool isTop)
+void separateFields(Pel* org, Pel* dstField, UInt stride, UInt width, UInt height, bool isTop)
 {
   if (!isTop)
   {
@@ -627,8 +627,8 @@ void separateFields(Pel* org, Pel* dstField, UInt stride, UInt width, UInt heigh
 
 }
 
-void EncLib::encode( Bool flush, PelStorage* pcPicYuvOrg, PelStorage* pcPicYuvTrueOrg, const InputColourSpaceConversion snrCSC, std::list<PelUnitBuf*>& rcListPicYuvRecOut,
-                     Int& iNumEncoded, Bool isTff )
+void EncLib::encode( bool flush, PelStorage* pcPicYuvOrg, PelStorage* pcPicYuvTrueOrg, const InputColourSpaceConversion snrCSC, std::list<PelUnitBuf*>& rcListPicYuvRecOut,
+                     Int& iNumEncoded, bool isTff )
 {
   iNumEncoded = 0;
 
@@ -637,7 +637,7 @@ void EncLib::encode( Bool flush, PelStorage* pcPicYuvOrg, PelStorage* pcPicYuvTr
     if (pcPicYuvOrg)
     {
       /* -- field initialization -- */
-      const Bool isTopField=isTff==(fieldNum==0);
+      const bool isTopField=isTff==(fieldNum==0);
 
       Picture *pcField;
       xGetNewPicBuffer( rcListPicYuvRecOut, pcField, -1 );
@@ -1083,9 +1083,9 @@ Int calcScale(Int x)
 #endif
 void EncLib::xInitHrdParameters(SPS &sps)
 {
-  Bool useSubCpbParams = (getSliceMode() > 0) || (getSliceSegmentMode() > 0);
+  bool useSubCpbParams = (getSliceMode() > 0) || (getSliceSegmentMode() > 0);
   Int  bitRate         = getTargetBitrate();
-  Bool isRandomAccess  = getIntraPeriod() > 0;
+  bool isRandomAccess  = getIntraPeriod() > 0;
 # if U0132_TARGET_BITS_SATURATION
   Int cpbSize          = getCpbSize();
   CHECK(!(cpbSize!=0), "Unspecified error");  // CPB size may not be equal to zero. ToDo: have a better default and check for level constraints
@@ -1137,7 +1137,7 @@ void EncLib::xInitHrdParameters(SPS &sps)
     }
   }
 
-  Bool rateCnt = ( bitRate > 0 );
+  bool rateCnt = ( bitRate > 0 );
   hrd->setNalHrdParametersPresentFlag( rateCnt );
   hrd->setVclHrdParametersPresentFlag( rateCnt );
   hrd->setSubPicCpbParamsPresentFlag( useSubCpbParams );
@@ -1243,7 +1243,7 @@ void EncLib::xInitPPS(PPS &pps, const SPS &sps)
   pps.setSPSId(sps.getSPSId());
 
   pps.setConstrainedIntraPred( m_bUseConstrainedIntraPred );
-  Bool bUseDQP = (getMaxCuDQPDepth() > 0)? true : false;
+  bool bUseDQP = (getMaxCuDQPDepth() > 0)? true : false;
 
   if((getMaxDeltaQP() != 0 )|| getUseAdaptiveQP())
   {
@@ -1339,7 +1339,7 @@ void EncLib::xInitPPS(PPS &pps, const SPS &sps)
   }
 #endif
 #if W0038_CQP_ADJ
-  Bool bChromaDeltaQPEnabled = false;
+  bool bChromaDeltaQPEnabled = false;
   {
     bChromaDeltaQPEnabled = ( m_sliceChromaQpOffsetIntraOrPeriodic[0] || m_sliceChromaQpOffsetIntraOrPeriodic[1] );
     if( !bChromaDeltaQPEnabled )
@@ -1398,7 +1398,7 @@ void EncLib::xInitPPS(PPS &pps, const SPS &sps)
   }
 
   // deblockingFilterControlPresentFlag is true if any of the settings differ from the inferred values:
-  const Bool deblockingFilterControlPresentFlag = pps.getDeblockingFilterOverrideEnabledFlag() ||
+  const bool deblockingFilterControlPresentFlag = pps.getDeblockingFilterOverrideEnabledFlag() ||
                                                   pps.getPPSDeblockingFilterDisabledFlag()     ||
                                                   pps.getDeblockingFilterBetaOffsetDiv2() != 0 ||
                                                   pps.getDeblockingFilterTcOffsetDiv2() != 0;
@@ -1453,7 +1453,7 @@ void EncLib::xInitPPS(PPS &pps, const SPS &sps)
 }
 
 //Function for initializing m_RPSList, a list of ReferencePictureSet, based on the GOPEntry objects read from the config file.
-void EncLib::xInitRPS(SPS &sps, Bool isFieldCoding)
+void EncLib::xInitRPS(SPS &sps, bool isFieldCoding)
 {
   ReferencePictureSet*      rps;
 
@@ -1745,16 +1745,16 @@ void  EncCfg::xCheckGSParameters()
 #endif
 }
 
-Bool EncLib::PPSNeedsWriting(Int ppsId)
+bool EncLib::PPSNeedsWriting(Int ppsId)
 {
-  Bool bChanged=m_ppsMap.getChangedFlag(ppsId);
+  bool bChanged=m_ppsMap.getChangedFlag(ppsId);
   m_ppsMap.clearChangedFlag(ppsId);
   return bChanged;
 }
 
-Bool EncLib::SPSNeedsWriting(Int spsId)
+bool EncLib::SPSNeedsWriting(Int spsId)
 {
-  Bool bChanged=m_spsMap.getChangedFlag(spsId);
+  bool bChanged=m_spsMap.getChangedFlag(spsId);
   m_spsMap.clearChangedFlag(spsId);
   return bChanged;
 }

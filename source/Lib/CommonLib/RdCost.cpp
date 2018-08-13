@@ -201,7 +201,7 @@ void RdCost::copyState( const RdCost& other )
 }
 #endif
 
-void RdCost::setDistParam( DistParam &rcDP, const CPelBuf &org, const Pel* piRefY, Int iRefStride, Int bitDepth, ComponentID compID, Int subShiftMode, Int step, Bool useHadamard )
+void RdCost::setDistParam( DistParam &rcDP, const CPelBuf &org, const Pel* piRefY, Int iRefStride, Int bitDepth, ComponentID compID, Int subShiftMode, Int step, bool useHadamard )
 {
   rcDP.bitDepth   = bitDepth;
   rcDP.compID     = compID;
@@ -283,7 +283,7 @@ void RdCost::setDistParam( DistParam &rcDP, const CPelBuf &org, const Pel* piRef
   }
 }
 
-void RdCost::setDistParam( DistParam &rcDP, const CPelBuf &org, const CPelBuf &cur, Int bitDepth, ComponentID compID, Bool useHadamard )
+void RdCost::setDistParam( DistParam &rcDP, const CPelBuf &org, const CPelBuf &cur, Int bitDepth, ComponentID compID, bool useHadamard )
 {
   rcDP.isQtbt       = m_useQtbt;
   rcDP.org          = org;
@@ -326,7 +326,7 @@ void RdCost::setDistParam( DistParam &rcDP, const CPelBuf &org, const CPelBuf &c
   rcDP.maximumDistortionForEarlyExit = std::numeric_limits<Distortion>::max();
 }
 
-void RdCost::setDistParam( DistParam &rcDP, const Pel* pOrg, const Pel* piRefY, Int iOrgStride, Int iRefStride, Int bitDepth, ComponentID compID, Int width, Int height, Int subShiftMode, Int step, Bool useHadamard )
+void RdCost::setDistParam( DistParam &rcDP, const Pel* pOrg, const Pel* piRefY, Int iOrgStride, Int iRefStride, Int bitDepth, ComponentID compID, Int width, Int height, Int subShiftMode, Int step, bool useHadamard )
 {
   rcDP.bitDepth   = bitDepth;
   rcDP.compID     = compID;

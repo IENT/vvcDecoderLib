@@ -86,7 +86,7 @@ public:
   void initSEIKneeFunctionInfo(SEIKneeFunctionInfo *sei);
   void initSEIChromaResamplingFilterHint(SEIChromaResamplingFilterHint *sei, Int iHorFilterIndex, Int iVerFilterIndex);
   void initSEITimeCode(SEITimeCode *sei);
-  Bool initSEIColourRemappingInfo(SEIColourRemappingInfo *sei, Int currPOC); // returns true on success, false on failure.
+  bool initSEIColourRemappingInfo(SEIColourRemappingInfo *sei, Int currPOC); // returns true on success, false on failure.
 #if U0033_ALTERNATIVE_TRANSFER_CHARACTERISTICS_SEI
   void initSEIAlternativeTransferCharacteristics(SEIAlternativeTransferCharacteristics *sei);
 #endif
@@ -105,7 +105,7 @@ private:
   UInt m_tl0Idx;
   UInt m_rapIdx;
 
-  Bool m_isInitialized;
+  bool m_isInitialized;
 };
 
 

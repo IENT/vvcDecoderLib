@@ -83,9 +83,9 @@ void  WeightPrediction::getWpScaling(const Slice                *pcSlice,
 {
   CHECK(iRefIdx0 < 0 && iRefIdx1 < 0, "Both picture reference list indizes smaller than '0'");
 
-  const Bool wpBiPred        = pcSlice->getPPS()->getWPBiPred();
-  const Bool bBiPred         = (iRefIdx0 >= 0 && iRefIdx1 >= 0);
-  const Bool bUniPred        = !bBiPred;
+  const bool wpBiPred        = pcSlice->getPPS()->getWPBiPred();
+  const bool bBiPred         = (iRefIdx0 >= 0 && iRefIdx1 >= 0);
+  const bool bUniPred        = !bBiPred;
 
   if (bUniPred || wpBiPred)
   {
@@ -114,7 +114,7 @@ void  WeightPrediction::getWpScaling(const Slice                *pcSlice,
   }
 
   const UInt numValidComponent = getNumberValidComponents(pcSlice->getSPS()->getChromaFormatIdc());
-  const Bool bUseHighPrecisionPredictionWeighting = pcSlice->getSPS()->getSpsRangeExtension().getHighPrecisionOffsetsEnabledFlag();
+  const bool bUseHighPrecisionPredictionWeighting = pcSlice->getSPS()->getSpsRangeExtension().getHighPrecisionOffsetsEnabledFlag();
 
   if (bBiPred)
   {
@@ -160,10 +160,10 @@ void WeightPrediction::addWeightBi(const CPelUnitBuf          &pcYuvSrc0,
                                    const WPScalingParam *const wp0,
                                    const WPScalingParam *const wp1,
                                          PelUnitBuf           &rpcYuvDst,
-                                   const Bool                  bRoundLuma /*= true*/,
+                                   const bool                  bRoundLuma /*= true*/,
                                    const ComponentID           maxNumComp)
 {
-  const Bool enableRounding[MAX_NUM_COMPONENT] = { bRoundLuma, true, true };
+  const bool enableRounding[MAX_NUM_COMPONENT] = { bRoundLuma, true, true };
 
   const UInt numValidComponent = (const UInt)pcYuvSrc0.bufs.size();
 

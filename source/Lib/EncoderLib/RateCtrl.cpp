@@ -73,7 +73,7 @@ EncRCSeq::~EncRCSeq()
   destroy();
 }
 
-void EncRCSeq::create( Int totalFrames, Int targetBitrate, Int frameRate, Int GOPSize, Int picWidth, Int picHeight, Int LCUWidth, Int LCUHeight, Int numberOfLevel, Bool useLCUSeparateModel, Int adaptiveBit )
+void EncRCSeq::create( Int totalFrames, Int targetBitrate, Int frameRate, Int GOPSize, Int picWidth, Int picHeight, Int LCUWidth, Int LCUHeight, Int numberOfLevel, bool useLCUSeparateModel, Int adaptiveBit )
 {
   destroy();
   m_totalFrames         = totalFrames;
@@ -924,7 +924,7 @@ Int EncRCPic::getLCUEstQP( Double lambda, Int clipPicQP )
   return estQP;
 }
 
-void EncRCPic::updateAfterCTU( Int LCUIdx, Int bits, Int QP, Double lambda, Bool updateLCUParameter )
+void EncRCPic::updateAfterCTU( Int LCUIdx, Int bits, Int QP, Double lambda, bool updateLCUParameter )
 {
   m_LCUs[LCUIdx].m_actualBits = bits;
   m_LCUs[LCUIdx].m_QP         = QP;
@@ -1231,11 +1231,11 @@ void RateCtrl::destroy()
   }
 }
 
-void RateCtrl::init( Int totalFrames, Int targetBitrate, Int frameRate, Int GOPSize, Int picWidth, Int picHeight, Int LCUWidth, Int LCUHeight, Int keepHierBits, Bool useLCUSeparateModel, GOPEntry  GOPList[MAX_GOP] )
+void RateCtrl::init( Int totalFrames, Int targetBitrate, Int frameRate, Int GOPSize, Int picWidth, Int picHeight, Int LCUWidth, Int LCUHeight, Int keepHierBits, bool useLCUSeparateModel, GOPEntry  GOPList[MAX_GOP] )
 {
   destroy();
 
-  Bool isLowdelay = true;
+  bool isLowdelay = true;
   for ( Int i=0; i<GOPSize-1; i++ )
   {
     if ( GOPList[i].m_POC > GOPList[i+1].m_POC )

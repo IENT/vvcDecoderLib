@@ -154,12 +154,12 @@ public:
   void  parseSPS            ( SPS* pcSPS );
   void  parsePPS            ( PPS* pcPPS );
   void  parseVUI            ( VUI* pcVUI, SPS* pcSPS );
-  void  parsePTL            ( PTL *rpcPTL, Bool profilePresentFlag, Int maxNumSubLayersMinus1 );
-  void  parseProfileTier    ( ProfileTierLevel *ptl, const Bool bIsSubLayer );
-  void  parseHrdParameters  ( HRD *hrd, Bool cprms_present_flag, UInt tempLevelHigh );
+  void  parsePTL            ( PTL *rpcPTL, bool profilePresentFlag, Int maxNumSubLayersMinus1 );
+  void  parseProfileTier    ( ProfileTierLevel *ptl, const bool bIsSubLayer );
+  void  parseHrdParameters  ( HRD *hrd, bool cprms_present_flag, UInt tempLevelHigh );
   void  parseSliceHeader    ( Slice* pcSlice, ParameterSetManager *parameterSetManager, const Int prevTid0POC );
   void  parseTerminatingBit ( UInt& ruiBit );
-  void  parseRemainingBytes ( Bool noTrailingBytesExpected );
+  void  parseRemainingBytes ( bool noTrailingBytesExpected );
 
   void  parsePredWeightTable( Slice* pcSlice, const SPS *sps );
 #if HEVC_USE_SCALING_LISTS
@@ -178,7 +178,7 @@ private:
 #endif
 
 protected:
-  Bool  xMoreRbspData();
+  bool  xMoreRbspData();
 #if JEM_TOOLS
   void  xParseCABACWSizes   ( Slice* pcSlice, const SPS* pcSPS );
 #endif

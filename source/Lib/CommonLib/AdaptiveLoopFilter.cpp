@@ -756,7 +756,7 @@ void ALFParam::reset()
   prevIdx           = 0;
 }
 
-void ALFParam::copyFrom(const ALFParam& src, const Bool isGALF, Bool max_depth_copy)
+void ALFParam::copyFrom(const ALFParam& src, const bool isGALF, bool max_depth_copy)
 {
   alf_flag = src.alf_flag;
   cu_control_flag = src.cu_control_flag;
@@ -818,7 +818,7 @@ void ALFParam::copyFrom(const ALFParam& src, const Bool isGALF, Bool max_depth_c
   ::memcpy(alfCoeffChroma, src.alfCoeffChroma, sizeof(Int) * AdaptiveLoopFilter::m_ALF_MAX_NUM_COEF_C);
 #endif
   num_alf_cu_flag = src.num_alf_cu_flag;
-  ::memcpy(alf_cu_flag, src.alf_cu_flag, sizeof(Bool) * src.num_alf_cu_flag);
+  ::memcpy(alf_cu_flag, src.alf_cu_flag, sizeof(bool) * src.num_alf_cu_flag);
 
   temporalPredFlag = src.temporalPredFlag;
   prevIdx          = src.prevIdx;
@@ -1923,7 +1923,7 @@ void AdaptiveLoopFilter::allocALFParam(ALFParam* pAlfParam)
   pAlfParam->num_ctus_in_frame = m_uiNumCUsInFrame;
   pAlfParam->maxCodingDepth = m_uiMaxTotalCUDepth;
   pAlfParam->num_alf_cu_flag  = 0;
-  pAlfParam->alf_cu_flag      = new Bool[(m_uiNumCUsInFrame << ((m_uiMaxTotalCUDepth-1)*2))];
+  pAlfParam->alf_cu_flag      = new bool[(m_uiNumCUsInFrame << ((m_uiMaxTotalCUDepth-1)*2))];
   ::memset(pAlfParam->kMinTab, 0, sizeof(pAlfParam->kMinTab));
 
   // galf stuff
@@ -1981,7 +1981,7 @@ void AdaptiveLoopFilter::freeALFParam(ALFParam* pAlfParam)
   }
 }
 
-void AdaptiveLoopFilter::copyALFParam(ALFParam* pDesAlfParam, ALFParam* pSrcAlfParam, Bool max_depth_copy )
+void AdaptiveLoopFilter::copyALFParam(ALFParam* pDesAlfParam, ALFParam* pSrcAlfParam, bool max_depth_copy )
 {
 #if COM16_C806_ALF_TEMPPRED_NUM
   if (!pDesAlfParam->temporalPredFlag)
@@ -2051,7 +2051,7 @@ void AdaptiveLoopFilter::copyALFParam(ALFParam* pDesAlfParam, ALFParam* pSrcAlfP
   {
 #endif
     pDesAlfParam->num_alf_cu_flag = pSrcAlfParam->num_alf_cu_flag;
-    ::memcpy(pDesAlfParam->alf_cu_flag, pSrcAlfParam->alf_cu_flag, sizeof(Bool)*pSrcAlfParam->num_alf_cu_flag);
+    ::memcpy(pDesAlfParam->alf_cu_flag, pSrcAlfParam->alf_cu_flag, sizeof(bool)*pSrcAlfParam->num_alf_cu_flag);
 #if COM16_C806_ALF_TEMPPRED_NUM
   }
 #endif
@@ -2661,7 +2661,7 @@ void AdaptiveLoopFilter::reconstructFilterCoeffs( ALFParam* pcAlfParam, int **pf
   }
 }
 
-void AdaptiveLoopFilter::initVarForChroma(ALFParam* pcAlfParam, Bool bUpdatedDCCoef)
+void AdaptiveLoopFilter::initVarForChroma(ALFParam* pcAlfParam, bool bUpdatedDCCoef)
 {
   Int k, i;
   //initilization for clip operation in subfilterFrame()
@@ -2726,7 +2726,7 @@ void AdaptiveLoopFilter::predictALFCoeffChroma( ALFParam* pAlfParam )
   pAlfParam->coeff_chroma[N-1]=pred-pAlfParam->coeff_chroma[N-1];
 }
 
-void AdaptiveLoopFilter::resetALFPredParam(ALFParam *pAlfParam, Bool bIntra)
+void AdaptiveLoopFilter::resetALFPredParam(ALFParam *pAlfParam, bool bIntra)
 {
   //reset to 9x9 filter shape
   pAlfParam->filterType = (AlfFilterType)2;

@@ -72,7 +72,7 @@ void read2(InputNALUnit& nalu)
 {
   InputBitstream& bs = nalu.getBitstream();
 
-  Bool forbidden_zero_bit = bs.read(1);           // forbidden_zero_bit
+  bool forbidden_zero_bit = bs.read(1);           // forbidden_zero_bit
   if(forbidden_zero_bit != 0) { THROW( "Forbidden zero-bit not '0'" );}
   nalu.m_nalUnitType = (NalUnitType) bs.read(6);  // nal_unit_type
   nalu.m_nuhLayerId = bs.read(6);                 // nuh_layer_id

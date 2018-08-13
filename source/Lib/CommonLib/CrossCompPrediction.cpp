@@ -45,7 +45,7 @@
 //! \ingroup CommonLib
 //! \{
 
-SChar CrossComponentPrediction::xCalcCrossComponentPredictionAlpha( TransformUnit &tu, const ComponentID &compID, Bool useRecoResidual )
+SChar CrossComponentPrediction::xCalcCrossComponentPredictionAlpha( TransformUnit &tu, const ComponentID &compID, bool useRecoResidual )
 {
   const CPelBuf pResiL = useRecoResidual ? tu.cs->getResiBuf( tu.Y() ) : tu.cs->getOrgResiBuf( tu.Y() );
   const CPelBuf pResiC = tu.cs->getResiBuf( tu.blocks[compID] );
@@ -87,7 +87,7 @@ void CrossComponentPrediction::crossComponentPrediction(        TransformUnit &t
                                                           const CPelBuf       &piResiL,
                                                           const CPelBuf       &piResiC,
                                                                 PelBuf        &piResiT,
-                                                          const Bool          &reverse )
+                                                          const bool          &reverse )
 {
   const Int alpha = tu.compAlpha[compID];
   const Int diffBitDepth = tu.cs->sps->getDifferentialLumaChromaBitDepth();

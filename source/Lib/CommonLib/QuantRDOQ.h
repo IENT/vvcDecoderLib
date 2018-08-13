@@ -95,15 +95,15 @@ private:
                               UShort             ui16AbsGoRice,
                               Int                iQBits,
                               Double             errorScale,
-                              Bool               bLast,
-                              Bool               useLimitedPrefixLength,
+                              bool               bLast,
+                              bool               useLimitedPrefixLength,
                               const Int          maxLog2TrDynamicRange ) const;
   inline Int xGetICRate     ( const UInt         uiAbsLevel,
                               const BinFracBits& fracBitsPar,
                               const BinFracBits& fracBitsGt1,
                               const BinFracBits& fracBitsGt2,
                               const UShort       ui16AbsGoRice,
-                              const Bool         useLimitedPrefixLength,
+                              const bool         useLimitedPrefixLength,
                               const Int          maxLog2TrDynamicRange  ) const;
 #else
   inline UInt xGetCodedLevel  ( Double&             rd64CodedCost,
@@ -122,8 +122,8 @@ private:
                                 UInt                c2Idx,
                                 Int                 iQBits,
                                 Double              errorScale,
-                                Bool                bLast,
-                                Bool                useLimitedPrefixLength,
+                                bool                bLast,
+                                bool                useLimitedPrefixLength,
                                 const Int           maxLog2TrDynamicRange
                               ) const;
   inline Int xGetICRate  ( const UInt         uiAbsLevel,
@@ -135,7 +135,7 @@ private:
                            const UShort       ui16AbsGoRice,
                            const UInt         c1Idx,
                            const UInt         c2Idx,
-                           const Bool         useLimitedPrefixLength,
+                           const bool         useLimitedPrefixLength,
                            const Int          maxLog2TrDynamicRange
                          ) const;
 #endif
@@ -151,7 +151,7 @@ private:
 
 private:
 #if HEVC_USE_SCALING_LISTS
-  Bool    m_isErrScaleListOwner;
+  bool    m_isErrScaleListOwner;
 
   Double *m_errScale             [SCALING_LIST_SIZE_NUM][SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM][SCALING_LIST_REM_NUM]; ///< array of quantization matrix coefficient 4x4
   Double  m_errScaleNoScalingList[SCALING_LIST_SIZE_NUM][SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM][SCALING_LIST_REM_NUM]; ///< array of quantization matrix coefficient 4x4

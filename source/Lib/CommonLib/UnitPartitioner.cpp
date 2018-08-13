@@ -606,7 +606,7 @@ void QTBTPartitioner::exitCurrSplit()
   }
 }
 
-Bool QTBTPartitioner::nextPart( const CodingStructure &cs, bool autoPop /*= false*/ )
+bool QTBTPartitioner::nextPart( const CodingStructure &cs, bool autoPop /*= false*/ )
 {
   const Position &prevPos = currArea().blocks[chType].pos();
 
@@ -699,7 +699,7 @@ Partitioning PartitionerImpl::getCUSubPartitions( const UnitArea &cuArea, const 
     {
       const UInt minCUSize = ( cs.sps->getMaxCUWidth() >> cs.sps->getMaxCodingDepth() );
 
-      Bool canSplit = cuArea.lumaSize().width > minCUSize && cuArea.lumaSize().height > minCUSize;
+      bool canSplit = cuArea.lumaSize().width > minCUSize && cuArea.lumaSize().height > minCUSize;
 
       Partitioning ret;
 

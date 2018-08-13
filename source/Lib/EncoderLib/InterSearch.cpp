@@ -451,7 +451,7 @@ inline void InterSearch::xTZ8PointDiamondSearch( IntTZSearchStruct& rcStruct,
                                                  const Int iStartX,
                                                  const Int iStartY,
                                                  const Int iDist,
-                                                 const Bool bCheckCornersAtDist1 )
+                                                 const bool bCheckCornersAtDist1 )
 {
   const SearchRange& sr = rcStruct.searchRange;
   // 8 point search,                   //   1 2 3
@@ -653,7 +653,7 @@ inline void InterSearch::xTZ8PointDiamondSearch( IntTZSearchStruct& rcStruct,
 Distortion InterSearch::xPatternRefinement( const CPelBuf* pcPatternKey,
                                             Mv baseRefMv,
                                             Int iFrac, Mv& rcMvFrac,
-                                            Bool bAllowUseOfHadamard )
+                                            bool bAllowUseOfHadamard )
 {
   Distortion  uiDist;
   Distortion  uiDistBest  = std::numeric_limits<Distortion>::max();
@@ -783,7 +783,7 @@ void InterSearch::xFRUCMrgEstimation( PredictionUnit& pu, PelUnitBuf& origBuf, D
     pu.frucMrgMode = uhFRUCME[nME];
     pu.mergeType   = MRG_TYPE_FRUC;
 
-    Bool bAvailable = deriveFRUCMV( pu );
+    bool bAvailable = deriveFRUCMV( pu );
     if( bAvailable )
     {
       Distortion uiCostCand = xGetInterPredictionError( pu, origBuf );
@@ -938,7 +938,7 @@ void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
     m_pcRdCost->selectMotionLambda( cu.transQuantBypass );
 
 #if !JVET_K0220_ENC_CTRL
-    Bool bFastSkipBi = false;
+    bool bFastSkipBi = false;
     if( auto slsCtrl = dynamic_cast< SaveLoadEncInfoCtrl* >( m_modeCtrl ) )
     {
       bFastSkipBi = ( LOAD_ENC_INFO == slsCtrl->getSaveLoadTag( pu ) && 3 != slsCtrl->getSaveLoadInterDir( pu ) );
@@ -947,7 +947,7 @@ void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
 #endif
 #if JEM_TOOLS || JVET_K_AFFINE
 #if !JVET_K0220_ENC_CTRL
-    Bool bFastSkipAffine = false;
+    bool bFastSkipAffine = false;
     if( pu.cs->sps->getSpsNext().getUseQTBT() && m_pcEncCfg->getUseSaveLoadEncInfo() )
     {
       SaveLoadEncInfoCtrl* modeCtrl = dynamic_cast<SaveLoadEncInfoCtrl*>( m_modeCtrl );
@@ -1183,7 +1183,7 @@ void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
             eRefPicList = REF_PIC_LIST_0;
           }
 
-          Bool bChanged = false;
+          bool bChanged = false;
 
           iRefStart = 0;
           iRefEnd   = cs.slice->getNumRefIdx(eRefPicList)-1;
@@ -1424,7 +1424,7 @@ void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
     {
       // save normal hevc result
       UInt uiMRGIndex = pu.mergeIdx;
-      Bool bMergeFlag = pu.mergeFlag;
+      bool bMergeFlag = pu.mergeFlag;
       UInt uiInterDir = pu.interDir;
 
       Mv cMvd[2];
@@ -1577,7 +1577,7 @@ void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
 
 
 // AMVP
-void InterSearch::xEstimateMvPredAMVP( PredictionUnit& pu, PelUnitBuf& origBuf, RefPicList eRefPicList, Int iRefIdx, Mv& rcMvPred, AMVPInfo& rAMVPInfo, Bool bFilled, Distortion* puiDistBiP )
+void InterSearch::xEstimateMvPredAMVP( PredictionUnit& pu, PelUnitBuf& origBuf, RefPicList eRefPicList, Int iRefIdx, Mv& rcMvPred, AMVPInfo& rAMVPInfo, bool bFilled, Distortion* puiDistBiP )
 {
   Mv         cBestMv;
   Int        iBestIdx   = 0;
@@ -1639,7 +1639,7 @@ UInt InterSearch::xGetMvpIdxBits(Int iIdx, Int iNum)
     return uiLength;
   }
 
-  Bool bCodeLast = ( iNum-1 > iTemp );
+  bool bCodeLast = ( iNum-1 > iTemp );
 
   uiLength += (iTemp-1);
 
@@ -1651,7 +1651,7 @@ UInt InterSearch::xGetMvpIdxBits(Int iIdx, Int iNum)
   return uiLength;
 }
 
-void InterSearch::xGetBlkBits( PartSize eCUMode, Bool bPSlice, Int iPartIdx, UInt uiLastMode, UInt uiBlkBit[3])
+void InterSearch::xGetBlkBits( PartSize eCUMode, bool bPSlice, Int iPartIdx, UInt uiLastMode, UInt uiBlkBit[3])
 {
   if ( eCUMode == SIZE_2Nx2N )
   {
@@ -1763,9 +1763,9 @@ Distortion InterSearch::xGetTemplateCost( const PredictionUnit& pu,
 
   // prediction pattern
 #if JEM_TOOLS
-  const Bool bi = !pu.cu->LICFlag && pu.cu->slice->testWeightPred() && pu.cu->slice->getSliceType()==P_SLICE;
+  const bool bi = !pu.cu->LICFlag && pu.cu->slice->testWeightPred() && pu.cu->slice->getSliceType()==P_SLICE;
 #else
-  const Bool bi = pu.cu->slice->testWeightPred() && pu.cu->slice->getSliceType()==P_SLICE;
+  const bool bi = pu.cu->slice->testWeightPred() && pu.cu->slice->getSliceType()==P_SLICE;
 #endif
 
 
@@ -1813,7 +1813,7 @@ Distortion InterSearch::xGetAffineTemplateCost( PredictionUnit& pu, PelUnitBuf& 
 }
 #endif
 
-void InterSearch::xMotionEstimation(PredictionUnit& pu, PelUnitBuf& origBuf, RefPicList eRefPicList, Mv& rcMvPred, Int iRefIdxPred, Mv& rcMv, Int& riMVPIdx, UInt& ruiBits, Distortion& ruiCost, const AMVPInfo& amvpInfo, Bool bBi)
+void InterSearch::xMotionEstimation(PredictionUnit& pu, PelUnitBuf& origBuf, RefPicList eRefPicList, Mv& rcMvPred, Int iRefIdxPred, Mv& rcMv, Int& riMVPIdx, UInt& ruiBits, Distortion& ruiCost, const AMVPInfo& amvpInfo, bool bBi)
 {
   Mv cMvHalf, cMvQter;
 
@@ -2086,31 +2086,31 @@ void InterSearch::xTZSearch( const PredictionUnit& pu,
                              Mv&                   rcMv,
                              Distortion&           ruiSAD,
                              const Mv* const       pIntegerMv2Nx2NPred,
-                             const Bool            bExtendedSettings,
-                             const Bool            bFastSettings)
+                             const bool            bExtendedSettings,
+                             const bool            bFastSettings)
 {
   const bool bUseRasterInFastMode                    = true; //toggle this to further reduce runtime
 
-  const Bool bUseAdaptiveRaster                      = bExtendedSettings;
+  const bool bUseAdaptiveRaster                      = bExtendedSettings;
   const Int  iRaster                                 = (bFastSettings && bUseRasterInFastMode) ? 8 : 5;
-  const Bool bTestZeroVector                         = true && !bFastSettings;
-  const Bool bTestZeroVectorStart                    = bExtendedSettings;
-  const Bool bTestZeroVectorStop                     = false;
-  const Bool bFirstSearchDiamond                     = true;  // 1 = xTZ8PointDiamondSearch   0 = xTZ8PointSquareSearch
-  const Bool bFirstCornersForDiamondDist1            = bExtendedSettings;
-  const Bool bFirstSearchStop                        = m_pcEncCfg->getFastMEAssumingSmootherMVEnabled();
+  const bool bTestZeroVector                         = true && !bFastSettings;
+  const bool bTestZeroVectorStart                    = bExtendedSettings;
+  const bool bTestZeroVectorStop                     = false;
+  const bool bFirstSearchDiamond                     = true;  // 1 = xTZ8PointDiamondSearch   0 = xTZ8PointSquareSearch
+  const bool bFirstCornersForDiamondDist1            = bExtendedSettings;
+  const bool bFirstSearchStop                        = m_pcEncCfg->getFastMEAssumingSmootherMVEnabled();
   const UInt uiFirstSearchRounds                     = bFastSettings ? (bUseRasterInFastMode?3:2) : 3;     // first search stop X rounds after best match (must be >=1)
-  const Bool bEnableRasterSearch                     = bFastSettings ? bUseRasterInFastMode : true;
-  const Bool bAlwaysRasterSearch                     = bExtendedSettings;  // true: BETTER but factor 2 slower
-  const Bool bRasterRefinementEnable                 = false; // enable either raster refinement or star refinement
-  const Bool bRasterRefinementDiamond                = false; // 1 = xTZ8PointDiamondSearch   0 = xTZ8PointSquareSearch
-  const Bool bRasterRefinementCornersForDiamondDist1 = bExtendedSettings;
-  const Bool bStarRefinementEnable                   = true;  // enable either star refinement or raster refinement
-  const Bool bStarRefinementDiamond                  = true;  // 1 = xTZ8PointDiamondSearch   0 = xTZ8PointSquareSearch
-  const Bool bStarRefinementCornersForDiamondDist1   = bExtendedSettings;
-  const Bool bStarRefinementStop                     = false || bFastSettings;
+  const bool bEnableRasterSearch                     = bFastSettings ? bUseRasterInFastMode : true;
+  const bool bAlwaysRasterSearch                     = bExtendedSettings;  // true: BETTER but factor 2 slower
+  const bool bRasterRefinementEnable                 = false; // enable either raster refinement or star refinement
+  const bool bRasterRefinementDiamond                = false; // 1 = xTZ8PointDiamondSearch   0 = xTZ8PointSquareSearch
+  const bool bRasterRefinementCornersForDiamondDist1 = bExtendedSettings;
+  const bool bStarRefinementEnable                   = true;  // enable either star refinement or raster refinement
+  const bool bStarRefinementDiamond                  = true;  // 1 = xTZ8PointDiamondSearch   0 = xTZ8PointSquareSearch
+  const bool bStarRefinementCornersForDiamondDist1   = bExtendedSettings;
+  const bool bStarRefinementStop                     = false || bFastSettings;
   const UInt uiStarRefinementRounds                  = 2;  // star refinement stop X rounds after best match (must be >=1)
-  const Bool bNewZeroNeighbourhoodTest               = bExtendedSettings;
+  const bool bNewZeroNeighbourhoodTest               = bExtendedSettings;
 
   Int iSearchRange = m_iSearchRange;
 
@@ -2173,7 +2173,7 @@ void InterSearch::xTZSearch( const PredictionUnit& pu,
   Int  iStartX = cStruct.iBestX;
   Int  iStartY = cStruct.iBestY;
 
-  const Bool bBestCandidateZero = (cStruct.iBestX == 0) && (cStruct.iBestY == 0);
+  const bool bBestCandidateZero = (cStruct.iBestX == 0) && (cStruct.iBestY == 0);
 
   // first search around best position up to now.
   // The following works as a "subsampled/log" window search around the best candidate
@@ -2367,12 +2367,12 @@ void InterSearch::xTZSearchSelective( const PredictionUnit& pu,
                                       Distortion            &ruiSAD,
                                       const Mv* const       pIntegerMv2Nx2NPred )
 {
-  const Bool bTestZeroVector          = true;
-  const Bool bEnableRasterSearch      = true;
-  const Bool bAlwaysRasterSearch      = false;  // 1: BETTER but factor 15x slower
-  const Bool bStarRefinementEnable    = true;   // enable either star refinement or raster refinement
-  const Bool bStarRefinementDiamond   = true;   // 1 = xTZ8PointDiamondSearch   0 = xTZ8PointSquareSearch
-  const Bool bStarRefinementStop      = false;
+  const bool bTestZeroVector          = true;
+  const bool bEnableRasterSearch      = true;
+  const bool bAlwaysRasterSearch      = false;  // 1: BETTER but factor 15x slower
+  const bool bStarRefinementEnable    = true;   // enable either star refinement or raster refinement
+  const bool bStarRefinementDiamond   = true;   // 1 = xTZ8PointDiamondSearch   0 = xTZ8PointSquareSearch
+  const bool bStarRefinementStop      = false;
   const UInt uiStarRefinementRounds   = 2;  // star refinement stop X rounds after best match (must be >=1)
   const Int  iSearchRange             = m_iSearchRange;
   const Int  iSearchRangeInitial      = m_iSearchRange >> 2;
@@ -2616,7 +2616,7 @@ void InterSearch::xPatternSearchFracDIF(
   Distortion&           ruiCost
 )
 {
-  const Bool bIsLosslessCoded = pu.cu->transQuantBypass;
+  const bool bIsLosslessCoded = pu.cu->transQuantBypass;
 
   //  Reference pattern initialization (integer scale)
   Int         iOffset    = rcMvInt.getHor() + rcMvInt.getVer() * cStruct.iRefStride;
@@ -2663,7 +2663,7 @@ void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
                                           Mv                    hevcMv[2][33]
 #else
                                           Mv                    hevcMv[2][33],
-                                          Bool                  bFastSkipBi
+                                          bool                  bFastSkipBi
 #endif
 #if JVET_K0185_AFFINE_6PARA_ENC
                                         , Mv                    mvAffine4Para[2][33][3]
@@ -3025,7 +3025,7 @@ void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
         eRefPicList = REF_PIC_LIST_0;
       }
 
-      Bool bChanged = false;
+      bool bChanged = false;
 
       iRefStart = 0;
       iRefEnd   = slice.getNumRefIdx(eRefPicList) - 1;
@@ -3389,7 +3389,7 @@ void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
                                            Mv              acMv[3],
                                            UInt&           ruiBits,
                                            Distortion&     ruiCost,
-                                           Bool            bBi )
+                                           bool            bBi )
 {
   const Int width  = pu.Y().width;
   const Int height = pu.Y().height;
@@ -3744,7 +3744,7 @@ void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
     acDeltaMv[1] = Mv( (Int)(dDeltaMv[1] * 4 + SIGN(dDeltaMv[1]) * 0.5 ) << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, (Int)(dDeltaMv[3] * 4 + SIGN(dDeltaMv[3]) * 0.5 ) << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE, true );
 #endif
 
-    Bool bAllZero = false;
+    bool bAllZero = false;
 #if JVET_K0185_AFFINE_6PARA_ENC
     for ( int i = 0; i < mvNum; i++ )
 #else
@@ -4244,7 +4244,7 @@ void InterSearch::xEncodeInterResidualQT(CodingStructure &cs, Partitioner &parti
 #if ENABLE_BMS
   const unsigned currDepth    = partitioner.currTrDepth;
 
-  const Bool bSubdiv          = currDepth != currTU.depth;
+  const bool bSubdiv          = currDepth != currTU.depth;
 #endif
 
   if (compID == MAX_NUM_TBLOCKS)  // we are not processing a channel, instead we always recurse and code the CBFs
@@ -4368,7 +4368,7 @@ void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &par
 #if ENABLE_BMS
   const unsigned currDepth = partitioner.currTrDepth;
 
-  Bool bCheckSplit = false, bCheckFull = false;
+  bool bCheckSplit = false, bCheckFull = false;
 #if ENABLE_BMS
   if( cs.pcv->noRQT )
   {
@@ -4411,7 +4411,7 @@ void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &par
 #endif
 
     Double minCost            [MAX_NUM_TBLOCKS];
-    Bool   checkTransformSkip [MAX_NUM_TBLOCKS];
+    bool   checkTransformSkip [MAX_NUM_TBLOCKS];
 
     m_CABACEstimator->resetBits();
 
@@ -4452,7 +4452,7 @@ void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &par
       }
 #endif
 
-      const Bool isCrossCPredictionAvailable = TU::hasCrossCompPredInfo( tu, compID );
+      const bool isCrossCPredictionAvailable = TU::hasCrossCompPredInfo( tu, compID );
 
       SChar preCalcAlpha = 0;
       const CPelBuf lumaResi = csFull->getResiBuf(tu.Y());
@@ -4471,16 +4471,16 @@ void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &par
       const int numTransformCandidates      = checkTransformSkip[compID] ? 2 : 1;
 #endif
       int lastTransformModeIndex            = numTransformCandidates - 1; //lastTransformModeIndex is the mode for transformSkip (if transformSkip is active)
-      const Bool isOneMode                  = crossCPredictionModesToTest == 1 && numTransformCandidates == 1;
+      const bool isOneMode                  = crossCPredictionModesToTest == 1 && numTransformCandidates == 1;
 
-      Bool isLastBest = isOneMode;
+      bool isLastBest = isOneMode;
       for( int transformMode = 0; transformMode < numTransformCandidates; transformMode++ )
       {
         for( Int crossCPredictionModeId = 0; crossCPredictionModeId < crossCPredictionModesToTest; crossCPredictionModeId++ )
         {
-          const Bool isFirstMode  = transformMode == 0 && crossCPredictionModeId == 0;
-          const Bool isLastMode   = ( transformMode + 1 ) == numTransformCandidates && ( crossCPredictionModeId + 1 ) == crossCPredictionModesToTest;
-          const Bool bUseCrossCPrediction = crossCPredictionModeId != 0;
+          const bool isFirstMode  = transformMode == 0 && crossCPredictionModeId == 0;
+          const bool isLastMode   = ( transformMode + 1 ) == numTransformCandidates && ( crossCPredictionModeId + 1 ) == crossCPredictionModesToTest;
+          const bool bUseCrossCPrediction = crossCPredictionModeId != 0;
 
           // copy the original residual into the residual buffer
           csFull->getResiBuf(compArea).copyFrom(cs.getOrgResiBuf(compArea));
@@ -4865,7 +4865,7 @@ void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &par
 #endif
 }
 
-void InterSearch::encodeResAndCalcRdInterCU(CodingStructure &cs, Partitioner &partitioner, const Bool &skipResidual)
+void InterSearch::encodeResAndCalcRdInterCU(CodingStructure &cs, Partitioner &partitioner, const bool &skipResidual)
 {
   CodingUnit &cu = *cs.getCU( partitioner.chType );
 

@@ -131,7 +131,7 @@ void SEIWriter::xWriteSEIpayloadData(OutputBitstream& bs, const SEI& sei, const 
 /**
  * marshal all SEI messages in provided list into one bitstream bs
  */
-void SEIWriter::writeSEImessages(OutputBitstream& bs, const SEIMessages &seiList, const SPS *sps, Bool isNested)
+void SEIWriter::writeSEImessages(OutputBitstream& bs, const SEIMessages &seiList, const SPS *sps, bool isNested)
 {
 #if ENABLE_TRACING
   if (g_HLSTraceEnable)
@@ -148,7 +148,7 @@ void SEIWriter::writeSEImessages(OutputBitstream& bs, const SEIMessages &seiList
     setBitstream(&bs_count);
 
 #if ENABLE_TRACING
-    Bool traceEnable = g_HLSTraceEnable;
+    bool traceEnable = g_HLSTraceEnable;
     g_HLSTraceEnable = false;
 #endif
     xWriteSEIpayloadData(bs_count, **sei, sps);

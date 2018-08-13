@@ -160,7 +160,7 @@ EncSlice::setUpLambda( Slice* slice, const Double dLambda, Int iQP)
  \param isField       true for field coding
  */
 
-void EncSlice::initEncSlice( Picture* pcPic, const Int pocLast, const Int pocCurr, const Int iGOPid, Slice*& rpcSlice, const Bool isField )
+void EncSlice::initEncSlice( Picture* pcPic, const Int pocLast, const Int pocCurr, const Int iGOPid, Slice*& rpcSlice, const bool isField )
 {
   Double dQP;
   Double dLambda;
@@ -426,7 +426,7 @@ void EncSlice::initEncSlice( Picture* pcPic, const Int pocLast, const Int pocCur
 #if W0038_CQP_ADJ
   if(rpcSlice->getPPS()->getSliceChromaQpFlag())
   {
-    const Bool bUseIntraOrPeriodicOffset = rpcSlice->getSliceType()==I_SLICE || (m_pcCfg->getSliceChromaOffsetQpPeriodicity()!=0 && (rpcSlice->getPOC()%m_pcCfg->getSliceChromaOffsetQpPeriodicity())==0);
+    const bool bUseIntraOrPeriodicOffset = rpcSlice->getSliceType()==I_SLICE || (m_pcCfg->getSliceChromaOffsetQpPeriodicity()!=0 && (rpcSlice->getPOC()%m_pcCfg->getSliceChromaOffsetQpPeriodicity())==0);
     Int cbQP = bUseIntraOrPeriodicOffset? m_pcCfg->getSliceChromaOffsetQpIntraOrPeriodic(false) : m_pcCfg->getGOPEntry(iGOPid).m_CbQPoffset;
     Int crQP = bUseIntraOrPeriodicOffset? m_pcCfg->getSliceChromaOffsetQpIntraOrPeriodic(true)  : m_pcCfg->getGOPEntry(iGOPid).m_CrQPoffset;
 
@@ -566,7 +566,7 @@ Double EncSlice::calculateLambda( const Slice*     slice,
                                         Int       &iQP )  // returned integer QP.
 {
   enum   SliceType eSliceType    = slice->getSliceType();
-  const  Bool      isField       = slice->getPic()->fieldPic;
+  const  bool      isField       = slice->getPic()->fieldPic;
   const  Int       NumberBFrames = ( m_pcCfg->getGOPSize() - 1 );
   const  Int       SHIFT_QP      = 12;
 #if X0038_LAMBDA_FROM_QP_CAPABILITY
@@ -1093,7 +1093,7 @@ void EncSlice::calCostSliceI(Picture* pcPic) // TODO: this only analyses the fir
 
 /** \param pcPic   picture class
  */
-void EncSlice::compressSlice( Picture* pcPic, const Bool bCompressEntireSlice, const Bool bFastDeltaQP )
+void EncSlice::compressSlice( Picture* pcPic, const bool bCompressEntireSlice, const bool bFastDeltaQP )
 {
   // if bCompressEntireSlice is true, then the entire slice (not slice segment) is compressed,
   //   effectively disabling the slice-segment-mode.
@@ -1214,7 +1214,7 @@ void EncSlice::compressSlice( Picture* pcPic, const Bool bCompressEntireSlice, c
     xCalcACDCParamSlice(pcSlice);
   }
 
-  const Bool bWp_explicit = (pcSlice->getSliceType()==P_SLICE && pcSlice->getPPS()->getUseWP()) || (pcSlice->getSliceType()==B_SLICE && pcSlice->getPPS()->getWPBiPred());
+  const bool bWp_explicit = (pcSlice->getSliceType()==P_SLICE && pcSlice->getPPS()->getUseWP()) || (pcSlice->getSliceType()==B_SLICE && pcSlice->getPPS()->getWPBiPred());
 
   if ( bWp_explicit )
   {
@@ -1455,7 +1455,7 @@ void EncSlice::compressSlice( Picture* pcPic, const Bool bCompressEntireSlice, c
 
 
 
-void EncSlice::encodeCtus( Picture* pcPic, const Bool bCompressEntireSlice, const Bool bFastDeltaQP, UInt startCtuTsAddr, UInt boundingCtuTsAddr, EncLib* pEncLib )
+void EncSlice::encodeCtus( Picture* pcPic, const bool bCompressEntireSlice, const bool bFastDeltaQP, UInt startCtuTsAddr, UInt boundingCtuTsAddr, EncLib* pEncLib )
 {
   //PROF_ACCUM_AND_START_NEW_SET( getProfilerCTU( pcPic, 0, 0 ), P_PIC_LEVEL );
   //PROF_START( getProfilerCTU( cs.slice->isIntra(), pcPic->scheduler.getWppThreadId() ), P_PIC_LEVEL, toWSizeIdx( cs.pcv->maxCUWidth ), toHSizeIdx( cs.pcv->maxCUHeight ) );
@@ -1792,13 +1792,13 @@ void EncSlice::encodeSlice   ( Picture* pcPic, OutputBitstream* pcSubstreams, UI
 #if HEVC_DEPENDENT_SLICES
   const UInt startCtuTsAddr          = pcSlice->getSliceSegmentCurStartCtuTsAddr();
   const UInt boundingCtuTsAddr       = pcSlice->getSliceSegmentCurEndCtuTsAddr();
-  const Bool depSliceSegmentsEnabled = pcSlice->getPPS()->getDependentSliceSegmentsEnabledFlag();
+  const bool depSliceSegmentsEnabled = pcSlice->getPPS()->getDependentSliceSegmentsEnabledFlag();
 #else
   const UInt startCtuTsAddr          = pcSlice->getSliceCurStartCtuTsAddr();
   const UInt boundingCtuTsAddr       = pcSlice->getSliceCurEndCtuTsAddr();
 #endif
 #if HEVC_TILES_WPP
-  const Bool wavefrontsEnabled       = pcSlice->getPPS()->getEntropyCodingSyncEnabledFlag();
+  const bool wavefrontsEnabled       = pcSlice->getPPS()->getEntropyCodingSyncEnabledFlag();
 #endif
 
 #if JEM_TOOLS
@@ -2000,7 +2000,7 @@ void EncSlice::encodeSlice   ( Picture* pcPic, OutputBitstream* pcSubstreams, UI
 }
 
 #if HEVC_TILES_WPP
-void EncSlice::calculateBoundingCtuTsAddrForSlice(UInt &startCtuTSAddrSlice, UInt &boundingCtuTSAddrSlice, Bool &haveReachedTileBoundary,
+void EncSlice::calculateBoundingCtuTsAddrForSlice(UInt &startCtuTSAddrSlice, UInt &boundingCtuTSAddrSlice, bool &haveReachedTileBoundary,
                                                    Picture* pcPic, const Int sliceMode, const Int sliceArgument)
 #else
 void EncSlice::calculateBoundingCtuTsAddrForSlice(UInt &startCtuTSAddrSlice, UInt &boundingCtuTSAddrSlice,
@@ -2057,7 +2057,7 @@ void EncSlice::calculateBoundingCtuTsAddrForSlice(UInt &startCtuTSAddrSlice, UIn
 
 #if HEVC_TILES_WPP
   // Adjust for tiles and wavefronts.
-  const Bool wavefrontsAreEnabled = pps.getEntropyCodingSyncEnabledFlag();
+  const bool wavefrontsAreEnabled = pps.getEntropyCodingSyncEnabledFlag();
 
   if ((sliceMode == FIXED_NUMBER_OF_CTU || sliceMode == FIXED_NUMBER_OF_BYTES) &&
       (pps.getNumTileRowsMinus1() > 0 || pps.getNumTileColumnsMinus1() > 0))
@@ -2111,7 +2111,7 @@ void EncSlice::xDetermineStartAndBoundingCtuTsAddr  ( UInt& startCtuTsAddr, UInt
   // Non-dependent slice
   UInt startCtuTsAddrSlice           = pcSlice->getSliceCurStartCtuTsAddr();
 #if HEVC_TILES_WPP
-  Bool haveReachedTileBoundarySlice  = false;
+  bool haveReachedTileBoundarySlice  = false;
 #endif
   UInt boundingCtuTsAddrSlice;
 #if HEVC_TILES_WPP
@@ -2128,7 +2128,7 @@ void EncSlice::xDetermineStartAndBoundingCtuTsAddr  ( UInt& startCtuTsAddr, UInt
   // Dependent slice
   UInt startCtuTsAddrSliceSegment          = pcSlice->getSliceSegmentCurStartCtuTsAddr();
 #if HEVC_TILES_WPP
-  Bool haveReachedTileBoundarySliceSegment = false;
+  bool haveReachedTileBoundarySliceSegment = false;
 #endif
   UInt boundingCtuTsAddrSliceSegment;
 #if HEVC_TILES_WPP

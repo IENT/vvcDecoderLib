@@ -119,8 +119,8 @@ inline UInt QuantRDOQ::xGetCodedLevel( Double&            rd64CodedCost,
                                        UShort             ui16AbsGoRice,
                                        Int                iQBits,
                                        Double             errorScale,
-                                       Bool               bLast,
-                                       Bool               useLimitedPrefixLength,
+                                       bool               bLast,
+                                       bool               useLimitedPrefixLength,
                                        const Int          maxLog2TrDynamicRange
                                      ) const
 {
@@ -180,8 +180,8 @@ inline UInt QuantRDOQ::xGetCodedLevel  ( Double&            rd64CodedCost,
                                        UInt               c2Idx,
                                        Int                iQBits,
                                        Double             errorScale,
-                                       Bool               bLast,
-                                       Bool               useLimitedPrefixLength,
+                                       bool               bLast,
+                                       bool               useLimitedPrefixLength,
                                        const Int          maxLog2TrDynamicRange
                                      ) const
 {
@@ -247,7 +247,7 @@ inline Int QuantRDOQ::xGetICRate( const UInt         uiAbsLevel,
                                   const BinFracBits& fracBitsGt1,
                                   const BinFracBits& fracBitsGt2,
                                   const UShort       ui16AbsGoRice,
-                                  const Bool         useLimitedPrefixLength,
+                                  const bool         useLimitedPrefixLength,
                                   const Int          maxLog2TrDynamicRange  ) const
 {
   Int iRate = Int( xGetIEPRate() ); // cost of sign bit
@@ -331,7 +331,7 @@ inline Int QuantRDOQ::xGetICRate  ( const UInt   uiAbsLevel,
                                   const UShort ui16AbsGoRice,
                                   const UInt   c1Idx,
                                   const UInt   c2Idx,
-                                  const Bool   useLimitedPrefixLength,
+                                  const bool   useLimitedPrefixLength,
                                   const Int maxLog2TrDynamicRange
                                 ) const
 {
@@ -675,9 +675,9 @@ void QuantRDOQ::quant(TransformUnit &tu, const ComponentID &compID, const CCoeff
   const CCoeffBuf &piCoef   = pSrc;
         CoeffBuf   piQCoef  = tu.getCoeffs(compID);
 
-  const Bool useTransformSkip      = tu.transformSkip[compID];
+  const bool useTransformSkip      = tu.transformSkip[compID];
 
-  Bool useRDOQ = useTransformSkip ? m_useRDOQTS : m_useRDOQ;
+  bool useRDOQ = useTransformSkip ? m_useRDOQTS : m_useRDOQ;
 
   {
     useRDOQ &= uiWidth > 2;
@@ -725,7 +725,7 @@ void QuantRDOQ::xRateDistOptQuant(TransformUnit &tu, const ComponentID &compID, 
   const ChannelType chType  = toChannelType(compID);
   const Int channelBitDepth = sps.getBitDepth( chType );
 
-  const Bool extendedPrecision     = sps.getSpsRangeExtension().getExtendedPrecisionProcessingFlag();
+  const bool extendedPrecision     = sps.getSpsRangeExtension().getExtendedPrecisionProcessingFlag();
   const Int  maxLog2TrDynamicRange = sps.getMaxLog2TrDynamicRange(chType);
 
   /* for 422 chroma blocks, the effective scaling applied during transformation is not a power of 2, hence it cannot be
@@ -744,7 +744,7 @@ void QuantRDOQ::xRateDistOptQuant(TransformUnit &tu, const ComponentID &compID, 
 
 #if JVET_K0072
 #else
-  const Bool bUseGolombRiceParameterAdaptation = sps.getSpsRangeExtension().getPersistentRiceAdaptationEnabledFlag();
+  const bool bUseGolombRiceParameterAdaptation = sps.getSpsRangeExtension().getPersistentRiceAdaptationEnabledFlag();
   const UInt initialGolombRiceParameter        = ctx.getGRAdaptStats(TU::getGolombRiceStatisticsIndex(tu, compID)) >> 2;
   UInt uiGoRiceParam                           = initialGolombRiceParameter;
 #endif
@@ -798,7 +798,7 @@ void QuantRDOQ::xRateDistOptQuant(TransformUnit &tu, const ComponentID &compID, 
   const Double *const pdErrScale = xGetErrScaleCoeff(scalingListType, (uiLog2BlockWidth-1), (uiLog2BlockHeight-1), cQP.rem);
   const Int    *const piQCoef    = getQuantCoeff(scalingListType, cQP.rem, (uiLog2BlockWidth-1), (uiLog2BlockHeight-1));
 
-  const Bool   enableScalingLists             = getUseScalingList(uiWidth, uiHeight, tu.transformSkip[compID]);
+  const bool   enableScalingLists             = getUseScalingList(uiWidth, uiHeight, tu.transformSkip[compID]);
 #if HM_QTBT_AS_IN_JEM_QUANT
   const Int    defaultQuantisationCoefficient = ( TU::needsSqrt2Scale( rect ) ? ( g_quantScales[cQP.rem] * 181 ) >> 7 : g_quantScales[cQP.rem] );
   const Double defaultErrorScale              = xGetErrScaleCoeffNoScalingList(scalingListType, (uiLog2BlockWidth-1), (uiLog2BlockHeight-1), cQP.rem);
@@ -1234,7 +1234,7 @@ void QuantRDOQ::xRateDistOptQuant(TransformUnit &tu, const ComponentID &compID, 
   }
 
 
-  Bool bFoundLast = false;
+  bool bFoundLast = false;
   for (Int iCGScanPos = iCGLastScanPos; iCGScanPos >= 0; iCGScanPos--)
   {
     d64BaseCost -= pdCostCoeffGroupSig [ iCGScanPos ];

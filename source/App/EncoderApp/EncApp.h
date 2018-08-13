@@ -71,7 +71,7 @@ private:
   void xCreateLib  ( std::list<PelUnitBuf*>& recBufList
                     );                           ///< create files & encoder class
   void xInitLibCfg ();                           ///< initialize internal variables
-  void xInitLib    (Bool isFieldCoding);         ///< initialize encoder class
+  void xInitLib    (bool isFieldCoding);         ///< initialize encoder class
   void xDestroyLib ();                           ///< destroy encoder class
 
   // file I/O

@@ -257,8 +257,8 @@ void LoopFilter::xDeblockCU( CodingUnit& cu, const DeblockEdgeDir edgeDir )
   for( auto &currPU : CU::traversePUs( cu ) )
   {
     const Area& areaPu = cu.Y().valid() ? currPU.block( COMPONENT_Y ) : area;
-    const Bool xOff    = currPU.blocks[cu.chType].x != cu.blocks[cu.chType].x;
-    const Bool yOff    = currPU.blocks[cu.chType].y != cu.blocks[cu.chType].y;
+    const bool xOff    = currPU.blocks[cu.chType].x != cu.blocks[cu.chType].x;
+    const bool yOff    = currPU.blocks[cu.chType].y != cu.blocks[cu.chType].y;
 
     xSetEdgefilterMultiple( cu, EDGE_VER, areaPu, (xOff ? m_stLFCUParam.internalEdge : m_stLFCUParam.leftEdge), xOff );
     xSetEdgefilterMultiple( cu, EDGE_HOR, areaPu, (yOff ? m_stLFCUParam.internalEdge : m_stLFCUParam.topEdge),  yOff );
@@ -409,7 +409,7 @@ void LoopFilter::xSetEdgefilterMultipleSubPu(const CodingUnit& cu,
                                              DeblockEdgeDir edgeDir,
                                              const Area&    area,
                                              const Position subPuPos,
-                                             Bool           bValue )
+                                             bool           bValue )
 {
   const PreCalcValues& pcv = *cu.cs->pcv;
 
@@ -586,7 +586,7 @@ void LoopFilter::xEdgeFilterLuma(const CodingUnit& cu, const DeblockEdgeDir edge
   const PPS     &pps      = *(cu.cs->pps);
   const SPS     &sps      = *(cu.cs->sps);
   const Slice   &slice    = *(cu.slice);
-  const Bool    ppsTransquantBypassEnabledFlag = pps.getTransquantBypassEnabledFlag();
+  const bool    ppsTransquantBypassEnabledFlag = pps.getTransquantBypassEnabledFlag();
   const Int     bitDepthLuma                   = sps.getBitDepth(CHANNEL_TYPE_LUMA);
   const ClpRng& clpRng( cu.cs->slice->clpRng(COMPONENT_Y) );
 

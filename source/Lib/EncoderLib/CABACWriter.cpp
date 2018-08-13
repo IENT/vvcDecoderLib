@@ -1424,7 +1424,7 @@ void CABACWriter::obmc_flag( const CodingUnit& cu )
     return;
   }
 
-  Bool bCoded = CU::isObmcFlagCoded ( cu );
+  bool bCoded = CU::isObmcFlagCoded ( cu );
 
   if ( bCoded )
   {
@@ -2192,7 +2192,7 @@ void CABACWriter::imv_mode( const CodingUnit& cu )
     return;
   }
 
-  Bool bNonZeroMvd = CU::hasSubCUNonZeroMVd( cu );
+  bool bNonZeroMvd = CU::hasSubCUNonZeroMVd( cu );
   if( !bNonZeroMvd )
   {
     return;
@@ -3165,7 +3165,7 @@ void CABACWriter::residual_nsst_mode( const CodingUnit& cu, CUCtx& cuCtx )
     return;
   }
 
-  Bool bUseThreeNSSTPasses = false;
+  bool bUseThreeNSSTPasses = false;
 
   if( cu.partSize == SIZE_2Nx2N )
   {
@@ -3946,11 +3946,11 @@ void CABACWriter::codeAlfCtuEnableFlag( CodingStructure& cs, UInt ctuRsAddr, con
     const UInt          curSliceIdx = cs.slice->getIndependentSliceIdx();
 #if HEVC_TILES_WPP
     const UInt          curTileIdx = cs.picture->tileMap->getTileIdxMap( pos );
-    Bool                leftMergeAvail = cs.getCURestricted( pos.offset( -(Int)pcv.maxCUWidth, 0 ), curSliceIdx, curTileIdx, CH_L ) ? true : false;
-    Bool                aboveMergeAvail = cs.getCURestricted( pos.offset( 0, -(Int)pcv.maxCUHeight ), curSliceIdx, curTileIdx, CH_L ) ? true : false;
+    bool                leftMergeAvail = cs.getCURestricted( pos.offset( -(Int)pcv.maxCUWidth, 0 ), curSliceIdx, curTileIdx, CH_L ) ? true : false;
+    bool                aboveMergeAvail = cs.getCURestricted( pos.offset( 0, -(Int)pcv.maxCUHeight ), curSliceIdx, curTileIdx, CH_L ) ? true : false;
 #else
-    Bool                leftAvail = cs.getCURestricted( pos.offset( -(Int)pcv.maxCUWidth, 0 ), curSliceIdx, CH_L ) ? true : false;
-    Bool                aboveAvail = cs.getCURestricted( pos.offset( 0, -(Int)pcv.maxCUHeight ), curSliceIdx, CH_L ) ? true : false;
+    bool                leftAvail = cs.getCURestricted( pos.offset( -(Int)pcv.maxCUWidth, 0 ), curSliceIdx, CH_L ) ? true : false;
+    bool                aboveAvail = cs.getCURestricted( pos.offset( 0, -(Int)pcv.maxCUHeight ), curSliceIdx, CH_L ) ? true : false;
 #endif
 
     Int leftCTUAddr = leftAvail ? ctuRsAddr - 1 : -1;

@@ -111,8 +111,8 @@ UInt DecApp::decode()
   }
 
   // main decoder loop
-  Bool openedReconFile = false; // reconstruction file not yet opened. (must be performed after SPS is seen)
-  Bool loopFiltered = false;
+  bool openedReconFile = false; // reconstruction file not yet opened. (must be performed after SPS is seen)
+  bool loopFiltered = false;
 
   while (!!bitstreamFile)
   {
@@ -132,7 +132,7 @@ UInt DecApp::decode()
     byteStreamNALUnit(bytestream, nalu.getBitstream().getFifo(), stats);
 
     // call actual decoding function
-    Bool bNewPicture = false;
+    bool bNewPicture = false;
     if (nalu.getBitstream().getFifo().empty())
     {
       /* this can happen if the following occur:
@@ -375,9 +375,9 @@ void DecApp::xWriteOutput( PicList* pcListPic, UInt tId )
         {
           const Window &conf = pcPicTop->cs->sps->getConformanceWindow();
           const Window  defDisp = (m_respectDefDispWindow && pcPicTop->cs->sps->getVuiParametersPresentFlag()) ? pcPicTop->cs->sps->getVuiParameters()->getDefaultDisplayWindow() : Window();
-          const Bool isTff = pcPicTop->topField;
+          const bool isTff = pcPicTop->topField;
 
-          Bool display = true;
+          bool display = true;
           if( m_decodedNoDisplaySEIEnabled )
           {
             SEIMessages noDisplay = getSeisByType( pcPic->SEIs, SEI::NO_DISPLAY );
@@ -501,7 +501,7 @@ void DecApp::xFlushOutput( PicList* pcListPic )
         {
           const Window &conf = pcPicTop->cs->sps->getConformanceWindow();
           const Window  defDisp = (m_respectDefDispWindow && pcPicTop->cs->sps->getVuiParametersPresentFlag()) ? pcPicTop->cs->sps->getVuiParameters()->getDefaultDisplayWindow() : Window();
-          const Bool isTff = pcPicTop->topField;
+          const bool isTff = pcPicTop->topField;
           m_cVideoIOYuvReconFile.write( pcPicTop->getRecoBuf(), pcPicBottom->getRecoBuf(),
                                          m_outputColourSpaceConvert,
                                          conf.getWindowLeftOffset() + defDisp.getWindowLeftOffset(),
@@ -594,7 +594,7 @@ void DecApp::xFlushOutput( PicList* pcListPic )
 
 /** \param nalu Input nalu to check whether its LayerId is within targetDecLayerIdSet
  */
-Bool DecApp::isNaluWithinTargetDecLayerIdSet( InputNALUnit* nalu )
+bool DecApp::isNaluWithinTargetDecLayerIdSet( InputNALUnit* nalu )
 {
   if ( m_targetDecLayerIdSet.size() == 0 ) // By default, the set is empty, meaning all LayerIds are allowed
   {

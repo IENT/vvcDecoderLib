@@ -108,15 +108,15 @@ private:
 #endif
 
   //  Data
-  Bool                    m_bLongtermTestPictureHasBeenCoded;
-  Bool                    m_bLongtermTestPictureHasBeenCoded2;
+  bool                    m_bLongtermTestPictureHasBeenCoded;
+  bool                    m_bLongtermTestPictureHasBeenCoded2;
   UInt                    m_numLongTermRefPicSPS;
   UInt                    m_ltRefPicPocLsbSps[MAX_NUM_LONG_TERM_REF_PICS];
-  Bool                    m_ltRefPicUsedByCurrPicFlag[MAX_NUM_LONG_TERM_REF_PICS];
+  bool                    m_ltRefPicUsedByCurrPicFlag[MAX_NUM_LONG_TERM_REF_PICS];
   Int                     m_iLastIDR;
   Int                     m_iGopSize;
   Int                     m_iNumPicCoded;
-  Bool                    m_bFirst;
+  bool                    m_bFirst;
   Int                     m_iLastRecoveryPicPOC;
   Int                     m_lastRasPoc;
 
@@ -138,10 +138,10 @@ private:
 #endif
   RateCtrl*                 m_pcRateCtrl;
   // indicate sequence first
-  Bool                    m_bSeqFirst;
+  bool                    m_bSeqFirst;
 
   // clean decoding refresh
-  Bool                    m_bRefreshPending;
+  bool                    m_bRefreshPending;
   Int                     m_pocCRA;
   NalUnitType             m_associatedIRAPType;
   Int                     m_associatedIRAPPOC;
@@ -149,7 +149,7 @@ private:
   std::vector<Int>        m_vRVM_RP;
   UInt                    m_lastBPSEI;
   UInt                    m_totalCoded;
-  Bool                    m_bufferingPeriodSEIPresentInAU;
+  bool                    m_bufferingPeriodSEIPresentInAU;
   SEIEncoder              m_seiEncoder;
 #if W0038_DB_OPT
   PelStorage*             m_pcDeblockingTempPicYuv;
@@ -160,7 +160,7 @@ private:
   UInt                    m_uiBlkSize[10];
   UInt                    m_uiNumBlk[10];
   UInt                    m_uiPrevISlicePOC;
-  Bool                    m_bInitAMaxBT;
+  bool                    m_bInitAMaxBT;
 
   AUWriterIf*             m_AUWriterIf;
 
@@ -173,7 +173,7 @@ public:
 
   void  init        ( EncLib* pcEncLib );
   void  compressGOP ( Int iPOCLast, Int iNumPicRcvd, PicList& rcListPic, std::list<PelUnitBuf*>& rcListPicYuvRec,
-                      Bool isField, Bool isTff, const InputColourSpaceConversion snr_conversion, const Bool printFrameMSE );
+                      bool isField, bool isTff, const InputColourSpaceConversion snr_conversion, const bool printFrameMSE );
   void  xAttachSliceDataToNalUnit (OutputNALUnit& rNalu, OutputBitstream* pcBitstreamRedirect);
 
 
@@ -181,12 +181,12 @@ public:
 
   PicList*   getListPic()      { return m_pcListPic; }
 
-  void  printOutSummary      ( UInt uiNumAllPicCoded, Bool isField, const Bool printMSEBasedSNR, const Bool printSequenceMSE, const BitDepths &bitDepths );
+  void  printOutSummary      ( UInt uiNumAllPicCoded, bool isField, const bool printMSEBasedSNR, const bool printSequenceMSE, const BitDepths &bitDepths );
 #if W0038_DB_OPT
   UInt64  preLoopFilterPicAndCalcDist( Picture* pcPic );
 #endif
   EncSlice*  getSliceEncoder()   { return m_pcSliceEncoder; }
-  NalUnitType getNalUnitType( Int pocCurr, Int lastIdr, Bool isField );
+  NalUnitType getNalUnitType( Int pocCurr, Int lastIdr, bool isField );
   void arrangeLongtermPicturesInRPS(Slice *, PicList& );
 
 #if EXTENSION_360_VIDEO
@@ -201,15 +201,15 @@ protected:
 
 protected:
 
-  void  xInitGOP          ( Int iPOCLast, Int iNumPicRcvd, Bool isField );
+  void  xInitGOP          ( Int iPOCLast, Int iNumPicRcvd, bool isField );
   void  xGetBuffer        ( PicList& rcListPic, std::list<PelUnitBuf*>& rcListPicYuvRecOut,
-                            Int iNumPicRcvd, Int iTimeOffset, Picture*& rpcPic, Int pocCurr, Bool isField );
+                            Int iNumPicRcvd, Int iTimeOffset, Picture*& rpcPic, Int pocCurr, bool isField );
 
-  void  xCalculateAddPSNRs         ( const Bool isField, const Bool isFieldTopFieldFirst, const Int iGOPid, Picture* pcPic, const AccessUnit&accessUnit, PicList &rcListPic, int64_t dEncTime, const InputColourSpaceConversion snr_conversion, const Bool printFrameMSE, Double* PSNR_Y );
-  void  xCalculateAddPSNR          ( Picture* pcPic, PelUnitBuf cPicD, const AccessUnit&, Double dEncTime, const InputColourSpaceConversion snr_conversion, const Bool printFrameMSE, Double* PSNR_Y );
+  void  xCalculateAddPSNRs         ( const bool isField, const bool isFieldTopFieldFirst, const Int iGOPid, Picture* pcPic, const AccessUnit&accessUnit, PicList &rcListPic, int64_t dEncTime, const InputColourSpaceConversion snr_conversion, const bool printFrameMSE, Double* PSNR_Y );
+  void  xCalculateAddPSNR          ( Picture* pcPic, PelUnitBuf cPicD, const AccessUnit&, Double dEncTime, const InputColourSpaceConversion snr_conversion, const bool printFrameMSE, Double* PSNR_Y );
   void  xCalculateInterlacedAddPSNR( Picture* pcPicOrgFirstField, Picture* pcPicOrgSecondField,
                                      PelUnitBuf cPicRecFirstField, PelUnitBuf cPicRecSecondField,
-                                     const InputColourSpaceConversion snr_conversion, const Bool printFrameMSE, Double* PSNR_Y );
+                                     const InputColourSpaceConversion snr_conversion, const bool printFrameMSE, Double* PSNR_Y );
 
   UInt64 xFindDistortionPlane(const CPelBuf& pic0, const CPelBuf& pic1, const UInt rshift
 #if ENABLE_QPA
@@ -227,7 +227,7 @@ protected:
 
   void xCreateIRAPLeadingSEIMessages (SEIMessages& seiMessages, const SPS *sps, const PPS *pps);
   void xCreatePerPictureSEIMessages (Int picInGOP, SEIMessages& seiMessages, SEIMessages& nestedSeiMessages, Slice *slice);
-  void xCreatePictureTimingSEI  (Int IRAPGOPid, SEIMessages& seiMessages, SEIMessages& nestedSeiMessages, SEIMessages& duInfoSeiMessages, Slice *slice, Bool isField, std::deque<DUData> &duData);
+  void xCreatePictureTimingSEI  (Int IRAPGOPid, SEIMessages& seiMessages, SEIMessages& nestedSeiMessages, SEIMessages& duInfoSeiMessages, Slice *slice, bool isField, std::deque<DUData> &duData);
   void xUpdateDuData(AccessUnit &testAU, std::deque<DUData> &duData);
   void xUpdateTimingSEI(SEIPictureTiming *pictureTimingSEI, std::deque<DUData> &duData, const SPS *sps);
   void xUpdateDuInfoSEI(SEIMessages &duInfoSeiMessages, SEIPictureTiming *pictureTimingSEI);
@@ -235,8 +235,8 @@ protected:
   void xCreateScalableNestingSEI (SEIMessages& seiMessages, SEIMessages& nestedSeiMessages);
   void xWriteSEI (NalUnitType naluType, SEIMessages& seiMessages, AccessUnit &accessUnit, AccessUnit::iterator &auPos, Int temporalId, const SPS *sps);
   void xWriteSEISeparately (NalUnitType naluType, SEIMessages& seiMessages, AccessUnit &accessUnit, AccessUnit::iterator &auPos, Int temporalId, const SPS *sps);
-  void xClearSEIs(SEIMessages& seiMessages, Bool deleteMessages);
-  void xWriteLeadingSEIOrdered (SEIMessages& seiMessages, SEIMessages& duInfoSeiMessages, AccessUnit &accessUnit, Int temporalId, const SPS *sps, Bool testWrite);
+  void xClearSEIs(SEIMessages& seiMessages, bool deleteMessages);
+  void xWriteLeadingSEIOrdered (SEIMessages& seiMessages, SEIMessages& duInfoSeiMessages, AccessUnit &accessUnit, Int temporalId, const SPS *sps, bool testWrite);
   void xWriteLeadingSEIMessages  (SEIMessages& seiMessages, SEIMessages& duInfoSeiMessages, AccessUnit &accessUnit, Int temporalId, const SPS *sps, std::deque<DUData> &duData);
   void xWriteTrailingSEIMessages (SEIMessages& seiMessages, AccessUnit &accessUnit, Int temporalId, const SPS *sps);
   void xWriteDuSEIMessages       (SEIMessages& duInfoSeiMessages, AccessUnit &accessUnit, Int temporalId, const SPS *sps, std::deque<DUData> &duData);
@@ -246,7 +246,7 @@ protected:
 #endif
   Int xWriteSPS (AccessUnit &accessUnit, const SPS *sps);
   Int xWritePPS (AccessUnit &accessUnit, const PPS *pps);
-  Int xWriteParameterSets (AccessUnit &accessUnit, Slice *slice, const Bool bSeqFirst);
+  Int xWriteParameterSets (AccessUnit &accessUnit, Slice *slice, const bool bSeqFirst);
 
   void applyDeblockingFilterMetric( Picture* pcPic, UInt uiNumSlices );
 #if W0038_DB_OPT

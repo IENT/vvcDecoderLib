@@ -55,7 +55,7 @@ Int64 xCalcSADvalueWP(const Int   bitDepth,
                       const Int   log2Denom,
                       const Int   weight,
                       const Int   offset,
-                      const Bool  useHighPrecision);
+                      const bool  useHighPrecision);
 
 //! calculate SAD values for both WP version and non-WP version.
 static
@@ -69,8 +69,8 @@ Int64 xCalcSADvalueWPOptionalClip(const Int   bitDepth,
                                   const Int   log2Denom,
                                   const Int   weight,
                                   const Int   offset,
-                                  const Bool  useHighPrecision,
-                                  const Bool  clipped);
+                                  const bool  useHighPrecision,
+                                  const bool  clipped);
 
 // -----------------------------------------------------------------------------
 // Helper functions
@@ -122,7 +122,7 @@ void xScaleHistogram(const std::vector<Int> &histogramInput,
                      const Int               log2Denom,
                      const Int               weight,
                      const Int               offset,
-                     const Bool              bHighPrecision)
+                     const bool              bHighPrecision)
 {
   CHECK(&histogramInput == &histogramOutput, "Input and output histogram are the same");
   const Int numElements=Int(histogramInput.size());
@@ -152,7 +152,7 @@ Distortion xSearchHistogram(const std::vector<Int> &histogramSource,
                             const Int               log2Denom,
                                   Int              &weightToUpdate,
                                   Int              &offsetToUpdate,
-                            const Bool              bHighPrecision,
+                            const bool              bHighPrecision,
                             const ComponentID       compID)
 {
   const Int initialWeight   = weightToUpdate;
@@ -353,7 +353,7 @@ void  WeightPredAnalysis::xCheckWPEnable(Slice *const slice)
 void WeightPredAnalysis::xEstimateWPParamSlice(Slice *const slice, const WeightedPredictionMethod method)
 {
   Int  iDenom         = 6;
-  Bool validRangeFlag = false;
+  bool validRangeFlag = false;
 
   if(slice->getNumRefIdx(REF_PIC_LIST_0)>3)
   {
@@ -398,10 +398,10 @@ void WeightPredAnalysis::xEstimateWPParamSlice(Slice *const slice, const Weighte
 
 
 //! update wp tables for explicit wp w.r.t range limitation
-Bool WeightPredAnalysis::xUpdatingWPParameters(Slice *const slice, const Int log2Denom)
+bool WeightPredAnalysis::xUpdatingWPParameters(Slice *const slice, const Int log2Denom)
 {
   const Int  numComp                    = ::getNumberValidComponents( slice->getSPS()->getChromaFormatIdc() );
-  const Bool bUseHighPrecisionWeighting = slice->getSPS()->getSpsRangeExtension().getHighPrecisionOffsetsEnabledFlag();
+  const bool bUseHighPrecisionWeighting = slice->getSPS()->getSpsRangeExtension().getHighPrecisionOffsetsEnabledFlag();
   const Int numPredDir                  = slice->isInterP() ? 1 : 2;
 
   CHECK(numPredDir > Int(NUM_REF_PIC_LIST_01), "Invalid reference picture list");
@@ -472,15 +472,15 @@ Bool WeightPredAnalysis::xUpdatingWPParameters(Slice *const slice, const Int log
 /** select whether weighted pred enables or not.
  * \param Slice *slice
  * \param log2Denom
- * \returns Bool
+ * \returns bool
  */
-Bool WeightPredAnalysis::xSelectWPHistExtClip(Slice *const slice, const Int log2Denom, const Bool bDoEnhancement, const Bool bClipInitialSADWP, const Bool bUseHistogram)
+bool WeightPredAnalysis::xSelectWPHistExtClip(Slice *const slice, const Int log2Denom, const bool bDoEnhancement, const bool bClipInitialSADWP, const bool bUseHistogram)
 {
 
   const CPelUnitBuf       pPic             = slice->getPic()->getOrigBuf();
   const Int               defaultWeight    = 1<<log2Denom;
   const Int               numPredDir       = slice->isInterP() ? 1 : 2;
-  const Bool              useHighPrecision = slice->getSPS()->getSpsRangeExtension().getHighPrecisionOffsetsEnabledFlag();
+  const bool              useHighPrecision = slice->getSPS()->getSpsRangeExtension().getHighPrecisionOffsetsEnabledFlag();
 
   CHECK(numPredDir > Int(NUM_REF_PIC_LIST_01), "Invalid reference picture list");
 
@@ -490,7 +490,7 @@ Bool WeightPredAnalysis::xSelectWPHistExtClip(Slice *const slice, const Int log2
 
     for ( Int refIdxTemp = 0; refIdxTemp < slice->getNumRefIdx(eRefPicList); refIdxTemp++ )
     {
-      Bool  useChromaWeight = false;
+      bool  useChromaWeight = false;
 
       for (Int comp = 0; comp < ::getNumberValidComponents(pPic.chromaFormat); comp++)
       {
@@ -594,12 +594,12 @@ Bool WeightPredAnalysis::xSelectWPHistExtClip(Slice *const slice, const Int log2
 }
 
 //! select whether weighted pred enables or not.
-Bool WeightPredAnalysis::xSelectWP(Slice *const slice, const Int log2Denom)
+bool WeightPredAnalysis::xSelectWP(Slice *const slice, const Int log2Denom)
 {
   const CPelUnitBuf       pPic                                = slice->getPic()->getOrigBuf();
   const Int               defaultWeight                       = 1<<log2Denom;
   const Int               numPredDir                          = slice->isInterP() ? 1 : 2;
-  const Bool              useHighPrecisionPredictionWeighting = slice->getSPS()->getSpsRangeExtension().getHighPrecisionOffsetsEnabledFlag();
+  const bool              useHighPrecisionPredictionWeighting = slice->getSPS()->getSpsRangeExtension().getHighPrecisionOffsetsEnabledFlag();
 
   CHECK(numPredDir > Int(NUM_REF_PIC_LIST_01), "Invalid reference picture list");
 
@@ -664,7 +664,7 @@ Int64 xCalcSADvalueWP(const Int   bitDepth,
                       const Int   log2Denom,
                       const Int   weight,
                       const Int   offset,
-                      const Bool  useHighPrecision)
+                      const bool  useHighPrecision)
 {
   //const Int64 iSize          = iWidth*iHeight;
   const Int64 realLog2Denom = useHighPrecision ? log2Denom : (log2Denom + (bitDepth - 8));
@@ -696,8 +696,8 @@ Int64 xCalcSADvalueWPOptionalClip(const Int   bitDepth,
                                   const Int   log2Denom,
                                   const Int   weight,
                                   const Int   offset,
-                                  const Bool  useHighPrecision,
-                                  const Bool  clipped)
+                                  const bool  useHighPrecision,
+                                  const bool  clipped)
 {
   Int64 SAD = 0;
   if (clipped)

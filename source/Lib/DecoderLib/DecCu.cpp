@@ -441,7 +441,7 @@ void DecCu::xDeriveCUMV( CodingUnit &cu )
       {
         pu.mergeType = MRG_TYPE_FRUC;
 
-        Bool bAvailable = m_pcInterPred->deriveFRUCMV( pu );
+        bool bAvailable = m_pcInterPred->deriveFRUCMV( pu );
 
         CHECK( !bAvailable, "fruc mode not availabe" );
         //normal merge data should be set already, to be checked

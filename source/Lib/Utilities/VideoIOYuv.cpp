@@ -124,7 +124,7 @@ static void scalePlane( PelBuf& areaBuf, const Int shiftbits, const Pel minval, 
  * \param MSBExtendedBitDepth
  * \param internalBitDepth bit-depth array to scale image data to/from when reading/writing.
  */
-void VideoIOYuv::open( const std::string &fileName, Bool bWriteMode, const Int fileBitDepth[MAX_NUM_CHANNEL_TYPE], const Int MSBExtendedBitDepth[MAX_NUM_CHANNEL_TYPE], const Int internalBitDepth[MAX_NUM_CHANNEL_TYPE] )
+void VideoIOYuv::open( const std::string &fileName, bool bWriteMode, const Int fileBitDepth[MAX_NUM_CHANNEL_TYPE], const Int MSBExtendedBitDepth[MAX_NUM_CHANNEL_TYPE], const Int internalBitDepth[MAX_NUM_CHANNEL_TYPE] )
 {
   //NOTE: files cannot have bit depth greater than 16
   for(UInt ch=0; ch<MAX_NUM_CHANNEL_TYPE; ch++)
@@ -173,12 +173,12 @@ void VideoIOYuv::close()
   m_cHandle.close();
 }
 
-Bool VideoIOYuv::isEof()
+bool VideoIOYuv::isEof()
 {
   return m_cHandle.eof();
 }
 
-Bool VideoIOYuv::isFail()
+bool VideoIOYuv::isFail()
 {
   return m_cHandle.fail();
 }
@@ -254,9 +254,9 @@ void VideoIOYuv::skipFrames(UInt numFrames, UInt width, UInt height, ChromaForma
  * @param fileBitDepth component bit depth in file
  * @return true for success, false in case of error
  */
-static Bool readPlane(Pel* dst,
+static bool readPlane(Pel* dst,
                       istream& fd,
-                      Bool is16bit,
+                      bool is16bit,
                       UInt stride444,
                       UInt width444,
                       UInt height444,
@@ -413,7 +413,7 @@ static Bool readPlane(Pel* dst,
  * @param fileBitDepth component bit depth in file
  * @return true for success, false in case of error
  */
-static Bool writePlane(ostream& fd, const Pel* src, Bool is16bit,
+static bool writePlane(ostream& fd, const Pel* src, bool is16bit,
                        const UInt stride_src,
                        UInt width444, UInt height444,
                        const ComponentID compID,
@@ -541,13 +541,13 @@ static Bool writePlane(ostream& fd, const Pel* src, Bool is16bit,
   return true;
 }
 
-static Bool writeField(ostream& fd, const Pel* top, const Pel* bottom, Bool is16bit,
+static bool writeField(ostream& fd, const Pel* top, const Pel* bottom, bool is16bit,
                        const UInt stride_src,
                        UInt width444, UInt height444,
                        const ComponentID compID,
                        const ChromaFormat srcFormat,
                        const ChromaFormat fileFormat,
-                       const UInt fileBitDepth, const Bool isTff)
+                       const UInt fileBitDepth, const bool isTff)
 {
   const UInt csx_file =getComponentScaleX(compID, fileFormat);
   const UInt csy_file =getComponentScaleY(compID, fileFormat);
@@ -692,7 +692,7 @@ static Bool writeField(ostream& fd, const Pel* top, const Pel* bottom, Bool is16
  * @param format           chroma format
  * @return true for success, false in case of error
  */
-Bool VideoIOYuv::read ( PelUnitBuf& pic, PelUnitBuf& picOrg, const InputColourSpaceConversion ipcsc, Int aiPad[2], ChromaFormat format, const Bool bClipToRec709 )
+bool VideoIOYuv::read ( PelUnitBuf& pic, PelUnitBuf& picOrg, const InputColourSpaceConversion ipcsc, Int aiPad[2], ChromaFormat format, const bool bClipToRec709 )
 {
   // check end-of-file
   if ( isEof() )
@@ -705,7 +705,7 @@ Bool VideoIOYuv::read ( PelUnitBuf& pic, PelUnitBuf& picOrg, const InputColourSp
     format = picOrg.chromaFormat;
   }
 
-  Bool is16bit = false;
+  bool is16bit = false;
 
   for(UInt ch=0; ch<MAX_NUM_CHANNEL_TYPE; ch++)
   {
@@ -736,7 +736,7 @@ Bool VideoIOYuv::read ( PelUnitBuf& pic, PelUnitBuf& picOrg, const InputColourSp
 
     const Int desired_bitdepth = m_MSBExtendedBitDepth[chType] + m_bitdepthShift[chType];
 
-    const Bool b709Compliance=(bClipToRec709) && (m_bitdepthShift[chType] < 0 && desired_bitdepth >= 8);     /* ITU-R BT.709 compliant clipping for converting say 10b to 8b */
+    const bool b709Compliance=(bClipToRec709) && (m_bitdepthShift[chType] < 0 && desired_bitdepth >= 8);     /* ITU-R BT.709 compliant clipping for converting say 10b to 8b */
     const Pel minval = b709Compliance? ((   1 << (desired_bitdepth - 8))   ) : 0;
     const Pel maxval = b709Compliance? ((0xff << (desired_bitdepth - 8)) -1) : (1 << desired_bitdepth) - 1;
     Pel* const dst = picOrg.get(compID).bufAt(0,0);
@@ -776,8 +776,8 @@ Bool VideoIOYuv::read ( PelUnitBuf& pic, PelUnitBuf& picOrg, const InputColourSp
  * @param format           chroma format
  * @return true for success, false in case of error
  */
-Bool VideoIOYuv::write( const CPelUnitBuf& pic,
-                        const InputColourSpaceConversion ipCSC, Int confLeft, Int confRight, Int confTop, Int confBottom, ChromaFormat format, const Bool bClipToRec709 )
+bool VideoIOYuv::write( const CPelUnitBuf& pic,
+                        const InputColourSpaceConversion ipCSC, Int confLeft, Int confRight, Int confTop, Int confBottom, ChromaFormat format, const bool bClipToRec709 )
 {
   PelStorage interm;
 
@@ -790,8 +790,8 @@ Bool VideoIOYuv::write( const CPelUnitBuf& pic,
   const CPelUnitBuf& picC = (ipCSC==IPCOLOURSPACE_UNCHANGED) ? pic : interm;
 
   // compute actual YUV frame size excluding padding size
-  Bool is16bit = false;
-  Bool nonZeroBitDepthShift=false;
+  bool is16bit = false;
+  bool nonZeroBitDepthShift=false;
 
   for(UInt ch=0; ch<MAX_NUM_CHANNEL_TYPE; ch++)
   {
@@ -805,7 +805,7 @@ Bool VideoIOYuv::write( const CPelUnitBuf& pic,
     }
   }
 
-  Bool retval = true;
+  bool retval = true;
   if (format>=NUM_CHROMA_FORMAT)
   {
     format= picC.chromaFormat;
@@ -821,7 +821,7 @@ Bool VideoIOYuv::write( const CPelUnitBuf& pic,
     {
       const ComponentID compID=ComponentID(comp);
       const ChannelType ch=toChannelType(compID);
-      const Bool b709Compliance = bClipToRec709 && (-m_bitdepthShift[ch] < 0 && m_MSBExtendedBitDepth[ch] >= 8);     /* ITU-R BT.709 compliant clipping for converting say 10b to 8b */
+      const bool b709Compliance = bClipToRec709 && (-m_bitdepthShift[ch] < 0 && m_MSBExtendedBitDepth[ch] >= 8);     /* ITU-R BT.709 compliant clipping for converting say 10b to 8b */
       const Pel minval = b709Compliance? ((   1 << (m_MSBExtendedBitDepth[ch] - 8))   ) : 0;
       const Pel maxval = b709Compliance? ((0xff << (m_MSBExtendedBitDepth[ch] - 8)) -1) : (1 << m_MSBExtendedBitDepth[ch]) - 1;
 
@@ -858,7 +858,7 @@ Bool VideoIOYuv::write( const CPelUnitBuf& pic,
   return retval;
 }
 
-Bool VideoIOYuv::write( const CPelUnitBuf& picTop, const CPelUnitBuf& picBottom, const InputColourSpaceConversion ipCSC, Int confLeft, Int confRight, Int confTop, Int confBottom, ChromaFormat format, const Bool isTff, const Bool bClipToRec709 )
+bool VideoIOYuv::write( const CPelUnitBuf& picTop, const CPelUnitBuf& picBottom, const InputColourSpaceConversion ipCSC, Int confLeft, Int confRight, Int confTop, Int confBottom, ChromaFormat format, const bool isTff, const bool bClipToRec709 )
 {
   PelStorage intermTop;
   PelStorage intermBottom;
@@ -873,8 +873,8 @@ Bool VideoIOYuv::write( const CPelUnitBuf& picTop, const CPelUnitBuf& picBottom,
   const CPelUnitBuf& picTopC    = (ipCSC==IPCOLOURSPACE_UNCHANGED) ? picTop    : intermTop;
   const CPelUnitBuf& picBottomC = (ipCSC==IPCOLOURSPACE_UNCHANGED) ? picBottom : intermBottom;
 
-  Bool is16bit = false;
-  Bool nonZeroBitDepthShift=false;
+  bool is16bit = false;
+  bool nonZeroBitDepthShift=false;
 
   for(UInt ch=0; ch<MAX_NUM_CHANNEL_TYPE; ch++)
   {
@@ -911,7 +911,7 @@ Bool VideoIOYuv::write( const CPelUnitBuf& picTop, const CPelUnitBuf& picBottom,
       {
         const ComponentID compID=ComponentID(comp);
         const ChannelType ch=toChannelType(compID);
-        const Bool b709Compliance=bClipToRec709 && (-m_bitdepthShift[ch] < 0 && m_MSBExtendedBitDepth[ch] >= 8);     /* ITU-R BT.709 compliant clipping for converting say 10b to 8b */
+        const bool b709Compliance=bClipToRec709 && (-m_bitdepthShift[ch] < 0 && m_MSBExtendedBitDepth[ch] >= 8);     /* ITU-R BT.709 compliant clipping for converting say 10b to 8b */
         const Pel minval = b709Compliance? ((   1 << (m_MSBExtendedBitDepth[ch] - 8))   ) : 0;
         const Pel maxval = b709Compliance? ((0xff << (m_MSBExtendedBitDepth[ch] - 8)) -1) : (1 << m_MSBExtendedBitDepth[ch]) - 1;
 
@@ -923,7 +923,7 @@ Bool VideoIOYuv::write( const CPelUnitBuf& picTop, const CPelUnitBuf& picBottom,
   const CPelUnitBuf& picTopO     = nonZeroBitDepthShift ? picTopZ    : picTopC;
   const CPelUnitBuf& picBottomO  = nonZeroBitDepthShift ? picBottomZ : picBottomC;
 
-  Bool retval = true;
+  bool retval = true;
   CHECK( picTopO.chromaFormat != picBottomO.chromaFormat, "Incompatible formats of bottom and top fields" );
 
   const ChromaFormat dstChrFormat = picTopO.chromaFormat;
@@ -966,7 +966,7 @@ Bool VideoIOYuv::write( const CPelUnitBuf& picTop, const CPelUnitBuf& picBottom,
 
 
 // static member
-void VideoIOYuv::ColourSpaceConvert(const CPelUnitBuf &src, PelUnitBuf &dest, const InputColourSpaceConversion conversion, Bool bIsForwards)
+void VideoIOYuv::ColourSpaceConvert(const CPelUnitBuf &src, PelUnitBuf &dest, const InputColourSpaceConversion conversion, bool bIsForwards)
 {
   const ChromaFormat  format       = src.chromaFormat;
   const UInt          numValidComp = ::getNumberValidComponents(format);

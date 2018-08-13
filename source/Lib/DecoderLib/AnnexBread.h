@@ -84,7 +84,7 @@ public:
    * returns true if an EOF will be encountered within the next
    * n bytes.
    */
-  Bool eofBeforeNBytes(UInt n)
+  bool eofBeforeNBytes(UInt n)
   {
     CHECK(n > 4, "Unsupported look-ahead value");
     if (m_NumFutureBytes >= n)
@@ -192,7 +192,7 @@ struct AnnexBStats
   }
 };
 
-Bool byteStreamNALUnit(InputByteStream& bs, std::vector<uint8_t>& nalUnit, AnnexBStats& stats);
+bool byteStreamNALUnit(InputByteStream& bs, std::vector<uint8_t>& nalUnit, AnnexBStats& stats);
 
 //! \}
 

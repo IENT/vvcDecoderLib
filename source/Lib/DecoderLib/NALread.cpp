@@ -56,7 +56,7 @@ using namespace std;
 
 //! \ingroup DecoderLib
 //! \{
-static void convertPayloadToRBSP(vector<uint8_t>& nalUnitBuf, InputBitstream *bitstream, Bool isVclNalUnit)
+static void convertPayloadToRBSP(vector<uint8_t>& nalUnitBuf, InputBitstream *bitstream, bool isVclNalUnit)
 {
   UInt zeroCount = 0;
   vector<uint8_t>::iterator it_read, it_write;
@@ -122,7 +122,7 @@ void readNalUnitHeader(InputNALUnit& nalu)
 {
   InputBitstream& bs = nalu.getBitstream();
 
-  Bool forbidden_zero_bit = bs.read(1);           // forbidden_zero_bit
+  bool forbidden_zero_bit = bs.read(1);           // forbidden_zero_bit
   if(forbidden_zero_bit != 0) { THROW( "Forbidden zero-bit not '0'" );}
   nalu.m_nalUnitType = (NalUnitType) bs.read(6);  // nal_unit_type
   nalu.m_nuhLayerId = bs.read(6);                 // nuh_layer_id

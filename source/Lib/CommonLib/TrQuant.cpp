@@ -252,9 +252,9 @@ void xTrMxN_EMT( const Int bitDepth, const Pel *residual, size_t stride, TCoeff 
 
 #if HEVC_USE_4x4_DSTVII
 #if INTRA67_3MPM
-void xITrMxN_EMT(const Int bitDepth, const TCoeff *coeff, Pel *residual, size_t stride, Int iWidth, Int iHeight, UInt uiSkipWidth, UInt uiSkipHeight, Bool useDST, const Int maxLog2TrDynamicRange, UChar ucMode, UChar ucTrIdx )
+void xITrMxN_EMT(const Int bitDepth, const TCoeff *coeff, Pel *residual, size_t stride, Int iWidth, Int iHeight, UInt uiSkipWidth, UInt uiSkipHeight, bool useDST, const Int maxLog2TrDynamicRange, UChar ucMode, UChar ucTrIdx )
 #else
-void xITrMxN_EMT( const Int bitDepth, const TCoeff *coeff, Pel *residual, size_t stride, Int iWidth, Int iHeight, UInt uiSkipWidth, UInt uiSkipHeight, Bool useDST, const Int maxLog2TrDynamicRange, UChar ucMode, UChar ucTrIdx, bool use65intraModes )
+void xITrMxN_EMT( const Int bitDepth, const TCoeff *coeff, Pel *residual, size_t stride, Int iWidth, Int iHeight, UInt uiSkipWidth, UInt uiSkipHeight, bool useDST, const Int maxLog2TrDynamicRange, UChar ucMode, UChar ucTrIdx, bool use65intraModes )
 #endif
 #else
 #if INTRA67_3MPM
@@ -947,7 +947,7 @@ void TrQuant::invTransformNxN( TransformUnit &tu, const ComponentID &compID, Pel
   if (tu.cu->transQuantBypass)
   {
     // where should this logic go?
-    const Bool rotateResidual = TU::isNonTransformedResidualRotated(tu, compID);
+    const bool rotateResidual = TU::isNonTransformedResidualRotated(tu, compID);
     const CCoeffBuf pCoeff    = tu.getCoeffs(compID);
 
     for (UInt y = 0, coefficientIndex = 0; y < uiHeight; y++)
@@ -1227,7 +1227,7 @@ void TrQuant::xITransformSkip(const CCoeffBuf     &pCoeff,
   }
 #endif
 
-  const Bool rotateResidual = TU::isNonTransformedResidualRotated( tu, compID );
+  const bool rotateResidual = TU::isNonTransformedResidualRotated( tu, compID );
 
   if( iTransformShift >= 0 )
   {
@@ -1347,7 +1347,7 @@ void TrQuant::transformNxN(TransformUnit &tu, const ComponentID &compID, const Q
     // transform and quantize
     if (CU::isLosslessCoded(*tu.cu))
     {
-      const Bool rotateResidual = TU::isNonTransformedResidualRotated( tu, compID );
+      const bool rotateResidual = TU::isNonTransformedResidualRotated( tu, compID );
 
       for( UInt y = 0; y < uiHeight; y++ )
       {
@@ -1409,10 +1409,10 @@ void TrQuant::transformNxN(TransformUnit &tu, const ComponentID &compID, const Q
 
 void TrQuant::applyForwardRDPCM(TransformUnit &tu, const ComponentID &compID, const QpParam &cQP, TCoeff &uiAbsSum, const RDPCMMode &mode)
 {
-  const Bool bLossless      = tu.cu->transQuantBypass;
+  const bool bLossless      = tu.cu->transQuantBypass;
   const UInt uiWidth        = tu.blocks[compID].width;
   const UInt uiHeight       = tu.blocks[compID].height;
-  const Bool rotateResidual = TU::isNonTransformedResidualRotated(tu, compID);
+  const bool rotateResidual = TU::isNonTransformedResidualRotated(tu, compID);
   const UInt uiSizeMinus1   = (uiWidth * uiHeight) - 1;
 
   const CPelBuf pcResidual  = tu.cs->getResiBuf(tu.blocks[compID]);
@@ -1426,7 +1426,7 @@ void TrQuant::applyForwardRDPCM(TransformUnit &tu, const ComponentID &compID, co
   const UInt  majorAxisLimit = (mode == RDPCM_VER) ? uiWidth  : uiHeight;
   const UInt  minorAxisLimit = (mode == RDPCM_VER) ? uiHeight : uiWidth;
 
-  const Bool bUseHalfRoundingPoint = (mode != RDPCM_OFF);
+  const bool bUseHalfRoundingPoint = (mode != RDPCM_OFF);
 
   uiAbsSum = 0;
 
@@ -1553,7 +1553,7 @@ void TrQuant::xTransformSkip(const TransformUnit &tu, const ComponentID &compID,
   }
 #endif
 
-  const Bool rotateResidual = TU::isNonTransformedResidualRotated( tu, compID );
+  const bool rotateResidual = TU::isNonTransformedResidualRotated( tu, compID );
   const UInt uiSizeMinus1 = ( width * height ) - 1;
 
   if( iTransformShift >= 0 )

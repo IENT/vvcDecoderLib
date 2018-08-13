@@ -174,7 +174,7 @@ void CodingStructure::setDecomp(const CompArea &_area, const bool _isCoded /*= t
 {
   const UnitScale& scale = unitScale[_area.compID];
 
-  AreaBuf<Bool> isCodedBlk( m_isDecomp[toChannelType( _area.compID )] + rsAddr( _area, area.blocks[_area.compID].pos(), area.blocks[_area.compID].width, scale ),
+  AreaBuf<bool> isCodedBlk( m_isDecomp[toChannelType( _area.compID )] + rsAddr( _area, area.blocks[_area.compID].pos(), area.blocks[_area.compID].width, scale ),
                             area.blocks[_area.compID].width >> scale.posx,
                             _area.width                     >> scale.posx,
                             _area.height                    >> scale.posy);
@@ -734,7 +734,7 @@ void CodingStructure::initSubStructure( CodingStructure& subStruct, const Channe
     unsigned numComp = ::getNumberValidChannels( area.chromaFormat );
     for( unsigned i = 0; i < numComp; i++)
     {
-      ::memcpy( subStruct.m_isDecomp[i], m_isDecomp[i], (unitScale[i].scale( area.blocks[i].size() ).area() * sizeof( Bool ) ) );
+      ::memcpy( subStruct.m_isDecomp[i], m_isDecomp[i], (unitScale[i].scale( area.blocks[i].size() ).area() * sizeof( bool ) ) );
     }
   }
 }

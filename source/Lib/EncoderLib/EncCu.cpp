@@ -1011,7 +1011,7 @@ void EncCu::xCheckModeSplit(CodingStructure *&tempCS, CodingStructure *&bestCS, 
   const Int qp                = encTestMode.qp;
   const PPS &pps              = *tempCS->pps;
   const Slice &slice          = *tempCS->slice;
-  const Bool bIsLosslessMode  = false; // False at this level. Next level down may set it to true.
+  const bool bIsLosslessMode  = false; // False at this level. Next level down may set it to true.
   const int oldPrevQp         = tempCS->prevQP[partitioner.chType];
   const UInt currDepth        = partitioner.currDepth;
 
@@ -1176,7 +1176,7 @@ void EncCu::xCheckModeSplit(CodingStructure *&tempCS, CodingStructure *&bestCS, 
 #if HEVC_TILES_WPP || HEVC_DEPENDENT_SLICES
     const UInt CtuAddr             = CU::getCtuAddr( *bestCS->getCU( partitioner.chType ) );
 #endif
-    const Bool isEndOfSlice        =    slice.getSliceMode() == FIXED_NUMBER_OF_BYTES
+    const bool isEndOfSlice        =    slice.getSliceMode() == FIXED_NUMBER_OF_BYTES
                                       && ((slice.getSliceBits() + CS::getEstBits(*bestCS)) > slice.getSliceArgument() << 3)
 #if HEVC_TILES_WPP
                                       && CtuAddr != tileMap.getCtuTsToRsAddrMap(slice.getSliceCurStartCtuTsAddr())
@@ -1188,7 +1188,7 @@ void EncCu::xCheckModeSplit(CodingStructure *&tempCS, CodingStructure *&bestCS, 
 #endif
 
 #if HEVC_DEPENDENT_SLICES
-    const Bool isEndOfSliceSegment =    slice.getSliceSegmentMode() == FIXED_NUMBER_OF_BYTES
+    const bool isEndOfSliceSegment =    slice.getSliceSegmentMode() == FIXED_NUMBER_OF_BYTES
                                       && ((slice.getSliceSegmentBits() + CS::getEstBits(*bestCS)) > slice.getSliceSegmentArgument() << 3)
                                       && CtuAddr != tileMap.getCtuTsToRsAddrMap(slice.getSliceSegmentCurStartCtuTsAddr());
                                           // Do not need to check slice condition for slice-segment since a slice-segment is a subset of a slice.
@@ -1384,7 +1384,7 @@ void EncCu::xCheckRDCostIntra( CodingStructure *&tempCS, CodingStructure *&bestC
     const int nonZeroCoeffThr = CS::isDualITree( *tempCS ) ? ( isLuma( partitioner.chType ) ? NSST_SIG_NZ_LUMA : NSST_SIG_NZ_CHROMA ) : NSST_SIG_NZ_LUMA + NSST_SIG_NZ_CHROMA;
     if( nsstIdx && tempCS->pcv->noRQT && cuCtx.numNonZeroCoeffNonTs <= nonZeroCoeffThr )
     {
-      Bool isMDIS = false;
+      bool isMDIS = false;
       if( sps.getSpsNext().isPlanarPDPC() )
       {
         CHECK( CU::getNumPUs( cu ) > 1, "PLanarPDPC: encoder MDIS condition not defined for multi PU" );
@@ -1692,7 +1692,7 @@ void EncCu::xCheckRDCostMerge2Nx2N( CodingStructure *&tempCS, CodingStructure *&
       PredictionUnit &pu  = tempCS->addPU( cu, partitioner.chType );
 
       DistParam distParam;
-      const Bool bUseHadamard= !encTestMode.lossless;
+      const bool bUseHadamard= !encTestMode.lossless;
       m_pcRdCost->setDistParam (distParam, tempCS->getOrgBuf().Y(), m_acMergeBuffer[0].Y(), sps.getBitDepth (CHANNEL_TYPE_LUMA), COMPONENT_Y, bUseHadamard);
 
       const UnitArea localUnitArea( tempCS->area.chromaFormat, Area( 0, 0, tempCS->area.Y().width, tempCS->area.Y().height) );
@@ -2066,7 +2066,7 @@ void EncCu::xCheckRDCostInterWoOBMC( CodingStructure *&tempCS, CodingStructure *
                                                    sps.getBitDepth(CHANNEL_TYPE_LUMA), COMPONENT_Y, DF_SAD_FULL_NBIT);
 #endif
   const Double    dOBMCThOff = 1.0;
-  const Bool   bCheckOBMCOff = uiSADOBMCOff * dOBMCThOff < uiSADOBMCOn;
+  const bool   bCheckOBMCOff = uiSADOBMCOff * dOBMCThOff < uiSADOBMCOn;
 
   if( !bCheckOBMCOff )
   {
@@ -2115,7 +2115,7 @@ void EncCu::xCheckRDCostMerge2Nx2NFRUC( CodingStructure *&tempCS, CodingStructur
     return;   // never check merge in fast delta-qp mode
   }
 
-  Bool transQuantBypass = tempCS->isLossless;
+  bool transQuantBypass = tempCS->isLossless;
 
   MergeCtx mergeCtx;
   const SPS &sps = *tempCS->sps;
@@ -2137,7 +2137,7 @@ void EncCu::xCheckRDCostMerge2Nx2NFRUC( CodingStructure *&tempCS, CodingStructur
 #endif
     tempCS->initStructData( encTestMode.qp, encTestMode.lossless );
 
-    Bool bAvailable        = false;
+    bool bAvailable        = false;
 
     CodingUnit &cu         = tempCS->addCU( tempCS->area, partitioner.chType );
 

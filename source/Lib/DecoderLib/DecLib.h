@@ -107,26 +107,26 @@ private:
   CacheModel              m_cacheModel;
 #endif
 
-  Bool isSkipPictureForBLA(Int& iPOCLastDisplay);
-  Bool isRandomAccessSkipPicture(Int& iSkipFrame,  Int& iPOCLastDisplay);
+  bool isSkipPictureForBLA(Int& iPOCLastDisplay);
+  bool isRandomAccessSkipPicture(Int& iSkipFrame,  Int& iPOCLastDisplay);
   Picture*                m_pcPic;
   UInt                    m_uiSliceSegmentIdx;
   Int                     m_prevPOC;
   Int                     m_prevTid0POC;
-  Bool                    m_bFirstSliceInPicture;
-  Bool                    m_bFirstSliceInSequence;
-  Bool                    m_prevSliceSkipped;
+  bool                    m_bFirstSliceInPicture;
+  bool                    m_bFirstSliceInSequence;
+  bool                    m_prevSliceSkipped;
   Int                     m_skippedPOC;
-  Bool                    m_bFirstSliceInBitstream;
+  bool                    m_bFirstSliceInBitstream;
   Int                     m_lastPOCNoOutputPriorPics;
-  Bool                    m_isNoOutputPriorPics;
-  Bool                    m_craNoRaslOutputFlag;    //value of variable NoRaslOutputFlag of the last CRA pic
+  bool                    m_isNoOutputPriorPics;
+  bool                    m_craNoRaslOutputFlag;    //value of variable NoRaslOutputFlag of the last CRA pic
   std::ostream           *m_pDecodedSEIOutputStream;
 
   Int                     m_decodedPictureHashSEIEnabled;  ///< Checksum(3)/CRC(2)/MD5(1)/disable(0) acting on decoded picture hash SEI message
   UInt                    m_numberOfChecksumErrorsDetected;
 
-  Bool                    m_warningMessageSkipPicture;
+  bool                    m_warningMessageSkipPicture;
 
   std::list<InputNALUnit*> m_prefixSEINALUs; /// Buffered up prefix SEI NAL Units.
 public:
@@ -143,7 +143,7 @@ public:
     const std::string& cacheCfgFileName
 #endif
   );
-  Bool  decode(InputNALUnit& nalu, Int& iSkipFrame, Int& iPOCLastDisplay);
+  bool  decode(InputNALUnit& nalu, Int& iSkipFrame, Int& iPOCLastDisplay);
   void  deletePicBuffer();
 
   void  executeLoopFilters();
@@ -151,10 +151,10 @@ public:
   void  finishPictureLight(Int& poc, PicList*& rpcListPic );
   void  checkNoOutputPriorPics (PicList* rpcListPic);
 
-  Bool  getNoOutputPriorPicsFlag () const   { return m_isNoOutputPriorPics; }
-  void  setNoOutputPriorPicsFlag (Bool val) { m_isNoOutputPriorPics = val; }
+  bool  getNoOutputPriorPicsFlag () const   { return m_isNoOutputPriorPics; }
+  void  setNoOutputPriorPicsFlag (bool val) { m_isNoOutputPriorPics = val; }
   void  setFirstSliceInPicture (bool val)  { m_bFirstSliceInPicture = val; }
-  Bool  getFirstSliceInSequence () const   { return m_bFirstSliceInSequence; }
+  bool  getFirstSliceInSequence () const   { return m_bFirstSliceInSequence; }
   void  setFirstSliceInSequence (bool val) { m_bFirstSliceInSequence = val; }
   void  setDecodedSEIMessageOutputStream(std::ostream *pOpStream) { m_pDecodedSEIOutputStream = pOpStream; }
   UInt  getNumberOfChecksumErrorsDetected() const { return m_numberOfChecksumErrorsDetected; }
@@ -166,7 +166,7 @@ protected:
   void  xCreateLostPicture (Int iLostPOC);
 
   void      xActivateParameterSets();
-  Bool      xDecodeSlice(InputNALUnit &nalu, Int &iSkipFrame, Int iPOCLastDisplay);
+  bool      xDecodeSlice(InputNALUnit &nalu, Int &iSkipFrame, Int iPOCLastDisplay);
 #if HEVC_VPS
   void      xDecodeVPS( InputNALUnit& nalu );
 #endif

@@ -192,7 +192,7 @@ std::istringstream &operator>>(std::istringstream &in, GOPEntry &entry)     //in
   return in;
 }
 
-Bool confirmPara(Bool bflag, const TChar* message);
+bool confirmPara(bool bflag, const TChar* message);
 
 static inline ChromaFormat numberToChromaFormat(const Int val)
 {
@@ -438,7 +438,7 @@ struct SMultiValueInput
   SMultiValueInput<T> &operator=(const std::vector<T> &userValues) { values=userValues; return *this; }
   SMultiValueInput<T> &operator=(const SMultiValueInput<T> &userValues) { values=userValues.values; return *this; }
 
-  T readValue(const TChar *&pStr, Bool &bSuccess);
+  T readValue(const TChar *&pStr, bool &bSuccess);
 
   istream& readValues(std::istream &in);
 };
@@ -450,7 +450,7 @@ static inline istream& operator >> (std::istream &in, SMultiValueInput<T> &value
 }
 
 template<>
-UInt SMultiValueInput<UInt>::readValue(const TChar *&pStr, Bool &bSuccess)
+UInt SMultiValueInput<UInt>::readValue(const TChar *&pStr, bool &bSuccess)
 {
   TChar *eptr;
   UInt val=strtoul(pStr, &eptr, 0);
@@ -460,7 +460,7 @@ UInt SMultiValueInput<UInt>::readValue(const TChar *&pStr, Bool &bSuccess)
 }
 
 template<>
-Int SMultiValueInput<Int>::readValue(const TChar *&pStr, Bool &bSuccess)
+Int SMultiValueInput<Int>::readValue(const TChar *&pStr, bool &bSuccess)
 {
   TChar *eptr;
   Int val=strtol(pStr, &eptr, 0);
@@ -470,7 +470,7 @@ Int SMultiValueInput<Int>::readValue(const TChar *&pStr, Bool &bSuccess)
 }
 
 template<>
-Double SMultiValueInput<Double>::readValue(const TChar *&pStr, Bool &bSuccess)
+Double SMultiValueInput<Double>::readValue(const TChar *&pStr, bool &bSuccess)
 {
   TChar *eptr;
   Double val=strtod(pStr, &eptr);
@@ -480,7 +480,7 @@ Double SMultiValueInput<Double>::readValue(const TChar *&pStr, Bool &bSuccess)
 }
 
 template<>
-Bool SMultiValueInput<Bool>::readValue(const TChar *&pStr, Bool &bSuccess)
+bool SMultiValueInput<bool>::readValue(const TChar *&pStr, bool &bSuccess)
 {
   TChar *eptr;
   Int val=strtol(pStr, &eptr, 0);
@@ -506,7 +506,7 @@ istream& SMultiValueInput<T>::readValues(std::istream &in)
 
     while (*pStr != 0)
     {
-      Bool bSuccess=true;
+      bool bSuccess=true;
       T val=readValue(pStr, bSuccess);
       if (!bSuccess)
       {
@@ -555,10 +555,10 @@ static inline istream& operator >> (std::istream &in, EncAppCfg::OptionalValue<T
 #endif
 
 static void
-automaticallySelectRExtProfile(const Bool bUsingGeneralRExtTools,
-                               const Bool bUsingChromaQPAdjustment,
-                               const Bool bUsingExtendedPrecision,
-                               const Bool bIntraConstraintFlag,
+automaticallySelectRExtProfile(const bool bUsingGeneralRExtTools,
+                               const bool bUsingChromaQPAdjustment,
+                               const bool bUsingExtendedPrecision,
+                               const bool bIntraConstraintFlag,
                                UInt &bitDepthConstraint,
                                ChromaFormat &chromaFormatConstraint,
                                const Int  maxBitDepth,
@@ -637,9 +637,9 @@ automaticallySelectRExtProfile(const Bool bUsingGeneralRExtTools,
     \param  argv        array of arguments
     \retval             true when success
  */
-Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
+bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
 {
-  Bool do_help = false;
+  bool do_help = false;
 
   Int tmpChromaFormat;
   Int tmpInputChromaFormat;
@@ -683,19 +683,19 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
   SMultiValueInput<Int>  cfg_DisplayPrimariesCode            (0, 50000, 6, 6, defaultPrimaryCodes,   sizeof(defaultPrimaryCodes  )/sizeof(Int));
   SMultiValueInput<Int>  cfg_DisplayWhitePointCode           (0, 50000, 2, 2, defaultWhitePointCode, sizeof(defaultWhitePointCode)/sizeof(Int));
 
-  SMultiValueInput<Bool> cfg_timeCodeSeiTimeStampFlag        (0,  1, 0, MAX_TIMECODE_SEI_SETS);
-  SMultiValueInput<Bool> cfg_timeCodeSeiNumUnitFieldBasedFlag(0,  1, 0, MAX_TIMECODE_SEI_SETS);
+  SMultiValueInput<bool> cfg_timeCodeSeiTimeStampFlag        (0,  1, 0, MAX_TIMECODE_SEI_SETS);
+  SMultiValueInput<bool> cfg_timeCodeSeiNumUnitFieldBasedFlag(0,  1, 0, MAX_TIMECODE_SEI_SETS);
   SMultiValueInput<Int>  cfg_timeCodeSeiCountingType         (0,  6, 0, MAX_TIMECODE_SEI_SETS);
-  SMultiValueInput<Bool> cfg_timeCodeSeiFullTimeStampFlag    (0,  1, 0, MAX_TIMECODE_SEI_SETS);
-  SMultiValueInput<Bool> cfg_timeCodeSeiDiscontinuityFlag    (0,  1, 0, MAX_TIMECODE_SEI_SETS);
-  SMultiValueInput<Bool> cfg_timeCodeSeiCntDroppedFlag       (0,  1, 0, MAX_TIMECODE_SEI_SETS);
+  SMultiValueInput<bool> cfg_timeCodeSeiFullTimeStampFlag    (0,  1, 0, MAX_TIMECODE_SEI_SETS);
+  SMultiValueInput<bool> cfg_timeCodeSeiDiscontinuityFlag    (0,  1, 0, MAX_TIMECODE_SEI_SETS);
+  SMultiValueInput<bool> cfg_timeCodeSeiCntDroppedFlag       (0,  1, 0, MAX_TIMECODE_SEI_SETS);
   SMultiValueInput<Int>  cfg_timeCodeSeiNumberOfFrames       (0,511, 0, MAX_TIMECODE_SEI_SETS);
   SMultiValueInput<Int>  cfg_timeCodeSeiSecondsValue         (0, 59, 0, MAX_TIMECODE_SEI_SETS);
   SMultiValueInput<Int>  cfg_timeCodeSeiMinutesValue         (0, 59, 0, MAX_TIMECODE_SEI_SETS);
   SMultiValueInput<Int>  cfg_timeCodeSeiHoursValue           (0, 23, 0, MAX_TIMECODE_SEI_SETS);
-  SMultiValueInput<Bool> cfg_timeCodeSeiSecondsFlag          (0,  1, 0, MAX_TIMECODE_SEI_SETS);
-  SMultiValueInput<Bool> cfg_timeCodeSeiMinutesFlag          (0,  1, 0, MAX_TIMECODE_SEI_SETS);
-  SMultiValueInput<Bool> cfg_timeCodeSeiHoursFlag            (0,  1, 0, MAX_TIMECODE_SEI_SETS);
+  SMultiValueInput<bool> cfg_timeCodeSeiSecondsFlag          (0,  1, 0, MAX_TIMECODE_SEI_SETS);
+  SMultiValueInput<bool> cfg_timeCodeSeiMinutesFlag          (0,  1, 0, MAX_TIMECODE_SEI_SETS);
+  SMultiValueInput<bool> cfg_timeCodeSeiHoursFlag            (0,  1, 0, MAX_TIMECODE_SEI_SETS);
   SMultiValueInput<Int>  cfg_timeCodeSeiTimeOffsetLength     (0, 31, 0, MAX_TIMECODE_SEI_SETS);
   SMultiValueInput<Int>  cfg_timeCodeSeiTimeOffsetValue      (std::numeric_limits<Int>::min(), std::numeric_limits<Int>::max(), 0, MAX_TIMECODE_SEI_SETS);
   Int warnUnknowParameter = 0;
@@ -1529,15 +1529,15 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
     if (m_bitDepthConstraint == 0 && tmpConstraintChromaFormat == 0)
     {
       // produce a valid combination, if possible.
-      const Bool bUsingGeneralRExtTools  = m_transformSkipRotationEnabledFlag        ||
+      const bool bUsingGeneralRExtTools  = m_transformSkipRotationEnabledFlag        ||
                                            m_transformSkipContextEnabledFlag         ||
                                            m_rdpcmEnabledFlag[RDPCM_SIGNAL_IMPLICIT] ||
                                            m_rdpcmEnabledFlag[RDPCM_SIGNAL_EXPLICIT] ||
                                            !m_enableIntraReferenceSmoothing          ||
                                            m_persistentRiceAdaptationEnabledFlag     ||
                                            m_log2MaxTransformSkipBlockSize!=2;
-      const Bool bUsingChromaQPAdjustment= m_diffCuChromaQpOffsetDepth >= 0;
-      const Bool bUsingExtendedPrecision = m_extendedPrecisionProcessingFlag;
+      const bool bUsingChromaQPAdjustment= m_diffCuChromaQpOffsetDepth >= 0;
+      const bool bUsingExtendedPrecision = m_extendedPrecisionProcessingFlag;
       if (m_onePictureOnlyConstraintFlag)
       {
         m_chromaFormatConstraint = CHROMA_444;
@@ -1919,7 +1919,7 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
 // Private member functions
 // ====================================================================================================================
 
-Bool EncAppCfg::xCheckParameter()
+bool EncAppCfg::xCheckParameter()
 {
   msg( NOTICE, "\n" );
   if (m_decodedPictureHashSEIType==HASHTYPE_NONE)
@@ -1943,7 +1943,7 @@ Bool EncAppCfg::xCheckParameter()
     msg( DETAILS, "***************************************************************************\n");
   }
 
-  Bool check_failed = false; /* abort if there is a fatal configuration problem */
+  bool check_failed = false; /* abort if there is a fatal configuration problem */
 #define xConfirmPara(a,b) check_failed |= confirmPara(a,b)
 
 
@@ -2167,17 +2167,17 @@ Bool EncAppCfg::xCheckParameter()
       const UInt intraIdx = m_intraConstraintFlag ? 1:0;
       const UInt bitDepthIdx = (m_bitDepthConstraint == 8 ? 0 : (m_bitDepthConstraint ==10 ? 1 : (m_bitDepthConstraint == 12 ? 2 : (m_bitDepthConstraint == 16 ? 3 : 4 ))));
       const UInt chromaFormatIdx = UInt(m_chromaFormatConstraint);
-      const Bool bValidProfile = (bitDepthIdx > 3 || chromaFormatIdx>3) ? false : (validRExtProfileNames[intraIdx][bitDepthIdx][chromaFormatIdx] != NONE);
+      const bool bValidProfile = (bitDepthIdx > 3 || chromaFormatIdx>3) ? false : (validRExtProfileNames[intraIdx][bitDepthIdx][chromaFormatIdx] != NONE);
       xConfirmPara(!bValidProfile, "Invalid intra constraint flag, bit depth constraint flag and chroma format constraint flag combination for a RExt profile");
-      const Bool bUsingGeneralRExtTools  = m_transformSkipRotationEnabledFlag        ||
+      const bool bUsingGeneralRExtTools  = m_transformSkipRotationEnabledFlag        ||
                                            m_transformSkipContextEnabledFlag         ||
                                            m_rdpcmEnabledFlag[RDPCM_SIGNAL_IMPLICIT] ||
                                            m_rdpcmEnabledFlag[RDPCM_SIGNAL_EXPLICIT] ||
                                            !m_enableIntraReferenceSmoothing          ||
                                            m_persistentRiceAdaptationEnabledFlag     ||
                                            m_log2MaxTransformSkipBlockSize!=2;
-      const Bool bUsingChromaQPTool      = m_diffCuChromaQpOffsetDepth >= 0;
-      const Bool bUsingExtendedPrecision = m_extendedPrecisionProcessingFlag;
+      const bool bUsingChromaQPTool      = m_diffCuChromaQpOffsetDepth >= 0;
+      const bool bUsingExtendedPrecision = m_extendedPrecisionProcessingFlag;
 
       xConfirmPara((m_chromaFormatConstraint==CHROMA_420 || m_chromaFormatConstraint==CHROMA_400) && bUsingChromaQPTool, "CU Chroma QP adjustment cannot be used for 4:0:0 or 4:2:0 RExt profiles");
       xConfirmPara(m_bitDepthConstraint != 16 && bUsingExtendedPrecision, "Extended precision can only be used in 16-bit RExt profiles");
@@ -2469,7 +2469,7 @@ Bool EncAppCfg::xCheckParameter()
 #endif
 
 #if HEVC_TILES_WPP
-  Bool tileFlag = (m_numTileColumnsMinus1 > 0 || m_numTileRowsMinus1 > 0 );
+  bool tileFlag = (m_numTileColumnsMinus1 > 0 || m_numTileRowsMinus1 > 0 );
   if (m_profile!=Profile::HIGHTHROUGHPUTREXT)
   {
     xConfirmPara( tileFlag && m_entropyCodingSyncEnabledFlag, "Tiles and entropy-coding-sync (Wavefronts) can not be applied together, except in the High Throughput Intra 4:4:4 16 profile");
@@ -2533,8 +2533,8 @@ Bool EncAppCfg::xCheckParameter()
     xConfirmPara( m_intraConstraintFlag, "IntraConstraintFlag cannot be 1 for inter sequences");
   }
 
-  Bool verifiedGOP=false;
-  Bool errorGOP=false;
+  bool verifiedGOP=false;
+  bool errorGOP=false;
   Int checkGOP=1;
   Int numRefs = m_isField ? 2 : 1;
   Int refList[MAX_NUM_REF_PICS+1];
@@ -2543,7 +2543,7 @@ Bool EncAppCfg::xCheckParameter()
   {
     refList[1] = 1;
   }
-  Bool isOK[MAX_GOP];
+  bool isOK[MAX_GOP];
   for(Int i=0; i<MAX_GOP; i++)
   {
     isOK[i]=false;
@@ -2596,7 +2596,7 @@ Bool EncAppCfg::xCheckParameter()
     else
     {
       //check that all reference pictures are available, or have a POC < 0 meaning they might be available in the next GOP.
-      Bool beforeI = false;
+      bool beforeI = false;
       for(Int i = 0; i< m_GOPList[curGOP].m_numRefPics; i++)
       {
         Int absPOC = curPOC+m_GOPList[curGOP].m_referencePics[i];
@@ -2606,7 +2606,7 @@ Bool EncAppCfg::xCheckParameter()
         }
         else
         {
-          Bool found=false;
+          bool found=false;
           for(Int j=0; j<numRefs; j++)
           {
             if(refList[j]==absPOC)
@@ -2669,7 +2669,7 @@ Bool EncAppCfg::xCheckParameter()
           Int offPOC = ((checkGOP-1+offset)/m_iGOPSize)*m_iGOPSize + m_GOPList[offGOP].m_POC;
           if(offPOC>=0&&m_GOPList[offGOP].m_temporalId<=m_GOPList[curGOP].m_temporalId)
           {
-            Bool newRef=false;
+            bool newRef=false;
             for(Int i=0; i<numRefs; i++)
             {
               if(refList[i]==offPOC)
@@ -3420,7 +3420,7 @@ void EncAppCfg::xPrintParameter()
   fflush( stdout );
 }
 
-Bool confirmPara(Bool bflag, const TChar* message)
+bool confirmPara(bool bflag, const TChar* message)
 {
   if (!bflag)
   {

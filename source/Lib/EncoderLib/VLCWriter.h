@@ -113,8 +113,8 @@ public:
   void  init( CABACDataStore& cabacDataStore ) { m_CABACDataStore = &cabacDataStore; }
 #endif
 private:
-  void xCodeShortTermRefPicSet  ( const ReferencePictureSet* pcRPS, Bool calledFromSliceHeader, Int idx );
-  Bool xFindMatchingLTRP        ( Slice* pcSlice, UInt *ltrpsIndex, Int ltrpPOC, Bool usedFlag );
+  void xCodeShortTermRefPicSet  ( const ReferencePictureSet* pcRPS, bool calledFromSliceHeader, Int idx );
+  bool xFindMatchingLTRP        ( Slice* pcSlice, UInt *ltrpsIndex, Int ltrpPOC, bool usedFlag );
   void xCodePredWeightTable     ( Slice* pcSlice );
 #if HEVC_USE_SCALING_LISTS
   void xCodeScalingList         ( const ScalingList* scalingList, UInt sizeId, UInt listId);
@@ -133,9 +133,9 @@ public:
   void  codeVPS                 ( const VPS* pcVPS );
 #endif
   void  codeSliceHeader         ( Slice* pcSlice );
-  void  codePTL                 ( const PTL* pcPTL, Bool profilePresentFlag, Int maxNumSubLayersMinus1);
-  void  codeProfileTier         ( const ProfileTierLevel* ptl, const Bool bIsSubLayer );
-  void  codeHrdParameters       ( const HRD *hrd, Bool commonInfPresentFlag, UInt maxNumSubLayersMinus1 );
+  void  codePTL                 ( const PTL* pcPTL, bool profilePresentFlag, Int maxNumSubLayersMinus1);
+  void  codeProfileTier         ( const ProfileTierLevel* ptl, const bool bIsSubLayer );
+  void  codeHrdParameters       ( const HRD *hrd, bool commonInfPresentFlag, UInt maxNumSubLayersMinus1 );
 #if HEVC_TILES_WPP
   void  codeTilesWPPEntryPoint  ( Slice* pSlice );
 #endif

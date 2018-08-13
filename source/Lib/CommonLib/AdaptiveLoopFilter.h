@@ -265,9 +265,9 @@ protected:
   Int**     m_filterCoeffTmp;
   Int**     m_filterCoeffSymTmp;
 
-  Bool      m_isGALF;
-  Bool      m_wasCreated;
-  Bool      m_isDec;
+  bool      m_isGALF;
+  bool      m_wasCreated;
+  bool      m_isDec;
 
 public:
 
@@ -338,18 +338,18 @@ public:
   // alloc & free & set functions //TODO move to ALFParam class
   void allocALFParam  ( ALFParam* pAlfParam );
   void freeALFParam   ( ALFParam* pAlfParam );
-  void copyALFParam   ( ALFParam* pDesAlfParam, ALFParam* pSrcAlfParam, Bool max_depth_copy = true );
+  void copyALFParam   ( ALFParam* pDesAlfParam, ALFParam* pSrcAlfParam, bool max_depth_copy = true );
 
   void storeALFParam  ( ALFParam* pAlfParam, bool isISlice, unsigned tLayer, unsigned tLayerMax );
   void loadALFParam   ( ALFParam* pAlfParam, unsigned idx, unsigned tLayer );
 
   void resetALFParam  ( ALFParam* pDesAlfParam);
-  void resetALFPredParam(ALFParam *pAlfParam, Bool bIntra);
+  void resetALFPredParam(ALFParam *pAlfParam, bool bIntra);
   void setNumCUsInFrame(UInt uiNumCUsInFrame);
 
   // predict filter coefficients
   void predictALFCoeffChroma  ( ALFParam* pAlfParam );                  ///< prediction of chroma ALF coefficients
-  void initVarForChroma(ALFParam* pcAlfParam, Bool bUpdatedDCCoef);
+  void initVarForChroma(ALFParam* pcAlfParam, bool bUpdatedDCCoef);
 
   void refreshAlfTempPred();
 

@@ -291,7 +291,7 @@ void SampleAdaptiveOffset::xReconstructBlkSAOParams(CodingStructure& cs, SAOBlkP
 
 void SampleAdaptiveOffset::offsetBlock(const Int channelBitDepth, const ClpRng& clpRng, Int typeIdx, Int* offset
                                           , const Pel* srcBlk, Pel* resBlk, Int srcStride, Int resStride,  Int width, Int height
-                                          , Bool isLeftAvail,  Bool isRightAvail, Bool isAboveAvail, Bool isBelowAvail, Bool isAboveLeftAvail, Bool isAboveRightAvail, Bool isBelowLeftAvail, Bool isBelowRightAvail)
+                                          , bool isLeftAvail,  bool isRightAvail, bool isAboveAvail, bool isBelowAvail, bool isAboveLeftAvail, bool isAboveRightAvail, bool isBelowLeftAvail, bool isBelowRightAvail)
 {
   Int x,y, startX, startY, endX, endY, edgeType;
   Int firstLineStartX, firstLineEndX, lastLineStartX, lastLineEndX;
@@ -510,7 +510,7 @@ void SampleAdaptiveOffset::offsetBlock(const Int channelBitDepth, const ClpRng& 
 void SampleAdaptiveOffset::offsetCTU( const UnitArea& area, const CPelUnitBuf& src, PelUnitBuf& res, SAOBlkParam& saoblkParam, CodingStructure& cs)
 {
   const UInt numberOfComponents = getNumberValidComponents( area.chromaFormat );
-  Bool bAllOff=true;
+  bool bAllOff=true;
   for( UInt compIdx = 0; compIdx < numberOfComponents; compIdx++)
   {
     if (saoblkParam[compIdx].modeIdc != SAO_MODE_OFF)
@@ -523,7 +523,7 @@ void SampleAdaptiveOffset::offsetCTU( const UnitArea& area, const CPelUnitBuf& s
     return;
   }
 
-  Bool isLeftAvail, isRightAvail, isAboveAvail, isBelowAvail, isAboveLeftAvail, isAboveRightAvail, isBelowLeftAvail, isBelowRightAvail;
+  bool isLeftAvail, isRightAvail, isAboveAvail, isBelowAvail, isAboveLeftAvail, isAboveRightAvail, isBelowLeftAvail, isBelowRightAvail;
 
   //block boundary availability
   deriveLoopFilterBoundaryAvailibility(cs, area.Y(), isLeftAvail,isRightAvail,isAboveAvail,isBelowAvail,isAboveLeftAvail,isAboveRightAvail,isBelowLeftAvail,isBelowRightAvail);
@@ -569,7 +569,7 @@ void SampleAdaptiveOffset::SAOProcess( CodingStructure& cs, SAOBlkParam* saoBlkP
   xReconstructBlkSAOParams(cs, saoBlkParams);
 
   const UInt numberOfComponents = getNumberValidComponents(cs.area.chromaFormat);
-  Bool bAllDisabled = true;
+  bool bAllDisabled = true;
   for (UInt compIdx = 0; compIdx < numberOfComponents; compIdx++)
   {
     if (m_picSAOEnabled[compIdx])
@@ -614,7 +614,7 @@ void SampleAdaptiveOffset::SAOProcess( CodingStructure& cs, SAOBlkParam* saoBlkP
 void SampleAdaptiveOffset::xPCMLFDisableProcess(CodingStructure& cs)
 {
   const PreCalcValues& pcv = *cs.pcv;
-  const Bool bPCMFilter = (cs.sps->getUsePCM() && cs.sps->getPCMFilterDisableFlag()) ? true : false;
+  const bool bPCMFilter = (cs.sps->getUsePCM() && cs.sps->getPCMFilterDisableFlag()) ? true : false;
 
   if( bPCMFilter || cs.pps->getTransquantBypassEnabledFlag() )
   {
@@ -683,14 +683,14 @@ void SampleAdaptiveOffset::xPCMSampleRestoration(CodingUnit& cu, const Component
 }
 
 void SampleAdaptiveOffset::deriveLoopFilterBoundaryAvailibility(CodingStructure& cs, const Position &pos,
-  Bool& isLeftAvail,
-  Bool& isRightAvail,
-  Bool& isAboveAvail,
-  Bool& isBelowAvail,
-  Bool& isAboveLeftAvail,
-  Bool& isAboveRightAvail,
-  Bool& isBelowLeftAvail,
-  Bool& isBelowRightAvail
+  bool& isLeftAvail,
+  bool& isRightAvail,
+  bool& isAboveAvail,
+  bool& isBelowAvail,
+  bool& isAboveLeftAvail,
+  bool& isAboveRightAvail,
+  bool& isBelowLeftAvail,
+  bool& isBelowRightAvail
   ) const
 {
   const int width = cs.pcv->maxCUWidth;

@@ -625,7 +625,7 @@ void EncApp::xDestroyLib()
   m_cEncLib.destroy();
 }
 
-void EncApp::xInitLib(Bool isFieldCoding)
+void EncApp::xInitLib(bool isFieldCoding)
 {
   m_cEncLib.init(isFieldCoding, this );
 }
@@ -661,7 +661,7 @@ void EncApp::encode()
 
   // main encoder loop
   Int   iNumEncoded = 0;
-  Bool  bEos = false;
+  bool  bEos = false;
 
   const InputColourSpaceConversion ipCSC  =  m_inputColourSpaceConvert;
   const InputColourSpaceConversion snrCSC = (!m_snrInternalColourSpace) ? m_inputColourSpaceConvert : IPCOLOURSPACE_UNCHANGED;
@@ -698,7 +698,7 @@ void EncApp::encode()
 
     bEos = (m_isField && (m_iFrameRcvd == (m_framesToBeEncoded >> 1) )) || ( !m_isField && (m_iFrameRcvd == m_framesToBeEncoded) );
 
-    Bool flush = 0;
+    bool flush = 0;
     // if end of file (which is only detected on a read failure) flush the encoder of any queued pictures
     if (m_cVideoIOYuvInputFile.isEof())
     {

@@ -150,9 +150,9 @@ public:
   void          _initRdCostX86();
 #endif
 
-  void           setDistParam( DistParam &rcDP, const CPelBuf &org, const Pel* piRefY , Int iRefStride, Int bitDepth, ComponentID compID, Int subShiftMode = 0, Int step = 1, Bool useHadamard = false );
-  void           setDistParam( DistParam &rcDP, const CPelBuf &org, const CPelBuf &cur, Int bitDepth, ComponentID compID, Bool useHadamard = false );
-  void           setDistParam( DistParam &rcDP, const Pel* pOrg, const Pel* piRefY, Int iOrgStride, Int iRefStride, Int bitDepth, ComponentID compID, Int width, Int height, Int subShiftMode = 0, Int step = 1, Bool useHadamard = false );
+  void           setDistParam( DistParam &rcDP, const CPelBuf &org, const Pel* piRefY , Int iRefStride, Int bitDepth, ComponentID compID, Int subShiftMode = 0, Int step = 1, bool useHadamard = false );
+  void           setDistParam( DistParam &rcDP, const CPelBuf &org, const CPelBuf &cur, Int bitDepth, ComponentID compID, bool useHadamard = false );
+  void           setDistParam( DistParam &rcDP, const Pel* pOrg, const Pel* piRefY, Int iOrgStride, Int iRefStride, Int bitDepth, ComponentID compID, Int width, Int height, Int subShiftMode = 0, Int step = 1, bool useHadamard = false );
 
   double         getMotionLambda          ( bool bIsTransquantBypass ) { return m_dLambdaMotionSAD[(bIsTransquantBypass && m_costMode==COST_MIXED_LOSSLESS_LOSSY_CODING)?1:0]; }
   void           selectMotionLambda       ( bool bIsTransquantBypass ) { m_motionLambda = getMotionLambda( bIsTransquantBypass ); }

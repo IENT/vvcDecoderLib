@@ -157,7 +157,7 @@ inline void dtraceModeCost(CodingStructure &cs, double lambda)
 
 inline void dtraceBestMode(CodingStructure *&tempCS, CodingStructure *&bestCS, double lambda)
 {
-  Bool bSplitCS = tempCS->cus.size() > 1 || bestCS->cus.size() > 1;
+  bool bSplitCS = tempCS->cus.size() > 1 || bestCS->cus.size() > 1;
   ChannelType chType = tempCS->cus.back()->chType;
 
   // if the last CU does not align with the CS, we probably are at the edge

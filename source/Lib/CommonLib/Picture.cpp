@@ -677,7 +677,7 @@ UInt TileMap::calculateNextCtuRSAddr( const UInt currCtuRsAddr ) const
   return nextCtuRsAddr;
 }
 
-UInt TileMap::getSubstreamForCtuAddr(const UInt ctuAddr, const Bool bAddressInRaster, Slice *pcSlice) const
+UInt TileMap::getSubstreamForCtuAddr(const UInt ctuAddr, const bool bAddressInRaster, Slice *pcSlice) const
 {
   const bool bWPPEnabled = pcSlice->getPPS()->getEntropyCodingSyncEnabledFlag();
   UInt subStrm;

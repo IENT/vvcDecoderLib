@@ -152,7 +152,7 @@ struct TileMap
   UInt getTileIdxMap( const Position& pos )  const { return getTileIdxMap( ( pos.x / pcv->maxCUWidth ) + ( pos.y / pcv->maxCUHeight ) * pcv->widthInCtus ); };
   UInt getCtuTsToRsAddrMap( UInt ctuTsAddr ) const { return *(ctuTsToRsAddrMap + (ctuTsAddr>=pcv->sizeInCtus ? pcv->sizeInCtus : ctuTsAddr)); }
   UInt getCtuRsToTsAddrMap( UInt ctuRsAddr ) const { return *(ctuRsToTsAddrMap + (ctuRsAddr>=pcv->sizeInCtus ? pcv->sizeInCtus : ctuRsAddr)); }
-  UInt getSubstreamForCtuAddr(const UInt ctuAddr, const Bool bAddressInRaster, Slice *pcSlice) const;
+  UInt getSubstreamForCtuAddr(const UInt ctuAddr, const bool bAddressInRaster, Slice *pcSlice) const;
 
   const PreCalcValues* pcv;
   std::vector<Tile> tiles;

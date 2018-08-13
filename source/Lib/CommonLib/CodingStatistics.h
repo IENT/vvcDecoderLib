@@ -204,7 +204,7 @@ static inline const TChar* getName(CodingStatisticsType name)
   return statNames[name];
 }
 
-static inline Bool isAlignedBins( CodingStatisticsType statT ) { return statT == STATS__CABAC_BITS__ALIGNED_SIGN_BIT || statT == STATS__CABAC_BITS__ALIGNED_ESCAPE_BITS; }
+static inline bool isAlignedBins( CodingStatisticsType statT ) { return statT == STATS__CABAC_BITS__ALIGNED_SIGN_BIT || statT == STATS__CABAC_BITS__ALIGNED_ESCAPE_BITS; }
 
 static const UInt CODING_STATS_NUM_WIDTHS     = 20; // just define the number of widths and heigts as 15
 static const UInt CODING_STATS_NUM_HEIGHTS    = 20;
@@ -440,7 +440,7 @@ public:
       SStat cabacSubTotal, epSubTotal;
       cabacSubTotal.classCount = classCounts[i];
       epSubTotal   .classCount = classCounts[i];
-      Bool bHadClassifiedEntry = false;
+      bool bHadClassifiedEntry = false;
 
       const TChar *pName = getName( CodingStatisticsType( i ) );
 

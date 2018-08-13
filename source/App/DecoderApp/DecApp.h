@@ -80,7 +80,7 @@ private:
   void  xDestroyDecLib    (); ///< destroy internal classes
   void  xWriteOutput      ( PicList* pcListPic , UInt tId); ///< write YUV to file
   void  xFlushOutput      ( PicList* pcListPic ); ///< flush all remaining decoded pictures to file
-  Bool  isNaluWithinTargetDecLayerIdSet ( InputNALUnit* nalu ); ///< check whether given Nalu is within targetDecLayerIdSet
+  bool  isNaluWithinTargetDecLayerIdSet ( InputNALUnit* nalu ); ///< check whether given Nalu is within targetDecLayerIdSet
 };
 
 //! \}
