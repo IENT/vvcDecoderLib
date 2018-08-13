@@ -139,7 +139,13 @@ Void EncLib::create ()
   }
 
   m_cLoopFilter.create( m_maxTotalCUDepth );
-#if JEM_TOOLS
+
+#if JVET_K0371_ALF
+  if( m_alf )
+  {
+    m_cEncALF.create( getSourceWidth(), getSourceHeight(), m_chromaFormatIDC, m_maxCUWidth, m_maxCUHeight, m_maxTotalCUDepth, m_bitDepth, m_inputBitDepth );
+  }
+#elif JEM_TOOLS
 
   if( m_ALF )
   {
@@ -168,7 +174,12 @@ Void EncLib::destroy ()
 #else
   m_cCuEncoder.         destroy();
 #endif
-#if JEM_TOOLS
+#if JVET_K0371_ALF
+  if( m_alf )
+  {
+    m_cEncALF.destroy();
+  }
+#elif JEM_TOOLS
   m_cEncALF.            destroy();
 #endif
   m_cEncSAO.            destroyEncData();
@@ -894,8 +905,10 @@ Void EncLib::xInitSPS(SPS &sps)
 #endif
 #if JEM_TOOLS
   sps.getSpsNext().setUseIntraPDPC          ( m_IntraPDPC );
+#if !JVET_K0371_ALF
   sps.getSpsNext().setALFEnabled            ( 0 != m_ALF );
   sps.getSpsNext().setGALFEnabled           ( 2 == m_ALF );
+#endif
   sps.getSpsNext().setUseOBMC               ( m_OBMC );
   sps.getSpsNext().setOBMCBlkSize           ( m_uiObmcBlkSize );
   sps.getSpsNext().setUseFRUCMrgMode        ( m_FRUC );
@@ -969,6 +982,9 @@ Void EncLib::xInitSPS(SPS &sps)
 #endif
 #if HEVC_USE_INTRA_SMOOTHING_T32 || HEVC_USE_INTRA_SMOOTHING_T64
   sps.setUseStrongIntraSmoothing( m_useStrongIntraSmoothing );
+#endif
+#if JVET_K0371_ALF
+  sps.setUseALF( m_alf );
 #endif
   sps.setVuiParametersPresentFlag(getVuiParametersPresentFlag());
 

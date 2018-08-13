@@ -143,6 +143,16 @@ public:
   Void  codeScalingList         ( const ScalingList &scalingList );
 #endif
 
+#if JVET_K0371_ALF
+  void alf( const AlfSliceParam& alfSliceParam );
+  void alfFilter( const AlfSliceParam& alfSliceParam, const bool isChroma );
+
+private:
+  void xWriteTruncBinCode( UInt uiSymbol, const int uiMaxSymbol );
+  void alfGolombEncode( const int coeff, const int k );
+  void truncatedUnaryEqProb( int symbol, int maxSymbol );
+#endif
+
 #if JEM_TOOLS
 private:
   CABACDataStore* m_CABACDataStore;

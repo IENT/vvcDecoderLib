@@ -284,7 +284,7 @@ public:
   SAOBlkParam    *getSAO(int id = 0)                        { return &m_sao[id][0]; };
   void            resizeSAO(unsigned numEntries, int dstid) { m_sao[dstid].resize(numEntries); }
   void            copySAO(const Picture& src, int dstid)    { std::copy(src.m_sao[0].begin(), src.m_sao[0].end(), m_sao[dstid].begin()); }
-#if JEM_TOOLS
+#if JEM_TOOLS && !JVET_K0371_ALF
 
   ALFParam&       getALFParam()                   { return m_alfParam; }
 #endif
@@ -295,7 +295,20 @@ public:
 #endif
 
   std::vector<SAOBlkParam> m_sao[2];
-#if JEM_TOOLS
+
+#if JVET_K0371_ALF
+  std::vector<UChar> m_alfCtuEnableFlag[MAX_NUM_COMPONENT];
+  UChar* getAlfCtuEnableFlag( Int compIdx ) { return m_alfCtuEnableFlag[compIdx].data(); }
+  std::vector<UChar>* getAlfCtuEnableFlag() { return m_alfCtuEnableFlag; }
+  Void resizeAlfCtuEnableFlag( Int numEntries )
+  {
+    for( Int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++ )
+    {
+      m_alfCtuEnableFlag[compIdx].resize( numEntries );
+      std::fill( m_alfCtuEnableFlag[compIdx].begin(), m_alfCtuEnableFlag[compIdx].end(), 0 );
+    }
+  }
+#elif JEM_TOOLS
   ALFParam m_alfParam;
 #endif
 };

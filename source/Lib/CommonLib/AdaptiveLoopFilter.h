@@ -40,7 +40,83 @@
 
 #include "CommonDef.h"
 
-#if JEM_TOOLS
+#if JVET_K0371_ALF
+#include "Unit.h"
+
+struct AlfClassifier
+{
+  AlfClassifier() {}
+  AlfClassifier( UChar cIdx, UChar tIdx )
+    : classIdx( cIdx ), transposeIdx( tIdx )
+  {
+  }
+
+  UChar classIdx;
+  UChar transposeIdx;
+};
+
+enum Direction
+{
+  HOR,
+  VER,
+  DIAG0,
+  DIAG1,
+  NUM_DIRECTIONS
+};
+
+class AdaptiveLoopFilter
+{
+public:
+  static constexpr int   m_NUM_BITS = 10;
+  static constexpr int   m_CLASSIFICATION_BLK_SIZE = 32;  //non-normative, local buffer size
+
+  AdaptiveLoopFilter();
+  virtual ~AdaptiveLoopFilter() {}
+
+  void ALFProcess( CodingStructure& cs, AlfSliceParam& alfSliceParam );
+  void reconstructCoeff( AlfSliceParam& alfSliceParam, ChannelType channel, const bool bRedo = false );
+  void create( const int picWidth, const int picHeight, const ChromaFormat format, const int maxCUWidth, const int maxCUHeight, const int maxCUDepth, const int inputBitDepth[MAX_NUM_CHANNEL_TYPE] );
+  void destroy();
+  static void deriveClassificationBlk( AlfClassifier** classifier, int** laplacian[NUM_DIRECTIONS], const CPelBuf& srcLuma, const Area& blk, const int shift );
+  void deriveClassification( AlfClassifier** classifier, const CPelBuf& srcLuma, const Area& blk );
+  template<AlfFilterType filtType>
+  static void filterBlk( AlfClassifier** classifier, const PelUnitBuf &recDst, const CPelUnitBuf& recSrc, const Area& blk, const ComponentID compId, short* filterSet, const ClpRng& clpRng );
+
+  inline static int getMaxGolombIdx( AlfFilterType filterType )
+  {
+    return filterType == ALF_FILTER_5 ? 2 : 3;
+  }
+
+  void( *m_deriveClassificationBlk )( AlfClassifier** classifier, int** laplacian[NUM_DIRECTIONS], const CPelBuf& srcLuma, const Area& blk, const int shift );
+  void( *m_filter5x5Blk )( AlfClassifier** classifier, const PelUnitBuf &recDst, const CPelUnitBuf& recSrc, const Area& blk, const ComponentID compId, short* filterSet, const ClpRng& clpRng );
+  void( *m_filter7x7Blk )( AlfClassifier** classifier, const PelUnitBuf &recDst, const CPelUnitBuf& recSrc, const Area& blk, const ComponentID compId, short* filterSet, const ClpRng& clpRng );
+
+#ifdef TARGET_SIMD_X86
+  void initAdaptiveLoopFilterX86();
+  template <X86_VEXT vext>
+  void _initAdaptiveLoopFilterX86();
+#endif
+
+protected:
+  std::vector<AlfFilterShape>  m_filterShapes[MAX_NUM_CHANNEL_TYPE];
+  AlfClassifier**              m_classifier;
+  short                        m_coeffFinal[MAX_NUM_ALF_CLASSES * MAX_NUM_ALF_LUMA_COEFF];
+  int**                        m_laplacian[NUM_DIRECTIONS];
+  UChar*                       m_ctuEnableFlag[MAX_NUM_COMPONENT];
+  PelStorage                   m_tempBuf;
+  int                          m_inputBitDepth[MAX_NUM_CHANNEL_TYPE];
+  int                          m_picWidth;
+  int                          m_picHeight;
+  int                          m_maxCUWidth;
+  int                          m_maxCUHeight;
+  int                          m_maxCUDepth;
+  int                          m_numCTUsInWidth;
+  int                          m_numCTUsInHeight;
+  int                          m_numCTUsInPic;
+  ChromaFormat                 m_chromaFormat;
+  ClpRngs                      m_clpRngs;
+};
+#elif JEM_TOOLS
 
 #include "Picture.h"
 

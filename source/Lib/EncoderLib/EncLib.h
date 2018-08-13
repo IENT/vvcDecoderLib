@@ -56,7 +56,7 @@
 #include "InterSearch.h"
 #include "IntraSearch.h"
 #include "EncSampleAdaptiveOffset.h"
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0371_ALF
 #include "EncAdaptiveLoopFilter.h"
 #endif
 #include "RateCtrl.h"
@@ -95,7 +95,7 @@ private:
 #endif
   LoopFilter                m_cLoopFilter;                        ///< deblocking filter class
   EncSampleAdaptiveOffset   m_cEncSAO;                            ///< sample adaptive offset class
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0371_ALF
   EncAdaptiveLoopFilter     m_cEncALF;
 #endif
   HLSWriter                 m_HLSWriter;                          ///< CAVLC encoder
@@ -197,7 +197,7 @@ public:
 #endif
   LoopFilter*             getLoopFilter         ()              { return  &m_cLoopFilter;          }
   EncSampleAdaptiveOffset* getSAO               ()              { return  &m_cEncSAO;              }
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0371_ALF
   EncAdaptiveLoopFilter*  getALF                ()              { return  &m_cEncALF;              }
 #endif
   EncGOP*                 getGOPEncoder         ()              { return  &m_cGOPEncoder;          }
