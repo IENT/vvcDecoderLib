@@ -52,20 +52,20 @@
 
 struct SAOStatData //data structure for SAO statistics
 {
-  Int64 diff[MAX_NUM_SAO_CLASSES];
-  Int64 count[MAX_NUM_SAO_CLASSES];
+  int64_t diff[MAX_NUM_SAO_CLASSES];
+  int64_t count[MAX_NUM_SAO_CLASSES];
 
   SAOStatData(){}
   ~SAOStatData(){}
   void reset()
   {
-    ::memset(diff, 0, sizeof(Int64)*MAX_NUM_SAO_CLASSES);
-    ::memset(count, 0, sizeof(Int64)*MAX_NUM_SAO_CLASSES);
+    ::memset(diff, 0, sizeof(int64_t)*MAX_NUM_SAO_CLASSES);
+    ::memset(count, 0, sizeof(int64_t)*MAX_NUM_SAO_CLASSES);
   }
   const SAOStatData& operator=(const SAOStatData& src)
   {
-    ::memcpy(diff, src.diff, sizeof(Int64)*MAX_NUM_SAO_CLASSES);
-    ::memcpy(count, src.count, sizeof(Int64)*MAX_NUM_SAO_CLASSES);
+    ::memcpy(diff, src.diff, sizeof(int64_t)*MAX_NUM_SAO_CLASSES);
+    ::memcpy(count, src.count, sizeof(int64_t)*MAX_NUM_SAO_CLASSES);
     return *this;
   }
   const SAOStatData& operator+= (const SAOStatData& src)
@@ -114,10 +114,10 @@ private: //methods
   void getBlkStats(const ComponentID compIdx, const Int channelBitDepth, SAOStatData* statsDataTypes, Pel* srcBlk, Pel* orgBlk, Int srcStride, Int orgStride, Int width, Int height, bool isLeftAvail,  bool isRightAvail, bool isAboveAvail, bool isBelowAvail, bool isAboveLeftAvail, bool isAboveRightAvail, bool isCalculatePreDeblockSamples);
   void deriveModeNewRDO(const BitDepths &bitDepths, Int ctuRsAddr, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES], bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, SAOBlkParam& modeParam, Double& modeNormCost );
   void deriveModeMergeRDO(const BitDepths &bitDepths, Int ctuRsAddr, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES], bool* sliceEnabled, std::vector<SAOStatData**>& blkStats, SAOBlkParam& modeParam, Double& modeNormCost );
-  Int64 getDistortion(const Int channelBitDepth, Int typeIdc, Int typeAuxInfo, Int* offsetVal, SAOStatData& statData);
+  int64_t getDistortion(const Int channelBitDepth, Int typeIdc, Int typeAuxInfo, Int* offsetVal, SAOStatData& statData);
   void deriveOffsets(ComponentID compIdx, const Int channelBitDepth, Int typeIdc, SAOStatData& statData, Int* quantOffsets, Int& typeAuxInfo);
-  inline Int64 estSaoDist(Int64 count, Int64 offset, Int64 diffSum, Int shift);
-  inline Int estIterOffset(Int typeIdx, Double lambda, Int offsetInput, Int64 count, Int64 diffSum, Int shift, Int bitIncrease, Int64& bestDist, Double& bestCost, Int offsetTh );
+  inline int64_t estSaoDist(int64_t count, int64_t offset, int64_t diffSum, Int shift);
+  inline Int estIterOffset(Int typeIdx, Double lambda, Int offsetInput, int64_t count, int64_t diffSum, Int shift, Int bitIncrease, int64_t& bestDist, Double& bestCost, Int offsetTh );
   void addPreDBFStatistics(std::vector<SAOStatData**>& blkStats);
 private: //members
   //for RDO

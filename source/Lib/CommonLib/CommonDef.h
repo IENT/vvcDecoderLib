@@ -55,7 +55,7 @@
 
 #ifdef _MSC_VER
 #if _MSC_VER <= 1500
-inline Int64 abs (Int64 x) { return _abs64(x); };
+inline int64_t abs (int64_t x) { return _abs64(x); };
 #endif
 #endif
 

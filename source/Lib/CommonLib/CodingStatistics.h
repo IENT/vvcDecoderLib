@@ -41,7 +41,7 @@
 #include <math.h>
 #include "ChromaFormat.h"
 
-static const Int64 CODINGSTATISTICS_ENTROPYSCALE = 32768;
+static const int64_t CODINGSTATISTICS_ENTROPYSCALE = 32768;
 
 
 enum CodingStatisticsType
@@ -297,10 +297,10 @@ public:
   {
     SStat() : bits( 0 ), count( 0 ), sum( 0 ), classCount( 0 ) { }
 
-    Int64 bits;
-    Int64 count;
-    Int64 sum;
-    Int64 classCount;
+    int64_t bits;
+    int64_t count;
+    int64_t sum;
+    int64_t classCount;
 
     void clear() { bits = 0; count = 0; sum = 0; classCount = 0; }
 
@@ -389,18 +389,18 @@ public:
 
   ~CodingStatistics()
   {
-    const Int64 es = CODINGSTATISTICS_ENTROPYSCALE;
+    const int64_t es = CODINGSTATISTICS_ENTROPYSCALE;
 
-    Int64 countTotal = 0;
-    Int64 classCounts[STATS__NUM_STATS];
+    int64_t countTotal = 0;
+    int64_t classCounts[STATS__NUM_STATS];
     std::fill_n( classCounts, ( size_t ) STATS__NUM_STATS, 0 );
 
-    Int64 cr = 0; // CABAC remainder, which is added to "STATS__CABAC_INITIALISATION"
+    int64_t cr = 0; // CABAC remainder, which is added to "STATS__CABAC_INITIALISATION"
     {
-      Int64 totalCABACbits = 0, roundedCABACbits = 0;
+      int64_t totalCABACbits = 0, roundedCABACbits = 0;
       for( Int i = STATS__NAL_UNIT_PACKING; i < STATS__NUM_STATS; i++ )
       {
-        Int64 classCount = 0;
+        int64_t classCount = 0;
 
         for( UInt c = 0; c < CODING_STATS_NUM_SUBCLASSES; c++ )
         {
@@ -417,7 +417,7 @@ public:
         classCounts[i] = classCount;
         countTotal    += classCount;
       }
-      Int64 remainder = totalCABACbits - roundedCABACbits * es;
+      int64_t remainder = totalCABACbits - roundedCABACbits * es;
       cr = ( remainder + es / 2 ) / es;
     }
 
@@ -456,7 +456,7 @@ public:
 
         SStat sCABAC;
         {
-          Int64 thisCABACbits = sCABACorig.bits / es;
+          int64_t thisCABACbits = sCABACorig.bits / es;
           if( i == STATS__CABAC_INITIALISATION && sCABACorig.bits != 0 )
           {
             thisCABACbits += cr;

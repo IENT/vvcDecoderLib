@@ -248,12 +248,12 @@ extern const SChar    i2Log2Tab[257];
 
 inline bool is34( const SizeType& size )
 {
-  return ( size & ( ( Int64 ) 1 << ( g_aucLog2[size] - 1 ) ) );
+  return ( size & ( ( int64_t ) 1 << ( g_aucLog2[size] - 1 ) ) );
 }
 
 inline bool is58( const SizeType& size )
 {
-  return ( size & ( ( Int64 ) 1 << ( g_aucLog2[size] - 2 ) ) );
+  return ( size & ( ( int64_t ) 1 << ( g_aucLog2[size] - 2 ) ) );
 }
 
 inline bool isNonLog2BlockSize( const Size& size )

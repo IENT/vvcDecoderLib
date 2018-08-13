@@ -3441,7 +3441,7 @@ void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
   }
 
 #if JVET_K0367_AFFINE_FIX_POINT
-  Int64  i64EqualCoeff[7][7];
+  int64_t  i64EqualCoeff[7][7];
   Pel    *piError = m_tmpAffiError;
   Int    *pdDerivate[2];
 #else
@@ -3618,7 +3618,7 @@ void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
 #if JVET_K0367_AFFINE_FIX_POINT
     for ( int row = 0; row < iParaNum; row++ )
     {
-      memset( &i64EqualCoeff[row][0], 0, iParaNum * sizeof( Int64 ) );
+      memset( &i64EqualCoeff[row][0], 0, iParaNum * sizeof( int64_t ) );
     }
 
     m_EqualCoeffComputer( piError, width, pdDerivate, width, i64EqualCoeff, width, height

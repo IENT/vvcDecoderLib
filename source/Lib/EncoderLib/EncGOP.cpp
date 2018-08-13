@@ -2855,7 +2855,7 @@ static inline double calcWeightedSquaredError(const CPelBuf& org,    const CPelB
   {
     for (x = 0; x < blockWidth; x++)
     {
-      register  Int64 iDiff = (Int64)o[y*O + x] - (Int64)r[y*R + x];
+      register  int64_t iDiff = (int64_t)o[y*O + x] - (int64_t)r[y*R + x];
       ssErr += UInt64(iDiff * iDiff);
     }
   }
@@ -2865,7 +2865,7 @@ static inline double calcWeightedSquaredError(const CPelBuf& org,    const CPelB
   {
     for (x = xAct; x < wAct; x++)
     {
-      saAct += UInt64(abs(4 * (Int64)o[y*O + x] - (Int64)o[y*O + x-1] - (Int64)o[y*O + x+1] - (Int64)o[(y-1)*O + x] - (Int64)o[(y+1)*O + x]));
+      saAct += UInt64(abs(4 * (int64_t)o[y*O + x] - (int64_t)o[y*O + x-1] - (int64_t)o[y*O + x+1] - (int64_t)o[(y-1)*O + x] - (int64_t)o[(y+1)*O + x]));
     }
   }
 
@@ -2914,7 +2914,7 @@ UInt64 EncGOP::xFindDistortionPlane(const CPelBuf& pic0, const CPelBuf& pic1, co
         {
           for (x = 0; x < W; x++)
           {
-            register Int64 iDiff = (Int64)pSrc0[x] - (Int64)pSrc1[x];
+            register int64_t iDiff = (int64_t)pSrc0[x] - (int64_t)pSrc1[x];
             uiTotalDiff += UInt64(iDiff * iDiff);
           }
           pSrc0 += pic0.stride;

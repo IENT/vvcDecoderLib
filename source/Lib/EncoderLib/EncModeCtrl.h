@@ -242,7 +242,7 @@ struct ComprCUCtx
   CodingStructure                  *bestCS;
   CodingUnit                       *bestCU;
   TransformUnit                    *bestTU;
-  static_vector<Int64,  30>         extraFeatures;
+  static_vector<int64_t,  30>         extraFeatures;
   static_vector<double, 30>         extraFeaturesd;
   double                            bestInterCost;
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
@@ -255,7 +255,7 @@ struct ComprCUCtx
 #endif
 
   template<typename T> T    get( int ft )       const { return typeid(T) == typeid(double) ? (T&)extraFeaturesd[ft] : T(extraFeatures[ft]); }
-  template<typename T> void set( int ft, T val )      { extraFeatures [ft] = Int64( val ); }
+  template<typename T> void set( int ft, T val )      { extraFeatures [ft] = int64_t( val ); }
   void                      set( int ft, double val ) { extraFeaturesd[ft] = val; }
 };
 

@@ -371,8 +371,6 @@ typedef       double              Double;
 // ====================================================================================================================
 
 #ifdef _MSC_VER
-typedef       __int64             Int64;
-
 #if _MSC_VER <= 1200 // MS VC6
 typedef       __int64             UInt64;   // MS VC6 does not support unsigned __int64 to double conversion
 #else
@@ -381,7 +379,6 @@ typedef       unsigned __int64    UInt64;
 
 #else
 
-typedef       long long           Int64;
 typedef       unsigned long long  UInt64;
 
 #endif
@@ -392,10 +389,10 @@ typedef       unsigned long long  UInt64;
 
 #if RExt__HIGH_BIT_DEPTH_SUPPORT
 typedef       Int             Pel;               ///< pixel type
-typedef       Int64           TCoeff;            ///< transform coefficient
+typedef       int64_t           TCoeff;            ///< transform coefficient
 typedef       Int             TMatrixCoeff;      ///< transform matrix coefficient
 typedef       Short           TFilterCoeff;      ///< filter coefficient
-typedef       Int64           Intermediate_Int;  ///< used as intermediate value in calculations
+typedef       int64_t           Intermediate_Int;  ///< used as intermediate value in calculations
 typedef       UInt64          Intermediate_UInt; ///< used as intermediate value in calculations
 #else
 typedef       Short           Pel;               ///< pixel type

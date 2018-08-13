@@ -388,7 +388,7 @@ void Quant::dequant(const TransformUnit &tu,
     const Int scaleBits = ( IQUANT_SHIFT + 1 );
 
     //from the dequantisation equation:
-    //iCoeffQ                         = Intermediate_Int((Int64(clipQCoef) * scale + iAdd) >> rightShift);
+    //iCoeffQ                         = Intermediate_Int((int64_t(clipQCoef) * scale + iAdd) >> rightShift);
     //(sizeof(Intermediate_Int) * 8)  =                    inputBitDepth   + scaleBits      - rightShift
     const UInt             targetInputBitDepth = std::min<UInt>((maxLog2TrDynamicRange + 1), (((sizeof(Intermediate_Int) * 8) + rightShift) - scaleBits));
     const Intermediate_Int inputMinimum        = -(1 << (targetInputBitDepth - 1));
@@ -799,7 +799,7 @@ void Quant::quant(TransformUnit &tu, const ComponentID &compID, const CCoeffBuf 
     const Int iQBits = QUANT_SHIFT + cQP.per + iTransformShift;
     // QBits will be OK for any internal bit depth as the reduction in transform shift is balanced by an increase in Qp_per due to QpBDOffset
 
-    const Int64 iAdd = Int64(tu.cs->slice->getSliceType() == I_SLICE ? 171 : 85) << Int64(iQBits - 9);
+    const int64_t iAdd = int64_t(tu.cs->slice->getSliceType() == I_SLICE ? 171 : 85) << int64_t(iQBits - 9);
 #if HEVC_USE_SIGN_HIDING
     const Int qBits8 = iQBits - 8;
 #endif
@@ -810,14 +810,14 @@ void Quant::quant(TransformUnit &tu, const ComponentID &compID, const CCoeffBuf 
       const TCoeff iSign    = (iLevel < 0 ? -1: 1);
 
 #if HEVC_USE_SCALING_LISTS
-      const Int64  tmpLevel = (Int64)abs(iLevel) * (enableScalingLists ? piQuantCoeff[uiBlockPos] : defaultQuantisationCoefficient);
+      const int64_t  tmpLevel = (int64_t)abs(iLevel) * (enableScalingLists ? piQuantCoeff[uiBlockPos] : defaultQuantisationCoefficient);
 #else
-      const Int64  tmpLevel = (Int64)abs(iLevel) * defaultQuantisationCoefficient;
+      const int64_t  tmpLevel = (int64_t)abs(iLevel) * defaultQuantisationCoefficient;
 #endif
 
       const TCoeff quantisedMagnitude = TCoeff((tmpLevel * iWHScale + iAdd ) >> iQBits);
 #if HEVC_USE_SIGN_HIDING
-      deltaU[uiBlockPos] = (TCoeff)((tmpLevel * iWHScale - ((Int64)quantisedMagnitude<<iQBits) )>> qBits8);
+      deltaU[uiBlockPos] = (TCoeff)((tmpLevel * iWHScale - ((int64_t)quantisedMagnitude<<iQBits) )>> qBits8);
 #endif
 
       uiAbsSum += quantisedMagnitude;
@@ -892,15 +892,15 @@ bool Quant::xNeedRDOQ(TransformUnit &tu, const ComponentID &compID, const CCoeff
   // QBits will be OK for any internal bit depth as the reduction in transform shift is balanced by an increase in Qp_per due to QpBDOffset
 
   // iAdd is different from the iAdd used in normal quantization
-  const Int64 iAdd = Int64(compID == COMPONENT_Y ? 171 : 256) << (iQBits - 9);
+  const int64_t iAdd = int64_t(compID == COMPONENT_Y ? 171 : 256) << (iQBits - 9);
 
   for (Int uiBlockPos = 0; uiBlockPos < rect.area(); uiBlockPos++)
   {
     const TCoeff iLevel   = piCoef.buf[uiBlockPos];
 #if HEVC_USE_SCALING_LISTS
-    const Int64  tmpLevel = (Int64)abs(iLevel) * (enableScalingLists ? piQuantCoeff[uiBlockPos] : defaultQuantisationCoefficient);
+    const int64_t  tmpLevel = (int64_t)abs(iLevel) * (enableScalingLists ? piQuantCoeff[uiBlockPos] : defaultQuantisationCoefficient);
 #else
-    const Int64  tmpLevel = (Int64)abs(iLevel) * defaultQuantisationCoefficient;
+    const int64_t  tmpLevel = (int64_t)abs(iLevel) * defaultQuantisationCoefficient;
 #endif
     const TCoeff quantisedMagnitude = TCoeff((tmpLevel * iWHScale + iAdd ) >> iQBits);
 
@@ -947,7 +947,7 @@ void Quant::transformSkipQuantOneSample(TransformUnit &tu, const ComponentID &co
   const Int iQBits = QUANT_SHIFT + cQP.per + iTransformShift;
   // QBits will be OK for any internal bit depth as the reduction in transform shift is balanced by an increase in Qp_per due to QpBDOffset
 
-  const Int iAdd = Int64(bUseHalfRoundingPoint ? 256 : (tu.cs->slice->getSliceType() == I_SLICE ? 171 : 85)) << Int64(iQBits - 9);
+  const Int iAdd = int64_t(bUseHalfRoundingPoint ? 256 : (tu.cs->slice->getSliceType() == I_SLICE ? 171 : 85)) << int64_t(iQBits - 9);
 
   TCoeff transformedCoefficient;
 
@@ -969,9 +969,9 @@ void Quant::transformSkipQuantOneSample(TransformUnit &tu, const ComponentID &co
 #if HEVC_USE_SCALING_LISTS
   const Int quantisationCoefficient = enableScalingLists ? piQuantCoeff[uiPos] : defaultQuantisationCoefficient;
 
-  const Int64 tmpLevel = (Int64)abs(transformedCoefficient) * quantisationCoefficient;
+  const int64_t tmpLevel = (int64_t)abs(transformedCoefficient) * quantisationCoefficient;
 #else
-  const Int64 tmpLevel = (Int64)abs(transformedCoefficient) * defaultQuantisationCoefficient;
+  const int64_t tmpLevel = (int64_t)abs(transformedCoefficient) * defaultQuantisationCoefficient;
 #endif
 
   const TCoeff quantisedCoefficient = (TCoeff((tmpLevel + iAdd ) >> iQBits)) * iSign;

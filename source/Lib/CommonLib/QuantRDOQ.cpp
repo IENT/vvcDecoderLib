@@ -885,9 +885,9 @@ void QuantRDOQ::xRateDistOptQuant(TransformUnit &tu, const ComponentID &compID, 
       const Double errorScale              = (enableScalingLists) ? pdErrScale[uiBlkPos] * blkErrScale : defaultErrorScale;
 #endif
 #endif
-      const Int64  tmpLevel                = Int64(abs(plSrcCoeff[ uiBlkPos ])) * quantisationCoefficient;
+      const int64_t  tmpLevel                = int64_t(abs(plSrcCoeff[ uiBlkPos ])) * quantisationCoefficient;
 
-      const Intermediate_Int lLevelDouble  = (Intermediate_Int)std::min<Int64>(tmpLevel, std::numeric_limits<Intermediate_Int>::max() - (Intermediate_Int(1) << (iQBits - 1)));
+      const Intermediate_Int lLevelDouble  = (Intermediate_Int)std::min<int64_t>(tmpLevel, std::numeric_limits<Intermediate_Int>::max() - (Intermediate_Int(1) << (iQBits - 1)));
 
       UInt uiMaxAbsLevel        = std::min<UInt>(UInt(entropyCodingMaximum), UInt((lLevelDouble + (Intermediate_Int(1) << (iQBits - 1))) >> iQBits));
 
@@ -998,8 +998,8 @@ void QuantRDOQ::xRateDistOptQuant(TransformUnit &tu, const ComponentID &compID, 
         }
 
         DTRACE( g_trace_ctx, D_RDOQ, " Lev=%d \n", uiLevel );
-        DTRACE_COND( ( uiMaxAbsLevel != 0 ), g_trace_ctx, D_RDOQ, " CostC0=%d\n", (Int64)( pdCostCoeff0[iScanPos] ) );
-        DTRACE_COND( ( uiMaxAbsLevel != 0 ), g_trace_ctx, D_RDOQ, " CostC =%d\n", (Int64)( pdCostCoeff[iScanPos] ) );
+        DTRACE_COND( ( uiMaxAbsLevel != 0 ), g_trace_ctx, D_RDOQ, " CostC0=%d\n", (int64_t)( pdCostCoeff0[iScanPos] ) );
+        DTRACE_COND( ( uiMaxAbsLevel != 0 ), g_trace_ctx, D_RDOQ, " CostC =%d\n", (int64_t)( pdCostCoeff[iScanPos] ) );
 
 #if HEVC_USE_SIGN_HIDING
         deltaU[ uiBlkPos ]        = TCoeff((lLevelDouble - (Intermediate_Int(uiLevel) << iQBits)) >> (iQBits-8));
@@ -1286,8 +1286,8 @@ void QuantRDOQ::xRateDistOptQuant(TransformUnit &tu, const ComponentID &compID, 
       }
     } // end if (uiSigCoeffGroupFlag[ uiCGBlkPos ])
     DTRACE( g_trace_ctx, D_RDOQ_COST, "%d: %3d, %3d, %dx%d, comp=%d\n", DTRACE_GET_COUNTER( g_trace_ctx, D_RDOQ_COST ), rect.x, rect.y, rect.width, rect.height, compID );
-    DTRACE( g_trace_ctx, D_RDOQ_COST, "Uncoded=%d\n", (Int64)( d64BlockUncodedCost ) );
-    DTRACE( g_trace_ctx, D_RDOQ_COST, "Coded  =%d\n", (Int64)( d64BaseCost ) );
+    DTRACE( g_trace_ctx, D_RDOQ_COST, "Uncoded=%d\n", (int64_t)( d64BlockUncodedCost ) );
+    DTRACE( g_trace_ctx, D_RDOQ_COST, "Coded  =%d\n", (int64_t)( d64BaseCost ) );
 
   } // end for
 
@@ -1311,10 +1311,10 @@ void QuantRDOQ::xRateDistOptQuant(TransformUnit &tu, const ComponentID &compID, 
   {
     const Double inverseQuantScale = Double(g_invQuantScales[cQP.rem]);
 #if DISTORTION_LAMBDA_BUGFIX
-    Int64 rdFactor = (Int64)(inverseQuantScale * inverseQuantScale * (1 << (2 * cQP.per)) / m_dLambda / 16
+    int64_t rdFactor = (int64_t)(inverseQuantScale * inverseQuantScale * (1 << (2 * cQP.per)) / m_dLambda / 16
                                / (1 << (2 * DISTORTION_PRECISION_ADJUSTMENT(channelBitDepth)))
 #else
-    Int64 rdFactor = (Int64)(inverseQuantScale * inverseQuantScale * (1 << (2 * cQP.per))
+    int64_t rdFactor = (int64_t)(inverseQuantScale * inverseQuantScale * (1 << (2 * cQP.per))
                              / m_dLambda / 16 / (1 << (2 * DISTORTION_PRECISION_ADJUSTMENT(channelBitDepth - 8)))
 #endif
 #if HM_QTBT_AS_IN_JEM_QUANT
@@ -1367,7 +1367,7 @@ void QuantRDOQ::xRateDistOptQuant(TransformUnit &tu, const ComponentID &compID, 
         if( signbit!=(absSum&0x1) )  // hide but need tune
         {
           // calculate the cost
-          Int64 minCostInc = std::numeric_limits<Int64>::max(), curCost = std::numeric_limits<Int64>::max();
+          int64_t minCostInc = std::numeric_limits<int64_t>::max(), curCost = std::numeric_limits<int64_t>::max();
           Int minPos = -1, finalChange = 0, curChange = 0;
 
           for( n = (lastCG == 1 ? lastNZPosInCG : iCGSizeM1); n >= 0; --n )
@@ -1375,8 +1375,8 @@ void QuantRDOQ::xRateDistOptQuant(TransformUnit &tu, const ComponentID &compID, 
             UInt uiBlkPos   = cctx.blockPos( n + subPos );
             if(piDstCoeff[ uiBlkPos ] != 0 )
             {
-              Int64 costUp   = rdFactor * ( - deltaU[uiBlkPos] ) + rateIncUp[uiBlkPos];
-              Int64 costDown = rdFactor * (   deltaU[uiBlkPos] ) + rateIncDown[uiBlkPos]
+              int64_t costUp   = rdFactor * ( - deltaU[uiBlkPos] ) + rateIncUp[uiBlkPos];
+              int64_t costDown = rdFactor * (   deltaU[uiBlkPos] ) + rateIncDown[uiBlkPos]
                 -   ((abs(piDstCoeff[uiBlkPos]) == 1) ? sigRateDelta[uiBlkPos] : 0);
 
               if(lastCG==1 && lastNZPosInCG==n && abs(piDstCoeff[uiBlkPos])==1)
@@ -1394,7 +1394,7 @@ void QuantRDOQ::xRateDistOptQuant(TransformUnit &tu, const ComponentID &compID, 
                 curChange = -1;
                 if(n==firstNZPosInCG && abs(piDstCoeff[uiBlkPos])==1)
                 {
-                  curCost = std::numeric_limits<Int64>::max();
+                  curCost = std::numeric_limits<int64_t>::max();
                 }
                 else
                 {
@@ -1412,7 +1412,7 @@ void QuantRDOQ::xRateDistOptQuant(TransformUnit &tu, const ComponentID &compID, 
                 UInt thissignbit = (plSrcCoeff[uiBlkPos]>=0?0:1);
                 if(thissignbit != signbit )
                 {
-                  curCost = std::numeric_limits<Int64>::max();
+                  curCost = std::numeric_limits<int64_t>::max();
                 }
               }
             }

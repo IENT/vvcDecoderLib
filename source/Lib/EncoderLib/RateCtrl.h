@@ -123,7 +123,7 @@ public:
   bool getUseLCUSeparateModel()         { return m_useLCUSeparateModel; }
 
   Int  getNumPixel()                    { return m_numberOfPixel; }
-  Int64  getTargetBits()                { return m_targetBits; }
+  int64_t  getTargetBits()                { return m_targetBits; }
   Int  getNumberOfLCU()                 { return m_numberOfLCU; }
   Int* getBitRatio()                    { return m_bitsRatio; }
   Int  getBitRatio( Int idx )           { CHECK(!( idx<m_GOPSize), "Idx exceeds GOP size"); return m_bitsRatio[idx]; }
@@ -138,7 +138,7 @@ public:
   void           setLCUPara( Int level, Int LCUIdx, TRCParameter para ) { CHECK(!( level < m_numberOfLevel ), "Level too big"); CHECK(!( LCUIdx  < m_numberOfLCU ), "LCU id exceeds number of LCU"); m_LCUPara[level][LCUIdx] = para; }
 
   Int  getFramesLeft()                  { return m_framesLeft; }
-  Int64  getBitsLeft()                  { return m_bitsLeft; }
+  int64_t  getBitsLeft()                  { return m_bitsLeft; }
 
   Double getSeqBpp()                    { return m_seqTargetBpp; }
   Double getAlphaUpdate()               { return m_alphaUpdate; }
@@ -161,7 +161,7 @@ private:
   Int m_averageBits;
 
   Int m_numberOfPixel;
-  Int64 m_targetBits;
+  int64_t m_targetBits;
   Int m_numberOfLCU;
   Int* m_bitsRatio;
   Int* m_GOPID2Level;
@@ -169,7 +169,7 @@ private:
   TRCParameter** m_LCUPara;
 
   Int m_framesLeft;
-  Int64 m_bitsLeft;
+  int64_t m_bitsLeft;
   Double m_seqTargetBpp;
   Double m_alphaUpdate;
   Double m_betaUpdate;

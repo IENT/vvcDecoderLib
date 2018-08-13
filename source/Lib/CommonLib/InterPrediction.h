@@ -76,11 +76,11 @@ private:
 #endif
 
 #if JEM_TOOLS
-  Int64 m_piDotProduct1[BIO_TEMP_BUFFER_SIZE];
-  Int64 m_piDotProduct2[BIO_TEMP_BUFFER_SIZE];
-  Int64 m_piDotProduct3[BIO_TEMP_BUFFER_SIZE];
-  Int64 m_piDotProduct5[BIO_TEMP_BUFFER_SIZE];
-  Int64 m_piDotProduct6[BIO_TEMP_BUFFER_SIZE];
+  int64_t m_piDotProduct1[BIO_TEMP_BUFFER_SIZE];
+  int64_t m_piDotProduct2[BIO_TEMP_BUFFER_SIZE];
+  int64_t m_piDotProduct3[BIO_TEMP_BUFFER_SIZE];
+  int64_t m_piDotProduct5[BIO_TEMP_BUFFER_SIZE];
+  int64_t m_piDotProduct6[BIO_TEMP_BUFFER_SIZE];
 #endif
 
 protected:
@@ -128,12 +128,12 @@ protected:
   inline void   gradFilter1DHor ( const Pel* piSrc, Int iSrcStride, Int iWidth, Int iHeight, Int iDstStride, Pel*& rpiDst, Int iMV, const Int iShift );
   inline void   gradFilter1DVer ( const Pel* piSrc, Int iSrcStride, Int iWidth, Int iHeight, Int iDstStride, Pel*& rpiDst, Int iMV, const Int iShift );
 
-  inline Int64  divide64        ( Int64 numer, Int64 denom);
-  inline void   calcBlkGradient ( Int sx, Int sy, Int64 *arraysGx2, Int64 *arraysGxGy, Int64 *arraysGxdI, Int64 *arraysGy2, Int64 *arraysGydI, Int64 &sGx2, Int64 &sGy2, Int64 &sGxGy, Int64 &sGxdI, Int64 &sGydI, Int iWidth, Int iHeight);
+  inline int64_t  divide64        ( int64_t numer, int64_t denom);
+  inline void   calcBlkGradient ( Int sx, Int sy, int64_t *arraysGx2, int64_t *arraysGxGy, int64_t *arraysGxdI, int64_t *arraysGy2, int64_t *arraysGydI, int64_t &sGx2, int64_t &sGy2, int64_t &sGxGy, int64_t &sGxdI, int64_t &sGydI, Int iWidth, Int iHeight);
 
-  Pel  optical_flow_averaging   ( Int64 s1, Int64 s2, Int64 s3, Int64 s5, Int64 s6,
+  Pel  optical_flow_averaging   ( int64_t s1, int64_t s2, int64_t s3, int64_t s5, int64_t s6,
                                   Pel pGradX0, Pel pGradX1, Pel pGradY0, Pel pGradY1, Pel pSrcY0Temp, Pel pSrcY1Temp,
-                                  const int shiftNum, const int offset, const Int64 limit, const Int64 denom_min_1, const Int64 denom_min_2, const ClpRng& clpRng );
+                                  const int shiftNum, const int offset, const int64_t limit, const int64_t denom_min_1, const int64_t denom_min_2, const ClpRng& clpRng );
   void applyBiOptFlow           ( const PredictionUnit &pu, const CPelUnitBuf &pcYuvSrc0, const CPelUnitBuf &pcYuvSrc1, const Int &iRefIdx0, const Int &iRefIdx1, PelUnitBuf &pcYuvDst, const BitDepths &clipBitDepths);
 #endif
 

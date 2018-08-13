@@ -88,7 +88,7 @@ void EncRCSeq::create( Int totalFrames, Int targetBitrate, Int frameRate, Int GO
   m_useLCUSeparateModel = useLCUSeparateModel;
 
   m_numberOfPixel   = m_picWidth * m_picHeight;
-  m_targetBits      = (Int64)m_totalFrames * (Int64)m_targetRate / (Int64)m_frameRate;
+  m_targetBits      = (int64_t)m_totalFrames * (int64_t)m_targetRate / (int64_t)m_frameRate;
   m_seqTargetBpp = (Double)m_targetRate / (Double)m_frameRate / (Double)m_numberOfPixel;
   if ( m_seqTargetBpp < 0.03 )
   {

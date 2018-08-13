@@ -1683,8 +1683,8 @@ struct WPScalingParam
 };
 struct WPACDCParam
 {
-  Int64 iAC;
-  Int64 iDC;
+  int64_t iAC;
+  int64_t iDC;
 };
 
 

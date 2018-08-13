@@ -1207,26 +1207,26 @@ void InterPrediction::applyBiOptFlow( const PredictionUnit &pu, const CPelUnitBu
   const int   shiftNum        = IF_INTERNAL_PREC + 1 - bitDepth;
   const int   offset          = ( 1 << ( shiftNum - 1 ) ) + 2 * IF_INTERNAL_OFFS;
   const bool  bShortRefMV     = ( pu.cs->slice->getCheckLDC() && PU::isBIOLDB(pu) );
-  const Int64 limit           = ( 12 << (IF_INTERNAL_PREC - bShortRefMV - bitDepth ) );
-  const Int64 regularizator_1 = 500 * (1<<(bitDepth-8)) * (1<<(bitDepth-8));
-  const Int64 regularizator_2 = regularizator_1<<1;
-  const Int64 denom_min_1     = 700 * (1<<(bitDepth-8)) * (1<<(bitDepth-8));
-  const Int64 denom_min_2     = denom_min_1<<1;
+  const int64_t limit           = ( 12 << (IF_INTERNAL_PREC - bShortRefMV - bitDepth ) );
+  const int64_t regularizator_1 = 500 * (1<<(bitDepth-8)) * (1<<(bitDepth-8));
+  const int64_t regularizator_2 = regularizator_1<<1;
+  const int64_t denom_min_1     = 700 * (1<<(bitDepth-8)) * (1<<(bitDepth-8));
+  const int64_t denom_min_2     = denom_min_1<<1;
 
-  Int64* m_piDotProductTemp1 = m_piDotProduct1;
-  Int64* m_piDotProductTemp2 = m_piDotProduct2;
-  Int64* m_piDotProductTemp3 = m_piDotProduct3;
-  Int64* m_piDotProductTemp5 = m_piDotProduct5;
-  Int64* m_piDotProductTemp6 = m_piDotProduct6;
+  int64_t* m_piDotProductTemp1 = m_piDotProduct1;
+  int64_t* m_piDotProductTemp2 = m_piDotProduct2;
+  int64_t* m_piDotProductTemp3 = m_piDotProduct3;
+  int64_t* m_piDotProductTemp5 = m_piDotProduct5;
+  int64_t* m_piDotProductTemp6 = m_piDotProduct6;
 
-  Int64 temp=0, tempX=0, tempY=0;
+  int64_t temp=0, tempX=0, tempY=0;
   for( int y = 0; y < iHeightG; y++ )
   {
     for( int x = 0; x < iWidthG; x++ )
     {
-      temp  = (Int64)( pSrcY0Temp[x] - pSrcY1Temp[x] );
-      tempX = (Int64)( pGradX0   [x] + pGradX1   [x] );
-      tempY = (Int64)( pGradY0   [x] + pGradY1   [x] );
+      temp  = (int64_t)( pSrcY0Temp[x] - pSrcY1Temp[x] );
+      tempX = (int64_t)( pGradX0   [x] + pGradX1   [x] );
+      tempY = (int64_t)( pGradY0   [x] + pGradY1   [x] );
       m_piDotProductTemp1[x] =  tempX * tempX;
       m_piDotProductTemp2[x] =  tempX * tempY;
       m_piDotProductTemp3[x] = -tempX * temp<<5;
@@ -1257,8 +1257,8 @@ void InterPrediction::applyBiOptFlow( const PredictionUnit &pu, const CPelUnitBu
   {
     for (Int xu = 0; xu < xUnit; xu++)
     {
-      Int64 sGxdI = 0, sGydI = 0, sGxGy = 0, sGx2 = 0, sGy2 = 0;
-      Int64 tmpx = 0, tmpy = 0;
+      int64_t sGxdI = 0, sGydI = 0, sGxGy = 0, sGx2 = 0, sGy2 = 0;
+      int64_t tmpx = 0, tmpy = 0;
 
       m_piDotProductTemp1 = m_piDotProduct1 + ((yu*iWidthG + xu) << 2);
       m_piDotProductTemp2 = m_piDotProduct2 + ((yu*iWidthG + xu) << 2);
@@ -1825,12 +1825,12 @@ void InterPrediction::xGradFilterY( const Pel* piRefY, Int iRefStride, Pel* piDs
   JVET_J0090_SET_CACHE_ENABLE( true );
 }
 
-Pel InterPrediction::optical_flow_averaging( Int64 s1, Int64 s2, Int64 s3, Int64 s5, Int64 s6, Pel pGradX0, Pel pGradX1, Pel pGradY0, Pel pGradY1, Pel pSrcY0Temp, Pel pSrcY1Temp,
-                                             const int shiftNum, const int offset, const Int64 limit, const Int64 denom_min_1, const Int64 denom_min_2, const ClpRng& clpRng )
+Pel InterPrediction::optical_flow_averaging( int64_t s1, int64_t s2, int64_t s3, int64_t s5, int64_t s6, Pel pGradX0, Pel pGradX1, Pel pGradY0, Pel pGradY1, Pel pSrcY0Temp, Pel pSrcY1Temp,
+                                             const int shiftNum, const int offset, const int64_t limit, const int64_t denom_min_1, const int64_t denom_min_2, const ClpRng& clpRng )
 {
-  Int64 vx = 0;
-  Int64 vy = 0;
-  Int64 b=0;
+  int64_t vx = 0;
+  int64_t vy = 0;
+  int64_t b=0;
 
   if( s1 > denom_min_1 )
   {
@@ -2137,7 +2137,7 @@ inline void InterPrediction::fracFilter2DHor( const Pel* piSrc, Int iSrcStride, 
 
 inline Int GetMSB64( UInt64 x )
 {
-  Int iMSB = 0, bits = (sizeof(Int64) << 3);
+  Int iMSB = 0, bits = (sizeof(int64_t) << 3);
   UInt64 y = 1;
 
   while (x > 1)
@@ -2157,14 +2157,14 @@ inline Int GetMSB64( UInt64 x )
   return iMSB;
 }
 
-inline Int64 InterPrediction::divide64( Int64 numer, Int64 denom )
+inline int64_t InterPrediction::divide64( int64_t numer, int64_t denom )
 {
-  Int64 d;
-  const Int64 iShiftA2 = 6;
-  const Int64 iAccuracyShift = 15;
-  const Int64 iMaxVal = 63;
-  Int64 iScaleShiftA2 = 0;
-  Int64 iScaleShiftA1 = 0;
+  int64_t d;
+  const int64_t iShiftA2 = 6;
+  const int64_t iAccuracyShift = 15;
+  const int64_t iMaxVal = 63;
+  int64_t iScaleShiftA2 = 0;
+  int64_t iScaleShiftA1 = 0;
 
   UChar signA1 = numer < 0;
   UChar signA2 = denom < 0;
@@ -2185,19 +2185,19 @@ inline Int64 InterPrediction::divide64( Int64 numer, Int64 denom )
     iScaleShiftA2 = 0;
   }
 
-  Int64 iScaleShiftA = iScaleShiftA2 + iAccuracyShift - iScaleShiftA1;
+  int64_t iScaleShiftA = iScaleShiftA2 + iAccuracyShift - iScaleShiftA1;
 
-  Int64 a2s = (denom >> iScaleShiftA2) > iMaxVal ? iMaxVal : (denom >> iScaleShiftA2);
-  Int64 a1s = (numer >> iScaleShiftA1);
+  int64_t a2s = (denom >> iScaleShiftA2) > iMaxVal ? iMaxVal : (denom >> iScaleShiftA2);
+  int64_t a1s = (numer >> iScaleShiftA1);
 
-  Int64 aI64 = (a1s * (Int64)m_uiaBIOShift[a2s]) >> iScaleShiftA;
+  int64_t aI64 = (a1s * (int64_t)m_uiaBIOShift[a2s]) >> iScaleShiftA;
 
   d = (signA1 + signA2 == 1) ? -aI64 : aI64;
 
   return d;
 }
 
-void InterPrediction::calcBlkGradient( Int sx, Int sy, Int64 *arraysGx2, Int64 *arraysGxGy, Int64 *arraysGxdI, Int64 *arraysGy2, Int64 *arraysGydI, Int64 &sGx2, Int64 &sGy2, Int64 &sGxGy, Int64 &sGxdI, Int64 &sGydI, Int iWidth, Int iHeight )
+void InterPrediction::calcBlkGradient( Int sx, Int sy, int64_t *arraysGx2, int64_t *arraysGxGy, int64_t *arraysGxdI, int64_t *arraysGy2, int64_t *arraysGydI, int64_t &sGx2, int64_t &sGy2, int64_t &sGxGy, int64_t &sGxdI, int64_t &sGydI, Int iWidth, Int iHeight )
 {
   static const UInt weightTbl[8][8] = { {1, 2, 3, 4, 4, 3, 2, 1},
       {2, 4, 6, 8, 8, 6, 4, 2},
@@ -2208,11 +2208,11 @@ void InterPrediction::calcBlkGradient( Int sx, Int sy, Int64 *arraysGx2, Int64 *
       {2, 4, 6, 8, 8, 6, 4, 2},
       {1, 2, 3, 4, 4, 3, 2, 1 } };
 
-  Int64 *pGx2 = arraysGx2;
-  Int64 *pGy2 = arraysGy2;
-  Int64 *pGxGy = arraysGxGy;
-  Int64 *pGxdI = arraysGxdI;
-  Int64 *pGydI = arraysGydI;
+  int64_t *pGx2 = arraysGx2;
+  int64_t *pGy2 = arraysGy2;
+  int64_t *pGxGy = arraysGxGy;
+  int64_t *pGxdI = arraysGxdI;
+  int64_t *pGydI = arraysGydI;
 
   Int x0;
 

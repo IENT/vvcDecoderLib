@@ -388,9 +388,9 @@ void EncSampleAdaptiveOffset::decidePicParams(const Slice& slice, bool* sliceEna
   }
 }
 
-Int64 EncSampleAdaptiveOffset::getDistortion(const Int channelBitDepth, Int typeIdc, Int typeAuxInfo, Int* invQuantOffset, SAOStatData& statData)
+int64_t EncSampleAdaptiveOffset::getDistortion(const Int channelBitDepth, Int typeIdc, Int typeAuxInfo, Int* invQuantOffset, SAOStatData& statData)
 {
-  Int64 dist        = 0;
+  int64_t dist        = 0;
 #if DISTORTION_LAMBDA_BUGFIX
   Int shift = 2 * DISTORTION_PRECISION_ADJUSTMENT(channelBitDepth);
 #else
@@ -428,16 +428,16 @@ Int64 EncSampleAdaptiveOffset::getDistortion(const Int channelBitDepth, Int type
   return dist;
 }
 
-inline Int64 EncSampleAdaptiveOffset::estSaoDist(Int64 count, Int64 offset, Int64 diffSum, Int shift)
+inline int64_t EncSampleAdaptiveOffset::estSaoDist(int64_t count, int64_t offset, int64_t diffSum, Int shift)
 {
   return (( count*offset*offset-diffSum*offset*2 ) >> shift);
 }
 
 
-inline Int EncSampleAdaptiveOffset::estIterOffset(Int typeIdx, Double lambda, Int offsetInput, Int64 count, Int64 diffSum, Int shift, Int bitIncrease, Int64& bestDist, Double& bestCost, Int offsetTh )
+inline Int EncSampleAdaptiveOffset::estIterOffset(Int typeIdx, Double lambda, Int offsetInput, int64_t count, int64_t diffSum, Int shift, Int bitIncrease, int64_t& bestDist, Double& bestCost, Int offsetTh )
 {
   Int iterOffset, tempOffset;
-  Int64 tempDist, tempRate;
+  int64_t tempDist, tempRate;
   Double tempCost, tempMinCost;
   Int offsetOutput = 0;
   iterOffset = offsetInput;
@@ -513,7 +513,7 @@ void EncSampleAdaptiveOffset::deriveOffsets(ComponentID compIdx, const Int chann
     case SAO_TYPE_EO_135:
     case SAO_TYPE_EO_45:
       {
-        Int64 classDist;
+        int64_t classDist;
         Double classCost;
         for(Int classIdx=0; classIdx<NUM_SAO_EO_CLASSES; classIdx++)
         {
@@ -545,9 +545,9 @@ void EncSampleAdaptiveOffset::deriveOffsets(ComponentID compIdx, const Int chann
       break;
     case SAO_TYPE_BO:
       {
-        Int64  distBOClasses[NUM_SAO_BO_CLASSES];
+        int64_t  distBOClasses[NUM_SAO_BO_CLASSES];
         Double costBOClasses[NUM_SAO_BO_CLASSES];
-        ::memset(distBOClasses, 0, sizeof(Int64)*NUM_SAO_BO_CLASSES);
+        ::memset(distBOClasses, 0, sizeof(int64_t)*NUM_SAO_BO_CLASSES);
         for(Int classIdx=0; classIdx< NUM_SAO_BO_CLASSES; classIdx++)
         {
           costBOClasses[classIdx]= m_lambda[compIdx];
@@ -599,7 +599,7 @@ void EncSampleAdaptiveOffset::deriveModeNewRDO(const BitDepths &bitDepths, Int c
   uint64_t previousFracBits;
   const Int numberOfComponents = m_numberOfComponents;
 
-  Int64 dist[MAX_NUM_COMPONENT], modeDist[MAX_NUM_COMPONENT];
+  int64_t dist[MAX_NUM_COMPONENT], modeDist[MAX_NUM_COMPONENT];
   SAOOffset testOffset[MAX_NUM_COMPONENT];
   Int invQuantOffset[MAX_NUM_SAO_CLASSES];
   for(Int comp=0; comp < MAX_NUM_COMPONENT; comp++)
@@ -1135,7 +1135,7 @@ void EncSampleAdaptiveOffset::getBlkStats(const ComponentID compIdx, const Int c
 {
   Int x,y, startX, startY, endX, endY, edgeType, firstLineStartX, firstLineEndX;
   SChar signLeft, signRight, signDown;
-  Int64 *diff, *count;
+  int64_t *diff, *count;
   Pel *srcLine, *orgLine;
   Int* skipLinesR = m_skipLinesR[compIdx];
   Int* skipLinesB = m_skipLinesB[compIdx];
