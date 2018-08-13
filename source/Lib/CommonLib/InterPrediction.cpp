@@ -2135,10 +2135,10 @@ inline void InterPrediction::fracFilter2DHor( const Pel* piSrc, Int iSrcStride, 
   }
 }
 
-inline Int GetMSB64( UInt64 x )
+inline Int GetMSB64( uint64_t x )
 {
   Int iMSB = 0, bits = (sizeof(int64_t) << 3);
-  UInt64 y = 1;
+  uint64_t y = 1;
 
   while (x > 1)
   {

@@ -835,7 +835,7 @@ void EncGOP::xCreatePictureTimingSEI  (Int IRAPGOPid, SEIMessages& seiMessages, 
     if( hrd->getSubPicCpbParamsPresentFlag() )
     {
       Int i;
-      UInt64 ui64Tmp;
+      uint64_t ui64Tmp;
       UInt uiPrev = 0;
       UInt numDU = ( pictureTimingSEI->m_numDecodingUnitsMinus1 + 1 );
       std::vector<UInt> &rDuCpbRemovalDelayMinus1 = pictureTimingSEI->m_duCpbRemovalDelayMinus1;
@@ -978,7 +978,7 @@ void EncGOP::xUpdateTimingSEI(SEIPictureTiming *pictureTimingSEI, std::deque<DUD
   if( hrd->getSubPicCpbParamsPresentFlag() )
   {
     Int i;
-    UInt64 ui64Tmp;
+    uint64_t ui64Tmp;
     UInt uiPrev = 0;
     UInt numDU = ( pictureTimingSEI->m_numDecodingUnitsMinus1 + 1 );
     std::vector<UInt> &rDuCpbRemovalDelayMinus1 = pictureTimingSEI->m_duCpbRemovalDelayMinus1;
@@ -2730,7 +2730,7 @@ void EncGOP::printOutSummary(UInt uiNumAllPicCoded, bool isField, const bool pri
 }
 
 #if W0038_DB_OPT
-UInt64 EncGOP::preLoopFilterPicAndCalcDist( Picture* pcPic )
+uint64_t EncGOP::preLoopFilterPicAndCalcDist( Picture* pcPic )
 {
   CodingStructure& cs = *pcPic->cs;
   m_pcLoopFilter->loopFilterPic( cs );
@@ -2738,7 +2738,7 @@ UInt64 EncGOP::preLoopFilterPicAndCalcDist( Picture* pcPic )
   const CPelUnitBuf picOrg = pcPic->getRecoBuf();
   const CPelUnitBuf picRec = cs.getRecoBuf();
 
-  UInt64 uiDist = 0;
+  uint64_t uiDist = 0;
   for( UInt comp = 0; comp < (UInt)picRec.bufs.size(); comp++)
   {
     const ComponentID compID = ComponentID(comp);
@@ -2845,8 +2845,8 @@ static inline double calcWeightedSquaredError(const CPelBuf& org,    const CPelB
 
   const int hAct = offsetY + (UInt)blockHeight < imageHeight ? blockHeight : blockHeight - 1;
   const int wAct = offsetX + (UInt)blockWidth  < imageWidth  ? blockWidth  : blockWidth  - 1;
-  UInt64 ssErr   = 0; // sum of squared diffs
-  UInt64 saAct   = 0; // sum of abs. activity
+  uint64_t ssErr   = 0; // sum of squared diffs
+  uint64_t saAct   = 0; // sum of abs. activity
   double msAct;
   int x, y;
 
@@ -2856,7 +2856,7 @@ static inline double calcWeightedSquaredError(const CPelBuf& org,    const CPelB
     for (x = 0; x < blockWidth; x++)
     {
       register  int64_t iDiff = (int64_t)o[y*O + x] - (int64_t)r[y*R + x];
-      ssErr += UInt64(iDiff * iDiff);
+      ssErr += uint64_t(iDiff * iDiff);
     }
   }
   if (wAct <= xAct || hAct <= yAct) return (double)ssErr;
@@ -2865,7 +2865,7 @@ static inline double calcWeightedSquaredError(const CPelBuf& org,    const CPelB
   {
     for (x = xAct; x < wAct; x++)
     {
-      saAct += UInt64(abs(4 * (int64_t)o[y*O + x] - (int64_t)o[y*O + x-1] - (int64_t)o[y*O + x+1] - (int64_t)o[(y-1)*O + x] - (int64_t)o[(y+1)*O + x]));
+      saAct += uint64_t(abs(4 * (int64_t)o[y*O + x] - (int64_t)o[y*O + x-1] - (int64_t)o[y*O + x+1] - (int64_t)o[(y-1)*O + x] - (int64_t)o[(y+1)*O + x]));
     }
   }
 
@@ -2881,13 +2881,13 @@ static inline double calcWeightedSquaredError(const CPelBuf& org,    const CPelB
 }
 #endif // ENABLE_QPA
 
-UInt64 EncGOP::xFindDistortionPlane(const CPelBuf& pic0, const CPelBuf& pic1, const UInt rshift
+uint64_t EncGOP::xFindDistortionPlane(const CPelBuf& pic0, const CPelBuf& pic1, const UInt rshift
 #if ENABLE_QPA
                                   , const UInt chromaShift /*= 0*/
 #endif
                                    )
 {
-  UInt64 uiTotalDiff;
+  uint64_t uiTotalDiff;
   const  Pel*  pSrc0 = pic0.bufAt(0, 0);
   const  Pel*  pSrc1 = pic1.bufAt(0, 0);
 
@@ -2915,7 +2915,7 @@ UInt64 EncGOP::xFindDistortionPlane(const CPelBuf& pic0, const CPelBuf& pic1, co
           for (x = 0; x < W; x++)
           {
             register int64_t iDiff = (int64_t)pSrc0[x] - (int64_t)pSrc1[x];
-            uiTotalDiff += UInt64(iDiff * iDiff);
+            uiTotalDiff += uint64_t(iDiff * iDiff);
           }
           pSrc0 += pic0.stride;
           pSrc1 += pic1.stride;
@@ -2945,9 +2945,9 @@ UInt64 EncGOP::xFindDistortionPlane(const CPelBuf& pic0, const CPelBuf& pic1, co
       {
         sumAct /= 1.5;
       }
-      return (wmse <= 0.0) ? 0 : UInt64(wmse * pow(sumAct, BETA) + 0.5);
+      return (wmse <= 0.0) ? 0 : uint64_t(wmse * pow(sumAct, BETA) + 0.5);
 #else
-      return (wmse <= 0.0 || numAct <= 0.0) ? 0 : UInt64(wmse * pow(sumAct / numAct, BETA) + 0.5);
+      return (wmse <= 0.0 || numAct <= 0.0) ? 0 : uint64_t(wmse * pow(sumAct / numAct, BETA) + 0.5);
 #endif
     }
 #endif // ENABLE_QPA
@@ -2957,7 +2957,7 @@ UInt64 EncGOP::xFindDistortionPlane(const CPelBuf& pic0, const CPelBuf& pic1, co
       for (Int x = 0; x < pic0.width; x++)
       {
         Intermediate_Int iTemp = pSrc0[x] - pSrc1[x];
-        uiTotalDiff += UInt64((iTemp * iTemp) >> rshift);
+        uiTotalDiff += uint64_t((iTemp * iTemp) >> rshift);
       }
       pSrc0 += pic0.stride;
       pSrc1 += pic1.stride;
@@ -2971,7 +2971,7 @@ UInt64 EncGOP::xFindDistortionPlane(const CPelBuf& pic0, const CPelBuf& pic1, co
       for (Int x = 0; x < pic0.width; x++)
       {
         Intermediate_Int iTemp = pSrc0[x] - pSrc1[x];
-        uiTotalDiff += UInt64(iTemp * iTemp);
+        uiTotalDiff += uint64_t(iTemp * iTemp);
       }
       pSrc0 += pic0.stride;
       pSrc1 += pic1.stride;
@@ -3166,10 +3166,10 @@ void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUn
     const CPelBuf orgPB(o.bufAt(0, 0), o.stride, width, height);
     const UInt    bitDepth = sps.getBitDepth(toChannelType(compID));
 #if ENABLE_QPA
-    const UInt64 uiSSDtemp = xFindDistortionPlane(recPB, orgPB, useWPSNR ? bitDepth : 0, ::getComponentScaleX(compID, format));
+    const uint64_t uiSSDtemp = xFindDistortionPlane(recPB, orgPB, useWPSNR ? bitDepth : 0, ::getComponentScaleX(compID, format));
     const UInt maxval = /*useWPSNR ? (1 << bitDepth) - 1 :*/ 255 << (bitDepth - 8); // fix with WPSNR: 1023 (4095) instead of 1020 (4080) for bit-depth 10 (12)
 #else
-    const UInt64 uiSSDtemp = xFindDistortionPlane(recPB, orgPB, 0);
+    const uint64_t uiSSDtemp = xFindDistortionPlane(recPB, orgPB, 0);
 #if WCG_WPSNR
   const Double uiSSDtempWeighted = xFindDistortionPlaneWPSNR(recPB, orgPB, 0, org.get(COMPONENT_Y), compID, format);
 #endif
@@ -3376,7 +3376,7 @@ void EncGOP::xCalculateInterlacedAddPSNR( Picture* pcPicOrgFirstField, Picture* 
     CHECK(!(acPicRecFields[0].get(ch).width==acPicRecFields[1].get(ch).width), "Unspecified error");
     CHECK(!(acPicRecFields[0].get(ch).height==acPicRecFields[0].get(ch).height), "Unspecified error");
 
-    UInt64 uiSSDtemp=0;
+    uint64_t uiSSDtemp=0;
     const UInt width    = acPicRecFields[0].get(ch).width - (m_pcEncLib->getPad(0) >> ::getComponentScaleX(ch, format));
     const UInt height   = acPicRecFields[0].get(ch).height - ((m_pcEncLib->getPad(1) >> 1) >> ::getComponentScaleY(ch, format));
     const UInt bitDepth = sps.getBitDepth(toChannelType(ch));
@@ -3679,8 +3679,8 @@ void EncGOP::applyDeblockingFilterMetric( Picture* pcPic, UInt uiNumSlices )
   const UInt noRows = (picHeight>>log2maxTB);
   CHECK(!(noCol > 1), "Unspecified error");
   CHECK(!(noRows > 1), "Unspecified error");
-  std::vector<UInt64> colSAD(noCol,  UInt64(0));
-  std::vector<UInt64> rowSAD(noRows, UInt64(0));
+  std::vector<uint64_t> colSAD(noCol,  uint64_t(0));
+  std::vector<uint64_t> rowSAD(noRows, uint64_t(0));
   UInt colIdx = 0;
   UInt rowIdx = 0;
   Pel p0, p1, p2, q0, q1, q2;
@@ -3738,8 +3738,8 @@ void EncGOP::applyDeblockingFilterMetric( Picture* pcPic, UInt uiNumSlices )
     }
   }
 
-  UInt64 colSADsum = 0;
-  UInt64 rowSADsum = 0;
+  uint64_t colSADsum = 0;
+  uint64_t rowSADsum = 0;
   for(Int c = 0; c < noCol-1; c++)
   {
     colSADsum += colSAD[c];
@@ -3756,7 +3756,7 @@ void EncGOP::applyDeblockingFilterMetric( Picture* pcPic, UInt uiNumSlices )
   rowSADsum /= (noRows-1);
   rowSADsum /= picWidth;
 
-  UInt64 avgSAD = ((colSADsum + rowSADsum)>>1);
+  uint64_t avgSAD = ((colSADsum + rowSADsum)>>1);
   avgSAD >>= (bitDepthLuma-8);
 
   if ( avgSAD > 2048 )
@@ -3825,15 +3825,15 @@ void EncGOP::applyDeblockingFilterParameterSelection( Picture* pcPic, const UInt
   const Int  maxTcOffsetDiv2   = bNoFiltering? Clip3(MIN_TC_OFFSET, MAX_TC_OFFSET, m_DBParam[currQualityLayer][DBFLT_TC_OFFSETD2]+2)       : MAX_TC_OFFSET;
   const Int  minTcOffsetDiv2   = bNoFiltering? Clip3(MIN_TC_OFFSET, MAX_TC_OFFSET, m_DBParam[currQualityLayer][DBFLT_TC_OFFSETD2]-2)       : MIN_TC_OFFSET;
 
-  UInt64 distBetaPrevious      = std::numeric_limits<UInt64>::max();
-  UInt64 distMin               = std::numeric_limits<UInt64>::max();
+  uint64_t distBetaPrevious      = std::numeric_limits<uint64_t>::max();
+  uint64_t distMin               = std::numeric_limits<uint64_t>::max();
   bool   bDBFilterDisabledBest = true;
   Int    betaOffsetDiv2Best    = 0;
   Int    tcOffsetDiv2Best      = 0;
 
   for(Int betaOffsetDiv2=maxBetaOffsetDiv2; betaOffsetDiv2>=minBetaOffsetDiv2; betaOffsetDiv2--)
   {
-    UInt64 distTcMin = std::numeric_limits<UInt64>::max();
+    uint64_t distTcMin = std::numeric_limits<uint64_t>::max();
     for(Int tcOffsetDiv2=maxTcOffsetDiv2; tcOffsetDiv2 >= minTcOffsetDiv2; tcOffsetDiv2--)
     {
       for (Int i=0; i<numSlices; i++)
@@ -3848,7 +3848,7 @@ void EncGOP::applyDeblockingFilterParameterSelection( Picture* pcPic, const UInt
       // restore reconstruction
       reco.copyFrom( *m_pcDeblockingTempPicYuv );
 
-      const UInt64 dist = preLoopFilterPicAndCalcDist( pcPic );
+      const uint64_t dist = preLoopFilterPicAndCalcDist( pcPic );
 
       if(dist < distMin)
       {

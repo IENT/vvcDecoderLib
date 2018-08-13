@@ -89,8 +89,8 @@ void AQpPreanalyzer::preanalyze( Picture* pcEPic )
       {
         const UInt uiCurrAQPartWidth = std::min(uiAQPartWidth, iWidth-x);
         const Pel* pBlkY = &pLineY[x];
-        UInt64 uiSum[4] = {0, 0, 0, 0};
-        UInt64 uiSumSq[4] = {0, 0, 0, 0};
+        uint64_t uiSum[4] = {0, 0, 0, 0};
+        uint64_t uiSumSq[4] = {0, 0, 0, 0};
         UInt by = 0;
         for ( ; by < uiCurrAQPartHeight>>1; by++ )
         {

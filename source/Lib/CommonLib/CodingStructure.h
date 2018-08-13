@@ -155,7 +155,7 @@ public:
   static_vector<double, NUM_ENC_FEATURES> features;
 
   double      cost;
-  UInt64      fracBits;
+  uint64_t      fracBits;
   Distortion  dist;
   Distortion  interHad;
 

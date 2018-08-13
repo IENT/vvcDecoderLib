@@ -489,7 +489,7 @@ void IntraSearch::estIntraPredLumaQT( CodingUnit &cu, Partitioner &partitioner )
             // NB xFracModeBitsIntra will not affect the mode for chroma that may have already been pre-estimated.
             m_CABACEstimator->getCtx() = SubCtx( Ctx::IPredMode[CHANNEL_TYPE_LUMA], ctxStartIntraMode );
 
-            UInt64 fracModeBits = xFracModeBitsIntra(pu, uiMode, CHANNEL_TYPE_LUMA);
+            uint64_t fracModeBits = xFracModeBitsIntra(pu, uiMode, CHANNEL_TYPE_LUMA);
 
             Double cost = ( Double ) uiSad + ( Double ) fracModeBits * sqrtLambdaForFirstPass;
 
@@ -666,7 +666,7 @@ void IntraSearch::estIntraPredLumaQT( CodingUnit &cu, Partitioner &partitioner )
                   // NB xFracModeBitsIntra will not affect the mode for chroma that may have already been pre-estimated.
                   m_CABACEstimator->getCtx() = SubCtx( Ctx::IPredMode[CHANNEL_TYPE_LUMA], ctxStartIntraMode );
 
-                  UInt64 fracModeBits = xFracModeBitsIntra( pu, uiMode, CHANNEL_TYPE_LUMA );
+                  uint64_t fracModeBits = xFracModeBitsIntra( pu, uiMode, CHANNEL_TYPE_LUMA );
 
                   Double cost = ( Double ) uiSad + ( Double ) fracModeBits * sqrtLambdaForFirstPass;
 
@@ -1108,7 +1108,7 @@ void IntraSearch::estIntraPredChromaQT(CodingUnit &cu, Partitioner &partitioner)
           m_CABACEstimator->getCtx() = ctxStart;
         }
 
-        UInt64 fracBits   = xGetIntraFracBitsQT( cs, partitioner, false, true );
+        uint64_t fracBits   = xGetIntraFracBitsQT( cs, partitioner, false, true );
         Distortion uiDist = cs.dist;
         Double    dCost   = m_pcRdCost->calcRdCost( fracBits, uiDist - baseDist );
 
@@ -1421,7 +1421,7 @@ void IntraSearch::xEncCoeffQT(CodingStructure &cs, Partitioner &partitioner, con
   }
 }
 
-UInt64 IntraSearch::xGetIntraFracBitsQT( CodingStructure &cs, Partitioner &partitioner, const bool &bLuma, const bool &bChroma )
+uint64_t IntraSearch::xGetIntraFracBitsQT( CodingStructure &cs, Partitioner &partitioner, const bool &bLuma, const bool &bChroma )
 {
   m_CABACEstimator->resetBits();
 
@@ -1447,11 +1447,11 @@ UInt64 IntraSearch::xGetIntraFracBitsQT( CodingStructure &cs, Partitioner &parti
   m_CABACEstimator->cu_emt_pertu_idx( *cs.cus.front() );
 
 #endif
-  UInt64 fracBits = m_CABACEstimator->getEstFracBits();
+  uint64_t fracBits = m_CABACEstimator->getEstFracBits();
   return fracBits;
 }
 
-UInt64 IntraSearch::xGetIntraFracBitsQTChroma(TransformUnit& currTU, const ComponentID &compID)
+uint64_t IntraSearch::xGetIntraFracBitsQTChroma(TransformUnit& currTU, const ComponentID &compID)
 {
   m_CABACEstimator->resetBits();
 
@@ -1464,7 +1464,7 @@ UInt64 IntraSearch::xGetIntraFracBitsQTChroma(TransformUnit& currTU, const Compo
     m_CABACEstimator->residual_coding( currTU, compID );
   }
 
-  UInt64 fracBits = m_CABACEstimator->getEstFracBits();
+  uint64_t fracBits = m_CABACEstimator->getEstFracBits();
   return fracBits;
 }
 
@@ -1715,7 +1715,7 @@ void IntraSearch::xRecurIntraCodingLumaQT( CodingStructure &cs, Partitioner &par
 
   Double     dSingleCost                        = MAX_DOUBLE;
   Distortion uiSingleDistLuma                   = 0;
-  UInt64     singleFracBits                     = 0;
+  uint64_t     singleFracBits                     = 0;
   bool       checkTransformSkip                 = pps.getUseTransformSkip();
   Int        bestModeId[MAX_NUM_COMPONENT]      = {0, 0, 0};
 #if JVET_K1000_SIMPLIFIED_EMT
@@ -1776,7 +1776,7 @@ void IntraSearch::xRecurIntraCodingLumaQT( CodingStructure &cs, Partitioner &par
     TransformUnit *tmpTU = nullptr;
 
     Distortion singleDistTmpLuma = 0;
-    UInt64     singleTmpFracBits = 0;
+    uint64_t     singleTmpFracBits = 0;
     Double     singleCostTmp     = 0;
     Int        firstCheckId      = 0;
 
@@ -2167,7 +2167,7 @@ ChromaCbfs IntraSearch::xRecurIntraChromaCodingQT(CodingStructure &cs, Partition
           }
           else if( !isOneMode )
           {
-            UInt64 fracBitsTmp = xGetIntraFracBitsQTChroma( currTU, compID );
+            uint64_t fracBitsTmp = xGetIntraFracBitsQTChroma( currTU, compID );
             singleCostTmp = m_pcRdCost->calcRdCost( fracBitsTmp, singleDistCTmp );
           }
 
@@ -2273,7 +2273,7 @@ ChromaCbfs IntraSearch::xRecurIntraChromaCodingQT(CodingStructure &cs, Partition
   return cbfs;
 }
 
-UInt64 IntraSearch::xFracModeBitsIntra(PredictionUnit &pu, const UInt &uiMode, const ChannelType &chType)
+uint64_t IntraSearch::xFracModeBitsIntra(PredictionUnit &pu, const UInt &uiMode, const ChannelType &chType)
 {
   UInt orgMode = uiMode;
 

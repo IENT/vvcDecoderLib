@@ -183,7 +183,7 @@ public:
 
   void  printOutSummary      ( UInt uiNumAllPicCoded, bool isField, const bool printMSEBasedSNR, const bool printSequenceMSE, const BitDepths &bitDepths );
 #if W0038_DB_OPT
-  UInt64  preLoopFilterPicAndCalcDist( Picture* pcPic );
+  uint64_t  preLoopFilterPicAndCalcDist( Picture* pcPic );
 #endif
   EncSlice*  getSliceEncoder()   { return m_pcSliceEncoder; }
   NalUnitType getNalUnitType( Int pocCurr, Int lastIdr, bool isField );
@@ -211,7 +211,7 @@ protected:
                                      PelUnitBuf cPicRecFirstField, PelUnitBuf cPicRecSecondField,
                                      const InputColourSpaceConversion snr_conversion, const bool printFrameMSE, Double* PSNR_Y );
 
-  UInt64 xFindDistortionPlane(const CPelBuf& pic0, const CPelBuf& pic1, const UInt rshift
+  uint64_t xFindDistortionPlane(const CPelBuf& pic0, const CPelBuf& pic1, const UInt rshift
 #if ENABLE_QPA
                             , const UInt chromaShift = 0
 #endif

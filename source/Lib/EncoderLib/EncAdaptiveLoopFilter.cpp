@@ -2057,24 +2057,24 @@ void EncAdaptiveLoopFilter::ALFProcess(CodingStructure& cs, ALFParam* pcAlfParam
   const PelUnitBuf cRecExtBuf = recExtBuf;
   // set min cost
 #if DISTORTION_TYPE_BUGFIX
-  UInt64 uiMinRate = std::numeric_limits<UInt64>::max();
-  UInt64 uiMinDist = std::numeric_limits<UInt64>::max();
+  uint64_t uiMinRate = std::numeric_limits<uint64_t>::max();
+  uint64_t uiMinDist = std::numeric_limits<uint64_t>::max();
 #else
-  UInt64 uiMinRate = MAX_INT;
-  UInt64 uiMinDist = MAX_INT;
+  uint64_t uiMinRate = MAX_INT;
+  uint64_t uiMinDist = MAX_INT;
 #endif
   Double dMinCost = MAX_DOUBLE;
 
 #if DISTORTION_TYPE_BUGFIX
-  UInt64 ruiBits = std::numeric_limits<UInt64>::max();
-  UInt64 ruiDist = std::numeric_limits<UInt64>::max();
+  uint64_t ruiBits = std::numeric_limits<uint64_t>::max();
+  uint64_t ruiDist = std::numeric_limits<uint64_t>::max();
 #else
-  UInt64 ruiBits = MAX_INT;
-  UInt64 ruiDist = MAX_INT;
+  uint64_t ruiBits = MAX_INT;
+  uint64_t ruiDist = MAX_INT;
 #endif
 
-  UInt64  uiOrigRate;
-  UInt64  uiOrigDist;
+  uint64_t  uiOrigRate;
+  uint64_t  uiOrigDist;
   Double  dOrigCost;
 
   // calc original cost
@@ -2177,7 +2177,7 @@ void EncAdaptiveLoopFilter::ALFProcess(CodingStructure& cs, ALFParam* pcAlfParam
 // ====================================================================================================================
 // LUMA
 // ====================================================================================================================
-void EncAdaptiveLoopFilter::xEncALFLuma( const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, UInt64& ruiMinRate, UInt64& ruiMinDist, Double& rdMinCost, const Slice* pSlice)
+void EncAdaptiveLoopFilter::xEncALFLuma( const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, uint64_t& ruiMinRate, uint64_t& ruiMinDist, Double& rdMinCost, const Slice* pSlice)
 {
   m_updateMatrix = true;
 #if JVET_C0038_NO_PREV_FILTERS
@@ -2440,7 +2440,7 @@ void EncAdaptiveLoopFilter::xPreFilterFr(Int** imgY_preFilter, const Pel* imgY_r
   }
   }
 #endif
-void EncAdaptiveLoopFilter::xEncALFChroma(UInt64 uiLumaRate, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, UInt64& ruiDist, UInt64& ruiBits, const Slice* pSlice)
+void EncAdaptiveLoopFilter::xEncALFChroma(uint64_t uiLumaRate, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, uint64_t& ruiDist, uint64_t& ruiBits, const Slice* pSlice)
 {
   // restriction for non-referenced B-slice
   if( m_eSliceType == B_SLICE && m_iPicNalReferenceIdc == 0 )
@@ -2463,11 +2463,11 @@ void EncAdaptiveLoopFilter::xEncALFChroma(UInt64 uiLumaRate, const PelUnitBuf& o
   }
 
   // set min cost
-  UInt64 uiMinRate = uiLumaRate;
+  uint64_t uiMinRate = uiLumaRate;
 #if DISTORTION_TYPE_BUGFIX
-  UInt64 uiMinDist = std::numeric_limits<UInt64>::max();
+  uint64_t uiMinDist = std::numeric_limits<uint64_t>::max();
 #else
-  UInt64 uiMinDist = MAX_INT;
+  uint64_t uiMinDist = MAX_INT;
 #endif
   Double dMinCost  = MAX_DOUBLE;
 
@@ -2484,10 +2484,10 @@ void EncAdaptiveLoopFilter::xEncALFChroma(UInt64 uiLumaRate, const PelUnitBuf& o
   xFilteringFrameChroma(orgUnitBuf, recExtBuf, recUnitBuf );
 
   // filter on/off decision for chroma
-  UInt64 uiFiltDistCb = xCalcSSD( orgUnitBuf, recUnitBuf, COMPONENT_Cb);
-  UInt64 uiFiltDistCr = xCalcSSD( orgUnitBuf, recUnitBuf, COMPONENT_Cr);
-  UInt64 uiOrgDistCb  = xCalcSSD( orgUnitBuf, recExtBuf, COMPONENT_Cb);
-  UInt64 uiOrgDistCr  = xCalcSSD( orgUnitBuf, recExtBuf, COMPONENT_Cr);
+  uint64_t uiFiltDistCb = xCalcSSD( orgUnitBuf, recUnitBuf, COMPONENT_Cb);
+  uint64_t uiFiltDistCr = xCalcSSD( orgUnitBuf, recUnitBuf, COMPONENT_Cr);
+  uint64_t uiOrgDistCb  = xCalcSSD( orgUnitBuf, recExtBuf, COMPONENT_Cb);
+  uint64_t uiOrgDistCr  = xCalcSSD( orgUnitBuf, recExtBuf, COMPONENT_Cr);
 
   m_pcTempAlfParam->chroma_idc = 0;
   if(uiOrgDistCb > uiFiltDistCb)
@@ -2507,7 +2507,7 @@ void EncAdaptiveLoopFilter::xEncALFChroma(UInt64 uiLumaRate, const PelUnitBuf& o
       xFilteringFrameChroma( orgUnitBuf, recExtBuf, recUnitBuf );
     }
 
-    UInt64 uiRate, uiDist;
+    uint64_t uiRate, uiDist;
     Double dCost;
     xCalcRDCostChroma( orgUnitBuf, recUnitBuf, m_pcTempAlfParam, uiRate, uiDist, dCost );
 
@@ -2578,8 +2578,8 @@ void EncAdaptiveLoopFilter::xCheckReUseFilterSet( CodingStructure& cs, const Pel
   cFrmAlfParam.chroma_idc       = 0;
 
   Double dCost  = 0;
-  UInt64 uiRate = 0;
-  UInt64 uiDist = 0;
+  uint64_t uiRate = 0;
+  uint64_t uiDist = 0;
 
   xFilterFrame_en(dstUnitBuf, recExtBuf, cFrmAlfParam, cs.slice->clpRng(COMPONENT_Y));
   uiDist = xCalcSSD(orgUnitBuf, dstUnitBuf, COMPONENT_Y);
@@ -2621,8 +2621,8 @@ void EncAdaptiveLoopFilter::xCheckReUseFilterSet( CodingStructure& cs, const Pel
 
       xFilteringFrameChroma( orgUnitBuf, recExtBuf, dstUnitBuf );
 
-      UInt64 uiOrgDistCb  = xCalcSSD(orgUnitBuf, recExtBuf, COMPONENT_Cb);
-      UInt64 uiFiltDistCb = xCalcSSD(orgUnitBuf, dstUnitBuf, COMPONENT_Cb);
+      uint64_t uiOrgDistCb  = xCalcSSD(orgUnitBuf, recExtBuf, COMPONENT_Cb);
+      uint64_t uiFiltDistCb = xCalcSSD(orgUnitBuf, dstUnitBuf, COMPONENT_Cb);
 
       if( uiFiltDistCb < uiOrgDistCb )
       {
@@ -2634,8 +2634,8 @@ void EncAdaptiveLoopFilter::xCheckReUseFilterSet( CodingStructure& cs, const Pel
         m_bestPelBuf.get(COMPONENT_Cb).copyFrom( recExtBuf.get(COMPONENT_Cb ) );
       }
 
-      UInt64 uiOrgDistCr  = xCalcSSD(orgUnitBuf, recExtBuf, COMPONENT_Cr);
-      UInt64 uiFiltDistCr = xCalcSSD(orgUnitBuf, dstUnitBuf, COMPONENT_Cr);
+      uint64_t uiOrgDistCr  = xCalcSSD(orgUnitBuf, recExtBuf, COMPONENT_Cr);
+      uint64_t uiFiltDistCr = xCalcSSD(orgUnitBuf, dstUnitBuf, COMPONENT_Cr);
 
       if(uiOrgDistCr  > uiFiltDistCr )
       {
@@ -4605,7 +4605,7 @@ void EncAdaptiveLoopFilter::xSetInitialMask( const CPelBuf& recBufExt )
 //********************************
 // CU Adaptation
 //********************************
-void EncAdaptiveLoopFilter::xCheckCUAdaptation( CodingStructure& cs, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, UInt64& ruiMinRate, UInt64& ruiMinDist, Double& rdMinCost )
+void EncAdaptiveLoopFilter::xCheckCUAdaptation( CodingStructure& cs, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, uint64_t& ruiMinRate, uint64_t& ruiMinDist, Double& rdMinCost )
 {
   ALFParam cFrmAlfParam;
   allocALFParam(&cFrmAlfParam);
@@ -4641,7 +4641,7 @@ void EncAdaptiveLoopFilter::xCheckCUAdaptation( CodingStructure& cs, const PelUn
           cs.slice->clpRng(COMPONENT_Y) );
       }
 
-      UInt64 uiRate, uiDist;
+      uint64_t uiRate, uiDist;
       Double dCost;
       xSetCUAlfCtrlFlags( cs, orgUnitBuf, recExtBuf, m_tempPelBuf, uiDist, uiDepth, m_pcTempAlfParam ); //set up varImg here
       xCalcRDCost( uiDist, m_pcTempAlfParam, uiRate, dCost );
@@ -4685,7 +4685,7 @@ void EncAdaptiveLoopFilter::xCheckCUAdaptation( CodingStructure& cs, const PelUn
 }
 
 
-void EncAdaptiveLoopFilter::xSetCUAlfCtrlFlags( CodingStructure& cs, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, UInt64& ruiDist, UInt uiAlfCtrlDepth, ALFParam *pAlfParam )
+void EncAdaptiveLoopFilter::xSetCUAlfCtrlFlags( CodingStructure& cs, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, uint64_t& ruiDist, UInt uiAlfCtrlDepth, ALFParam *pAlfParam )
 {
   ruiDist = 0;
   pAlfParam->num_alf_cu_flag = 0;
@@ -4733,7 +4733,7 @@ void EncAdaptiveLoopFilter::xSetCUAlfCtrlFlags( CodingStructure& cs, const PelUn
 }
 
 
-void EncAdaptiveLoopFilter::xSetCUAlfCtrlFlag( CodingStructure& cs, const UnitArea alfCtrlArea, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, UInt64& ruiDist, ALFParam *pAlfParam)
+void EncAdaptiveLoopFilter::xSetCUAlfCtrlFlag( CodingStructure& cs, const UnitArea alfCtrlArea, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, uint64_t& ruiDist, ALFParam *pAlfParam)
 {
 
   const Position& blkPos   = alfCtrlArea.lumaPos();
@@ -4745,8 +4745,8 @@ void EncAdaptiveLoopFilter::xSetCUAlfCtrlFlag( CodingStructure& cs, const UnitAr
   CPelBuf cfiltBufCUs  = recUnitBuf.get(COMPONENT_Y).subBuf( blkPos, blkSize );
   UIntBuf  maskBufCUs  = m_maskBuf.subBuf( blkPos, blkSize );
 
-  UInt64 uiRecSSD  = xCalcSSD( orgBufCUs, recBufCUs  );
-  UInt64 uiFiltSSD = xCalcSSD( orgBufCUs, cfiltBufCUs );
+  uint64_t uiRecSSD  = xCalcSSD( orgBufCUs, recBufCUs  );
+  uint64_t uiFiltSSD = xCalcSSD( orgBufCUs, cfiltBufCUs );
 
   UInt filterFlag = !!(uiFiltSSD < uiRecSSD );
   maskBufCUs.fill( filterFlag );
@@ -5634,7 +5634,7 @@ Int EncAdaptiveLoopFilter::lengthFilterCoeffs( int sqrFiltLength, int filters_pe
 // Filter Type Decsion
 //###################################
 
-void EncAdaptiveLoopFilter::xFilterTypeDecision(  CodingStructure& cs, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, UInt64& ruiMinRate, UInt64& ruiMinDist, Double& rdMinCost, const Slice*  slice)
+void EncAdaptiveLoopFilter::xFilterTypeDecision(  CodingStructure& cs, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, uint64_t& ruiMinRate, uint64_t& ruiMinDist, Double& rdMinCost, const Slice*  slice)
 {
 
   // restriction for non-referenced B-slice
@@ -5643,7 +5643,7 @@ void EncAdaptiveLoopFilter::xFilterTypeDecision(  CodingStructure& cs, const Pel
     return;
   }
 
-  UInt64 uiRate, uiDist;
+  uint64_t uiRate, uiDist;
   Double dCost;
 
   bool bChanged = false;
@@ -5751,7 +5751,7 @@ void EncAdaptiveLoopFilter::xReDesignFilterCoeff( const PelUnitBuf& orgUnitBuf, 
 }
 
 
-void EncAdaptiveLoopFilter::xCalcRDCost( const UInt64 uiDist, ALFParam* pAlfParam, UInt64& ruiRate,  Double& rdCost )
+void EncAdaptiveLoopFilter::xCalcRDCost( const uint64_t uiDist, ALFParam* pAlfParam, uint64_t& ruiRate,  Double& rdCost )
 {
   if(pAlfParam != NULL)
   {
@@ -5768,7 +5768,7 @@ void EncAdaptiveLoopFilter::xCalcRDCost( const UInt64 uiDist, ALFParam* pAlfPara
 }
 
 
-void EncAdaptiveLoopFilter::xCalcRDCostLuma( const CPelUnitBuf& orgUnitBuf, const CPelUnitBuf& recBuf, ALFParam* pAlfParam, UInt64& ruiRate, UInt64& ruiDist, Double& rdCost )
+void EncAdaptiveLoopFilter::xCalcRDCostLuma( const CPelUnitBuf& orgUnitBuf, const CPelUnitBuf& recBuf, ALFParam* pAlfParam, uint64_t& ruiRate, uint64_t& ruiDist, Double& rdCost )
 {
   if(pAlfParam != NULL)
   {
@@ -5785,12 +5785,12 @@ void EncAdaptiveLoopFilter::xCalcRDCostLuma( const CPelUnitBuf& orgUnitBuf, cons
   rdCost  = (Double)(ruiRate) * m_dLambdaLuma + (Double)(ruiDist);
 }
 
-UInt64 EncAdaptiveLoopFilter::xCalcSSD(const CPelUnitBuf& OrgBuf, const CPelUnitBuf& CmpBuf,  const ComponentID compId)
+uint64_t EncAdaptiveLoopFilter::xCalcSSD(const CPelUnitBuf& OrgBuf, const CPelUnitBuf& CmpBuf,  const ComponentID compId)
 {
   return xCalcSSD(OrgBuf.get(compId), CmpBuf.get(compId));
 }
 
-UInt64 EncAdaptiveLoopFilter::xCalcSSD(const CPelBuf& refBuf, const CPelBuf& cmpBuf)
+uint64_t EncAdaptiveLoopFilter::xCalcSSD(const CPelBuf& refBuf, const CPelBuf& cmpBuf)
 {
   Int iWidth = refBuf.width;
   Int iHeight = refBuf.height;
@@ -5799,7 +5799,7 @@ UInt64 EncAdaptiveLoopFilter::xCalcSSD(const CPelBuf& refBuf, const CPelBuf& cmp
   const Pel* pOrg = refBuf.buf;
   const Pel* pCmp = cmpBuf.buf;
 
-  UInt64 uiSSD = 0;
+  uint64_t uiSSD = 0;
   Int x, y;
 
   UInt uiShift = m_nBitIncrement<<1;
@@ -5823,7 +5823,7 @@ UInt64 EncAdaptiveLoopFilter::xCalcSSD(const CPelBuf& refBuf, const CPelBuf& cmp
 //   CHROMA RELATED
 //####################################
 
-void EncAdaptiveLoopFilter::xCalcRDCostChroma( const CPelUnitBuf& orgUnitBuf, const CPelUnitBuf& recBuf, ALFParam* pAlfParam, UInt64& ruiRate, UInt64& ruiDist, Double& rdCost )
+void EncAdaptiveLoopFilter::xCalcRDCostChroma( const CPelUnitBuf& orgUnitBuf, const CPelUnitBuf& recBuf, ALFParam* pAlfParam, uint64_t& ruiRate, uint64_t& ruiDist, Double& rdCost )
 {
   if( pAlfParam->chroma_idc )
   {
@@ -6340,9 +6340,9 @@ void EncAdaptiveLoopFilter::xFilterCoefQuickSort( Double *coef_data, Int *coef_n
 }
 
 #if COM16_C806_ALF_TEMPPRED_NUM
-bool EncAdaptiveLoopFilter::xFilteringLumaChroma(CodingStructure& cs, ALFParam *pAlfParam, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, UInt64& ruiMinRate, UInt64& ruiMinDist, Double& rdMinCost, Int uiIndex, const Slice* pSlice)
+bool EncAdaptiveLoopFilter::xFilteringLumaChroma(CodingStructure& cs, ALFParam *pAlfParam, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, uint64_t& ruiMinRate, uint64_t& ruiMinDist, Double& rdMinCost, Int uiIndex, const Slice* pSlice)
 {
-  UInt64 uiRate, uiDist = 0;
+  uint64_t uiRate, uiDist = 0;
   Double dCost;
 
   //UInt   uiTmpMaxDepth = pAlfParam->alf_max_depth;
@@ -6393,7 +6393,7 @@ bool EncAdaptiveLoopFilter::xFilteringLumaChroma(CodingStructure& cs, ALFParam *
   {
     m_pcTempAlfParam->alf_max_depth = uiDepth;
     m_tempPelBuf.get(COMPONENT_Y).copyFrom(recUnitBuf.get(COMPONENT_Y));
-    UInt64 uiTmpRate, uiTmpDist;
+    uint64_t uiTmpRate, uiTmpDist;
     Double dTmpCost;
     //m_pcPicYuvTmp: filtered signal, pcPicDec: orig reconst
     xSetCUAlfCtrlFlags(cs, orgUnitBuf, recExtBuf, m_tempPelBuf, uiTmpDist, uiDepth, m_pcTempAlfParam);
@@ -6434,7 +6434,7 @@ bool EncAdaptiveLoopFilter::xFilteringLumaChroma(CodingStructure& cs, ALFParam *
     xFrameChromaGalf(pAlfParam, recExtBuf, recUnitBuf, COMPONENT_Cb);
     xFrameChromaGalf(pAlfParam, recExtBuf, recUnitBuf, COMPONENT_Cr);
 
-    UInt64 uiDistOrg;
+    uint64_t uiDistOrg;
 
     uiDist    = xCalcSSD(orgUnitBuf, recUnitBuf, COMPONENT_Cb);
     uiDistOrg = xCalcSSD(orgUnitBuf, recExtBuf, COMPONENT_Cb);

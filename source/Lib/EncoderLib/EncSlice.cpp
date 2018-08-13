@@ -767,7 +767,7 @@ static bool applyQPAdaptation (Picture* const pcPic, Slice* const pcSlice,    co
     // change new fixed QP based on average CTU luma value (Sharp)
     if (useSharpLumaDQP)
     {
-      UInt64 uAvgLuma = 0;
+      uint64_t uAvgLuma = 0;
 
       for (UInt ctuTsAddr = startAddr; ctuTsAddr < boundingAddr; ctuTsAddr++)
       {
@@ -777,11 +777,11 @@ static bool applyQPAdaptation (Picture* const pcPic, Slice* const pcSlice,    co
         const UInt ctuRsAddr = ctuTsAddr;
 #endif
 
-        uAvgLuma += (UInt64)pcPic->m_iOffsetCtu[ctuRsAddr];
+        uAvgLuma += (uint64_t)pcPic->m_iOffsetCtu[ctuRsAddr];
       }
       uAvgLuma = (uAvgLuma + ((boundingAddr - startAddr) >> 1)) / (boundingAddr - startAddr);
 
-      iQPFixed = Clip3 (0, MAX_QP, iQPFixed + 1 - int((3 * uAvgLuma * uAvgLuma) >> UInt64(2 * iBitDepth - 1)));
+      iQPFixed = Clip3 (0, MAX_QP, iQPFixed + 1 - int((3 * uAvgLuma * uAvgLuma) >> uint64_t(2 * iBitDepth - 1)));
     }
 #endif
 
@@ -836,9 +836,9 @@ static bool applyQPAdaptation (Picture* const pcPic, Slice* const pcSlice,    co
         // change adaptive QP based on mean CTU luma value (Sharp)
         if (useSharpLumaDQP)
         {
-          const UInt64 uAvgLuma   = (UInt64)dcOffset;
+          const uint64_t uAvgLuma   = (uint64_t)dcOffset;
 
-          iQPAdapt = max (0, iQPAdapt + 1 - int((3 * uAvgLuma * uAvgLuma) >> UInt64(2 * iBitDepth - 1)));
+          iQPAdapt = max (0, iQPAdapt + 1 - int((3 * uAvgLuma * uAvgLuma) >> uint64_t(2 * iBitDepth - 1)));
         }
 
 #endif
@@ -862,9 +862,9 @@ static bool applyQPAdaptation (Picture* const pcPic, Slice* const pcSlice,    co
 
         if (iSrcHeight >= 64 || iSrcWidth >= 64)  // normalization
         {
-          const UInt64 blockSize = UInt64(iSrcWidth * iSrcHeight);
+          const uint64_t blockSize = uint64_t(iSrcWidth * iSrcHeight);
 
-          uAbsDCless = UInt((UInt64(uAbsDCless) * 64*64 + (blockSize >> 1)) / blockSize);
+          uAbsDCless = UInt((uint64_t(uAbsDCless) * 64*64 + (blockSize >> 1)) / blockSize);
         }
 
         if (uAbsDCless < 64*64) uAbsDCless = 64*64;  // limit to 1
@@ -1025,7 +1025,7 @@ void EncSlice::precompressSlice( Picture* pcPic )
     // try compress
     compressSlice   ( pcPic, true, m_pcCfg->getFastDeltaQp());
 
-    UInt64 uiPicDist        = m_uiPicDist; // Distortion, as calculated by compressSlice.
+    uint64_t uiPicDist        = m_uiPicDist; // Distortion, as calculated by compressSlice.
     // NOTE: This distortion is the chroma-weighted SSE distortion for the slice.
     //       Previously a standard SSE distortion was calculated (for the entire frame).
     //       Which is correct?

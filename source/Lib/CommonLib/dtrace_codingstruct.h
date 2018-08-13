@@ -76,11 +76,11 @@ inline void dtraceModeCost(CodingStructure &cs, double lambda)
   Distortion tempDist = cs.dist;
 
 #if OLD_RDCOST
-  UInt64 tempBits = cs.fracBits >> SCALE_BITS;
-  UInt64 tempCost = (UInt64)(cs.dist + (double)tempBits * lambda);
+  uint64_t tempBits = cs.fracBits >> SCALE_BITS;
+  uint64_t tempCost = (uint64_t)(cs.dist + (double)tempBits * lambda);
 #else
-  UInt64 tempBits = cs.fracBits;
-  UInt64 tempCost = (UInt64)cs.cost;
+  uint64_t tempBits = cs.fracBits;
+  uint64_t tempCost = (uint64_t)cs.cost;
 #endif
 
   if( cs.cost == MAX_DOUBLE )
@@ -166,15 +166,15 @@ inline void dtraceBestMode(CodingStructure *&tempCS, CodingStructure *&bestCS, d
   Distortion tempDist = tempCS->dist;
 
 #if OLD_RDCOST
-  UInt64 tempBits = tempCS->fracBits >> SCALE_BITS;
-  UInt64 bestBits = bestCS->fracBits >> SCALE_BITS;
-  UInt64 tempCost = (UInt64)(tempCS->dist + (double)tempBits * lambda);
-  UInt64 bestCost = (UInt64)(bestCS->dist + (double)bestBits * lambda);
+  uint64_t tempBits = tempCS->fracBits >> SCALE_BITS;
+  uint64_t bestBits = bestCS->fracBits >> SCALE_BITS;
+  uint64_t tempCost = (uint64_t)(tempCS->dist + (double)tempBits * lambda);
+  uint64_t bestCost = (uint64_t)(bestCS->dist + (double)bestBits * lambda);
 #else
-  UInt64 tempBits = tempCS->fracBits;
-  UInt64 bestBits = bestCS->fracBits;
-  UInt64 tempCost = (UInt64)tempCS->cost;
-  UInt64 bestCost = (UInt64)bestCS->cost;
+  uint64_t tempBits = tempCS->fracBits;
+  uint64_t bestBits = bestCS->fracBits;
+  uint64_t tempCost = (uint64_t)tempCS->cost;
+  uint64_t bestCost = (uint64_t)bestCS->cost;
 #endif
 
   if( tempCS->cost == MAX_DOUBLE )

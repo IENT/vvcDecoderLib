@@ -67,7 +67,7 @@ CIPFSpec getCIPFSpec( const Slice* slice, const int ctuXPosInCtus, const int ctu
 
 #endif
 
-UInt64 CS::getEstBits(const CodingStructure &cs)
+uint64_t CS::getEstBits(const CodingStructure &cs)
 {
   return cs.fracBits >> SCALE_BITS;
 }

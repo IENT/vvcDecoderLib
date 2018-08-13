@@ -367,23 +367,6 @@ typedef       double              Double;
 
 
 // ====================================================================================================================
-// 64-bit integer type
-// ====================================================================================================================
-
-#ifdef _MSC_VER
-#if _MSC_VER <= 1200 // MS VC6
-typedef       __int64             UInt64;   // MS VC6 does not support unsigned __int64 to double conversion
-#else
-typedef       unsigned __int64    UInt64;
-#endif
-
-#else
-
-typedef       unsigned long long  UInt64;
-
-#endif
-
-// ====================================================================================================================
 // Named numerical types
 // ====================================================================================================================
 
@@ -393,7 +376,7 @@ typedef       int64_t           TCoeff;            ///< transform coefficient
 typedef       Int             TMatrixCoeff;      ///< transform matrix coefficient
 typedef       Short           TFilterCoeff;      ///< filter coefficient
 typedef       int64_t           Intermediate_Int;  ///< used as intermediate value in calculations
-typedef       UInt64          Intermediate_UInt; ///< used as intermediate value in calculations
+typedef       uint64_t          Intermediate_UInt; ///< used as intermediate value in calculations
 #else
 typedef       Short           Pel;               ///< pixel type
 typedef       Int             TCoeff;            ///< transform coefficient
@@ -403,13 +386,13 @@ typedef       Int             Intermediate_Int;  ///< used as intermediate value
 typedef       UInt            Intermediate_UInt; ///< used as intermediate value in calculations
 #endif
 
-typedef       UInt64          SplitSeries;       ///< used to encoded the splits that caused a particular CU size
+typedef       uint64_t          SplitSeries;       ///< used to encoded the splits that caused a particular CU size
 
 #if DISTORTION_TYPE_BUGFIX
 typedef       uint64_t        Distortion;        ///< distortion measurement
 #else
 #if FULL_NBIT
-typedef       UInt64          Distortion;        ///< distortion measurement
+typedef       uint64_t          Distortion;        ///< distortion measurement
 #else
 typedef       UInt            Distortion;        ///< distortion measurement
 #endif

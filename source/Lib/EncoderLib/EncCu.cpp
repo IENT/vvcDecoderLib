@@ -1048,7 +1048,7 @@ void EncCu::xCheckModeSplit(CodingStructure *&tempCS, CodingStructure *&bestCS, 
     }
 
     const double factor = ( tempCS->currQP[partitioner.chType] > 30 ? 1.1 : 1.075 );
-    const double cost   = m_pcRdCost->calcRdCost( UInt64( m_CABACEstimator->getEstFracBits() + ( ( bestCS->fracBits ) / factor ) ), Distortion( bestCS->dist / factor ) );
+    const double cost   = m_pcRdCost->calcRdCost( uint64_t( m_CABACEstimator->getEstFracBits() + ( ( bestCS->fracBits ) / factor ) ), Distortion( bestCS->dist / factor ) );
 
     m_CABACEstimator->getCtx() = SubCtx( Ctx::SplitFlag,   ctxStartSP );
     m_CABACEstimator->getCtx() = SubCtx( Ctx::BTSplitFlag, ctxStartBT );

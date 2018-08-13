@@ -46,7 +46,7 @@
 // CS tools
 namespace CS
 {
-  UInt64 getEstBits                   ( const CodingStructure &cs );
+  uint64_t getEstBits                   ( const CodingStructure &cs );
 #if JEM_TOOLS
   void   initFrucMvp                  (       CodingStructure &cs );
 #endif

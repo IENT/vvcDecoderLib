@@ -5011,7 +5011,7 @@ void InterSearch::encodeResAndCalcRdInterCU(CodingStructure &cs, Partitioner &pa
   // all decisions now made. Fully encode the CU, including the headers:
   m_CABACEstimator->getCtx() = ctxStart;
 
-  UInt64 finalFracBits = xGetSymbolFracBitsInter( cs, partitioner );
+  uint64_t finalFracBits = xGetSymbolFracBitsInter( cs, partitioner );
   // we've now encoded the CU, and so have a valid bit cost
   if (!cu.rootCbf)
   {
@@ -5050,9 +5050,9 @@ void InterSearch::encodeResAndCalcRdInterCU(CodingStructure &cs, Partitioner &pa
   CHECK(cs.tus.size() == 0, "No TUs present");
 }
 
-UInt64 InterSearch::xGetSymbolFracBitsInter(CodingStructure &cs, Partitioner &partitioner)
+uint64_t InterSearch::xGetSymbolFracBitsInter(CodingStructure &cs, Partitioner &partitioner)
 {
-  UInt64 fracBits   = 0;
+  uint64_t fracBits   = 0;
   CodingUnit &cu    = *cs.getCU( partitioner.chType );
 
   m_CABACEstimator->resetBits();
