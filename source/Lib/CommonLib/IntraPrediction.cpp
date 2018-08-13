@@ -2206,7 +2206,7 @@ Int IntraPrediction::xCalcLMParametersGeneralized(Int x, Int y, Int xx, Int xy, 
     a = Clip3(-(1 << (15 - iB)), (1 << (15 - iB)) - 1, a);
     a = a << iB;
 
-    Short n = 0;
+    int16_t n = 0;
     if (a != 0)
     {
       n = GetFloorLog2(abs(a) + ((a < 0 ? -1 : 1) - 1) / 2) - 5;
@@ -2799,7 +2799,7 @@ void IntraPrediction::xGetLMParameters(const PredictionUnit &pu, const Component
     a = Clip3( -( 1 << ( 15 - iB ) ), ( 1 << ( 15 - iB ) ) - 1, a );
     a = a << iB;
 
-    Short n = 0;
+    int16_t n = 0;
     if( a != 0 )
     {
       n = GetFloorLog2( abs( a ) + ( ( a < 0 ? -1 : 1 ) - 1 ) / 2 ) - 5;

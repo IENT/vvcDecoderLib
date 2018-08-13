@@ -261,7 +261,7 @@ protected:
 
   Int**     m_filterCoeffSym;
   Int**     m_filterCoeffPrevSelected;
-  Short**   m_filterCoeffShort;
+  int16_t**   m_filterCoeffShort;
   Int**     m_filterCoeffTmp;
   Int**     m_filterCoeffSymTmp;
 

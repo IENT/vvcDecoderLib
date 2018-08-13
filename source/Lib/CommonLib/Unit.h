@@ -369,7 +369,7 @@ struct InterPredictionData
   uint8_t     mvpNum  [NUM_REF_PIC_LIST_01];
   Mv        mvd     [NUM_REF_PIC_LIST_01];
   Mv        mv      [NUM_REF_PIC_LIST_01];
-  Short     refIdx  [NUM_REF_PIC_LIST_01];
+  int16_t     refIdx  [NUM_REF_PIC_LIST_01];
   MergeType mergeType;
 #if JEM_TOOLS
   uint8_t     frucMrgMode;

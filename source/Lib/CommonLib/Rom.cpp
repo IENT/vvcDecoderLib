@@ -297,26 +297,26 @@ void initROM()
         // DCT-II
         w0 = k == 0 ? sqrt(0.5) : 1;
         v = cos(PI*(n + 0.5)*k / c) * w0 * sqrt(2.0 / c);
-        iT[DCT2*c*c + k*c + n] = (Short)(s * v + (v > 0 ? 0.5 : -0.5));
+        iT[DCT2*c*c + k*c + n] = (int16_t)(s * v + (v > 0 ? 0.5 : -0.5));
 
         // DCT-VIII
         v = cos(PI*(k + 0.5)*(n + 0.5) / (c + 0.5)) * sqrt(2.0 / (c + 0.5));
-        iT[DCT8*c*c + k*c + n] = (Short)(s * v + (v > 0 ? 0.5 : -0.5));
+        iT[DCT8*c*c + k*c + n] = (int16_t)(s * v + (v > 0 ? 0.5 : -0.5));
 
         // DST-VII
         v = sin(PI*(k + 0.5)*(n + 1) / (c + 0.5)) * sqrt(2.0 / (c + 0.5));
-        iT[DST7*c*c + k*c + n] = (Short)(s * v + (v > 0 ? 0.5 : -0.5));
+        iT[DST7*c*c + k*c + n] = (int16_t)(s * v + (v > 0 ? 0.5 : -0.5));
 
 #if !JVET_K1000_SIMPLIFIED_EMT
         // DCT-V
         w0 = (k == 0) ? sqrt(0.5) : 1.0;
         double w1 = (n == 0) ? sqrt(0.5) : 1.0;
         v = cos(PI*n*k / (c - 0.5)) * w0 * w1 * sqrt(2.0 / (c - 0.5));
-        iT[DCT5*c*c + k*c + n] = (Short)(s * v + (v > 0 ? 0.5 : -0.5));
+        iT[DCT5*c*c + k*c + n] = (int16_t)(s * v + (v > 0 ? 0.5 : -0.5));
 
         // DST-I
         v = sin(PI*(n + 1)*(k + 1) / (c + 1)) * sqrt(2.0 / (c + 1));
-        iT[DST1*c*c + k*c + n] = (Short)(s * v + (v > 0 ? 0.5 : -0.5));
+        iT[DST1*c*c + k*c + n] = (int16_t)(s * v + (v > 0 ? 0.5 : -0.5));
 #endif
       }
     }

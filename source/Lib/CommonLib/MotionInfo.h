@@ -74,7 +74,7 @@ struct AffineAMVPInfo
 struct MvField
 {
   Mv    mv;
-  Short refIdx;
+  int16_t refIdx;
 
   MvField()                                    :            refIdx( NOT_VALID ) {}
   MvField( Mv const & cMv, const int iRefIdx ) : mv( cMv ), refIdx(   iRefIdx ) {}
@@ -110,7 +110,7 @@ struct MotionInfo
   UShort   sliceIdx;
 
   Mv      mv     [ NUM_REF_PIC_LIST_01 ];
-  Short   refIdx [ NUM_REF_PIC_LIST_01 ];
+  int16_t   refIdx [ NUM_REF_PIC_LIST_01 ];
 
 #if JEM_TOOLS
   MotionInfo()        : isInter(  false ), usesLIC( false ), interDir( 0 ), sliceIdx( 0 ), refIdx{ NOT_VALID, NOT_VALID } { }

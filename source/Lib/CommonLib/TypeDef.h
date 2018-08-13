@@ -356,7 +356,6 @@
 // Basic type redefinition
 // ====================================================================================================================
 
-typedef       short               Short;
 typedef       unsigned short      UShort;
 typedef       int                 Int;
 typedef       unsigned int        UInt;
@@ -370,14 +369,14 @@ typedef       unsigned int        UInt;
 typedef       Int             Pel;               ///< pixel type
 typedef       int64_t           TCoeff;            ///< transform coefficient
 typedef       Int             TMatrixCoeff;      ///< transform matrix coefficient
-typedef       Short           TFilterCoeff;      ///< filter coefficient
+typedef       int16_t           TFilterCoeff;      ///< filter coefficient
 typedef       int64_t           Intermediate_Int;  ///< used as intermediate value in calculations
 typedef       uint64_t          Intermediate_UInt; ///< used as intermediate value in calculations
 #else
-typedef       Short           Pel;               ///< pixel type
+typedef       int16_t           Pel;               ///< pixel type
 typedef       Int             TCoeff;            ///< transform coefficient
-typedef       Short           TMatrixCoeff;      ///< transform matrix coefficient
-typedef       Short           TFilterCoeff;      ///< filter coefficient
+typedef       int16_t           TMatrixCoeff;      ///< transform matrix coefficient
+typedef       int16_t           TFilterCoeff;      ///< filter coefficient
 typedef       Int             Intermediate_Int;  ///< used as intermediate value in calculations
 typedef       UInt            Intermediate_UInt; ///< used as intermediate value in calculations
 #endif

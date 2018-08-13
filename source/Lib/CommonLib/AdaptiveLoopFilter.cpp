@@ -179,7 +179,7 @@ void AdaptiveLoopFilter::reconstructCoeff( AlfSliceParam& alfSliceParam, Channel
   for( int classIdx = 0; classIdx < numClasses; classIdx++ )
   {
     int filterIdx = alfSliceParam.filterCoeffDeltaIdx[classIdx];
-    memcpy( m_coeffFinal + classIdx * MAX_NUM_ALF_LUMA_COEFF, coeff + filterIdx * MAX_NUM_ALF_LUMA_COEFF, sizeof( Short ) * numCoeff );
+    memcpy( m_coeffFinal + classIdx * MAX_NUM_ALF_LUMA_COEFF, coeff + filterIdx * MAX_NUM_ALF_LUMA_COEFF, sizeof( int16_t ) * numCoeff );
   }
 
   if( bRedo && alfSliceParam.coeffDeltaPredModeFlag )
@@ -2539,9 +2539,9 @@ void AdaptiveLoopFilter::xDecodeFilter( ALFParam* pcAlfParam )
     coef = m_filterCoeffPrevSelected[varInd];
     for( int i = 0; i < centerCoef; i++)
     {
-      m_filterCoeffShort[varInd][i] = (Short)coef[i];
+      m_filterCoeffShort[varInd][i] = (int16_t)coef[i];
     }
-    m_filterCoeffShort[varInd][centerCoef] = (Short)coef[centerCoef];
+    m_filterCoeffShort[varInd][centerCoef] = (int16_t)coef[centerCoef];
   }
 #else
   Int maxPxlVal = m_nIBDIMax;
@@ -2564,14 +2564,14 @@ void AdaptiveLoopFilter::xDecodeFilter( ALFParam* pcAlfParam )
     {
       CHECK( coef[i] > 32767 || coef[i] < -32768, "ALF: Coeffs out of bound" );
 
-      m_filterCoeffShort[varInd][i]   = (Short) coef[i];
+      m_filterCoeffShort[varInd][i]   = (int16_t) coef[i];
       sumCoef[ coef[i] > 0 ? 0 : 1 ] += (coef[i] << 1);
     }
     CHECK( coef[centerCoef] > 32767 || coef[centerCoef] < -32768, "ALF: Coeffs out of bound" );
     CHECK( coef[lastCoef]   > 32767 || coef[lastCoef]   < -32768, "ALF: Coeffs out of bound" );
 
-    m_filterCoeffShort[varInd][centerCoef] = (Short)coef[centerCoef];
-    m_filterCoeffShort[varInd][lastCoef]   = (Short)coef[lastCoef];
+    m_filterCoeffShort[varInd][centerCoef] = (int16_t)coef[centerCoef];
+    m_filterCoeffShort[varInd][lastCoef]   = (int16_t)coef[lastCoef];
 
     sumCoef[ coef[centerCoef] > 0 ? 0 : 1 ] += coef[centerCoef];
 
@@ -3063,7 +3063,7 @@ void AdaptiveLoopFilter::xFilterBlkGalf(PelUnitBuf &recDst, const CPelUnitBuf& r
 
   const Pel *pImgYPad, *pImgYPad1,*pImgYPad2,*pImgYPad3,*pImgYPad4,*pImgYPad5,*pImgYPad6;
 
-  Short *coef = m_filterCoeffShort[0];
+  int16_t *coef = m_filterCoeffShort[0];
   const Pel *pImg0, *pImg1, *pImg2, *pImg3, *pImg4, *pImg5, *pImg6;
   Pel *pImgYRec;
   const Pel *pImgYPad7, *pImgYPad8;
@@ -3470,7 +3470,7 @@ void AdaptiveLoopFilter::xFilterBlkAlf(PelBuf &recDst, const CPelBuf& recSrc, co
 
   const Pel *pImgYPad, *pImgYPad1,*pImgYPad2,*pImgYPad3,*pImgYPad4,*pImgYPad5,*pImgYPad6;
 
-  Short *coef = m_filterCoeffShort[0];
+  int16_t *coef = m_filterCoeffShort[0];
   const Pel *pImg0, *pImg1, *pImg2, *pImg3, *pImg4, *pImg5, *pImg6;
   Pel *pImgYRec;
 

@@ -226,9 +226,9 @@ void BilateralFilter::smoothBlockBilateralFilter(unsigned uiWidth, unsigned uiHe
   Int mySignIfNeg;
   Int mySign;
 
-  Short *blockCurrentPixelPtr = block;
-  Short *blockRightPixelPtr = blockCurrentPixelPtr+1;
-  Short *blockNextLinePixelPtr = blockCurrentPixelPtr + uiWidth;
+  int16_t *blockCurrentPixelPtr = block;
+  int16_t *blockRightPixelPtr = blockCurrentPixelPtr+1;
+  int16_t *blockNextLinePixelPtr = blockCurrentPixelPtr + uiWidth;
   Int *sumWeightsPtr = sumWeights;
   Int *sumDeltaPtr = sumDelta;
 

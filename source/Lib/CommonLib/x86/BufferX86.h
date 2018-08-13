@@ -49,7 +49,7 @@
 #ifdef TARGET_SIMD_X86
 
 template< X86_VEXT vext, int W >
-void addAvg_SSE( const Short* src0, Int src0Stride, const Short* src1, Int src1Stride, Short *dst, Int dstStride, Int width, Int height, Int shift, Int offset, const ClpRng& clpRng )
+void addAvg_SSE( const int16_t* src0, Int src0Stride, const int16_t* src1, Int src1Stride, int16_t *dst, Int dstStride, Int width, Int height, Int shift, Int offset, const ClpRng& clpRng )
 {
   if( W == 8 )
   {
@@ -129,7 +129,7 @@ void addAvg_SSE( const Short* src0, Int src0Stride, const Short* src1, Int src1S
 }
 
 template< X86_VEXT vext, int W >
-void reco_SSE( const Short* src0, Int src0Stride, const Short* src1, Int src1Stride, Short *dst, Int dstStride, Int width, Int height, const ClpRng& clpRng )
+void reco_SSE( const int16_t* src0, Int src0Stride, const int16_t* src1, Int src1Stride, int16_t *dst, Int dstStride, Int width, Int height, const ClpRng& clpRng )
 {
   if( W == 8 )
   {

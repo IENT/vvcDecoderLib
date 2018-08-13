@@ -1306,7 +1306,7 @@ void InterPrediction::applyBiOptFlow( const PredictionUnit &pu, const CPelUnitBu
           Int b = (Int)tmpx * (pGradX0[x] - pGradX1[x]) + (Int)tmpy * (pGradY0[x] - pGradY1[x]);
           b = (b > 0) ? ((b + 32) >> 6) : (-((-b + 32) >> 6));
 
-          pDstY0[x] = ( ClipPel( ( Short ) ( ( pSrcY0Temp[x] + pSrcY1Temp[x] + b + offset ) >> shiftNum ), clpRng ) );
+          pDstY0[x] = ( ClipPel( ( int16_t ) ( ( pSrcY0Temp[x] + pSrcY1Temp[x] + b + offset ) >> shiftNum ), clpRng ) );
         }
         pDstY0 += iDstStride; pSrcY0Temp += iSrc0Stride; pSrcY1Temp += iSrc1Stride;
         pGradX0 += iWidthG; pGradX1 += iWidthG; pGradY0 += iWidthG; pGradY1 += iWidthG;
@@ -1845,10 +1845,10 @@ Pel InterPrediction::optical_flow_averaging( int64_t s1, int64_t s2, int64_t s3,
 
   b = vx * ( pGradX0 - pGradX1 ) + vy * ( pGradY0 - pGradY1 );
   b = ( b > 0 ? (b+32)>>6 : -((-b+32)>>6) );
-  return ClipPel( (Short)((pSrcY0Temp + pSrcY1Temp + b + offset) >> shiftNum), clpRng );
+  return ClipPel( (int16_t)((pSrcY0Temp + pSrcY1Temp + b + offset) >> shiftNum), clpRng );
 }
 
-const Short m_lumaGradientFilter[4<<VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE][BIO_FILTER_LENGTH] =
+const int16_t m_lumaGradientFilter[4<<VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE][BIO_FILTER_LENGTH] =
 {
   {       8,     -39,      -3,      46,     -17,       5 },   //0
   {       8,     -32,     -13,      50,     -18,       5 },   //1 -->-->
@@ -1868,7 +1868,7 @@ const Short m_lumaGradientFilter[4<<VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE][BI
   {      -5,      18,     -50,      13,      32,      -8 }    //15-->-->
 };
 
-const Short m_lumaInterpolationFilter[4<<VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE][BIO_FILTER_LENGTH] =
+const int16_t m_lumaInterpolationFilter[4<<VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE][BIO_FILTER_LENGTH] =
 {
   {       0,       0,      64,       0,       0,       0 },   //0
   {       1,      -3,      64,       4,      -2,       0 },   //1 -->-->
@@ -1898,7 +1898,7 @@ inline void InterPrediction::gradFilter2DVer( const Pel* piSrc, Int iSrcStride, 
   const Pel*  piSrcTmp3     = piSrcTmp2 + iSrcStride;
   const Pel*  piSrcTmp4     = piSrcTmp3 + iSrcStride;
   const Pel*  piSrcTmp5     = piSrcTmp4 + iSrcStride;
-  const Short *const coeffs = m_lumaGradientFilter[iMV];
+  const int16_t *const coeffs = m_lumaGradientFilter[iMV];
 
   const int   iOffSet       = ( iShift > 0 ? ( 1 << ( iShift - 1 ) ) : 0 );
 
@@ -1945,7 +1945,7 @@ inline void InterPrediction::gradFilter1DVer( const Pel* piSrc, Int iSrcStride, 
   const Pel*  piSrcTmp3     = piSrcTmp2 + iSrcStride;
   const Pel*  piSrcTmp4     = piSrcTmp3 + iSrcStride;
   const Pel*  piSrcTmp5     = piSrcTmp4 + iSrcStride;
-  const Short *const coeffs = m_lumaGradientFilter[iMV];
+  const int16_t *const coeffs = m_lumaGradientFilter[iMV];
 
   const int   iOffSet       = 1 << ( iShift - 1 );
 
@@ -1988,7 +1988,7 @@ inline void InterPrediction::gradFilter1DHor( const Pel* piSrc, Int iSrcStride, 
   int         iSum          = 0;
   const Pel*  piSrcTmp      = piSrc - BIO_FILTER_HALF_LENGTH_MINUS_1;
   const int   iOffSet       = 1 << ( iShift - 1 );
-  const Short *const coeffs = m_lumaGradientFilter[iMV];
+  const int16_t *const coeffs = m_lumaGradientFilter[iMV];
 
   iSrcStride               -= width;
   iDstStride               -= width;
@@ -2024,7 +2024,7 @@ inline void InterPrediction::gradFilter2DHor( const Pel* piSrc, Int iSrcStride, 
   Int         iSum          = 0;
   const Pel*  piSrcTmp      = piSrc - BIO_FILTER_HALF_LENGTH_MINUS_1;
   const Int   iOffSet       = ( iShift > 0 ? 1 << ( iShift - 1 ) : 0 );
-  const Short *const coeffs = m_lumaGradientFilter[iMV];
+  const int16_t *const coeffs = m_lumaGradientFilter[iMV];
 
   iSrcStride               -= width;
   iDstStride               -= width;
@@ -2065,7 +2065,7 @@ inline void InterPrediction::fracFilter2DVer( const Pel* piSrc, Int iSrcStride, 
   const Pel*  piSrcTmp4     = piSrcTmp3 + iSrcStride;
   const Pel*  piSrcTmp5     = piSrcTmp4 + iSrcStride;
   const int   iOffSet       = ( iShift > 0 ? ( 1 << ( iShift - 1 ) ) - ( 8192 << iShift ) : -8192 );
-  const Short *const coeffs = m_lumaInterpolationFilter[iMV];
+  const int16_t *const coeffs = m_lumaInterpolationFilter[iMV];
 
   iSrcStride               -= width;
   iDstStride               -= width;
@@ -2106,7 +2106,7 @@ inline void InterPrediction::fracFilter2DHor( const Pel* piSrc, Int iSrcStride, 
   int         iSum          = 0;
   const Pel*  piSrcTmp      = piSrc - BIO_FILTER_HALF_LENGTH_MINUS_1;
   const int   iOffSet       = ( iShift > 0 ? 1 << ( iShift - 1 ) : 0 );
-  const Short *const coeffs = m_lumaInterpolationFilter[iMV];
+  const int16_t *const coeffs = m_lumaInterpolationFilter[iMV];
 
   iSrcStride               -= width;
   iDstStride               -= width;
