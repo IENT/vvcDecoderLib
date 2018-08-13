@@ -2286,8 +2286,10 @@ bool EncCu::xCheckRDCostInterIMV( CodingStructure *&tempCS, CodingStructure *&be
   }
 
   cu.imv      = iIMV > 1 ? 2 : 1;
-#if JEM_TOOLS
+#if JVET_K1000_SIMPLIFIED_EMT
   cu.emtFlag  = false;
+#endif
+#if JEM_TOOLS
   cu.obmcFlag = sps.getSpsNext().getUseOBMC();
 #endif
 

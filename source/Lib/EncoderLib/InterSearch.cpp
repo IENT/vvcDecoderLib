@@ -1049,24 +1049,28 @@ Void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
         }
       }
 
-#if JEM_TOOLS
 #if JVET_K0220_ENC_CTRL
-#if JVET_K0357_AMVR
-      if (cu.Y().width > 8 && cu.Y().height > 8 && cu.partSize == SIZE_2Nx2N && cu.slice->getSPS()->getSpsNext().getUseAffine() && !cu.LICFlag && cu.imv == 0)
-#else
-      if (cu.Y().width > 8 && cu.Y().height > 8 && cu.partSize == SIZE_2Nx2N && cu.slice->getSPS()->getSpsNext().getUseAffine() && !cu.LICFlag)
+      if (cu.Y().width > 8 && cu.Y().height > 8 && cu.partSize == SIZE_2Nx2N && cu.slice->getSPS()->getSpsNext().getUseAffine() 
+#if JEM_TOOLS
+        && !cu.LICFlag 
 #endif
-#else
 #if JVET_K0357_AMVR
-      if (cu.Y().width > 8 && cu.Y().height > 8 && cu.partSize == SIZE_2Nx2N && cu.slice->getSPS()->getSpsNext().getUseAffine() && !cu.LICFlag && cu.imv == 0 && !bFastSkipAffine)
-#else
-      if (cu.Y().width > 8 && cu.Y().height > 8 && cu.partSize == SIZE_2Nx2N && cu.slice->getSPS()->getSpsNext().getUseAffine() && !cu.LICFlag && !bFastSkipAffine)
+        && cu.imv == 0
 #endif
+        )
+#else
+      if (cu.Y().width > 8 && cu.Y().height > 8 && cu.partSize == SIZE_2Nx2N && cu.slice->getSPS()->getSpsNext().getUseAffine() 
+#if JEM_TOOLS
+        && !cu.LICFlag 
+#endif
+#if JVET_K0357_AMVR
+        && cu.imv == 0
+#endif
+        && !bFastSkipAffine)
 #endif
       {
         ::memcpy( cMvHevcTemp, cMvTemp, sizeof( cMvTemp ) );
       }
-#endif
 #if !JEM_TOOLS && JVET_K_AFFINE
 #if JVET_K0220_ENC_CTRL
       if ( cu.Y().width > 8 && cu.Y().height > 8 && cu.partSize == SIZE_2Nx2N && cu.slice->getSPS()->getSpsNext().getUseAffine() )
