@@ -64,10 +64,10 @@ void         generateTrafoBlockSizeScaling( SizeIndexInfo& sizeIdxInfo );
 // ====================================================================================================================
 
 // flexible conversion from relative to absolute index
-extern       UInt*  g_scanOrder     [SCAN_NUMBER_OF_GROUP_TYPES][SCAN_NUMBER_OF_TYPES][MAX_CU_SIZE / 2 + 1][MAX_CU_SIZE / 2 + 1];
-extern       UInt*  g_scanOrderPosXY[SCAN_NUMBER_OF_GROUP_TYPES][SCAN_NUMBER_OF_TYPES][MAX_CU_SIZE / 2 + 1][MAX_CU_SIZE / 2 + 1][2];
+extern       uint32_t*  g_scanOrder     [SCAN_NUMBER_OF_GROUP_TYPES][SCAN_NUMBER_OF_TYPES][MAX_CU_SIZE / 2 + 1][MAX_CU_SIZE / 2 + 1];
+extern       uint32_t*  g_scanOrderPosXY[SCAN_NUMBER_OF_GROUP_TYPES][SCAN_NUMBER_OF_TYPES][MAX_CU_SIZE / 2 + 1][MAX_CU_SIZE / 2 + 1][2];
 #if JEM_TOOLS && !ENABLE_BMS
-extern       UInt   g_auiCoefTopLeftDiagScan8x8[ MAX_CU_SIZE / 2 + 1 ][64];
+extern       uint32_t   g_auiCoefTopLeftDiagScan8x8[ MAX_CU_SIZE / 2 + 1 ][64];
 
 #endif
 
@@ -111,14 +111,14 @@ extern const uint8_t  g_aucChromaScale[NUM_CHROMA_FORMAT][chromaQPMappingTableSi
 // Scanning order & context mapping table
 // ====================================================================================================================
 
-extern const UInt   ctxIndMap4x4[4*4];
+extern const uint32_t   ctxIndMap4x4[4*4];
 
-extern const UInt   g_uiGroupIdx[ MAX_TU_SIZE ];
-extern const UInt   g_uiMinInGroup[ LAST_SIGNIFICANT_GROUPS ];
+extern const uint32_t   g_uiGroupIdx[ MAX_TU_SIZE ];
+extern const uint32_t   g_uiMinInGroup[ LAST_SIGNIFICANT_GROUPS ];
 #if JVET_K0072
-extern const UInt   g_auiGoRicePars [ 32 ];
+extern const uint32_t   g_auiGoRicePars [ 32 ];
 #endif
-extern const UInt   g_auiGoRiceRange[ MAX_GR_ORDER_RESIDUAL ];                  //!< maximum value coded with Rice codes
+extern const uint32_t   g_auiGoRiceRange[ MAX_GR_ORDER_RESIDUAL ];                  //!< maximum value coded with Rice codes
 
 // ====================================================================================================================
 // Intra prediction table
@@ -168,7 +168,7 @@ extern const uint8_t g_aucTrSetHorz[NUM_INTRA_MODE - 1];
 extern const uint8_t g_aucTrSetVert35[35];
 extern const uint8_t g_aucTrSetHorz35[35];
 
-extern const UInt g_EmtSigNumThr;
+extern const uint32_t g_EmtSigNumThr;
 #endif
 
 extern TMatrixCoeff g_aiTr2   [NUM_TRANS_TYPE][  2][  2];
@@ -284,8 +284,8 @@ extern const int g_quantTSDefault4x4   [4*4];
 extern const int g_quantIntraDefault8x8[8*8];
 extern const int g_quantInterDefault8x8[8*8];
 
-extern const UInt g_scalingListSize [SCALING_LIST_SIZE_NUM];
-extern const UInt g_scalingListSizeX[SCALING_LIST_SIZE_NUM];
+extern const uint32_t g_scalingListSize [SCALING_LIST_SIZE_NUM];
+extern const uint32_t g_scalingListSizeX[SCALING_LIST_SIZE_NUM];
 #endif
 
 extern MsgLevel g_verbosity;

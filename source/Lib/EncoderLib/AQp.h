@@ -52,27 +52,27 @@
 class AQpLayer
 {
 private:
-  UInt                  m_uiAQPartWidth;
-  UInt                  m_uiAQPartHeight;
-  UInt                  m_uiNumAQPartInWidth;
-  UInt                  m_uiNumAQPartInHeight;
+  uint32_t                  m_uiAQPartWidth;
+  uint32_t                  m_uiAQPartHeight;
+  uint32_t                  m_uiNumAQPartInWidth;
+  uint32_t                  m_uiNumAQPartInHeight;
   double                m_dAvgActivity;
   std::vector<double>   m_acEncAQU;
 
 public:
-  AQpLayer( int iWidth, int iHeight, UInt uiAQPartWidth, UInt uiAQPartHeight );
+  AQpLayer( int iWidth, int iHeight, uint32_t uiAQPartWidth, uint32_t uiAQPartHeight );
   virtual ~AQpLayer();
 
-  UInt                   getAQPartWidth()        { return m_uiAQPartWidth;       }
-  UInt                   getAQPartHeight()       { return m_uiAQPartHeight;      }
-  UInt                   getNumAQPartInWidth()   { return m_uiNumAQPartInWidth;  }
-  UInt                   getNumAQPartInHeight()  { return m_uiNumAQPartInHeight; }
-  UInt                   getAQPartStride()       { return m_uiNumAQPartInWidth;  }
+  uint32_t                   getAQPartWidth()        { return m_uiAQPartWidth;       }
+  uint32_t                   getAQPartHeight()       { return m_uiAQPartHeight;      }
+  uint32_t                   getNumAQPartInWidth()   { return m_uiNumAQPartInWidth;  }
+  uint32_t                   getNumAQPartInHeight()  { return m_uiNumAQPartInHeight; }
+  uint32_t                   getAQPartStride()       { return m_uiNumAQPartInWidth;  }
   std::vector<double>&   getQPAdaptationUnit()   { return m_acEncAQU;           }
   double getActivity( const Position& pos)
   {
-    UInt uiAQUPosX = pos.x / m_uiAQPartWidth;
-    UInt uiAQUPosY = pos.y / m_uiAQPartHeight;
+    uint32_t uiAQUPosX = pos.x / m_uiAQPartWidth;
+    uint32_t uiAQUPosY = pos.y / m_uiAQPartHeight;
     return m_acEncAQU[uiAQUPosY * m_uiNumAQPartInWidth + uiAQUPosX];
   }
 

@@ -52,7 +52,7 @@
 
 #if ENABLE_TRACING
 
-void  VLCReader::xReadCodeTr(UInt length, UInt& rValue, const char *pSymbolName)
+void  VLCReader::xReadCodeTr(uint32_t length, uint32_t& rValue, const char *pSymbolName)
 {
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
   xReadCode (length, rValue, pSymbolName);
@@ -69,7 +69,7 @@ void  VLCReader::xReadCodeTr(UInt length, UInt& rValue, const char *pSymbolName)
   }
 }
 
-void  VLCReader::xReadUvlcTr(UInt& rValue, const char *pSymbolName)
+void  VLCReader::xReadUvlcTr(uint32_t& rValue, const char *pSymbolName)
 {
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
   xReadUvlc (rValue, pSymbolName);
@@ -89,7 +89,7 @@ void  VLCReader::xReadSvlcTr(int& rValue, const char *pSymbolName)
   DTRACE( g_trace_ctx, D_HEADER, "%-50s se(v) : %d\n", pSymbolName, rValue );
 }
 
-void  VLCReader::xReadFlagTr(UInt& rValue, const char *pSymbolName)
+void  VLCReader::xReadFlagTr(uint32_t& rValue, const char *pSymbolName)
 {
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
   xReadFlag (rValue, pSymbolName);
@@ -111,9 +111,9 @@ void xTraceFillerData ()
 // Protected member functions
 // ====================================================================================================================
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
-void VLCReader::xReadCode (UInt uiLength, UInt& ruiCode, const char *pSymbolName)
+void VLCReader::xReadCode (uint32_t uiLength, uint32_t& ruiCode, const char *pSymbolName)
 #else
-void VLCReader::xReadCode (UInt uiLength, UInt& ruiCode)
+void VLCReader::xReadCode (uint32_t uiLength, uint32_t& ruiCode)
 #endif
 {
   CHECK( uiLength == 0, "Reading a code of lenght '0'" );
@@ -124,17 +124,17 @@ void VLCReader::xReadCode (UInt uiLength, UInt& ruiCode)
 }
 
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
-void VLCReader::xReadUvlc( UInt& ruiVal, const char *pSymbolName)
+void VLCReader::xReadUvlc( uint32_t& ruiVal, const char *pSymbolName)
 #else
-void VLCReader::xReadUvlc( UInt& ruiVal)
+void VLCReader::xReadUvlc( uint32_t& ruiVal)
 #endif
 {
-  UInt uiVal = 0;
-  UInt uiCode = 0;
-  UInt uiLength;
+  uint32_t uiVal = 0;
+  uint32_t uiCode = 0;
+  uint32_t uiLength;
   m_pcBitstream->read( 1, uiCode );
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
-  UInt totalLen=1;
+  uint32_t totalLen=1;
 #endif
 
   if( 0 == uiCode )
@@ -167,14 +167,14 @@ void VLCReader::xReadSvlc( int& riVal, const char *pSymbolName)
 void VLCReader::xReadSvlc( int& riVal)
 #endif
 {
-  UInt uiBits = 0;
+  uint32_t uiBits = 0;
   m_pcBitstream->read( 1, uiBits );
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
-  UInt totalLen=1;
+  uint32_t totalLen=1;
 #endif
   if( 0 == uiBits )
   {
-    UInt uiLength = 0;
+    uint32_t uiLength = 0;
 
     while( ! ( uiBits & 1 ))
     {
@@ -200,9 +200,9 @@ void VLCReader::xReadSvlc( int& riVal)
 }
 
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
-void VLCReader::xReadFlag (UInt& ruiCode, const char *pSymbolName)
+void VLCReader::xReadFlag (uint32_t& ruiCode, const char *pSymbolName)
 #else
-void VLCReader::xReadFlag (UInt& ruiCode)
+void VLCReader::xReadFlag (uint32_t& ruiCode)
 #endif
 {
   m_pcBitstream->read( 1, ruiCode );
@@ -213,7 +213,7 @@ void VLCReader::xReadFlag (UInt& ruiCode)
 
 void VLCReader::xReadRbspTrailingBits()
 {
-  UInt bit;
+  uint32_t bit;
   READ_FLAG( bit, "rbsp_stop_one_bit");
   CHECK(bit!=1, "Trailing bit not '1'");
   int cnt = 0;
@@ -226,7 +226,7 @@ void VLCReader::xReadRbspTrailingBits()
   CHECK(cnt >= 8, "Read more than '8' trailing bits");
 }
 
-void AUDReader::parseAccessUnitDelimiter(InputBitstream* bs, UInt &picType)
+void AUDReader::parseAccessUnitDelimiter(InputBitstream* bs, uint32_t &picType)
 {
   setBitstream(bs);
 
@@ -238,13 +238,13 @@ void AUDReader::parseAccessUnitDelimiter(InputBitstream* bs, UInt &picType)
   xReadRbspTrailingBits();
 }
 
-void FDReader::parseFillerData(InputBitstream* bs, UInt &fdSize)
+void FDReader::parseFillerData(InputBitstream* bs, uint32_t &fdSize)
 {
   setBitstream(bs);
 #if ENABLE_TRACING
   xTraceFillerData();
 #endif
-  UInt ffByte;
+  uint32_t ffByte;
   fdSize = 0;
   while( m_pcBitstream->getNumBitsLeft() >8 )
   {
@@ -277,8 +277,8 @@ HLSyntaxReader::~HLSyntaxReader()
 
 void HLSyntaxReader::parseShortTermRefPicSet( SPS* sps, ReferencePictureSet* rps, int idx )
 {
-  UInt code;
-  UInt interRPSPred;
+  uint32_t code;
+  uint32_t interRPSPred;
   if (idx > 0)
   {
     READ_FLAG(interRPSPred, "inter_ref_pic_set_prediction_flag");  rps->setInterRPSPrediction(interRPSPred);
@@ -291,7 +291,7 @@ void HLSyntaxReader::parseShortTermRefPicSet( SPS* sps, ReferencePictureSet* rps
 
   if (interRPSPred)
   {
-    UInt bit;
+    uint32_t bit;
     if(idx == sps->getRPSList()->getNumberOfReferencePictureSets())
     {
       READ_UVLC(code, "delta_idx_minus1" ); // delta index of the Reference Picture Set used for prediction minus 1
@@ -379,7 +379,7 @@ void HLSyntaxReader::parsePPS( PPS* pcPPS )
 #if ENABLE_TRACING
   xTracePPSHeader ();
 #endif
-  UInt  uiCode;
+  uint32_t  uiCode;
 
   int   iCode;
 
@@ -465,15 +465,15 @@ void HLSyntaxReader::parsePPS( PPS* pcPPS )
     READ_UVLC ( uiCode, "num_tile_rows_minus1" );                   pcPPS->setNumTileRowsMinus1( uiCode );
     READ_FLAG ( uiCode, "uniform_spacing_flag" );                   pcPPS->setTileUniformSpacingFlag( uiCode == 1 );
 
-    const UInt tileColumnsMinus1 = pcPPS->getNumTileColumnsMinus1();
-    const UInt tileRowsMinus1    = pcPPS->getNumTileRowsMinus1();
+    const uint32_t tileColumnsMinus1 = pcPPS->getNumTileColumnsMinus1();
+    const uint32_t tileRowsMinus1    = pcPPS->getNumTileRowsMinus1();
 
     if ( !pcPPS->getTileUniformSpacingFlag())
     {
       if (tileColumnsMinus1 > 0)
       {
         std::vector<int> columnWidth(tileColumnsMinus1);
-        for(UInt i = 0; i < tileColumnsMinus1; i++)
+        for(uint32_t i = 0; i < tileColumnsMinus1; i++)
         {
           READ_UVLC( uiCode, "column_width_minus1" );
           columnWidth[i] = uiCode+1;
@@ -484,7 +484,7 @@ void HLSyntaxReader::parsePPS( PPS* pcPPS )
       if (tileRowsMinus1 > 0)
       {
         std::vector<int> rowHeight (tileRowsMinus1);
-        for(UInt i = 0; i < tileRowsMinus1; i++)
+        for(uint32_t i = 0; i < tileRowsMinus1; i++)
         {
           READ_UVLC( uiCode, "row_height_minus1" );
           rowHeight[i] = uiCode + 1;
@@ -577,7 +577,7 @@ void HLSyntaxReader::parsePPS( PPS* pcPPS )
           else
           {
             READ_UVLC(uiCode, "diff_cu_chroma_qp_offset_depth"); ppsRangeExtension.setDiffCuChromaQpOffsetDepth(uiCode);
-            UInt tableSizeMinus1 = 0;
+            uint32_t tableSizeMinus1 = 0;
             READ_UVLC(tableSizeMinus1, "chroma_qp_offset_list_len_minus1");
             CHECK(tableSizeMinus1 >= MAX_QP_OFFSET_LIST_SIZE, "Table size exceeds maximum");
 
@@ -623,7 +623,7 @@ void  HLSyntaxReader::parseVUI(VUI* pcVUI, SPS *pcSPS)
 #if ENABLE_TRACING
   DTRACE( g_trace_ctx, D_HEADER, "----------- vui_parameters -----------\n");
 #endif
-  UInt  uiCode;
+  uint32_t  uiCode;
 
   READ_FLAG(     uiCode, "aspect_ratio_info_present_flag");           pcVUI->setAspectRatioInfoPresentFlag(uiCode);
   if (pcVUI->getAspectRatioInfoPresentFlag())
@@ -715,9 +715,9 @@ void  HLSyntaxReader::parseVUI(VUI* pcVUI, SPS *pcSPS)
   }
 }
 
-void HLSyntaxReader::parseHrdParameters(HRD *hrd, bool commonInfPresentFlag, UInt maxNumSubLayersMinus1)
+void HLSyntaxReader::parseHrdParameters(HRD *hrd, bool commonInfPresentFlag, uint32_t maxNumSubLayersMinus1)
 {
-  UInt  uiCode;
+  uint32_t  uiCode;
   if( commonInfPresentFlag )
   {
     READ_FLAG( uiCode, "nal_hrd_parameters_present_flag" );           hrd->setNalHrdParametersPresentFlag( uiCode == 1 ? true : false );
@@ -1018,7 +1018,7 @@ void HLSyntaxReader::parseSPS(SPS* pcSPS)
   xTraceSPSHeader ();
 #endif
 
-  UInt  uiCode;
+  uint32_t  uiCode;
 #if HEVC_VPS
   READ_CODE( 4,  uiCode, "sps_video_parameter_set_id");          pcSPS->setVPSId        ( uiCode );
 #endif
@@ -1075,10 +1075,10 @@ void HLSyntaxReader::parseSPS(SPS* pcSPS)
   READ_UVLC( uiCode,    "log2_max_pic_order_cnt_lsb_minus4" );   pcSPS->setBitsForPOC( 4 + uiCode );
   CHECK(uiCode > 12, "Invalid code");
 
-  UInt subLayerOrderingInfoPresentFlag;
+  uint32_t subLayerOrderingInfoPresentFlag;
   READ_FLAG(subLayerOrderingInfoPresentFlag, "sps_sub_layer_ordering_info_present_flag");
 
-  for(UInt i=0; i <= pcSPS->getMaxTLayers()-1; i++)
+  for(uint32_t i=0; i <= pcSPS->getMaxTLayers()-1; i++)
   {
     READ_UVLC ( uiCode, "sps_max_dec_pic_buffering_minus1[i]");
     pcSPS->setMaxDecPicBuffering( uiCode + 1, i);
@@ -1160,7 +1160,7 @@ void HLSyntaxReader::parseSPS(SPS* pcSPS)
   RPSList* rpsList = pcSPS->getRPSList();
   ReferencePictureSet* rps;
 
-  for(UInt i=0; i< rpsList->getNumberOfReferencePictureSets(); i++)
+  for(uint32_t i=0; i< rpsList->getNumberOfReferencePictureSets(); i++)
   {
     rps = rpsList->getReferencePictureSet(i);
     parseShortTermRefPicSet(pcSPS,rps,i);
@@ -1170,7 +1170,7 @@ void HLSyntaxReader::parseSPS(SPS* pcSPS)
   {
     READ_UVLC( uiCode, "num_long_term_ref_pics_sps" );
     pcSPS->setNumLongTermRefPicSPS(uiCode);
-    for (UInt k = 0; k < pcSPS->getNumLongTermRefPicSPS(); k++)
+    for (uint32_t k = 0; k < pcSPS->getNumLongTermRefPicSPS(); k++)
     {
       READ_CODE( pcSPS->getBitsForPOC(), uiCode, "lt_ref_pic_poc_lsb_sps" );
       pcSPS->setLtRefPicPocLsbSps(k, uiCode);
@@ -1271,7 +1271,7 @@ void HLSyntaxReader::parseVPS(VPS* pcVPS)
 #if ENABLE_TRACING
   xTraceVPSHeader ();
 #endif
-  UInt  uiCode;
+  uint32_t  uiCode;
 
   READ_CODE( 4,  uiCode,  "vps_video_parameter_set_id" );         pcVPS->setVPSId( uiCode );
   READ_FLAG( uiCode,      "vps_base_layer_internal_flag" );       CHECK(uiCode != 1, "Invalid code");
@@ -1282,9 +1282,9 @@ void HLSyntaxReader::parseVPS(VPS* pcVPS)
   CHECK (pcVPS->getMaxTLayers()<=1&&!pcVPS->getTemporalNestingFlag(), "Invalid VPS state");
   READ_CODE( 16, uiCode,  "vps_reserved_0xffff_16bits" );         CHECK(uiCode != 0xffff, "Invalid value for reserved bits");
   parsePTL ( pcVPS->getPTL(), true, pcVPS->getMaxTLayers()-1);
-  UInt subLayerOrderingInfoPresentFlag;
+  uint32_t subLayerOrderingInfoPresentFlag;
   READ_FLAG(subLayerOrderingInfoPresentFlag, "vps_sub_layer_ordering_info_present_flag");
-  for(UInt i = 0; i <= pcVPS->getMaxTLayers()-1; i++)
+  for(uint32_t i = 0; i <= pcVPS->getMaxTLayers()-1; i++)
   {
     READ_UVLC( uiCode,  "vps_max_dec_pic_buffering_minus1[i]" );    pcVPS->setMaxDecPicBuffering( uiCode + 1, i );
     READ_UVLC( uiCode,  "vps_max_num_reorder_pics[i]" );            pcVPS->setNumReorderPics( uiCode, i );
@@ -1306,10 +1306,10 @@ void HLSyntaxReader::parseVPS(VPS* pcVPS)
   CHECK( pcVPS->getMaxNuhReservedZeroLayerId() >= MAX_VPS_NUH_RESERVED_ZERO_LAYER_ID_PLUS1, "Reserved zero layer id too big" );
   READ_CODE( 6, uiCode, "vps_max_layer_id" );                        pcVPS->setMaxNuhReservedZeroLayerId( uiCode );
   READ_UVLC(    uiCode, "vps_num_layer_sets_minus1" );               pcVPS->setMaxOpSets( uiCode + 1 );
-  for( UInt opsIdx = 1; opsIdx <= ( pcVPS->getMaxOpSets() - 1 ); opsIdx ++ )
+  for( uint32_t opsIdx = 1; opsIdx <= ( pcVPS->getMaxOpSets() - 1 ); opsIdx ++ )
   {
     // Operation point set
-    for( UInt i = 0; i <= pcVPS->getMaxNuhReservedZeroLayerId(); i ++ )
+    for( uint32_t i = 0; i <= pcVPS->getMaxNuhReservedZeroLayerId(); i ++ )
     {
       READ_FLAG( uiCode, "layer_id_included_flag[opsIdx][i]" );   pcVPS->setLayerIdIncludedFlag( uiCode == 1 ? true : false, opsIdx, i );
     }
@@ -1333,7 +1333,7 @@ void HLSyntaxReader::parseVPS(VPS* pcVPS)
     {
       pcVPS->createHrdParamBuffer();
     }
-    for( UInt i = 0; i < pcVPS->getNumHrdParameters(); i ++ )
+    for( uint32_t i = 0; i < pcVPS->getNumHrdParameters(); i ++ )
     {
       READ_UVLC( uiCode, "hrd_layer_set_idx[i]" );                  pcVPS->setHrdOpSetIdx( uiCode, i );
       if( i > 0 )
@@ -1364,7 +1364,7 @@ void HLSyntaxReader::parseVPS(VPS* pcVPS)
 
 void HLSyntaxReader::parseSliceHeader (Slice* pcSlice, ParameterSetManager *parameterSetManager, const int prevTid0POC)
 {
-  UInt  uiCode;
+  uint32_t  uiCode;
   int   iCode;
 
 #if ENABLE_TRACING
@@ -1373,7 +1373,7 @@ void HLSyntaxReader::parseSliceHeader (Slice* pcSlice, ParameterSetManager *para
   PPS* pps = NULL;
   SPS* sps = NULL;
 
-  UInt firstSliceSegmentInPic;
+  uint32_t firstSliceSegmentInPic;
   READ_FLAG( firstSliceSegmentInPic, "first_slice_segment_in_pic_flag" );
   if( pcSlice->getRapPicFlag())
   {
@@ -1389,7 +1389,7 @@ void HLSyntaxReader::parseSliceHeader (Slice* pcSlice, ParameterSetManager *para
   CHECK(sps==0, "Invalid SPS");
 
   const ChromaFormat chFmt = sps->getChromaFormatIdc();
-  const UInt numValidComp=getNumberValidComponents(chFmt);
+  const uint32_t numValidComp=getNumberValidComponents(chFmt);
   const bool bChroma=(chFmt!=CHROMA_400);
 
 #if HEVC_DEPENDENT_SLICES
@@ -1403,7 +1403,7 @@ void HLSyntaxReader::parseSliceHeader (Slice* pcSlice, ParameterSetManager *para
   }
 #endif
   int numCTUs = ((sps->getPicWidthInLumaSamples()+sps->getMaxCUWidth()-1)/sps->getMaxCUWidth())*((sps->getPicHeightInLumaSamples()+sps->getMaxCUHeight()-1)/sps->getMaxCUHeight());
-  UInt sliceSegmentAddress = 0;
+  uint32_t sliceSegmentAddress = 0;
   int bitsSliceSegmentAddress = 0;
   while(numCTUs>(1<<bitsSliceSegmentAddress))
   {
@@ -1517,8 +1517,8 @@ void HLSyntaxReader::parseSliceHeader (Slice* pcSlice, ParameterSetManager *para
       if(sps->getLongTermRefsPresent())
       {
         int offset = rps->getNumberOfNegativePictures()+rps->getNumberOfPositivePictures();
-        UInt numOfLtrp = 0;
-        UInt numLtrpInSPS = 0;
+        uint32_t numOfLtrp = 0;
+        uint32_t numLtrpInSPS = 0;
         if (sps->getNumLongTermRefPicSPS() > 0)
         {
           READ_UVLC( uiCode, "num_long_term_sps");
@@ -1820,7 +1820,7 @@ void HLSyntaxReader::parseSliceHeader (Slice* pcSlice, ParameterSetManager *para
       if (!pcSlice->isIntra())
       {
         READ_UVLC(uiCode, "max_binary_tree_unit_size");
-        UInt maxCU = sps->getSpsNext().getCTUSize();
+        uint32_t maxCU = sps->getSpsNext().getCTUSize();
         pcSlice->setMaxBTSize(maxCU >> uiCode);
       }
       else
@@ -1944,7 +1944,7 @@ void HLSyntaxReader::parseSliceHeader (Slice* pcSlice, ParameterSetManager *para
 
       if( clpRngs.used )
       {
-        const UInt lumaBits = sps->getBitDepth( CHANNEL_TYPE_LUMA ) - sps->getSpsNext().getAClipQuant();
+        const uint32_t lumaBits = sps->getBitDepth( CHANNEL_TYPE_LUMA ) - sps->getSpsNext().getAClipQuant();
         READ_CODE( lumaBits, uiCode, "slice_ClipAdaptive_Y_MIN");
         clpRngs.comp[COMPONENT_Y].min = uiCode << sps->getSpsNext().getAClipQuant();
         READ_CODE( lumaBits, uiCode, "slice_ClipAdaptive_Y_MAX");
@@ -1953,7 +1953,7 @@ void HLSyntaxReader::parseSliceHeader (Slice* pcSlice, ParameterSetManager *para
         READ_FLAG(uiCode, "slice_ClipAdaptive_flag_chroma"); clpRngs.chroma = (0!=uiCode);
         if( clpRngs.chroma )
         {
-          const UInt chromaBits = sps->getBitDepth( CHANNEL_TYPE_CHROMA ) - sps->getSpsNext().getAClipQuant();
+          const uint32_t chromaBits = sps->getBitDepth( CHANNEL_TYPE_CHROMA ) - sps->getSpsNext().getAClipQuant();
           READ_CODE( chromaBits, uiCode, "slice_ClipAdaptive_C0_MIN");
           clpRngs.comp[COMPONENT_Cb].min = uiCode << sps->getSpsNext().getAClipQuant();
 
@@ -1992,7 +1992,7 @@ void HLSyntaxReader::parseSliceHeader (Slice* pcSlice, ParameterSetManager *para
     READ_UVLC(uiCode,"slice_segment_header_extension_length");
     for(int i=0; i<uiCode; i++)
     {
-      UInt ignore_;
+      uint32_t ignore_;
       READ_CODE(8,ignore_,"slice_segment_header_extension_data_byte");
     }
   }
@@ -2002,17 +2002,17 @@ void HLSyntaxReader::parseSliceHeader (Slice* pcSlice, ParameterSetManager *para
 #endif
 
 #if HEVC_TILES_WPP
-  std::vector<UInt> entryPointOffset;
+  std::vector<uint32_t> entryPointOffset;
   if( pps->getTilesEnabledFlag() || pps->getEntropyCodingSyncEnabledFlag() )
   {
-    UInt numEntryPointOffsets;
-    UInt offsetLenMinus1;
+    uint32_t numEntryPointOffsets;
+    uint32_t offsetLenMinus1;
     READ_UVLC( numEntryPointOffsets, "num_entry_point_offsets" );
     if( numEntryPointOffsets > 0 )
     {
       READ_UVLC( offsetLenMinus1, "offset_len_minus1" );
       entryPointOffset.resize( numEntryPointOffsets );
-      for( UInt idx = 0; idx < numEntryPointOffsets; idx++ )
+      for( uint32_t idx = 0; idx < numEntryPointOffsets; idx++ )
       {
         READ_CODE( offsetLenMinus1 + 1, uiCode, "entry_point_offset_minus1" );
         entryPointOffset[idx] = uiCode + 1;
@@ -2035,7 +2035,7 @@ void HLSyntaxReader::parseSliceHeader (Slice* pcSlice, ParameterSetManager *para
     int endOfSliceHeaderLocation = m_pcBitstream->getByteLocation();
 
     // Adjust endOfSliceHeaderLocation to account for emulation prevention bytes in the slice segment header
-    for ( UInt curByteIdx  = 0; curByteIdx<m_pcBitstream->numEmulationPreventionBytesRead(); curByteIdx++ )
+    for ( uint32_t curByteIdx  = 0; curByteIdx<m_pcBitstream->numEmulationPreventionBytesRead(); curByteIdx++ )
     {
       if ( m_pcBitstream->getEmulationPreventionByteLocation( curByteIdx ) < endOfSliceHeaderLocation )
       {
@@ -2045,12 +2045,12 @@ void HLSyntaxReader::parseSliceHeader (Slice* pcSlice, ParameterSetManager *para
 
     int  curEntryPointOffset     = 0;
     int  prevEntryPointOffset    = 0;
-    for (UInt idx=0; idx<entryPointOffset.size(); idx++)
+    for (uint32_t idx=0; idx<entryPointOffset.size(); idx++)
     {
       curEntryPointOffset += entryPointOffset[ idx ];
 
       int emulationPreventionByteCount = 0;
-      for ( UInt curByteIdx  = 0; curByteIdx<m_pcBitstream->numEmulationPreventionBytesRead(); curByteIdx++ )
+      for ( uint32_t curByteIdx  = 0; curByteIdx<m_pcBitstream->numEmulationPreventionBytesRead(); curByteIdx++ )
       {
         if ( m_pcBitstream->getEmulationPreventionByteLocation( curByteIdx ) >= ( prevEntryPointOffset + endOfSliceHeaderLocation ) &&
              m_pcBitstream->getEmulationPreventionByteLocation( curByteIdx ) <  ( curEntryPointOffset  + endOfSliceHeaderLocation ) )
@@ -2132,7 +2132,7 @@ void HLSyntaxReader::xParseCABACWSizes( Slice* pcSlice, const SPS* sps )
 
 void HLSyntaxReader::parsePTL( PTL *rpcPTL, bool profilePresentFlag, int maxNumSubLayersMinus1 )
 {
-  UInt uiCode;
+  uint32_t uiCode;
   if(profilePresentFlag)
   {
     parseProfileTier(rpcPTL->getGeneralPTL(), false);
@@ -2175,7 +2175,7 @@ void HLSyntaxReader::parseProfileTier(ProfileTierLevel *ptl, const bool /*bIsSub
 #define PTL_TRACE_TEXT(txt) txt
 #endif
 {
-  UInt uiCode;
+  uint32_t uiCode;
   READ_CODE(2 , uiCode,   PTL_TRACE_TEXT("profile_space"                   )); ptl->setProfileSpace(uiCode);
   READ_FLAG(    uiCode,   PTL_TRACE_TEXT("tier_flag"                       )); ptl->setTierFlag    (uiCode ? Level::HIGH : Level::MAIN);
   READ_CODE(5 , uiCode,   PTL_TRACE_TEXT("profile_idc"                     )); ptl->setProfileIdc  (Profile::Name(uiCode));
@@ -2194,7 +2194,7 @@ void HLSyntaxReader::parseProfileTier(ProfileTierLevel *ptl, const bool /*bIsSub
   if (ptl->getProfileIdc() == Profile::MAINREXT           || ptl->getProfileCompatibilityFlag(Profile::MAINREXT) ||
       ptl->getProfileIdc() == Profile::HIGHTHROUGHPUTREXT || ptl->getProfileCompatibilityFlag(Profile::HIGHTHROUGHPUTREXT))
   {
-    UInt maxBitDepth=16;
+    uint32_t maxBitDepth=16;
     READ_FLAG(    uiCode, PTL_TRACE_TEXT("max_12bit_constraint_flag"       )); if (uiCode) maxBitDepth=12;
     READ_FLAG(    uiCode, PTL_TRACE_TEXT("max_10bit_constraint_flag"       )); if (uiCode) maxBitDepth=10;
     READ_FLAG(    uiCode, PTL_TRACE_TEXT("max_8bit_constraint_flag"        )); if (uiCode) maxBitDepth=8;
@@ -2238,13 +2238,13 @@ void HLSyntaxReader::parseProfileTier(ProfileTierLevel *ptl, const bool /*bIsSub
 #undef PTL_TRACE_TEXT
 }
 
-void HLSyntaxReader::parseTerminatingBit( UInt& ruiBit )
+void HLSyntaxReader::parseTerminatingBit( uint32_t& ruiBit )
 {
   ruiBit = false;
   int iBitsLeft = m_pcBitstream->getNumBitsLeft();
   if(iBitsLeft <= 8)
   {
-    UInt uiPeekValue = m_pcBitstream->peekBits(iBitsLeft);
+    uint32_t uiPeekValue = m_pcBitstream->peekBits(iBitsLeft);
     if (uiPeekValue == (1<<(iBitsLeft-1)))
     {
       ruiBit = true;
@@ -2262,7 +2262,7 @@ void HLSyntaxReader::parseRemainingBytes( bool noTrailingBytesExpected )
   {
     while (m_pcBitstream->getNumBitsLeft())
     {
-      UInt trailingNullByte=m_pcBitstream->readByte();
+      uint32_t trailingNullByte=m_pcBitstream->readByte();
       if (trailingNullByte!=0)
       {
         msg( ERROR, "Trailing byte should be 0, but has value %02x\n", trailingNullByte);
@@ -2288,8 +2288,8 @@ void HLSyntaxReader::parsePredWeightTable( Slice* pcSlice, const SPS *sps )
   const bool            bChroma      = (chFmt!=CHROMA_400);
   const SliceType       eSliceType   = pcSlice->getSliceType();
   const int             iNbRef       = (eSliceType == B_SLICE ) ? (2) : (1);
-  UInt            uiLog2WeightDenomLuma=0, uiLog2WeightDenomChroma=0;
-  UInt            uiTotalSignalledWeightFlags = 0;
+  uint32_t            uiLog2WeightDenomLuma=0, uiLog2WeightDenomChroma=0;
+  uint32_t            uiTotalSignalledWeightFlags = 0;
 
   int iDeltaDenom;
   // decode delta_luma_log2_weight_denom :
@@ -2300,7 +2300,7 @@ void HLSyntaxReader::parsePredWeightTable( Slice* pcSlice, const SPS *sps )
     READ_SVLC( iDeltaDenom, "delta_chroma_log2_weight_denom" );
     CHECK((iDeltaDenom + (int)uiLog2WeightDenomLuma)<0, "Invalid code");
     CHECK((iDeltaDenom + (int)uiLog2WeightDenomLuma)>7, "Invalid code");
-    uiLog2WeightDenomChroma = (UInt)(iDeltaDenom + uiLog2WeightDenomLuma);
+    uiLog2WeightDenomChroma = (uint32_t)(iDeltaDenom + uiLog2WeightDenomLuma);
   }
 
   for ( int iNumRef=0 ; iNumRef<iNbRef ; iNumRef++ ) // loop over l0 and l1 syntax elements
@@ -2316,14 +2316,14 @@ void HLSyntaxReader::parsePredWeightTable( Slice* pcSlice, const SPS *sps )
         wp[j].uiLog2WeightDenom = uiLog2WeightDenomChroma;
       }
 
-      UInt  uiCode;
+      uint32_t  uiCode;
       READ_FLAG( uiCode, iNumRef==0?"luma_weight_l0_flag[i]":"luma_weight_l1_flag[i]" );
       wp[COMPONENT_Y].bPresentFlag = ( uiCode == 1 );
       uiTotalSignalledWeightFlags += wp[COMPONENT_Y].bPresentFlag;
     }
     if ( bChroma )
     {
-      UInt  uiCode;
+      uint32_t  uiCode;
       for ( int iRefIdx=0 ; iRefIdx<pcSlice->getNumRefIdx(eRefPicList) ; iRefIdx++ )
       {
         pcSlice->getWpScaling(eRefPicList, iRefIdx, wp);
@@ -2405,7 +2405,7 @@ void HLSyntaxReader::parsePredWeightTable( Slice* pcSlice, const SPS *sps )
 */
 void HLSyntaxReader::parseScalingList(ScalingList* scalingList)
 {
-  UInt  code, sizeId, listId;
+  uint32_t  code, sizeId, listId;
   bool scalingListPredModeFlag;
   //for each size
   for(sizeId = SCALING_LIST_FIRST_CODED; sizeId <= SCALING_LIST_LAST_CODED; sizeId++)
@@ -2437,7 +2437,7 @@ void HLSyntaxReader::parseScalingList(ScalingList* scalingList)
             code*=(SCALING_LIST_NUM/NUMBER_OF_PREDICTION_MODES); // Adjust the decoded code for this size, to cope with the missing 32x32 chroma entries.
           }
 
-          scalingList->setRefMatrixId (sizeId,listId,(UInt)((int)(listId)-(code)));
+          scalingList->setRefMatrixId (sizeId,listId,(uint32_t)((int)(listId)-(code)));
           if( sizeId > SCALING_LIST_8x8 )
           {
             scalingList->setScalingListDC(sizeId,listId,((listId == scalingList->getRefMatrixId (sizeId,listId))? 16 :scalingList->getScalingListDC(sizeId, scalingList->getRefMatrixId (sizeId,listId))));
@@ -2461,13 +2461,13 @@ void HLSyntaxReader::parseScalingList(ScalingList* scalingList)
 * \param sizeId size index
 * \param listId list index
 */
-void HLSyntaxReader::decodeScalingList(ScalingList *scalingList, UInt sizeId, UInt listId)
+void HLSyntaxReader::decodeScalingList(ScalingList *scalingList, uint32_t sizeId, uint32_t listId)
 {
   int i,coefNum = std::min(MAX_MATRIX_COEF_NUM,(int)g_scalingListSize[sizeId]);
   int data;
   int scalingListDcCoefMinus8 = 0;
   int nextCoef = SCALING_LIST_START_VALUE;
-  UInt* scan = g_scanOrder[SCAN_UNGROUPED][SCAN_DIAG][gp_sizeIdxInfo->idxFrom( 1 << ( sizeId == SCALING_LIST_FIRST_CODED ? 2 : 3 ) )][gp_sizeIdxInfo->idxFrom( 1 << ( sizeId == SCALING_LIST_FIRST_CODED ? 2 : 3 ) )];
+  uint32_t* scan = g_scanOrder[SCAN_UNGROUPED][SCAN_DIAG][gp_sizeIdxInfo->idxFrom( 1 << ( sizeId == SCALING_LIST_FIRST_CODED ? 2 : 3 ) )][gp_sizeIdxInfo->idxFrom( 1 << ( sizeId == SCALING_LIST_FIRST_CODED ? 2 : 3 ) )];
   int *dst = scalingList->getScalingListAddress(sizeId, listId);
 
   if( sizeId > SCALING_LIST_8x8 )
@@ -2518,7 +2518,7 @@ bool HLSyntaxReader::xMoreRbspData()
 #if JVET_K0371_ALF
 void HLSyntaxReader::alf( AlfSliceParam& alfSliceParam )
 {
-  UInt code;
+  uint32_t code;
   READ_FLAG( code, "alf_slice_enable_flag" );
   alfSliceParam.enabledFlag[COMPONENT_Y] = code ? true : false;
 
@@ -2563,7 +2563,7 @@ void HLSyntaxReader::alf( AlfSliceParam& alfSliceParam )
 
 int HLSyntaxReader::alfGolombDecode( const int k )
 {
-  UInt uiSymbol;
+  uint32_t uiSymbol;
   int q = -1;
   int nr = 0;
   int m = (int)pow( 2.0, k );
@@ -2607,7 +2607,7 @@ int HLSyntaxReader::alfGolombDecode( const int k )
 
 void HLSyntaxReader::alfFilter( AlfSliceParam& alfSliceParam, const bool isChroma )
 {
-  UInt code;
+  uint32_t code;
   if( !isChroma )
   {
     READ_FLAG( code, "alf_coefficients_delta_flag" );
@@ -2683,7 +2683,7 @@ int HLSyntaxReader::truncatedUnaryEqProb( const int maxSymbol )
 {
   for( int k = 0; k < maxSymbol; k++ )
   {
-    UInt symbol;
+    uint32_t symbol;
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
     xReadFlag( symbol, "" );
 #else
@@ -2698,7 +2698,7 @@ int HLSyntaxReader::truncatedUnaryEqProb( const int maxSymbol )
   return maxSymbol;
 }
 
-void HLSyntaxReader::xReadTruncBinCode( UInt& ruiSymbol, const int uiMaxSymbol )
+void HLSyntaxReader::xReadTruncBinCode( uint32_t& ruiSymbol, const int uiMaxSymbol )
 {
   int uiThresh;
   if( uiMaxSymbol > 256 )
@@ -2726,7 +2726,7 @@ void HLSyntaxReader::xReadTruncBinCode( UInt& ruiSymbol, const int uiMaxSymbol )
 #endif
   if( ruiSymbol >= uiVal - b )
   {
-    UInt uiSymbol;
+    uint32_t uiSymbol;
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
     xReadFlag( uiSymbol, "" );
 #else

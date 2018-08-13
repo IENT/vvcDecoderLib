@@ -136,7 +136,7 @@ void DecCu::xIntraRecBlk( TransformUnit& tu, const ComponentID compID )
 
   const PredictionUnit &pu  = *tu.cs->getPU( area.pos(), chType );
 #if JEM_TOOLS||JVET_K0190
-  const UInt uiChFinalMode  = PU::getFinalIntraMode( pu, chType );
+  const uint32_t uiChFinalMode  = PU::getFinalIntraMode( pu, chType );
 #endif
 
   //===== init availability pattern =====
@@ -224,9 +224,9 @@ void DecCu::xReconIntraQT( CodingUnit &cu )
     return;
   }
 
-  const UInt numChType = ::getNumberValidChannels( cu.chromaFormat );
+  const uint32_t numChType = ::getNumberValidChannels( cu.chromaFormat );
 
-  for( UInt chType = CHANNEL_TYPE_LUMA; chType < numChType; chType++ )
+  for( uint32_t chType = CHANNEL_TYPE_LUMA; chType < numChType; chType++ )
   {
     if( cu.blocks[chType].valid() )
     {
@@ -252,11 +252,11 @@ void DecCu::xDecodePCMTexture(TransformUnit &tu, const ComponentID compID)
         PelBuf piPicReco       = tu.cs->getRecoBuf( area );
   const CPelBuf piPicPcm       = tu.getPcmbuf(compID);
   const SPS &sps               = *tu.cs->sps;
-  const UInt uiPcmLeftShiftBit = sps.getBitDepth(toChannelType(compID)) - sps.getPCMBitDepth(toChannelType(compID));
+  const uint32_t uiPcmLeftShiftBit = sps.getBitDepth(toChannelType(compID)) - sps.getPCMBitDepth(toChannelType(compID));
 
-  for (UInt uiY = 0; uiY < area.height; uiY++)
+  for (uint32_t uiY = 0; uiY < area.height; uiY++)
   {
-    for (UInt uiX = 0; uiX < area.width; uiX++)
+    for (uint32_t uiX = 0; uiX < area.width; uiX++)
     {
       piPicReco.at(uiX, uiY) = (piPicPcm.at(uiX, uiY) << uiPcmLeftShiftBit);
     }
@@ -273,7 +273,7 @@ void DecCu::xDecodePCMTexture(TransformUnit &tu, const ComponentID compID)
 */
 void DecCu::xReconPCM(TransformUnit &tu)
 {
-  for (UInt ch = 0; ch < tu.blocks.size(); ch++)
+  for (uint32_t ch = 0; ch < tu.blocks.size(); ch++)
   {
     ComponentID compID = ComponentID(ch);
 
@@ -302,9 +302,9 @@ DecCu::xIntraRecQT(CodingUnit &cu, const ChannelType chType)
     }
     else
     {
-      const UInt numValidComp = getNumberValidComponents( cu.chromaFormat );
+      const uint32_t numValidComp = getNumberValidComponents( cu.chromaFormat );
 
-      for( UInt compID = COMPONENT_Cb; compID < numValidComp; compID++ )
+      for( uint32_t compID = COMPONENT_Cb; compID < numValidComp; compID++ )
       {
         xIntraRecBlk( currTU, ComponentID( compID ) );
       }
@@ -414,9 +414,9 @@ void DecCu::xDecodeInterTexture(CodingUnit &cu)
     return;
   }
 
-  const UInt uiNumVaildComp = getNumberValidComponents(cu.chromaFormat);
+  const uint32_t uiNumVaildComp = getNumberValidComponents(cu.chromaFormat);
 
-  for (UInt ch = 0; ch < uiNumVaildComp; ch++)
+  for (uint32_t ch = 0; ch < uiNumVaildComp; ch++)
   {
     const ComponentID compID = ComponentID(ch);
 
@@ -535,7 +535,7 @@ void DecCu::xDeriveCUMV( CodingUnit &cu )
 #if JEM_TOOLS || JVET_K_AFFINE
         if( pu.cu->affine )
         {
-          for ( UInt uiRefListIdx = 0; uiRefListIdx < 2; uiRefListIdx++ )
+          for ( uint32_t uiRefListIdx = 0; uiRefListIdx < 2; uiRefListIdx++ )
           {
             RefPicList eRefList = RefPicList( uiRefListIdx );
             if ( pu.cs->slice->getNumRefIdx( eRefList ) > 0 && ( pu.interDir & ( 1 << uiRefListIdx ) ) )
@@ -590,7 +590,7 @@ void DecCu::xDeriveCUMV( CodingUnit &cu )
         else
 #endif
         {
-          for ( UInt uiRefListIdx = 0; uiRefListIdx < 2; uiRefListIdx++ )
+          for ( uint32_t uiRefListIdx = 0; uiRefListIdx < 2; uiRefListIdx++ )
           {
             RefPicList eRefList = RefPicList( uiRefListIdx );
             if ( pu.cs->slice->getNumRefIdx( eRefList ) > 0 && ( pu.interDir & ( 1 << uiRefListIdx ) ) )
@@ -670,7 +670,7 @@ void DecCu::xDeriveCUMV( CodingUnit &cu )
       else
       {
 #endif
-        for ( UInt uiRefListIdx = 0; uiRefListIdx < 2; uiRefListIdx++ )
+        for ( uint32_t uiRefListIdx = 0; uiRefListIdx < 2; uiRefListIdx++ )
         {
           RefPicList eRefList = RefPicList( uiRefListIdx );
           if ( pu.cs->slice->getNumRefIdx( eRefList ) > 0 && ( pu.interDir & ( 1 << uiRefListIdx ) ) )

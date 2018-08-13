@@ -88,13 +88,13 @@ private:
   //cost variables for the EMT algorithm and new modes list
   double m_bestModeCostStore[4];                                    // RD cost of the best mode for each PU using DCT2
   double m_modeCostStore    [4][NUM_LUMA_MODE];                         // RD cost of each mode for each PU using DCT2
-  UInt   m_savedRdModeList  [4][NUM_LUMA_MODE], m_savedNumRdModes[4];
+  uint32_t   m_savedRdModeList  [4][NUM_LUMA_MODE], m_savedNumRdModes[4];
 
 #endif
 #if JEM_TOOLS
-  static_vector<UInt,   FAST_UDI_MAX_RDMODE_NUM> m_uiSavedRdModeListNSST;
-  UInt                                           m_uiSavedNumRdModesNSST;
-  static_vector<UInt,   FAST_UDI_MAX_RDMODE_NUM> m_uiSavedHadModeListNSST;
+  static_vector<uint32_t,   FAST_UDI_MAX_RDMODE_NUM> m_uiSavedRdModeListNSST;
+  uint32_t                                           m_uiSavedNumRdModesNSST;
+  static_vector<uint32_t,   FAST_UDI_MAX_RDMODE_NUM> m_uiSavedHadModeListNSST;
   static_vector<double, FAST_UDI_MAX_RDMODE_NUM> m_dSavedModeCostNSST;
   static_vector<double, FAST_UDI_MAX_RDMODE_NUM> m_dSavedHadListNSST;
 
@@ -132,9 +132,9 @@ public:
 #endif
                                     CABACWriter*   CABACEstimator,
                                     CtxCache*      ctxCache,
-                                    const UInt     maxCUWidth,
-                                    const UInt     maxCUHeight,
-                                    const UInt     maxTotalCUDepth
+                                    const uint32_t     maxCUWidth,
+                                    const uint32_t     maxCUHeight,
+                                    const uint32_t     maxTotalCUDepth
                                   );
 
   void destroy                    ();
@@ -172,17 +172,17 @@ protected:
   uint64_t xGetIntraFracBitsQTChroma(TransformUnit& tu, const ComponentID &compID);
   void xEncCoeffQT                (CodingStructure &cs, Partitioner& pm, const ComponentID &compID);
 
-  uint64_t xFracModeBitsIntra       (PredictionUnit &pu, const UInt &uiMode, const ChannelType &compID);
+  uint64_t xFracModeBitsIntra       (PredictionUnit &pu, const uint32_t &uiMode, const ChannelType &compID);
 
-  void xIntraCodingTUBlock        (TransformUnit &tu, const ComponentID &compID, const bool &checkCrossCPrediction, Distortion& ruiDist, const int &default0Save1Load2 = 0, UInt* numSig = nullptr );
+  void xIntraCodingTUBlock        (TransformUnit &tu, const ComponentID &compID, const bool &checkCrossCPrediction, Distortion& ruiDist, const int &default0Save1Load2 = 0, uint32_t* numSig = nullptr );
 
   ChromaCbfs xRecurIntraChromaCodingQT  (CodingStructure &cs, Partitioner& pm);
 
   void xRecurIntraCodingLumaQT    ( CodingStructure &cs, Partitioner& pm );
 
 
-  void encPredIntraDPCM( const ComponentID &compID, PelBuf &pOrg, PelBuf &pDst, const UInt &uiDirMode );
-  static bool useDPCMForFirstPassIntraEstimation( const PredictionUnit &pu, const UInt &uiDirMode );
+  void encPredIntraDPCM( const ComponentID &compID, PelBuf &pOrg, PelBuf &pDst, const uint32_t &uiDirMode );
+  static bool useDPCMForFirstPassIntraEstimation( const PredictionUnit &pu, const uint32_t &uiDirMode );
 };// END CLASS DEFINITION EncSearch
 
 //! \}

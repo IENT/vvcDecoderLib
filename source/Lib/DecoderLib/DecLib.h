@@ -110,7 +110,7 @@ private:
   bool isSkipPictureForBLA(int& iPOCLastDisplay);
   bool isRandomAccessSkipPicture(int& iSkipFrame,  int& iPOCLastDisplay);
   Picture*                m_pcPic;
-  UInt                    m_uiSliceSegmentIdx;
+  uint32_t                    m_uiSliceSegmentIdx;
   int                     m_prevPOC;
   int                     m_prevTid0POC;
   bool                    m_bFirstSliceInPicture;
@@ -124,7 +124,7 @@ private:
   std::ostream           *m_pDecodedSEIOutputStream;
 
   int                     m_decodedPictureHashSEIEnabled;  ///< Checksum(3)/CRC(2)/MD5(1)/disable(0) acting on decoded picture hash SEI message
-  UInt                    m_numberOfChecksumErrorsDetected;
+  uint32_t                    m_numberOfChecksumErrorsDetected;
 
   bool                    m_warningMessageSkipPicture;
 
@@ -157,12 +157,12 @@ public:
   bool  getFirstSliceInSequence () const   { return m_bFirstSliceInSequence; }
   void  setFirstSliceInSequence (bool val) { m_bFirstSliceInSequence = val; }
   void  setDecodedSEIMessageOutputStream(std::ostream *pOpStream) { m_pDecodedSEIOutputStream = pOpStream; }
-  UInt  getNumberOfChecksumErrorsDetected() const { return m_numberOfChecksumErrorsDetected; }
+  uint32_t  getNumberOfChecksumErrorsDetected() const { return m_numberOfChecksumErrorsDetected; }
 
 protected:
   void  xUpdateRasInit(Slice* slice);
 
-  Picture * xGetNewPicBuffer(const SPS &sps, const PPS &pps, const UInt temporalLayer);
+  Picture * xGetNewPicBuffer(const SPS &sps, const PPS &pps, const uint32_t temporalLayer);
   void  xCreateLostPicture (int iLostPOC);
 
   void      xActivateParameterSets();

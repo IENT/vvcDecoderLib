@@ -49,14 +49,14 @@
  *  - the initial startcode in the access unit,
  *  - any SPS/PPS nal units
  */
-static std::vector<UInt> writeAnnexB(std::ostream& out, const AccessUnit& au)
+static std::vector<uint32_t> writeAnnexB(std::ostream& out, const AccessUnit& au)
 {
-  std::vector<UInt> annexBsizes;
+  std::vector<uint32_t> annexBsizes;
 
   for (AccessUnit::const_iterator it = au.begin(); it != au.end(); it++)
   {
     const NALUnitEBSP& nalu = **it;
-    UInt size = 0; /* size of annexB unit in bytes */
+    uint32_t size = 0; /* size of annexB unit in bytes */
 
     static const uint8_t start_code_prefix[] = {0,0,0,1};
 #if HEVC_VPS
@@ -82,7 +82,7 @@ static std::vector<UInt> writeAnnexB(std::ostream& out, const AccessUnit& au)
       size += 3;
     }
     out << nalu.m_nalUnitData.str();
-    size += UInt(nalu.m_nalUnitData.str().size());
+    size += uint32_t(nalu.m_nalUnitData.str().size());
 
     annexBsizes.push_back(size);
   }

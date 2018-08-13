@@ -94,7 +94,7 @@ public:
   // trailing SEIs
   void initDecodedPictureHashSEI(SEIDecodedPictureHash *sei, PelUnitBuf& pic, std::string &rHashString, const BitDepths &bitDepths);
   void initTemporalLevel0IndexSEI(SEITemporalLevel0Index *sei, Slice *slice);
-  void initSEIGreenMetadataInfo(SEIGreenMetadataInfo *sei, UInt u);
+  void initSEIGreenMetadataInfo(SEIGreenMetadataInfo *sei, uint32_t u);
 
 private:
   EncCfg* m_pcCfg;
@@ -102,8 +102,8 @@ private:
   EncGOP* m_pcEncGOP;
 
   // for temporal level 0 index SEI
-  UInt m_tl0Idx;
-  UInt m_rapIdx;
+  uint32_t m_tl0Idx;
+  uint32_t m_rapIdx;
 
   bool m_isInitialized;
 };

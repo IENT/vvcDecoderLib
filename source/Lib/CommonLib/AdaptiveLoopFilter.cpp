@@ -1767,7 +1767,7 @@ void AdaptiveLoopFilter::destroyMatrix4D_double(double ****m4D, int d1, int d2)
   }
 }
 
-void AdaptiveLoopFilter::create( const int iPicWidth, const int iPicHeight, const ChromaFormat chromaFormatIDC, const int uiMaxCUWidth, const UInt uiMaxCUHeight, const UInt uiMaxCUDepth, const int nInputBitDepth, const int nInternalBitDepth, const int numberOfCTUs )
+void AdaptiveLoopFilter::create( const int iPicWidth, const int iPicHeight, const ChromaFormat chromaFormatIDC, const int uiMaxCUWidth, const uint32_t uiMaxCUHeight, const uint32_t uiMaxCUDepth, const int nInputBitDepth, const int nInternalBitDepth, const int numberOfCTUs )
 {
   m_nInputBitDepth    = nInputBitDepth;
   m_nInternalBitDepth = nInternalBitDepth;
@@ -1865,7 +1865,7 @@ void AdaptiveLoopFilter::destroy()
 
 int AdaptiveLoopFilter::ALFTapHToTapV(int tapH)
 {
-  return std::min<UInt>(tapH, 7);
+  return std::min<uint32_t>(tapH, 7);
 }
 
 int AdaptiveLoopFilter::ALFFlHToFlV(int flH)
@@ -1873,7 +1873,7 @@ int AdaptiveLoopFilter::ALFFlHToFlV(int flH)
 #if GALF
   return flH;
 #else
-  return std::min<UInt>(flH, 7/2);
+  return std::min<uint32_t>(flH, 7/2);
 #endif
 }
 
@@ -2293,8 +2293,8 @@ void AdaptiveLoopFilter::xCUAdaptive( CodingStructure& cs, const PelUnitBuf &rec
 
   Partitioner* partitioner = PartitionerFactory::get( *cs.slice );
 
-  UInt indx = 0;
-  for( UInt uiCTUAddr = 0; uiCTUAddr < cs.pcv->sizeInCtus ; uiCTUAddr++ )
+  uint32_t indx = 0;
+  for( uint32_t uiCTUAddr = 0; uiCTUAddr < cs.pcv->sizeInCtus ; uiCTUAddr++ )
   {
     const unsigned  ctuXPosInCtus         = uiCTUAddr % widthInCtus;
     const unsigned  ctuYPosInCtus         = uiCTUAddr / widthInCtus;
@@ -2734,7 +2734,7 @@ void AdaptiveLoopFilter::resetALFPredParam(ALFParam *pAlfParam, bool bIntra)
   pAlfParam->num_coeff = AdaptiveLoopFilter::m_SQR_FILT_LENGTH_9SYM;
 }
 
-void AdaptiveLoopFilter::setNumCUsInFrame(UInt uiNumCUsInFrame)
+void AdaptiveLoopFilter::setNumCUsInFrame(uint32_t uiNumCUsInFrame)
 {
   m_uiNumCUsInFrame = uiNumCUsInFrame;
 }

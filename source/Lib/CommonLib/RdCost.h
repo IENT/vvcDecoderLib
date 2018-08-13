@@ -167,14 +167,14 @@ public:
 #endif
   }
   void           setCostScale             ( int iCostScale )           { m_iCostScale = iCostScale; }
-  Distortion     getCost                  ( UInt b )                   { return Distortion( m_motionLambda * b ); }
+  Distortion     getCost                  ( uint32_t b )                   { return Distortion( m_motionLambda * b ); }
 
 #if ENABLE_SPLIT_PARALLELISM
   void copyState( const RdCost& other );
 #endif
 
   // for motion cost
-  static UInt    xGetExpGolombNumberOfBits( int iVal )
+  static uint32_t    xGetExpGolombNumberOfBits( int iVal )
   {
     CHECKD( iVal == std::numeric_limits<int>::min(), "Wrong value" );
     unsigned uiLength2 = 1, uiTemp2 = ( iVal <= 0 ) ? ( unsigned( -iVal ) << 1 ) + 1 : unsigned( iVal << 1 );
@@ -189,10 +189,10 @@ public:
   }
 #if JVET_K0357_AMVR
   Distortion     getCostOfVectorWithPredictor( const int x, const int y, const unsigned imvShift )  { return Distortion( m_motionLambda * getBitsOfVectorWithPredictor(x, y, imvShift )); }
-  UInt           getBitsOfVectorWithPredictor( const int x, const int y, const unsigned imvShift )  { return xGetExpGolombNumberOfBits(((x << m_iCostScale) - m_mvPredictor.getHor())>>imvShift) + xGetExpGolombNumberOfBits(((y << m_iCostScale) - m_mvPredictor.getVer())>>imvShift); }
+  uint32_t           getBitsOfVectorWithPredictor( const int x, const int y, const unsigned imvShift )  { return xGetExpGolombNumberOfBits(((x << m_iCostScale) - m_mvPredictor.getHor())>>imvShift) + xGetExpGolombNumberOfBits(((y << m_iCostScale) - m_mvPredictor.getVer())>>imvShift); }
 #else
   Distortion     getCostOfVectorWithPredictor( const int x, const int y )  { return Distortion( m_motionLambda * getBitsOfVectorWithPredictor(x, y )); }
-  UInt           getBitsOfVectorWithPredictor( const int x, const int y )  { return xGetExpGolombNumberOfBits(((x << m_iCostScale) - m_mvPredictor.getHor())) + xGetExpGolombNumberOfBits(((y << m_iCostScale) - m_mvPredictor.getVer())); }
+  uint32_t           getBitsOfVectorWithPredictor( const int x, const int y )  { return xGetExpGolombNumberOfBits(((x << m_iCostScale) - m_mvPredictor.getHor())) + xGetExpGolombNumberOfBits(((y << m_iCostScale) - m_mvPredictor.getVer())); }
 #endif
 #if WCG_EXT
          void    saveUnadjustedLambda       ();
@@ -211,7 +211,7 @@ private:
   static Distortion xGetSSE16N        ( const DistParam& pcDtParam );
 
 #if WCG_EXT
-  static Distortion getWeightedMSE    (int compIdx, const Pel org, const Pel cur, const UInt uiShift, const Pel orgLuma);
+  static Distortion getWeightedMSE    (int compIdx, const Pel org, const Pel cur, const uint32_t uiShift, const Pel orgLuma);
   static Distortion xGetSSE_WTD       ( const DistParam& pcDtParam );
   static Distortion xGetSSE2_WTD      ( const DistParam& pcDtParam );
   static Distortion xGetSSE4_WTD      ( const DistParam& pcDtParam );

@@ -41,7 +41,7 @@
 #include "CommonDef.h"
 
 typedef int PosType;
-typedef UInt SizeType;
+typedef uint32_t SizeType;
 struct Position
 {
   PosType x;
@@ -71,7 +71,7 @@ struct Size
 
   bool operator!=(const Size &other)      const { return (width != other.width) || (height != other.height); }
   bool operator==(const Size &other)      const { return (width == other.width) && (height == other.height); }
-  UInt area()                             const { return (UInt) width * (UInt) height; }
+  uint32_t area()                             const { return (uint32_t) width * (uint32_t) height; }
 };
 
 struct Area : public Position, public Size
@@ -115,22 +115,22 @@ struct UnitScale
   Area     scale( const Area    &_area ) const { return Area( scale( _area.pos() ), scale( _area.size() ) ); }
 };
 
-inline size_t rsAddr(const Position &pos, const UInt stride, const UnitScale &unitScale )
+inline size_t rsAddr(const Position &pos, const uint32_t stride, const UnitScale &unitScale )
 {
   return (size_t)(stride >> unitScale.posx) * (size_t)(pos.y >> unitScale.posy) + (size_t)(pos.x >> unitScale.posx);
 }
 
-inline size_t rsAddr(const Position &pos, const Position &origin, const UInt stride, const UnitScale &unitScale )
+inline size_t rsAddr(const Position &pos, const Position &origin, const uint32_t stride, const UnitScale &unitScale )
 {
   return (stride >> unitScale.posx) * ((pos.y - origin.y) >> unitScale.posy) + ((pos.x - origin.x) >> unitScale.posx);
 }
 
-inline size_t rsAddr(const Position &pos, const UInt stride )
+inline size_t rsAddr(const Position &pos, const uint32_t stride )
 {
   return stride * (size_t)pos.y + (size_t)pos.x;
 }
 
-inline size_t rsAddr(const Position &pos, const Position &origin, const UInt stride )
+inline size_t rsAddr(const Position &pos, const Position &origin, const uint32_t stride )
 {
   return stride * (pos.y - origin.y) + (pos.x - origin.x);
 }

@@ -137,8 +137,8 @@ public:
 #if JVET_K0072
   unsigned sigCtxIdAbs( int scanPos, const TCoeff* coeff, const int state )
   {
-    const UInt    posY      = m_scanPosY[ scanPos ];
-    const UInt    posX      = m_scanPosX[ scanPos ];
+    const uint32_t    posY      = m_scanPosY[ scanPos ];
+    const uint32_t    posX      = m_scanPosX[ scanPos ];
     const TCoeff* pData     = coeff + posX + posY * m_width;
     const int     diag      = posX + posY;
     int           numPos    = 0;
@@ -193,8 +193,8 @@ public:
   unsigned GoRiceParAbs( int scanPos, const TCoeff* coeff ) const
   {
 #define UPDATE(x) sum+=abs(x)-!!x
-    const UInt    posY      = m_scanPosY[ scanPos ];
-    const UInt    posX      = m_scanPosX[ scanPos ];
+    const uint32_t    posY      = m_scanPosY[ scanPos ];
+    const uint32_t    posX      = m_scanPosX[ scanPos ];
     const TCoeff* pData     = coeff + posX + posY * m_width;
     int           sum       = 0;
     if( posX < m_width-1 )
@@ -227,8 +227,8 @@ public:
                               const TCoeff*   coeff,
                                     int       strd = 0  )
   {
-    const UInt posY = m_scanPosY[scanPos];
-    const UInt posX = m_scanPosX[scanPos];
+    const uint32_t posY = m_scanPosY[scanPos];
+    const uint32_t posX = m_scanPosX[scanPos];
 
     strd = strd == 0 ? m_width : strd;
     const TCoeff *pData = coeff + posX + posY * strd;
@@ -284,8 +284,8 @@ public:
                               const TCoeff*   coeff,
                                     int       strd = 0  )
   {
-    const UInt posY = m_scanPosY[scanPos];
-    const UInt posX = m_scanPosX[scanPos];
+    const uint32_t posY = m_scanPosY[scanPos];
+    const uint32_t posX = m_scanPosX[scanPos];
 
     strd = strd == 0 ? m_width : strd;
     const TCoeff *pData = coeff + posX + posY * strd;
@@ -336,8 +336,8 @@ public:
                               const TCoeff*   coeff,
                                     int       strd = 0  )
   {
-    const UInt posY = m_scanPosY[ scanPos ];
-    const UInt posX = m_scanPosX[ scanPos ];
+    const uint32_t posY = m_scanPosY[ scanPos ];
+    const uint32_t posX = m_scanPosX[ scanPos ];
 
     strd = strd == 0 ? m_width : strd;
     const TCoeff *pData = coeff + posX + posY * strd;
@@ -383,8 +383,8 @@ public:
                               const TCoeff*   coeff,
                                     int       strd = 0  )
   {
-    const UInt posY = m_scanPosY[ scanPos ];
-    const UInt posX = m_scanPosX[ scanPos ];
+    const uint32_t posY = m_scanPosY[ scanPos ];
+    const uint32_t posX = m_scanPosX[ scanPos ];
 
     strd = strd == 0 ? m_width : strd;
     const TCoeff *pData = coeff + posX + posY * strd;
@@ -543,7 +543,7 @@ public:
 public:
   bool      isDQPCoded;
   bool      isChromaQpAdjCoded;
-  UInt      numNonZeroCoeffNonTs;
+  uint32_t      numNonZeroCoeffNonTs;
   int8_t     qp;                   // used as a previous(last) QP and for QP prediction
 };
 

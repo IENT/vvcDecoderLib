@@ -56,9 +56,9 @@ int8_t CrossComponentPrediction::xCalcCrossComponentPredictionAlpha( TransformUn
   int SSxy = 0;
   int SSxx = 0;
 
-  for( UInt uiY = 0; uiY < pResiL.height; uiY++ )
+  for( uint32_t uiY = 0; uiY < pResiL.height; uiY++ )
   {
-    for( UInt uiX = 0; uiX < pResiL.width; uiX++ )
+    for( uint32_t uiX = 0; uiX < pResiL.width; uiX++ )
     {
       const Pel scaledResiL = rightShift( pResiL.at( uiX, uiY ), diffBitDepth );
       SSxy += ( scaledResiL * pResiC.at( uiX, uiY ) );

@@ -258,9 +258,9 @@ Distortion RdCostWeightPrediction::xGetSSEw( const DistParam &rcDtParam )
   const int             shift           = wpCur.shift;
   const int             round           = wpCur.round;
 #if DISTORTION_LAMBDA_BUGFIX
-  const UInt distortionShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
+  const uint32_t distortionShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
 #else
-  const UInt            distortionShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth-8) << 1);
+  const uint32_t            distortionShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth-8) << 1);
 #endif
 
   Distortion sum = 0;

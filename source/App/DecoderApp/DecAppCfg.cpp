@@ -221,7 +221,7 @@ DecAppCfg::DecAppCfg()
 , m_outputDecodedSEIMessagesFilename()
 , m_bClipOutputVideoToRec709Range(false)
 {
-  for (UInt channelTypeIndex = 0; channelTypeIndex < MAX_NUM_CHANNEL_TYPE; channelTypeIndex++)
+  for (uint32_t channelTypeIndex = 0; channelTypeIndex < MAX_NUM_CHANNEL_TYPE; channelTypeIndex++)
   {
     m_outputBitDepth[channelTypeIndex] = 0;
   }

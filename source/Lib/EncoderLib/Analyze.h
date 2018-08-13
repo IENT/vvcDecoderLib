@@ -69,7 +69,7 @@ class Analyze
 private:
   double    m_dPSNRSum[MAX_NUM_COMPONENT];
   double    m_dAddBits;
-  UInt      m_uiNumPic;
+  uint32_t      m_uiNumPic;
   double    m_dFrmRate; //--CFG_KDY
   double    m_MSEyuvframe[MAX_NUM_COMPONENT]; // sum of MSEs
 #if ENABLE_QPA && FRAME_WEIGHTING
@@ -87,7 +87,7 @@ public:
   void  addResult( double psnr[MAX_NUM_COMPONENT], double bits, const double MSEyuvframe[MAX_NUM_COMPONENT])
   {
     m_dAddBits  += bits;
-    for(UInt i=0; i<MAX_NUM_COMPONENT; i++)
+    for(uint32_t i=0; i<MAX_NUM_COMPONENT; i++)
     {
       m_dPSNRSum[i] += psnr[i];
       m_MSEyuvframe[i] += MSEyuvframe[i];
@@ -107,7 +107,7 @@ public:
   double  getPsnr(ComponentID compID) const { return  m_dPSNRSum[compID];  }
   double  getBits()                   const { return  m_dAddBits;   }
   void    setBits(double numBits)     { m_dAddBits = numBits; }
-  UInt    getNumPic()                 const { return  m_uiNumPic;   }
+  uint32_t    getNumPic()                 const { return  m_uiNumPic;   }
 #if EXTENSION_360_VIDEO
   TExt360EncAnalyze& getExt360Info() { return m_ext360; }
 #endif
@@ -116,7 +116,7 @@ public:
   void    clear()
   {
     m_dAddBits = 0;
-    for(UInt i=0; i<MAX_NUM_COMPONENT; i++)
+    for(uint32_t i=0; i<MAX_NUM_COMPONENT; i++)
     {
       m_dPSNRSum[i] = 0;
       m_MSEyuvframe[i] = 0;
@@ -140,7 +140,7 @@ public:
     int scale = 0;
 
     int maximumBitDepth = bitDepths.recon[CHANNEL_TYPE_LUMA];
-    for (UInt channelTypeIndex = 1; channelTypeIndex < MAX_NUM_CHANNEL_TYPE; channelTypeIndex++)
+    for (uint32_t channelTypeIndex = 1; channelTypeIndex < MAX_NUM_CHANNEL_TYPE; channelTypeIndex++)
     {
       if (bitDepths.recon[channelTypeIndex] > maximumBitDepth)
       {
@@ -149,19 +149,19 @@ public:
     }
 
 #if ENABLE_QPA
-    const UInt maxval                = /*useWPSNR ? (1 << maximumBitDepth) - 1 :*/ 255 << (maximumBitDepth - 8); // fix with WPSNR: 1023 (4095) instead of 1020 (4080) for bit depth 10 (12)
+    const uint32_t maxval                = /*useWPSNR ? (1 << maximumBitDepth) - 1 :*/ 255 << (maximumBitDepth - 8); // fix with WPSNR: 1023 (4095) instead of 1020 (4080) for bit depth 10 (12)
 #else
-    const UInt maxval                = 255 << (maximumBitDepth - 8);
+    const uint32_t maxval                = 255 << (maximumBitDepth - 8);
 #endif
-    const UInt numberValidComponents = getNumberValidComponents(chFmt);
+    const uint32_t numberValidComponents = getNumberValidComponents(chFmt);
 
-    for (UInt comp=0; comp<numberValidComponents; comp++)
+    for (uint32_t comp=0; comp<numberValidComponents; comp++)
     {
       const ComponentID compID        = ComponentID(comp);
-      const UInt        csx           = getComponentScaleX(compID, chFmt);
-      const UInt        csy           = getComponentScaleY(compID, chFmt);
+      const uint32_t        csx           = getComponentScaleX(compID, chFmt);
+      const uint32_t        csy           = getComponentScaleY(compID, chFmt);
       const int         scaleChan     = (4>>(csx+csy));
-      const UInt        bitDepthShift = 2 * (maximumBitDepth - bitDepths.recon[toChannelType(compID)]); //*2 because this is a squared number
+      const uint32_t        bitDepthShift = 2 * (maximumBitDepth - bitDepths.recon[toChannelType(compID)]); //*2 because this is a squared number
 
       const double      channelMSE    = (m_MSEyuvframe[compID] * double(1 << bitDepthShift)) / double(getNumPic());
 
@@ -191,7 +191,7 @@ public:
     double MSEBasedSNR[MAX_NUM_COMPONENT];
     if (printMSEBasedSNR)
     {
-      for (UInt componentIndex = 0; componentIndex < MAX_NUM_COMPONENT; componentIndex++)
+      for (uint32_t componentIndex = 0; componentIndex < MAX_NUM_COMPONENT; componentIndex++)
       {
         const ComponentID compID = ComponentID(componentIndex);
 
@@ -202,10 +202,10 @@ public:
         else
         {
 #if ENABLE_QPA
-          const UInt maxval = /*useWPSNR ? (1 << bitDepths.recon[toChannelType(compID)]) - 1 :*/ 255 << (bitDepths.recon[toChannelType(compID)] - 8); // fix with WPSNR: 1023 (4095) instead of 1020 (4080) for bit depth 10 (12)
+          const uint32_t maxval = /*useWPSNR ? (1 << bitDepths.recon[toChannelType(compID)]) - 1 :*/ 255 << (bitDepths.recon[toChannelType(compID)] - 8); // fix with WPSNR: 1023 (4095) instead of 1020 (4080) for bit depth 10 (12)
 #else
           //NOTE: this is not the true maximum value for any bitDepth other than 8. It comes from the original HM PSNR calculation
-          const UInt maxval = 255 << (bitDepths.recon[toChannelType(compID)] - 8);
+          const uint32_t maxval = 255 << (bitDepths.recon[toChannelType(compID)] - 8);
 #endif
           const double MSE  = m_MSEyuvframe[compID];
 

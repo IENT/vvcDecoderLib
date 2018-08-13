@@ -99,22 +99,22 @@ const char* nalUnitTypeToString(NalUnitType type)
 class ScanGenerator
 {
 private:
-  UInt m_line, m_column;
-  const UInt m_blockWidth, m_blockHeight;
-  const UInt m_stride;
+  uint32_t m_line, m_column;
+  const uint32_t m_blockWidth, m_blockHeight;
+  const uint32_t m_stride;
   const CoeffScanType m_scanType;
 
 public:
-  ScanGenerator(UInt blockWidth, UInt blockHeight, UInt stride, CoeffScanType scanType)
+  ScanGenerator(uint32_t blockWidth, uint32_t blockHeight, uint32_t stride, CoeffScanType scanType)
     : m_line(0), m_column(0), m_blockWidth(blockWidth), m_blockHeight(blockHeight), m_stride(stride), m_scanType(scanType)
   { }
 
-  UInt GetCurrentX() const { return m_column; }
-  UInt GetCurrentY() const { return m_line; }
+  uint32_t GetCurrentX() const { return m_column; }
+  uint32_t GetCurrentY() const { return m_line; }
 
-  UInt GetNextIndex(UInt blockOffsetX, UInt blockOffsetY)
+  uint32_t GetNextIndex(uint32_t blockOffsetX, uint32_t blockOffsetY)
   {
-    const UInt rtn = ((m_line + blockOffsetY) * m_stride) + m_column + blockOffsetX;
+    const uint32_t rtn = ((m_line + blockOffsetY) * m_stride) + m_column + blockOffsetX;
 
     //advance line and column to the next position
     switch (m_scanType)
@@ -341,29 +341,29 @@ void initROM()
   sizeInfo.init(MAX_CU_SIZE);
 
   // initialize scan orders
-  for (UInt blockHeightIdx = 0; blockHeightIdx < sizeInfo.numAllHeights(); blockHeightIdx++)
+  for (uint32_t blockHeightIdx = 0; blockHeightIdx < sizeInfo.numAllHeights(); blockHeightIdx++)
   {
-    for (UInt blockWidthIdx = 0; blockWidthIdx < sizeInfo.numAllWidths(); blockWidthIdx++)
+    for (uint32_t blockWidthIdx = 0; blockWidthIdx < sizeInfo.numAllWidths(); blockWidthIdx++)
     {
-      const UInt blockWidth  = sizeInfo.sizeFrom(blockWidthIdx);
-      const UInt blockHeight = sizeInfo.sizeFrom(blockHeightIdx);
-      const UInt totalValues = blockWidth * blockHeight;
+      const uint32_t blockWidth  = sizeInfo.sizeFrom(blockWidthIdx);
+      const uint32_t blockHeight = sizeInfo.sizeFrom(blockHeightIdx);
+      const uint32_t totalValues = blockWidth * blockHeight;
 
       //--------------------------------------------------------------------------------------------------
 
       //non-grouped scan orders
 
-      for (UInt scanTypeIndex = 0; scanTypeIndex < SCAN_NUMBER_OF_TYPES; scanTypeIndex++)
+      for (uint32_t scanTypeIndex = 0; scanTypeIndex < SCAN_NUMBER_OF_TYPES; scanTypeIndex++)
       {
         const CoeffScanType scanType = CoeffScanType(scanTypeIndex);
 
-        g_scanOrder     [SCAN_UNGROUPED][scanType][blockWidthIdx][blockHeightIdx]    = new UInt[totalValues];
-        g_scanOrderPosXY[SCAN_UNGROUPED][scanType][blockWidthIdx][blockHeightIdx][0] = new UInt[totalValues];
-        g_scanOrderPosXY[SCAN_UNGROUPED][scanType][blockWidthIdx][blockHeightIdx][1] = new UInt[totalValues];
+        g_scanOrder     [SCAN_UNGROUPED][scanType][blockWidthIdx][blockHeightIdx]    = new uint32_t[totalValues];
+        g_scanOrderPosXY[SCAN_UNGROUPED][scanType][blockWidthIdx][blockHeightIdx][0] = new uint32_t[totalValues];
+        g_scanOrderPosXY[SCAN_UNGROUPED][scanType][blockWidthIdx][blockHeightIdx][1] = new uint32_t[totalValues];
 
         ScanGenerator fullBlockScan(blockWidth, blockHeight, blockWidth, scanType);
 
-        for (UInt scanPosition = 0; scanPosition < totalValues; scanPosition++)
+        for (uint32_t scanPosition = 0; scanPosition < totalValues; scanPosition++)
         {
           const int rasterPos = fullBlockScan.GetNextIndex( 0, 0 );
           const int posY      = rasterPos / blockWidth;
@@ -377,7 +377,7 @@ void initROM()
       if( blockWidthIdx >= sizeInfo.numWidths() || blockHeightIdx >= sizeInfo.numHeights() )
       {
         // size indizes greater than numIdxs are sizes than are only used when grouping - they will never come up as a block size - thus they can be skipped at this point
-        for( UInt scanTypeIndex = 0; scanTypeIndex < SCAN_NUMBER_OF_TYPES; scanTypeIndex++ )
+        for( uint32_t scanTypeIndex = 0; scanTypeIndex < SCAN_NUMBER_OF_TYPES; scanTypeIndex++ )
         {
           g_scanOrder     [SCAN_GROUPED_4x4][scanTypeIndex][blockWidthIdx][blockHeightIdx]    = nullptr;
           g_scanOrderPosXY[SCAN_GROUPED_4x4][scanTypeIndex][blockWidthIdx][blockHeightIdx][0] = nullptr;
@@ -391,39 +391,39 @@ void initROM()
       //--------------------------------------------------------------------------------------------------
 
       //grouped scan orders
-      const UInt  log2CGWidth    = (blockWidth & 3) + (blockHeight & 3) > 0 ? 1 : 2;
-      const UInt  log2CGHeight   = (blockWidth & 3) + (blockHeight & 3) > 0 ? 1 : 2;
+      const uint32_t  log2CGWidth    = (blockWidth & 3) + (blockHeight & 3) > 0 ? 1 : 2;
+      const uint32_t  log2CGHeight   = (blockWidth & 3) + (blockHeight & 3) > 0 ? 1 : 2;
 
-      const UInt  groupWidth     = 1 << log2CGWidth;
-      const UInt  groupHeight    = 1 << log2CGHeight;
-      const UInt  widthInGroups  = blockWidth >> log2CGWidth;
-      const UInt  heightInGroups = blockHeight >> log2CGHeight;
+      const uint32_t  groupWidth     = 1 << log2CGWidth;
+      const uint32_t  groupHeight    = 1 << log2CGHeight;
+      const uint32_t  widthInGroups  = blockWidth >> log2CGWidth;
+      const uint32_t  heightInGroups = blockHeight >> log2CGHeight;
 
-      const UInt  groupSize      = groupWidth    * groupHeight;
-      const UInt  totalGroups    = widthInGroups * heightInGroups;
+      const uint32_t  groupSize      = groupWidth    * groupHeight;
+      const uint32_t  totalGroups    = widthInGroups * heightInGroups;
 
-      for (UInt scanTypeIndex = 0; scanTypeIndex < SCAN_NUMBER_OF_TYPES; scanTypeIndex++)
+      for (uint32_t scanTypeIndex = 0; scanTypeIndex < SCAN_NUMBER_OF_TYPES; scanTypeIndex++)
       {
         const CoeffScanType scanType = CoeffScanType(scanTypeIndex);
 
-        g_scanOrder     [SCAN_GROUPED_4x4][scanType][blockWidthIdx][blockHeightIdx]    = new UInt[totalValues];
-        g_scanOrderPosXY[SCAN_GROUPED_4x4][scanType][blockWidthIdx][blockHeightIdx][0] = new UInt[totalValues];
-        g_scanOrderPosXY[SCAN_GROUPED_4x4][scanType][blockWidthIdx][blockHeightIdx][1] = new UInt[totalValues];
+        g_scanOrder     [SCAN_GROUPED_4x4][scanType][blockWidthIdx][blockHeightIdx]    = new uint32_t[totalValues];
+        g_scanOrderPosXY[SCAN_GROUPED_4x4][scanType][blockWidthIdx][blockHeightIdx][0] = new uint32_t[totalValues];
+        g_scanOrderPosXY[SCAN_GROUPED_4x4][scanType][blockWidthIdx][blockHeightIdx][1] = new uint32_t[totalValues];
 
 
         ScanGenerator fullBlockScan(widthInGroups, heightInGroups, groupWidth, scanType);
 
-        for (UInt groupIndex = 0; groupIndex < totalGroups; groupIndex++)
+        for (uint32_t groupIndex = 0; groupIndex < totalGroups; groupIndex++)
         {
-          const UInt groupPositionY  = fullBlockScan.GetCurrentY();
-          const UInt groupPositionX  = fullBlockScan.GetCurrentX();
-          const UInt groupOffsetX    = groupPositionX * groupWidth;
-          const UInt groupOffsetY    = groupPositionY * groupHeight;
-          const UInt groupOffsetScan = groupIndex     * groupSize;
+          const uint32_t groupPositionY  = fullBlockScan.GetCurrentY();
+          const uint32_t groupPositionX  = fullBlockScan.GetCurrentX();
+          const uint32_t groupOffsetX    = groupPositionX * groupWidth;
+          const uint32_t groupOffsetY    = groupPositionY * groupHeight;
+          const uint32_t groupOffsetScan = groupIndex     * groupSize;
 
           ScanGenerator groupScan(groupWidth, groupHeight, blockWidth, scanType);
 
-          for (UInt scanPosition = 0; scanPosition < groupSize; scanPosition++)
+          for (uint32_t scanPosition = 0; scanPosition < groupSize; scanPosition++)
           {
             const int rasterPos = groupScan.GetNextIndex( groupOffsetX, groupOffsetY );
             const int posY      = rasterPos / blockWidth;
@@ -444,9 +444,9 @@ void initROM()
 #if JEM_TOOLS && !ENABLE_BMS
 
   // initialize CoefTopLeftDiagScan8x8 for NSST
-  for (UInt blockWidthIdx = 0; blockWidthIdx < sizeInfo.numAllWidths(); blockWidthIdx++)
+  for (uint32_t blockWidthIdx = 0; blockWidthIdx < sizeInfo.numAllWidths(); blockWidthIdx++)
   {
-    const UInt blockWidth = sizeInfo.sizeFrom(blockWidthIdx);
+    const uint32_t blockWidth = sizeInfo.sizeFrom(blockWidthIdx);
 
     const static uint8_t g_auiXYDiagScan8x8[64][2] =
     {
@@ -472,13 +472,13 @@ void destroyROM()
   unsigned numWidths = gp_sizeIdxInfo->numAllWidths();
   unsigned numHeights = gp_sizeIdxInfo->numAllHeights();
 
-  for (UInt groupTypeIndex = 0; groupTypeIndex < SCAN_NUMBER_OF_GROUP_TYPES; groupTypeIndex++)
+  for (uint32_t groupTypeIndex = 0; groupTypeIndex < SCAN_NUMBER_OF_GROUP_TYPES; groupTypeIndex++)
   {
-    for (UInt scanOrderIndex = 0; scanOrderIndex < SCAN_NUMBER_OF_TYPES; scanOrderIndex++)
+    for (uint32_t scanOrderIndex = 0; scanOrderIndex < SCAN_NUMBER_OF_TYPES; scanOrderIndex++)
     {
-      for (UInt blockWidthIdx = 0; blockWidthIdx <= numWidths; blockWidthIdx++)
+      for (uint32_t blockWidthIdx = 0; blockWidthIdx <= numWidths; blockWidthIdx++)
       {
-        for (UInt blockHeightIdx = 0; blockHeightIdx <= numHeights; blockHeightIdx++)
+        for (uint32_t blockHeightIdx = 0; blockHeightIdx <= numHeights; blockHeightIdx++)
         {
           delete[] g_scanOrder[groupTypeIndex][scanOrderIndex][blockWidthIdx][blockHeightIdx];
           g_scanOrder[groupTypeIndex][scanOrderIndex][blockWidthIdx][blockHeightIdx] = nullptr;
@@ -559,7 +559,7 @@ const uint8_t g_aucTrSetHorz35[35] =
 };
 
 //EMT threshold
-const UInt g_EmtSigNumThr = 2;
+const uint32_t g_EmtSigNumThr = 2;
 
 #endif
 
@@ -956,14 +956,14 @@ UnitScale g_miScaling( MIN_CU_LOG2, MIN_CU_LOG2 );
 // ====================================================================================================================
 
 // scanning order table
-UInt* g_scanOrder     [SCAN_NUMBER_OF_GROUP_TYPES][SCAN_NUMBER_OF_TYPES][MAX_CU_SIZE / 2 + 1][MAX_CU_SIZE / 2 + 1];
-UInt* g_scanOrderPosXY[SCAN_NUMBER_OF_GROUP_TYPES][SCAN_NUMBER_OF_TYPES][MAX_CU_SIZE / 2 + 1][MAX_CU_SIZE / 2 + 1][2];
+uint32_t* g_scanOrder     [SCAN_NUMBER_OF_GROUP_TYPES][SCAN_NUMBER_OF_TYPES][MAX_CU_SIZE / 2 + 1][MAX_CU_SIZE / 2 + 1];
+uint32_t* g_scanOrderPosXY[SCAN_NUMBER_OF_GROUP_TYPES][SCAN_NUMBER_OF_TYPES][MAX_CU_SIZE / 2 + 1][MAX_CU_SIZE / 2 + 1][2];
 #if JEM_TOOLS && !ENABLE_BMS
-UInt  g_auiCoefTopLeftDiagScan8x8[MAX_CU_SIZE / 2 + 1][64];
+uint32_t  g_auiCoefTopLeftDiagScan8x8[MAX_CU_SIZE / 2 + 1][64];
 
 #endif
 
-const UInt ctxIndMap4x4[4 * 4] =
+const uint32_t ctxIndMap4x4[4 * 4] =
 {
   0, 1, 4, 5,
   2, 3, 4, 5,
@@ -972,12 +972,12 @@ const UInt ctxIndMap4x4[4 * 4] =
 };
 
 
-const UInt g_uiMinInGroup[LAST_SIGNIFICANT_GROUPS] = { 0,1,2,3,4,6,8,12,16,24,32,48,64,96 };
-const UInt g_uiGroupIdx[MAX_TU_SIZE] = { 0,1,2,3,4,4,5,5,6,6,6,6,7,7,7,7,8,8,8,8,8,8,8,8,9,9,9,9,9,9,9,9, 10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11
+const uint32_t g_uiMinInGroup[LAST_SIGNIFICANT_GROUPS] = { 0,1,2,3,4,6,8,12,16,24,32,48,64,96 };
+const uint32_t g_uiGroupIdx[MAX_TU_SIZE] = { 0,1,2,3,4,4,5,5,6,6,6,6,7,7,7,7,8,8,8,8,8,8,8,8,9,9,9,9,9,9,9,9, 10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11
 ,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12
 ,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13 };
 #if JVET_K0072
-const UInt g_auiGoRicePars[ 32 ] =
+const uint32_t g_auiGoRicePars[ 32 ] =
 {
   0, 0, 0, 0,
   0, 0, 0, 0, 0, 0,
@@ -985,7 +985,7 @@ const UInt g_auiGoRicePars[ 32 ] =
   1, 1, 1, 2, 2, 2, 2, 2, 2, 2
 };
 #endif
-const UInt g_auiGoRiceRange[MAX_GR_ORDER_RESIDUAL] =
+const uint32_t g_auiGoRiceRange[MAX_GR_ORDER_RESIDUAL] =
 {
   6, 5, 6, COEF_REMAIN_BIN_REDUCTION, COEF_REMAIN_BIN_REDUCTION, COEF_REMAIN_BIN_REDUCTION, COEF_REMAIN_BIN_REDUCTION, COEF_REMAIN_BIN_REDUCTION, COEF_REMAIN_BIN_REDUCTION, COEF_REMAIN_BIN_REDUCTION
 };
@@ -1093,8 +1093,8 @@ const int g_quantInterDefault8x8[8 * 8] =
   24,25,28,33,41,54,71,91
 };
 
-const UInt g_scalingListSize [SCALING_LIST_SIZE_NUM] = { 4, 16, 64, 256, 1024, 4096, 16384 };
-const UInt g_scalingListSizeX[SCALING_LIST_SIZE_NUM] = { 2,  4,  8,  16,   32,   64,   128 };
+const uint32_t g_scalingListSize [SCALING_LIST_SIZE_NUM] = { 4, 16, 64, 256, 1024, 4096, 16384 };
+const uint32_t g_scalingListSizeX[SCALING_LIST_SIZE_NUM] = { 2,  4,  8,  16,   32,   64,   128 };
 #endif
 
 const uint8_t g_NonMPM[257] = { 0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,

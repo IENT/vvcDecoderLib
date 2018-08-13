@@ -113,7 +113,7 @@ void  WeightPrediction::getWpScaling(const Slice                *pcSlice,
     wp1 = NULL;
   }
 
-  const UInt numValidComponent = getNumberValidComponents(pcSlice->getSPS()->getChromaFormatIdc());
+  const uint32_t numValidComponent = getNumberValidComponents(pcSlice->getSPS()->getChromaFormatIdc());
   const bool bUseHighPrecisionPredictionWeighting = pcSlice->getSPS()->getSpsRangeExtension().getHighPrecisionOffsetsEnabledFlag();
 
   if (bBiPred)
@@ -165,7 +165,7 @@ void WeightPrediction::addWeightBi(const CPelUnitBuf          &pcYuvSrc0,
 {
   const bool enableRounding[MAX_NUM_COMPONENT] = { bRoundLuma, true, true };
 
-  const UInt numValidComponent = (const UInt)pcYuvSrc0.bufs.size();
+  const uint32_t numValidComponent = (const uint32_t)pcYuvSrc0.bufs.size();
 
   for (int componentIndex = 0; componentIndex < numValidComponent && componentIndex <= maxNumComp; componentIndex++)
   {
@@ -187,9 +187,9 @@ void WeightPrediction::addWeightBi(const CPelUnitBuf          &pcYuvSrc0,
     const int  iHeight  = rpcYuvDst.bufs[compID].height;
     const int  iWidth   = rpcYuvDst.bufs[compID].width;
 
-    const UInt iSrc0Stride = pcYuvSrc0.bufs[compID].stride;
-    const UInt iSrc1Stride = pcYuvSrc1.bufs[compID].stride;
-    const UInt iDstStride =  rpcYuvDst.bufs[compID].stride;
+    const uint32_t iSrc0Stride = pcYuvSrc0.bufs[compID].stride;
+    const uint32_t iSrc1Stride = pcYuvSrc1.bufs[compID].stride;
+    const uint32_t iDstStride =  rpcYuvDst.bufs[compID].stride;
 
     for (int y = iHeight - 1; y >= 0; y--)
     {
@@ -221,7 +221,7 @@ void  WeightPrediction::addWeightUni(const CPelUnitBuf          &pcYuvSrc0,
                                            PelUnitBuf           &rpcYuvDst,
                                      const ComponentID           maxNumComp)
 {
-  const UInt numValidComponent = (const UInt)pcYuvSrc0.bufs.size();
+  const uint32_t numValidComponent = (const uint32_t)pcYuvSrc0.bufs.size();
 
   for (int componentIndex = 0; componentIndex < numValidComponent && componentIndex <= maxNumComp; componentIndex++)
   {
@@ -237,8 +237,8 @@ void  WeightPrediction::addWeightUni(const CPelUnitBuf          &pcYuvSrc0,
     const int  clipBD       = clpRng.bd;
     const int  shiftNum     = std::max<int>(2, (IF_INTERNAL_PREC - clipBD));
     const int  shift        = wp0[compID].shift + shiftNum;
-    const UInt iSrc0Stride  = pcYuvSrc0.bufs[compID].stride;
-    const UInt iDstStride   = rpcYuvDst.bufs[compID].stride;
+    const uint32_t iSrc0Stride  = pcYuvSrc0.bufs[compID].stride;
+    const uint32_t iDstStride   = rpcYuvDst.bufs[compID].stride;
     const int  iHeight      = rpcYuvDst.bufs[compID].height;
     const int  iWidth       = rpcYuvDst.bufs[compID].width;
 

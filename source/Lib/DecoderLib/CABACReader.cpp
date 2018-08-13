@@ -173,9 +173,9 @@ bool CABACReader::coding_tree_unit( CodingStructure& cs, const UnitArea& area, i
     int                 ry = ctuRsAddr / frame_width_in_ctus;
     int                 rx = ctuRsAddr - ry * frame_width_in_ctus;
     const Position      pos( rx * cs.pcv->maxCUWidth, ry * cs.pcv->maxCUHeight );
-    const UInt          curSliceIdx = cs.slice->getIndependentSliceIdx();
+    const uint32_t          curSliceIdx = cs.slice->getIndependentSliceIdx();
 #if HEVC_TILES_WPP
-    const UInt          curTileIdx = cs.picture->tileMap->getTileIdxMap( pos );
+    const uint32_t          curTileIdx = cs.picture->tileMap->getTileIdxMap( pos );
     bool                leftMergeAvail = cs.getCURestricted( pos.offset( -(int)pcv.maxCUWidth, 0 ), curSliceIdx, curTileIdx, CH_L ) ? true : false;
     bool                aboveMergeAvail = cs.getCURestricted( pos.offset( 0, -(int)pcv.maxCUHeight ), curSliceIdx, curTileIdx, CH_L ) ? true : false;
 #else
@@ -411,9 +411,9 @@ void CABACReader::sao( CodingStructure& cs, unsigned ctuRsAddr )
 
 #if JEM_TOOLS
 #if !JVET_K0371_ALF
-UInt CABACReader::parseAlfUvlc ()
+uint32_t CABACReader::parseAlfUvlc ()
 {
-  UInt uiCode;
+  uint32_t uiCode;
   int  i;
 
   uiCode = m_BinDecoder.decodeBinEP();
@@ -434,7 +434,7 @@ UInt CABACReader::parseAlfUvlc ()
 
 int CABACReader::parseAlfSvlc()
 {
-  UInt uiCode;
+  uint32_t uiCode;
   int  iSign;
   int  i;
 
@@ -462,12 +462,12 @@ int CABACReader::parseAlfSvlc()
 }
 #endif
 
-void CABACReader::xReadTruncBinCode(UInt& ruiSymbol, UInt uiMaxSymbol)
+void CABACReader::xReadTruncBinCode(uint32_t& ruiSymbol, uint32_t uiMaxSymbol)
 {
-  UInt uiThresh;
+  uint32_t uiThresh;
   if (uiMaxSymbol > 256)
   {
-    UInt uiThreshVal = 1 << 8;
+    uint32_t uiThreshVal = 1 << 8;
     uiThresh = 8;
     while (uiThreshVal <= uiMaxSymbol)
     {
@@ -481,12 +481,12 @@ void CABACReader::xReadTruncBinCode(UInt& ruiSymbol, UInt uiMaxSymbol)
     uiThresh = g_NonMPM[uiMaxSymbol];
   }
 
-  UInt uiVal = 1 << uiThresh;
-  UInt b = uiMaxSymbol - uiVal;
+  uint32_t uiVal = 1 << uiThresh;
+  uint32_t b = uiMaxSymbol - uiVal;
   ruiSymbol = m_BinDecoder.decodeBinsEP(uiThresh);
   if (ruiSymbol >= uiVal - b)
   {
-    UInt uiSymbol;
+    uint32_t uiSymbol;
     uiSymbol = m_BinDecoder.decodeBinEP();
     ruiSymbol <<= 1;
     ruiSymbol += uiSymbol;
@@ -495,10 +495,10 @@ void CABACReader::xReadTruncBinCode(UInt& ruiSymbol, UInt uiMaxSymbol)
 }
 
 #if !JVET_K0371_ALF
-UInt CABACReader::xReadEpExGolomb(UInt uiCount)
+uint32_t CABACReader::xReadEpExGolomb(uint32_t uiCount)
 {
-  UInt uiSymbol = 0;
-  UInt uiBit = 1;
+  uint32_t uiSymbol = 0;
+  uint32_t uiBit = 1;
 
   while (uiBit)
   {
@@ -508,7 +508,7 @@ UInt CABACReader::xReadEpExGolomb(UInt uiCount)
 
   if (--uiCount)
   {
-    UInt bins;
+    uint32_t bins;
     bins = m_BinDecoder.decodeBinsEP(uiCount);
     uiSymbol += bins;
   }
@@ -518,7 +518,7 @@ UInt CABACReader::xReadEpExGolomb(UInt uiCount)
 
 int CABACReader::alfGolombDecode(int k)
 {
-  UInt uiSymbol;
+  uint32_t uiSymbol;
   int q = -1;
   int nr = 0;
   int m = (int)pow(2.0, k);
@@ -562,7 +562,7 @@ void CABACReader::alf( CodingStructure& cs )
     alfParam.reset();
   }
 
-  UInt alfFlag = m_BinDecoder.decodeBinEP();
+  uint32_t alfFlag = m_BinDecoder.decodeBinEP();
   if( !alfFlag )
   {
     return;
@@ -619,7 +619,7 @@ void CABACReader::alf_aux( ALFParam& alfParam, bool isGALF )
   int FiltTab[3] = {5, 7, 9};
   int sqrFiltLengthTab[3] = {AdaptiveLoopFilter::m_SQR_FILT_LENGTH_5SYM, AdaptiveLoopFilter::m_SQR_FILT_LENGTH_7SYM, AdaptiveLoopFilter::m_SQR_FILT_LENGTH_9SYM };
 
-  UInt uiSymbol;
+  uint32_t uiSymbol;
   const int iNoVarBins = AdaptiveLoopFilter::m_NO_VAR_BINS;
   int i;
   if( isGALF )
@@ -642,7 +642,7 @@ void CABACReader::alf_aux( ALFParam& alfParam, bool isGALF )
     {
       for (i = 0; i< iNoVarBins; i++)
       {
-        xReadTruncBinCode(uiSymbol, (UInt)alfParam.filters_per_group);
+        xReadTruncBinCode(uiSymbol, (uint32_t)alfParam.filters_per_group);
         alfParam.filterPattern[i] = (int)uiSymbol;
       }
     }
@@ -691,7 +691,7 @@ void CABACReader::alf_aux( ALFParam& alfParam, bool isGALF )
           {
             if (alfParam.PrevFiltIdx[i] > 0)
             {
-              xReadTruncBinCode(uiSymbol, (UInt)alfParam.iAvailableFilters);
+              xReadTruncBinCode(uiSymbol, (uint32_t)alfParam.iAvailableFilters);
               alfParam.PrevFiltIdx[i] = (uiSymbol + 1);
             }
           }
@@ -716,7 +716,7 @@ void CABACReader::alf_aux( ALFParam& alfParam, bool isGALF )
     else if( fMode == ALF_TWO_FILTERS )
     {
       alfParam.filters_per_group = 2;
-      UInt symbol = parseAlfUvlc();
+      uint32_t symbol = parseAlfUvlc();
       alfParam.startSecondFilter = symbol;
       alfParam.filterPattern[ symbol ] = 1;
     }
@@ -725,7 +725,7 @@ void CABACReader::alf_aux( ALFParam& alfParam, bool isGALF )
       alfParam.filters_per_group = 1;
       for( int i=1; i< AdaptiveLoopFilter::m_NO_VAR_BINS; i++)
       {
-        UInt symbol = m_BinDecoder.decodeBinEP();
+        uint32_t symbol = m_BinDecoder.decodeBinEP();
         alfParam.filterPattern[i]   = symbol;
         alfParam.filters_per_group += symbol;
       }
@@ -753,7 +753,7 @@ void CABACReader::alf_aux( ALFParam& alfParam, bool isGALF )
 
 void CABACReader::alf_filter( ALFParam& alfParam, bool isGALF, bool bChroma )
 {
-  UInt uiSymbol;
+  uint32_t uiSymbol;
   int ind, scanPos, i;
   int golombIndexBit;
   int kMin;
@@ -877,11 +877,11 @@ void CABACReader::alf_cu_ctrl( ALFParam& alfParam )
   {
     alfParam.alf_max_depth = unary_max_symbol( Ctx::AlfUvlcSCModel( 0 ), Ctx::AlfUvlcSCModel( 1 ), alfParam.maxCodingDepth - 1 );
 
-    UInt uiLength = 0;
-    UInt minValue = alfParam.num_ctus_in_frame;
-    UInt maxValue = ( minValue << ( alfParam.alf_max_depth * 2) );
-    UInt temp = maxValue - minValue;
-    for( UInt i = 0; i < 32; i++ )
+    uint32_t uiLength = 0;
+    uint32_t minValue = alfParam.num_ctus_in_frame;
+    uint32_t maxValue = ( minValue << ( alfParam.alf_max_depth * 2) );
+    uint32_t temp = maxValue - minValue;
+    for( uint32_t i = 0; i < 32; i++ )
     {
       if( temp & 0x1 )
       {
@@ -889,8 +889,8 @@ void CABACReader::alf_cu_ctrl( ALFParam& alfParam )
       }
       temp = ( temp >> 1 );
     }
-    UInt numOfFlags = 0;
-    UInt uiBit;
+    uint32_t numOfFlags = 0;
+    uint32_t uiBit;
     if( uiLength )
     {
       while( uiLength-- )
@@ -904,7 +904,7 @@ void CABACReader::alf_cu_ctrl( ALFParam& alfParam )
 
     DTRACE( g_trace_ctx, D_SYNTAX, "alf_cu_ctrl() max_depth=%d max_alf_depth=%d num_cu_flags=%d\n", alfParam.maxCodingDepth, alfParam.alf_max_depth, alfParam.num_alf_cu_flag );
 
-    for( UInt i = 0; i < alfParam.num_alf_cu_flag; i++ )
+    for( uint32_t i = 0; i < alfParam.num_alf_cu_flag; i++ )
     {
       alfParam.alf_cu_flag[i] = m_BinDecoder.decodeBin( Ctx::AlfCUCtrlFlags( 0 ) );
 
@@ -1483,7 +1483,7 @@ void CABACReader::intra_luma_pred_modes( CodingUnit &cu )
 
   RExt__DECODER_DEBUG_BIT_STATISTICS_CREATE_SET_SIZE2( STATS__CABAC_BITS__INTRA_DIR_ANG, cu.lumaSize(), CHANNEL_TYPE_LUMA );
 
-  const UInt numMPMs = cu.cs->pcv->numMPMs;
+  const uint32_t numMPMs = cu.cs->pcv->numMPMs;
 
   // prev_intra_luma_pred_flag
   int numBlocks = CU::getNumPUs( cu );
@@ -3031,7 +3031,7 @@ void CABACReader::residual_nsst_mode( CodingUnit& cu )
 
   if( bUseThreeNSSTPasses )
   {
-    UInt idxROT = m_BinDecoder.decodeBin( Ctx::NSSTIdx( 1 ) );
+    uint32_t idxROT = m_BinDecoder.decodeBin( Ctx::NSSTIdx( 1 ) );
     if( idxROT )
     {
       idxROT += m_BinDecoder.decodeBin( Ctx::NSSTIdx( 3 ) );
@@ -3040,10 +3040,10 @@ void CABACReader::residual_nsst_mode( CodingUnit& cu )
   }
   else
   {
-    UInt idxROT = m_BinDecoder.decodeBin( Ctx::NSSTIdx( 0 ) );
+    uint32_t idxROT = m_BinDecoder.decodeBin( Ctx::NSSTIdx( 0 ) );
     if( idxROT )
     {
-      UInt uiSymbol = m_BinDecoder.decodeBin( Ctx::NSSTIdx( 2 ) );
+      uint32_t uiSymbol = m_BinDecoder.decodeBin( Ctx::NSSTIdx( 2 ) );
       if( uiSymbol )
       {
         idxROT += 1 + m_BinDecoder.decodeBin( Ctx::NSSTIdx( 4 ) );
@@ -3077,8 +3077,8 @@ int CABACReader::last_sig_coeff( CoeffCodingContext& cctx )
   }
   if( PosLastX > 3 )
   {
-    UInt uiTemp  = 0;
-    UInt uiCount = ( PosLastX - 2 ) >> 1;
+    uint32_t uiTemp  = 0;
+    uint32_t uiCount = ( PosLastX - 2 ) >> 1;
     for ( int i = uiCount - 1; i >= 0; i-- )
     {
       uiTemp += m_BinDecoder.decodeBinEP( ) << i;
@@ -3087,8 +3087,8 @@ int CABACReader::last_sig_coeff( CoeffCodingContext& cctx )
   }
   if( PosLastY > 3 )
   {
-    UInt uiTemp  = 0;
-    UInt uiCount = ( PosLastY - 2 ) >> 1;
+    uint32_t uiTemp  = 0;
+    uint32_t uiCount = ( PosLastY - 2 ) >> 1;
     for ( int i = uiCount - 1; i >= 0; i-- )
     {
       uiTemp += m_BinDecoder.decodeBinEP( ) << i;

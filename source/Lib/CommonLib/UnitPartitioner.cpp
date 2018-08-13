@@ -680,7 +680,7 @@ Partitioning PartitionerImpl::getCUSubPartitions( const UnitArea &cuArea, const 
 
       sub.resize( 4, cuArea );
 
-      for( UInt i = 0; i < 4; i++ )
+      for( uint32_t i = 0; i < 4; i++ )
       {
         for( auto &blk : sub[i].blocks )
         {
@@ -697,7 +697,7 @@ Partitioning PartitionerImpl::getCUSubPartitions( const UnitArea &cuArea, const 
     }
     else
     {
-      const UInt minCUSize = ( cs.sps->getMaxCUWidth() >> cs.sps->getMaxCodingDepth() );
+      const uint32_t minCUSize = ( cs.sps->getMaxCUWidth() >> cs.sps->getMaxCodingDepth() );
 
       bool canSplit = cuArea.lumaSize().width > minCUSize && cuArea.lumaSize().height > minCUSize;
 
@@ -728,7 +728,7 @@ Partitioning PartitionerImpl::getCUSubPartitions( const UnitArea &cuArea, const 
         }
         else
         {
-          for( UInt i = 0; i < 4; i++ )
+          for( uint32_t i = 0; i < 4; i++ )
           {
             ret[i] = cuArea;
 
@@ -779,7 +779,7 @@ Partitioning PartitionerImpl::getCUSubPartitions( const UnitArea &cuArea, const 
 
     sub.resize(2, cuArea);
 
-    for (UInt i = 0; i < 2; i++)
+    for (uint32_t i = 0; i < 2; i++)
     {
       for (auto &blk : sub[i].blocks)
       {
@@ -798,7 +798,7 @@ Partitioning PartitionerImpl::getCUSubPartitions( const UnitArea &cuArea, const 
 
     sub.resize( 2, cuArea );
 
-    for( UInt i = 0; i < 2; i++ )
+    for( uint32_t i = 0; i < 2; i++ )
     {
       for( auto &blk : sub[i].blocks )
       {

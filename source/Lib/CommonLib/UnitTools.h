@@ -72,7 +72,7 @@ namespace CU
   bool isInter                        (const CodingUnit &cu);
   bool isRDPCMEnabled                 (const CodingUnit &cu);
   bool isLosslessCoded                (const CodingUnit &cu);
-  UInt getIntraSizeIdx                (const CodingUnit &cu);
+  uint32_t getIntraSizeIdx                (const CodingUnit &cu);
 
   bool isSameCtu                      (const CodingUnit &cu, const CodingUnit &cu2);
   bool isSameSlice                    (const CodingUnit &cu, const CodingUnit &cu2);
@@ -81,18 +81,18 @@ namespace CU
   bool isSameSliceAndTile             (const CodingUnit &cu, const CodingUnit &cu2);
 #endif
   bool isLastSubCUOfCtu               (const CodingUnit &cu);
-  UInt getCtuAddr                     (const CodingUnit &cu);
+  uint32_t getCtuAddr                     (const CodingUnit &cu);
 
   int  predictQP                      (const CodingUnit& cu, const int prevQP );
   bool isQGStart                      (const CodingUnit& cu); // check if start of a Quantization Group
 
-  UInt getNumPUs                      (const CodingUnit& cu);
+  uint32_t getNumPUs                      (const CodingUnit& cu);
   void addPUs                         (      CodingUnit& cu);
 
   PartSplit getSplitAtDepth           (const CodingUnit& cu, const unsigned depth);
 
   bool hasNonTsCodedBlock             (const CodingUnit& cu);
-  UInt getNumNonZeroCoeffNonTs        (const CodingUnit& cu);
+  uint32_t getNumNonZeroCoeffNonTs        (const CodingUnit& cu);
 #if JEM_TOOLS
   bool isLICFlagPresent               (const CodingUnit& cu);
   bool isObmcFlagCoded                (const CodingUnit& cu);
@@ -132,7 +132,7 @@ namespace PU
 #endif
 #endif
   void getIntraChromaCandModes        (const PredictionUnit &pu, unsigned modeList[NUM_CHROMA_MODE]);
-  UInt getFinalIntraMode              (const PredictionUnit &pu, const ChannelType &chType);
+  uint32_t getFinalIntraMode              (const PredictionUnit &pu, const ChannelType &chType);
 
   void getInterMergeCandidates        (const PredictionUnit &pu, MergeCtx& mrgCtx, const int& mrgCandIdx = -1 );
   bool isDiffMER                      (const PredictionUnit &pu, const PredictionUnit &pu2);
@@ -209,7 +209,7 @@ namespace PU
 // TU tools
 namespace TU
 {
-  UInt getNumNonZeroCoeffsNonTS       (const TransformUnit &tu, const bool bLuma = true, const bool bChroma = true);
+  uint32_t getNumNonZeroCoeffsNonTS       (const TransformUnit &tu, const bool bLuma = true, const bool bChroma = true);
 #if HEVC_USE_4x4_DSTVII
   bool useDST                         (const TransformUnit &tu, const ComponentID &compID);
 #endif
@@ -222,9 +222,9 @@ namespace TU
   void setCbf                         (      TransformUnit &tu, const ComponentID &compID, const bool &cbf);
 #endif
   bool hasTransformSkipFlag           (const CodingStructure& cs, const CompArea& area);
-  UInt getGolombRiceStatisticsIndex   (const TransformUnit &tu, const ComponentID &compID);
+  uint32_t getGolombRiceStatisticsIndex   (const TransformUnit &tu, const ComponentID &compID);
 #if HEVC_USE_MDCS
-  UInt getCoefScanIdx                 (const TransformUnit &tu, const ComponentID &compID);
+  uint32_t getCoefScanIdx                 (const TransformUnit &tu, const ComponentID &compID);
 #endif
   bool hasCrossCompPredInfo           (const TransformUnit &tu, const ComponentID &compID);
 
@@ -236,10 +236,10 @@ namespace TU
 #endif
 }
 
-UInt getCtuAddr        (const Position& pos, const PreCalcValues &pcv);
+uint32_t getCtuAddr        (const Position& pos, const PreCalcValues &pcv);
 
 template<typename T, size_t N>
-UInt updateCandList( T uiMode, double uiCost, static_vector<T, N>& candModeList, static_vector<double, N>& candCostList, size_t uiFastCandNum = N )
+uint32_t updateCandList( T uiMode, double uiCost, static_vector<T, N>& candModeList, static_vector<double, N>& candCostList, size_t uiFastCandNum = N )
 {
   CHECK( std::min( uiFastCandNum, candModeList.size() ) != std::min( uiFastCandNum, candCostList.size() ), "Sizes do not match!" );
   CHECK( uiFastCandNum > candModeList.capacity(), "The vector is to small to hold all the candidates!" );

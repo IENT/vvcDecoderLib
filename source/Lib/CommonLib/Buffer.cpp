@@ -154,7 +154,7 @@ template<>
 void AreaBuf<Pel>::toLast( const ClpRng& clpRng )
 {
         Pel* src       = buf;
-  const UInt srcStride = stride;
+  const uint32_t srcStride = stride;
 
   const int  clipbd    = clpRng.bd;
   const int  shiftNum  = std::max<int>(2, (IF_INTERNAL_PREC - clipbd));
@@ -304,7 +304,7 @@ void AreaBuf<Pel>::subtract( const Pel val )
 
 PelStorage::PelStorage()
 {
-  for( UInt i = 0; i < MAX_NUM_COMPONENT; i++ )
+  for( uint32_t i = 0; i < MAX_NUM_COMPONENT; i++ )
   {
     m_origin[i] = nullptr;
   }
@@ -326,7 +326,7 @@ void PelStorage::create( const ChromaFormat &_chromaFormat, const Area& _area, c
 
   chromaFormat = _chromaFormat;
 
-  const UInt numCh = getNumberValidComponents( _chromaFormat );
+  const uint32_t numCh = getNumberValidComponents( _chromaFormat );
 
   unsigned extHeight = _area.height;
   unsigned extWidth  = _area.width;
@@ -337,7 +337,7 @@ void PelStorage::create( const ChromaFormat &_chromaFormat, const Area& _area, c
     extWidth  = ( ( _area.width  + _maxCUSize - 1 ) / _maxCUSize ) * _maxCUSize;
   }
 
-  for( UInt i = 0; i < numCh; i++ )
+  for( uint32_t i = 0; i < numCh; i++ )
   {
     const ComponentID compID = ComponentID( i );
     const unsigned scaleX = ::getComponentScaleX( compID, _chromaFormat );
@@ -356,7 +356,7 @@ void PelStorage::create( const ChromaFormat &_chromaFormat, const Area& _area, c
       CHECK( _alignment != MEMORY_ALIGN_DEF_SIZE, "Unsupported alignment" );
       totalWidth = ( ( totalWidth + _alignment - 1 ) / _alignment ) * _alignment;
     }
-    UInt area = totalWidth * totalHeight;
+    uint32_t area = totalWidth * totalHeight;
     CHECK( !area, "Trying to create a buffer with zero area" );
 
     m_origin[i] = ( Pel* ) xMalloc( Pel, area );
@@ -369,11 +369,11 @@ void PelStorage::createFromBuf( PelUnitBuf buf )
 {
   chromaFormat = buf.chromaFormat;
 
-  const UInt numCh = ::getNumberValidComponents( chromaFormat );
+  const uint32_t numCh = ::getNumberValidComponents( chromaFormat );
 
   bufs.resize(numCh);
 
-  for( UInt i = 0; i < numCh; i++ )
+  for( uint32_t i = 0; i < numCh; i++ )
   {
     PelBuf cPelBuf = buf.get( ComponentID( i ) );
     bufs[i] = PelBuf( cPelBuf.bufAt( 0, 0 ), cPelBuf.stride, cPelBuf.width, cPelBuf.height );
@@ -382,9 +382,9 @@ void PelStorage::createFromBuf( PelUnitBuf buf )
 
 void PelStorage::swap( PelStorage& other )
 {
-  const UInt numCh = ::getNumberValidComponents( chromaFormat );
+  const uint32_t numCh = ::getNumberValidComponents( chromaFormat );
 
-  for( UInt i = 0; i < numCh; i++ )
+  for( uint32_t i = 0; i < numCh; i++ )
   {
     // check this otherwise it would turn out to get very weird
     CHECK( chromaFormat                   != other.chromaFormat                  , "Incompatible formats" );
@@ -400,7 +400,7 @@ void PelStorage::swap( PelStorage& other )
 void PelStorage::destroy()
 {
   chromaFormat = NUM_CHROMA_FORMAT;
-  for( UInt i = 0; i < MAX_NUM_COMPONENT; i++ )
+  for( uint32_t i = 0; i < MAX_NUM_COMPONENT; i++ )
   {
     if( m_origin[i] )
     {

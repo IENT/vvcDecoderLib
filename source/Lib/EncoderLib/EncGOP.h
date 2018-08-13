@@ -110,8 +110,8 @@ private:
   //  Data
   bool                    m_bLongtermTestPictureHasBeenCoded;
   bool                    m_bLongtermTestPictureHasBeenCoded2;
-  UInt                    m_numLongTermRefPicSPS;
-  UInt                    m_ltRefPicPocLsbSps[MAX_NUM_LONG_TERM_REF_PICS];
+  uint32_t                    m_numLongTermRefPicSPS;
+  uint32_t                    m_ltRefPicPocLsbSps[MAX_NUM_LONG_TERM_REF_PICS];
   bool                    m_ltRefPicUsedByCurrPicFlag[MAX_NUM_LONG_TERM_REF_PICS];
   int                     m_iLastIDR;
   int                     m_iGopSize;
@@ -147,8 +147,8 @@ private:
   int                     m_associatedIRAPPOC;
 
   std::vector<int>        m_vRVM_RP;
-  UInt                    m_lastBPSEI;
-  UInt                    m_totalCoded;
+  uint32_t                    m_lastBPSEI;
+  uint32_t                    m_totalCoded;
   bool                    m_bufferingPeriodSEIPresentInAU;
   SEIEncoder              m_seiEncoder;
 #if W0038_DB_OPT
@@ -157,9 +157,9 @@ private:
 #endif
 
   // members needed for adaptive max BT size
-  UInt                    m_uiBlkSize[10];
-  UInt                    m_uiNumBlk[10];
-  UInt                    m_uiPrevISlicePOC;
+  uint32_t                    m_uiBlkSize[10];
+  uint32_t                    m_uiNumBlk[10];
+  uint32_t                    m_uiPrevISlicePOC;
   bool                    m_bInitAMaxBT;
 
   AUWriterIf*             m_AUWriterIf;
@@ -181,7 +181,7 @@ public:
 
   PicList*   getListPic()      { return m_pcListPic; }
 
-  void  printOutSummary      ( UInt uiNumAllPicCoded, bool isField, const bool printMSEBasedSNR, const bool printSequenceMSE, const BitDepths &bitDepths );
+  void  printOutSummary      ( uint32_t uiNumAllPicCoded, bool isField, const bool printMSEBasedSNR, const bool printSequenceMSE, const BitDepths &bitDepths );
 #if W0038_DB_OPT
   uint64_t  preLoopFilterPicAndCalcDist( Picture* pcPic );
 #endif
@@ -211,13 +211,13 @@ protected:
                                      PelUnitBuf cPicRecFirstField, PelUnitBuf cPicRecSecondField,
                                      const InputColourSpaceConversion snr_conversion, const bool printFrameMSE, double* PSNR_Y );
 
-  uint64_t xFindDistortionPlane(const CPelBuf& pic0, const CPelBuf& pic1, const UInt rshift
+  uint64_t xFindDistortionPlane(const CPelBuf& pic0, const CPelBuf& pic1, const uint32_t rshift
 #if ENABLE_QPA
-                            , const UInt chromaShift = 0
+                            , const uint32_t chromaShift = 0
 #endif
                              );
 #if WCG_WPSNR
-  double xFindDistortionPlaneWPSNR(const CPelBuf& pic0, const CPelBuf& pic1, const UInt rshift, const CPelBuf& picLuma0, ComponentID compID, const ChromaFormat chfmt );
+  double xFindDistortionPlaneWPSNR(const CPelBuf& pic0, const CPelBuf& pic1, const uint32_t rshift, const CPelBuf& picLuma0, ComponentID compID, const ChromaFormat chfmt );
 #endif
   double xCalculateRVM();
 
@@ -248,9 +248,9 @@ protected:
   int xWritePPS (AccessUnit &accessUnit, const PPS *pps);
   int xWriteParameterSets (AccessUnit &accessUnit, Slice *slice, const bool bSeqFirst);
 
-  void applyDeblockingFilterMetric( Picture* pcPic, UInt uiNumSlices );
+  void applyDeblockingFilterMetric( Picture* pcPic, uint32_t uiNumSlices );
 #if W0038_DB_OPT
-  void applyDeblockingFilterParameterSelection( Picture* pcPic, const UInt numSlices, const int gopID );
+  void applyDeblockingFilterParameterSelection( Picture* pcPic, const uint32_t numSlices, const int gopID );
 #endif
 };// END CLASS DEFINITION EncGOP
 

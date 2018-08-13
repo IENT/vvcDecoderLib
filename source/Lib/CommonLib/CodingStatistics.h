@@ -206,10 +206,10 @@ static inline const char* getName(CodingStatisticsType name)
 
 static inline bool isAlignedBins( CodingStatisticsType statT ) { return statT == STATS__CABAC_BITS__ALIGNED_SIGN_BIT || statT == STATS__CABAC_BITS__ALIGNED_ESCAPE_BITS; }
 
-static const UInt CODING_STATS_NUM_WIDTHS     = 20; // just define the number of widths and heigts as 15
-static const UInt CODING_STATS_NUM_HEIGHTS    = 20;
-static const UInt CODING_STATS_NUM_SIZES      = CODING_STATS_NUM_HEIGHTS * CODING_STATS_NUM_WIDTHS;
-static const UInt CODING_STATS_NUM_SUBCLASSES = CODING_STATS_NUM_SIZES * (1 + MAX_NUM_COMPONENT + MAX_NUM_CHANNEL_TYPE);
+static const uint32_t CODING_STATS_NUM_WIDTHS     = 20; // just define the number of widths and heigts as 15
+static const uint32_t CODING_STATS_NUM_HEIGHTS    = 20;
+static const uint32_t CODING_STATS_NUM_SIZES      = CODING_STATS_NUM_HEIGHTS * CODING_STATS_NUM_WIDTHS;
+static const uint32_t CODING_STATS_NUM_SUBCLASSES = CODING_STATS_NUM_SIZES * (1 + MAX_NUM_COMPONENT + MAX_NUM_CHANNEL_TYPE);
 
 class CodingStatisticsClassType
 {
@@ -219,7 +219,7 @@ public:
   {
   }
 
-  CodingStatisticsClassType( const CodingStatisticsType t, const UInt width, const UInt height ) : type( t ), subClass( gp_sizeIdxInfo->idxFrom( height ) * CODING_STATS_NUM_WIDTHS + gp_sizeIdxInfo->idxFrom( width ) )
+  CodingStatisticsClassType( const CodingStatisticsType t, const uint32_t width, const uint32_t height ) : type( t ), subClass( gp_sizeIdxInfo->idxFrom( height ) * CODING_STATS_NUM_WIDTHS + gp_sizeIdxInfo->idxFrom( width ) )
   {
   }
 
@@ -235,11 +235,11 @@ public:
   {
   }
 
-  CodingStatisticsClassType( const CodingStatisticsType t, const UInt width, const UInt height, const ComponentID cid ) : type( t ), subClass( ( cid + 1 ) * CODING_STATS_NUM_SIZES + gp_sizeIdxInfo->idxFrom( height ) * CODING_STATS_NUM_WIDTHS + gp_sizeIdxInfo->idxFrom( width ) )
+  CodingStatisticsClassType( const CodingStatisticsType t, const uint32_t width, const uint32_t height, const ComponentID cid ) : type( t ), subClass( ( cid + 1 ) * CODING_STATS_NUM_SIZES + gp_sizeIdxInfo->idxFrom( height ) * CODING_STATS_NUM_WIDTHS + gp_sizeIdxInfo->idxFrom( width ) )
   {
   }
 
-  CodingStatisticsClassType( const CodingStatisticsType t, const UInt width, const UInt height, const ChannelType chid ) : type( t ), subClass( ( chid + MAX_NUM_COMPONENT + 1 ) * CODING_STATS_NUM_SIZES + gp_sizeIdxInfo->idxFrom( height ) * CODING_STATS_NUM_WIDTHS + gp_sizeIdxInfo->idxFrom( width ) )
+  CodingStatisticsClassType( const CodingStatisticsType t, const uint32_t width, const uint32_t height, const ChannelType chid ) : type( t ), subClass( ( chid + MAX_NUM_COMPONENT + 1 ) * CODING_STATS_NUM_SIZES + gp_sizeIdxInfo->idxFrom( height ) * CODING_STATS_NUM_WIDTHS + gp_sizeIdxInfo->idxFrom( width ) )
   {
   }
 
@@ -250,17 +250,17 @@ public:
     subClass = 0;
   }
 
-  static UInt GetSubClassWidth( const UInt subClass )
+  static uint32_t GetSubClassWidth( const uint32_t subClass )
   {
     return subClass % CODING_STATS_NUM_WIDTHS;
   }
 
-  static UInt GetSubClassHeight( const UInt subClass )
+  static uint32_t GetSubClassHeight( const uint32_t subClass )
   {
     return ( subClass % CODING_STATS_NUM_SIZES ) / CODING_STATS_NUM_WIDTHS;
   }
 
-  static const char *GetSubClassString( const UInt subClass )
+  static const char *GetSubClassString( const uint32_t subClass )
   {
     CHECK( subClass >= CODING_STATS_NUM_SUBCLASSES, "Subclass does not exist" );
     static const char *strings[1 + MAX_NUM_COMPONENT + MAX_NUM_CHANNEL_TYPE] = { "-", "Y", "Cb", "Cr", "Luma", "Chroma" };
@@ -268,7 +268,7 @@ public:
   }
 
   CodingStatisticsType type;
-  UInt subClass;
+  uint32_t subClass;
 };
 
 
@@ -279,16 +279,16 @@ public:
 
   struct StatLogValue
   {
-    UInt values[512 + 1];
+    uint32_t values[512 + 1];
     StatLogValue()
     {
       const double es = double( CODINGSTATISTICS_ENTROPYSCALE );
 
       values[0] = 0;
 
-      for( UInt i = 1; i < sizeof( values ) / sizeof( UInt ); i++ )
+      for( uint32_t i = 1; i < sizeof( values ) / sizeof( uint32_t ); i++ )
       {
-        values[i] = UInt( log( double( i ) )*es / log( 2.0 ) );
+        values[i] = uint32_t( log( double( i ) )*es / log( 2.0 ) );
       }
     }
   };
@@ -327,7 +327,7 @@ private:
   {
   }
 
-  static void OutputLine( const char *pName, const char sep, UInt wIdx, UInt hIdx, const char *pSubClassStr, const SStat &sCABAC, const SStat &sEP )
+  static void OutputLine( const char *pName, const char sep, uint32_t wIdx, uint32_t hIdx, const char *pSubClassStr, const SStat &sCABAC, const SStat &sEP )
   {
     if( wIdx == 0 && hIdx == 0 )
     {
@@ -374,7 +374,7 @@ private:
   static void OutputDashedLine( const char *pText )
   {
     printf( "--%s", pText );
-    UInt tot = 0;
+    uint32_t tot = 0;
     for( ; pText[tot] != 0; tot++ );
 
     tot += 2;
@@ -402,14 +402,14 @@ public:
       {
         int64_t classCount = 0;
 
-        for( UInt c = 0; c < CODING_STATS_NUM_SUBCLASSES; c++ )
+        for( uint32_t c = 0; c < CODING_STATS_NUM_SUBCLASSES; c++ )
         {
           totalCABACbits    += data.statistics[i][c].bits;
           roundedCABACbits  += data.statistics[i][c].bits / es;
           classCount        += data.statistics[i][c].count;
         }
 
-        for( UInt c = 0; c < CODING_STATS_NUM_SUBCLASSES; c++ )
+        for( uint32_t c = 0; c < CODING_STATS_NUM_SUBCLASSES; c++ )
         {
           data.statistics[i][c].classCount = classCount;
         }
@@ -444,7 +444,7 @@ public:
 
       const char *pName = getName( CodingStatisticsType( i ) );
 
-      for( UInt c = 0; c < CODING_STATS_NUM_SUBCLASSES; c++ )
+      for( uint32_t c = 0; c < CODING_STATS_NUM_SUBCLASSES; c++ )
       {
         SStat &sCABACorig = data.statistics[i][c];
         SStat &sEP        = data.statistics_ep[i][c];
@@ -467,8 +467,8 @@ public:
           sCABAC.sum        = sCABACorig.sum;
           sCABAC.classCount = classCounts[i];
         }
-        UInt wIdx = CodingStatisticsClassType::GetSubClassWidth( c );
-        UInt hIdx = CodingStatisticsClassType::GetSubClassHeight( c );
+        uint32_t wIdx = CodingStatisticsClassType::GetSubClassWidth( c );
+        uint32_t hIdx = CodingStatisticsClassType::GetSubClassHeight( c );
         OutputLine( pName, ':', wIdx, hIdx, CodingStatisticsClassType::GetSubClassString( c ), sCABAC, sEP );
         cabacSubTotal += sCABAC;
         epSubTotal    += sEP;
@@ -511,12 +511,12 @@ public:
 
     // Now output the breakdowns
     OutputDashedLine( "CABAC Break down by size" );
-    for( UInt w = 0; w < CODING_STATS_NUM_WIDTHS; w++ )
+    for( uint32_t w = 0; w < CODING_STATS_NUM_WIDTHS; w++ )
     {
-      for( UInt h = 0; h < CODING_STATS_NUM_HEIGHTS; h++ )
+      for( uint32_t h = 0; h < CODING_STATS_NUM_HEIGHTS; h++ )
       {
         SStat subTotalCabac, subTotalEP;
-        for( UInt c = 0; c < CODING_STATS_NUM_SUBCLASSES; c += CODING_STATS_NUM_SIZES )
+        for( uint32_t c = 0; c < CODING_STATS_NUM_SUBCLASSES; c += CODING_STATS_NUM_SIZES )
         {
           subTotalCabac += statTotals_cabac[c + h * CODING_STATS_NUM_WIDTHS + w];
           subTotalEP    += statTotals_ep   [c + h * CODING_STATS_NUM_WIDTHS + w];
@@ -528,12 +528,12 @@ public:
       }
     }
     OutputDashedLine( "Break down by component/Channel type" );
-    for( UInt c = 0; c < CODING_STATS_NUM_SUBCLASSES; c += CODING_STATS_NUM_SIZES )
+    for( uint32_t c = 0; c < CODING_STATS_NUM_SUBCLASSES; c += CODING_STATS_NUM_SIZES )
     {
       SStat subTotalCabac, subTotalEP;
-      for( UInt w = 0; w < CODING_STATS_NUM_WIDTHS; w++ )
+      for( uint32_t w = 0; w < CODING_STATS_NUM_WIDTHS; w++ )
       {
-        for( UInt h = 0; h < CODING_STATS_NUM_HEIGHTS; h++ )
+        for( uint32_t h = 0; h < CODING_STATS_NUM_HEIGHTS; h++ )
         {
           subTotalCabac += statTotals_cabac[c + h * CODING_STATS_NUM_WIDTHS + w];
           subTotalEP    += statTotals_ep   [c + h * CODING_STATS_NUM_WIDTHS + w];
@@ -545,11 +545,11 @@ public:
       }
     }
     OutputDashedLine( "Break down by size and component/Channel type" );
-    for( UInt c = 0; c < CODING_STATS_NUM_SUBCLASSES; c += CODING_STATS_NUM_SIZES )
+    for( uint32_t c = 0; c < CODING_STATS_NUM_SUBCLASSES; c += CODING_STATS_NUM_SIZES )
     {
-      for( UInt w = 0; w < CODING_STATS_NUM_WIDTHS; w++ )
+      for( uint32_t w = 0; w < CODING_STATS_NUM_WIDTHS; w++ )
       {
-        for( UInt h = 0; h < CODING_STATS_NUM_HEIGHTS; h++ )
+        for( uint32_t h = 0; h < CODING_STATS_NUM_HEIGHTS; h++ )
         {
           SStat subTotalCabac, subTotalEP;
           subTotalCabac += statTotals_cabac[c + h * CODING_STATS_NUM_WIDTHS + w];
@@ -639,7 +639,7 @@ public:
 
   StatLogValue values;
 
-  static void UpdateCABACStat( const CodingStatisticsClassType &stat, UInt uiRangeBefore, UInt uiRangeAfter, int val )
+  static void UpdateCABACStat( const CodingStatisticsClassType &stat, uint32_t uiRangeBefore, uint32_t uiRangeAfter, int val )
   {
     CHECK( stat.type == STATS__CABAC_BITS__INVALID, "Should never be used." );
     CodingStatistics &inst = GetSingletonInstance();

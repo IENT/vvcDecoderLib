@@ -198,13 +198,13 @@ private:
   void        alf_filter                ( ALFParam&               alfParam, bool isGALF, bool bChroma = false );
   void        alf_chroma                ( ALFParam& alfParam );
   void        alf_cu_ctrl               ( ALFParam& alfParam );
-  UInt        parseAlfUvlc();
+  uint32_t        parseAlfUvlc();
   int         parseAlfSvlc();
   int         alfGolombDecode(int k);
 #endif
 
-  void        xReadTruncBinCode   ( UInt& ruiSymbol, UInt uiMaxSymbol );
-  UInt        xReadEpExGolomb     ( UInt uiCount );
+  void        xReadTruncBinCode   ( uint32_t& ruiSymbol, uint32_t uiMaxSymbol );
+  uint32_t        xReadEpExGolomb     ( uint32_t uiCount );
 
 #endif
 private:

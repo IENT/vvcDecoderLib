@@ -473,10 +473,10 @@ void TileMap::create( const SPS& sps, const PPS& pps )
   numTiles       = numTileColumns * numTileRows;
   tiles.resize( numTiles );
 
-  const UInt numCtusInFrame = pcv->sizeInCtus;
-  tileIdxMap       = new UInt[numCtusInFrame];
-  ctuTsToRsAddrMap = new UInt[numCtusInFrame+1];
-  ctuRsToTsAddrMap = new UInt[numCtusInFrame+1];
+  const uint32_t numCtusInFrame = pcv->sizeInCtus;
+  tileIdxMap       = new uint32_t[numCtusInFrame];
+  ctuTsToRsAddrMap = new uint32_t[numCtusInFrame+1];
+  ctuRsToTsAddrMap = new uint32_t[numCtusInFrame+1];
 
   initTileMap( sps, pps );
   initCtuTsRsAddrMap();
@@ -507,8 +507,8 @@ void TileMap::destroy()
 
 void TileMap::initTileMap( const SPS& sps, const PPS& pps )
 {
-  const UInt frameWidthInCtus  = pcv->widthInCtus;
-  const UInt frameHeightInCtus = pcv->heightInCtus;
+  const uint32_t frameWidthInCtus  = pcv->widthInCtus;
+  const uint32_t frameHeightInCtus = pcv->heightInCtus;
 
   if( pps.getTileUniformSpacingFlag() )
   {
@@ -605,7 +605,7 @@ void TileMap::initTileMap( const SPS& sps, const PPS& pps )
   int  rowIdx = 0;
 
   //initialize the TileIdxMap
-  const UInt numCtusInFrame = pcv->sizeInCtus;
+  const uint32_t numCtusInFrame = pcv->sizeInCtus;
   for( int i=0; i<numCtusInFrame; i++)
   {
     for( int col=0; col < numTileColumns; col++)
@@ -631,7 +631,7 @@ void TileMap::initTileMap( const SPS& sps, const PPS& pps )
 void TileMap::initCtuTsRsAddrMap()
 {
   //generate the Coding Order Map and Inverse Coding Order Map
-  const UInt numCtusInFrame = pcv->sizeInCtus;
+  const uint32_t numCtusInFrame = pcv->sizeInCtus;
   for(int ctuTsAddr=0, ctuRsAddr=0; ctuTsAddr<numCtusInFrame; ctuTsAddr++, ctuRsAddr = calculateNextCtuRSAddr(ctuRsAddr))
   {
     ctuTsToRsAddrMap[ctuTsAddr] = ctuRsAddr;
@@ -641,13 +641,13 @@ void TileMap::initCtuTsRsAddrMap()
   ctuRsToTsAddrMap[numCtusInFrame] = numCtusInFrame;
 }
 
-UInt TileMap::calculateNextCtuRSAddr( const UInt currCtuRsAddr ) const
+uint32_t TileMap::calculateNextCtuRSAddr( const uint32_t currCtuRsAddr ) const
 {
-  const UInt frameWidthInCtus = pcv->widthInCtus;
-  UInt  nextCtuRsAddr;
+  const uint32_t frameWidthInCtus = pcv->widthInCtus;
+  uint32_t  nextCtuRsAddr;
 
   //get the tile index for the current CTU
-  const UInt uiTileIdx = getTileIdxMap(currCtuRsAddr);
+  const uint32_t uiTileIdx = getTileIdxMap(currCtuRsAddr);
 
   //get the raster scan address for the next CTU
   if( currCtuRsAddr % frameWidthInCtus == tiles[uiTileIdx].getRightEdgePosInCtus() && currCtuRsAddr / frameWidthInCtus == tiles[uiTileIdx].getBottomEdgePosInCtus() )
@@ -677,22 +677,22 @@ UInt TileMap::calculateNextCtuRSAddr( const UInt currCtuRsAddr ) const
   return nextCtuRsAddr;
 }
 
-UInt TileMap::getSubstreamForCtuAddr(const UInt ctuAddr, const bool bAddressInRaster, Slice *pcSlice) const
+uint32_t TileMap::getSubstreamForCtuAddr(const uint32_t ctuAddr, const bool bAddressInRaster, Slice *pcSlice) const
 {
   const bool bWPPEnabled = pcSlice->getPPS()->getEntropyCodingSyncEnabledFlag();
-  UInt subStrm;
+  uint32_t subStrm;
 
   if( (bWPPEnabled && pcv->heightInCtus > 1) || (numTiles > 1) ) // wavefronts, and possibly tiles being used.
   {
-    const UInt ctuRsAddr = bAddressInRaster ? ctuAddr : getCtuTsToRsAddrMap(ctuAddr);
-    const UInt tileIndex = getTileIdxMap(ctuRsAddr);
+    const uint32_t ctuRsAddr = bAddressInRaster ? ctuAddr : getCtuTsToRsAddrMap(ctuAddr);
+    const uint32_t tileIndex = getTileIdxMap(ctuRsAddr);
 
     if (bWPPEnabled)
     {
-      const UInt firstCtuRsAddrOfTile     = tiles[tileIndex].getFirstCtuRsAddr();
-      const UInt tileYInCtus              = firstCtuRsAddrOfTile / pcv->widthInCtus;
-      const UInt ctuLine                  = ctuRsAddr / pcv->widthInCtus;
-      const UInt startingSubstreamForTile = (tileYInCtus * numTileColumns) + (tiles[tileIndex].getTileHeightInCtus() * (tileIndex % numTileColumns));
+      const uint32_t firstCtuRsAddrOfTile     = tiles[tileIndex].getFirstCtuRsAddr();
+      const uint32_t tileYInCtus              = firstCtuRsAddrOfTile / pcv->widthInCtus;
+      const uint32_t ctuLine                  = ctuRsAddr / pcv->widthInCtus;
+      const uint32_t startingSubstreamForTile = (tileYInCtus * numTileColumns) + (tiles[tileIndex].getTileHeightInCtus() * (tileIndex % numTileColumns));
 
       subStrm = startingSubstreamForTile + (ctuLine - tileYInCtus);
     }
@@ -721,7 +721,7 @@ Picture::Picture()
   reconstructed        = false;
   neededForOutput      = false;
   referenced           = false;
-  layer                = std::numeric_limits<UInt>::max();
+  layer                = std::numeric_limits<uint32_t>::max();
   fieldPic             = false;
   topField             = false;
   for( int i = 0; i < MAX_NUM_CHANNEL_TYPE; i++ )
@@ -756,7 +756,7 @@ void Picture::destroy()
   for( int jId = 0; jId < PARL_SPLIT_MAX_NUM_THREADS; jId++ )
 #endif
 #endif
-  for (UInt t = 0; t < NUM_PIC_TYPES; t++)
+  for (uint32_t t = 0; t < NUM_PIC_TYPES; t++)
   {
     M_BUFS( jId, t ).destroy();
   }
@@ -821,7 +821,7 @@ void Picture::destroyTempBuffers()
 
   for( int jId = 0; jId < scheduler.getNumPicInstances(); jId++ )
 #endif
-  for( UInt t = 0; t < NUM_PIC_TYPES; t++ )
+  for( uint32_t t = 0; t < NUM_PIC_TYPES; t++ )
   {
     if( t == PIC_RESIDUAL || t == PIC_PREDICTION ) M_BUFS( jId, t ).destroy();
 #if ENABLE_SPLIT_PARALLELISM
@@ -919,7 +919,7 @@ void Picture::allocateNewSlice()
   }
 }
 
-Slice *Picture::swapSliceObject(Slice * p, UInt i)
+Slice *Picture::swapSliceObject(Slice * p, uint32_t i)
 {
   p->setSPS(cs->sps);
   p->setPPS(cs->pps);
@@ -933,7 +933,7 @@ Slice *Picture::swapSliceObject(Slice * p, UInt i)
 
 void Picture::clearSliceBuffer()
 {
-  for (UInt i = 0; i < UInt(slices.size()); i++)
+  for (uint32_t i = 0; i < uint32_t(slices.size()); i++)
   {
     delete slices[i];
   }

@@ -62,8 +62,8 @@ private:
   VideoIOYuv        m_cVideoIOYuvInputFile;       ///< input YUV file
   VideoIOYuv        m_cVideoIOYuvReconFile;       ///< output reconstruction file
   int               m_iFrameRcvd;                 ///< number of received frames
-  UInt              m_essentialBytes;
-  UInt              m_totalBytes;
+  uint32_t              m_essentialBytes;
+  uint32_t              m_totalBytes;
   fstream           m_bitstream;
 
 private:
@@ -77,7 +77,7 @@ private:
   // file I/O
   void xWriteOutput     ( int iNumEncoded, std::list<PelUnitBuf*>& recBufList
                          );                      ///< write bitstream to file
-  void rateStatsAccum   ( const AccessUnit& au, const std::vector<UInt>& stats);
+  void rateStatsAccum   ( const AccessUnit& au, const std::vector<uint32_t>& stats);
   void printRateSummary ();
   void printChromaFormat();
 

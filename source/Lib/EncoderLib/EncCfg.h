@@ -119,7 +119,7 @@ protected:
   //==== File I/O ========
   int       m_iFrameRate;
   int       m_FrameSkip;
-  UInt      m_temporalSubsampleRatio;
+  uint32_t      m_temporalSubsampleRatio;
   int       m_iSourceWidth;
   int       m_iSourceHeight;
   Window    m_conformanceWindow;
@@ -143,15 +143,15 @@ protected:
   bool m_interlacedSourceFlag;
   bool m_nonPackedConstraintFlag;
   bool m_frameOnlyConstraintFlag;
-  UInt              m_bitDepthConstraintValue;
+  uint32_t              m_bitDepthConstraintValue;
   ChromaFormat      m_chromaFormatConstraintValue;
   bool              m_intraConstraintFlag;
   bool              m_onePictureOnlyConstraintFlag;
   bool              m_lowerBitRateConstraintFlag;
 
   //====== Coding Structure ========
-  UInt      m_uiIntraPeriod;                    // TODO: make this an int - it can be -1!
-  UInt      m_uiDecodingRefreshType;            ///< the type of decoding refresh employed for the random access.
+  uint32_t      m_uiIntraPeriod;                    // TODO: make this an int - it can be -1!
+  uint32_t      m_uiDecodingRefreshType;            ///< the type of decoding refresh employed for the random access.
   int       m_iGOPSize;
   GOPEntry  m_GOPList[MAX_GOP];
   int       m_extraRPSs;
@@ -284,10 +284,10 @@ protected:
   bool      m_contentBasedFastQtbt;
 
   //======= Transform =============
-  UInt      m_uiQuadtreeTULog2MaxSize;
-  UInt      m_uiQuadtreeTULog2MinSize;
-  UInt      m_uiQuadtreeTUMaxDepthInter;
-  UInt      m_uiQuadtreeTUMaxDepthIntra;
+  uint32_t      m_uiQuadtreeTULog2MaxSize;
+  uint32_t      m_uiQuadtreeTULog2MinSize;
+  uint32_t      m_uiQuadtreeTUMaxDepthInter;
+  uint32_t      m_uiQuadtreeTUMaxDepthIntra;
 
   //====== Loop/Deblock Filter ========
   bool      m_bLoopFilterDisable;
@@ -332,7 +332,7 @@ protected:
   WCGChromaQPControl m_wcgChromaQpControl;                    ///< Wide-colour-gamut chroma QP control.
 #endif
 #if W0038_CQP_ADJ
-  UInt      m_sliceChromaQpOffsetPeriodicity;                 ///< Used in conjunction with Slice Cb/Cr QpOffsetIntraOrPeriodic. Use 0 (default) to disable periodic nature.
+  uint32_t      m_sliceChromaQpOffsetPeriodicity;                 ///< Used in conjunction with Slice Cb/Cr QpOffsetIntraOrPeriodic. Use 0 (default) to disable periodic nature.
   int       m_sliceChromaQpOffsetIntraOrPeriodic[2/*Cb,Cr*/]; ///< Chroma Cb QP Offset at slice level for I slice or for periodic inter slices as defined by SliceChromaQPOffsetPeriodicity. Replaces offset in the GOP table.
 #endif
 
@@ -357,7 +357,7 @@ protected:
 #if T0196_SELECTIVE_RDOQ
   bool      m_useSelectiveRDOQ;
 #endif
-  UInt      m_rdPenalty;
+  uint32_t      m_rdPenalty;
   FastInterSearchMode m_fastInterSearchMode;
   bool      m_bUseEarlyCU;
   bool      m_useFastDecisionForMerge;
@@ -365,10 +365,10 @@ protected:
   bool      m_useEarlySkipDetection;
   bool      m_crossComponentPredictionEnabledFlag;
   bool      m_reconBasedCrossCPredictionEstimate;
-  UInt      m_log2SaoOffsetScale[MAX_NUM_CHANNEL_TYPE];
+  uint32_t      m_log2SaoOffsetScale[MAX_NUM_CHANNEL_TYPE];
   bool      m_useTransformSkip;
   bool      m_useTransformSkipFast;
-  UInt      m_log2MaxTransformSkipBlockSize;
+  uint32_t      m_log2MaxTransformSkipBlockSize;
   bool      m_transformSkipRotationEnabledFlag;
   bool      m_transformSkipContextEnabledFlag;
   bool      m_persistentRiceAdaptationEnabledFlag;
@@ -378,7 +378,7 @@ protected:
   LumaLevelToDeltaQPMapping m_lumaLevelToDeltaQPMapping; ///< mapping from luma level to delta QP.
 #endif
   int*      m_aidQP;
-  UInt      m_uiDeltaQpRD;
+  uint32_t      m_uiDeltaQpRD;
   bool      m_bFastDeltaQP;
 
   bool      m_bUseConstrainedIntraPred;
@@ -387,8 +387,8 @@ protected:
   bool      m_bUseBLambdaForNonKeyLowDelayPictures;
   bool      m_usePCM;
   int       m_PCMBitDepth[MAX_NUM_CHANNEL_TYPE];
-  UInt      m_pcmLog2MaxSize;
-  UInt      m_uiPCMLog2MinSize;
+  uint32_t      m_pcmLog2MaxSize;
+  uint32_t      m_uiPCMLog2MinSize;
   //====== Slice ========
   SliceConstraint m_sliceMode;
   int       m_sliceArgument;
@@ -486,8 +486,8 @@ protected:
   bool      m_useWeightedPred;       //< Use of Weighting Prediction (P_SLICE)
   bool      m_useWeightedBiPred;    //< Use of Bi-directional Weighting Prediction (B_SLICE)
   WeightedPredictionMethod m_weightedPredictionMethod;
-  UInt      m_log2ParallelMergeLevelMinus2;       ///< Parallel merge estimation region
-  UInt      m_maxNumMergeCand;                    ///< Maximum number of merge candidates
+  uint32_t      m_log2ParallelMergeLevelMinus2;       ///< Parallel merge estimation region
+  uint32_t      m_maxNumMergeCand;                    ///< Maximum number of merge candidates
 #if HEVC_USE_SCALING_LISTS
   ScalingListMode m_useScalingListId;             ///< Using quantization matrix i.e. 0=off, 1=default, 2=file.
   std::string m_scalingListFileName;              ///< quantization matrix file name
@@ -506,7 +506,7 @@ protected:
   bool      m_RCForceIntraQP;
 #if U0132_TARGET_BITS_SATURATION
   bool      m_RCCpbSaturationEnabled;
-  UInt      m_RCCpbSize;
+  uint32_t      m_RCCpbSize;
   double    m_RCInitialCpbFullness;
 #endif
   bool      m_TransquantBypassEnabledFlag;                    ///< transquant_bypass_enabled_flag setting in PPS.
@@ -563,7 +563,7 @@ protected:
 
   std::string m_summaryOutFilename;                           ///< filename to use for producing summary output file.
   std::string m_summaryPicFilenameBase;                       ///< Base filename to use for producing summary picture output files. The actual filenames used will have I.txt, P.txt and B.txt appended.
-  UInt        m_summaryVerboseness;                           ///< Specifies the level of the verboseness of the text output.
+  uint32_t        m_summaryVerboseness;                           ///< Specifies the level of the verboseness of the text output.
 #if JVET_K0357_AMVR
   int       m_ImvMode;
   int       m_Imv4PelFast;
@@ -611,8 +611,8 @@ public:
   void setLevel(Level::Tier tier, Level::Name level) { m_levelTier = tier; m_level = level; }
 
   void      setFrameRate                    ( int   i )      { m_iFrameRate = i; }
-  void      setFrameSkip                    ( UInt  i )      { m_FrameSkip = i; }
-  void      setTemporalSubsampleRatio       ( UInt  i )      { m_temporalSubsampleRatio = i; }
+  void      setFrameSkip                    ( uint32_t  i )      { m_FrameSkip = i; }
+  void      setTemporalSubsampleRatio       ( uint32_t  i )      { m_temporalSubsampleRatio = i; }
   void      setSourceWidth                  ( int   i )      { m_iSourceWidth = i; }
   void      setSourceHeight                 ( int   i )      { m_iSourceHeight = i; }
 
@@ -637,15 +637,15 @@ public:
   void      setCabacZeroWordPaddingEnabled(bool value)       { m_cabacZeroWordPaddingEnabled = value; }
 
   //====== Coding Structure ========
-  void      setIntraPeriod                  ( int   i )      { m_uiIntraPeriod = (UInt)i; }
-  void      setDecodingRefreshType          ( int   i )      { m_uiDecodingRefreshType = (UInt)i; }
+  void      setIntraPeriod                  ( int   i )      { m_uiIntraPeriod = (uint32_t)i; }
+  void      setDecodingRefreshType          ( int   i )      { m_uiDecodingRefreshType = (uint32_t)i; }
   void      setGOPSize                      ( int   i )      { m_iGOPSize = i; }
   void      setGopList                      ( const GOPEntry GOPList[MAX_GOP] ) {  for ( int i = 0; i < MAX_GOP; i++ ) m_GOPList[i] = GOPList[i]; }
   void      setExtraRPSs                    ( int   i )      { m_extraRPSs = i; }
   const GOPEntry &getGOPEntry               ( int   i ) const { return m_GOPList[i]; }
   void      setEncodedFlag                  ( int  i, bool value )  { m_GOPList[i].m_isEncoded = value; }
-  void      setMaxDecPicBuffering           ( UInt u, UInt tlayer ) { m_maxDecPicBuffering[tlayer] = u;    }
-  void      setNumReorderPics               ( int  i, UInt tlayer ) { m_numReorderPics[tlayer] = i;    }
+  void      setMaxDecPicBuffering           ( uint32_t u, uint32_t tlayer ) { m_maxDecPicBuffering[tlayer] = u;    }
+  void      setNumReorderPics               ( int  i, uint32_t tlayer ) { m_numReorderPics[tlayer] = i;    }
 
   void      setBaseQP                       ( int   i )      { m_iQP = i; }
 #if X0038_LAMBDA_FROM_QP_CAPABILITY
@@ -712,8 +712,8 @@ public:
 #endif
 
 #if JEM_TOOLS
-  void      setCABACEngineMode              ( UInt mode )    { m_CABACEngineMode = mode; }
-  UInt      getCABACEngineMode              ()               { return m_CABACEngineMode; }
+  void      setCABACEngineMode              ( uint32_t mode )    { m_CABACEngineMode = mode; }
+  uint32_t      getCABACEngineMode              ()               { return m_CABACEngineMode; }
 
 #if JVET_K0072
 #else
@@ -824,13 +824,13 @@ public:
 #endif
   // ADD_NEW_TOOL : (encoder lib) add access functions here
 
-  void      setMaxCUWidth                   ( UInt  u )      { m_maxCUWidth  = u; }
-  UInt      getMaxCUWidth                   () const         { return m_maxCUWidth; }
-  void      setMaxCUHeight                  ( UInt  u )      { m_maxCUHeight = u; }
-  UInt      getMaxCUHeight                  () const         { return m_maxCUHeight; }
-  void      setMaxCodingDepth               ( UInt  u )      { m_maxTotalCUDepth = u; }
-  UInt      getMaxCodingDepth               () const         { return m_maxTotalCUDepth; }
-  void      setLog2DiffMaxMinCodingBlockSize( UInt  u )      { m_log2DiffMaxMinCodingBlockSize = u; }
+  void      setMaxCUWidth                   ( uint32_t  u )      { m_maxCUWidth  = u; }
+  uint32_t      getMaxCUWidth                   () const         { return m_maxCUWidth; }
+  void      setMaxCUHeight                  ( uint32_t  u )      { m_maxCUHeight = u; }
+  uint32_t      getMaxCUHeight                  () const         { return m_maxCUHeight; }
+  void      setMaxCodingDepth               ( uint32_t  u )      { m_maxTotalCUDepth = u; }
+  uint32_t      getMaxCodingDepth               () const         { return m_maxTotalCUDepth; }
+  void      setLog2DiffMaxMinCodingBlockSize( uint32_t  u )      { m_log2DiffMaxMinCodingBlockSize = u; }
 
   void      setUseFastLCTU                  ( bool  n )      { m_useFastLCTU = n; }
   bool      getUseFastLCTU                  () const         { return m_useFastLCTU; }
@@ -854,10 +854,10 @@ public:
   bool      getUseContentBasedFastQtbt      () const         { return m_contentBasedFastQtbt; }
 
   //======== Transform =============
-  void      setQuadtreeTULog2MaxSize        ( UInt  u )      { m_uiQuadtreeTULog2MaxSize = u; }
-  void      setQuadtreeTULog2MinSize        ( UInt  u )      { m_uiQuadtreeTULog2MinSize = u; }
-  void      setQuadtreeTUMaxDepthInter      ( UInt  u )      { m_uiQuadtreeTUMaxDepthInter = u; }
-  void      setQuadtreeTUMaxDepthIntra      ( UInt  u )      { m_uiQuadtreeTUMaxDepthIntra = u; }
+  void      setQuadtreeTULog2MaxSize        ( uint32_t  u )      { m_uiQuadtreeTULog2MaxSize = u; }
+  void      setQuadtreeTULog2MinSize        ( uint32_t  u )      { m_uiQuadtreeTULog2MinSize = u; }
+  void      setQuadtreeTUMaxDepthInter      ( uint32_t  u )      { m_uiQuadtreeTUMaxDepthInter = u; }
+  void      setQuadtreeTUMaxDepthIntra      ( uint32_t  u )      { m_uiQuadtreeTUMaxDepthIntra = u; }
 
   void setUseAMP( bool b ) { m_useAMP = b; }
 
@@ -899,9 +899,9 @@ public:
   const WCGChromaQPControl &getWCGChromaQPControl () const { return m_wcgChromaQpControl; }
 #endif
 #if W0038_CQP_ADJ
-  void      setSliceChromaOffsetQpIntraOrPeriodic( UInt periodicity, int sliceChromaQpOffsetIntraOrPeriodic[2]) { m_sliceChromaQpOffsetPeriodicity = periodicity; memcpy(m_sliceChromaQpOffsetIntraOrPeriodic, sliceChromaQpOffsetIntraOrPeriodic, sizeof(m_sliceChromaQpOffsetIntraOrPeriodic)); }
+  void      setSliceChromaOffsetQpIntraOrPeriodic( uint32_t periodicity, int sliceChromaQpOffsetIntraOrPeriodic[2]) { m_sliceChromaQpOffsetPeriodicity = periodicity; memcpy(m_sliceChromaQpOffsetIntraOrPeriodic, sliceChromaQpOffsetIntraOrPeriodic, sizeof(m_sliceChromaQpOffsetIntraOrPeriodic)); }
   int       getSliceChromaOffsetQpIntraOrPeriodic( bool bIsCr) const                                            { return m_sliceChromaQpOffsetIntraOrPeriodic[bIsCr?1:0]; }
-  UInt      getSliceChromaOffsetQpPeriodicity() const                                                           { return m_sliceChromaQpOffsetPeriodicity; }
+  uint32_t      getSliceChromaOffsetQpPeriodicity() const                                                           { return m_sliceChromaQpOffsetPeriodicity; }
 #endif
 
   void      setChromaFormatIdc              ( ChromaFormat cf ) { m_chromaFormatIDC = cf; }
@@ -931,26 +931,26 @@ public:
 
   //====== Sequence ========
   int       getFrameRate                    () const     { return  m_iFrameRate; }
-  UInt      getFrameSkip                    () const     { return  m_FrameSkip; }
-  UInt      getTemporalSubsampleRatio       () const     { return  m_temporalSubsampleRatio; }
+  uint32_t      getFrameSkip                    () const     { return  m_FrameSkip; }
+  uint32_t      getTemporalSubsampleRatio       () const     { return  m_temporalSubsampleRatio; }
   int       getSourceWidth                  () const     { return  m_iSourceWidth; }
   int       getSourceHeight                 () const     { return  m_iSourceHeight; }
   int       getFramesToBeEncoded            () const     { return  m_framesToBeEncoded; }
 
   //====== Lambda Modifiers ========
-  void      setLambdaModifier               ( UInt uiIndex, double dValue ) { m_adLambdaModifier[ uiIndex ] = dValue; }
-  double    getLambdaModifier               ( UInt uiIndex )          const { return m_adLambdaModifier[ uiIndex ]; }
+  void      setLambdaModifier               ( uint32_t uiIndex, double dValue ) { m_adLambdaModifier[ uiIndex ] = dValue; }
+  double    getLambdaModifier               ( uint32_t uiIndex )          const { return m_adLambdaModifier[ uiIndex ]; }
   void      setIntraLambdaModifier          ( const std::vector<double> &dValue )               { m_adIntraLambdaModifier = dValue;       }
   const std::vector<double>& getIntraLambdaModifier()                        const { return m_adIntraLambdaModifier;         }
   void      setIntraQpFactor                ( double dValue )               { m_dIntraQpFactor = dValue;              }
   double    getIntraQpFactor                ()                        const { return m_dIntraQpFactor;                }
 
   //==== Coding Structure ========
-  UInt      getIntraPeriod                  () const     { return  m_uiIntraPeriod; }
-  UInt      getDecodingRefreshType          () const     { return  m_uiDecodingRefreshType; }
+  uint32_t      getIntraPeriod                  () const     { return  m_uiIntraPeriod; }
+  uint32_t      getDecodingRefreshType          () const     { return  m_uiDecodingRefreshType; }
   int       getGOPSize                      () const     { return  m_iGOPSize; }
-  int       getMaxDecPicBuffering           (UInt tlayer) { return m_maxDecPicBuffering[tlayer]; }
-  int       getNumReorderPics               (UInt tlayer) { return m_numReorderPics[tlayer]; }
+  int       getMaxDecPicBuffering           (uint32_t tlayer) { return m_maxDecPicBuffering[tlayer]; }
+  int       getNumReorderPics               (uint32_t tlayer) { return m_numReorderPics[tlayer]; }
 #if X0038_LAMBDA_FROM_QP_CAPABILITY
   int       getIntraQPOffset                () const    { return  m_intraQPOffset; }
   int       getLambdaFromQPEnable           () const    { return  m_lambdaFromQPEnable; }
@@ -961,7 +961,7 @@ protected:
 #endif
   int       getBaseQP                       () const { return  m_iQP; } // public should use getQPForPicture.
 public:
-  int       getQPForPicture                 (const UInt gopIndex, const Slice *pSlice) const; // Function actually defined in EncLib.cpp
+  int       getQPForPicture                 (const uint32_t gopIndex, const Slice *pSlice) const; // Function actually defined in EncLib.cpp
 #else
   int       getBaseQP                       ()       { return  m_iQP; }
 #endif
@@ -971,10 +971,10 @@ public:
   void      setAccessUnitDelimiter(bool val){ m_AccessUnitDelimiter = val; }
 
   //======== Transform =============
-  UInt      getQuadtreeTULog2MaxSize        ()      const { return m_uiQuadtreeTULog2MaxSize; }
-  UInt      getQuadtreeTULog2MinSize        ()      const { return m_uiQuadtreeTULog2MinSize; }
-  UInt      getQuadtreeTUMaxDepthInter      ()      const { return m_uiQuadtreeTUMaxDepthInter; }
-  UInt      getQuadtreeTUMaxDepthIntra      ()      const { return m_uiQuadtreeTUMaxDepthIntra; }
+  uint32_t      getQuadtreeTULog2MaxSize        ()      const { return m_uiQuadtreeTULog2MaxSize; }
+  uint32_t      getQuadtreeTULog2MinSize        ()      const { return m_uiQuadtreeTULog2MinSize; }
+  uint32_t      getQuadtreeTUMaxDepthInter      ()      const { return m_uiQuadtreeTUMaxDepthInter; }
+  uint32_t      getQuadtreeTUMaxDepthIntra      ()      const { return m_uiQuadtreeTUMaxDepthIntra; }
 
   //==== Loop/Deblock Filter ========
   bool      getLoopFilterDisable            ()      { return  m_bLoopFilterDisable;       }
@@ -1016,7 +1016,7 @@ public:
 #if T0196_SELECTIVE_RDOQ
   void      setUseSelectiveRDOQ             ( bool b )      { m_useSelectiveRDOQ = b; }
 #endif
-  void      setRDpenalty                    ( UInt  u )     { m_rdPenalty  = u; }
+  void      setRDpenalty                    ( uint32_t  u )     { m_rdPenalty  = u; }
   void      setFastInterSearchMode          ( FastInterSearchMode m ) { m_fastInterSearchMode = m; }
   void      setUseEarlyCU                   ( bool  b )     { m_bUseEarlyCU = b; }
   void      setUseFastDecisionForMerge      ( bool  b )     { m_useFastDecisionForMerge = b; }
@@ -1031,10 +1031,10 @@ public:
   void      setPCMFilterDisableFlag         ( bool  b )     {  m_bPCMFilterDisableFlag = b; }
   void      setUsePCM                       ( bool  b )     {  m_usePCM = b;               }
   void      setPCMBitDepth( const ChannelType chType, int pcmBitDepthForChannel ) { m_PCMBitDepth[chType] = pcmBitDepthForChannel; }
-  void      setPCMLog2MaxSize               ( UInt u )      { m_pcmLog2MaxSize = u;      }
-  void      setPCMLog2MinSize               ( UInt u )     { m_uiPCMLog2MinSize = u;      }
+  void      setPCMLog2MaxSize               ( uint32_t u )      { m_pcmLog2MaxSize = u;      }
+  void      setPCMLog2MinSize               ( uint32_t u )     { m_uiPCMLog2MinSize = u;      }
   void      setdQPs                         ( int*  p )     { m_aidQP       = p; }
-  void      setDeltaQpRD                    ( UInt  u )     {m_uiDeltaQpRD  = u; }
+  void      setDeltaQpRD                    ( uint32_t  u )     {m_uiDeltaQpRD  = u; }
   void      setFastDeltaQp                  ( bool  b )     {m_bFastDeltaQP = b; }
   int       getBitDepth                     (const ChannelType chType) const { return m_bitDepth[chType]; }
   bool      getUseASR                       ()      { return m_bUseASR;     }
@@ -1057,14 +1057,14 @@ public:
   bool      getPCMInputBitDepthFlag         ()      { return m_bPCMInputBitDepthFlag;   }
   bool      getPCMFilterDisableFlag         ()      { return m_bPCMFilterDisableFlag;   }
   bool      getUsePCM                       ()      { return m_usePCM;                 }
-  UInt      getPCMLog2MaxSize               ()      { return m_pcmLog2MaxSize;  }
-  UInt      getPCMLog2MinSize               ()      { return  m_uiPCMLog2MinSize;  }
+  uint32_t      getPCMLog2MaxSize               ()      { return m_pcmLog2MaxSize;  }
+  uint32_t      getPCMLog2MinSize               ()      { return  m_uiPCMLog2MinSize;  }
 
   bool      getCrossComponentPredictionEnabledFlag     ()                const { return m_crossComponentPredictionEnabledFlag;   }
   void      setCrossComponentPredictionEnabledFlag     (const bool value)      { m_crossComponentPredictionEnabledFlag = value;  }
   bool      getUseReconBasedCrossCPredictionEstimate ()                const { return m_reconBasedCrossCPredictionEstimate;  }
   void      setUseReconBasedCrossCPredictionEstimate (const bool value)      { m_reconBasedCrossCPredictionEstimate = value; }
-  void      setLog2SaoOffsetScale(ChannelType type, UInt uiBitShift)         { m_log2SaoOffsetScale[type] = uiBitShift; }
+  void      setLog2SaoOffsetScale(ChannelType type, uint32_t uiBitShift)         { m_log2SaoOffsetScale[type] = uiBitShift; }
 
   bool getUseTransformSkip                             ()      { return m_useTransformSkip;        }
   void setUseTransformSkip                             ( bool b ) { m_useTransformSkip  = b;       }
@@ -1080,13 +1080,13 @@ public:
   void setRdpcmEnabledFlag                             (const RDPCMSignallingMode signallingMode, const bool value) { m_rdpcmEnabledFlag[signallingMode] = value; }
   bool getUseTransformSkipFast                         ()      { return m_useTransformSkipFast;    }
   void setUseTransformSkipFast                         ( bool b ) { m_useTransformSkipFast  = b;   }
-  UInt getLog2MaxTransformSkipBlockSize                () const      { return m_log2MaxTransformSkipBlockSize;     }
-  void setLog2MaxTransformSkipBlockSize                ( UInt u )    { m_log2MaxTransformSkipBlockSize  = u;       }
+  uint32_t getLog2MaxTransformSkipBlockSize                () const      { return m_log2MaxTransformSkipBlockSize;     }
+  void setLog2MaxTransformSkipBlockSize                ( uint32_t u )    { m_log2MaxTransformSkipBlockSize  = u;       }
   bool getIntraSmoothingDisabledFlag               ()      const { return m_intraSmoothingDisabledFlag; }
   void setIntraSmoothingDisabledFlag               (bool bValue) { m_intraSmoothingDisabledFlag=bValue; }
 
   const int* getdQPs                        () const { return m_aidQP;       }
-  UInt      getDeltaQpRD                    () const { return m_uiDeltaQpRD; }
+  uint32_t      getDeltaQpRD                    () const { return m_uiDeltaQpRD; }
   bool      getFastDeltaQp                  () const { return m_bFastDeltaQP; }
 
   //====== Slice ========
@@ -1128,11 +1128,11 @@ public:
   void  setNumColumnsMinus1            ( int i )                     { m_iNumColumnsMinus1 = i; }
   int   getNumColumnsMinus1            ()                            { return m_iNumColumnsMinus1; }
   void  setColumnWidth ( const std::vector<int>& columnWidth )       { m_tileColumnWidth = columnWidth; }
-  UInt  getColumnWidth                 ( UInt columnIdx )            { return m_tileColumnWidth[columnIdx]; }
+  uint32_t  getColumnWidth                 ( uint32_t columnIdx )            { return m_tileColumnWidth[columnIdx]; }
   void  setNumRowsMinus1               ( int i )                     { m_iNumRowsMinus1 = i; }
   int   getNumRowsMinus1               ()                            { return m_iNumRowsMinus1; }
   void  setRowHeight ( const std::vector<int>& rowHeight)            { m_tileRowHeight = rowHeight; }
-  UInt  getRowHeight                   ( UInt rowIdx )               { return m_tileRowHeight[rowIdx]; }
+  uint32_t  getRowHeight                   ( uint32_t rowIdx )               { return m_tileRowHeight[rowIdx]; }
 #endif
   void  xCheckGSParameters();
 #if HEVC_TILES_WPP
@@ -1285,10 +1285,10 @@ public:
   void         setWPBiPred            ( bool b )                     { m_useWeightedBiPred = b;    }
   bool         getUseWP               ()                             { return m_useWeightedPred;   }
   bool         getWPBiPred            ()                             { return m_useWeightedBiPred; }
-  void         setLog2ParallelMergeLevelMinus2   ( UInt u )          { m_log2ParallelMergeLevelMinus2       = u;    }
-  UInt         getLog2ParallelMergeLevelMinus2   ()                  { return m_log2ParallelMergeLevelMinus2;       }
-  void         setMaxNumMergeCand                ( UInt u )          { m_maxNumMergeCand = u;      }
-  UInt         getMaxNumMergeCand                ()                  { return m_maxNumMergeCand;   }
+  void         setLog2ParallelMergeLevelMinus2   ( uint32_t u )          { m_log2ParallelMergeLevelMinus2       = u;    }
+  uint32_t         getLog2ParallelMergeLevelMinus2   ()                  { return m_log2ParallelMergeLevelMinus2;       }
+  void         setMaxNumMergeCand                ( uint32_t u )          { m_maxNumMergeCand = u;      }
+  uint32_t         getMaxNumMergeCand                ()                  { return m_maxNumMergeCand;   }
 #if HEVC_USE_SCALING_LISTS
   void         setUseScalingListId    ( ScalingListMode u )          { m_useScalingListId       = u;   }
   ScalingListMode getUseScalingListId    ()                          { return m_useScalingListId;      }
@@ -1324,8 +1324,8 @@ public:
 #if U0132_TARGET_BITS_SATURATION
   bool         getCpbSaturationEnabled()                             { return m_RCCpbSaturationEnabled;}
   void         setCpbSaturationEnabled( bool b )                     { m_RCCpbSaturationEnabled = b;   }
-  UInt         getCpbSize             ()                             { return m_RCCpbSize;}
-  void         setCpbSize             ( UInt ui )                    { m_RCCpbSize = ui;   }
+  uint32_t         getCpbSize             ()                             { return m_RCCpbSize;}
+  void         setCpbSize             ( uint32_t ui )                    { m_RCCpbSize = ui;   }
   double       getInitialCpbFullness  ()                             { return m_RCInitialCpbFullness;  }
   void         setInitialCpbFullness  (double f)                     { m_RCInitialCpbFullness = f;     }
 #endif
@@ -1431,8 +1431,8 @@ public:
   bool         getFrameOnlyConstraintFlag() const                    { return m_frameOnlyConstraintFlag; }
   void         setFrameOnlyConstraintFlag(bool b)                    { m_frameOnlyConstraintFlag = b; }
 
-  UInt         getBitDepthConstraintValue() const                    { return m_bitDepthConstraintValue; }
-  void         setBitDepthConstraintValue(UInt v)                    { m_bitDepthConstraintValue=v; }
+  uint32_t         getBitDepthConstraintValue() const                    { return m_bitDepthConstraintValue; }
+  void         setBitDepthConstraintValue(uint32_t v)                    { m_bitDepthConstraintValue=v; }
 
   ChromaFormat getChromaFormatConstraintValue() const                { return m_chromaFormatConstraintValue; }
   void         setChromaFormatConstraintValue(ChromaFormat v)        { m_chromaFormatConstraintValue=v; }
@@ -1458,8 +1458,8 @@ public:
   void         setSummaryPicFilenameBase(const std::string &s)       { m_summaryPicFilenameBase = s; }
   const std::string& getSummaryPicFilenameBase() const               { return m_summaryPicFilenameBase; }
 
-  void         setSummaryVerboseness(UInt v)                         { m_summaryVerboseness = v; }
-  UInt         getSummaryVerboseness( ) const                        { return m_summaryVerboseness; }
+  void         setSummaryVerboseness(uint32_t v)                         { m_summaryVerboseness = v; }
+  uint32_t         getSummaryVerboseness( ) const                        { return m_summaryVerboseness; }
 #if JVET_K0357_AMVR
   void         setIMV(int n)                                         { m_ImvMode = n; }
   int          getIMV() const                                        { return m_ImvMode; }

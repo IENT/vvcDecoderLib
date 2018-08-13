@@ -122,7 +122,7 @@ typedef enum
 // Common constants
 // ====================================================================================================================
 
-static const UInt   MAX_UINT =                            0xFFFFFFFFU; ///< max. value of unsigned 32-bit integer
+static const uint32_t   MAX_UINT =                            0xFFFFFFFFU; ///< max. value of unsigned 32-bit integer
 static const int    MAX_INT =                              2147483647; ///< max. value of signed 32-bit integer
 static const uint8_t  MAX_UCHAR =                                   255;
 static const uint8_t  MAX_SCHAR =                                   127;
@@ -245,14 +245,14 @@ static const int DM_CHROMA_IDX =                       NUM_INTRA_MODE; ///< chro
 static const uint8_t INTER_MODE_IDX =                               255; ///< index for inter modes
 
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
-static const UInt  EMT_INTRA_MAX_CU =                              32; ///< Max Intra CU size applying EMT, supported values: 8, 16, 32, 64, 128
-static const UInt  EMT_INTER_MAX_CU =                              32; ///< Max Inter CU size applying EMT, supported values: 8, 16, 32, 64, 128
+static const uint32_t  EMT_INTRA_MAX_CU =                              32; ///< Max Intra CU size applying EMT, supported values: 8, 16, 32, 64, 128
+static const uint32_t  EMT_INTER_MAX_CU =                              32; ///< Max Inter CU size applying EMT, supported values: 8, 16, 32, 64, 128
 #if JVET_K1000_SIMPLIFIED_EMT
-static const UInt  EMT_INTRA_MAX_CU_WITH_QTBT =                    32; ///< Max Intra CU size applying EMT, supported values: 8, 16, 32, 64, 128
-static const UInt  EMT_INTER_MAX_CU_WITH_QTBT =                    32; ///< Max Inter CU size applying EMT, supported values: 8, 16, 32, 64, 128
+static const uint32_t  EMT_INTRA_MAX_CU_WITH_QTBT =                    32; ///< Max Intra CU size applying EMT, supported values: 8, 16, 32, 64, 128
+static const uint32_t  EMT_INTER_MAX_CU_WITH_QTBT =                    32; ///< Max Inter CU size applying EMT, supported values: 8, 16, 32, 64, 128
 #else
-static const UInt  EMT_INTRA_MAX_CU_WITH_QTBT =                    64; ///< Max Intra CU size applying EMT, supported values: 8, 16, 32, 64, 128
-static const UInt  EMT_INTER_MAX_CU_WITH_QTBT =                    64; ///< Max Inter CU size applying EMT, supported values: 8, 16, 32, 64, 128
+static const uint32_t  EMT_INTRA_MAX_CU_WITH_QTBT =                    64; ///< Max Intra CU size applying EMT, supported values: 8, 16, 32, 64, 128
+static const uint32_t  EMT_INTER_MAX_CU_WITH_QTBT =                    64; ///< Max Inter CU size applying EMT, supported values: 8, 16, 32, 64, 128
 #endif
 #endif
 
@@ -366,7 +366,7 @@ static const int MAX_ENCODER_DEBLOCKING_QUALITY_LAYERS =           8 ;
 #endif
 
 #if SHARP_LUMA_DELTA_QP
-static const UInt LUMA_LEVEL_TO_DQP_LUT_MAXSIZE =                1024; ///< max LUT size for QP offset based on luma
+static const uint32_t LUMA_LEVEL_TO_DQP_LUT_MAXSIZE =                1024; ///< max LUT size for QP offset based on luma
 
 #endif
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
@@ -439,7 +439,7 @@ static const unsigned C806_ALF_TEMPPRED_NUM =                      6;
 #if JEM_TOOLS
 static const int NB_FRUC_CAND_ADDED =                              2 ; ///< for entire (AMVP and merge) CU, number of added spatial candidates in top, left, top-left, top-right, below-left <0-5>
 static const int NB_FRUC_CAND_ADDED_SUB =                          4 ; ///< for sub-blocks of merge CU, number of added spatial candidates in top, left, top-left, top-right, below-left <0-5>
-static const UInt NB_FRUC_CAND_ATMVP =                             4 ; ///< for sub-blocks of merge CU, number of ATMVP candidates
+static const uint32_t NB_FRUC_CAND_ATMVP =                             4 ; ///< for sub-blocks of merge CU, number of ATMVP candidates
 
 static const int DMVR_INTME_RANGE =                                 1;
 #endif

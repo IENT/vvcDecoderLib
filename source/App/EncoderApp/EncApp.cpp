@@ -123,7 +123,7 @@ void EncApp::xInitLibCfg()
     m_cEncLib.setNumReorderPics                                  ( m_numReorderPics[i], i );
     m_cEncLib.setMaxDecPicBuffering                              ( m_maxDecPicBuffering[i], i );
   }
-  for( UInt uiLoop = 0; uiLoop < MAX_TLAYER; ++uiLoop )
+  for( uint32_t uiLoop = 0; uiLoop < MAX_TLAYER; ++uiLoop )
   {
     m_cEncLib.setLambdaModifier                                  ( uiLoop, m_adLambdaModifier[ uiLoop ] );
   }
@@ -337,7 +337,7 @@ void EncApp::xInitLibCfg()
   m_cEncLib.setPersistentRiceAdaptationEnabledFlag               ( m_persistentRiceAdaptationEnabledFlag );
   m_cEncLib.setCabacBypassAlignmentEnabledFlag                   ( m_cabacBypassAlignmentEnabledFlag );
   m_cEncLib.setLog2MaxTransformSkipBlockSize                     ( m_log2MaxTransformSkipBlockSize  );
-  for (UInt signallingModeIndex = 0; signallingModeIndex < NUMBER_OF_RDPCM_SIGNALLING_MODES; signallingModeIndex++)
+  for (uint32_t signallingModeIndex = 0; signallingModeIndex < NUMBER_OF_RDPCM_SIGNALLING_MODES; signallingModeIndex++)
   {
     m_cEncLib.setRdpcmEnabledFlag                                ( RDPCMSignallingMode(signallingModeIndex), m_rdpcmEnabledFlag[signallingModeIndex]);
   }
@@ -349,7 +349,7 @@ void EncApp::xInitLibCfg()
   m_cEncLib.setUsePCM                                            ( m_usePCM );
 
   // set internal bit-depth and constants
-  for (UInt channelType = 0; channelType < MAX_NUM_CHANNEL_TYPE; channelType++)
+  for (uint32_t channelType = 0; channelType < MAX_NUM_CHANNEL_TYPE; channelType++)
   {
     m_cEncLib.setBitDepth((ChannelType)channelType, m_internalBitDepth[channelType]);
     m_cEncLib.setInputBitDepth((ChannelType)channelType, m_inputBitDepth[channelType]);
@@ -811,7 +811,7 @@ void EncApp::xWriteOutput( int iNumEncoded, std::list<PelUnitBuf*>& recBufList
 
 void EncApp::outputAU( const AccessUnit& au )
 {
-  const vector<UInt>& stats = writeAnnexB(m_bitstream, au);
+  const vector<uint32_t>& stats = writeAnnexB(m_bitstream, au);
   rateStatsAccum(au, stats);
   m_bitstream.flush();
 }
@@ -820,10 +820,10 @@ void EncApp::outputAU( const AccessUnit& au )
 /**
  *
  */
-void EncApp::rateStatsAccum(const AccessUnit& au, const std::vector<UInt>& annexBsizes)
+void EncApp::rateStatsAccum(const AccessUnit& au, const std::vector<uint32_t>& annexBsizes)
 {
   AccessUnit::const_iterator it_au = au.begin();
-  vector<UInt>::const_iterator it_stats = annexBsizes.begin();
+  vector<uint32_t>::const_iterator it_stats = annexBsizes.begin();
 
   for (; it_au != au.end(); it_au++, it_stats++)
   {

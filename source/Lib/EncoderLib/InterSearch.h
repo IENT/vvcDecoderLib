@@ -64,9 +64,9 @@
 // Class definition
 // ====================================================================================================================
 
-static const UInt MAX_NUM_REF_LIST_ADAPT_SR = 2;
-static const UInt MAX_IDX_ADAPT_SR          = 33;
-static const UInt NUM_MV_PREDICTORS         = 3;
+static const uint32_t MAX_NUM_REF_LIST_ADAPT_SR = 2;
+static const uint32_t MAX_IDX_ADAPT_SR          = 33;
+static const uint32_t NUM_MV_PREDICTORS         = 3;
 
 class EncModeCtrl;
 
@@ -129,7 +129,7 @@ protected:
   Pel            *m_pTempPel;
 
   // AMVP cost computation
-  UInt            m_auiMVPIdxCost               [AMVP_MAX_NUM_CANDS+1][AMVP_MAX_NUM_CANDS+1]; //th array bounds
+  uint32_t            m_auiMVPIdxCost               [AMVP_MAX_NUM_CANDS+1][AMVP_MAX_NUM_CANDS+1]; //th array bounds
 
   Mv              m_integerMv2Nx2N              [NUM_REF_PIC_LIST_01][MAX_NUM_REF];
 
@@ -152,9 +152,9 @@ public:
                                       int            iSearchRange,
                                       int            bipredSearchRange,
                                       MESearchMethod motionEstimationSearchMethod,
-                                      const UInt     maxCUWidth,
-                                      const UInt     maxCUHeight,
-                                      const UInt     maxTotalCUDepth,
+                                      const uint32_t     maxCUWidth,
+                                      const uint32_t     maxCUHeight,
+                                      const uint32_t     maxTotalCUDepth,
                                       RdCost*        pcRdCost,
                                       CABACWriter*   CABACEstimator,
                                       CtxCache*      ctxCache
@@ -189,8 +189,8 @@ protected:
     int         iRefStride;
     int         iBestX;
     int         iBestY;
-    UInt        uiBestRound;
-    UInt        uiBestDistance;
+    uint32_t        uiBestRound;
+    uint32_t        uiBestDistance;
     Distortion  uiBestSad;
     uint8_t       ucPointNr;
     int         subShiftMode;
@@ -200,7 +200,7 @@ protected:
   } IntTZSearchStruct;
 
   // sub-functions for ME
-  inline void xTZSearchHelp         ( IntTZSearchStruct& rcStruct, const int iSearchX, const int iSearchY, const uint8_t ucPointNr, const UInt uiDistance );
+  inline void xTZSearchHelp         ( IntTZSearchStruct& rcStruct, const int iSearchX, const int iSearchY, const uint8_t ucPointNr, const uint32_t uiDistance );
   inline void xTZ2PointSearch       ( IntTZSearchStruct& rcStruct );
   inline void xTZ8PointSquareSearch ( IntTZSearchStruct& rcStruct, const int iStartX, const int iStartY, const int iDist );
   inline void xTZ8PointDiamondSearch( IntTZSearchStruct& rcStruct, const int iStartX, const int iStartY, const int iDist, const bool bCheckCornersAtDist1 );
@@ -239,7 +239,7 @@ protected:
                                     Mv&         rcMvPred,
                                     int&        riMVPIdx,
                                     AMVPInfo&   amvpInfo,
-                                    UInt&       ruiBits,
+                                    uint32_t&       ruiBits,
                                     Distortion& ruiCost
 #if JVET_K0357_AMVR
                                     ,
@@ -259,13 +259,13 @@ protected:
 
 
   void xCopyAMVPInfo              ( AMVPInfo*   pSrc, AMVPInfo* pDst );
-  UInt xGetMvpIdxBits             ( int iIdx, int iNum );
-  void xGetBlkBits                ( PartSize  eCUMode, bool bPSlice, int iPartIdx,  UInt uiLastMode, UInt uiBlkBit[3]);
+  uint32_t xGetMvpIdxBits             ( int iIdx, int iNum );
+  void xGetBlkBits                ( PartSize  eCUMode, bool bPSlice, int iPartIdx,  uint32_t uiLastMode, uint32_t uiBlkBit[3]);
 
   void xMergeEstimation           ( PredictionUnit&       pu,
                                     PelUnitBuf&           origBuf,
                                     int                   iPartIdx,
-                                    UInt&                 uiMergeIndex,
+                                    uint32_t&                 uiMergeIndex,
                                     Distortion&           ruiCost,
                                     MergeCtx &            mergeCtx
                                   );
@@ -291,7 +291,7 @@ protected:
                                     int                   iRefIdxPred,
                                     Mv&                   rcMv,
                                     int&                  riMVPIdx,
-                                    UInt&                 ruiBits,
+                                    uint32_t&                 ruiBits,
                                     Distortion&           ruiCost,
                                     const AMVPInfo&       amvpInfo,
                                     bool                  bBi = false
@@ -336,7 +336,7 @@ protected:
                                     Mv&                 rcMv,
                                     Mv&                 rcMvPred,
                                     int&                riMVPIdx,
-                                    UInt&               ruiBits,
+                                    uint32_t&               ruiBits,
                                     Distortion&         ruiCost,
                                     const AMVPInfo&     amvpInfo,
                                     double              fWeight
@@ -356,7 +356,7 @@ protected:
   void xPredAffineInterSearch     ( PredictionUnit&       pu,
                                     PelUnitBuf&           origBuf,
                                     int                   puIdx,
-                                    UInt&                 lastMode,
+                                    uint32_t&                 lastMode,
                                     Distortion&           affineCost,
 #if JVET_K0220_ENC_CTRL
                                     Mv                    hevcMv[2][33]
@@ -376,7 +376,7 @@ protected:
                                     Mv              acMvPred[3],
                                     int             iRefIdxPred,
                                     Mv              acMv[3],
-                                    UInt&           ruiBits,
+                                    uint32_t&           ruiBits,
                                     Distortion&     ruiCost,
                                     bool            bBi = false
                                   );
@@ -393,7 +393,7 @@ protected:
   Distortion xGetAffineTemplateCost( PredictionUnit& pu, PelUnitBuf& origBuf, PelUnitBuf& predBuf, Mv acMvCand[3], int iMVPIdx, int iMVPNum, RefPicList eRefPicList, int iRefIdx );
 
   void xCopyAffineAMVPInfo        ( AffineAMVPInfo& src, AffineAMVPInfo& dst );
-  void xCheckBestAffineMVP        ( PredictionUnit &pu, AffineAMVPInfo &affineAMVPInfo, RefPicList eRefPicList, Mv acMv[3], Mv acMvPred[3], int& riMVPIdx, UInt& ruiBits, Distortion& ruiCost );
+  void xCheckBestAffineMVP        ( PredictionUnit &pu, AffineAMVPInfo &affineAMVPInfo, RefPicList eRefPicList, Mv acMv[3], Mv acMvPred[3], int& riMVPIdx, uint32_t& ruiBits, Distortion& ruiCost );
 #endif
   void xExtDIFUpSamplingH         ( CPelBuf* pcPattern );
   void xExtDIFUpSamplingQ         ( CPelBuf* pcPatternKey, Mv halfPelRef );

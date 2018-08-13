@@ -155,18 +155,18 @@ void SEIWriter::writeSEImessages(OutputBitstream& bs, const SEIMessages &seiList
 #if ENABLE_TRACING
     g_HLSTraceEnable = traceEnable;
 #endif
-    UInt payload_data_num_bits = bs_count.getNumberOfWrittenBits();
+    uint32_t payload_data_num_bits = bs_count.getNumberOfWrittenBits();
     CHECK(0 != payload_data_num_bits % 8, "Invalid number of payload data bits");
 
     setBitstream(&bs);
-    UInt payloadType = (*sei)->payloadType();
+    uint32_t payloadType = (*sei)->payloadType();
     for (; payloadType >= 0xff; payloadType -= 0xff)
     {
       WRITE_CODE(0xff, 8, "payload_type");
     }
     WRITE_CODE(payloadType, 8, "payload_type");
 
-    UInt payloadSize = payload_data_num_bits/8;
+    uint32_t payloadSize = payload_data_num_bits/8;
     for (; payloadSize >= 0xff; payloadSize -= 0xff)
     {
       WRITE_CODE(0xff, 8, "payload_size");
@@ -193,12 +193,12 @@ void SEIWriter::writeSEImessages(OutputBitstream& bs, const SEIMessages &seiList
  */
 void SEIWriter::xWriteSEIuserDataUnregistered(const SEIuserDataUnregistered &sei)
 {
-  for (UInt i = 0; i < ISO_IEC_11578_LEN; i++)
+  for (uint32_t i = 0; i < ISO_IEC_11578_LEN; i++)
   {
     WRITE_CODE(sei.uuid_iso_iec_11578[i], 8 , "sei.uuid_iso_iec_11578[i]");
   }
 
-  for (UInt i = 0; i < sei.userDataLength; i++)
+  for (uint32_t i = 0; i < sei.userDataLength; i++)
   {
     WRITE_CODE(sei.userData[i], 8 , "user_data");
   }
@@ -222,7 +222,7 @@ void SEIWriter::xWriteSEIDecodedPictureHash(const SEIDecodedPictureHash& sei)
   if (traceString != 0) //use of this variable is needed to avoid a compiler error with G++ 4.6.1
   {
     WRITE_CODE(sei.method, 8, "hash_type");
-    for(UInt i=0; i<UInt(sei.m_pictureHash.hash.size()); i++)
+    for(uint32_t i=0; i<uint32_t(sei.m_pictureHash.hash.size()); i++)
     {
       WRITE_CODE(sei.m_pictureHash.hash[i], 8, traceString);
     }
@@ -414,7 +414,7 @@ void SEIWriter::xWriteSEIToneMappingInfo(const SEIToneMappingInfo& sei)
       }
     case 2:
       {
-        UInt num = 1u << sei.m_targetBitDepth;
+        uint32_t num = 1u << sei.m_targetBitDepth;
         for(i = 0; i < num; i++)
         {
           WRITE_CODE( sei.m_startOfCodedInterval[i], (( sei.m_codedDataBitDepth + 7 ) >> 3 ) << 3,  "start_of_coded_interval" );
@@ -493,7 +493,7 @@ void SEIWriter::xWriteSEISOPDescription(const SEISOPDescription& sei)
 {
   WRITE_UVLC( sei.m_sopSeqParameterSetId,           "sop_seq_parameter_set_id"               );
   WRITE_UVLC( sei.m_numPicsInSopMinus1,             "num_pics_in_sop_minus1"               );
-  for (UInt i = 0; i <= sei.m_numPicsInSopMinus1; i++)
+  for (uint32_t i = 0; i <= sei.m_numPicsInSopMinus1; i++)
   {
     WRITE_CODE( sei.m_sopDescVclNaluType[i], 6, "sop_desc_vcl_nalu_type" );
     WRITE_CODE( sei.m_sopDescTemporalId[i],  3, "sop_desc_temporal_id" );
@@ -516,7 +516,7 @@ void SEIWriter::xWriteSEIScalableNesting(OutputBitstream& bs, const SEIScalableN
   {
     WRITE_FLAG( sei.m_defaultOpFlag,                 "default_op_flag"               );
     WRITE_UVLC( sei.m_nestingNumOpsMinus1,           "nesting_num_ops_minus1"        );
-    for (UInt i = (sei.m_defaultOpFlag ? 1 : 0); i <= sei.m_nestingNumOpsMinus1; i++)
+    for (uint32_t i = (sei.m_defaultOpFlag ? 1 : 0); i <= sei.m_nestingNumOpsMinus1; i++)
     {
       WRITE_CODE( sei.m_nestingMaxTemporalIdPlus1[i], 3,  "nesting_max_temporal_id_plus1" );
       WRITE_UVLC( sei.m_nestingOpIdx[i],                  "nesting_op_idx"                );
@@ -529,7 +529,7 @@ void SEIWriter::xWriteSEIScalableNesting(OutputBitstream& bs, const SEIScalableN
     {
       WRITE_CODE( sei.m_nestingNoOpMaxTemporalIdPlus1, 3, "nesting_no_op_max_temporal_id_plus1" );
       WRITE_UVLC( sei.m_nestingNumLayersMinus1,           "nesting_num_layers"                  );
-      for (UInt i = 0; i <= sei.m_nestingNumLayersMinus1; i++)
+      for (uint32_t i = 0; i <= sei.m_nestingNumLayersMinus1; i++)
       {
         WRITE_CODE( sei.m_nestingLayerId[i], 6,           "nesting_layer_id"              );
       }
@@ -549,7 +549,7 @@ void SEIWriter::xWriteSEIScalableNesting(OutputBitstream& bs, const SEIScalableN
 #if HEVC_TILES_WPP
 void SEIWriter::xWriteSEITempMotionConstrainedTileSets(const SEITempMotionConstrainedTileSets& sei)
 {
-  //UInt code;
+  //uint32_t code;
   WRITE_FLAG((sei.m_mc_all_tiles_exact_sample_value_match_flag ? 1 : 0), "mc_all_tiles_exact_sample_value_match_flag");
   WRITE_FLAG((sei.m_each_tile_one_tile_set_flag                ? 1 : 0), "each_tile_one_tile_set_flag"               );
 
@@ -649,12 +649,12 @@ void SEIWriter::xWriteSEITimeCode(const SEITimeCode& sei)
       {
         if(currentTimeSet.timeOffsetValue >= 0)
         {
-          WRITE_CODE((UInt)currentTimeSet.timeOffsetValue, currentTimeSet.timeOffsetLength, "time_offset_value");
+          WRITE_CODE((uint32_t)currentTimeSet.timeOffsetValue, currentTimeSet.timeOffsetLength, "time_offset_value");
         }
         else
         {
           //  Two's complement conversion
-          UInt offsetValue = ~(currentTimeSet.timeOffsetValue) + 1;
+          uint32_t offsetValue = ~(currentTimeSet.timeOffsetValue) + 1;
           offsetValue |= (1 << (currentTimeSet.timeOffsetLength-1));
           WRITE_CODE(offsetValue, currentTimeSet.timeOffsetLength, "time_offset_value");
         }
@@ -715,15 +715,15 @@ void SEIWriter::xWriteSEIKneeFunctionInfo(const SEIKneeFunctionInfo &sei)
   if ( !sei.m_kneeCancelFlag )
   {
     WRITE_FLAG( sei.m_kneePersistenceFlag, "knee_function_persistence_flag" );
-    WRITE_CODE( (UInt)sei.m_kneeInputDrange , 32,  "input_d_range" );
-    WRITE_CODE( (UInt)sei.m_kneeInputDispLuminance, 32,  "input_disp_luminance" );
-    WRITE_CODE( (UInt)sei.m_kneeOutputDrange, 32,  "output_d_range" );
-    WRITE_CODE( (UInt)sei.m_kneeOutputDispLuminance, 32,  "output_disp_luminance" );
+    WRITE_CODE( (uint32_t)sei.m_kneeInputDrange , 32,  "input_d_range" );
+    WRITE_CODE( (uint32_t)sei.m_kneeInputDispLuminance, 32,  "input_disp_luminance" );
+    WRITE_CODE( (uint32_t)sei.m_kneeOutputDrange, 32,  "output_d_range" );
+    WRITE_CODE( (uint32_t)sei.m_kneeOutputDispLuminance, 32,  "output_disp_luminance" );
     WRITE_UVLC( sei.m_kneeNumKneePointsMinus1, "num_knee_points_minus1" );
     for(int i = 0; i <= sei.m_kneeNumKneePointsMinus1; i++ )
     {
-      WRITE_CODE( (UInt)sei.m_kneeInputKneePoint[i], 10,"input_knee_point" );
-      WRITE_CODE( (UInt)sei.m_kneeOutputKneePoint[i], 10, "output_knee_point" );
+      WRITE_CODE( (uint32_t)sei.m_kneeInputKneePoint[i], 10,"input_knee_point" );
+      WRITE_CODE( (uint32_t)sei.m_kneeOutputKneePoint[i], 10, "output_knee_point" );
     }
   }
 }

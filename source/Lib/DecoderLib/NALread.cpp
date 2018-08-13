@@ -58,10 +58,10 @@ using namespace std;
 //! \{
 static void convertPayloadToRBSP(vector<uint8_t>& nalUnitBuf, InputBitstream *bitstream, bool isVclNalUnit)
 {
-  UInt zeroCount = 0;
+  uint32_t zeroCount = 0;
   vector<uint8_t>::iterator it_read, it_write;
 
-  UInt pos = 0;
+  uint32_t pos = 0;
   bitstream->clearEmulationPreventionByteLocation();
   for (it_read = it_write = nalUnitBuf.begin(); it_read != nalUnitBuf.end(); it_read++, it_write++, pos++)
   {

@@ -122,7 +122,7 @@ struct CompArea : public Area
   CompArea() : Area(), chromaFormat(NUM_CHROMA_FORMAT), compID(MAX_NUM_TBLOCKS)                                                                                                                                 { }
   CompArea(const ComponentID _compID, const ChromaFormat _cf, const Area &_area, const bool isLuma = false)                                          : Area(_area),          chromaFormat(_cf), compID(_compID) { if (isLuma) xRecalcLumaToChroma(); }
   CompArea(const ComponentID _compID, const ChromaFormat _cf, const Position& _pos, const Size& _size, const bool isLuma = false)                    : Area(_pos, _size),    chromaFormat(_cf), compID(_compID) { if (isLuma) xRecalcLumaToChroma(); }
-  CompArea(const ComponentID _compID, const ChromaFormat _cf, const UInt _x, const UInt _y, const UInt _w, const UInt _h, const bool isLuma = false) : Area(_x, _y, _w, _h), chromaFormat(_cf), compID(_compID) { if (isLuma) xRecalcLumaToChroma(); }
+  CompArea(const ComponentID _compID, const ChromaFormat _cf, const uint32_t _x, const uint32_t _y, const uint32_t _w, const uint32_t _h, const bool isLuma = false) : Area(_x, _y, _w, _h), chromaFormat(_cf), compID(_compID) { if (isLuma) xRecalcLumaToChroma(); }
 
   ChromaFormat chromaFormat;
   ComponentID compID;
@@ -206,7 +206,7 @@ struct UnitArea
     if (chromaFormat != other.chromaFormat)   return false;
     if (blocks.size() != other.blocks.size()) return false;
 
-    for (UInt i = 0; i < blocks.size(); i++)
+    for (uint32_t i = 0; i < blocks.size(); i++)
     {
       if (blocks[i] != other.blocks[i]) return false;
     }
@@ -240,7 +240,7 @@ inline UnitArea clipArea(const UnitArea &area, const UnitArea &boundingBox)
 {
   UnitArea ret(area.chromaFormat);
 
-  for (UInt i = 0; i < area.blocks.size(); i++)
+  for (uint32_t i = 0; i < area.blocks.size(); i++)
   {
     ret.blocks.push_back(clipArea(area.blocks[i], boundingBox.blocks[i]));
   }
@@ -253,7 +253,7 @@ struct UnitAreaRelative : public UnitArea
   UnitAreaRelative(const UnitArea& origUnit, const UnitArea& unit)
   {
     *((UnitArea*)this) = unit;
-    for(UInt i = 0; i < blocks.size(); i++)
+    for(uint32_t i = 0; i < blocks.size(); i++)
     {
       blocks[i].positionRelativeTo(origUnit.blocks[i]);
     }
@@ -311,13 +311,13 @@ struct CodingUnit : public UnitArea
 #endif
   bool           rootCbf;
 #if HEVC_TILES_WPP
-  UInt           tileIdx;
+  uint32_t           tileIdx;
 #endif
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   uint8_t          emtFlag;
 #endif
 #if JEM_TOOLS
-  UInt           nsstIdx;
+  uint32_t           nsstIdx;
 #endif
 #if JEM_TOOLS
   bool           LICFlag;
@@ -357,7 +357,7 @@ struct CodingUnit : public UnitArea
 
 struct IntraPredictionData
 {
-  UInt  intraDir[MAX_NUM_CHANNEL_TYPE];
+  uint32_t  intraDir[MAX_NUM_CHANNEL_TYPE];
 };
 
 struct InterPredictionData

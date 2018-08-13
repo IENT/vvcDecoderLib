@@ -195,7 +195,7 @@ struct ComprCUCtx
   {
   }
 
-  ComprCUCtx( const CodingStructure& cs, const UInt _minDepth, const UInt _maxDepth, const UInt numExtraFeatures )
+  ComprCUCtx( const CodingStructure& cs, const uint32_t _minDepth, const uint32_t _maxDepth, const uint32_t numExtraFeatures )
     : minDepth      ( _minDepth  )
     , maxDepth      ( _maxDepth  )
     , testModes     (            )

@@ -520,7 +520,7 @@ void InterpolationFilter::filterHor( const ComponentID compID, Pel const *src, i
   }
   else
   {
-    const UInt csx = getComponentScaleX( compID, fmt );
+    const uint32_t csx = getComponentScaleX( compID, fmt );
 #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
     CHECK( frac < 0 || csx >= 2 || ( frac << ( 1 - csx ) ) >= ( CHROMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE ), "Invalid fraction" );
 #else
@@ -577,7 +577,7 @@ void InterpolationFilter::filterVer( const ComponentID compID, Pel const *src, i
   }
   else
   {
-    const UInt csy = getComponentScaleY( compID, fmt );
+    const uint32_t csy = getComponentScaleY( compID, fmt );
 #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
     CHECK( frac < 0 || csy >= 2 || ( frac << ( 1 - csy ) ) >= ( CHROMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE ), "Invalid fraction" );
 #else

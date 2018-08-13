@@ -153,8 +153,8 @@ void EncCu::create( EncCfg* encCfg )
 
       for( unsigned h = 0; h < numHeights; h++ )
       {
-        UInt width  = gp_sizeIdxInfo->sizeFrom( w );
-        UInt height = gp_sizeIdxInfo->sizeFrom( h );
+        uint32_t width  = gp_sizeIdxInfo->sizeFrom( w );
+        uint32_t height = gp_sizeIdxInfo->sizeFrom( h );
 
         if( ( BTnoRQT || w == h ) && gp_sizeIdxInfo->isCuSize( width ) && gp_sizeIdxInfo->isCuSize( height ) )
         {
@@ -593,8 +593,8 @@ void EncCu::xCompressCU( CodingStructure *&tempCS, CodingStructure *&bestCS, Par
   Slice&   slice      = *tempCS->slice;
   const PPS &pps      = *tempCS->pps;
   const SPS &sps      = *tempCS->sps;
-  const UInt uiLPelX  = tempCS->area.Y().lumaPos().x;
-  const UInt uiTPelY  = tempCS->area.Y().lumaPos().y;
+  const uint32_t uiLPelX  = tempCS->area.Y().lumaPos().x;
+  const uint32_t uiTPelY  = tempCS->area.Y().lumaPos().y;
 
 #if JEM_TOOLS || JVET_K0357_AMVR
   const unsigned wIdx = gp_sizeIdxInfo->idxFrom( partitioner.currArea().lwidth()  );
@@ -1013,7 +1013,7 @@ void EncCu::xCheckModeSplit(CodingStructure *&tempCS, CodingStructure *&bestCS, 
   const Slice &slice          = *tempCS->slice;
   const bool bIsLosslessMode  = false; // False at this level. Next level down may set it to true.
   const int oldPrevQp         = tempCS->prevQP[partitioner.chType];
-  const UInt currDepth        = partitioner.currDepth;
+  const uint32_t currDepth        = partitioner.currDepth;
 
   const PartSplit split = getPartSplit( encTestMode );
 
@@ -1174,7 +1174,7 @@ void EncCu::xCheckModeSplit(CodingStructure *&tempCS, CodingStructure *&bestCS, 
     const TileMap& tileMap = *tempCS->picture->tileMap;
 #endif
 #if HEVC_TILES_WPP || HEVC_DEPENDENT_SLICES
-    const UInt CtuAddr             = CU::getCtuAddr( *bestCS->getCU( partitioner.chType ) );
+    const uint32_t CtuAddr             = CU::getCtuAddr( *bestCS->getCU( partitioner.chType ) );
 #endif
     const bool isEndOfSlice        =    slice.getSliceMode() == FIXED_NUMBER_OF_BYTES
                                       && ((slice.getSliceBits() + CS::getEstBits(*bestCS)) > slice.getSliceArgument() << 3)
@@ -1341,7 +1341,7 @@ void EncCu::xCheckRDCostIntra( CodingStructure *&tempCS, CodingStructure *&bestC
 
     cu.rootCbf = false;
 
-    for( UInt t = 0; t < getNumberValidTBlocks( *cu.cs->pcv ); t++ )
+    for( uint32_t t = 0; t < getNumberValidTBlocks( *cu.cs->pcv ); t++ )
     {
       cu.rootCbf |= cu.firstTU->cbf[t] != 0;
     }
@@ -1573,11 +1573,11 @@ void EncCu::xCheckDQP( CodingStructure& cs, Partitioner& partitioner, bool bKeep
 void EncCu::xFillPCMBuffer( CodingUnit &cu )
 {
   const ChromaFormat format        = cu.chromaFormat;
-  const UInt numberValidComponents = getNumberValidComponents(format);
+  const uint32_t numberValidComponents = getNumberValidComponents(format);
 
   for( auto &tu : CU::traverseTUs( cu ) )
   {
-    for( UInt ch = 0; ch < numberValidComponents; ch++ )
+    for( uint32_t ch = 0; ch < numberValidComponents; ch++ )
     {
       const ComponentID compID = ComponentID( ch );
 
@@ -1634,7 +1634,7 @@ void EncCu::xCheckRDCostMerge2Nx2N( CodingStructure *&tempCS, CodingStructure *&
 
 
   bool candHasNoResidual[MRG_MAX_NUM_CANDS];
-  for (UInt ui = 0; ui < mergeCtx.numValidMergeCand; ui++)
+  for (uint32_t ui = 0; ui < mergeCtx.numValidMergeCand; ui++)
   {
     candHasNoResidual[ui] = false;
   }
@@ -1697,7 +1697,7 @@ void EncCu::xCheckRDCostMerge2Nx2N( CodingStructure *&tempCS, CodingStructure *&
 
       const UnitArea localUnitArea( tempCS->area.chromaFormat, Area( 0, 0, tempCS->area.Y().width, tempCS->area.Y().height) );
 
-      for( UInt uiMergeCand = 0; uiMergeCand < mergeCtx.numValidMergeCand; uiMergeCand++ )
+      for( uint32_t uiMergeCand = 0; uiMergeCand < mergeCtx.numValidMergeCand; uiMergeCand++ )
       {
         acMergeBuffer[uiMergeCand] = m_acMergeBuffer[uiMergeCand].getBuf( localUnitArea );
 
@@ -1726,9 +1726,9 @@ void EncCu::xCheckRDCostMerge2Nx2N( CodingStructure *&tempCS, CodingStructure *&
 #if DISTORTION_TYPE_BUGFIX
         Distortion uiSad = distParam.distFunc(distParam);
 #else
-        UInt uiSad = distParam.distFunc(distParam);
+        uint32_t uiSad = distParam.distFunc(distParam);
 #endif
-        UInt uiBitsCand = uiMergeCand + 1;
+        uint32_t uiBitsCand = uiMergeCand + 1;
         if( uiMergeCand == tempCS->slice->getMaxNumMergeCand() - 1 )
         {
           uiBitsCand--;
@@ -1741,7 +1741,7 @@ void EncCu::xCheckRDCostMerge2Nx2N( CodingStructure *&tempCS, CodingStructure *&
       }
 
       // Try to limit number of candidates using SATD-costs
-      for( UInt i = 1; i < uiNumMrgSATDCand; i++ )
+      for( uint32_t i = 1; i < uiNumMrgSATDCand; i++ )
       {
         if( candCostList[i] > MRG_FAST_RATIO * candCostList[0] )
         {
@@ -1760,14 +1760,14 @@ void EncCu::xCheckRDCostMerge2Nx2N( CodingStructure *&tempCS, CodingStructure *&
 #endif
   }
 
-  const UInt iteration = encTestMode.lossless ? 1 : 2;
+  const uint32_t iteration = encTestMode.lossless ? 1 : 2;
 
   // 2. Pass: check candidates using full RD test
-  for( UInt uiNoResidualPass = 0; uiNoResidualPass < iteration; uiNoResidualPass++ )
+  for( uint32_t uiNoResidualPass = 0; uiNoResidualPass < iteration; uiNoResidualPass++ )
   {
-    for( UInt uiMrgHADIdx = 0; uiMrgHADIdx < uiNumMrgSATDCand; uiMrgHADIdx++ )
+    for( uint32_t uiMrgHADIdx = 0; uiMrgHADIdx < uiNumMrgSATDCand; uiMrgHADIdx++ )
     {
-      UInt uiMergeCand = RdModeList[uiMrgHADIdx];
+      uint32_t uiMergeCand = RdModeList[uiMrgHADIdx];
 
       if( ( (uiNoResidualPass != 0) && candHasNoResidual[uiMergeCand] )
        || ( (uiNoResidualPass == 0) && bestIsSkip ) )
@@ -1844,7 +1844,7 @@ void EncCu::xCheckRDCostMerge2Nx2N( CodingStructure *&tempCS, CodingStructure *&
         {
           int absolute_MV = 0;
 
-          for( UInt uiRefListIdx = 0; uiRefListIdx < 2; uiRefListIdx++ )
+          for( uint32_t uiRefListIdx = 0; uiRefListIdx < 2; uiRefListIdx++ )
           {
             if( slice.getNumRefIdx( RefPicList( uiRefListIdx ) ) > 0 )
             {
@@ -2060,9 +2060,9 @@ void EncCu::xCheckRDCostInterWoOBMC( CodingStructure *&tempCS, CodingStructure *
     m_pcRdCost->getDistPart(tempCS->getOrgBuf(cu->Y()), CSWoOBMC->getPredBuf(cu->Y()),
                             sps.getBitDepth(CHANNEL_TYPE_LUMA), COMPONENT_Y, DF_SAD_FULL_NBIT);
 #else
-  const UInt uiSADOBMCOff = m_pcRdCost->getDistPart(tempCS->getOrgBuf(cu->Y()), m_pPredBufWoOBMC[wIdx][hIdx].Y(),
+  const uint32_t uiSADOBMCOff = m_pcRdCost->getDistPart(tempCS->getOrgBuf(cu->Y()), m_pPredBufWoOBMC[wIdx][hIdx].Y(),
                                                     sps.getBitDepth(CHANNEL_TYPE_LUMA), COMPONENT_Y, DF_SAD_FULL_NBIT);
-  const UInt uiSADOBMCOn  = m_pcRdCost->getDistPart(tempCS->getOrgBuf(cu->Y()), CSWoOBMC->getPredBuf(cu->Y()),
+  const uint32_t uiSADOBMCOn  = m_pcRdCost->getDistPart(tempCS->getOrgBuf(cu->Y()), CSWoOBMC->getPredBuf(cu->Y()),
                                                    sps.getBitDepth(CHANNEL_TYPE_LUMA), COMPONENT_Y, DF_SAD_FULL_NBIT);
 #endif
   const double    dOBMCThOff = 1.0;
@@ -2173,10 +2173,10 @@ void EncCu::xCheckRDCostMerge2Nx2NFRUC( CodingStructure *&tempCS, CodingStructur
       mergeCtx.subPuFrucMiBuf.fill( MotionInfo() );
       mergeCtx.subPuFrucMiBuf.copyFrom( puFruc.getMotionBuf() );
 
-      UInt iteration = encTestMode.lossless ? 1 : 2;
+      uint32_t iteration = encTestMode.lossless ? 1 : 2;
       bool candHasNoResidual = false;
       // 2. Pass: check candidates using full RD test
-      for( UInt uiNoResidualPass = 0; uiNoResidualPass < iteration; uiNoResidualPass++ )
+      for( uint32_t uiNoResidualPass = 0; uiNoResidualPass < iteration; uiNoResidualPass++ )
       {
         if( (uiNoResidualPass != 0) && candHasNoResidual )
         {

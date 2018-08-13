@@ -77,15 +77,15 @@ protected:
 
   void  setBitstream          ( OutputBitstream* p )  { m_pcBitIf = p;  }
 
-  void  xWriteCode            ( UInt uiCode, UInt uiLength );
-  void  xWriteUvlc            ( UInt uiCode );
+  void  xWriteCode            ( uint32_t uiCode, uint32_t uiLength );
+  void  xWriteUvlc            ( uint32_t uiCode );
   void  xWriteSvlc            ( int  iCode   );
-  void  xWriteFlag            ( UInt uiCode );
+  void  xWriteFlag            ( uint32_t uiCode );
 #if ENABLE_TRACING
-  void  xWriteCodeTr          ( UInt value, UInt  length, const char *pSymbolName);
-  void  xWriteUvlcTr          ( UInt value,               const char *pSymbolName);
+  void  xWriteCodeTr          ( uint32_t value, uint32_t  length, const char *pSymbolName);
+  void  xWriteUvlcTr          ( uint32_t value,               const char *pSymbolName);
   void  xWriteSvlcTr          ( int  value,               const char *pSymbolName);
-  void  xWriteFlagTr          ( UInt value,               const char *pSymbolName);
+  void  xWriteFlagTr          ( uint32_t value,               const char *pSymbolName);
 #endif
   void  xWriteRbspTrailingBits();
 };
@@ -114,17 +114,17 @@ public:
 #endif
 private:
   void xCodeShortTermRefPicSet  ( const ReferencePictureSet* pcRPS, bool calledFromSliceHeader, int idx );
-  bool xFindMatchingLTRP        ( Slice* pcSlice, UInt *ltrpsIndex, int ltrpPOC, bool usedFlag );
+  bool xFindMatchingLTRP        ( Slice* pcSlice, uint32_t *ltrpsIndex, int ltrpPOC, bool usedFlag );
   void xCodePredWeightTable     ( Slice* pcSlice );
 #if HEVC_USE_SCALING_LISTS
-  void xCodeScalingList         ( const ScalingList* scalingList, UInt sizeId, UInt listId);
+  void xCodeScalingList         ( const ScalingList* scalingList, uint32_t sizeId, uint32_t listId);
 #endif
 #if JEM_TOOLS
   void xCodeCABACWSizes         ( Slice* pcSlice );
 #endif
 public:
   void  setBitstream            ( OutputBitstream* p )  { m_pcBitIf = p;  }
-  UInt  getNumberOfWrittenBits  ()                      { return m_pcBitIf->getNumberOfWrittenBits();  }
+  uint32_t  getNumberOfWrittenBits  ()                      { return m_pcBitIf->getNumberOfWrittenBits();  }
   void  codeVUI                 ( const VUI *pcVUI, const SPS* pcSPS );
   void  codeSPSNext             ( const SPSNext& spsNext, const bool usePCM );
   void  codeSPS                 ( const SPS* pcSPS );
@@ -135,7 +135,7 @@ public:
   void  codeSliceHeader         ( Slice* pcSlice );
   void  codePTL                 ( const PTL* pcPTL, bool profilePresentFlag, int maxNumSubLayersMinus1);
   void  codeProfileTier         ( const ProfileTierLevel* ptl, const bool bIsSubLayer );
-  void  codeHrdParameters       ( const HRD *hrd, bool commonInfPresentFlag, UInt maxNumSubLayersMinus1 );
+  void  codeHrdParameters       ( const HRD *hrd, bool commonInfPresentFlag, uint32_t maxNumSubLayersMinus1 );
 #if HEVC_TILES_WPP
   void  codeTilesWPPEntryPoint  ( Slice* pSlice );
 #endif
@@ -148,7 +148,7 @@ public:
   void alfFilter( const AlfSliceParam& alfSliceParam, const bool isChroma );
 
 private:
-  void xWriteTruncBinCode( UInt uiSymbol, const int uiMaxSymbol );
+  void xWriteTruncBinCode( uint32_t uiSymbol, const int uiMaxSymbol );
   void alfGolombEncode( const int coeff, const int k );
   void truncatedUnaryEqProb( int symbol, int maxSymbol );
 #endif

@@ -102,15 +102,15 @@ void BilateralFilter::destroy()
 
 void BilateralFilter::createdivToMulLUTs()
 {
-  UInt one = 1 << BITS_PER_DIV_LUT_ENTRY; // 1 is represented by 2^14 (not 2^14 -1)
+  uint32_t one = 1 << BITS_PER_DIV_LUT_ENTRY; // 1 is represented by 2^14 (not 2^14 -1)
   divToMulOneOverN[0] = one; // We can never divide by zero since the centerweight is non-zero, so we can set this value to something arbitrary.
   divToMulShift[0] = 0;
 
-  for (UInt n=1; n<BILATERAL_FILTER_MAX_DENOMINATOR_PLUS_ONE; n++)
+  for (uint32_t n=1; n<BILATERAL_FILTER_MAX_DENOMINATOR_PLUS_ONE; n++)
   {
-    UInt tryLUT = one / n;
+    uint32_t tryLUT = one / n;
 
-    UInt tryShift = 0;
+    uint32_t tryShift = 0;
     // Make sure the LUT entry stored does not start with (binary) zeros.
     while(tryLUT <= one)
     {
@@ -123,7 +123,7 @@ void BilateralFilter::createdivToMulLUTs()
     }
 
     // We may need to add 1 to the LUT entry in order to make 3/3, 4/4, 5/5, ... come out right.
-    UInt adiv = divToMulOneOverN[n] * n / (one << divToMulShift[n]);
+    uint32_t adiv = divToMulOneOverN[n] * n / (one << divToMulShift[n]);
     if(adiv != 1)
       divToMulOneOverN[n]++;
   }
@@ -568,9 +568,9 @@ void BilateralFilter::bilateralFilterInter( PelBuf& resiBuf, const CPelBuf& pred
 
   // need to be performed if residual  is used
   // Resi' = Reco' - Pred
-  for (UInt uiY = 0; uiY < uiHeight; ++uiY)
+  for (uint32_t uiY = 0; uiY < uiHeight; ++uiY)
   {
-    for (UInt uiX = 0; uiX < uiWidth; ++uiX)
+    for (uint32_t uiX = 0; uiX < uiWidth; ++uiX)
     {
       piResi[uiX] = tempblock[ uiX + uiY*uiWidth ] - piPred[uiX];
     }

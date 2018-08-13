@@ -70,11 +70,11 @@ public:
 
 private:
 #if HEVC_USE_SCALING_LISTS
-  double* xGetErrScaleCoeff              ( UInt list, UInt sizeX, UInt sizeY, int qp ) { return m_errScale             [sizeX][sizeY][list][qp]; };  //!< get Error Scale Coefficent
-  double& xGetErrScaleCoeffNoScalingList ( UInt list, UInt sizeX, UInt sizeY, int qp ) { return m_errScaleNoScalingList[sizeX][sizeY][list][qp]; };  //!< get Error Scale Coefficent
+  double* xGetErrScaleCoeff              ( uint32_t list, uint32_t sizeX, uint32_t sizeY, int qp ) { return m_errScale             [sizeX][sizeY][list][qp]; };  //!< get Error Scale Coefficent
+  double& xGetErrScaleCoeffNoScalingList ( uint32_t list, uint32_t sizeX, uint32_t sizeY, int qp ) { return m_errScaleNoScalingList[sizeX][sizeY][list][qp]; };  //!< get Error Scale Coefficent
   void    xInitScalingList               ( const QuantRDOQ* other );
   void    xDestroyScalingList            ();
-  void    xSetErrScaleCoeff              ( UInt list, UInt sizeX, UInt sizeY, int qp, const int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths );
+  void    xSetErrScaleCoeff              ( uint32_t list, uint32_t sizeX, uint32_t sizeY, int qp, const int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE], const BitDepths &bitDepths );
 #else
   double  xGetErrScaleCoeff              ( SizeType width, SizeType height, int qp, const int maxLog2TrDynamicRange, const int channelBitDepth);
 #endif
@@ -83,11 +83,11 @@ private:
   void xRateDistOptQuant(TransformUnit &tu, const ComponentID &compID, const CCoeffBuf &pSrc, TCoeff &uiAbsSum, const QpParam &cQP, const Ctx &ctx);
 
 #if JVET_K0072
-  inline UInt xGetCodedLevel( double&            rd64CodedCost,
+  inline uint32_t xGetCodedLevel( double&            rd64CodedCost,
                               double&            rd64CodedCost0,
                               double&            rd64CodedCostSig,
                               Intermediate_Int   lLevelDouble,
-                              UInt               uiMaxAbsLevel,
+                              uint32_t               uiMaxAbsLevel,
                               const BinFracBits* fracBitsSig,
                               const BinFracBits& fracBitsPar,
                               const BinFracBits& fracBitsGt1,
@@ -98,7 +98,7 @@ private:
                               bool               bLast,
                               bool               useLimitedPrefixLength,
                               const int          maxLog2TrDynamicRange ) const;
-  inline int xGetICRate     ( const UInt         uiAbsLevel,
+  inline int xGetICRate     ( const uint32_t         uiAbsLevel,
                               const BinFracBits& fracBitsPar,
                               const BinFracBits& fracBitsGt1,
                               const BinFracBits& fracBitsGt2,
@@ -106,11 +106,11 @@ private:
                               const bool         useLimitedPrefixLength,
                               const int          maxLog2TrDynamicRange  ) const;
 #else
-  inline UInt xGetCodedLevel  ( double&             rd64CodedCost,
+  inline uint32_t xGetCodedLevel  ( double&             rd64CodedCost,
                                 double&             rd64CodedCost0,
                                 double&             rd64CodedCostSig,
                                 Intermediate_Int    lLevelDouble,
-                                UInt                uiMaxAbsLevel,
+                                uint32_t                uiMaxAbsLevel,
                                 const BinFracBits*  fracBitsSig,
                                 const BinFracBits&  fracBitsOne,
                                 const BinFracBits&  fracBitsAbs,
@@ -118,23 +118,23 @@ private:
                                 const bool          useAltRC,
 #endif
                                 uint16_t              ui16AbsGoRice,
-                                UInt                c1Idx,
-                                UInt                c2Idx,
+                                uint32_t                c1Idx,
+                                uint32_t                c2Idx,
                                 int                 iQBits,
                                 double              errorScale,
                                 bool                bLast,
                                 bool                useLimitedPrefixLength,
                                 const int           maxLog2TrDynamicRange
                               ) const;
-  inline int xGetICRate  ( const UInt         uiAbsLevel,
+  inline int xGetICRate  ( const uint32_t         uiAbsLevel,
                            const BinFracBits& fracBitsOne,
                            const BinFracBits& fracBitsAbs,
 #if JEM_TOOLS
                            const bool         useAltRC,
 #endif
                            const uint16_t       ui16AbsGoRice,
-                           const UInt         c1Idx,
-                           const UInt         c2Idx,
+                           const uint32_t         c1Idx,
+                           const uint32_t         c2Idx,
                            const bool         useLimitedPrefixLength,
                            const int          maxLog2TrDynamicRange
                          ) const;

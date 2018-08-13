@@ -87,21 +87,21 @@ protected:
   virtual ~VLCReader() {};
 
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
-  void  xReadCode    ( UInt   length, UInt& val, const char *pSymbolName );
-  void  xReadUvlc    (                UInt& val, const char *pSymbolName );
+  void  xReadCode    ( uint32_t   length, uint32_t& val, const char *pSymbolName );
+  void  xReadUvlc    (                uint32_t& val, const char *pSymbolName );
   void  xReadSvlc    (                 int& val, const char *pSymbolName );
-  void  xReadFlag    (                UInt& val, const char *pSymbolName );
+  void  xReadFlag    (                uint32_t& val, const char *pSymbolName );
 #else
-  void  xReadCode    ( UInt   length, UInt& val );
-  void  xReadUvlc    (                UInt& val );
+  void  xReadCode    ( uint32_t   length, uint32_t& val );
+  void  xReadUvlc    (                uint32_t& val );
   void  xReadSvlc    (                 int& val );
-  void  xReadFlag    (                UInt& val );
+  void  xReadFlag    (                uint32_t& val );
 #endif
 #if ENABLE_TRACING
-  void  xReadCodeTr  ( UInt  length, UInt& rValue, const char *pSymbolName );
-  void  xReadUvlcTr  (               UInt& rValue, const char *pSymbolName );
+  void  xReadCodeTr  ( uint32_t  length, uint32_t& rValue, const char *pSymbolName );
+  void  xReadUvlcTr  (               uint32_t& rValue, const char *pSymbolName );
   void  xReadSvlcTr  (                int& rValue, const char *pSymbolName );
-  void  xReadFlagTr  (               UInt& rValue, const char *pSymbolName );
+  void  xReadFlagTr  (               uint32_t& rValue, const char *pSymbolName );
 #endif
 public:
   void  setBitstream ( InputBitstream* p )   { m_pcBitstream = p; }
@@ -118,7 +118,7 @@ class AUDReader: public VLCReader
 public:
   AUDReader() {};
   virtual ~AUDReader() {};
-  void parseAccessUnitDelimiter(InputBitstream* bs, UInt &picType);
+  void parseAccessUnitDelimiter(InputBitstream* bs, uint32_t &picType);
 };
 
 
@@ -128,7 +128,7 @@ class FDReader: public VLCReader
 public:
   FDReader() {};
   virtual ~FDReader() {};
-  void parseFillerData(InputBitstream* bs, UInt &fdSize);
+  void parseFillerData(InputBitstream* bs, uint32_t &fdSize);
 };
 
 
@@ -156,15 +156,15 @@ public:
   void  parseVUI            ( VUI* pcVUI, SPS* pcSPS );
   void  parsePTL            ( PTL *rpcPTL, bool profilePresentFlag, int maxNumSubLayersMinus1 );
   void  parseProfileTier    ( ProfileTierLevel *ptl, const bool bIsSubLayer );
-  void  parseHrdParameters  ( HRD *hrd, bool cprms_present_flag, UInt tempLevelHigh );
+  void  parseHrdParameters  ( HRD *hrd, bool cprms_present_flag, uint32_t tempLevelHigh );
   void  parseSliceHeader    ( Slice* pcSlice, ParameterSetManager *parameterSetManager, const int prevTid0POC );
-  void  parseTerminatingBit ( UInt& ruiBit );
+  void  parseTerminatingBit ( uint32_t& ruiBit );
   void  parseRemainingBytes ( bool noTrailingBytesExpected );
 
   void  parsePredWeightTable( Slice* pcSlice, const SPS *sps );
 #if HEVC_USE_SCALING_LISTS
   void  parseScalingList    ( ScalingList* scalingList );
-  void  decodeScalingList   ( ScalingList *scalingList, UInt sizeId, UInt listId);
+  void  decodeScalingList   ( ScalingList *scalingList, uint32_t sizeId, uint32_t listId);
 #endif
 
 #if JVET_K0371_ALF
@@ -173,7 +173,7 @@ public:
 
 private:
   int truncatedUnaryEqProb( const int maxSymbol );
-  void xReadTruncBinCode( UInt& ruiSymbol, const int uiMaxSymbol );
+  void xReadTruncBinCode( uint32_t& ruiSymbol, const int uiMaxSymbol );
   int  alfGolombDecode( const int k );
 #endif
 

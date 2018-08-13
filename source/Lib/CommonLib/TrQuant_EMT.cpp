@@ -1200,7 +1200,7 @@ void fastForwardDCT2_B128(const TCoeff *src, TCoeff *dst, int shift, int line, i
     dst++;
   }
 
-  const UInt uiTrSize = 128;
+  const uint32_t uiTrSize = 128;
   const int  reducedLine = line - iSkipLine;
   const int  cutoff = uiTrSize - iSkipLine2;
   if (iSkipLine)

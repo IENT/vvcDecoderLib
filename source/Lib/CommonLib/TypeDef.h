@@ -353,13 +353,6 @@
 #endif
 
 // ====================================================================================================================
-// Basic type redefinition
-// ====================================================================================================================
-
-typedef       unsigned int        UInt;
-
-
-// ====================================================================================================================
 // Named numerical types
 // ====================================================================================================================
 
@@ -376,7 +369,7 @@ typedef       int             TCoeff;            ///< transform coefficient
 typedef       int16_t           TMatrixCoeff;      ///< transform matrix coefficient
 typedef       int16_t           TFilterCoeff;      ///< filter coefficient
 typedef       int             Intermediate_Int;  ///< used as intermediate value in calculations
-typedef       UInt            Intermediate_UInt; ///< used as intermediate value in calculations
+typedef       uint32_t            Intermediate_UInt; ///< used as intermediate value in calculations
 #endif
 
 typedef       uint64_t          SplitSeries;       ///< used to encoded the splits that caused a particular CU size
@@ -387,7 +380,7 @@ typedef       uint64_t        Distortion;        ///< distortion measurement
 #if FULL_NBIT
 typedef       uint64_t          Distortion;        ///< distortion measurement
 #else
-typedef       UInt            Distortion;        ///< distortion measurement
+typedef       uint32_t            Distortion;        ///< distortion measurement
 #endif
 #endif
 
@@ -1095,13 +1088,13 @@ struct ALFParam
   int *coeff_chroma;                      ///< filter coefficient array (chroma)
 
   //CU Adaptation
-  UInt num_alf_cu_flag;
-  UInt alf_max_depth;
+  uint32_t num_alf_cu_flag;
+  uint32_t alf_max_depth;
   bool *alf_cu_flag;
 
   //Coeff send related
-  UInt num_ctus_in_frame;
-  UInt maxCodingDepth;
+  uint32_t num_ctus_in_frame;
+  uint32_t maxCodingDepth;
 
   int codedVarBins[NUM_OF_ALF_CLASSES];
   int filters_per_group_diff; //this can be updated using codedVarBins
@@ -1147,7 +1140,7 @@ struct PictureHash
     {
       return false;
     }
-    for(UInt i=0; i<UInt(hash.size()); i++)
+    for(uint32_t i=0; i<uint32_t(hash.size()); i++)
     {
       if (other.hash[i] != hash[i])
       {
@@ -1201,8 +1194,8 @@ struct SEITimeSet
 struct SEIMasteringDisplay
 {
   bool      colourVolumeSEIEnabled;
-  UInt      maxLuminance;
-  UInt      minLuminance;
+  uint32_t      maxLuminance;
+  uint32_t      minLuminance;
   uint16_t    primaries[3][2];
   uint16_t    whitePoint[2];
 };

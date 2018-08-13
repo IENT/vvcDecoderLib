@@ -245,9 +245,9 @@ protected:
   int       m_nBitIncrement;
   int       m_nIBDIMax;
   ClpRngs   m_clpRngs;
-  UInt      m_uiMaxTotalCUDepth;
-  UInt      m_uiMaxCUWidth;
-  UInt      m_uiNumCUsInFrame; //TODO rename
+  uint32_t      m_uiMaxTotalCUDepth;
+  uint32_t      m_uiMaxCUWidth;
+  uint32_t      m_uiNumCUsInFrame; //TODO rename
 
   Pel**     m_imgY_var;
   int**     m_imgY_temp;
@@ -329,7 +329,7 @@ public:
   virtual ~AdaptiveLoopFilter() {}
 
   // initialize & destroy temporary buffer
-  void create( const int iPicWidth, int iPicHeight, const ChromaFormat chromaFormatIDC, const int uiMaxCUWidth, const UInt uiMaxCUHeight, const UInt uiMaxCUDepth, const int nInputBitDepth, const int nInternalBitDepth, const int numberOfCTUs );
+  void create( const int iPicWidth, int iPicHeight, const ChromaFormat chromaFormatIDC, const int uiMaxCUWidth, const uint32_t uiMaxCUHeight, const uint32_t uiMaxCUDepth, const int nInputBitDepth, const int nInternalBitDepth, const int numberOfCTUs );
   void destroy ();
 
   void ALFProcess     ( CodingStructure& cs, ALFParam* pcAlfParam
@@ -345,7 +345,7 @@ public:
 
   void resetALFParam  ( ALFParam* pDesAlfParam);
   void resetALFPredParam(ALFParam *pAlfParam, bool bIntra);
-  void setNumCUsInFrame(UInt uiNumCUsInFrame);
+  void setNumCUsInFrame(uint32_t uiNumCUsInFrame);
 
   // predict filter coefficients
   void predictALFCoeffChroma  ( ALFParam* pAlfParam );                  ///< prediction of chroma ALF coefficients

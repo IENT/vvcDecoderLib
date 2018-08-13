@@ -247,7 +247,7 @@ private:
 // Class definition
 // ====================================================================================================================
 
-typedef AreaBuf<UInt>  UIntBuf;
+typedef AreaBuf<uint32_t>  UIntBuf;
 
 #define ROUND(a)  (((a) < 0)? (int)((a) - 0.5) : (int)((a) + 0.5))
 
@@ -289,7 +289,7 @@ public:
            EncAdaptiveLoopFilter ();
   virtual ~EncAdaptiveLoopFilter (){}
 
-  void create                      ( const int iPicWidth, int iPicHeight, const ChromaFormat chromaFormatIDC, const int uiMaxCUWidth, const UInt uiMaxCUHeight, const UInt uiMaxCUDepth , const int nInputBitDepth, const int nInternalBitDepth, const int numberOfCTUs );
+  void create                      ( const int iPicWidth, int iPicHeight, const ChromaFormat chromaFormatIDC, const int uiMaxCUWidth, const uint32_t uiMaxCUHeight, const uint32_t uiMaxCUDepth , const int nInputBitDepth, const int nInternalBitDepth, const int numberOfCTUs );
   void init                        ( CodingStructure& cs, CABACDataStore* cabacDataStore, CABACEncoder* cabacEncoder );
   void destroy                     ();
 
@@ -312,7 +312,7 @@ private:
   void  xSetInitialMask            ( const CPelBuf& recBufExt );
   void  xInitFixedFilters();
   void  xCheckCUAdaptation         ( CodingStructure& cs, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, uint64_t& ruiMinRate, uint64_t& ruiMinDist, double& rdMinCost );
-  void  xSetCUAlfCtrlFlags         ( CodingStructure& cs, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, uint64_t& ruiDist, UInt uiAlfCtrlDepth, ALFParam *pAlfParam );
+  void  xSetCUAlfCtrlFlags         ( CodingStructure& cs, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, uint64_t& ruiDist, uint32_t uiAlfCtrlDepth, ALFParam *pAlfParam );
   void  xSetCUAlfCtrlFlag          ( CodingStructure& cs, const UnitArea alfCtrlArea, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, uint64_t& ruiDist, ALFParam *pAlfParam);
 #if COM16_C806_ALF_TEMPPRED_NUM
   bool xFilteringLumaChroma(CodingStructure& cs, ALFParam *pAlfParam, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, uint64_t& ruiMinRate, uint64_t& ruiMinDist, double& rdMinCost, int uiIndex, const Slice* pSlice);

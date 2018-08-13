@@ -344,13 +344,13 @@ void EncGOP::init ( EncLib* pcEncLib )
 #elif JEM_TOOLS
   m_pcALF                = pcEncLib->getALF();
 #if COM16_C806_ALF_TEMPPRED_NUM
-  UInt uiMaxCUWidth = m_pcCfg->getMaxCUWidth();
-  UInt uiMaxCUHeight = m_pcCfg->getMaxCUHeight();
-  UInt uiPicWidth = m_pcCfg->getSourceWidth();
-  UInt uiPicHeight = m_pcCfg->getSourceHeight();
-  UInt uiWidthInCU = (uiPicWidth %uiMaxCUWidth) ? uiPicWidth / uiMaxCUWidth + 1 : uiPicWidth / uiMaxCUWidth;
-  UInt uiHeightInCU = (uiPicHeight%uiMaxCUHeight) ? uiPicHeight / uiMaxCUHeight + 1 : uiPicHeight / uiMaxCUHeight;
-  UInt uiNumCUsInFrame = uiWidthInCU * uiHeightInCU;
+  uint32_t uiMaxCUWidth = m_pcCfg->getMaxCUWidth();
+  uint32_t uiMaxCUHeight = m_pcCfg->getMaxCUHeight();
+  uint32_t uiPicWidth = m_pcCfg->getSourceWidth();
+  uint32_t uiPicHeight = m_pcCfg->getSourceHeight();
+  uint32_t uiWidthInCU = (uiPicWidth %uiMaxCUWidth) ? uiPicWidth / uiMaxCUWidth + 1 : uiPicWidth / uiMaxCUWidth;
+  uint32_t uiHeightInCU = (uiPicHeight%uiMaxCUHeight) ? uiPicHeight / uiMaxCUHeight + 1 : uiPicHeight / uiMaxCUHeight;
+  uint32_t uiNumCUsInFrame = uiWidthInCU * uiHeightInCU;
   m_pcALF->setNumCUsInFrame(uiNumCUsInFrame);
 #endif
 #endif
@@ -808,7 +808,7 @@ void EncGOP::xCreatePictureTimingSEI  (int IRAPGOPid, SEIMessages& seiMessages, 
     // DU parameters
     if( hrd->getSubPicCpbParamsPresentFlag() )
     {
-      UInt numDU = (UInt) duData.size();
+      uint32_t numDU = (uint32_t) duData.size();
       pictureTimingSEI->m_numDecodingUnitsMinus1     = ( numDU - 1 );
       pictureTimingSEI->m_duCommonCpbRemovalDelayFlag = false;
       pictureTimingSEI->m_numNalusInDuMinus1.resize( numDU );
@@ -836,10 +836,10 @@ void EncGOP::xCreatePictureTimingSEI  (int IRAPGOPid, SEIMessages& seiMessages, 
     {
       int i;
       uint64_t ui64Tmp;
-      UInt uiPrev = 0;
-      UInt numDU = ( pictureTimingSEI->m_numDecodingUnitsMinus1 + 1 );
-      std::vector<UInt> &rDuCpbRemovalDelayMinus1 = pictureTimingSEI->m_duCpbRemovalDelayMinus1;
-      UInt maxDiff = ( hrd->getTickDivisorMinus2() + 2 ) - 1;
+      uint32_t uiPrev = 0;
+      uint32_t numDU = ( pictureTimingSEI->m_numDecodingUnitsMinus1 + 1 );
+      std::vector<uint32_t> &rDuCpbRemovalDelayMinus1 = pictureTimingSEI->m_duCpbRemovalDelayMinus1;
+      uint32_t maxDiff = ( hrd->getTickDivisorMinus2() + 2 ) - 1;
 
       for( i = 0; i < numDU; i ++ )
       {
@@ -853,26 +853,26 @@ void EncGOP::xCreatePictureTimingSEI  (int IRAPGOPid, SEIMessages& seiMessages, 
       else
       {
         rDuCpbRemovalDelayMinus1[ numDU - 1 ] = 0;/* by definition */
-        UInt tmp = 0;
-        UInt accum = 0;
+        uint32_t tmp = 0;
+        uint32_t accum = 0;
 
         for( i = ( numDU - 2 ); i >= 0; i -- )
         {
           ui64Tmp = ( ( ( duData[numDU - 1].accumBitsDU  - duData[i].accumBitsDU ) * ( vui->getTimingInfo()->getTimeScale() / vui->getTimingInfo()->getNumUnitsInTick() ) * ( hrd->getTickDivisorMinus2() + 2 ) ) / ( m_pcCfg->getTargetBitrate() ) );
-          if( (UInt)ui64Tmp > maxDiff )
+          if( (uint32_t)ui64Tmp > maxDiff )
           {
             tmp ++;
           }
         }
         uiPrev = 0;
 
-        UInt flag = 0;
+        uint32_t flag = 0;
         for( i = ( numDU - 2 ); i >= 0; i -- )
         {
           flag = 0;
           ui64Tmp = ( ( ( duData[numDU - 1].accumBitsDU  - duData[i].accumBitsDU ) * ( vui->getTimingInfo()->getTimeScale() / vui->getTimingInfo()->getNumUnitsInTick() ) * ( hrd->getTickDivisorMinus2() + 2 ) ) / ( m_pcCfg->getTargetBitrate() ) );
 
-          if( (UInt)ui64Tmp > maxDiff )
+          if( (uint32_t)ui64Tmp > maxDiff )
           {
             if(uiPrev >= maxDiff - tmp)
             {
@@ -881,7 +881,7 @@ void EncGOP::xCreatePictureTimingSEI  (int IRAPGOPid, SEIMessages& seiMessages, 
             }
             else                            ui64Tmp = maxDiff - tmp + 1;
           }
-          rDuCpbRemovalDelayMinus1[ i ] = (UInt)ui64Tmp - uiPrev - 1;
+          rDuCpbRemovalDelayMinus1[ i ] = (uint32_t)ui64Tmp - uiPrev - 1;
           if( (int)rDuCpbRemovalDelayMinus1[ i ] < 0 )
           {
             rDuCpbRemovalDelayMinus1[ i ] = 0;
@@ -937,11 +937,11 @@ void EncGOP::xUpdateDuData(AccessUnit &testAU, std::deque<DUData> &duData)
     return;
   }
   // fix first
-  UInt numNalUnits = (UInt)testAU.size();
-  UInt numRBSPBytes = 0;
+  uint32_t numNalUnits = (uint32_t)testAU.size();
+  uint32_t numRBSPBytes = 0;
   for (AccessUnit::const_iterator it = testAU.begin(); it != testAU.end(); it++)
   {
-    numRBSPBytes += UInt((*it)->m_nalUnitData.str().size());
+    numRBSPBytes += uint32_t((*it)->m_nalUnitData.str().size());
   }
   duData[0].accumBitsDU += ( numRBSPBytes << 3 );
   duData[0].accumNalsDU += numNalUnits;
@@ -979,10 +979,10 @@ void EncGOP::xUpdateTimingSEI(SEIPictureTiming *pictureTimingSEI, std::deque<DUD
   {
     int i;
     uint64_t ui64Tmp;
-    UInt uiPrev = 0;
-    UInt numDU = ( pictureTimingSEI->m_numDecodingUnitsMinus1 + 1 );
-    std::vector<UInt> &rDuCpbRemovalDelayMinus1 = pictureTimingSEI->m_duCpbRemovalDelayMinus1;
-    UInt maxDiff = ( hrd->getTickDivisorMinus2() + 2 ) - 1;
+    uint32_t uiPrev = 0;
+    uint32_t numDU = ( pictureTimingSEI->m_numDecodingUnitsMinus1 + 1 );
+    std::vector<uint32_t> &rDuCpbRemovalDelayMinus1 = pictureTimingSEI->m_duCpbRemovalDelayMinus1;
+    uint32_t maxDiff = ( hrd->getTickDivisorMinus2() + 2 ) - 1;
 
     for( i = 0; i < numDU; i ++ )
     {
@@ -996,26 +996,26 @@ void EncGOP::xUpdateTimingSEI(SEIPictureTiming *pictureTimingSEI, std::deque<DUD
     else
     {
       rDuCpbRemovalDelayMinus1[ numDU - 1 ] = 0;/* by definition */
-      UInt tmp = 0;
-      UInt accum = 0;
+      uint32_t tmp = 0;
+      uint32_t accum = 0;
 
       for( i = ( numDU - 2 ); i >= 0; i -- )
       {
         ui64Tmp = ( ( ( duData[numDU - 1].accumBitsDU  - duData[i].accumBitsDU ) * ( vui->getTimingInfo()->getTimeScale() / vui->getTimingInfo()->getNumUnitsInTick() ) * ( hrd->getTickDivisorMinus2() + 2 ) ) / ( m_pcCfg->getTargetBitrate() ) );
-        if( (UInt)ui64Tmp > maxDiff )
+        if( (uint32_t)ui64Tmp > maxDiff )
         {
           tmp ++;
         }
       }
       uiPrev = 0;
 
-      UInt flag = 0;
+      uint32_t flag = 0;
       for( i = ( numDU - 2 ); i >= 0; i -- )
       {
         flag = 0;
         ui64Tmp = ( ( ( duData[numDU - 1].accumBitsDU  - duData[i].accumBitsDU ) * ( vui->getTimingInfo()->getTimeScale() / vui->getTimingInfo()->getNumUnitsInTick() ) * ( hrd->getTickDivisorMinus2() + 2 ) ) / ( m_pcCfg->getTargetBitrate() ) );
 
-        if( (UInt)ui64Tmp > maxDiff )
+        if( (uint32_t)ui64Tmp > maxDiff )
         {
           if(uiPrev >= maxDiff - tmp)
           {
@@ -1024,7 +1024,7 @@ void EncGOP::xUpdateTimingSEI(SEIPictureTiming *pictureTimingSEI, std::deque<DUD
           }
           else                            ui64Tmp = maxDiff - tmp + 1;
         }
-        rDuCpbRemovalDelayMinus1[ i ] = (UInt)ui64Tmp - uiPrev - 1;
+        rDuCpbRemovalDelayMinus1[ i ] = (uint32_t)ui64Tmp - uiPrev - 1;
         if( (int)rDuCpbRemovalDelayMinus1[ i ] < 0 )
         {
           rDuCpbRemovalDelayMinus1[ i ] = 0;
@@ -1089,11 +1089,11 @@ cabac_zero_word_padding(Slice *const pcSlice, Picture *const pcPic, const std::s
           zeroBytesPadding[i*3+2]=3;  // 00 00 03
         }
         nalUnitData.write(reinterpret_cast<const char*>(&(zeroBytesPadding[0])), numberOfAdditionalCabacZeroBytes);
-        msg( NOTICE, "Adding %d bytes of padding\n", UInt( numberOfAdditionalCabacZeroWords * 3 ) );
+        msg( NOTICE, "Adding %d bytes of padding\n", uint32_t( numberOfAdditionalCabacZeroWords * 3 ) );
       }
       else
       {
-        msg( NOTICE, "Standard would normally require adding %d bytes of padding\n", UInt( numberOfAdditionalCabacZeroWords * 3 ) );
+        msg( NOTICE, "Standard would normally require adding %d bytes of padding\n", uint32_t( numberOfAdditionalCabacZeroWords * 3 ) );
       }
     }
   }
@@ -1229,7 +1229,7 @@ int EfficientFieldIRAPMapping::restoreGOPid(const int GOPid)
 
 
 #if X0038_LAMBDA_FROM_QP_CAPABILITY
-static UInt calculateCollocatedFromL0Flag(const Slice *pSlice)
+static uint32_t calculateCollocatedFromL0Flag(const Slice *pSlice)
 {
   const int refIdx = 0; // Zero always assumed
   const Picture *refPicL0 = pSlice->getRefPic(REF_PIC_LIST_0, refIdx);
@@ -1237,7 +1237,7 @@ static UInt calculateCollocatedFromL0Flag(const Slice *pSlice)
   return refPicL0->slices[0]->getSliceQp() > refPicL1->slices[0]->getSliceQp();
 }
 #else
-static UInt calculateCollocatedFromL1Flag(EncCfg *pCfg, const int GOPid, const int gopSize)
+static uint32_t calculateCollocatedFromL1Flag(EncCfg *pCfg, const int GOPid, const int gopSize)
 {
   int iCloseLeft=1, iCloseRight=-1;
   for(int i = 0; i<pCfg->getGOPEntry(GOPid).m_numRefPics; i++)
@@ -1529,7 +1529,7 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
     auto beforeTime = std::chrono::steady_clock::now();
 
 #if !X0038_LAMBDA_FROM_QP_CAPABILITY
-    UInt uiColDir = calculateCollocatedFromL1Flag(m_pcCfg, iGOPid, m_iGopSize);
+    uint32_t uiColDir = calculateCollocatedFromL1Flag(m_pcCfg, iGOPid, m_iGopSize);
 #endif
 
     /////////////////////////////////////////////////////////////////////////////////////////////////// Initial to start encoding
@@ -1838,7 +1838,7 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
     if (pcSlice->getSliceType() == B_SLICE)
     {
 #if X0038_LAMBDA_FROM_QP_CAPABILITY
-      const UInt uiColFromL0 = calculateCollocatedFromL0Flag(pcSlice);
+      const uint32_t uiColFromL0 = calculateCollocatedFromL0Flag(pcSlice);
       pcSlice->setColFromL0Flag(uiColFromL0);
 #else
       pcSlice->setColFromL0Flag(1-uiColDir);
@@ -2090,7 +2090,7 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
       m_pcSliceEncoder->resetQP( pcPic, sliceQP, lambda );
     }
 
-    UInt uiNumSliceSegments = 1;
+    uint32_t uiNumSliceSegments = 1;
 
 #if JEM_TOOLS
     // set adaptive clipping bounds for current slice
@@ -2112,7 +2112,7 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
     }
 
     // Allocate some coders, now the number of tiles are known.
-    const UInt numberOfCtusInFrame = pcPic->cs->pcv->sizeInCtus;
+    const uint32_t numberOfCtusInFrame = pcPic->cs->pcv->sizeInCtus;
 #if HEVC_TILES_WPP
     const int numSubstreamsColumns = (pcSlice->getPPS()->getNumTileColumnsMinus1() + 1);
     const int numSubstreamRows     = pcSlice->getPPS()->getEntropyCodingSyncEnabledFlag() ? pcPic->cs->pcv->heightInCtus : (pcSlice->getPPS()->getNumTileRowsMinus1() + 1);
@@ -2169,18 +2169,18 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
       pcSlice->setSliceSegmentCurStartCtuTsAddr( 0 );
 #endif
 
-      for(UInt nextCtuTsAddr = 0; nextCtuTsAddr < numberOfCtusInFrame; )
+      for(uint32_t nextCtuTsAddr = 0; nextCtuTsAddr < numberOfCtusInFrame; )
       {
         m_pcSliceEncoder->precompressSlice( pcPic );
         m_pcSliceEncoder->compressSlice   ( pcPic, false, false );
 
 #if HEVC_DEPENDENT_SLICES
-        const UInt curSliceSegmentEnd = pcSlice->getSliceSegmentCurEndCtuTsAddr();
+        const uint32_t curSliceSegmentEnd = pcSlice->getSliceSegmentCurEndCtuTsAddr();
         if (curSliceSegmentEnd < numberOfCtusInFrame)
         {
           const bool bNextSegmentIsDependentSlice = curSliceSegmentEnd < pcSlice->getSliceCurEndCtuTsAddr();
-          const UInt sliceBits                    = pcSlice->getSliceBits();
-          UInt independentSliceIdx                = pcSlice->getIndependentSliceIdx();
+          const uint32_t sliceBits                    = pcSlice->getSliceBits();
+          uint32_t independentSliceIdx                = pcSlice->getIndependentSliceIdx();
           pcPic->allocateNewSlice();
           // prepare for next slice
           m_pcSliceEncoder->setSliceSegmentIdx      ( uiNumSliceSegments   );
@@ -2207,10 +2207,10 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
         }
         nextCtuTsAddr = curSliceSegmentEnd;
 #else
-        const UInt curSliceEnd = pcSlice->getSliceCurEndCtuTsAddr();
+        const uint32_t curSliceEnd = pcSlice->getSliceCurEndCtuTsAddr();
         if(curSliceEnd < numberOfCtusInFrame)
         {
-          UInt independentSliceIdx = pcSlice->getIndependentSliceIdx();
+          uint32_t independentSliceIdx = pcSlice->getIndependentSliceIdx();
           pcPic->allocateNewSlice();
           m_pcSliceEncoder->setSliceSegmentIdx      (uiNumSliceSegments);
           // prepare for next slice
@@ -2303,8 +2303,8 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
 
       if( pcSlice->getSPS()->getSpsNext().getALFEnabled() )
       {
-        const UInt tidxMAX  = E0104_ALF_MAX_TEMPLAYERID - 1u;
-        const UInt tidx     = pcSlice->getTLayer();
+        const uint32_t tidxMAX  = E0104_ALF_MAX_TEMPLAYERID - 1u;
+        const uint32_t tidx     = pcSlice->getTLayer();
         CHECK( tidx > tidxMAX, "index out of range" );
 
         m_pcALF->init( cs, m_pcEncLib->getCABACDataStore(), m_pcEncLib->getCABACEncoder() );
@@ -2337,8 +2337,8 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
 #if !JVET_K0371_ALF
       if( pcSlice->getSPS()->getSpsNext().getALFEnabled() )
       {
-        const UInt tidxMAX  = E0104_ALF_MAX_TEMPLAYERID - 1u;
-        const UInt tidx     = pcSlice->getTLayer();
+        const uint32_t tidxMAX  = E0104_ALF_MAX_TEMPLAYERID - 1u;
+        const uint32_t tidx     = pcSlice->getTLayer();
         CHECK( tidx > tidxMAX, "index out of range" );
         ALFParam& cAlfParam = pcPic->getALFParam();
 
@@ -2403,9 +2403,9 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
       std::size_t numBytesInVclNalUnits = 0; // For implementation of cabac_zero_word stuffing (section 7.4.3.10)
 
 #if HEVC_DEPENDENT_SLICES
-      for( UInt sliceSegmentStartCtuTsAddr = 0, sliceSegmentIdxCount=0; sliceSegmentStartCtuTsAddr < numberOfCtusInFrame; sliceSegmentIdxCount++, sliceSegmentStartCtuTsAddr=pcSlice->getSliceSegmentCurEndCtuTsAddr() )
+      for( uint32_t sliceSegmentStartCtuTsAddr = 0, sliceSegmentIdxCount=0; sliceSegmentStartCtuTsAddr < numberOfCtusInFrame; sliceSegmentIdxCount++, sliceSegmentStartCtuTsAddr=pcSlice->getSliceSegmentCurEndCtuTsAddr() )
 #else
-      for(UInt sliceSegmentStartCtuTsAddr = 0, sliceSegmentIdxCount = 0; sliceSegmentStartCtuTsAddr < numberOfCtusInFrame; sliceSegmentIdxCount++, sliceSegmentStartCtuTsAddr = pcSlice->getSliceCurEndCtuTsAddr())
+      for(uint32_t sliceSegmentStartCtuTsAddr = 0, sliceSegmentIdxCount = 0; sliceSegmentStartCtuTsAddr < numberOfCtusInFrame; sliceSegmentIdxCount++, sliceSegmentStartCtuTsAddr = pcSlice->getSliceCurEndCtuTsAddr())
 #endif
       {
         pcSlice = pcPic->slices[sliceSegmentIdxCount];
@@ -2418,7 +2418,7 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
         pcSlice->setRPS   (pcPic->slices[0]->getRPS());
         pcSlice->setRPSidx(pcPic->slices[0]->getRPSidx());
 
-        for ( UInt ui = 0 ; ui < numSubstreams; ui++ )
+        for ( uint32_t ui = 0 ; ui < numSubstreams; ui++ )
         {
           substreamsOut[ui].clear();
         }
@@ -2453,7 +2453,7 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
 
         pcSlice->clearSubstreamSizes(  );
         {
-          UInt numBinsCoded = 0;
+          uint32_t numBinsCoded = 0;
           m_pcSliceEncoder->encodeSlice(pcPic, &(substreamsOut[0]), numBinsCoded);
           binCountsInNalUnits+=numBinsCoded;
         }
@@ -2487,7 +2487,7 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
           const int numZeroSubstreamsAtStartOfSlice  = 0;
           const int numSubstreamsToCode  = pcSlice->getNumberOfSubstreamSizes()+1;
 #endif
-          for ( UInt ui = 0 ; ui < numSubstreamsToCode; ui++ )
+          for ( uint32_t ui = 0 ; ui < numSubstreamsToCode; ui++ )
           {
             pcOut->addSubstream(&(substreamsOut[ui+numZeroSubstreamsAtStartOfSlice]));
           }
@@ -2498,7 +2498,7 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
         bool bNALUAlignedWrittenToList    = false; // used to ensure current NALU is not written more than once to the NALU list.
         xAttachSliceDataToNalUnit(nalu, pcBitstreamRedirect);
         accessUnit.push_back(new NALUnitEBSP(nalu));
-        actualTotalBits += UInt(accessUnit.back()->m_nalUnitData.str().size()) * 8;
+        actualTotalBits += uint32_t(accessUnit.back()->m_nalUnitData.str().size()) * 8;
         numBytesInVclNalUnits += (std::size_t)(accessUnit.back()->m_nalUnitData.str().size());
         bNALUAlignedWrittenToList = true;
 
@@ -2514,11 +2514,11 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
            || ( pcSlice->getSPS()->getVuiParameters()->getHrdParameters()->getVclHrdParametersPresentFlag() ) ) &&
             ( pcSlice->getSPS()->getVuiParameters()->getHrdParameters()->getSubPicCpbParamsPresentFlag() ) )
         {
-            UInt numNalus = 0;
-          UInt numRBSPBytes = 0;
+            uint32_t numNalus = 0;
+          uint32_t numRBSPBytes = 0;
           for (AccessUnit::const_iterator it = accessUnit.begin(); it != accessUnit.end(); it++)
           {
-            numRBSPBytes += UInt((*it)->m_nalUnitData.str().size());
+            numRBSPBytes += uint32_t((*it)->m_nalUnitData.str().size());
             numNalus ++;
           }
           duData.push_back(DUData());
@@ -2553,7 +2553,7 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
       if( m_pcCfg->getSEIGreenMetadataInfoSEIEnable() && pcSlice->getPOC() == ( m_pcCfg->getFramesToBeEncoded() - 1 )  )
       {
         SEIGreenMetadataInfo *seiGreenMetadataInfo = new SEIGreenMetadataInfo;
-        m_seiEncoder.initSEIGreenMetadataInfo(seiGreenMetadataInfo, (UInt)(PSNR_Y * 100 + 0.5));
+        m_seiEncoder.initSEIGreenMetadataInfo(seiGreenMetadataInfo, (uint32_t)(PSNR_Y * 100 + 0.5));
         trailingSeiMessages.push_back(seiGreenMetadataInfo);
       }
 
@@ -2630,7 +2630,7 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
 
 }
 
-void EncGOP::printOutSummary(UInt uiNumAllPicCoded, bool isField, const bool printMSEBasedSNR, const bool printSequenceMSE, const BitDepths &bitDepths)
+void EncGOP::printOutSummary(uint32_t uiNumAllPicCoded, bool isField, const bool printMSEBasedSNR, const bool printSequenceMSE, const BitDepths &bitDepths)
 {
 #if ENABLE_QPA
   const bool    useWPSNR = m_pcEncLib->getUseWPSNR();
@@ -2739,13 +2739,13 @@ uint64_t EncGOP::preLoopFilterPicAndCalcDist( Picture* pcPic )
   const CPelUnitBuf picRec = cs.getRecoBuf();
 
   uint64_t uiDist = 0;
-  for( UInt comp = 0; comp < (UInt)picRec.bufs.size(); comp++)
+  for( uint32_t comp = 0; comp < (uint32_t)picRec.bufs.size(); comp++)
   {
     const ComponentID compID = ComponentID(comp);
 #if DISTORTION_LAMBDA_BUGFIX
-    const UInt rshift = 2 * DISTORTION_PRECISION_ADJUSTMENT(cs.sps->getBitDepth(toChannelType(compID)));
+    const uint32_t rshift = 2 * DISTORTION_PRECISION_ADJUSTMENT(cs.sps->getBitDepth(toChannelType(compID)));
 #else
-    const UInt rshift = 2 * DISTORTION_PRECISION_ADJUSTMENT(cs.sps->getBitDepth(toChannelType(compID)) - 8);
+    const uint32_t rshift = 2 * DISTORTION_PRECISION_ADJUSTMENT(cs.sps->getBitDepth(toChannelType(compID)) - 8);
 #endif
 #if ENABLE_QPA
     CHECK( rshift >= 8, "shifts greater than 7 are not supported." );
@@ -2827,11 +2827,11 @@ void EncGOP::xGetBuffer( PicList&                  rcListPic,
 #endif
 #define GLOBAL_AVERAGING 1 // "global" averaging of a_k across a set instead of one picture
 #if FRAME_WEIGHTING
-static const UInt DQP[16] = { 4, 12, 11, 12,  9, 12, 11, 12,  6, 12, 11, 12,  9, 12, 11, 12 };
+static const uint32_t DQP[16] = { 4, 12, 11, 12,  9, 12, 11, 12,  6, 12, 11, 12,  9, 12, 11, 12 };
 #endif
 
 static inline double calcWeightedSquaredError(const CPelBuf& org,    const CPelBuf& rec,     double &sumAct,
-                                              const UInt imageWidth, const UInt imageHeight, const UInt offsetX,  const UInt offsetY, int blockWidth, int blockHeight)
+                                              const uint32_t imageWidth, const uint32_t imageHeight, const uint32_t offsetX,  const uint32_t offsetY, int blockWidth, int blockHeight)
 {
   const int    O = org.stride;
   const int    R = rec.stride;
@@ -2840,11 +2840,11 @@ static inline double calcWeightedSquaredError(const CPelBuf& org,    const CPelB
   const int yAct = offsetY > 0 ? 0 : 1;
   const int xAct = offsetX > 0 ? 0 : 1;
 
-  if (offsetY + (UInt)blockHeight > imageHeight) blockHeight = imageHeight - offsetY;
-  if (offsetX + (UInt)blockWidth  > imageWidth ) blockWidth  = imageWidth  - offsetX;
+  if (offsetY + (uint32_t)blockHeight > imageHeight) blockHeight = imageHeight - offsetY;
+  if (offsetX + (uint32_t)blockWidth  > imageWidth ) blockWidth  = imageWidth  - offsetX;
 
-  const int hAct = offsetY + (UInt)blockHeight < imageHeight ? blockHeight : blockHeight - 1;
-  const int wAct = offsetX + (UInt)blockWidth  < imageWidth  ? blockWidth  : blockWidth  - 1;
+  const int hAct = offsetY + (uint32_t)blockHeight < imageHeight ? blockHeight : blockHeight - 1;
+  const int wAct = offsetX + (uint32_t)blockWidth  < imageWidth  ? blockWidth  : blockWidth  - 1;
   uint64_t ssErr   = 0; // sum of squared diffs
   uint64_t saAct   = 0; // sum of abs. activity
   double msAct;
@@ -2881,9 +2881,9 @@ static inline double calcWeightedSquaredError(const CPelBuf& org,    const CPelB
 }
 #endif // ENABLE_QPA
 
-uint64_t EncGOP::xFindDistortionPlane(const CPelBuf& pic0, const CPelBuf& pic1, const UInt rshift
+uint64_t EncGOP::xFindDistortionPlane(const CPelBuf& pic0, const CPelBuf& pic1, const uint32_t rshift
 #if ENABLE_QPA
-                                  , const UInt chromaShift /*= 0*/
+                                  , const uint32_t chromaShift /*= 0*/
 #endif
                                    )
 {
@@ -2897,15 +2897,15 @@ uint64_t EncGOP::xFindDistortionPlane(const CPelBuf& pic0, const CPelBuf& pic1, 
   if( rshift > 0 )
   {
 #if ENABLE_QPA
-    const   UInt  BD = rshift;      // image bit-depth
+    const   uint32_t  BD = rshift;      // image bit-depth
     if (BD >= 8)
     {
-      const UInt   W = pic0.width;  // image width
-      const UInt   H = pic0.height; // image height
+      const uint32_t   W = pic0.width;  // image width
+      const uint32_t   H = pic0.height; // image height
       const double R = double(W * H) / (1920.0 * 1080.0);
-      const UInt   B = Clip3<UInt>(0, 128 >> chromaShift, 4 * UInt(16.0 * sqrt(R) + 0.5)); // WPSNR block size in integer multiple of 4 (for SIMD, = 64 at full-HD)
+      const uint32_t   B = Clip3<uint32_t>(0, 128 >> chromaShift, 4 * uint32_t(16.0 * sqrt(R) + 0.5)); // WPSNR block size in integer multiple of 4 (for SIMD, = 64 at full-HD)
 
-      UInt x, y;
+      uint32_t x, y;
 
       if (B < 4) // image is too small to use WPSNR, resort to traditional PSNR
       {
@@ -2981,7 +2981,7 @@ uint64_t EncGOP::xFindDistortionPlane(const CPelBuf& pic0, const CPelBuf& pic1, 
   return uiTotalDiff;
 }
 #if WCG_WPSNR
-double EncGOP::xFindDistortionPlaneWPSNR(const CPelBuf& pic0, const CPelBuf& pic1, const UInt rshift, const CPelBuf& picLuma0, 
+double EncGOP::xFindDistortionPlaneWPSNR(const CPelBuf& pic0, const CPelBuf& pic1, const uint32_t rshift, const CPelBuf& picLuma0, 
   ComponentID compID, const ChromaFormat chfmt    )
 {
   const bool    useLumaWPSNR = m_pcEncLib->getLumaLevelToDeltaQPMapping().isEnabled();
@@ -3144,7 +3144,7 @@ void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUn
   const bool bPicIsField     = pcPic->fieldPic;
   const Slice*  pcSlice      = pcPic->slices[0];
 #if ENABLE_QPA && FRAME_WEIGHTING
-  const UInt    currDQP      = (pcSlice->getPOC() % m_pcEncLib->getIntraPeriod()) == 0 ? 0 : DQP[pcSlice->getPOC() % m_pcEncLib->getGOPSize()];
+  const uint32_t    currDQP      = (pcSlice->getPOC() % m_pcEncLib->getIntraPeriod()) == 0 ? 0 : DQP[pcSlice->getPOC() % m_pcEncLib->getGOPSize()];
   const double  frameWeight  = pow(2.0, (double)currDQP / -3.0);
 
   if (useWPSNR) m_gcAnalyzeAll.addWeight(frameWeight);
@@ -3158,24 +3158,24 @@ void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUn
     CHECK(!( p.width  == o.width), "Unspecified error");
     CHECK(!( p.height == o.height), "Unspecified error");
 
-    const UInt   width  = p.width  - (m_pcEncLib->getPad(0) >> ::getComponentScaleX(compID, format));
-    const UInt   height = p.height - (m_pcEncLib->getPad(1) >> (!!bPicIsField+::getComponentScaleY(compID,format)));
+    const uint32_t   width  = p.width  - (m_pcEncLib->getPad(0) >> ::getComponentScaleX(compID, format));
+    const uint32_t   height = p.height - (m_pcEncLib->getPad(1) >> (!!bPicIsField+::getComponentScaleY(compID,format)));
 
     // create new buffers with correct dimensions
     const CPelBuf recPB(p.bufAt(0, 0), p.stride, width, height);
     const CPelBuf orgPB(o.bufAt(0, 0), o.stride, width, height);
-    const UInt    bitDepth = sps.getBitDepth(toChannelType(compID));
+    const uint32_t    bitDepth = sps.getBitDepth(toChannelType(compID));
 #if ENABLE_QPA
     const uint64_t uiSSDtemp = xFindDistortionPlane(recPB, orgPB, useWPSNR ? bitDepth : 0, ::getComponentScaleX(compID, format));
-    const UInt maxval = /*useWPSNR ? (1 << bitDepth) - 1 :*/ 255 << (bitDepth - 8); // fix with WPSNR: 1023 (4095) instead of 1020 (4080) for bit-depth 10 (12)
+    const uint32_t maxval = /*useWPSNR ? (1 << bitDepth) - 1 :*/ 255 << (bitDepth - 8); // fix with WPSNR: 1023 (4095) instead of 1020 (4080) for bit-depth 10 (12)
 #else
     const uint64_t uiSSDtemp = xFindDistortionPlane(recPB, orgPB, 0);
 #if WCG_WPSNR
   const double uiSSDtempWeighted = xFindDistortionPlaneWPSNR(recPB, orgPB, 0, org.get(COMPONENT_Y), compID, format);
 #endif
-    const UInt maxval = 255 << (bitDepth - 8);
+    const uint32_t maxval = 255 << (bitDepth - 8);
 #endif
-    const UInt size   = width * height;
+    const uint32_t size   = width * height;
     const double fRefValue = (double)maxval * maxval * size;
     dPSNR[comp]       = uiSSDtemp ? 10.0 * log10(fRefValue / (double)uiSSDtemp) : 999.99;
     MSEyuvframe[comp] = (double)uiSSDtemp / size;
@@ -3200,10 +3200,10 @@ void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUn
    *  - any AnnexB contributions (start_code_prefix, zero_byte, etc.,)
    *  - SEI NAL units
    */
-  UInt numRBSPBytes = 0;
+  uint32_t numRBSPBytes = 0;
   for (AccessUnit::const_iterator it = accessUnit.begin(); it != accessUnit.end(); it++)
   {
-    UInt numRBSPBytes_nal = UInt((*it)->m_nalUnitData.str().size());
+    uint32_t numRBSPBytes_nal = uint32_t((*it)->m_nalUnitData.str().size());
     if (m_pcCfg->getSummaryVerboseness() > 0)
     {
       msg( NOTICE, "*** %6s numBytesInNALunit: %u\n", nalUnitTypeToString((*it)->m_nalUnitType), numRBSPBytes_nal);
@@ -3226,7 +3226,7 @@ void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUn
     }
   }
 
-  UInt uibits = numRBSPBytes * 8;
+  uint32_t uibits = numRBSPBytes * 8;
   m_vRVM_RP.push_back( uibits );
 
   //===== add PSNR =====
@@ -3349,7 +3349,7 @@ void EncGOP::xCalculateInterlacedAddPSNR( Picture* pcPicOrgFirstField, Picture* 
   PelStorage cscd[2 /* first/second field */];
   if (conversion!=IPCOLOURSPACE_UNCHANGED)
   {
-    for(UInt fieldNum=0; fieldNum<2; fieldNum++)
+    for(uint32_t fieldNum=0; fieldNum<2; fieldNum++)
     {
       PelUnitBuf& reconField= (acPicRecFields[fieldNum]);
       cscd[fieldNum].create( reconField.chromaFormat, Area( Position(), reconField.Y()) );
@@ -3362,10 +3362,10 @@ void EncGOP::xCalculateInterlacedAddPSNR( Picture* pcPicOrgFirstField, Picture* 
   double MSEyuvframe[MAX_NUM_COMPONENT] = {0, 0, 0};
 
   CHECK(!(acPicRecFields[0].chromaFormat==acPicRecFields[1].chromaFormat), "Unspecified error");
-  const UInt numValidComponents = ::getNumberValidComponents( acPicRecFields[0].chromaFormat );
+  const uint32_t numValidComponents = ::getNumberValidComponents( acPicRecFields[0].chromaFormat );
 #if ENABLE_QPA && FRAME_WEIGHTING
   const Slice*  pcSlice      = pcPicOrgFirstField->slices[0];
-  const UInt    currDQP      = (pcSlice->getPOC() % m_pcEncLib->getIntraPeriod()) == 0 ? 0 : DQP[pcSlice->getPOC() % m_pcEncLib->getGOPSize()];
+  const uint32_t    currDQP      = (pcSlice->getPOC() % m_pcEncLib->getIntraPeriod()) == 0 ? 0 : DQP[pcSlice->getPOC() % m_pcEncLib->getGOPSize()];
   const double  frameWeight  = pow(2.0, (double)currDQP / -3.0);
 
   if (useWPSNR) m_gcAnalyzeAll_in.addWeight(frameWeight);
@@ -3377,11 +3377,11 @@ void EncGOP::xCalculateInterlacedAddPSNR( Picture* pcPicOrgFirstField, Picture* 
     CHECK(!(acPicRecFields[0].get(ch).height==acPicRecFields[0].get(ch).height), "Unspecified error");
 
     uint64_t uiSSDtemp=0;
-    const UInt width    = acPicRecFields[0].get(ch).width - (m_pcEncLib->getPad(0) >> ::getComponentScaleX(ch, format));
-    const UInt height   = acPicRecFields[0].get(ch).height - ((m_pcEncLib->getPad(1) >> 1) >> ::getComponentScaleY(ch, format));
-    const UInt bitDepth = sps.getBitDepth(toChannelType(ch));
+    const uint32_t width    = acPicRecFields[0].get(ch).width - (m_pcEncLib->getPad(0) >> ::getComponentScaleX(ch, format));
+    const uint32_t height   = acPicRecFields[0].get(ch).height - ((m_pcEncLib->getPad(1) >> 1) >> ::getComponentScaleY(ch, format));
+    const uint32_t bitDepth = sps.getBitDepth(toChannelType(ch));
 
-    for(UInt fieldNum=0; fieldNum<2; fieldNum++)
+    for(uint32_t fieldNum=0; fieldNum<2; fieldNum++)
     {
       CHECK(!(conversion == IPCOLOURSPACE_UNCHANGED), "Unspecified error");
 #if ENABLE_QPA
@@ -3391,11 +3391,11 @@ void EncGOP::xCalculateInterlacedAddPSNR( Picture* pcPicOrgFirstField, Picture* 
 #endif
     }
 #if ENABLE_QPA
-    const UInt maxval = /*useWPSNR ? (1 << bitDepth) - 1 :*/ 255 << (bitDepth - 8); // fix with WPSNR: 1023 (4095) instead of 1020 (4080) for bit-depth 10 (12)
+    const uint32_t maxval = /*useWPSNR ? (1 << bitDepth) - 1 :*/ 255 << (bitDepth - 8); // fix with WPSNR: 1023 (4095) instead of 1020 (4080) for bit-depth 10 (12)
 #else
-    const UInt maxval = 255 << (bitDepth - 8);
+    const uint32_t maxval = 255 << (bitDepth - 8);
 #endif
-    const UInt size   = width * height * 2;
+    const uint32_t size   = width * height * 2;
     const double fRefValue = (double)maxval * maxval * size;
     dPSNR[ch]         = uiSSDtemp ? 10.0 * log10(fRefValue / (double)uiSSDtemp) : 999.99;
     MSEyuvframe[ch]   = (double)uiSSDtemp / size;
@@ -3404,7 +3404,7 @@ void EncGOP::xCalculateInterlacedAddPSNR( Picture* pcPicOrgFirstField, Picture* 
 #endif
   }
 
-  UInt uibits = 0; // the number of bits for the pair is not calculated here - instead the overall total is used elsewhere.
+  uint32_t uibits = 0; // the number of bits for the pair is not calculated here - instead the overall total is used elsewhere.
 
   //===== add PSNR =====
   m_gcAnalyzeAll_in.addResult (dPSNR, (double)uibits, MSEyuvframe);
@@ -3417,7 +3417,7 @@ void EncGOP::xCalculateInterlacedAddPSNR( Picture* pcPicOrgFirstField, Picture* 
     msg( DETAILS, " [Y MSE %6.4lf  U MSE %6.4lf  V MSE %6.4lf]", MSEyuvframe[COMPONENT_Y], MSEyuvframe[COMPONENT_Cb], MSEyuvframe[COMPONENT_Cr] );
   }
 
-  for(UInt fieldNum=0; fieldNum<2; fieldNum++)
+  for(uint32_t fieldNum=0; fieldNum<2; fieldNum++)
   {
     cscd[fieldNum].destroy();
   }
@@ -3662,27 +3662,27 @@ void EncGOP::arrangeLongtermPicturesInRPS(Slice *pcSlice, PicList& rcListPic)
   }
 }
 
-void EncGOP::applyDeblockingFilterMetric( Picture* pcPic, UInt uiNumSlices )
+void EncGOP::applyDeblockingFilterMetric( Picture* pcPic, uint32_t uiNumSlices )
 {
   PelBuf cPelBuf = pcPic->getRecoBuf().get( COMPONENT_Y );
   Pel* Rec    = cPelBuf.buf;
   const int  stride = cPelBuf.stride;
-  const UInt picWidth = cPelBuf.width;
-  const UInt picHeight = cPelBuf.height;
+  const uint32_t picWidth = cPelBuf.width;
+  const uint32_t picHeight = cPelBuf.height;
 
   Pel* tempRec = Rec;
   const Slice* pcSlice = pcPic->slices[0];
-  UInt log2maxTB = pcSlice->getSPS()->getQuadtreeTULog2MaxSize();
-  UInt maxTBsize = (1<<log2maxTB);
-  const UInt minBlockArtSize = 8;
-  const UInt noCol = (picWidth>>log2maxTB);
-  const UInt noRows = (picHeight>>log2maxTB);
+  uint32_t log2maxTB = pcSlice->getSPS()->getQuadtreeTULog2MaxSize();
+  uint32_t maxTBsize = (1<<log2maxTB);
+  const uint32_t minBlockArtSize = 8;
+  const uint32_t noCol = (picWidth>>log2maxTB);
+  const uint32_t noRows = (picHeight>>log2maxTB);
   CHECK(!(noCol > 1), "Unspecified error");
   CHECK(!(noRows > 1), "Unspecified error");
   std::vector<uint64_t> colSAD(noCol,  uint64_t(0));
   std::vector<uint64_t> rowSAD(noRows, uint64_t(0));
-  UInt colIdx = 0;
-  UInt rowIdx = 0;
+  uint32_t colIdx = 0;
+  uint32_t rowIdx = 0;
   Pel p0, p1, p2, q0, q1, q2;
 
   int qp = pcSlice->getSliceQp();
@@ -3691,7 +3691,7 @@ void EncGOP::applyDeblockingFilterMetric( Picture* pcPic, UInt uiNumSlices )
   int beta = LoopFilter::getBeta( qp ) * bitdepthScale;
   const int thr2 = (beta>>2);
   const int thr1 = 2*bitdepthScale;
-  UInt a = 0;
+  uint32_t a = 0;
 
   if (maxTBsize > minBlockArtSize)
   {
@@ -3787,7 +3787,7 @@ void EncGOP::applyDeblockingFilterMetric( Picture* pcPic, UInt uiNumSlices )
 }
 
 #if W0038_DB_OPT
-void EncGOP::applyDeblockingFilterParameterSelection( Picture* pcPic, const UInt numSlices, const int gopID )
+void EncGOP::applyDeblockingFilterParameterSelection( Picture* pcPic, const uint32_t numSlices, const int gopID )
 {
   enum DBFltParam
   {

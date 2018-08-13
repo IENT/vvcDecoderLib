@@ -463,9 +463,9 @@ Distortion RdCost::xGetSAD( const DistParam& rcDtParam )
   const int  iStrideCur      = rcDtParam.cur.stride * iSubStep;
   const int  iStrideOrg      = rcDtParam.org.stride * iSubStep;
 #if DISTORTION_LAMBDA_BUGFIX
-  const UInt distortionShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth);
+  const uint32_t distortionShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth);
 #else
-  const UInt distortionShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth - 8);
+  const uint32_t distortionShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth - 8);
 #endif
 
   Distortion uiSum = 0;
@@ -1016,9 +1016,9 @@ Distortion RdCost::xGetMRSAD( const DistParam& rcDtParam )
   const int  iStrideCur      = rcDtParam.cur.stride * iSubStep;
   const int  iStrideOrg      = rcDtParam.org.stride * iSubStep;
 #if DISTORTION_LAMBDA_BUGFIX
-  const UInt distortionShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth);
+  const uint32_t distortionShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth);
 #else
-  const UInt distortionShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth - 8);
+  const uint32_t distortionShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth - 8);
 #endif
 
   int32_t deltaSum = 0;
@@ -1833,9 +1833,9 @@ Distortion RdCost::xGetSSE( const DistParam &rcDtParam )
 
   Distortion uiSum   = 0;
 #if DISTORTION_LAMBDA_BUGFIX
-  UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
+  uint32_t uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
 #else
-  UInt       uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth-8) << 1);
+  uint32_t       uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth-8) << 1);
 #endif
 
   Intermediate_Int iTemp;
@@ -1870,9 +1870,9 @@ Distortion RdCost::xGetSSE4( const DistParam &rcDtParam )
 
   Distortion uiSum   = 0;
 #if DISTORTION_LAMBDA_BUGFIX
-  UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
+  uint32_t uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
 #else
-  UInt       uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth - 8) << 1);
+  uint32_t       uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth - 8) << 1);
 #endif
 
   Intermediate_Int  iTemp;
@@ -1908,9 +1908,9 @@ Distortion RdCost::xGetSSE8( const DistParam &rcDtParam )
 
   Distortion uiSum   = 0;
 #if DISTORTION_LAMBDA_BUGFIX
-  UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
+  uint32_t uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
 #else
-  UInt       uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth - 8) << 1);
+  uint32_t       uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth - 8) << 1);
 #endif
 
   Intermediate_Int  iTemp;
@@ -1949,9 +1949,9 @@ Distortion RdCost::xGetSSE16( const DistParam &rcDtParam )
 
   Distortion uiSum   = 0;
 #if DISTORTION_LAMBDA_BUGFIX
-  UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
+  uint32_t uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
 #else
-  UInt       uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth-8) << 1);
+  uint32_t       uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth-8) << 1);
 #endif
 
   Intermediate_Int  iTemp;
@@ -1998,9 +1998,9 @@ Distortion RdCost::xGetSSE16N( const DistParam &rcDtParam )
 
   Distortion uiSum   = 0;
 #if DISTORTION_LAMBDA_BUGFIX
-  UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
+  uint32_t uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
 #else
-  UInt       uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth-8) << 1);
+  uint32_t       uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth-8) << 1);
 #endif
 
   Intermediate_Int  iTemp;
@@ -2051,9 +2051,9 @@ Distortion RdCost::xGetSSE32( const DistParam &rcDtParam )
 
   Distortion uiSum   = 0;
 #if DISTORTION_LAMBDA_BUGFIX
-  UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
+  uint32_t uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
 #else
-  UInt       uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth-8) << 1);
+  uint32_t       uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth-8) << 1);
 #endif
 
   Intermediate_Int  iTemp;
@@ -2117,9 +2117,9 @@ Distortion RdCost::xGetSSE64( const DistParam &rcDtParam )
 
   Distortion uiSum   = 0;
 #if DISTORTION_LAMBDA_BUGFIX
-  UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
+  uint32_t uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
 #else
-  UInt       uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth-8) << 1);
+  uint32_t       uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth-8) << 1);
 #endif
 
   Intermediate_Int  iTemp;
@@ -3008,7 +3008,7 @@ void RdCost::initLumaLevelToWeightTable()
   }
 }
 
-Distortion RdCost::getWeightedMSE(int compIdx, const Pel org, const Pel cur, const UInt uiShift, const Pel orgLuma) 
+Distortion RdCost::getWeightedMSE(int compIdx, const Pel org, const Pel cur, const uint32_t uiShift, const Pel orgLuma) 
 {
   Distortion distortionVal = 0;
   Intermediate_Int iTemp = org - cur;
@@ -3043,9 +3043,9 @@ Distortion RdCost::xGetSSE_WTD( const DistParam &rcDtParam )
 
   Distortion uiSum   = 0;
 #if DISTORTION_LAMBDA_BUGFIX
-  UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
+  uint32_t uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
 #else
-  UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth - 8) << 1);
+  uint32_t uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth - 8) << 1);
 #endif
   for( ; iRows != 0; iRows-- )
   {
@@ -3078,9 +3078,9 @@ Distortion RdCost::xGetSSE2_WTD( const DistParam &rcDtParam )
   const size_t  cShift           = (rcDtParam.compID==COMPONENT_Y) ? 0 : 1; // assume 420, could use getComponentScaleX, getComponentScaleY
   Distortion uiSum   = 0;
 #if DISTORTION_LAMBDA_BUGFIX
-  UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
+  uint32_t uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
 #else
-  UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth - 8) << 1);
+  uint32_t uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth - 8) << 1);
 #endif
   for( ; iRows != 0; iRows-- )
   {
@@ -3111,9 +3111,9 @@ Distortion RdCost::xGetSSE4_WTD( const DistParam &rcDtParam )
   const size_t  cShift           = (rcDtParam.compID==COMPONENT_Y) ? 0 : 1; // assume 420, could use getComponentScaleX, getComponentScaleY
   Distortion uiSum   = 0;
 #if DISTORTION_LAMBDA_BUGFIX
-  UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
+  uint32_t uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
 #else
-  UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth - 8) << 1);
+  uint32_t uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth - 8) << 1);
 #endif
   for( ; iRows != 0; iRows-- )
   {
@@ -3147,9 +3147,9 @@ Distortion RdCost::xGetSSE8_WTD( const DistParam &rcDtParam )
  
   Distortion uiSum   = 0;
 #if DISTORTION_LAMBDA_BUGFIX
-  UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
+  uint32_t uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
 #else
-  UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth - 8) << 1);
+  uint32_t uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth - 8) << 1);
 #endif
   for( ; iRows != 0; iRows-- )
   {
@@ -3186,9 +3186,9 @@ Distortion RdCost::xGetSSE16_WTD( const DistParam &rcDtParam )
   
   Distortion uiSum   = 0;
 #if DISTORTION_LAMBDA_BUGFIX
-  UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
+  uint32_t uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
 #else
-  UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth - 8) << 1);
+  uint32_t uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth - 8) << 1);
 #endif
   for( ; iRows != 0; iRows-- )
   {
@@ -3232,9 +3232,9 @@ Distortion RdCost::xGetSSE16N_WTD( const DistParam &rcDtParam )
   const size_t  cShift           = (rcDtParam.compID==COMPONENT_Y) ? 0 : 1; // assume 420, could use getComponentScaleX, getComponentScaleY
   Distortion uiSum   = 0;
 #if DISTORTION_LAMBDA_BUGFIX
-  UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
+  uint32_t uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
 #else
-  UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth - 8) << 1);
+  uint32_t uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth - 8) << 1);
 #endif
   for( ; iRows != 0; iRows-- )
   {
@@ -3282,9 +3282,9 @@ Distortion RdCost::xGetSSE32_WTD( const DistParam &rcDtParam )
   
   Distortion uiSum   = 0;
 #if DISTORTION_LAMBDA_BUGFIX
-  UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
+  uint32_t uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
 #else
-  UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth - 8) << 1);
+  uint32_t uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth - 8) << 1);
 #endif
   for( ; iRows != 0; iRows-- )
   {
@@ -3345,9 +3345,9 @@ Distortion RdCost::xGetSSE64_WTD( const DistParam &rcDtParam )
  
   Distortion uiSum   = 0;
 #if DISTORTION_LAMBDA_BUGFIX
-  UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth)) << 1;
+  uint32_t uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth)) << 1;
 #else
-  UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth - 8) << 1);
+  uint32_t uiShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth - 8) << 1);
 #endif
   for( ; iRows != 0; iRows-- )
   {

@@ -66,9 +66,9 @@ public:
   void  open  ( const std::string &fileName, bool bWriteMode, const int fileBitDepth[MAX_NUM_CHANNEL_TYPE], const int MSBExtendedBitDepth[MAX_NUM_CHANNEL_TYPE], const int internalBitDepth[MAX_NUM_CHANNEL_TYPE] ); ///< open or create file
   void  close ();                                           ///< close file
 #if EXTENSION_360_VIDEO
-  void skipFrames(int numFrames, UInt width, UInt height, ChromaFormat format);
+  void skipFrames(int numFrames, uint32_t width, uint32_t height, ChromaFormat format);
 #else
-  void skipFrames(UInt numFrames, UInt width, UInt height, ChromaFormat format);
+  void skipFrames(uint32_t numFrames, uint32_t width, uint32_t height, ChromaFormat format);
 #endif
   // if fileFormat<NUM_CHROMA_FORMAT, the format of the file is that format specified, else it is the format of the PicYuv.
 

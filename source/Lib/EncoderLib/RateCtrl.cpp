@@ -1423,7 +1423,7 @@ void RateCtrl::init( int totalFrames, int targetBitrate, int frameRate, int GOPS
 #if U0132_TARGET_BITS_SATURATION
   m_CpbSaturationEnabled = false;
   m_cpbSize              = targetBitrate;
-  m_cpbState             = (UInt)(m_cpbSize*0.5f);
+  m_cpbState             = (uint32_t)(m_cpbSize*0.5f);
   m_bufferingRate        = (int)(targetBitrate / frameRate);
 #endif
 
@@ -1467,8 +1467,8 @@ void RateCtrl::initHrdParam(const HRD* pcHrd, int iFrameRate, double fInitialCpb
 {
   m_CpbSaturationEnabled = true;
   m_cpbSize = (pcHrd->getCpbSizeValueMinus1(0, 0, 0) + 1) << (4 + pcHrd->getCpbSizeScale());
-  m_cpbState = (UInt)(m_cpbSize*fInitialCpbFullness);
-  m_bufferingRate = (UInt)(((pcHrd->getBitRateValueMinus1(0, 0, 0) + 1) << (6 + pcHrd->getBitRateScale())) / iFrameRate);
+  m_cpbState = (uint32_t)(m_cpbSize*fInitialCpbFullness);
+  m_bufferingRate = (uint32_t)(((pcHrd->getBitRateValueMinus1(0, 0, 0) + 1) << (6 + pcHrd->getBitRateScale())) / iFrameRate);
   msg( NOTICE, "\nHRD - [Initial CPB state %6d] [CPB Size %6d] [Buffering Rate %6d]\n", m_cpbState, m_cpbSize, m_bufferingRate);
 }
 #endif

@@ -89,7 +89,7 @@ SliceType xGetCtxInitId( const Slice& slice, const BinEncIf& binEncoder, Ctx& ct
     SliceType aSliceTypeChoices[] = { B_SLICE, P_SLICE };
     uint64_t  bestCost            = std::numeric_limits<uint64_t>::max();
     SliceType bestSliceType       = aSliceTypeChoices[0];
-    for (UInt idx=0; idx<2; idx++)
+    for (uint32_t idx=0; idx<2; idx++)
     {
       uint64_t  curCost           = 0;
       SliceType curSliceType      = aSliceTypeChoices[idx];
@@ -481,7 +481,7 @@ int CABACWriter::alf_lengthGolomb(int coeffVal, int k)
     return(q + 1 + k);
 }
 
-void CABACWriter::codeAlfUvlc( UInt uiCode )
+void CABACWriter::codeAlfUvlc( uint32_t uiCode )
 {
   int i;
   if ( uiCode == 0 )
@@ -531,12 +531,12 @@ void CABACWriter::codeAlfSvlc( int iCode )
 }
 #endif
 
-void CABACWriter::xWriteTruncBinCode(UInt uiSymbol, UInt uiMaxSymbol)
+void CABACWriter::xWriteTruncBinCode(uint32_t uiSymbol, uint32_t uiMaxSymbol)
 {
-  UInt uiThresh;
+  uint32_t uiThresh;
   if (uiMaxSymbol > 256)
   {
-    UInt uiThreshVal = 1 << 8;
+    uint32_t uiThreshVal = 1 << 8;
     uiThresh = 8;
     while (uiThreshVal <= uiMaxSymbol)
     {
@@ -552,11 +552,11 @@ void CABACWriter::xWriteTruncBinCode(UInt uiSymbol, UInt uiMaxSymbol)
   }
 #endif
 
-  UInt uiVal = 1 << uiThresh;
+  uint32_t uiVal = 1 << uiThresh;
   assert(uiVal <= uiMaxSymbol);
   assert((uiVal << 1) > uiMaxSymbol);
   assert(uiSymbol < uiMaxSymbol);
-  UInt b = uiMaxSymbol - uiVal;
+  uint32_t b = uiMaxSymbol - uiVal;
   assert(b < uiVal);
   if (uiSymbol < uiVal - b)
   {
@@ -573,12 +573,12 @@ void CABACWriter::xWriteTruncBinCode(UInt uiSymbol, UInt uiMaxSymbol)
 
 #if !JVET_K0371_ALF
 #if JVET_C0038_NO_PREV_FILTERS
-void CABACWriter::xWriteEpExGolomb(UInt uiSymbol, UInt uiCount)
+void CABACWriter::xWriteEpExGolomb(uint32_t uiSymbol, uint32_t uiCount)
 {
-  UInt bins = 0;
+  uint32_t bins = 0;
   int numBins = 0;
 
-  while (uiSymbol >= (UInt)(1 << uiCount))
+  while (uiSymbol >= (uint32_t)(1 << uiCount))
   {
     bins = 2 * bins + 1;
     numBins++;
@@ -685,7 +685,7 @@ void CABACWriter::alf_aux( const ALFParam& alfParam, bool isGALF )
 {
   int iNoVarBins = AdaptiveLoopFilter::m_NO_VAR_BINS;
 #if GALF
-  xWriteTruncBinCode((UInt)(alfParam.filters_per_group - 1), (UInt)iNoVarBins);
+  xWriteTruncBinCode((uint32_t)(alfParam.filters_per_group - 1), (uint32_t)iNoVarBins);
 #endif
 
   //FilterType
@@ -695,12 +695,12 @@ void CABACWriter::alf_aux( const ALFParam& alfParam, bool isGALF )
   if( isGALF )
   {
     //int iNoVarBins = AdaptiveLoopFilter::m_NO_VAR_BINS;
-    //xWriteTruncBinCode((UInt)(alfParam.filters_per_group - 1), (UInt)iNoVarBins);
+    //xWriteTruncBinCode((uint32_t)(alfParam.filters_per_group - 1), (uint32_t)iNoVarBins);
     if (alfParam.filters_per_group > 1)
     {
       for (int i = 0; i < iNoVarBins; i++)
       {
-        xWriteTruncBinCode((UInt)alfParam.filterPattern[i], (UInt)alfParam.filters_per_group);
+        xWriteTruncBinCode((uint32_t)alfParam.filterPattern[i], (uint32_t)alfParam.filters_per_group);
       }
     }
 
@@ -936,14 +936,14 @@ void CABACWriter::alf_cu_ctrl( const ALFParam& alfParam )
   if( alfParam.cu_control_flag)
   {
     unary_max_symbol( alfParam.alf_max_depth, Ctx::AlfUvlcSCModel(0),Ctx::AlfUvlcSCModel(1), alfParam.maxCodingDepth-1);
-    UInt uiLength = 0;
+    uint32_t uiLength = 0;
 
-    UInt maxValue = ( alfParam.num_ctus_in_frame << (alfParam.alf_max_depth*2) );
-    UInt minValue = alfParam.num_ctus_in_frame;
+    uint32_t maxValue = ( alfParam.num_ctus_in_frame << (alfParam.alf_max_depth*2) );
+    uint32_t minValue = alfParam.num_ctus_in_frame;
     CHECK( maxValue < alfParam.num_alf_cu_flag, "ALF: wrong max value for number of CUs" );
     CHECK( minValue > alfParam.num_alf_cu_flag, "ALF: wrong min value for number of CUs" );
-    UInt temp = maxValue - minValue;
-    for(UInt i=0; i<32; i++)
+    uint32_t temp = maxValue - minValue;
+    for(uint32_t i=0; i<32; i++)
     {
       if(temp&0x1)
       {
@@ -951,7 +951,7 @@ void CABACWriter::alf_cu_ctrl( const ALFParam& alfParam )
       }
       temp = (temp >> 1);
     }
-    UInt uiSymbol = alfParam.num_alf_cu_flag - minValue;
+    uint32_t uiSymbol = alfParam.num_alf_cu_flag - minValue;
     if(uiLength)
     {
       while( uiLength-- )
@@ -962,7 +962,7 @@ void CABACWriter::alf_cu_ctrl( const ALFParam& alfParam )
 
     DTRACE( g_trace_ctx, D_SYNTAX, "alf_cu_ctrl() max_depth=%d max_alf_depth=%d num_cu_flags=%d\n", alfParam.maxCodingDepth, alfParam.alf_max_depth, alfParam.num_alf_cu_flag );
 
-    for(UInt i=0; i< alfParam.num_alf_cu_flag; i++)
+    for(uint32_t i=0; i< alfParam.num_alf_cu_flag; i++)
     {
       m_BinEncoder.encodeBin( alfParam.alf_cu_flag[i], Ctx::AlfCUCtrlFlags( 0 ) );
 
@@ -3064,7 +3064,7 @@ void CABACWriter::emt_tu_index( const TransformUnit& tu )
   }
 }
 
-//void CABACWriter::emt_cu_flag(const CodingUnit& cu, UInt depth, bool codeCuFlag, const int tuWidth,const int tuHeight)
+//void CABACWriter::emt_cu_flag(const CodingUnit& cu, uint32_t depth, bool codeCuFlag, const int tuWidth,const int tuHeight)
 void CABACWriter::emt_cu_flag( const CodingUnit& cu )
 {
   const CodingStructure& cs = *cu.cs;
@@ -3184,7 +3184,7 @@ void CABACWriter::residual_nsst_mode( const CodingUnit& cu, CUCtx& cuCtx )
 
   if( bUseThreeNSSTPasses )
   {
-    const UInt idxROT = cu.nsstIdx;
+    const uint32_t idxROT = cu.nsstIdx;
     assert( idxROT < 3 );
     m_BinEncoder.encodeBin( idxROT ? 1 : 0, Ctx::NSSTIdx( 1 ) );
     if( idxROT )
@@ -3194,7 +3194,7 @@ void CABACWriter::residual_nsst_mode( const CodingUnit& cu, CUCtx& cuCtx )
   }
   else
   {
-    const UInt idxROT = cu.nsstIdx;
+    const uint32_t idxROT = cu.nsstIdx;
     assert( idxROT < 4 );
     m_BinEncoder.encodeBin( idxROT ? 1 : 0, Ctx::NSSTIdx( 0 ) );
     if( idxROT )
@@ -3924,7 +3924,7 @@ void CABACWriter::codeAlfCtuEnableFlags( CodingStructure& cs, ChannelType channe
 }
 void CABACWriter::codeAlfCtuEnableFlags( CodingStructure& cs, ComponentID compID, AlfSliceParam* alfParam)
 {
-  UInt numCTUs = cs.pcv->sizeInCtus;
+  uint32_t numCTUs = cs.pcv->sizeInCtus;
 
   for( int ctuIdx = 0; ctuIdx < numCTUs; ctuIdx++ )
   {
@@ -3932,7 +3932,7 @@ void CABACWriter::codeAlfCtuEnableFlags( CodingStructure& cs, ComponentID compID
   }
 }
 
-void CABACWriter::codeAlfCtuEnableFlag( CodingStructure& cs, UInt ctuRsAddr, const int compIdx, AlfSliceParam* alfParam)
+void CABACWriter::codeAlfCtuEnableFlag( CodingStructure& cs, uint32_t ctuRsAddr, const int compIdx, AlfSliceParam* alfParam)
 {
   AlfSliceParam& alfSliceParam = alfParam ? (*alfParam) : cs.slice->getAlfSliceParam();
 
@@ -3943,9 +3943,9 @@ void CABACWriter::codeAlfCtuEnableFlag( CodingStructure& cs, UInt ctuRsAddr, con
     int                 ry = ctuRsAddr / frame_width_in_ctus;
     int                 rx = ctuRsAddr - ry * frame_width_in_ctus;
     const Position      pos( rx * cs.pcv->maxCUWidth, ry * cs.pcv->maxCUHeight );
-    const UInt          curSliceIdx = cs.slice->getIndependentSliceIdx();
+    const uint32_t          curSliceIdx = cs.slice->getIndependentSliceIdx();
 #if HEVC_TILES_WPP
-    const UInt          curTileIdx = cs.picture->tileMap->getTileIdxMap( pos );
+    const uint32_t          curTileIdx = cs.picture->tileMap->getTileIdxMap( pos );
     bool                leftMergeAvail = cs.getCURestricted( pos.offset( -(int)pcv.maxCUWidth, 0 ), curSliceIdx, curTileIdx, CH_L ) ? true : false;
     bool                aboveMergeAvail = cs.getCURestricted( pos.offset( 0, -(int)pcv.maxCUHeight ), curSliceIdx, curTileIdx, CH_L ) ? true : false;
 #else

@@ -79,7 +79,7 @@ void read2(InputNALUnit& nalu)
   nalu.m_temporalId = bs.read(3) - 1;             // nuh_temporal_id_plus1
 }
 
-UInt SEIRemovalApp::decode()
+uint32_t SEIRemovalApp::decode()
 {
 //  int                 poc;
 //  PicList* pcListPic = NULL;

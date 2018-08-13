@@ -73,7 +73,7 @@ public:
   // initialize class
   void init      (
                     const Quant* otherQuant,
-                    const UInt uiMaxTrSize,
+                    const uint32_t uiMaxTrSize,
                     const bool bUseRDOQ             = false,
                     const bool bUseRDOQTS           = false,
 #if T0196_SELECTIVE_RDOQ
@@ -82,7 +82,7 @@ public:
 #if JVET_K0072
 #else
 #if JEM_TOOLS
-                    const UInt uiAltResiCompId      = 0,
+                    const uint32_t uiAltResiCompId      = 0,
 #endif
 #endif
                     const bool bEnc                 = false,
@@ -101,8 +101,8 @@ public:
 #endif
 
 #if JEM_TOOLS
-  void FwdNsstNxN( int* src, const UInt uiMode, const UInt uiIndex, const UInt uiSize );
-  void InvNsstNxN( int* src, const UInt uiMode, const UInt uiIndex, const UInt uiSize );
+  void FwdNsstNxN( int* src, const uint32_t uiMode, const uint32_t uiIndex, const uint32_t uiSize );
+  void InvNsstNxN( int* src, const uint32_t uiMode, const uint32_t uiIndex, const uint32_t uiSize );
 #endif
 
 protected:
@@ -119,8 +119,8 @@ public:
   void rdpcmNxN         (TransformUnit &tu, const ComponentID &compID, const QpParam &cQP, TCoeff &uiAbsSum,       RDPCMMode &rdpcmMode);
   void applyForwardRDPCM(TransformUnit &tu, const ComponentID &compID, const QpParam &cQP, TCoeff &uiAbsSum, const RDPCMMode &rdpcmMode);
 
-  void transformSkipQuantOneSample(TransformUnit &tu, const ComponentID &compID, const TCoeff &resiDiff, TCoeff &coeff,    const UInt &uiPos, const QpParam &cQP, const bool bUseHalfRoundingPoint);
-  void invTrSkipDeQuantOneSample  (TransformUnit &tu, const ComponentID &compID, const TCoeff &pcCoeff,  Pel &reconSample, const UInt &uiPos, const QpParam &cQP);
+  void transformSkipQuantOneSample(TransformUnit &tu, const ComponentID &compID, const TCoeff &resiDiff, TCoeff &coeff,    const uint32_t &uiPos, const QpParam &cQP, const bool bUseHalfRoundingPoint);
+  void invTrSkipDeQuantOneSample  (TransformUnit &tu, const ComponentID &compID, const TCoeff &pcCoeff,  Pel &reconSample, const uint32_t &uiPos, const QpParam &cQP);
 
   void invRdpcmNxN(TransformUnit& tu, const ComponentID &compID, PelBuf &pcResidual);
 #if RDOQ_CHROMA_LAMBDA
@@ -140,7 +140,7 @@ public:
 
 protected:
   TCoeff*  m_plTempCoeff;
-  UInt     m_uiMaxTrSize;
+  uint32_t     m_uiMaxTrSize;
   bool     m_bEnc;
   bool     m_useTransformSkipFast;
 

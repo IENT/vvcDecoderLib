@@ -318,7 +318,7 @@ strToLevel[] =
 };
 
 #if U0132_TARGET_BITS_SATURATION
-UInt g_uiMaxCpbSize[2][21] =
+uint32_t g_uiMaxCpbSize[2][21] =
 {
   //         LEVEL1,        LEVEL2,LEVEL2_1,     LEVEL3, LEVEL3_1,      LEVEL4, LEVEL4_1,       LEVEL5,  LEVEL5_1,  LEVEL5_2,    LEVEL6,  LEVEL6_1,  LEVEL6_2
   { 0, 0, 0, 350000, 0, 0, 1500000, 3000000, 0, 6000000, 10000000, 0, 12000000, 20000000, 0,  25000000,  40000000,  60000000,  60000000, 120000000, 240000000 },
@@ -357,9 +357,9 @@ strToScalingListMode[] =
 #endif
 
 template<typename T, typename P>
-static std::string enumToString(P map[], UInt mapLen, const T val)
+static std::string enumToString(P map[], uint32_t mapLen, const T val)
 {
-  for (UInt i = 0; i < mapLen; i++)
+  for (uint32_t i = 0; i < mapLen; i++)
   {
     if (val == map[i].value)
     {
@@ -370,12 +370,12 @@ static std::string enumToString(P map[], UInt mapLen, const T val)
 }
 
 template<typename T, typename P>
-static istream& readStrToEnum(P map[], UInt mapLen, istream &in, T &val)
+static istream& readStrToEnum(P map[], uint32_t mapLen, istream &in, T &val)
 {
   string str;
   in >> str;
 
-  for (UInt i = 0; i < mapLen; i++)
+  for (uint32_t i = 0; i < mapLen; i++)
   {
     if (str == map[i].str)
     {
@@ -433,7 +433,7 @@ struct SMultiValueInput
   SMultiValueInput(std::vector<T> &defaults) : minValIncl(0), maxValIncl(0), minNumValuesIncl(0), maxNumValuesIncl(0), values(defaults) { }
   SMultiValueInput(const T &minValue, const T &maxValue, std::size_t minNumberValues=0, std::size_t maxNumberValues=0)
     : minValIncl(minValue), maxValIncl(maxValue), minNumValuesIncl(minNumberValues), maxNumValuesIncl(maxNumberValues), values()  { }
-  SMultiValueInput(const T &minValue, const T &maxValue, std::size_t minNumberValues, std::size_t maxNumberValues, const T* defValues, const UInt numDefValues)
+  SMultiValueInput(const T &minValue, const T &maxValue, std::size_t minNumberValues, std::size_t maxNumberValues, const T* defValues, const uint32_t numDefValues)
     : minValIncl(minValue), maxValIncl(maxValue), minNumValuesIncl(minNumberValues), maxNumValuesIncl(maxNumberValues), values(defValues, defValues+numDefValues)  { }
   SMultiValueInput<T> &operator=(const std::vector<T> &userValues) { values=userValues; return *this; }
   SMultiValueInput<T> &operator=(const SMultiValueInput<T> &userValues) { values=userValues.values; return *this; }
@@ -450,10 +450,10 @@ static inline istream& operator >> (std::istream &in, SMultiValueInput<T> &value
 }
 
 template<>
-UInt SMultiValueInput<UInt>::readValue(const char *&pStr, bool &bSuccess)
+uint32_t SMultiValueInput<uint32_t>::readValue(const char *&pStr, bool &bSuccess)
 {
   char *eptr;
-  UInt val=strtoul(pStr, &eptr, 0);
+  uint32_t val=strtoul(pStr, &eptr, 0);
   pStr=eptr;
   bSuccess=!(*eptr!=0 && !isspace(*eptr) && *eptr!=',') && !(val<minValIncl || val>maxValIncl);
   return val;
@@ -559,13 +559,13 @@ automaticallySelectRExtProfile(const bool bUsingGeneralRExtTools,
                                const bool bUsingChromaQPAdjustment,
                                const bool bUsingExtendedPrecision,
                                const bool bIntraConstraintFlag,
-                               UInt &bitDepthConstraint,
+                               uint32_t &bitDepthConstraint,
                                ChromaFormat &chromaFormatConstraint,
                                const int  maxBitDepth,
                                const ChromaFormat chromaFormat)
 {
   // Try to choose profile, according to table in Q1013.
-  UInt trialBitDepthConstraint=maxBitDepth;
+  uint32_t trialBitDepthConstraint=maxBitDepth;
   if (trialBitDepthConstraint<8)
   {
     trialBitDepthConstraint=8;
@@ -658,8 +658,8 @@ bool EncAppCfg::parseCfg( int argc, char* argv[] )
   int saoOffsetBitShift[MAX_NUM_CHANNEL_TYPE];
 
   // Multi-value input fields:                                // minval, maxval (incl), min_entries, max_entries (incl) [, default values, number of default values]
-  SMultiValueInput<UInt> cfg_ColumnWidth                     (0, std::numeric_limits<UInt>::max(), 0, std::numeric_limits<UInt>::max());
-  SMultiValueInput<UInt> cfg_RowHeight                       (0, std::numeric_limits<UInt>::max(), 0, std::numeric_limits<UInt>::max());
+  SMultiValueInput<uint32_t> cfg_ColumnWidth                     (0, std::numeric_limits<uint32_t>::max(), 0, std::numeric_limits<uint32_t>::max());
+  SMultiValueInput<uint32_t> cfg_RowHeight                       (0, std::numeric_limits<uint32_t>::max(), 0, std::numeric_limits<uint32_t>::max());
   SMultiValueInput<int>  cfg_startOfCodedInterval            (std::numeric_limits<int>::min(), std::numeric_limits<int>::max(), 0, 1<<16);
   SMultiValueInput<int>  cfg_codedPivotValue                 (std::numeric_limits<int>::min(), std::numeric_limits<int>::max(), 0, 1<<16);
   SMultiValueInput<int>  cfg_targetPivotValue                (std::numeric_limits<int>::min(), std::numeric_limits<int>::max(), 0, 1<<16);
@@ -671,13 +671,13 @@ bool EncAppCfg::parseCfg( int argc, char* argv[] )
   const int defaultLumaLevelTodQp_LumaChangePoints[] =  { 0, 301, 367, 434, 501, 567, 634, 701, 767, 834};
   SMultiValueInput<int>  cfg_lumaLeveltoDQPMappingQP         (-MAX_QP, MAX_QP,                    0, LUMA_LEVEL_TO_DQP_LUT_MAXSIZE, defaultLumaLevelTodQp_QpChangePoints,   sizeof(defaultLumaLevelTodQp_QpChangePoints  )/sizeof(int));
   SMultiValueInput<int>  cfg_lumaLeveltoDQPMappingLuma       (0, std::numeric_limits<int>::max(), 0, LUMA_LEVEL_TO_DQP_LUT_MAXSIZE, defaultLumaLevelTodQp_LumaChangePoints, sizeof(defaultLumaLevelTodQp_LumaChangePoints)/sizeof(int));
-  UInt lumaLevelToDeltaQPMode;
+  uint32_t lumaLevelToDeltaQPMode;
 #endif
 
-  const UInt defaultInputKneeCodes[3]  = { 600, 800, 900 };
-  const UInt defaultOutputKneeCodes[3] = { 100, 250, 450 };
-  SMultiValueInput<UInt> cfg_kneeSEIInputKneePointValue      (1,  999, 0, 999, defaultInputKneeCodes,  sizeof(defaultInputKneeCodes )/sizeof(UInt));
-  SMultiValueInput<UInt> cfg_kneeSEIOutputKneePointValue     (0, 1000, 0, 999, defaultOutputKneeCodes, sizeof(defaultOutputKneeCodes)/sizeof(UInt));
+  const uint32_t defaultInputKneeCodes[3]  = { 600, 800, 900 };
+  const uint32_t defaultOutputKneeCodes[3] = { 100, 250, 450 };
+  SMultiValueInput<uint32_t> cfg_kneeSEIInputKneePointValue      (1,  999, 0, 999, defaultInputKneeCodes,  sizeof(defaultInputKneeCodes )/sizeof(uint32_t));
+  SMultiValueInput<uint32_t> cfg_kneeSEIOutputKneePointValue     (0, 1000, 0, 999, defaultOutputKneeCodes, sizeof(defaultOutputKneeCodes)/sizeof(uint32_t));
   const int defaultPrimaryCodes[6]     = { 0,50000, 0,0, 50000,0 };
   const int defaultWhitePointCode[2]   = { 16667, 16667 };
   SMultiValueInput<int>  cfg_DisplayPrimariesCode            (0, 50000, 6, 6, defaultPrimaryCodes,   sizeof(defaultPrimaryCodes  )/sizeof(int));
@@ -973,7 +973,7 @@ bool EncAppCfg::parseCfg( int argc, char* argv[] )
   /* Quantization parameters */
 #if QP_SWITCHING_FOR_PARALLEL
   ("QP,q",                                            m_iQP,                                               30, "Qp value")
-  ("QPIncrementFrame,-qpif",                          m_qpIncrementAtSourceFrame,       OptionalValue<UInt>(), "If a source file frame number is specified, the internal QP will be incremented for all POCs associated with source frames >= frame number. If empty, do not increment.")
+  ("QPIncrementFrame,-qpif",                          m_qpIncrementAtSourceFrame,       OptionalValue<uint32_t>(), "If a source file frame number is specified, the internal QP will be incremented for all POCs associated with source frames >= frame number. If empty, do not increment.")
 #else
   ("QP,q",                                            m_fQP,                                             30.0, "Qp value, if value is float, QP is switched once during encoding")
 #endif
@@ -1412,7 +1412,7 @@ bool EncAppCfg::parseCfg( int argc, char* argv[] )
     else
     {
       m_tileColumnWidth.resize(m_numTileColumnsMinus1);
-      for(UInt i=0; i<cfg_ColumnWidth.values.size(); i++)
+      for(uint32_t i=0; i<cfg_ColumnWidth.values.size(); i++)
       {
         m_tileColumnWidth[i]=cfg_ColumnWidth.values[i];
       }
@@ -1436,7 +1436,7 @@ bool EncAppCfg::parseCfg( int argc, char* argv[] )
     else
     {
       m_tileRowHeight.resize(m_numTileRowsMinus1);
-      for(UInt i=0; i<cfg_RowHeight.values.size(); i++)
+      for(uint32_t i=0; i<cfg_RowHeight.values.size(); i++)
       {
         m_tileRowHeight[i]=cfg_RowHeight.values[i];
       }
@@ -1677,7 +1677,7 @@ bool EncAppCfg::parseCfg( int argc, char* argv[] )
 #if QP_SWITCHING_FOR_PARALLEL
   if (m_qpIncrementAtSourceFrame.bPresent)
   {
-    UInt switchingPOC = 0;
+    uint32_t switchingPOC = 0;
     if (m_qpIncrementAtSourceFrame.value > m_FrameSkip)
     {
       // if switch source frame (ssf) = 10, and frame skip (fs)=2 and temporal subsample ratio (tsr) =1, then
@@ -1685,7 +1685,7 @@ bool EncAppCfg::parseCfg( int argc, char* argv[] )
       // if ssf=10, fs=2, tsr=2, then for this simulation, switch at POC 4 (=(10-2)/2): POC0=Src2, POC1=Src4, POC2=Src6, POC3=Src8, POC4=Src10
       switchingPOC = (m_qpIncrementAtSourceFrame.value - m_FrameSkip) / m_temporalSubsampleRatio;
     }
-    for (UInt i = switchingPOC; i<(m_framesToBeEncoded + m_iGOPSize + 1); i++)
+    for (uint32_t i = switchingPOC; i<(m_framesToBeEncoded + m_iGOPSize + 1); i++)
     {
       m_aidQP[i] = 1;
     }
@@ -1706,13 +1706,13 @@ bool EncAppCfg::parseCfg( int argc, char* argv[] )
   }
 #endif
 
-  for(UInt ch=0; ch<MAX_NUM_CHANNEL_TYPE; ch++)
+  for(uint32_t ch=0; ch<MAX_NUM_CHANNEL_TYPE; ch++)
   {
     if (saoOffsetBitShift[ch]<0)
     {
       if (m_internalBitDepth[ch]>10)
       {
-        m_log2SaoOffsetScale[ch]=UInt(Clip3<int>(0, m_internalBitDepth[ch]-10, int(m_internalBitDepth[ch]-10 + 0.165*m_iQP - 3.22 + 0.5) ) );
+        m_log2SaoOffsetScale[ch]=uint32_t(Clip3<int>(0, m_internalBitDepth[ch]-10, int(m_internalBitDepth[ch]-10 + 0.165*m_iQP - 3.22 + 0.5) ) );
       }
       else
       {
@@ -1721,7 +1721,7 @@ bool EncAppCfg::parseCfg( int argc, char* argv[] )
     }
     else
     {
-      m_log2SaoOffsetScale[ch]=UInt(saoOffsetBitShift[ch]);
+      m_log2SaoOffsetScale[ch]=uint32_t(saoOffsetBitShift[ch]);
     }
   }
 
@@ -1734,7 +1734,7 @@ bool EncAppCfg::parseCfg( int argc, char* argv[] )
   {
     CHECK(  cfg_lumaLeveltoDQPMappingLuma.values.size() != cfg_lumaLeveltoDQPMappingQP.values.size(), "Error in cfg" );
     m_lumaLevelToDeltaQPMapping.mapping.resize(cfg_lumaLeveltoDQPMappingLuma.values.size());
-    for(UInt i=0; i<cfg_lumaLeveltoDQPMappingLuma.values.size(); i++)
+    for(uint32_t i=0; i<cfg_lumaLeveltoDQPMappingLuma.values.size(); i++)
     {
       m_lumaLevelToDeltaQPMapping.mapping[i]=std::pair<int,int>(cfg_lumaLeveltoDQPMappingLuma.values[i], cfg_lumaLeveltoDQPMappingQP.values[i]);
     }
@@ -1764,11 +1764,11 @@ bool EncAppCfg::parseCfg( int argc, char* argv[] )
 
   if( m_masteringDisplay.colourVolumeSEIEnabled )
   {
-    for(UInt idx=0; idx<6; idx++)
+    for(uint32_t idx=0; idx<6; idx++)
     {
       m_masteringDisplay.primaries[idx/2][idx%2] = uint16_t((cfg_DisplayPrimariesCode.values.size() > idx) ? cfg_DisplayPrimariesCode.values[idx] : 0);
     }
-    for(UInt idx=0; idx<2; idx++)
+    for(uint32_t idx=0; idx<2; idx++)
     {
       m_masteringDisplay.whitePoint[idx] = uint16_t((cfg_DisplayWhitePointCode.values.size() > idx) ? cfg_DisplayWhitePointCode.values[idx] : 0);
     }
@@ -1778,9 +1778,9 @@ bool EncAppCfg::parseCfg( int argc, char* argv[] )
   {
     if( m_toneMapModelId == 2 && !cfg_startOfCodedInterval.values.empty() )
     {
-      const UInt num = 1u<< m_toneMapTargetBitDepth;
+      const uint32_t num = 1u<< m_toneMapTargetBitDepth;
       m_startOfCodedInterval = new int[num];
-      for(UInt i=0; i<num; i++)
+      for(uint32_t i=0; i<num; i++)
       {
         m_startOfCodedInterval[i] = cfg_startOfCodedInterval.values.size() > i ? cfg_startOfCodedInterval.values[i] : 0;
       }
@@ -1795,7 +1795,7 @@ bool EncAppCfg::parseCfg( int argc, char* argv[] )
       {
         m_codedPivotValue  = new int[m_numPivots];
         m_targetPivotValue = new int[m_numPivots];
-        for(UInt i=0; i<m_numPivots; i++)
+        for(uint32_t i=0; i<m_numPivots; i++)
         {
           m_codedPivotValue[i]  = cfg_codedPivotValue.values.size()  > i ? cfg_codedPivotValue.values [i] : 0;
           m_targetPivotValue[i] = cfg_targetPivotValue.values.size() > i ? cfg_targetPivotValue.values[i] : 0;
@@ -1892,7 +1892,7 @@ bool EncAppCfg::parseCfg( int argc, char* argv[] )
   if( !m_QTBT )
   {
     // compute actual CU depth with respect to config depth and max transform size
-    UInt uiAddCUDepth = 0;
+    uint32_t uiAddCUDepth = 0;
     while( ( m_uiMaxCUWidth >> m_uiMaxCUDepth ) > ( 1 << ( m_quadtreeTULog2MinSize + uiAddCUDepth ) ) )
     {
       uiAddCUDepth++;
@@ -2154,7 +2154,7 @@ bool EncAppCfg::xCheckParameter()
 
 
   xConfirmPara(m_bitstreamFileName.empty(), "A bitstream file name must be specified (BitstreamFile)");
-  const UInt maxBitDepth=(m_chromaFormatIDC==CHROMA_400) ? m_internalBitDepth[CHANNEL_TYPE_LUMA] : std::max(m_internalBitDepth[CHANNEL_TYPE_LUMA], m_internalBitDepth[CHANNEL_TYPE_CHROMA]);
+  const uint32_t maxBitDepth=(m_chromaFormatIDC==CHROMA_400) ? m_internalBitDepth[CHANNEL_TYPE_LUMA] : std::max(m_internalBitDepth[CHANNEL_TYPE_LUMA], m_internalBitDepth[CHANNEL_TYPE_CHROMA]);
   xConfirmPara(m_bitDepthConstraint<maxBitDepth, "The internalBitDepth must not be greater than the bitDepthConstraint value");
   xConfirmPara(m_chromaFormatConstraint<m_chromaFormatIDC, "The chroma format used must not be greater than the chromaFormatConstraint value");
 
@@ -2164,9 +2164,9 @@ bool EncAppCfg::xCheckParameter()
     xConfirmPara(m_cabacBypassAlignmentEnabledFlag && m_profile!=Profile::HIGHTHROUGHPUTREXT, "AlignCABACBeforeBypass must not be enabled unless the high throughput profile is being used.");
     if (m_profile == Profile::MAINREXT)
     {
-      const UInt intraIdx = m_intraConstraintFlag ? 1:0;
-      const UInt bitDepthIdx = (m_bitDepthConstraint == 8 ? 0 : (m_bitDepthConstraint ==10 ? 1 : (m_bitDepthConstraint == 12 ? 2 : (m_bitDepthConstraint == 16 ? 3 : 4 ))));
-      const UInt chromaFormatIdx = UInt(m_chromaFormatConstraint);
+      const uint32_t intraIdx = m_intraConstraintFlag ? 1:0;
+      const uint32_t bitDepthIdx = (m_bitDepthConstraint == 8 ? 0 : (m_bitDepthConstraint ==10 ? 1 : (m_bitDepthConstraint == 12 ? 2 : (m_bitDepthConstraint == 16 ? 3 : 4 ))));
+      const uint32_t chromaFormatIdx = uint32_t(m_chromaFormatConstraint);
       const bool bValidProfile = (bitDepthIdx > 3 || chromaFormatIdx>3) ? false : (validRExtProfileNames[intraIdx][bitDepthIdx][chromaFormatIdx] != NONE);
       xConfirmPara(!bValidProfile, "Invalid intra constraint flag, bit depth constraint flag and chroma format constraint flag combination for a RExt profile");
       const bool bUsingGeneralRExtTools  = m_transformSkipRotationEnabledFlag        ||
@@ -2232,14 +2232,14 @@ bool EncAppCfg::xCheckParameter()
 #if !RExt__HIGH_BIT_DEPTH_SUPPORT
   if (m_extendedPrecisionProcessingFlag)
   {
-    for (UInt channelType = 0; channelType < MAX_NUM_CHANNEL_TYPE; channelType++)
+    for (uint32_t channelType = 0; channelType < MAX_NUM_CHANNEL_TYPE; channelType++)
     {
       xConfirmPara((m_internalBitDepth[channelType] > 8) , "Model is not configured to support high enough internal accuracies - enable RExt__HIGH_BIT_DEPTH_SUPPORT to use increased precision internal data types etc...");
     }
   }
   else
   {
-    for (UInt channelType = 0; channelType < MAX_NUM_CHANNEL_TYPE; channelType++)
+    for (uint32_t channelType = 0; channelType < MAX_NUM_CHANNEL_TYPE; channelType++)
     {
       xConfirmPara((m_internalBitDepth[channelType] > 12) , "Model is not configured to support high enough internal accuracies - enable RExt__HIGH_BIT_DEPTH_SUPPORT to use increased precision internal data types etc...");
     }
@@ -2446,7 +2446,7 @@ bool EncAppCfg::xCheckParameter()
 #endif
   if( m_usePCM)
   {
-    for (UInt channelType = 0; channelType < MAX_NUM_CHANNEL_TYPE; channelType++)
+    for (uint32_t channelType = 0; channelType < MAX_NUM_CHANNEL_TYPE; channelType++)
     {
       xConfirmPara(((m_MSBExtendedBitDepth[channelType] > m_internalBitDepth[channelType]) && m_bPCMInputBitDepthFlag), "PCM bit depth cannot be greater than internal bit depth (PCMInputBitDepthFlag cannot be used when InputBitDepth or MSBExtendedBitDepth > InternalBitDepth)");
     }
@@ -2498,7 +2498,7 @@ bool EncAppCfg::xCheckParameter()
   }
 
   // max CU width and height should be power of 2
-  UInt ui = m_uiMaxCUWidth;
+  uint32_t ui = m_uiMaxCUWidth;
   while(ui)
   {
     ui >>= 1;
@@ -2941,7 +2941,7 @@ bool EncAppCfg::xCheckParameter()
   if (m_kneeSEIEnabled && !m_kneeSEICancelFlag)
   {
     xConfirmPara( m_kneeSEINumKneePointsMinus1 < 0 || m_kneeSEINumKneePointsMinus1 > 998, "SEIKneeFunctionNumKneePointsMinus1 must be in the range of 0 to 998");
-    for ( UInt i=0; i<=m_kneeSEINumKneePointsMinus1; i++ )
+    for ( uint32_t i=0; i<=m_kneeSEINumKneePointsMinus1; i++ )
     {
       xConfirmPara( m_kneeSEIInputKneePoint[i] < 1 || m_kneeSEIInputKneePoint[i] > 999, "SEIKneeFunctionInputKneePointValue must be in the range of 1 to 999");
       xConfirmPara( m_kneeSEIOutputKneePoint[i] < 0 || m_kneeSEIOutputKneePoint[i] > 1000, "SEIKneeFunctionInputKneePointValue must be in the range of 0 to 1000");
@@ -2973,7 +2973,7 @@ bool EncAppCfg::xCheckParameter()
 #if U0132_TARGET_BITS_SATURATION
     if ((m_RCCpbSaturationEnabled) && (m_level!=Level::NONE) && (m_profile!=Profile::NONE))
     {
-      UInt uiLevelIdx = (m_level / 10) + (UInt)((m_level % 10) / 3);    // (m_level / 30)*3 + ((m_level % 10) / 3);
+      uint32_t uiLevelIdx = (m_level / 10) + (uint32_t)((m_level % 10) / 3);    // (m_level / 30)*3 + ((m_level % 10) / 3);
       xConfirmPara(m_RCCpbSize > g_uiMaxCpbSize[m_levelTier][uiLevelIdx], "RCCpbSize should be smaller than or equal to Max CPB size according to tier and level");
       xConfirmPara(m_RCInitialCpbFullness > 1, "RCInitialCpbFullness should be smaller than or equal to 1");
     }
@@ -3047,9 +3047,9 @@ bool EncAppCfg::xCheckParameter()
 
 const char *profileToString(const Profile::Name profile)
 {
-  static const UInt numberOfProfiles = sizeof(strToProfile)/sizeof(*strToProfile);
+  static const uint32_t numberOfProfiles = sizeof(strToProfile)/sizeof(*strToProfile);
 
-  for (UInt profileIndex = 0; profileIndex < numberOfProfiles; profileIndex++)
+  for (uint32_t profileIndex = 0; profileIndex < numberOfProfiles; profileIndex++)
   {
     if (strToProfile[profileIndex].value == profile)
     {
@@ -3096,9 +3096,9 @@ void EncAppCfg::xPrintParameter()
     }
     else
     {
-      const UInt intraIdx = m_intraConstraintFlag ? 1:0;
-      const UInt bitDepthIdx = (m_bitDepthConstraint == 8 ? 0 : (m_bitDepthConstraint ==10 ? 1 : (m_bitDepthConstraint == 12 ? 2 : (m_bitDepthConstraint == 16 ? 3 : 4 ))));
-      const UInt chromaFormatIdx = UInt(m_chromaFormatConstraint);
+      const uint32_t intraIdx = m_intraConstraintFlag ? 1:0;
+      const uint32_t bitDepthIdx = (m_bitDepthConstraint == 8 ? 0 : (m_bitDepthConstraint ==10 ? 1 : (m_bitDepthConstraint == 12 ? 2 : (m_bitDepthConstraint == 16 ? 3 : 4 ))));
+      const uint32_t chromaFormatIdx = uint32_t(m_chromaFormatConstraint);
       validProfileName = (bitDepthIdx > 3 || chromaFormatIdx>3) ? NONE : validRExtProfileNames[intraIdx][bitDepthIdx][chromaFormatIdx];
     }
     std::string rextSubProfile;

@@ -333,9 +333,9 @@ public:
   list<EncRCPic*>& getPicList() { return m_listRCPictures; }
 #if U0132_TARGET_BITS_SATURATION
   bool       getCpbSaturationEnabled()  { return m_CpbSaturationEnabled;  }
-  UInt       getCpbState()              { return m_cpbState;       }
-  UInt       getCpbSize()               { return m_cpbSize;        }
-  UInt       getBufferingRate()         { return m_bufferingRate;  }
+  uint32_t       getCpbState()              { return m_cpbState;       }
+  uint32_t       getCpbSize()               { return m_cpbSize;        }
+  uint32_t       getBufferingRate()         { return m_bufferingRate;  }
   int        updateCpbState(int actualBits);
   void       initHrdParam(const HRD* pcHrd, int iFrameRate, double fInitialCpbFullness);
 #endif
@@ -349,8 +349,8 @@ private:
 #if U0132_TARGET_BITS_SATURATION
   bool       m_CpbSaturationEnabled;    // Enable target bits saturation to avoid CPB overflow and underflow
   int        m_cpbState;                // CPB State
-  UInt       m_cpbSize;                 // CPB size
-  UInt       m_bufferingRate;           // Buffering rate
+  uint32_t       m_cpbSize;                 // CPB size
+  uint32_t       m_bufferingRate;           // Buffering rate
 #endif
 };
 

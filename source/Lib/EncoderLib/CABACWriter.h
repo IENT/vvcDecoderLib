@@ -221,7 +221,7 @@ public:
 #if JVET_K0371_ALF
   void        codeAlfCtuEnableFlags     ( CodingStructure& cs, ChannelType channel, AlfSliceParam* alfParam);
   void        codeAlfCtuEnableFlags     ( CodingStructure& cs, ComponentID compID, AlfSliceParam* alfParam);
-  void        codeAlfCtuEnableFlag      ( CodingStructure& cs, UInt ctuRsAddr, const int compIdx, AlfSliceParam* alfParam = NULL );
+  void        codeAlfCtuEnableFlag      ( CodingStructure& cs, uint32_t ctuRsAddr, const int compIdx, AlfSliceParam* alfParam = NULL );
 #endif
 
 private:
@@ -237,7 +237,7 @@ private:
   void        alf_cu_ctrl               ( const ALFParam&               alfParam );
   void        alf_chroma                ( const ALFParam&               alfParam );
   int         alf_lengthGolomb          ( int coeffVal, int k );
-  void        codeAlfUvlc               ( UInt uiCode );
+  void        codeAlfUvlc               ( uint32_t uiCode );
   void        codeAlfSvlc               ( int iCode );
   void        alfGolombEncode           ( int coeff, int k );
 
@@ -246,9 +246,9 @@ private:
   unsigned    get_num_written_bits()    { return m_BinEncoder.getNumWrittenBits(); }
 
 #if JEM_TOOLS
-  void  xWriteTruncBinCode(UInt uiSymbol, UInt uiMaxSymbol);
+  void  xWriteTruncBinCode(uint32_t uiSymbol, uint32_t uiMaxSymbol);
 #if JVET_C0038_NO_PREV_FILTERS
-  void  xWriteEpExGolomb(UInt uiSymbol, UInt uiCount);
+  void  xWriteEpExGolomb(uint32_t uiSymbol, uint32_t uiCount);
 #endif
 
 #endif

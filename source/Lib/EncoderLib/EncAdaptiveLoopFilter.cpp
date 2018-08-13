@@ -1868,19 +1868,19 @@ EncAdaptiveLoopFilter::EncAdaptiveLoopFilter()
 // Public member functions
 // ====================================================================================================================
 
-void EncAdaptiveLoopFilter::create( const int iPicWidth, int iPicHeight, const ChromaFormat chromaFormatIDC, const int uiMaxCUWidth, const UInt uiMaxCUHeight, const UInt uiMaxCUDepth, const int nInputBitDepth, const int nInternalBitDepth, const int numberOfCTUs )
+void EncAdaptiveLoopFilter::create( const int iPicWidth, int iPicHeight, const ChromaFormat chromaFormatIDC, const int uiMaxCUWidth, const uint32_t uiMaxCUHeight, const uint32_t uiMaxCUDepth, const int nInputBitDepth, const int nInternalBitDepth, const int numberOfCTUs )
 {
   AdaptiveLoopFilter::create( iPicWidth, iPicHeight, chromaFormatIDC, uiMaxCUWidth, uiMaxCUHeight, uiMaxCUDepth, nInputBitDepth, nInternalBitDepth, numberOfCTUs );
 
   m_bestPelBuf.create( chromaFormatIDC, Area(0, 0, iPicWidth, iPicHeight ), uiMaxCUWidth, 0, 0, false );
   m_tempPelBuf.create( chromaFormatIDC, Area(0, 0, iPicWidth, iPicHeight ), uiMaxCUWidth, 0, 0, false );
 
-  m_maskBuf.buf = (UInt *) calloc( iPicWidth*iPicHeight, sizeof(UInt ) );
+  m_maskBuf.buf = (uint32_t *) calloc( iPicWidth*iPicHeight, sizeof(uint32_t ) );
   m_maskBuf.width   = iPicWidth;
   m_maskBuf.height  = iPicHeight;
   m_maskBuf.stride  = iPicWidth;
 
-  m_maskBestBuf.buf = (UInt *)calloc(iPicWidth*iPicHeight, sizeof(UInt));
+  m_maskBestBuf.buf = (uint32_t *)calloc(iPicWidth*iPicHeight, sizeof(uint32_t));
   m_maskBestBuf.width = iPicWidth;
   m_maskBestBuf.height = iPicHeight;
   m_maskBestBuf.stride = iPicWidth;
@@ -2141,7 +2141,7 @@ void EncAdaptiveLoopFilter::ALFProcess(CodingStructure& cs, ALFParam* pcAlfParam
   {
     m_bestPelBuf.copyFrom(recUnitBuf);
     //test stored ALF coefficients of both luma and chroma.
-    for (UInt iAlfIdx = 0; iAlfIdx < iStoredAlfParaNum && iAlfIdx < C806_ALF_TEMPPRED_NUM; iAlfIdx++)
+    for (uint32_t iAlfIdx = 0; iAlfIdx < iStoredAlfParaNum && iAlfIdx < C806_ALF_TEMPPRED_NUM; iAlfIdx++)
     {
       recUnitBuf.copyFrom(recExtBuf);
       ALFParam& pcStoredAlf = pcStoredAlfPara[iAlfIdx];
@@ -2594,7 +2594,7 @@ void EncAdaptiveLoopFilter::xCheckReUseFilterSet( CodingStructure& cs, const Pel
 
   cFrmAlfParam.cu_control_flag = 1;
 
-  for( UInt uiDepth = 0; uiDepth < m_uiMaxTotalCUDepth; uiDepth++ )
+  for( uint32_t uiDepth = 0; uiDepth < m_uiMaxTotalCUDepth; uiDepth++ )
   {
     m_tempPelBuf.get(COMPONENT_Y).copyFrom(dstUnitBuf.get(COMPONENT_Y));
     copyALFParam( m_pcTempAlfParam, &cFrmAlfParam);
@@ -4613,7 +4613,7 @@ void EncAdaptiveLoopFilter::xCheckCUAdaptation( CodingStructure& cs, const PelUn
   int    Height = orgUnitBuf.get(COMPONENT_Y).height;
   int    Width = orgUnitBuf.get(COMPONENT_Y).width;
 
-  for( UInt uiDepth = 0; uiDepth < m_uiMaxTotalCUDepth; uiDepth++ )
+  for( uint32_t uiDepth = 0; uiDepth < m_uiMaxTotalCUDepth; uiDepth++ )
   {
     int nBlkSize = ( cs.slice->getSPS()->getMaxCUHeight() * cs.slice->getSPS()->getMaxCUWidth() ) >> ( uiDepth << 1 );
     int nPicSize = orgUnitBuf.get(COMPONENT_Y).width * orgUnitBuf.get(COMPONENT_Y).height;
@@ -4629,7 +4629,7 @@ void EncAdaptiveLoopFilter::xCheckCUAdaptation( CodingStructure& cs, const PelUn
     m_pcTempAlfParam->cu_control_flag = 1;
     m_pcTempAlfParam->alf_max_depth = uiDepth;
 
-    for (UInt uiRD = 0; uiRD <= ALF_NUM_OF_REDESIGN; uiRD++)
+    for (uint32_t uiRD = 0; uiRD <= ALF_NUM_OF_REDESIGN; uiRD++)
     {
       if (uiRD)
       {
@@ -4685,7 +4685,7 @@ void EncAdaptiveLoopFilter::xCheckCUAdaptation( CodingStructure& cs, const PelUn
 }
 
 
-void EncAdaptiveLoopFilter::xSetCUAlfCtrlFlags( CodingStructure& cs, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, uint64_t& ruiDist, UInt uiAlfCtrlDepth, ALFParam *pAlfParam )
+void EncAdaptiveLoopFilter::xSetCUAlfCtrlFlags( CodingStructure& cs, const PelUnitBuf& orgUnitBuf, const PelUnitBuf& recExtBuf, PelUnitBuf& recUnitBuf, uint64_t& ruiDist, uint32_t uiAlfCtrlDepth, ALFParam *pAlfParam )
 {
   ruiDist = 0;
   pAlfParam->num_alf_cu_flag = 0;
@@ -4700,7 +4700,7 @@ void EncAdaptiveLoopFilter::xSetCUAlfCtrlFlags( CodingStructure& cs, const PelUn
 
   Partitioner* partitioner = PartitionerFactory::get( *cs.slice );
 
-  for( UInt uiCTUAddr = 0; uiCTUAddr < cs.pcv->sizeInCtus ; uiCTUAddr++ )
+  for( uint32_t uiCTUAddr = 0; uiCTUAddr < cs.pcv->sizeInCtus ; uiCTUAddr++ )
   {
     const unsigned  ctuXPosInCtus         = uiCTUAddr % widthInCtus;
     const unsigned  ctuYPosInCtus         = uiCTUAddr / widthInCtus;
@@ -4748,7 +4748,7 @@ void EncAdaptiveLoopFilter::xSetCUAlfCtrlFlag( CodingStructure& cs, const UnitAr
   uint64_t uiRecSSD  = xCalcSSD( orgBufCUs, recBufCUs  );
   uint64_t uiFiltSSD = xCalcSSD( orgBufCUs, cfiltBufCUs );
 
-  UInt filterFlag = !!(uiFiltSSD < uiRecSSD );
+  uint32_t filterFlag = !!(uiFiltSSD < uiRecSSD );
   maskBufCUs.fill( filterFlag );
   ruiDist += filterFlag ? uiFiltSSD : uiRecSSD;
   pAlfParam->alf_cu_flag[pAlfParam->num_alf_cu_flag] = 0!=filterFlag;
@@ -5802,7 +5802,7 @@ uint64_t EncAdaptiveLoopFilter::xCalcSSD(const CPelBuf& refBuf, const CPelBuf& c
   uint64_t uiSSD = 0;
   int x, y;
 
-  UInt uiShift = m_nBitIncrement<<1;
+  uint32_t uiShift = m_nBitIncrement<<1;
   int iTemp;
 
   for( y = 0; y < iHeight; y++ )
@@ -6345,8 +6345,8 @@ bool EncAdaptiveLoopFilter::xFilteringLumaChroma(CodingStructure& cs, ALFParam *
   uint64_t uiRate, uiDist = 0;
   double dCost;
 
-  //UInt   uiTmpMaxDepth = pAlfParam->alf_max_depth;
-  //UInt   uiTmpAlfCtrlFlag = pAlfParam->cu_control_flag;
+  //uint32_t   uiTmpMaxDepth = pAlfParam->alf_max_depth;
+  //uint32_t   uiTmpAlfCtrlFlag = pAlfParam->cu_control_flag;
   m_pcTempAlfParam->temporalPredFlag = true;
   copyALFParam(m_pcTempAlfParam, pAlfParam);
   xcopyFilterCoeff(m_pcTempAlfParam->filterType, m_pcTempAlfParam->alfCoeffLuma);
@@ -6386,10 +6386,10 @@ bool EncAdaptiveLoopFilter::xFilteringLumaChroma(CodingStructure& cs, ALFParam *
   }
 
   m_pcTempAlfParam->cu_control_flag = 1;
-  UInt uiBestDepth = 0;
+  uint32_t uiBestDepth = 0;
   bool bChanged = false;
 
-  for (UInt uiDepth = 0; uiDepth < m_uiMaxTotalCUDepth; uiDepth++)
+  for (uint32_t uiDepth = 0; uiDepth < m_uiMaxTotalCUDepth; uiDepth++)
   {
     m_pcTempAlfParam->alf_max_depth = uiDepth;
     m_tempPelBuf.get(COMPONENT_Y).copyFrom(recUnitBuf.get(COMPONENT_Y));

@@ -73,7 +73,7 @@ DecApp::DecApp()
  - destroy internal class
  - returns the number of mismatching pictures
  */
-UInt DecApp::decode()
+uint32_t DecApp::decode()
 {
   int                 poc;
   PicList* pcListPic = NULL;
@@ -199,7 +199,7 @@ UInt DecApp::decode()
       if ( (!m_reconFileName.empty()) && (!openedReconFile) )
       {
         const BitDepths &bitDepths=pcListPic->front()->cs->sps->getBitDepths(); // use bit depths of first reconstructed picture.
-        for( UInt channelType = 0; channelType < MAX_NUM_CHANNEL_TYPE; channelType++ )
+        for( uint32_t channelType = 0; channelType < MAX_NUM_CHANNEL_TYPE; channelType++ )
         {
             if( m_outputBitDepth[channelType] == 0 )
             {
@@ -248,7 +248,7 @@ UInt DecApp::decode()
   xFlushOutput( pcListPic );
 
   // get the number of checksum errors
-  UInt nRet = m_cDecLib.getNumberOfChecksumErrorsDetected();
+  uint32_t nRet = m_cDecLib.getNumberOfChecksumErrorsDetected();
 
   // delete buffers
   m_cDecLib.deletePicBuffer();
@@ -304,7 +304,7 @@ void DecApp::xDestroyDecLib()
 /** \param pcListPic list of pictures to be written to file
     \param tId       temporal sub-layer ID
  */
-void DecApp::xWriteOutput( PicList* pcListPic, UInt tId )
+void DecApp::xWriteOutput( PicList* pcListPic, uint32_t tId )
 {
   if (pcListPic->empty())
   {
@@ -315,9 +315,9 @@ void DecApp::xWriteOutput( PicList* pcListPic, UInt tId )
   int numPicsNotYetDisplayed = 0;
   int dpbFullness = 0;
   const SPS* activeSPS = (pcListPic->front()->cs->sps);
-  UInt numReorderPicsHighestTid;
-  UInt maxDecPicBufferingHighestTid;
-  UInt maxNrSublayers = activeSPS->getMaxTLayers();
+  uint32_t numReorderPicsHighestTid;
+  uint32_t maxDecPicBufferingHighestTid;
+  uint32_t maxNrSublayers = activeSPS->getMaxTLayers();
 
   if(m_iMaxTemporalLayer == -1 || m_iMaxTemporalLayer >= maxNrSublayers)
   {

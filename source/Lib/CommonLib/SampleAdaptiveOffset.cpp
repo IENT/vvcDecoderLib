@@ -123,7 +123,7 @@ SampleAdaptiveOffset::~SampleAdaptiveOffset()
   m_signLineBuf2.clear();
 }
 
-void SampleAdaptiveOffset::create( int picWidth, int picHeight, ChromaFormat format, UInt maxCUWidth, UInt maxCUHeight, UInt maxCUDepth, UInt lumaBitShift, UInt chromaBitShift )
+void SampleAdaptiveOffset::create( int picWidth, int picHeight, ChromaFormat format, uint32_t maxCUWidth, uint32_t maxCUHeight, uint32_t maxCUDepth, uint32_t lumaBitShift, uint32_t chromaBitShift )
 {
   //temporary picture buffer
   UnitArea picArea(format, Area(0, 0, picWidth, picHeight));
@@ -264,12 +264,12 @@ void SampleAdaptiveOffset::reconstructBlkSAOParam(SAOBlkParam& recParam, SAOBlkP
 
 void SampleAdaptiveOffset::xReconstructBlkSAOParams(CodingStructure& cs, SAOBlkParam* saoBlkParams)
 {
-  for(UInt compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++)
+  for(uint32_t compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++)
   {
     m_picSAOEnabled[compIdx] = false;
   }
 
-  const UInt numberOfComponents = getNumberValidComponents(cs.pcv->chrFormat);
+  const uint32_t numberOfComponents = getNumberValidComponents(cs.pcv->chrFormat);
 
   for(int ctuRsAddr=0; ctuRsAddr< cs.pcv->sizeInCtus; ctuRsAddr++)
   {
@@ -278,7 +278,7 @@ void SampleAdaptiveOffset::xReconstructBlkSAOParams(CodingStructure& cs, SAOBlkP
 
     reconstructBlkSAOParam(saoBlkParams[ctuRsAddr], mergeList);
 
-    for(UInt compIdx = 0; compIdx < numberOfComponents; compIdx++)
+    for(uint32_t compIdx = 0; compIdx < numberOfComponents; compIdx++)
     {
       if(saoBlkParams[ctuRsAddr][compIdx].modeIdc != SAO_MODE_OFF)
       {
@@ -509,9 +509,9 @@ void SampleAdaptiveOffset::offsetBlock(const int channelBitDepth, const ClpRng& 
 
 void SampleAdaptiveOffset::offsetCTU( const UnitArea& area, const CPelUnitBuf& src, PelUnitBuf& res, SAOBlkParam& saoblkParam, CodingStructure& cs)
 {
-  const UInt numberOfComponents = getNumberValidComponents( area.chromaFormat );
+  const uint32_t numberOfComponents = getNumberValidComponents( area.chromaFormat );
   bool bAllOff=true;
-  for( UInt compIdx = 0; compIdx < numberOfComponents; compIdx++)
+  for( uint32_t compIdx = 0; compIdx < numberOfComponents; compIdx++)
   {
     if (saoblkParam[compIdx].modeIdc != SAO_MODE_OFF)
     {
@@ -568,9 +568,9 @@ void SampleAdaptiveOffset::SAOProcess( CodingStructure& cs, SAOBlkParam* saoBlkP
 
   xReconstructBlkSAOParams(cs, saoBlkParams);
 
-  const UInt numberOfComponents = getNumberValidComponents(cs.area.chromaFormat);
+  const uint32_t numberOfComponents = getNumberValidComponents(cs.area.chromaFormat);
   bool bAllDisabled = true;
-  for (UInt compIdx = 0; compIdx < numberOfComponents; compIdx++)
+  for (uint32_t compIdx = 0; compIdx < numberOfComponents; compIdx++)
   {
     if (m_picSAOEnabled[compIdx])
     {
@@ -587,12 +587,12 @@ void SampleAdaptiveOffset::SAOProcess( CodingStructure& cs, SAOBlkParam* saoBlkP
   m_tempBuf.copyFrom( rec );
 
   int ctuRsAddr = 0;
-  for( UInt yPos = 0; yPos < pcv.lumaHeight; yPos += pcv.maxCUHeight )
+  for( uint32_t yPos = 0; yPos < pcv.lumaHeight; yPos += pcv.maxCUHeight )
   {
-    for( UInt xPos = 0; xPos < pcv.lumaWidth; xPos += pcv.maxCUWidth )
+    for( uint32_t xPos = 0; xPos < pcv.lumaWidth; xPos += pcv.maxCUWidth )
     {
-      const UInt width  = (xPos + pcv.maxCUWidth  > pcv.lumaWidth)  ? (pcv.lumaWidth - xPos)  : pcv.maxCUWidth;
-      const UInt height = (yPos + pcv.maxCUHeight > pcv.lumaHeight) ? (pcv.lumaHeight - yPos) : pcv.maxCUHeight;
+      const uint32_t width  = (xPos + pcv.maxCUWidth  > pcv.lumaWidth)  ? (pcv.lumaWidth - xPos)  : pcv.maxCUWidth;
+      const uint32_t height = (yPos + pcv.maxCUHeight > pcv.lumaHeight) ? (pcv.lumaHeight - yPos) : pcv.maxCUHeight;
       const UnitArea area( cs.area.chromaFormat, Area(xPos , yPos, width, height) );
 
       offsetCTU( area, m_tempBuf, rec, cs.picture->getSAO()[ctuRsAddr], cs);
@@ -618,9 +618,9 @@ void SampleAdaptiveOffset::xPCMLFDisableProcess(CodingStructure& cs)
 
   if( bPCMFilter || cs.pps->getTransquantBypassEnabledFlag() )
   {
-    for( UInt yPos = 0; yPos < pcv.lumaHeight; yPos += pcv.maxCUHeight )
+    for( uint32_t yPos = 0; yPos < pcv.lumaHeight; yPos += pcv.maxCUHeight )
     {
-      for( UInt xPos = 0; xPos < pcv.lumaWidth; xPos += pcv.maxCUWidth )
+      for( uint32_t xPos = 0; xPos < pcv.lumaWidth; xPos += pcv.maxCUWidth )
       {
         UnitArea ctuArea( cs.area.chromaFormat, Area( xPos, yPos, pcv.maxCUWidth, pcv.maxCUHeight ) );
 
@@ -640,9 +640,9 @@ void SampleAdaptiveOffset::xPCMCURestoration(CodingStructure& cs, const UnitArea
     // restore PCM samples
     if( ( cu.ipcm && sps.getPCMFilterDisableFlag() ) || CU::isLosslessCoded( cu ) )
     {
-      const UInt numComponents = m_numberOfComponents;
+      const uint32_t numComponents = m_numberOfComponents;
 
-      for( UInt comp = 0; comp < numComponents; comp++ )
+      for( uint32_t comp = 0; comp < numComponents; comp++ )
       {
         xPCMSampleRestoration( cu, ComponentID( comp ) );
       }
@@ -671,11 +671,11 @@ void SampleAdaptiveOffset::xPCMSampleRestoration(CodingUnit& cu, const Component
   const CPelBuf& pcmBuf   = tu.getPcmbuf( compID );
          PelBuf dstBuf    = cu.cs->getRecoBuf( ca );
   const SPS &sps = *cu.cs->sps;
-  const UInt uiPcmLeftShiftBit = sps.getBitDepth(toChannelType(compID)) - sps.getPCMBitDepth(toChannelType(compID));
+  const uint32_t uiPcmLeftShiftBit = sps.getBitDepth(toChannelType(compID)) - sps.getPCMBitDepth(toChannelType(compID));
 
-  for (UInt y = 0; y < ca.height; y++)
+  for (uint32_t y = 0; y < ca.height; y++)
   {
-    for (UInt x = 0; x < ca.width; x++)
+    for (uint32_t x = 0; x < ca.width; x++)
     {
       dstBuf.at(x,y) = (pcmBuf.at(x,y) << uiPcmLeftShiftBit);
     }

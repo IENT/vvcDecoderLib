@@ -137,12 +137,12 @@ Slice::Slice()
 , m_dProcessingTime               ( 0 )
 , m_uiMaxBTSize                   ( 0 )
 {
-  for(UInt i=0; i<NUM_REF_PIC_LIST_01; i++)
+  for(uint32_t i=0; i<NUM_REF_PIC_LIST_01; i++)
   {
     m_aiNumRefIdx[i] = 0;
   }
 
-  for (UInt component = 0; component < MAX_NUM_COMPONENT; component++)
+  for (uint32_t component = 0; component < MAX_NUM_COMPONENT; component++)
   {
     m_lambdas            [component] = 0.0;
     m_iSliceChromaQpDelta[component] = 0;
@@ -157,7 +157,7 @@ Slice::Slice()
 
   for(int iNumCount = 0; iNumCount < MAX_NUM_REF; iNumCount++)
   {
-    for(UInt i=0; i<NUM_REF_PIC_LIST_01; i++)
+    for(uint32_t i=0; i<NUM_REF_PIC_LIST_01; i++)
     {
       m_apcRefPicList [i][iNumCount] = NULL;
       m_aiRefPOCList  [i][iNumCount] = 0;
@@ -200,7 +200,7 @@ Slice::~Slice()
 
 void Slice::initSlice()
 {
-  for(UInt i=0; i<NUM_REF_PIC_LIST_01; i++)
+  for(uint32_t i=0; i<NUM_REF_PIC_LIST_01; i++)
   {
     m_aiNumRefIdx[i]      = 0;
   }
@@ -211,7 +211,7 @@ void Slice::initSlice()
 
   m_bCheckLDC = false;
 
-  for (UInt component = 0; component < MAX_NUM_COMPONENT; component++)
+  for (uint32_t component = 0; component < MAX_NUM_COMPONENT; component++)
   {
     m_iSliceChromaQpDelta[component] = 0;
   }
@@ -396,13 +396,13 @@ void Slice::setRefPicList( PicList& rcListPic, bool checkNumPocTotalCurr, bool b
   }
 
   Picture*  pcRefPic= NULL;
-  static const UInt MAX_NUM_NEGATIVE_PICTURES=16;
+  static const uint32_t MAX_NUM_NEGATIVE_PICTURES=16;
   Picture*  RefPicSetStCurr0[MAX_NUM_NEGATIVE_PICTURES];
   Picture*  RefPicSetStCurr1[MAX_NUM_NEGATIVE_PICTURES];
   Picture*  RefPicSetLtCurr[MAX_NUM_NEGATIVE_PICTURES];
-  UInt NumPicStCurr0 = 0;
-  UInt NumPicStCurr1 = 0;
-  UInt NumPicLtCurr = 0;
+  uint32_t NumPicStCurr0 = 0;
+  uint32_t NumPicStCurr1 = 0;
+  uint32_t NumPicLtCurr = 0;
   int i;
 
   for(i=0; i < m_pRPS->getNumberOfNegativePictures(); i++)
@@ -551,7 +551,7 @@ int Slice::getNumRpsCurrTempList() const
   {
     return 0;
   }
-  for(UInt i=0; i < m_pRPS->getNumberOfNegativePictures()+ m_pRPS->getNumberOfPositivePictures() + m_pRPS->getNumberOfLongtermPictures(); i++)
+  for(uint32_t i=0; i < m_pRPS->getNumberOfNegativePictures()+ m_pRPS->getNumberOfPositivePictures() + m_pRPS->getNumberOfLongtermPictures(); i++)
   {
     if(m_pRPS->getUsed(i))
     {
@@ -575,7 +575,7 @@ void Slice::initEqualRef()
   }
 }
 
-void Slice::checkColRefIdx(UInt curSliceSegmentIdx, const Picture* pic)
+void Slice::checkColRefIdx(uint32_t curSliceSegmentIdx, const Picture* pic)
 {
   int i;
   Slice* curSlice = pic->slices[curSliceSegmentIdx];
@@ -765,7 +765,7 @@ void Slice::copySliceInfo(Slice *pSrc, bool cpyAlmostAll)
 
   m_bCheckLDC             = pSrc->m_bCheckLDC;
   m_iSliceQpDelta        = pSrc->m_iSliceQpDelta;
-  for (UInt component = 0; component < MAX_NUM_COMPONENT; component++)
+  for (uint32_t component = 0; component < MAX_NUM_COMPONENT; component++)
   {
     m_iSliceChromaQpDelta[component] = pSrc->m_iSliceChromaQpDelta[component];
   }
@@ -828,15 +828,15 @@ void Slice::copySliceInfo(Slice *pSrc, bool cpyAlmostAll)
   m_clpRngs                       = pSrc->m_clpRngs;
   m_pendingRasInit                = pSrc->m_pendingRasInit;
 
-  for ( UInt e=0 ; e<NUM_REF_PIC_LIST_01 ; e++ )
+  for ( uint32_t e=0 ; e<NUM_REF_PIC_LIST_01 ; e++ )
   {
-    for ( UInt n=0 ; n<MAX_NUM_REF ; n++ )
+    for ( uint32_t n=0 ; n<MAX_NUM_REF ; n++ )
     {
       memcpy(m_weightPredTable[e][n], pSrc->m_weightPredTable[e][n], sizeof(WPScalingParam)*MAX_NUM_COMPONENT );
     }
   }
 
-  for( UInt ch = 0 ; ch < MAX_NUM_CHANNEL_TYPE; ch++)
+  for( uint32_t ch = 0 ; ch < MAX_NUM_CHANNEL_TYPE; ch++)
   {
     m_saoEnabledFlag[ch] = pSrc->m_saoEnabledFlag[ch];
   }
@@ -1706,7 +1706,7 @@ SPSRExt::SPSRExt()
  , m_persistentRiceAdaptationEnabledFlag(false)
  , m_cabacBypassAlignmentEnabledFlag    (false)
 {
-  for (UInt signallingModeIndex = 0; signallingModeIndex < NUMBER_OF_RDPCM_SIGNALLING_MODES; signallingModeIndex++)
+  for (uint32_t signallingModeIndex = 0; signallingModeIndex < NUMBER_OF_RDPCM_SIGNALLING_MODES; signallingModeIndex++)
   {
     m_rdpcmEnabledFlag[signallingModeIndex] = false;
   }
@@ -2139,9 +2139,9 @@ RefPicListModification::~RefPicListModification()
 #if HEVC_USE_SCALING_LISTS
 ScalingList::ScalingList()
 {
-  for(UInt sizeId = 0; sizeId < SCALING_LIST_SIZE_NUM; sizeId++)
+  for(uint32_t sizeId = 0; sizeId < SCALING_LIST_SIZE_NUM; sizeId++)
   {
-    for(UInt listId = 0; listId < SCALING_LIST_NUM; listId++)
+    for(uint32_t listId = 0; listId < SCALING_LIST_NUM; listId++)
     {
       m_scalingListCoef[sizeId][listId].resize(std::min<int>(MAX_MATRIX_COEF_NUM,(int)g_scalingListSize[sizeId]));
     }
@@ -2152,9 +2152,9 @@ ScalingList::ScalingList()
 */
 void ScalingList::setDefaultScalingList()
 {
-  for(UInt sizeId = 0; sizeId < SCALING_LIST_SIZE_NUM; sizeId++)
+  for(uint32_t sizeId = 0; sizeId < SCALING_LIST_SIZE_NUM; sizeId++)
   {
-    for(UInt listId=0;listId<SCALING_LIST_NUM;listId++)
+    for(uint32_t listId=0;listId<SCALING_LIST_NUM;listId++)
     {
       processDefaultMatrix(sizeId, listId);
     }
@@ -2165,11 +2165,11 @@ void ScalingList::setDefaultScalingList()
 */
 bool ScalingList::checkDefaultScalingList()
 {
-  UInt defaultCounter=0;
+  uint32_t defaultCounter=0;
 
-  for( UInt sizeId = 0; sizeId < SCALING_LIST_SIZE_NUM; sizeId++ )
+  for( uint32_t sizeId = 0; sizeId < SCALING_LIST_SIZE_NUM; sizeId++ )
   {
-    for(UInt listId=0;listId<SCALING_LIST_NUM;listId++)
+    for(uint32_t listId=0;listId<SCALING_LIST_NUM;listId++)
     {
       if( !::memcmp(getScalingListAddress(sizeId,listId), getScalingListDefaultAddress(sizeId, listId),sizeof(int)*std::min(MAX_MATRIX_COEF_NUM,(int)g_scalingListSize[sizeId])) // check value of matrix
      && ((sizeId < SCALING_LIST_16x16) || (getScalingListDC(sizeId,listId) == 16))) // check DC value
@@ -2187,12 +2187,12 @@ bool ScalingList::checkDefaultScalingList()
  * \param listId    index of input matrix
  * \param refListId index of reference matrix
  */
-void ScalingList::processRefMatrix( UInt sizeId, UInt listId , UInt refListId )
+void ScalingList::processRefMatrix( uint32_t sizeId, uint32_t listId , uint32_t refListId )
 {
   ::memcpy(getScalingListAddress(sizeId, listId),((listId == refListId)? getScalingListDefaultAddress(sizeId, refListId): getScalingListAddress(sizeId, refListId)),sizeof(int)*std::min(MAX_MATRIX_COEF_NUM,(int)g_scalingListSize[sizeId]));
 }
 
-void ScalingList::checkPredMode(UInt sizeId, UInt listId)
+void ScalingList::checkPredMode(uint32_t sizeId, uint32_t listId)
 {
   int predListStep = (sizeId == SCALING_LIST_32x32? (SCALING_LIST_NUM/NUMBER_OF_PREDICTION_MODES) : 1); // if 32x32, skip over chroma entries.
 
@@ -2228,9 +2228,9 @@ static void outputScalingListHelp(std::ostream &os)
          "  <value>\n";
 
   os << "The permitted matrix names are:\n";
-  for(UInt sizeIdc = 0; sizeIdc < SCALING_LIST_SIZE_NUM; sizeIdc++)
+  for(uint32_t sizeIdc = 0; sizeIdc < SCALING_LIST_SIZE_NUM; sizeIdc++)
   {
-    for(UInt listIdc = 0; listIdc < SCALING_LIST_NUM; listIdc++)
+    for(uint32_t listIdc = 0; listIdc < SCALING_LIST_NUM; listIdc++)
     {
       if ((sizeIdc!=SCALING_LIST_32x32) || (listIdc%(SCALING_LIST_NUM/NUMBER_OF_PREDICTION_MODES) == 0))
       {
@@ -2242,18 +2242,18 @@ static void outputScalingListHelp(std::ostream &os)
 
 void ScalingList::outputScalingLists(std::ostream &os) const
 {
-  for(UInt sizeIdc = 0; sizeIdc < SCALING_LIST_SIZE_NUM; sizeIdc++)
+  for(uint32_t sizeIdc = 0; sizeIdc < SCALING_LIST_SIZE_NUM; sizeIdc++)
   {
-    const UInt size = std::min(8,4<<(sizeIdc));
-    for(UInt listIdc = 0; listIdc < SCALING_LIST_NUM; listIdc++)
+    const uint32_t size = std::min(8,4<<(sizeIdc));
+    for(uint32_t listIdc = 0; listIdc < SCALING_LIST_NUM; listIdc++)
     {
       if ((sizeIdc!=SCALING_LIST_32x32) || (listIdc%(SCALING_LIST_NUM/NUMBER_OF_PREDICTION_MODES) == 0))
       {
         const int *src = getScalingListAddress(sizeIdc, listIdc);
         os << (MatrixType[sizeIdc][listIdc]) << " =\n  ";
-        for(UInt y=0; y<size; y++)
+        for(uint32_t y=0; y<size; y++)
         {
-          for(UInt x=0; x<size; x++, src++)
+          for(uint32_t x=0; x<size; x++, src++)
           {
             os << std::setw(3) << (*src) << ", ";
           }
@@ -2289,18 +2289,18 @@ bool ScalingList::xParseScalingList(const std::string &fileName)
     return true;
   }
 
-  for(UInt sizeIdc = SCALING_LIST_FIRST_CODED; sizeIdc < SCALING_LIST_SIZE_NUM; sizeIdc++)
+  for(uint32_t sizeIdc = SCALING_LIST_FIRST_CODED; sizeIdc < SCALING_LIST_SIZE_NUM; sizeIdc++)
   {
-    const UInt size = std::min(MAX_MATRIX_COEF_NUM,(int)g_scalingListSize[sizeIdc]);
+    const uint32_t size = std::min(MAX_MATRIX_COEF_NUM,(int)g_scalingListSize[sizeIdc]);
 
-    for(UInt listIdc = 0; listIdc < SCALING_LIST_NUM; listIdc++)
+    for(uint32_t listIdc = 0; listIdc < SCALING_LIST_NUM; listIdc++)
     {
       int * const src = getScalingListAddress(sizeIdc, listIdc);
 
       if ((sizeIdc==SCALING_LIST_32x32) && (listIdc%(SCALING_LIST_NUM/NUMBER_OF_PREDICTION_MODES) != 0)) // derive chroma32x32 from chroma16x16
       {
         const int *srcNextSmallerSize = getScalingListAddress(sizeIdc-1, listIdc);
-        for(UInt i=0; i<size; i++)
+        for(uint32_t i=0; i<size; i++)
         {
           src[i] = srcNextSmallerSize[i];
         }
@@ -2327,7 +2327,7 @@ bool ScalingList::xParseScalingList(const std::string &fileName)
             return true;
           }
         }
-        for (UInt i=0; i<size; i++)
+        for (uint32_t i=0; i<size; i++)
         {
           int data;
           if (fscanf(fp, "%d,", &data)!=1)
@@ -2397,7 +2397,7 @@ bool ScalingList::xParseScalingList(const std::string &fileName)
  * \param listId list index
  * \returns pointer of quantization matrix
  */
-const int* ScalingList::getScalingListDefaultAddress(UInt sizeId, UInt listId)
+const int* ScalingList::getScalingListDefaultAddress(uint32_t sizeId, uint32_t listId)
 {
   const int *src = 0;
   switch(sizeId)
@@ -2425,7 +2425,7 @@ const int* ScalingList::getScalingListDefaultAddress(UInt sizeId, UInt listId)
  * \param sizeId size index
  * \param listId index of input matrix
  */
-void ScalingList::processDefaultMatrix(UInt sizeId, UInt listId)
+void ScalingList::processDefaultMatrix(uint32_t sizeId, uint32_t listId)
 {
   ::memcpy(getScalingListAddress(sizeId, listId),getScalingListDefaultAddress(sizeId,listId),sizeof(int)*std::min(MAX_MATRIX_COEF_NUM,(int)g_scalingListSize[sizeId]));
   setScalingListDC(sizeId,listId,SCALING_LIST_DC);
@@ -2435,9 +2435,9 @@ void ScalingList::processDefaultMatrix(UInt sizeId, UInt listId)
  */
 void ScalingList::checkDcOfMatrix()
 {
-  for(UInt sizeId = 0; sizeId < SCALING_LIST_SIZE_NUM; sizeId++)
+  for(uint32_t sizeId = 0; sizeId < SCALING_LIST_SIZE_NUM; sizeId++)
   {
-    for(UInt listId = 0; listId < SCALING_LIST_NUM; listId++)
+    for(uint32_t listId = 0; listId < SCALING_LIST_NUM; listId++)
     {
       //check default matrix?
       if(getScalingListDC(sizeId,listId) == 0)
@@ -2628,36 +2628,36 @@ void calculateParameterSetChangedFlag(bool &bChanged, const std::vector<uint8_t>
 
 //! \}
 
-UInt PreCalcValues::getValIdx( const Slice &slice, const ChannelType chType ) const
+uint32_t PreCalcValues::getValIdx( const Slice &slice, const ChannelType chType ) const
 {
   return slice.isIntra() ? ( ISingleTree ? 0 : ( chType << 1 ) ) : 1;
 }
 
-UInt PreCalcValues::getMaxBtDepth( const Slice &slice, const ChannelType chType ) const
+uint32_t PreCalcValues::getMaxBtDepth( const Slice &slice, const ChannelType chType ) const
 {
   return maxBtDepth[getValIdx( slice, chType )];
 }
 
-UInt PreCalcValues::getMinBtSize( const Slice &slice, const ChannelType chType ) const
+uint32_t PreCalcValues::getMinBtSize( const Slice &slice, const ChannelType chType ) const
 {
   return minBtSize[getValIdx( slice, chType )];
 }
 
-UInt PreCalcValues::getMaxBtSize( const Slice &slice, const ChannelType chType ) const
+uint32_t PreCalcValues::getMaxBtSize( const Slice &slice, const ChannelType chType ) const
 {
   return ( !slice.isIntra() || isLuma( chType ) || ISingleTree ) ? slice.getMaxBTSize() : MAX_BT_SIZE_C;
 }
 
-UInt PreCalcValues::getMinTtSize( const Slice &slice, const ChannelType chType ) const
+uint32_t PreCalcValues::getMinTtSize( const Slice &slice, const ChannelType chType ) const
 {
   return minTtSize[getValIdx( slice, chType )];
 }
 
-UInt PreCalcValues::getMaxTtSize( const Slice &slice, const ChannelType chType ) const
+uint32_t PreCalcValues::getMaxTtSize( const Slice &slice, const ChannelType chType ) const
 {
   return maxTtSize[getValIdx( slice, chType )];
 }
-UInt PreCalcValues::getMinQtSize( const Slice &slice, const ChannelType chType ) const
+uint32_t PreCalcValues::getMinQtSize( const Slice &slice, const ChannelType chType ) const
 {
   return minQtSize[getValIdx( slice, chType )];
 }

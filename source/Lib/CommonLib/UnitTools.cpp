@@ -282,7 +282,7 @@ bool CU::isSameSliceAndTile(const CodingUnit& cu, const CodingUnit& cu2)
 
 bool CU::isSameCtu(const CodingUnit& cu, const CodingUnit& cu2)
 {
-  UInt ctuSizeBit = g_aucLog2[cu.cs->sps->getMaxCUWidth()];
+  uint32_t ctuSizeBit = g_aucLog2[cu.cs->sps->getMaxCUWidth()];
 
   Position pos1Ctu(cu.lumaPos().x  >> ctuSizeBit, cu.lumaPos().y  >> ctuSizeBit);
   Position pos2Ctu(cu2.lumaPos().x >> ctuSizeBit, cu2.lumaPos().y >> ctuSizeBit);
@@ -290,11 +290,11 @@ bool CU::isSameCtu(const CodingUnit& cu, const CodingUnit& cu2)
   return pos1Ctu.x == pos2Ctu.x && pos1Ctu.y == pos2Ctu.y;
 }
 
-UInt CU::getIntraSizeIdx(const CodingUnit &cu)
+uint32_t CU::getIntraSizeIdx(const CodingUnit &cu)
 {
   uint8_t uiWidth = cu.lumaSize().width;
 
-  UInt  uiCnt   = 0;
+  uint32_t  uiCnt   = 0;
 
   while (uiWidth)
   {
@@ -316,7 +316,7 @@ bool CU::isLastSubCUOfCtu( const CodingUnit &cu )
            ( ( ( cuAreaY.y + cuAreaY.height ) & cu.cs->pcv->maxCUHeightMask ) == 0 || cuAreaY.y + cuAreaY.height == sps.getPicHeightInLumaSamples() ) );
 }
 
-UInt CU::getCtuAddr( const CodingUnit &cu )
+uint32_t CU::getCtuAddr( const CodingUnit &cu )
 {
   return getCtuAddr( cu.blocks[cu.chType].lumaPos(), *cu.cs->pcv );
 }
@@ -360,9 +360,9 @@ bool CU::isQGStart( const CodingUnit& cu )
          ( cu.blocks[cu.chType].y % ( ( 1 << ( g_aucLog2[sps.getMaxCUHeight()] - pps.getMaxCuDQPDepth() ) ) >> getChannelTypeScaleY( cu.chType, cu.chromaFormat ) ) ) == 0;
 }
 
-UInt CU::getNumPUs( const CodingUnit& cu )
+uint32_t CU::getNumPUs( const CodingUnit& cu )
 {
-  UInt cnt = 0;
+  uint32_t cnt = 0;
   PredictionUnit *pu = cu.firstPU;
 
   do
@@ -402,7 +402,7 @@ bool CU::hasNonTsCodedBlock( const CodingUnit& cu )
 
   for( auto &currTU : traverseTUs( cu ) )
   {
-    for( UInt i = 0; i < ::getNumberValidTBlocks( *cu.cs->pcv ); i++ )
+    for( uint32_t i = 0; i < ::getNumberValidTBlocks( *cu.cs->pcv ); i++ )
     {
       hasAnyNonTSCoded |= ( currTU.blocks[i].valid() && !currTU.transformSkip[i] && TU::getCbf( currTU, ComponentID( i ) ) );
     }
@@ -411,9 +411,9 @@ bool CU::hasNonTsCodedBlock( const CodingUnit& cu )
   return hasAnyNonTSCoded;
 }
 
-UInt CU::getNumNonZeroCoeffNonTs( const CodingUnit& cu )
+uint32_t CU::getNumNonZeroCoeffNonTs( const CodingUnit& cu )
 {
-  UInt count = 0;
+  uint32_t count = 0;
   for( auto &currTU : traverseTUs( cu ) )
   {
     count += TU::getNumNonZeroCoeffsNonTS( currTU );
@@ -512,7 +512,7 @@ int PU::getIntraMPMs( const PredictionUnit &pu, unsigned* mpm, const ChannelType
 #endif
   {
     int  numCand = -1;
-    UInt modeIdx =  0;
+    uint32_t modeIdx =  0;
 
     bool includedMode[NUM_INTRA_MODE];
     memset(includedMode, false, sizeof(includedMode));
@@ -624,13 +624,13 @@ int PU::getIntraMPMs( const PredictionUnit &pu, unsigned* mpm, const ChannelType
     }
 
     // -+1 derived angular modes
-    const UInt numAddedModes = modeIdx;
+    const uint32_t numAddedModes = modeIdx;
     const int  offset        = (int)NUM_LUMA_MODE - 5;
     const int  mod           = offset + 3;
 
-    for( UInt idx = 0; idx < numAddedModes && modeIdx < numMPMs; idx++ )
+    for( uint32_t idx = 0; idx < numAddedModes && modeIdx < numMPMs; idx++ )
     {
-      UInt mode = mpm[idx];
+      uint32_t mode = mpm[idx];
       if( mode > DC_IDX )
       {
         // -1
@@ -646,16 +646,16 @@ int PU::getIntraMPMs( const PredictionUnit &pu, unsigned* mpm, const ChannelType
     }
 
     // default modes
-    UInt defaultIntraModes[] ={ PLANAR_IDX, DC_IDX, VER_IDX, HOR_IDX, 2, DIA_IDX };
+    uint32_t defaultIntraModes[] ={ PLANAR_IDX, DC_IDX, VER_IDX, HOR_IDX, 2, DIA_IDX };
     CHECK( modeIdx <= 1, "Invalid mode" );
-    for( UInt idx = 2; idx < numMPMs && modeIdx < numMPMs; idx++ )
+    for( uint32_t idx = 2; idx < numMPMs && modeIdx < numMPMs; idx++ )
     {
       mpm[modeIdx] = defaultIntraModes[idx];
       if( !includedMode[mpm[modeIdx]] ) { includedMode[mpm[modeIdx++]] = true; }
     }
 
     CHECK( modeIdx != numMPMs, "Invalid mode" );
-    for( UInt i = 0; i < numMPMs; i++ )
+    for( uint32_t i = 0; i < numMPMs; i++ )
     {
       CHECK( mpm[i] >= NUM_LUMA_MODE, "Invalid mode" );
     }
@@ -816,7 +816,7 @@ int PU::getIntraMPMs( const PredictionUnit &pu, unsigned* mpm, const ChannelType
         mpm[2] = g_intraMode65to33AngMapping[(leftIntraDir + aboveIntraDir) < 2 ? VER_IDX : DC_IDX];
       }
     }
-    for( UInt i = 0; i < numMPMs; i++ )
+    for( uint32_t i = 0; i < numMPMs; i++ )
     {
       mpm[i] = g_intraMode33to65AngMapping[mpm[i]];
       CHECK( mpm[i] >= NUM_LUMA_MODE, "Invalid MPM" );
@@ -836,8 +836,8 @@ int PU::getDMModes(const PredictionUnit &pu, unsigned *modeList)
   {
     const Position lumaPos  = pu.blocks[pu.chType].lumaPos();
     const Size chromaSize   = pu.blocks[pu.chType].size();
-    const UInt scaleX       = getComponentScaleX( pu.blocks[pu.chType].compID, pu.chromaFormat );
-    const UInt scaleY       = getComponentScaleY( pu.blocks[pu.chType].compID, pu.chromaFormat );
+    const uint32_t scaleX       = getComponentScaleX( pu.blocks[pu.chType].compID, pu.chromaFormat );
+    const uint32_t scaleY       = getComponentScaleY( pu.blocks[pu.chType].compID, pu.chromaFormat );
     const Size lumaSize     = Size( chromaSize.width << scaleX, chromaSize.height << scaleY );
     const int centerOffsetX = ( lumaSize.width  == 4 ) ? ( 0 ) : ( ( lumaSize.width  >> 1 ) - 1 );
     const int centerOffsetY = ( lumaSize.height == 4 ) ? ( 0 ) : ( ( lumaSize.height >> 1 ) - 1 );
@@ -933,7 +933,7 @@ void PU::getIntraChromaCandModes( const PredictionUnit &pu, unsigned modeList[NU
 #endif
 
     const PredictionUnit *lumaPU = CS::isDualITree( *pu.cs ) ? pu.cs->picture->cs->getPU( pu.blocks[pu.chType].lumaPos(), CHANNEL_TYPE_LUMA ) : &pu;
-    const UInt lumaMode = lumaPU->intraDir[CHANNEL_TYPE_LUMA];
+    const uint32_t lumaMode = lumaPU->intraDir[CHANNEL_TYPE_LUMA];
     for( int i = 0; i < 4; i++ )
     {
       if( lumaMode == modeList[i] )
@@ -1086,9 +1086,9 @@ bool PU::isChromaIntraModeCrossCheckMode( const PredictionUnit &pu )
 #endif
 }
 
-UInt PU::getFinalIntraMode( const PredictionUnit &pu, const ChannelType &chType )
+uint32_t PU::getFinalIntraMode( const PredictionUnit &pu, const ChannelType &chType )
 {
-  UInt uiIntraMode = pu.intraDir[chType];
+  uint32_t uiIntraMode = pu.intraDir[chType];
 
   if( uiIntraMode == DM_CHROMA_IDX && !isLuma( chType ) )
   {
@@ -1107,12 +1107,12 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx, co
 {
   const CodingStructure &cs  = *pu.cs;
   const Slice &slice         = *pu.cs->slice;
-  const UInt maxNumMergeCand = slice.getMaxNumMergeCand();
+  const uint32_t maxNumMergeCand = slice.getMaxNumMergeCand();
   const bool canFastExit     = pu.cs->pps->getLog2ParallelMergeLevelMinus2() == 0;
 
   bool isCandInter[MRG_MAX_NUM_CANDS];
 
-  for (UInt ui = 0; ui < maxNumMergeCand; ++ui)
+  for (uint32_t ui = 0; ui < maxNumMergeCand; ++ui)
   {
     isCandInter[ui] = false;
 #if JEM_TOOLS
@@ -1599,14 +1599,14 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx, co
     return;
   }
 
-  UInt uiArrayAddr = cnt;
-  UInt uiCutoff    = std::min( uiArrayAddr, 4u );
+  uint32_t uiArrayAddr = cnt;
+  uint32_t uiCutoff    = std::min( uiArrayAddr, 4u );
 
   if (slice.isInterB())
   {
-    static const UInt NUM_PRIORITY_LIST = 12;
-    static const UInt uiPriorityList0[NUM_PRIORITY_LIST] = { 0 , 1, 0, 2, 1, 2, 0, 3, 1, 3, 2, 3 };
-    static const UInt uiPriorityList1[NUM_PRIORITY_LIST] = { 1 , 0, 2, 0, 2, 1, 3, 0, 3, 1, 3, 2 };
+    static const uint32_t NUM_PRIORITY_LIST = 12;
+    static const uint32_t uiPriorityList0[NUM_PRIORITY_LIST] = { 0 , 1, 0, 2, 1, 2, 0, 3, 1, 3, 2, 3 };
+    static const uint32_t uiPriorityList1[NUM_PRIORITY_LIST] = { 1 , 0, 2, 0, 2, 1, 3, 0, 3, 1, 3, 2 };
 
     for (int idx = 0; idx < uiCutoff * (uiCutoff - 1) && uiArrayAddr != maxNumMergeCand; idx++)
     {
@@ -3059,7 +3059,7 @@ bool PU::getInterMergeSubPuMvpCand( const PredictionUnit &pu, MergeCtx& mrgCtx, 
 
       if( mi.isInter )
       {
-        for( UInt uiCurrRefListId = 0; uiCurrRefListId < ( bBSlice ? 2 : 1 ); uiCurrRefListId++ )
+        for( uint32_t uiCurrRefListId = 0; uiCurrRefListId < ( bBSlice ? 2 : 1 ); uiCurrRefListId++ )
         {
           RefPicList  eCurrRefPicList = RefPicList( uiCurrRefListId );
 
@@ -3149,7 +3149,7 @@ bool PU::getInterMergeSubPuMvpCand( const PredictionUnit &pu, MergeCtx& mrgCtx, 
             mi.mv[currRefListId] = cColMv;
           }
 #else
-        for (UInt uiCurrRefListId = 0; uiCurrRefListId < (bBSlice ? 2 : 1); uiCurrRefListId++)
+        for (uint32_t uiCurrRefListId = 0; uiCurrRefListId < (bBSlice ? 2 : 1); uiCurrRefListId++)
         {
           RefPicList eCurrRefPicList = RefPicList(uiCurrRefListId);
           if( deriveScaledMotionTemporal( slice, colPos, pColPic, eCurrRefPicList, cColMv, tempLICFlag, eFetchRefPicList ) )
@@ -4126,7 +4126,7 @@ bool PU::getInterMergeSubPuMvpCand(const PredictionUnit &pu, MergeCtx& mrgCtx, b
 
       if (mi.isInter)
       {
-        for (UInt uiCurrRefListId = 0; uiCurrRefListId < (bBSlice ? 2 : 1); uiCurrRefListId++)
+        for (uint32_t uiCurrRefListId = 0; uiCurrRefListId < (bBSlice ? 2 : 1); uiCurrRefListId++)
         {
           RefPicList  eCurrRefPicList = RefPicList(uiCurrRefListId);
 
@@ -4215,7 +4215,7 @@ bool PU::getInterMergeSubPuMvpCand(const PredictionUnit &pu, MergeCtx& mrgCtx, b
             mi.mv[currRefListId] = cColMv;
           }
 #else
-        for (UInt uiCurrRefListId = 0; uiCurrRefListId < (bBSlice ? 2 : 1); uiCurrRefListId++)
+        for (uint32_t uiCurrRefListId = 0; uiCurrRefListId < (bBSlice ? 2 : 1); uiCurrRefListId++)
         {
           RefPicList eCurrRefPicList = RefPicList(uiCurrRefListId);
           if (deriveScaledMotionTemporal(slice, colPos, pColPic, eCurrRefPicList, cColMv, eFetchRefPicList))
@@ -4484,7 +4484,7 @@ void PU::restrictBiPredMergeCands( const PredictionUnit &pu, MergeCtx& mergeCtx 
 {
   if( PU::isBipredRestriction( pu ) )
   {
-    for( UInt mergeCand = 0; mergeCand < mergeCtx.numValidMergeCand; ++mergeCand )
+    for( uint32_t mergeCand = 0; mergeCand < mergeCtx.numValidMergeCand; ++mergeCand )
     {
       if( mergeCtx.interDirNeighbours[ mergeCand ] == 3 )
       {
@@ -4754,7 +4754,7 @@ bool PU::getNeighborMotion( PredictionUnit &pu, MotionInfo& mi, Position off, in
     }
     else
     {
-      for( UInt iRefList = 0; iRefList < 2; iRefList++ )
+      for( uint32_t iRefList = 0; iRefList < 2; iRefList++ )
       {
         if( currMotion.interDir & ( 1 << iRefList ) )
         {
@@ -4820,7 +4820,7 @@ void TU::setCbf( TransformUnit &tu, const ComponentID &compID, const bool &cbf )
 
 bool TU::hasTransformSkipFlag(const CodingStructure& cs, const CompArea& area)
 {
-  UInt transformSkipLog2MaxSize = cs.pps->getPpsRangeExtension().getLog2MaxTransformSkipBlockSize();
+  uint32_t transformSkipLog2MaxSize = cs.pps->getPpsRangeExtension().getLog2MaxTransformSkipBlockSize();
 
   if( cs.pcv->rectCUs )
   {
@@ -4829,26 +4829,26 @@ bool TU::hasTransformSkipFlag(const CodingStructure& cs, const CompArea& area)
   return ( area.width <= (1 << transformSkipLog2MaxSize) );
 }
 
-UInt TU::getGolombRiceStatisticsIndex(const TransformUnit &tu, const ComponentID &compID)
+uint32_t TU::getGolombRiceStatisticsIndex(const TransformUnit &tu, const ComponentID &compID)
 {
   const bool transformSkip    = tu.transformSkip[compID];
   const bool transquantBypass = tu.cu->transQuantBypass;
 
   //--------
 
-  const UInt channelTypeOffset = isChroma(compID) ? 2 : 0;
-  const UInt nonTransformedOffset = (transformSkip || transquantBypass) ? 1 : 0;
+  const uint32_t channelTypeOffset = isChroma(compID) ? 2 : 0;
+  const uint32_t nonTransformedOffset = (transformSkip || transquantBypass) ? 1 : 0;
 
   //--------
 
-  const UInt selectedIndex = channelTypeOffset + nonTransformedOffset;
+  const uint32_t selectedIndex = channelTypeOffset + nonTransformedOffset;
   CHECK( selectedIndex >= RExt__GOLOMB_RICE_ADAPTATION_STATISTICS_SETS, "Invalid golomb rice adaptation statistics set" );
 
   return selectedIndex;
 }
 
 #if HEVC_USE_MDCS
-UInt TU::getCoefScanIdx(const TransformUnit &tu, const ComponentID &compID)
+uint32_t TU::getCoefScanIdx(const TransformUnit &tu, const ComponentID &compID)
 {
   //------------------------------------------------
 
@@ -4869,8 +4869,8 @@ UInt TU::getCoefScanIdx(const TransformUnit &tu, const ComponentID &compID)
   const ChromaFormat format = sps.getChromaFormatIdc();
 
 
-  const UInt maximumWidth  = MDCS_MAXIMUM_WIDTH  >> getComponentScaleX(compID, format);
-  const UInt maximumHeight = MDCS_MAXIMUM_HEIGHT >> getComponentScaleY(compID, format);
+  const uint32_t maximumWidth  = MDCS_MAXIMUM_WIDTH  >> getComponentScaleX(compID, format);
+  const uint32_t maximumHeight = MDCS_MAXIMUM_HEIGHT >> getComponentScaleY(compID, format);
 
   if ((area.width > maximumWidth) || (area.height > maximumHeight))
   {
@@ -4883,7 +4883,7 @@ UInt TU::getCoefScanIdx(const TransformUnit &tu, const ComponentID &compID)
 
   const PredictionUnit &pu = *tu.cs->getPU( area.pos(), toChannelType( compID ) );
 
-  UInt uiDirMode = PU::getFinalIntraMode(pu, toChannelType(compID));
+  uint32_t uiDirMode = PU::getFinalIntraMode(pu, toChannelType(compID));
 
   //------------------
 
@@ -4908,19 +4908,19 @@ bool TU::hasCrossCompPredInfo( const TransformUnit &tu, const ComponentID &compI
          ( CU::isInter(*tu.cu) || PU::isChromaIntraModeCrossCheckMode( *tu.cs->getPU( tu.blocks[compID].pos(), toChannelType( compID ) ) ) ) );
 }
 
-UInt TU::getNumNonZeroCoeffsNonTS( const TransformUnit& tu, const bool bLuma, const bool bChroma )
+uint32_t TU::getNumNonZeroCoeffsNonTS( const TransformUnit& tu, const bool bLuma, const bool bChroma )
 {
-  UInt count = 0;
-  for( UInt i = 0; i < ::getNumberValidTBlocks( *tu.cs->pcv ); i++ )
+  uint32_t count = 0;
+  for( uint32_t i = 0; i < ::getNumberValidTBlocks( *tu.cs->pcv ); i++ )
   {
     if( tu.blocks[i].valid() && !tu.transformSkip[i] && TU::getCbf( tu, ComponentID( i ) ) )
     {
       if( isLuma  ( tu.blocks[i].compID ) && !bLuma   ) continue;
       if( isChroma( tu.blocks[i].compID ) && !bChroma ) continue;
 
-      UInt area = tu.blocks[i].area();
+      uint32_t area = tu.blocks[i].area();
       const TCoeff* coeff = tu.getCoeffs( ComponentID( i ) ).buf;
-      for( UInt j = 0; j < area; j++ )
+      for( uint32_t j = 0; j < area; j++ )
       {
         count += coeff[j] != 0;
       }
@@ -4957,7 +4957,7 @@ bool TU::needsQP3Offset(const TransformUnit &tu, const ComponentID &compID)
 
 // other tools
 
-UInt getCtuAddr( const Position& pos, const PreCalcValues& pcv )
+uint32_t getCtuAddr( const Position& pos, const PreCalcValues& pcv )
 {
   return ( pos.x >> pcv.maxCUWidthLog2 ) + ( pos.y >> pcv.maxCUHeightLog2 ) * pcv.widthInCtus;
 }

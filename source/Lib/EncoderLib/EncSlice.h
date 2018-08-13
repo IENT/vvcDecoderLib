@@ -89,7 +89,7 @@ private:
   std::vector<double>     m_vdRdPicQp;                          ///< array of picture QP candidates (double-type for lambda)
   std::vector<int>        m_viRdPicQp;                          ///< array of picture QP candidates (int-type)
   RateCtrl*               m_pcRateCtrl;                         ///< Rate control manager
-  UInt                    m_uiSliceSegmentIdx;
+  uint32_t                    m_uiSliceSegmentIdx;
 #if HEVC_DEPENDENT_SLICES
   Ctx                     m_lastSliceSegmentEndContextState;    ///< context storage for state at the end of the previous slice-segment (used for dependent slices only).
 #endif
@@ -118,9 +118,9 @@ private:
   void    setUpLambda( Slice* slice, const double dLambda, int iQP );
 #endif
 #if HEVC_TILES_WPP
-  void    calculateBoundingCtuTsAddrForSlice( UInt &startCtuTSAddrSlice, UInt &boundingCtuTSAddrSlice, bool &haveReachedTileBoundary, Picture* pcPic, const int sliceMode, const int sliceArgument );
+  void    calculateBoundingCtuTsAddrForSlice( uint32_t &startCtuTSAddrSlice, uint32_t &boundingCtuTSAddrSlice, bool &haveReachedTileBoundary, Picture* pcPic, const int sliceMode, const int sliceArgument );
 #else
-  void    calculateBoundingCtuTsAddrForSlice( UInt &startCtuTSAddrSlice, UInt &boundingCtuTSAddrSlice, Picture* pcPic, const int sliceMode, const int sliceArgument );
+  void    calculateBoundingCtuTsAddrForSlice( uint32_t &startCtuTSAddrSlice, uint32_t &boundingCtuTSAddrSlice, Picture* pcPic, const int sliceMode, const int sliceArgument );
 #endif
 
 
@@ -128,7 +128,7 @@ public:
   EncSlice();
   virtual ~EncSlice();
 
-  void    create              ( int iWidth, int iHeight, ChromaFormat chromaFormat, UInt iMaxCUWidth, UInt iMaxCUHeight, uint8_t uhTotalDepth );
+  void    create              ( int iWidth, int iHeight, ChromaFormat chromaFormat, uint32_t iMaxCUWidth, uint32_t iMaxCUHeight, uint8_t uhTotalDepth );
   void    destroy             ();
   void    init                ( EncLib* pcEncLib, const SPS& sps );
 
@@ -142,20 +142,20 @@ public:
   void    compressSlice       ( Picture* pcPic, const bool bCompressEntireSlice, const bool bFastDeltaQP );      ///< analysis stage of slice
   void    calCostSliceI       ( Picture* pcPic );
 
-  void    encodeSlice         ( Picture* pcPic, OutputBitstream* pcSubstreams, UInt &numBinsCoded );
+  void    encodeSlice         ( Picture* pcPic, OutputBitstream* pcSubstreams, uint32_t &numBinsCoded );
 #if ENABLE_WPP_PARALLELISM
   static
 #endif
-  void    encodeCtus          ( Picture* pcPic, const bool bCompressEntireSlice, const bool bFastDeltaQP, UInt startCtuTsAddr, UInt boundingCtuTsAddr, EncLib* pcEncLib );
+  void    encodeCtus          ( Picture* pcPic, const bool bCompressEntireSlice, const bool bFastDeltaQP, uint32_t startCtuTsAddr, uint32_t boundingCtuTsAddr, EncLib* pcEncLib );
 
 
   // misc. functions
   void    setSearchRange      ( Slice* pcSlice  );                                  ///< set ME range adaptively
 
   EncCu*  getCUEncoder        ()                    { return m_pcCuEncoder; }                        ///< CU encoder
-  void    xDetermineStartAndBoundingCtuTsAddr  ( UInt& startCtuTsAddr, UInt& boundingCtuTsAddr, Picture* pcPic );
-  UInt    getSliceSegmentIdx  ()                    { return m_uiSliceSegmentIdx;       }
-  void    setSliceSegmentIdx  (UInt i)              { m_uiSliceSegmentIdx = i;          }
+  void    xDetermineStartAndBoundingCtuTsAddr  ( uint32_t& startCtuTsAddr, uint32_t& boundingCtuTsAddr, Picture* pcPic );
+  uint32_t    getSliceSegmentIdx  ()                    { return m_uiSliceSegmentIdx;       }
+  void    setSliceSegmentIdx  (uint32_t i)              { m_uiSliceSegmentIdx = i;          }
 
   SliceType getEncCABACTableIdx() const             { return m_encCABACTableIdx;        }
 

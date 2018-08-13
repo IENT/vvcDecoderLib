@@ -48,8 +48,8 @@ class OutputBitstream;
 struct NALUnit
 {
   NalUnitType m_nalUnitType; ///< nal_unit_type
-  UInt        m_temporalId;  ///< temporal_id
-  UInt        m_nuhLayerId;  ///< nuh_layer_id
+  uint32_t        m_temporalId;  ///< temporal_id
+  uint32_t        m_nuhLayerId;  ///< nuh_layer_id
 
   NALUnit(const NALUnit &src)
   :m_nalUnitType (src.m_nalUnitType)
@@ -99,7 +99,7 @@ struct NALUnit
 
   bool isVcl()
   {
-    return ( (UInt)m_nalUnitType < 32 );
+    return ( (uint32_t)m_nalUnitType < 32 );
   }
 };
 

@@ -118,26 +118,26 @@ typedef std::list<SEI*> SEIMessages;
 class Tile
 {
 private:
-  UInt      m_tileWidthInCtus;
-  UInt      m_tileHeightInCtus;
-  UInt      m_rightEdgePosInCtus;
-  UInt      m_bottomEdgePosInCtus;
-  UInt      m_firstCtuRsAddr;
+  uint32_t      m_tileWidthInCtus;
+  uint32_t      m_tileHeightInCtus;
+  uint32_t      m_rightEdgePosInCtus;
+  uint32_t      m_bottomEdgePosInCtus;
+  uint32_t      m_firstCtuRsAddr;
 
 public:
   Tile();
   virtual ~Tile();
 
-  void      setTileWidthInCtus     ( UInt i )            { m_tileWidthInCtus = i; }
-  UInt      getTileWidthInCtus     () const              { return m_tileWidthInCtus; }
-  void      setTileHeightInCtus    ( UInt i )            { m_tileHeightInCtus = i; }
-  UInt      getTileHeightInCtus    () const              { return m_tileHeightInCtus; }
-  void      setRightEdgePosInCtus  ( UInt i )            { m_rightEdgePosInCtus = i; }
-  UInt      getRightEdgePosInCtus  () const              { return m_rightEdgePosInCtus; }
-  void      setBottomEdgePosInCtus ( UInt i )            { m_bottomEdgePosInCtus = i; }
-  UInt      getBottomEdgePosInCtus () const              { return m_bottomEdgePosInCtus; }
-  void      setFirstCtuRsAddr      ( UInt i )            { m_firstCtuRsAddr = i; }
-  UInt      getFirstCtuRsAddr      () const              { return m_firstCtuRsAddr; }
+  void      setTileWidthInCtus     ( uint32_t i )            { m_tileWidthInCtus = i; }
+  uint32_t      getTileWidthInCtus     () const              { return m_tileWidthInCtus; }
+  void      setTileHeightInCtus    ( uint32_t i )            { m_tileHeightInCtus = i; }
+  uint32_t      getTileHeightInCtus    () const              { return m_tileHeightInCtus; }
+  void      setRightEdgePosInCtus  ( uint32_t i )            { m_rightEdgePosInCtus = i; }
+  uint32_t      getRightEdgePosInCtus  () const              { return m_rightEdgePosInCtus; }
+  void      setBottomEdgePosInCtus ( uint32_t i )            { m_bottomEdgePosInCtus = i; }
+  uint32_t      getBottomEdgePosInCtus () const              { return m_bottomEdgePosInCtus; }
+  void      setFirstCtuRsAddr      ( uint32_t i )            { m_firstCtuRsAddr = i; }
+  uint32_t      getFirstCtuRsAddr      () const              { return m_firstCtuRsAddr; }
 };
 
 
@@ -148,24 +148,24 @@ struct TileMap
   void create( const SPS& sps, const PPS& pps );
   void destroy();
 
-  UInt getTileIdxMap( UInt ctuRsAddr )       const { return *(tileIdxMap + ctuRsAddr); }
-  UInt getTileIdxMap( const Position& pos )  const { return getTileIdxMap( ( pos.x / pcv->maxCUWidth ) + ( pos.y / pcv->maxCUHeight ) * pcv->widthInCtus ); };
-  UInt getCtuTsToRsAddrMap( UInt ctuTsAddr ) const { return *(ctuTsToRsAddrMap + (ctuTsAddr>=pcv->sizeInCtus ? pcv->sizeInCtus : ctuTsAddr)); }
-  UInt getCtuRsToTsAddrMap( UInt ctuRsAddr ) const { return *(ctuRsToTsAddrMap + (ctuRsAddr>=pcv->sizeInCtus ? pcv->sizeInCtus : ctuRsAddr)); }
-  UInt getSubstreamForCtuAddr(const UInt ctuAddr, const bool bAddressInRaster, Slice *pcSlice) const;
+  uint32_t getTileIdxMap( uint32_t ctuRsAddr )       const { return *(tileIdxMap + ctuRsAddr); }
+  uint32_t getTileIdxMap( const Position& pos )  const { return getTileIdxMap( ( pos.x / pcv->maxCUWidth ) + ( pos.y / pcv->maxCUHeight ) * pcv->widthInCtus ); };
+  uint32_t getCtuTsToRsAddrMap( uint32_t ctuTsAddr ) const { return *(ctuTsToRsAddrMap + (ctuTsAddr>=pcv->sizeInCtus ? pcv->sizeInCtus : ctuTsAddr)); }
+  uint32_t getCtuRsToTsAddrMap( uint32_t ctuRsAddr ) const { return *(ctuRsToTsAddrMap + (ctuRsAddr>=pcv->sizeInCtus ? pcv->sizeInCtus : ctuRsAddr)); }
+  uint32_t getSubstreamForCtuAddr(const uint32_t ctuAddr, const bool bAddressInRaster, Slice *pcSlice) const;
 
   const PreCalcValues* pcv;
   std::vector<Tile> tiles;
-  UInt  numTiles;
-  UInt  numTileColumns;
-  UInt  numTileRows;
-  UInt* tileIdxMap;
-  UInt* ctuTsToRsAddrMap;
-  UInt* ctuRsToTsAddrMap;
+  uint32_t  numTiles;
+  uint32_t  numTileColumns;
+  uint32_t  numTileRows;
+  uint32_t* tileIdxMap;
+  uint32_t* ctuTsToRsAddrMap;
+  uint32_t* ctuRsToTsAddrMap;
 
   void initTileMap( const SPS& sps, const PPS& pps );
   void initCtuTsRsAddrMap();
-  UInt calculateNextCtuRSAddr( const UInt currCtuRsAddr ) const;
+  uint32_t calculateNextCtuRSAddr( const uint32_t currCtuRsAddr ) const;
 };
 #endif
 
@@ -177,7 +177,7 @@ struct TileMap
 
 struct Picture : public UnitArea
 {
-  UInt margin;
+  uint32_t margin;
   Picture();
 
   void create(const ChromaFormat &_chromaFormat, const Size &size, const unsigned _maxCUSize, const unsigned margin, const bool bDecoder);
@@ -237,8 +237,8 @@ public:
   int  m_prevQP[MAX_NUM_CHANNEL_TYPE];
 
   int  poc;
-  UInt layer;
-  UInt depth;
+  uint32_t layer;
+  uint32_t depth;
 
 #if ENABLE_SPLIT_PARALLELISM
 #if ENABLE_WPP_PARALLELISM
@@ -255,7 +255,7 @@ public:
   SEIMessages        SEIs;
 
   void         allocateNewSlice();
-  Slice        *swapSliceObject(Slice * p, UInt i);
+  Slice        *swapSliceObject(Slice * p, uint32_t i);
   void         clearSliceBuffer();
 
 #if HEVC_TILES_WPP

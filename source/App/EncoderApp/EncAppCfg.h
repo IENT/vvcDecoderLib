@@ -80,8 +80,8 @@ protected:
 
   // source specification
   int       m_iFrameRate;                                     ///< source frame-rates (Hz)
-  UInt      m_FrameSkip;                                      ///< number of skipped frames from the beginning
-  UInt      m_temporalSubsampleRatio;                         ///< temporal subsample ratio, 2 means code every two frames
+  uint32_t      m_FrameSkip;                                      ///< number of skipped frames from the beginning
+  uint32_t      m_temporalSubsampleRatio;                         ///< temporal subsample ratio, 2 means code every two frames
   int       m_iSourceWidth;                                   ///< source width in pixel
   int       m_iSourceHeight;                                  ///< source height in pixel (when interlaced = field height)
 #if EXTENSION_360_VIDEO
@@ -120,7 +120,7 @@ protected:
   Profile::Name m_profile;
   Level::Tier   m_levelTier;
   Level::Name   m_level;
-  UInt          m_bitDepthConstraint;
+  uint32_t          m_bitDepthConstraint;
   ChromaFormat  m_chromaFormatConstraint;
   bool          m_intraConstraintFlag;
   bool          m_onePictureOnlyConstraintFlag;
@@ -140,10 +140,10 @@ protected:
   int       m_maxDecPicBuffering[MAX_TLAYER];                 ///< total number of pictures in the decoded picture buffer
   bool      m_crossComponentPredictionEnabledFlag;            ///< flag enabling the use of cross-component prediction
   bool      m_reconBasedCrossCPredictionEstimate;             ///< causes the alpha calculation in encoder search to be based on the decoded residual rather than the pre-transform encoder-side residual
-  UInt      m_log2SaoOffsetScale[MAX_NUM_CHANNEL_TYPE];       ///< number of bits for the upward bit shift operation on the decoded SAO offsets
+  uint32_t      m_log2SaoOffsetScale[MAX_NUM_CHANNEL_TYPE];       ///< number of bits for the upward bit shift operation on the decoded SAO offsets
   bool      m_useTransformSkip;                               ///< flag for enabling intra transform skipping
   bool      m_useTransformSkipFast;                           ///< flag for enabling fast intra transform skipping
-  UInt      m_log2MaxTransformSkipBlockSize;                  ///< transform-skip maximum size (minimum of 2)
+  uint32_t      m_log2MaxTransformSkipBlockSize;                  ///< transform-skip maximum size (minimum of 2)
   bool      m_transformSkipRotationEnabledFlag;               ///< control flag for transform-skip/transquant-bypass residual rotation
   bool      m_transformSkipContextEnabledFlag;                ///< control flag for transform-skip/transquant-bypass single significance map context
   bool      m_rdpcmEnabledFlag[NUMBER_OF_RDPCM_SIGNALLING_MODES];///< control flags for residual DPCM
@@ -153,7 +153,7 @@ protected:
 
   // coding quality
 #if QP_SWITCHING_FOR_PARALLEL
-  OptionalValue<UInt> m_qpIncrementAtSourceFrame;             ///< Optional source frame number at which all subsequent frames are to use an increased internal QP.
+  OptionalValue<uint32_t> m_qpIncrementAtSourceFrame;             ///< Optional source frame number at which all subsequent frames are to use an increased internal QP.
 #else
   double    m_fQP;                                            ///< QP value of key-picture (floating point)
 #endif
@@ -165,7 +165,7 @@ protected:
   std::string m_dQPFileName;                                  ///< QP offset for each slice (initialized from external file)
   int*      m_aidQP;                                          ///< array of slice QP values
   int       m_iMaxDeltaQP;                                    ///< max. |delta QP|
-  UInt      m_uiDeltaQpRD;                                    ///< dQP range for multi-pass slice QP optimization
+  uint32_t      m_uiDeltaQpRD;                                    ///< dQP range for multi-pass slice QP optimization
   int       m_iMaxCuDQPDepth;                                 ///< Max. depth for a minimum CuDQPSize (0:default)
   int       m_diffCuChromaQpOffsetDepth;                      ///< If negative, then do not apply chroma qp offsets.
   bool      m_bFastDeltaQP;                                   ///< Fast Delta QP (false:default)
@@ -178,7 +178,7 @@ protected:
   WCGChromaQPControl m_wcgChromaQpControl;                    ///< Wide-colour-gamut chroma QP control.
 #endif
 #if W0038_CQP_ADJ
-  UInt      m_sliceChromaQpOffsetPeriodicity;                 ///< Used in conjunction with Slice Cb/Cr QpOffsetIntraOrPeriodic. Use 0 (default) to disable periodic nature.
+  uint32_t      m_sliceChromaQpOffsetPeriodicity;                 ///< Used in conjunction with Slice Cb/Cr QpOffsetIntraOrPeriodic. Use 0 (default) to disable periodic nature.
   int       m_sliceChromaQpOffsetIntraOrPeriodic[2/*Cb,Cr*/]; ///< Chroma Cb QP Offset at slice level for I slice or for periodic inter slices as defined by SliceChromaQPOffsetPeriodicity. Replaces offset in the GOP table.
 #endif
 #if SHARP_LUMA_DELTA_QP
@@ -313,8 +313,8 @@ protected:
   int       m_quadtreeTULog2MinSize;
   int       m_tuLog2MaxSize;
 
-  UInt      m_uiQuadtreeTUMaxDepthInter;
-  UInt      m_uiQuadtreeTUMaxDepthIntra;
+  uint32_t      m_uiQuadtreeTUMaxDepthInter;
+  uint32_t      m_uiQuadtreeTUMaxDepthIntra;
 
   // coding tools (bit-depth)
   int       m_inputBitDepth   [MAX_NUM_CHANNEL_TYPE];         ///< bit-depth of input file
@@ -352,8 +352,8 @@ protected:
 #endif
   // coding tools (PCM)
   bool      m_usePCM;                                         ///< flag for using IPCM
-  UInt      m_pcmLog2MaxSize;                                 ///< log2 of maximum PCM block size
-  UInt      m_uiPCMLog2MinSize;                               ///< log2 of minimum PCM block size
+  uint32_t      m_pcmLog2MaxSize;                                 ///< log2 of maximum PCM block size
+  uint32_t      m_uiPCMLog2MinSize;                               ///< log2 of minimum PCM block size
   bool      m_bPCMFilterDisableFlag;                          ///< PCM filter disable flag
   bool      m_enableIntraReferenceSmoothing;                  ///< flag for enabling(default)/disabling intra reference smoothing/filtering
 
@@ -470,16 +470,16 @@ protected:
 #if U0033_ALTERNATIVE_TRANSFER_CHARACTERISTICS_SEI
   int       m_preferredTransferCharacteristics;
 #endif
-  UInt      m_greenMetadataType;
-  UInt      m_xsdMetricType;
+  uint32_t      m_greenMetadataType;
+  uint32_t      m_xsdMetricType;
 
   // weighted prediction
   bool      m_useWeightedPred;                    ///< Use of weighted prediction in P slices
   bool      m_useWeightedBiPred;                  ///< Use of bi-directional weighted prediction in B slices
   WeightedPredictionMethod m_weightedPredictionMethod;
 
-  UInt      m_log2ParallelMergeLevel;                         ///< Parallel merge estimation region
-  UInt      m_maxNumMergeCand;                                ///< Max number of merge candidates
+  uint32_t      m_log2ParallelMergeLevel;                         ///< Parallel merge estimation region
+  uint32_t      m_maxNumMergeCand;                                ///< Max number of merge candidates
 
   int       m_TMVPModeId;
 #if JVET_K0072
@@ -497,7 +497,7 @@ protected:
   bool      m_RCForceIntraQP;                     ///< force all intra picture to use initial QP or not
 #if U0132_TARGET_BITS_SATURATION
   bool      m_RCCpbSaturationEnabled;             ///< enable target bits saturation to avoid CPB overflow and underflow
-  UInt      m_RCCpbSize;                          ///< CPB size
+  uint32_t      m_RCCpbSize;                          ///< CPB size
   double    m_RCInitialCpbFullness;               ///< initial CPB fullness
 #endif
 #if HEVC_USE_SCALING_LISTS
@@ -559,7 +559,7 @@ protected:
 
   std::string m_summaryOutFilename;                           ///< filename to use for producing summary output file.
   std::string m_summaryPicFilenameBase;                       ///< Base filename to use for producing summary picture output files. The actual filenames used will have I.txt, P.txt and B.txt appended.
-  UInt        m_summaryVerboseness;                           ///< Specifies the level of the verboseness of the text output.
+  uint32_t        m_summaryVerboseness;                           ///< Specifies the level of the verboseness of the text output.
 
   int         m_verbosity;
 

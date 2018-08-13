@@ -224,7 +224,7 @@ Distortion xSearchHistogram(const std::vector<int> &histogramSource,
 
 WeightPredAnalysis::WeightPredAnalysis()
 {
-  for ( UInt lst =0 ; lst<NUM_REF_PIC_LIST_01 ; lst++ )
+  for ( uint32_t lst =0 ; lst<NUM_REF_PIC_LIST_01 ; lst++ )
   {
     for ( int refIdx=0 ; refIdx<MAX_NUM_REF ; refIdx++ )
     {
@@ -307,7 +307,7 @@ void  WeightPredAnalysis::xCheckWPEnable(Slice *const slice)
 //  const PicYuv *pPic = slice->getPic()->getPicYuvOrg();
 
   int presentCnt = 0;
-  for ( UInt lst=0 ; lst<NUM_REF_PIC_LIST_01 ; lst++ )
+  for ( uint32_t lst=0 ; lst<NUM_REF_PIC_LIST_01 ; lst++ )
   {
     for ( int refIdx=0 ; refIdx<MAX_NUM_REF ; refIdx++ )
     {
@@ -324,7 +324,7 @@ void  WeightPredAnalysis::xCheckWPEnable(Slice *const slice)
     slice->setTestWeightPred(false);
     slice->setTestWeightBiPred(false);
 
-    for ( UInt lst=0 ; lst<NUM_REF_PIC_LIST_01 ; lst++ )
+    for ( uint32_t lst=0 ; lst<NUM_REF_PIC_LIST_01 ; lst++ )
     {
       for ( int refIdx=0 ; refIdx<MAX_NUM_REF ; refIdx++ )
       {

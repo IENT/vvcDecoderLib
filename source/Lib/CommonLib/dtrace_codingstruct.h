@@ -57,11 +57,11 @@ inline void dtracePicComp( DTRACE_CHANNEL channel, CodingStructure& cs, const CP
   if( !g_trace_ctx ) return;
   if( pelUnitBuf.chromaFormat == CHROMA_400 && compId != COMPONENT_Y )  return;
   const Pel* piSrc    = pelUnitBuf.bufs[compId].buf;
-  UInt       uiStride = pelUnitBuf.bufs[compId].stride;
-  UInt       uiWidth  = pelUnitBuf.bufs[compId].width;
-  UInt       uiHeight = pelUnitBuf.bufs[compId].height;
-  UInt       uiChromaScaleX = getComponentScaleX( compId, pelUnitBuf.chromaFormat );
-  UInt       uiChromaScaleY = getComponentScaleY( compId, pelUnitBuf.chromaFormat );
+  uint32_t       uiStride = pelUnitBuf.bufs[compId].stride;
+  uint32_t       uiWidth  = pelUnitBuf.bufs[compId].width;
+  uint32_t       uiHeight = pelUnitBuf.bufs[compId].height;
+  uint32_t       uiChromaScaleX = getComponentScaleX( compId, pelUnitBuf.chromaFormat );
+  uint32_t       uiChromaScaleY = getComponentScaleY( compId, pelUnitBuf.chromaFormat );
 
   DTRACE                ( g_trace_ctx, channel, "\n%s: poc = %d, size=%dx%d\n\n", g_trace_ctx->getChannelName(channel), cs.slice->getPOC(), uiWidth, uiHeight );
   DTRACE_FRAME_BLOCKWISE( g_trace_ctx, channel, piSrc, uiStride, uiWidth, uiHeight, cs.sps->getMaxCUWidth() >> uiChromaScaleX, cs.sps->getMaxCUHeight() >> uiChromaScaleY);

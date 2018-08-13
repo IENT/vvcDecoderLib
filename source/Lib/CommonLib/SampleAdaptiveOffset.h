@@ -67,7 +67,7 @@ public:
   virtual ~SampleAdaptiveOffset();
   void SAOProcess( CodingStructure& cs, SAOBlkParam* saoBlkParams
                    );
-  void create( int picWidth, int picHeight, ChromaFormat format, UInt maxCUWidth, UInt maxCUHeight, UInt maxCUDepth, UInt lumaBitShift, UInt chromaBitShift );
+  void create( int picWidth, int picHeight, ChromaFormat format, uint32_t maxCUWidth, uint32_t maxCUHeight, uint32_t maxCUDepth, uint32_t lumaBitShift, uint32_t chromaBitShift );
   void destroy();
   static int getMaxOffsetQVal(const int channelBitDepth) { return (1<<(std::min<int>(channelBitDepth,MAX_SAO_TRUNCATED_BITDEPTH)-5))-1; } //Table 9-32, inclusive
 
@@ -95,9 +95,9 @@ protected:
   void xReconstructBlkSAOParams(CodingStructure& cs, SAOBlkParam* saoBlkParams);
 
 protected:
-  UInt m_offsetStepLog2[MAX_NUM_COMPONENT]; //offset step
+  uint32_t m_offsetStepLog2[MAX_NUM_COMPONENT]; //offset step
   PelStorage m_tempBuf;
-  UInt m_numberOfComponents;
+  uint32_t m_numberOfComponents;
 
   std::vector<int8_t> m_signLineBuf1;
   std::vector<int8_t> m_signLineBuf2;

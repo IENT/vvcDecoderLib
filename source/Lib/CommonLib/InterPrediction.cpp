@@ -62,19 +62,19 @@ InterPrediction::InterPrediction()
 , m_pGradY1         ( nullptr )
 #endif
 {
-  for( UInt ch = 0; ch < MAX_NUM_COMPONENT; ch++ )
+  for( uint32_t ch = 0; ch < MAX_NUM_COMPONENT; ch++ )
   {
-    for( UInt refList = 0; refList < NUM_REF_PIC_LIST_01; refList++ )
+    for( uint32_t refList = 0; refList < NUM_REF_PIC_LIST_01; refList++ )
     {
       m_acYuvPred[refList][ch] = nullptr;
     }
   }
 
-  for( UInt c = 0; c < MAX_NUM_COMPONENT; c++ )
+  for( uint32_t c = 0; c < MAX_NUM_COMPONENT; c++ )
   {
-    for( UInt i = 0; i < LUMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS; i++ )
+    for( uint32_t i = 0; i < LUMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS; i++ )
     {
-      for( UInt j = 0; j < LUMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS; j++ )
+      for( uint32_t j = 0; j < LUMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS; j++ )
       {
         m_filteredBlock[i][j][c] = nullptr;
       }
@@ -90,9 +90,9 @@ InterPrediction::InterPrediction()
     m_LICMultApprox[k] = ( ( 1 << 15 ) + ( k >> 1 ) ) / k;
   }
 
-  for( UInt ch = 0; ch < MAX_NUM_COMPONENT; ch++ )
+  for( uint32_t ch = 0; ch < MAX_NUM_COMPONENT; ch++ )
   {
-    for( UInt tmplt = 0; tmplt < 2; tmplt++ )
+    for( uint32_t tmplt = 0; tmplt < 2; tmplt++ )
     {
       m_acYuvPredFrucTemplate[tmplt][ch] = nullptr;
     }
@@ -108,20 +108,20 @@ InterPrediction::~InterPrediction()
 
 void InterPrediction::destroy()
 {
-  for( UInt i = 0; i < NUM_REF_PIC_LIST_01; i++ )
+  for( uint32_t i = 0; i < NUM_REF_PIC_LIST_01; i++ )
   {
-    for( UInt c = 0; c < MAX_NUM_COMPONENT; c++ )
+    for( uint32_t c = 0; c < MAX_NUM_COMPONENT; c++ )
     {
       xFree( m_acYuvPred[i][c] );
       m_acYuvPred[i][c] = nullptr;
     }
   }
 
-  for( UInt c = 0; c < MAX_NUM_COMPONENT; c++ )
+  for( uint32_t c = 0; c < MAX_NUM_COMPONENT; c++ )
   {
-    for( UInt i = 0; i < LUMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS; i++ )
+    for( uint32_t i = 0; i < LUMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS; i++ )
     {
-      for( UInt j = 0; j < LUMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS; j++ )
+      for( uint32_t j = 0; j < LUMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS; j++ )
       {
         xFree( m_filteredBlock[i][j][c] );
         m_filteredBlock[i][j][c] = nullptr;
@@ -139,9 +139,9 @@ void InterPrediction::destroy()
   xFree( m_pGradY1 );   m_pGradY1 = nullptr;
   m_tmpObmcBuf.destroy();
 
-  for( UInt ch = 0; ch < MAX_NUM_COMPONENT; ch++ )
+  for( uint32_t ch = 0; ch < MAX_NUM_COMPONENT; ch++ )
   {
-    for( UInt tmplt = 0; tmplt < 2; tmplt++ )
+    for( uint32_t tmplt = 0; tmplt < 2; tmplt++ )
     {
       xFree( m_acYuvPredFrucTemplate[tmplt][ch] );
       m_acYuvPredFrucTemplate[tmplt][ch] = nullptr;
@@ -167,7 +167,7 @@ void InterPrediction::init( RdCost* pcRdCost, ChromaFormat chromaFormatIDC )
 
   if( m_acYuvPred[REF_PIC_LIST_0][COMPONENT_Y] == nullptr ) // check if first is null (in which case, nothing initialised yet)
   {
-    for( UInt c = 0; c < MAX_NUM_COMPONENT; c++ )
+    for( uint32_t c = 0; c < MAX_NUM_COMPONENT; c++ )
     {
 #if JEM_TOOLS
       int extWidth  = MAX_CU_SIZE + DMVR_INTME_RANGE*2 + 16;
@@ -176,18 +176,18 @@ void InterPrediction::init( RdCost* pcRdCost, ChromaFormat chromaFormatIDC )
       int extWidth  = MAX_CU_SIZE + 16;
       int extHeight = MAX_CU_SIZE + 1;
 #endif
-      for( UInt i = 0; i < LUMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS; i++ )
+      for( uint32_t i = 0; i < LUMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS; i++ )
       {
         m_filteredBlockTmp[i][c] = ( Pel* ) xMalloc( Pel, ( extWidth + 4 ) * ( extHeight + 7 + 4 ) );
 
-        for( UInt j = 0; j < LUMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS; j++ )
+        for( uint32_t j = 0; j < LUMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS; j++ )
         {
           m_filteredBlock[i][j][c] = ( Pel* ) xMalloc( Pel, extWidth * extHeight );
         }
       }
 
       // new structure
-      for( UInt i = 0; i < NUM_REF_PIC_LIST_01; i++ )
+      for( uint32_t i = 0; i < NUM_REF_PIC_LIST_01; i++ )
       {
         m_acYuvPred[i][c] = ( Pel* ) xMalloc( Pel, MAX_CU_SIZE * MAX_CU_SIZE );
       }
@@ -203,9 +203,9 @@ void InterPrediction::init( RdCost* pcRdCost, ChromaFormat chromaFormatIDC )
 
     m_tmpObmcBuf.create( UnitArea( chromaFormatIDC, Area( 0, 0, MAX_CU_SIZE, MAX_CU_SIZE ) ) );
 
-    for( UInt ch = 0; ch < MAX_NUM_COMPONENT; ch++ )
+    for( uint32_t ch = 0; ch < MAX_NUM_COMPONENT; ch++ )
     {
-      for( UInt tmplt = 0; tmplt < 2; tmplt++ )
+      for( uint32_t tmplt = 0; tmplt < 2; tmplt++ )
       {
         m_acYuvPredFrucTemplate[tmplt][ch] = ( Pel* ) xMalloc( Pel, MAX_CU_SIZE * MAX_CU_SIZE );
       }
@@ -350,7 +350,7 @@ void InterPrediction::xSubPuMC( PredictionUnit& pu, PelUnitBuf& predBuf, const R
 #if JEM_TOOLS
   if( pu.mergeType == MRG_TYPE_FRUC )
   {
-    UInt nRefineBlockSize = xFrucGetSubBlkSize( pu, puSize.width, puSize.height );
+    uint32_t nRefineBlockSize = xFrucGetSubBlkSize( pu, puSize.width, puSize.height );
 
 #if JVET_K0346
     puHeight     = std::min(puSize.width, nRefineBlockSize);
@@ -491,7 +491,7 @@ void InterPrediction::xPredInterUni(const PredictionUnit& pu, const RefPicList& 
   clipMv(mv[0], pu.cu->lumaPos(), sps);
 
 
-  for( UInt comp = COMPONENT_Y; comp < pcYuvPred.bufs.size() && comp <= m_maxCompIDToPred; comp++ )
+  for( uint32_t comp = COMPONENT_Y; comp < pcYuvPred.bufs.size() && comp <= m_maxCompIDToPred; comp++ )
   {
     const ComponentID compID = ComponentID( comp );
 
@@ -570,7 +570,7 @@ void InterPrediction::xPredInterBi(PredictionUnit& pu, PelUnitBuf &pcYuvPred)
   }
 #endif
 
-  for (UInt refList = 0; refList < NUM_REF_PIC_LIST_01; refList++)
+  for (uint32_t refList = 0; refList < NUM_REF_PIC_LIST_01; refList++)
   {
     if( pu.refIdx[refList] < 0)
     {
@@ -1449,18 +1449,18 @@ void InterPrediction::subBlockOBMC( PredictionUnit  &pu, PelUnitBuf* pDst, bool 
   const PartSize   ePartSize = pu.cu->partSize;
   const UnitArea   orgPuArea = pu;
 
-  const UInt uiWidth         = pu.lwidth();
-  const UInt uiHeight        = pu.lheight();
+  const uint32_t uiWidth         = pu.lwidth();
+  const uint32_t uiHeight        = pu.lheight();
 
-  const UInt uiMinCUW        = pu.cs->pcv->minCUWidth;
+  const uint32_t uiMinCUW        = pu.cs->pcv->minCUWidth;
 
-  const UInt uiOBMCBlkSize   = pu.cs->sps->getSpsNext().getOBMCBlkSize();
+  const uint32_t uiOBMCBlkSize   = pu.cs->sps->getSpsNext().getOBMCBlkSize();
 
-  const UInt uiHeightInBlock = uiHeight         / uiMinCUW;
-  const UInt uiWidthInBlock  = uiWidth          / uiMinCUW;
-  const UInt uiHeightInCU    = pu.cu->lheight() / uiMinCUW;
-  const UInt uiWidhtInCU     = pu.cu->lwidth()  / uiMinCUW;
-  const UInt uiStep          = uiOBMCBlkSize    / uiMinCUW;
+  const uint32_t uiHeightInBlock = uiHeight         / uiMinCUW;
+  const uint32_t uiWidthInBlock  = uiWidth          / uiMinCUW;
+  const uint32_t uiHeightInCU    = pu.cu->lheight() / uiMinCUW;
+  const uint32_t uiWidhtInCU     = pu.cu->lwidth()  / uiMinCUW;
+  const uint32_t uiStep          = uiOBMCBlkSize    / uiMinCUW;
 
   const bool bOBMCSimp       = cs.pcv->only2Nx2N ? uiWidth * uiHeight < 64 : ( pu.cu->lwidth() == 8 && ePartSize != SIZE_2Nx2N );
 
@@ -2199,7 +2199,7 @@ inline int64_t InterPrediction::divide64( int64_t numer, int64_t denom )
 
 void InterPrediction::calcBlkGradient( int sx, int sy, int64_t *arraysGx2, int64_t *arraysGxGy, int64_t *arraysGxdI, int64_t *arraysGy2, int64_t *arraysGydI, int64_t &sGx2, int64_t &sGy2, int64_t &sGxGy, int64_t &sGxdI, int64_t &sGydI, int iWidth, int iHeight )
 {
-  static const UInt weightTbl[8][8] = { {1, 2, 3, 4, 4, 3, 2, 1},
+  static const uint32_t weightTbl[8][8] = { {1, 2, 3, 4, 4, 3, 2, 1},
       {2, 4, 6, 8, 8, 6, 4, 2},
       {3, 6, 9, 12, 12, 9, 6, 3},
       {4, 8, 12, 16, 16, 12, 8, 4},
@@ -2229,7 +2229,7 @@ void InterPrediction::calcBlkGradient( int sx, int sy, int64_t *arraysGx2, int64
   {
     for (int x = -2; x < 6; x++)
     {
-      UInt weight = weightTbl[y + 2][x + 2];
+      uint32_t weight = weightTbl[y + 2][x + 2];
       x0 = x;
       if (sx + x < 0)       x0 = 0;
       if (sx + x >= iWidth) x0 = 3;
@@ -2264,7 +2264,7 @@ Distortion InterPrediction::xFrucGetTempMatchCost(PredictionUnit &pu, int nWidth
                                                   RefPicList eCurRefPicList, const MvField &rCurMvField,
                                                   Distortion uiMVCost)
 #else
-UInt InterPrediction::xFrucGetTempMatchCost( PredictionUnit& pu, int nWidth, int nHeight, RefPicList eCurRefPicList, const MvField& rCurMvField, UInt uiMVCost )
+uint32_t InterPrediction::xFrucGetTempMatchCost( PredictionUnit& pu, int nWidth, int nHeight, RefPicList eCurRefPicList, const MvField& rCurMvField, uint32_t uiMVCost )
 #endif
 {
   const int nMVUnit = 2;
@@ -2272,7 +2272,7 @@ UInt InterPrediction::xFrucGetTempMatchCost( PredictionUnit& pu, int nWidth, int
 #if DISTORTION_TYPE_BUGFIX
   Distortion uiCost = uiMVCost;
 #else
-  UInt uiCost = uiMVCost;
+  uint32_t uiCost = uiMVCost;
 #endif
 
   DistParam cDistParam;
@@ -2335,14 +2335,14 @@ Distortion InterPrediction::xFrucGetBilaMatchCost(PredictionUnit &pu, int nWidth
                                                   RefPicList eCurRefPicList, const MvField &rCurMvField,
                                                   MvField &rPairMVField, Distortion uiMVCost)
 #else
-UInt InterPrediction::xFrucGetBilaMatchCost(PredictionUnit &pu, int nWidth, int nHeight, RefPicList eCurRefPicList,
-                                            const MvField &rCurMvField, MvField &rPairMVField, UInt uiMVCost)
+uint32_t InterPrediction::xFrucGetBilaMatchCost(PredictionUnit &pu, int nWidth, int nHeight, RefPicList eCurRefPicList,
+                                            const MvField &rCurMvField, MvField &rPairMVField, uint32_t uiMVCost)
 #endif
 {
 #if DISTORTION_TYPE_BUGFIX
   Distortion uiCost = std::numeric_limits<Distortion>::max();
 #else
-  UInt uiCost = MAX_UINT;
+  uint32_t uiCost = MAX_UINT;
 #endif
 
   if( PU::getMvPair( pu, eCurRefPicList , rCurMvField , rPairMVField ) )
@@ -2668,13 +2668,13 @@ Distortion InterPrediction::xFrucFindBestMvFromList(MvField *pBestMvField, RefPi
                                                     PredictionUnit &pu, const MvField &rMvStart, int nBlkWidth,
                                                     int nBlkHeight, bool bTM, bool bMvCost)
 #else
-UInt InterPrediction::xFrucFindBestMvFromList( MvField* pBestMvField, RefPicList& rBestRefPicList, PredictionUnit& pu, const MvField& rMvStart, int nBlkWidth, int nBlkHeight, bool bTM, bool bMvCost )
+uint32_t InterPrediction::xFrucFindBestMvFromList( MvField* pBestMvField, RefPicList& rBestRefPicList, PredictionUnit& pu, const MvField& rMvStart, int nBlkWidth, int nBlkHeight, bool bTM, bool bMvCost )
 #endif
 {
 #if DISTORTION_TYPE_BUGFIX
   Distortion uiMinCost = std::numeric_limits<Distortion>::max();
 #else
-  UInt uiMinCost = MAX_UINT;
+  uint32_t uiMinCost = MAX_UINT;
 #endif
 
   int nRefPicListStart = 0;
@@ -2701,7 +2701,7 @@ UInt InterPrediction::xFrucFindBestMvFromList( MvField* pBestMvField, RefPicList
 #if DISTORTION_TYPE_BUGFIX
       Distortion uiCost = 0;
 #else
-      UInt uiCost = 0;
+      uint32_t uiCost = 0;
 #endif
       if( bMvCost )
       {
@@ -2762,16 +2762,16 @@ bool InterPrediction::deriveFRUCMV( PredictionUnit &pu )
 
 #if DISTORTION_TYPE_BUGFIX
 Distortion InterPrediction::xFrucGetMvCost(const Mv &rMvStart, const Mv &rMvCur, int nSearchRange, int nWeighting,
-                                           UInt precShift)
+                                           uint32_t precShift)
 #else
-UInt InterPrediction::xFrucGetMvCost( const Mv& rMvStart, const Mv& rMvCur, int nSearchRange, int nWeighting, UInt precShift )
+uint32_t InterPrediction::xFrucGetMvCost( const Mv& rMvStart, const Mv& rMvCur, int nSearchRange, int nWeighting, uint32_t precShift )
 #endif
 {
   Mv mvDist = rMvStart - rMvCur;
 #if DISTORTION_TYPE_BUGFIX
   Distortion uiCost = std::numeric_limits<Distortion>::max();
 #else
-  UInt uiCost = MAX_UINT;
+  uint32_t uiCost = MAX_UINT;
 #endif
   if( mvDist.getAbsHor() <= nSearchRange && mvDist.getAbsVer() <= nSearchRange )
   {
@@ -2787,7 +2787,7 @@ Distortion InterPrediction::xFrucRefineMv(MvField *pBestMvField, RefPicList eCur
                                           int nSearchMethod, PredictionUnit &pu, const MvField &rMvStart, int nBlkWidth,
                                           int nBlkHeight, bool bTM, bool bMvCostZero)
 #else
-UInt InterPrediction::xFrucRefineMv( MvField* pBestMvField, RefPicList eCurRefPicList, UInt uiMinCost, int nSearchMethod, PredictionUnit& pu, const MvField& rMvStart, int nBlkWidth, int nBlkHeight, bool bTM, bool bMvCostZero )
+uint32_t InterPrediction::xFrucRefineMv( MvField* pBestMvField, RefPicList eCurRefPicList, uint32_t uiMinCost, int nSearchMethod, PredictionUnit& pu, const MvField& rMvStart, int nBlkWidth, int nBlkHeight, bool bTM, bool bMvCostZero )
 #endif
 {
   int nSearchStepShift = 0;
@@ -2858,10 +2858,10 @@ template<int SearchPattern>
 Distortion InterPrediction::xFrucRefineMvSearch(MvField *pBestMvField, RefPicList eCurRefPicList, PredictionUnit &pu,
                                                 const MvField &rMvStart, int nBlkWidth, int nBlkHeight,
                                                 Distortion uiMinDist, bool bTM, int nSearchStepShift,
-                                                UInt uiMaxSearchRounds, bool bMvCostZero)
+                                                uint32_t uiMaxSearchRounds, bool bMvCostZero)
 #else
 template<int SearchPattern>
-UInt InterPrediction::xFrucRefineMvSearch ( MvField* pBestMvField, RefPicList eCurRefPicList, PredictionUnit& pu, const MvField& rMvStart, int nBlkWidth, int nBlkHeight, UInt uiMinDist, bool bTM, int nSearchStepShift, UInt uiMaxSearchRounds, bool bMvCostZero )
+uint32_t InterPrediction::xFrucRefineMvSearch ( MvField* pBestMvField, RefPicList eCurRefPicList, PredictionUnit& pu, const MvField& rMvStart, int nBlkWidth, int nBlkHeight, uint32_t uiMinDist, bool bTM, int nSearchStepShift, uint32_t uiMaxSearchRounds, bool bMvCostZero )
 #endif
 {
   const Mv mvSearchOffsetCross  [4] = { Mv(  0 , 1 ) , Mv( 1 , 0 ) , Mv(  0 , -1 ) , Mv( -1 ,  0 ) };
@@ -2908,7 +2908,7 @@ UInt InterPrediction::xFrucRefineMvSearch ( MvField* pBestMvField, RefPicList eC
   {
     rSearchRange >>= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
   }
-  for( UInt uiRound = 0 ; uiRound < uiMaxSearchRounds ; uiRound++ )
+  for( uint32_t uiRound = 0 ; uiRound < uiMaxSearchRounds ; uiRound++ )
   {
     nBestDirect = -1;
     MvField mvCurCenter = pBestMvField[eCurRefPicList];
@@ -2938,7 +2938,7 @@ UInt InterPrediction::xFrucRefineMvSearch ( MvField* pBestMvField, RefPicList eC
         pu.cs->sps->getSpsNext().getUseHighPrecMv() ? VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : 0);
       if (bMvCostZero && uiCost != std::numeric_limits<Distortion>::max())
 #else
-      UInt uiCost = xFrucGetMvCost( rMvStart.mv, mvCand.mv, rSearchRange, FRUC_MERGE_REFINE_MVWEIGHT, pu.cs->sps->getSpsNext().getUseHighPrecMv() ? VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : 0 );
+      uint32_t uiCost = xFrucGetMvCost( rMvStart.mv, mvCand.mv, rSearchRange, FRUC_MERGE_REFINE_MVWEIGHT, pu.cs->sps->getSpsNext().getUseHighPrecMv() ? VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : 0 );
       if (bMvCostZero && uiCost != MAX_UINT)
 #endif
       {
@@ -3008,7 +3008,7 @@ bool InterPrediction::frucFindBlkMv4Pred( PredictionUnit& pu, RefPicList eTarget
       Distortion uiMinCost = xFrucFindBestMvFromList(mvStart, eTargetRefPicList, pu, mvStart[eTargetRefPicList], nWidth,
                                                      nHeight, true, false);
 #else
-      UInt uiMinCost = xFrucFindBestMvFromList( mvStart, eTargetRefPicList, pu, mvStart[eTargetRefPicList], nWidth, nHeight, true, false );
+      uint32_t uiMinCost = xFrucFindBestMvFromList( mvStart, eTargetRefPicList, pu, mvStart[eTargetRefPicList], nWidth, nHeight, true, false );
 #endif
       if( mvStart[eTargetRefPicList].refIdx >= 0 )
       {
@@ -3045,7 +3045,7 @@ bool InterPrediction::xFrucFindBlkMv( PredictionUnit& pu, const MergeCtx& mergeC
     Distortion uiMinCost =
       xFrucFindBestMvFromList(mvStart, eBestRefPicList, pu, mvStart[eBestRefPicList], nWidth, nHeight, false, false);
 #else
-    UInt uiMinCost = xFrucFindBestMvFromList( mvStart, eBestRefPicList, pu, mvStart[eBestRefPicList], nWidth, nHeight, false, false );
+    uint32_t uiMinCost = xFrucFindBestMvFromList( mvStart, eBestRefPicList, pu, mvStart[eBestRefPicList], nWidth, nHeight, false, false );
 #endif
 
     if( mvStart[eBestRefPicList].refIdx >= 0 )
@@ -3070,7 +3070,7 @@ bool InterPrediction::xFrucFindBlkMv( PredictionUnit& pu, const MergeCtx& mergeC
 #if DISTORTION_TYPE_BUGFIX
     Distortion uiMinCost[2];
 #else
-    UInt uiMinCost[2];
+    uint32_t uiMinCost[2];
 #endif
     // find the best Mvs from the two lists first and then refine Mvs: try to avoid duplicated Mvs
     for( int nRefPicList = 0 ; nRefPicList < 2 ; nRefPicList++ )
@@ -3096,7 +3096,7 @@ bool InterPrediction::xFrucFindBlkMv( PredictionUnit& pu, const MergeCtx& mergeC
 #if DISTORTION_TYPE_BUGFIX
       Distortion uiCostBi = xFrucGetTempMatchCost(pu, nWidth, nHeight, REF_PIC_LIST_1, mvFinal[REF_PIC_LIST_1], 0);
 #else
-      UInt uiCostBi = xFrucGetTempMatchCost( pu, nWidth, nHeight, REF_PIC_LIST_1, mvFinal[REF_PIC_LIST_1], 0 );
+      uint32_t uiCostBi = xFrucGetTempMatchCost( pu, nWidth, nHeight, REF_PIC_LIST_1, mvFinal[REF_PIC_LIST_1], 0 );
 #endif
 
       if (2 * uiCostBi <= 5 * std::min(uiMinCost[0], uiMinCost[1]) )  // if (uiMinCostBi <= 5/4*2*min(uiMinCost[0], uiMinCost[1]) )
@@ -3185,7 +3185,7 @@ bool InterPrediction::xFrucRefineSubBlkMv( PredictionUnit& pu, const MergeCtx &m
             Distortion uiMinCost = xFrucFindBestMvFromList(mvFinal, eCurRefPicList, subPu, mvStart[eCurRefPicList],
                                                            nRefineBlockSize, nRefineBlockSize, bTM, true);
 #else
-            UInt uiMinCost = xFrucFindBestMvFromList( mvFinal, eCurRefPicList, subPu, mvStart[eCurRefPicList], nRefineBlockSize, nRefineBlockSize, bTM, true );
+            uint32_t uiMinCost = xFrucFindBestMvFromList( mvFinal, eCurRefPicList, subPu, mvStart[eCurRefPicList], nRefineBlockSize, nRefineBlockSize, bTM, true );
 #endif
             uiMinCost = xFrucRefineMv( mvFinal, eCurRefPicList, uiMinCost, nSearchMethod, subPu, mvStart[eCurRefPicList], nRefineBlockSize, nRefineBlockSize, bTM );
           }
@@ -3201,7 +3201,7 @@ bool InterPrediction::xFrucRefineSubBlkMv( PredictionUnit& pu, const MergeCtx &m
         Distortion uiMinCost = xFrucFindBestMvFromList(mvFinal, eBestRefPicList, subPu, mvStart[eBestRefPicList],
                                                        nRefineBlockSize, nRefineBlockSize, bTM, true);
 #else
-        UInt uiMinCost = xFrucFindBestMvFromList( mvFinal, eBestRefPicList, subPu, mvStart[eBestRefPicList], nRefineBlockSize, nRefineBlockSize, bTM, true );
+        uint32_t uiMinCost = xFrucFindBestMvFromList( mvFinal, eBestRefPicList, subPu, mvStart[eBestRefPicList], nRefineBlockSize, nRefineBlockSize, bTM, true );
 #endif
         uiMinCost = xFrucRefineMv( mvFinal, eBestRefPicList, uiMinCost, nSearchMethod, subPu, mvStart[eBestRefPicList], nRefineBlockSize, nRefineBlockSize, bTM );
       }
@@ -3433,10 +3433,10 @@ void InterPrediction::xFillPredBlckAndBorder( const PredictionUnit& pu, RefPicLi
 }
 
 #if DISTORTION_TYPE_BUGFIX
-Distortion InterPrediction::xDirectMCCost(int iBitDepth, Pel *pRef, UInt uiRefStride, const Pel *pOrg, UInt uiOrgStride,
+Distortion InterPrediction::xDirectMCCost(int iBitDepth, Pel *pRef, uint32_t uiRefStride, const Pel *pOrg, uint32_t uiOrgStride,
                                           int iWidth, int iHeight)
 #else
-UInt InterPrediction::xDirectMCCost( int iBitDepth, Pel* pRef, UInt uiRefStride, const Pel* pOrg, UInt uiOrgStride, int iWidth, int iHeight )
+uint32_t InterPrediction::xDirectMCCost( int iBitDepth, Pel* pRef, uint32_t uiRefStride, const Pel* pOrg, uint32_t uiOrgStride, int iWidth, int iHeight )
 #endif
 {
   DistParam cDistParam;
@@ -3448,7 +3448,7 @@ UInt InterPrediction::xDirectMCCost( int iBitDepth, Pel* pRef, UInt uiRefStride,
 #if DISTORTION_TYPE_BUGFIX
   Distortion uiCost = cDistParam.distFunc(cDistParam);
 #else
-  UInt uiCost = cDistParam.distFunc( cDistParam );
+  uint32_t uiCost = cDistParam.distFunc( cDistParam );
 #endif
 
   return uiCost;
@@ -3456,10 +3456,10 @@ UInt InterPrediction::xDirectMCCost( int iBitDepth, Pel* pRef, UInt uiRefStride,
 
 #if DISTORTION_TYPE_BUGFIX
 void InterPrediction::xBIPMVRefine(PredictionUnit &pu, RefPicList eRefPicList, int iWidth, int iHeight,
-                                   const CPelUnitBuf &pcYuvOrg, UInt uiMaxSearchRounds, UInt nSearchStepShift,
+                                   const CPelUnitBuf &pcYuvOrg, uint32_t uiMaxSearchRounds, uint32_t nSearchStepShift,
                                    Distortion &uiMinCost, bool fullPel /*= true*/)
 #else
-void InterPrediction::xBIPMVRefine( PredictionUnit& pu, RefPicList eRefPicList, int iWidth, int iHeight, const CPelUnitBuf &pcYuvOrg, UInt uiMaxSearchRounds, UInt nSearchStepShift, UInt& uiMinCost, bool fullPel /*= true*/ )
+void InterPrediction::xBIPMVRefine( PredictionUnit& pu, RefPicList eRefPicList, int iWidth, int iHeight, const CPelUnitBuf &pcYuvOrg, uint32_t uiMaxSearchRounds, uint32_t nSearchStepShift, uint32_t& uiMinCost, bool fullPel /*= true*/ )
 #endif
 {
   const Mv mvSearchOffsetSquare[8] = { Mv(-1 , 1) , Mv(0 , 1) , Mv(1 , 1) , Mv(1 , 0) , Mv(1 , -1) , Mv(0 , -1) , Mv(-1 , -1) , Mv(-1 , 0) };
@@ -3477,7 +3477,7 @@ void InterPrediction::xBIPMVRefine( PredictionUnit& pu, RefPicList eRefPicList, 
 
   int nBestDirect;
 
-  for (UInt uiRound = 0; uiRound < uiMaxSearchRounds; uiRound++)
+  for (uint32_t uiRound = 0; uiRound < uiMaxSearchRounds; uiRound++)
   {
     nBestDirect = -1;
     Mv cMvCtr = cBestMv;
@@ -3501,7 +3501,7 @@ void InterPrediction::xBIPMVRefine( PredictionUnit& pu, RefPicList eRefPicList, 
 #if DISTORTION_TYPE_BUGFIX
       Distortion uiCost;
 #else
-      UInt uiCost;
+      uint32_t uiCost;
 #endif
 
       if ( fullPel )
@@ -3566,7 +3566,7 @@ void InterPrediction::xProcessDMVR( PredictionUnit& pu, PelUnitBuf &pcYuvDst, co
 
 
   //mv refinement
-  UInt searchStepShift = 2;
+  uint32_t searchStepShift = 2;
   if( pu.cu->slice->getSPS()->getSpsNext().getUseHighPrecMv() )
   {
     searchStepShift += 2;
@@ -3584,7 +3584,7 @@ void InterPrediction::xProcessDMVR( PredictionUnit& pu, PelUnitBuf &pcYuvDst, co
     xDirectMCCost(clpRngs.comp[COMPONENT_Y].bd, pcYuvDst.Y().buf, pcYuvDst.Y().stride, srcPred0.Y().buf,
                   srcPred0.Y().stride, pu.lumaSize().width, pu.lumaSize().height);
 #else
-  UInt uiMinCost = xDirectMCCost( clpRngs.comp[COMPONENT_Y].bd, pcYuvDst.Y().buf, pcYuvDst.Y().stride, srcPred0.Y().buf, srcPred0.Y().stride, pu.lumaSize().width, pu.lumaSize().height );
+  uint32_t uiMinCost = xDirectMCCost( clpRngs.comp[COMPONENT_Y].bd, pcYuvDst.Y().buf, pcYuvDst.Y().stride, srcPred0.Y().buf, srcPred0.Y().stride, pu.lumaSize().width, pu.lumaSize().height );
 #endif
 
   xFillPredBlckAndBorder( pu, REF_PIC_LIST_0, pu.lumaSize().width, pu.lumaSize().height, srcPred0.Y() );
@@ -3597,7 +3597,7 @@ void InterPrediction::xProcessDMVR( PredictionUnit& pu, PelUnitBuf &pcYuvDst, co
   clipMv( mv, pu.lumaPos(), *pu.cs->sps );
 
 
-  for( UInt comp = COMPONENT_Y; comp < srcPred0.bufs.size() && comp <= m_maxCompIDToPred; comp++ )
+  for( uint32_t comp = COMPONENT_Y; comp < srcPred0.bufs.size() && comp <= m_maxCompIDToPred; comp++ )
   {
     const ComponentID compID = ComponentID( comp );
 
@@ -3619,7 +3619,7 @@ void InterPrediction::xProcessDMVR( PredictionUnit& pu, PelUnitBuf &pcYuvDst, co
   clipMv( mv, pu.lumaPos(), *pu.cs->sps );
 
 
-  for( UInt comp = COMPONENT_Y; comp < srcPred1.bufs.size() && comp <= m_maxCompIDToPred; comp++ )
+  for( uint32_t comp = COMPONENT_Y; comp < srcPred1.bufs.size() && comp <= m_maxCompIDToPred; comp++ )
   {
     const ComponentID compID = ComponentID( comp );
 

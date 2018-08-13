@@ -60,7 +60,7 @@ enum PredBuf
   NUM_PRED_BUF        = 2
 };
 
-static const UInt MAX_INTRA_FILTER_DEPTHS=8;
+static const uint32_t MAX_INTRA_FILTER_DEPTHS=8;
 
 class IntraPrediction
 {
@@ -100,9 +100,9 @@ protected:
   void xPredIntraPlanar           ( const CPelBuf &pSrc, PelBuf &pDst,                                                                                                         const SPS& sps );
   void xPredIntraDc               ( const CPelBuf &pSrc, PelBuf &pDst, const ChannelType channelType,                                                                                          const bool enableBoundaryFilter = true );
 #if HEVC_USE_HOR_VER_PREDFILTERING
-  void xPredIntraAng              ( const CPelBuf &pSrc, PelBuf &pDst, const ChannelType channelType, const UInt dirMode, const ClpRng& clpRng, const bool bEnableEdgeFilters, const SPS& sps, const bool enableBoundaryFilter = true );
+  void xPredIntraAng              ( const CPelBuf &pSrc, PelBuf &pDst, const ChannelType channelType, const uint32_t dirMode, const ClpRng& clpRng, const bool bEnableEdgeFilters, const SPS& sps, const bool enableBoundaryFilter = true );
 #else
-  void xPredIntraAng              ( const CPelBuf &pSrc, PelBuf &pDst, const ChannelType channelType, const UInt dirMode, const ClpRng& clpRng, const SPS& sps, const bool enableBoundaryFilter = true );
+  void xPredIntraAng              ( const CPelBuf &pSrc, PelBuf &pDst, const ChannelType channelType, const uint32_t dirMode, const ClpRng& clpRng, const SPS& sps, const bool enableBoundaryFilter = true );
 #endif
   Pel  xGetPredValDc              ( const CPelBuf &pSrc, const Size &dstSize );
 
@@ -111,7 +111,7 @@ protected:
 
 #if JEM_TOOLS && JEM_USE_INTRA_BOUNDARY
   // filtering (intra boundary filter)
-  void xIntraPredFilteringModeDGL ( const CPelBuf &pSrc, PelBuf &pDst, UInt uiMode );
+  void xIntraPredFilteringModeDGL ( const CPelBuf &pSrc, PelBuf &pDst, uint32_t uiMode );
   void xIntraPredFilteringMode34  ( const CPelBuf &pSrc, PelBuf &pDst );
   void xIntraPredFilteringMode02  ( const CPelBuf &pSrc, PelBuf &pDst );
 #endif
@@ -181,7 +181,7 @@ static bool useFilteredIntraRefSamples( const ComponentID &compID, const Predict
 #if HM_MDIS_AS_IN_JEM && JEM_TOOLS
   static bool getPlanarMDISCondition( const UnitArea &tuArea ) { return abs(PLANAR_IDX - HOR_IDX) > m_aucIntraFilter[CHANNEL_TYPE_LUMA][((g_aucLog2[tuArea.Y().width] + g_aucLog2[tuArea.Y().height]) >> 1)]; }
 #endif
-  static bool useDPCMForFirstPassIntraEstimation(const PredictionUnit &pu, const UInt &uiDirMode);
+  static bool useDPCMForFirstPassIntraEstimation(const PredictionUnit &pu, const uint32_t &uiDirMode);
 };
 
 //! \}

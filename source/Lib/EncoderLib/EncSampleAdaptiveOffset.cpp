@@ -90,15 +90,15 @@ EncSampleAdaptiveOffset::~EncSampleAdaptiveOffset()
   destroyEncData();
 }
 
-void EncSampleAdaptiveOffset::createEncData(bool isPreDBFSamplesUsed, UInt numCTUsPic)
+void EncSampleAdaptiveOffset::createEncData(bool isPreDBFSamplesUsed, uint32_t numCTUsPic)
 {
   //statistics
-  const UInt sizeInCtus = numCTUsPic;
+  const uint32_t sizeInCtus = numCTUsPic;
   m_statData.resize( sizeInCtus );
-  for(UInt i=0; i< sizeInCtus; i++)
+  for(uint32_t i=0; i< sizeInCtus; i++)
   {
     m_statData[i] = new SAOStatData*[MAX_NUM_COMPONENT];
-    for(UInt compIdx=0; compIdx < MAX_NUM_COMPONENT; compIdx++)
+    for(uint32_t compIdx=0; compIdx < MAX_NUM_COMPONENT; compIdx++)
     {
       m_statData[i][compIdx] = new SAOStatData[NUM_SAO_NEW_TYPES];
     }
@@ -106,10 +106,10 @@ void EncSampleAdaptiveOffset::createEncData(bool isPreDBFSamplesUsed, UInt numCT
   if(isPreDBFSamplesUsed)
   {
     m_preDBFstatData.resize( sizeInCtus );
-    for(UInt i=0; i< sizeInCtus; i++)
+    for(uint32_t i=0; i< sizeInCtus; i++)
     {
       m_preDBFstatData[i] = new SAOStatData*[MAX_NUM_COMPONENT];
-      for(UInt compIdx=0; compIdx < MAX_NUM_COMPONENT; compIdx++)
+      for(uint32_t compIdx=0; compIdx < MAX_NUM_COMPONENT; compIdx++)
       {
         m_preDBFstatData[i][compIdx] = new SAOStatData[NUM_SAO_NEW_TYPES];
       }
@@ -179,9 +179,9 @@ void EncSampleAdaptiveOffset::createEncData(bool isPreDBFSamplesUsed, UInt numCT
 
 void EncSampleAdaptiveOffset::destroyEncData()
 {
-  for(UInt i=0; i< m_statData.size(); i++)
+  for(uint32_t i=0; i< m_statData.size(); i++)
   {
-    for(UInt compIdx=0; compIdx< MAX_NUM_COMPONENT; compIdx++)
+    for(uint32_t compIdx=0; compIdx< MAX_NUM_COMPONENT; compIdx++)
     {
       delete[] m_statData[i][compIdx];
     }
@@ -270,12 +270,12 @@ void EncSampleAdaptiveOffset::getPreDBFStatistics(CodingStructure& cs)
 
 void EncSampleAdaptiveOffset::addPreDBFStatistics(std::vector<SAOStatData**>& blkStats)
 {
-  const UInt numCTUsPic = (UInt)blkStats.size();
-  for(UInt n=0; n< numCTUsPic; n++)
+  const uint32_t numCTUsPic = (uint32_t)blkStats.size();
+  for(uint32_t n=0; n< numCTUsPic; n++)
   {
-    for(UInt compIdx=0; compIdx < MAX_NUM_COMPONENT; compIdx++)
+    for(uint32_t compIdx=0; compIdx < MAX_NUM_COMPONENT; compIdx++)
     {
-      for(UInt typeIdc=0; typeIdc < NUM_SAO_NEW_TYPES; typeIdc++)
+      for(uint32_t typeIdc=0; typeIdc < NUM_SAO_NEW_TYPES; typeIdc++)
       {
         blkStats[n][compIdx][typeIdc] += m_preDBFstatData[n][compIdx][typeIdc];
       }
@@ -298,12 +298,12 @@ void EncSampleAdaptiveOffset::getStatistics(std::vector<SAOStatData**>& blkStats
   }
 
   int ctuRsAddr = 0;
-  for( UInt yPos = 0; yPos < pcv.lumaHeight; yPos += pcv.maxCUHeight )
+  for( uint32_t yPos = 0; yPos < pcv.lumaHeight; yPos += pcv.maxCUHeight )
   {
-    for( UInt xPos = 0; xPos < pcv.lumaWidth; xPos += pcv.maxCUWidth )
+    for( uint32_t xPos = 0; xPos < pcv.lumaWidth; xPos += pcv.maxCUWidth )
     {
-      const UInt width  = (xPos + pcv.maxCUWidth  > pcv.lumaWidth)  ? (pcv.lumaWidth - xPos)  : pcv.maxCUWidth;
-      const UInt height = (yPos + pcv.maxCUHeight > pcv.lumaHeight) ? (pcv.lumaHeight - yPos) : pcv.maxCUHeight;
+      const uint32_t width  = (xPos + pcv.maxCUWidth  > pcv.lumaWidth)  ? (pcv.lumaWidth - xPos)  : pcv.maxCUWidth;
+      const uint32_t height = (yPos + pcv.maxCUHeight > pcv.lumaHeight) ? (pcv.lumaHeight - yPos) : pcv.maxCUHeight;
       const UnitArea area( cs.area.chromaFormat, Area(xPos , yPos, width, height) );
 
       deriveLoopFilterBoundaryAvailibility(cs, area.Y(), isLeftAvail, isAboveAvail, isAboveLeftAvail );
@@ -663,7 +663,7 @@ void EncSampleAdaptiveOffset::deriveModeNewRDO(const BitDepths &bitDepths, int c
   cost = 0;
   previousFracBits = 0;
   m_CABACEstimator->resetBits();
-  for(UInt componentIndex = COMPONENT_Cb; componentIndex < numberOfComponents; componentIndex++)
+  for(uint32_t componentIndex = COMPONENT_Cb; componentIndex < numberOfComponents; componentIndex++)
   {
     const ComponentID component = ComponentID(componentIndex);
 
@@ -686,7 +686,7 @@ void EncSampleAdaptiveOffset::deriveModeNewRDO(const BitDepths &bitDepths, int c
     previousFracBits = 0;
     cost = 0;
 
-    for(UInt componentIndex = COMPONENT_Cb; componentIndex < numberOfComponents; componentIndex++)
+    for(uint32_t componentIndex = COMPONENT_Cb; componentIndex < numberOfComponents; componentIndex++)
     {
       const ComponentID component = ComponentID(componentIndex);
       if(!sliceEnabled[component])
@@ -711,7 +711,7 @@ void EncSampleAdaptiveOffset::deriveModeNewRDO(const BitDepths &bitDepths, int c
     if(cost < minCost)
     {
       minCost = cost;
-      for(UInt componentIndex = COMPONENT_Cb; componentIndex < numberOfComponents; componentIndex++)
+      for(uint32_t componentIndex = COMPONENT_Cb; componentIndex < numberOfComponents; componentIndex++)
       {
         modeDist[componentIndex]  = dist[componentIndex];
         modeParam[componentIndex] = testOffset[componentIndex];
@@ -722,7 +722,7 @@ void EncSampleAdaptiveOffset::deriveModeNewRDO(const BitDepths &bitDepths, int c
 
   //----- re-gen rate & normalized cost----//
   modeNormCost = 0;
-  for(UInt componentIndex = COMPONENT_Y; componentIndex < numberOfComponents; componentIndex++)
+  for(uint32_t componentIndex = COMPONENT_Y; componentIndex < numberOfComponents; componentIndex++)
   {
     modeNormCost += (double)modeDist[componentIndex] / m_lambda[componentIndex];
   }
@@ -800,8 +800,8 @@ void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, bool* sliceEn
 {
   const PreCalcValues& pcv = *cs.pcv;
   bool allBlksDisabled = true;
-  const UInt numberOfComponents = m_numberOfComponents;
-  for(UInt compId = COMPONENT_Y; compId < numberOfComponents; compId++)
+  const uint32_t numberOfComponents = m_numberOfComponents;
+  for(uint32_t compId = COMPONENT_Y; compId < numberOfComponents; compId++)
   {
     if (sliceEnabled[compId])
     {
@@ -820,10 +820,10 @@ void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, bool* sliceEn
   if (isGreedymergeEncoding)
   {
     groupBlkStat.resize(cs.pcv->sizeInCtus);
-    for (UInt k = 0; k < cs.pcv->sizeInCtus; k++)
+    for (uint32_t k = 0; k < cs.pcv->sizeInCtus; k++)
     {
       groupBlkStat[k] = new SAOStatData*[MAX_NUM_COMPONENT];
-      for (UInt compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++)
+      for (uint32_t compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++)
       {
         groupBlkStat[k][compIdx] = new SAOStatData[NUM_SAO_NEW_TYPES];
       }
@@ -844,12 +844,12 @@ void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, bool* sliceEn
   double totalCost = 0; // Used if bTestSAODisableAtPictureLevel==true
 
   int ctuRsAddr = 0;
-  for( UInt yPos = 0; yPos < pcv.lumaHeight; yPos += pcv.maxCUHeight )
+  for( uint32_t yPos = 0; yPos < pcv.lumaHeight; yPos += pcv.maxCUHeight )
   {
-    for( UInt xPos = 0; xPos < pcv.lumaWidth; xPos += pcv.maxCUWidth )
+    for( uint32_t xPos = 0; xPos < pcv.lumaWidth; xPos += pcv.maxCUWidth )
     {
-      const UInt width  = (xPos + pcv.maxCUWidth  > pcv.lumaWidth)  ? (pcv.lumaWidth - xPos)  : pcv.maxCUWidth;
-      const UInt height = (yPos + pcv.maxCUHeight > pcv.lumaHeight) ? (pcv.lumaHeight - yPos) : pcv.maxCUHeight;
+      const uint32_t width  = (xPos + pcv.maxCUWidth  > pcv.lumaWidth)  ? (pcv.lumaWidth - xPos)  : pcv.maxCUWidth;
+      const uint32_t height = (yPos + pcv.maxCUHeight > pcv.lumaHeight) ? (pcv.lumaHeight - yPos) : pcv.maxCUHeight;
       const UnitArea area( pcv.chrFormat, Area( xPos , yPos, width, height) );
 
       if(allBlksDisabled)
@@ -1051,12 +1051,12 @@ void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, bool* sliceEn
   if (isGreedymergeEncoding)
   {
     ctuRsAddr = 0;
-    for (UInt yPos = 0; yPos < pcv.lumaHeight; yPos += pcv.maxCUHeight)
+    for (uint32_t yPos = 0; yPos < pcv.lumaHeight; yPos += pcv.maxCUHeight)
     {
-      for (UInt xPos = 0; xPos < pcv.lumaWidth; xPos += pcv.maxCUWidth)
+      for (uint32_t xPos = 0; xPos < pcv.lumaWidth; xPos += pcv.maxCUWidth)
       {
-        const UInt width = (xPos + pcv.maxCUWidth > pcv.lumaWidth) ? (pcv.lumaWidth - xPos) : pcv.maxCUWidth;
-        const UInt height = (yPos + pcv.maxCUHeight > pcv.lumaHeight) ? (pcv.lumaHeight - yPos) : pcv.maxCUHeight;
+        const uint32_t width = (xPos + pcv.maxCUWidth > pcv.lumaWidth) ? (pcv.lumaWidth - xPos) : pcv.maxCUWidth;
+        const uint32_t height = (yPos + pcv.maxCUHeight > pcv.lumaHeight) ? (pcv.lumaHeight - yPos) : pcv.maxCUHeight;
 
         const UnitArea area(pcv.chrFormat, Area(xPos, yPos, width, height));
 
@@ -1065,9 +1065,9 @@ void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, bool* sliceEn
       }
     }
     //delete memory
-    for (UInt i = 0; i< groupBlkStat.size(); i++)
+    for (uint32_t i = 0; i< groupBlkStat.size(); i++)
     {
-      for (UInt compIdx = 0; compIdx< MAX_NUM_COMPONENT; compIdx++)
+      for (uint32_t compIdx = 0; compIdx< MAX_NUM_COMPONENT; compIdx++)
       {
         delete[] groupBlkStat[i][compIdx];
       }
@@ -1083,7 +1083,7 @@ void EncSampleAdaptiveOffset::decideBlkParams(CodingStructure& cs, bool* sliceEn
       codedParams[ctuRsAddr].reset();
     }
 
-    for (UInt componentIndex = 0; componentIndex < MAX_NUM_COMPONENT; componentIndex++)
+    for (uint32_t componentIndex = 0; componentIndex < MAX_NUM_COMPONENT; componentIndex++)
     {
       sliceEnabled[componentIndex] = false;
     }
@@ -1098,7 +1098,7 @@ void EncSampleAdaptiveOffset::disabledRate( CodingStructure& cs, SAOBlkParam* re
   if (saoEncodingRate > 0.0)
   {
     const PreCalcValues& pcv = *cs.pcv;
-    const UInt numberOfComponents = m_numberOfComponents;
+    const uint32_t numberOfComponents = m_numberOfComponents;
     int picTempLayer = cs.slice->getDepth();
     int numCtusForSAOOff[MAX_NUM_COMPONENT];
 

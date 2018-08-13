@@ -50,7 +50,7 @@
 //! \ingroup DecoderLib
 //! \{
 
-void SEIReader::sei_read_code(std::ostream *pOS, UInt uiLength, UInt& ruiCode, const char *pSymbolName)
+void SEIReader::sei_read_code(std::ostream *pOS, uint32_t uiLength, uint32_t& ruiCode, const char *pSymbolName)
 {
   READ_CODE(uiLength, ruiCode, pSymbolName);
   if (pOS)
@@ -59,7 +59,7 @@ void SEIReader::sei_read_code(std::ostream *pOS, UInt uiLength, UInt& ruiCode, c
   }
 }
 
-void SEIReader::sei_read_uvlc(std::ostream *pOS, UInt& ruiCode, const char *pSymbolName)
+void SEIReader::sei_read_uvlc(std::ostream *pOS, uint32_t& ruiCode, const char *pSymbolName)
 {
   READ_UVLC(ruiCode, pSymbolName);
   if (pOS)
@@ -77,7 +77,7 @@ void SEIReader::sei_read_svlc(std::ostream *pOS, int& ruiCode, const char *pSymb
   }
 }
 
-void SEIReader::sei_read_flag(std::ostream *pOS, UInt& ruiCode, const char *pSymbolName)
+void SEIReader::sei_read_flag(std::ostream *pOS, uint32_t& ruiCode, const char *pSymbolName)
 {
   READ_FLAG(ruiCode, pSymbolName);
   if (pOS)
@@ -86,7 +86,7 @@ void SEIReader::sei_read_flag(std::ostream *pOS, UInt& ruiCode, const char *pSym
   }
 }
 
-static inline void output_sei_message_header(SEI &sei, std::ostream *pDecodedMessageOutputStream, UInt payloadSize)
+static inline void output_sei_message_header(SEI &sei, std::ostream *pDecodedMessageOutputStream, uint32_t payloadSize)
 {
   if (pDecodedMessageOutputStream)
   {
@@ -128,7 +128,7 @@ void SEIReader::xReadSEImessage(SEIMessages& seis, const NalUnitType nalUnitType
   xTraceSEIHeader();
 #endif
   int payloadType = 0;
-  UInt val = 0;
+  uint32_t val = 0;
 
   do
   {
@@ -136,7 +136,7 @@ void SEIReader::xReadSEImessage(SEIMessages& seis, const NalUnitType nalUnitType
     payloadType += val;
   } while (val==0xFF);
 
-  UInt payloadSize = 0;
+  uint32_t payloadSize = 0;
   do
   {
     sei_read_code(NULL, 8, val, "payload_size");
@@ -277,9 +277,9 @@ void SEIReader::xReadSEImessage(SEIMessages& seis, const NalUnitType nalUnitType
       break;
 #endif
     default:
-      for (UInt i = 0; i < payloadSize; i++)
+      for (uint32_t i = 0; i < payloadSize; i++)
       {
-        UInt seiByte;
+        uint32_t seiByte;
         sei_read_code (NULL, 8, seiByte, "unknown prefix SEI payload byte");
       }
       msg( WARNING, "Unknown prefix SEI message (payloadType = %d) was found!\n", payloadType);
@@ -307,9 +307,9 @@ void SEIReader::xReadSEImessage(SEIMessages& seis, const NalUnitType nalUnitType
         xParseSEIGreenMetadataInfo((SEIGreenMetadataInfo&) *sei, payloadSize, pDecodedMessageOutputStream);
         break;
       default:
-        for (UInt i = 0; i < payloadSize; i++)
+        for (uint32_t i = 0; i < payloadSize; i++)
         {
-          UInt seiByte;
+          uint32_t seiByte;
           sei_read_code( NULL, 8, seiByte, "unknown suffix SEI payload byte");
         }
         msg( WARNING, "Unknown suffix SEI message (payloadType = %d) was found!\n", payloadType);
@@ -338,7 +338,7 @@ void SEIReader::xReadSEImessage(SEIMessages& seis, const NalUnitType nalUnitType
   {
     for (; payloadBitsRemaining > 9; payloadBitsRemaining--)
     {
-      UInt reservedPayloadExtensionData;
+      uint32_t reservedPayloadExtensionData;
       sei_read_code ( pDecodedMessageOutputStream, 1, reservedPayloadExtensionData, "reserved_payload_extension_data");
     }
 
@@ -353,11 +353,11 @@ void SEIReader::xReadSEImessage(SEIMessages& seis, const NalUnitType nalUnitType
     /* 3 */
     for (; payloadBitsRemaining > 9 - finalPayloadBits; payloadBitsRemaining--)
     {
-      UInt reservedPayloadExtensionData;
+      uint32_t reservedPayloadExtensionData;
       sei_read_flag ( 0, reservedPayloadExtensionData, "reserved_payload_extension_data");
     }
 
-    UInt dummy;
+    uint32_t dummy;
     sei_read_flag( 0, dummy, "payload_bit_equal_to_one"); payloadBitsRemaining--;
     while (payloadBitsRemaining)
     {
@@ -375,13 +375,13 @@ void SEIReader::xReadSEImessage(SEIMessages& seis, const NalUnitType nalUnitType
  * of payloasSize bytes into sei.
  */
 
-void SEIReader::xParseSEIuserDataUnregistered(SEIuserDataUnregistered &sei, UInt payloadSize, std::ostream *pDecodedMessageOutputStream)
+void SEIReader::xParseSEIuserDataUnregistered(SEIuserDataUnregistered &sei, uint32_t payloadSize, std::ostream *pDecodedMessageOutputStream)
 {
   CHECK(payloadSize < ISO_IEC_11578_LEN, "Payload too small");
-  UInt val;
+  uint32_t val;
   output_sei_message_header(sei, pDecodedMessageOutputStream, payloadSize);
 
-  for (UInt i = 0; i < ISO_IEC_11578_LEN; i++)
+  for (uint32_t i = 0; i < ISO_IEC_11578_LEN; i++)
   {
     sei_read_code( pDecodedMessageOutputStream, 8, val, "uuid_iso_iec_11578");
     sei.uuid_iso_iec_11578[i] = val;
@@ -395,7 +395,7 @@ void SEIReader::xParseSEIuserDataUnregistered(SEIuserDataUnregistered &sei, UInt
   }
 
   sei.userData = new uint8_t[sei.userDataLength];
-  for (UInt i = 0; i < sei.userDataLength; i++)
+  for (uint32_t i = 0; i < sei.userDataLength; i++)
   {
     sei_read_code( NULL, 8, val, "user_data_payload_byte" );
     sei.userData[i] = val;
@@ -410,12 +410,12 @@ void SEIReader::xParseSEIuserDataUnregistered(SEIuserDataUnregistered &sei, UInt
  * parse bitstream bs and unpack a decoded picture hash SEI message
  * of payloadSize bytes into sei.
  */
-void SEIReader::xParseSEIDecodedPictureHash(SEIDecodedPictureHash& sei, UInt payloadSize, std::ostream *pDecodedMessageOutputStream)
+void SEIReader::xParseSEIDecodedPictureHash(SEIDecodedPictureHash& sei, uint32_t payloadSize, std::ostream *pDecodedMessageOutputStream)
 {
-  UInt bytesRead = 0;
+  uint32_t bytesRead = 0;
   output_sei_message_header(sei, pDecodedMessageOutputStream, payloadSize);
 
-  UInt val;
+  uint32_t val;
   sei_read_code( pDecodedMessageOutputStream, 8, val, "hash_type");
   sei.method = static_cast<HashType>(val); bytesRead++;
 
@@ -450,9 +450,9 @@ void SEIReader::xParseSEIDecodedPictureHash(SEIDecodedPictureHash& sei, UInt pay
   }
 }
 
-void SEIReader::xParseSEIActiveParameterSets(SEIActiveParameterSets& sei, UInt payloadSize, std::ostream *pDecodedMessageOutputStream)
+void SEIReader::xParseSEIActiveParameterSets(SEIActiveParameterSets& sei, uint32_t payloadSize, std::ostream *pDecodedMessageOutputStream)
 {
-  UInt val;
+  uint32_t val;
   output_sei_message_header(sei, pDecodedMessageOutputStream, payloadSize);
 
 #if HEVC_VPS
@@ -469,9 +469,9 @@ void SEIReader::xParseSEIActiveParameterSets(SEIActiveParameterSets& sei, UInt p
   }
 }
 
-void SEIReader::xParseSEIDecodingUnitInfo(SEIDecodingUnitInfo& sei, UInt payloadSize, const SPS *sps, std::ostream *pDecodedMessageOutputStream)
+void SEIReader::xParseSEIDecodingUnitInfo(SEIDecodingUnitInfo& sei, uint32_t payloadSize, const SPS *sps, std::ostream *pDecodedMessageOutputStream)
 {
-  UInt val;
+  uint32_t val;
   output_sei_message_header(sei, pDecodedMessageOutputStream, payloadSize);
   sei_read_uvlc( pDecodedMessageOutputStream, val, "decoding_unit_idx");
   sei.m_decodingUnitIdx = val;
@@ -494,10 +494,10 @@ void SEIReader::xParseSEIDecodingUnitInfo(SEIDecodingUnitInfo& sei, UInt payload
   }
 }
 
-void SEIReader::xParseSEIBufferingPeriod(SEIBufferingPeriod& sei, UInt payloadSize, const SPS *sps, std::ostream *pDecodedMessageOutputStream)
+void SEIReader::xParseSEIBufferingPeriod(SEIBufferingPeriod& sei, uint32_t payloadSize, const SPS *sps, std::ostream *pDecodedMessageOutputStream)
 {
   int i, nalOrVcl;
-  UInt code;
+  uint32_t code;
 
   const VUI *pVUI = sps->getVuiParameters();
   const HRD *pHRD = pVUI->getHrdParameters();
@@ -544,10 +544,10 @@ void SEIReader::xParseSEIBufferingPeriod(SEIBufferingPeriod& sei, UInt payloadSi
   }
 }
 
-void SEIReader::xParseSEIPictureTiming(SEIPictureTiming& sei, UInt payloadSize, const SPS *sps, std::ostream *pDecodedMessageOutputStream)
+void SEIReader::xParseSEIPictureTiming(SEIPictureTiming& sei, uint32_t payloadSize, const SPS *sps, std::ostream *pDecodedMessageOutputStream)
 {
   int i;
-  UInt code;
+  uint32_t code;
 
   const VUI *vui = sps->getVuiParameters();
   const HRD *hrd = vui->getHrdParameters();
@@ -601,10 +601,10 @@ void SEIReader::xParseSEIPictureTiming(SEIPictureTiming& sei, UInt payloadSize, 
   }
 }
 
-void SEIReader::xParseSEIRecoveryPoint(SEIRecoveryPoint& sei, UInt payloadSize, std::ostream *pDecodedMessageOutputStream)
+void SEIReader::xParseSEIRecoveryPoint(SEIRecoveryPoint& sei, uint32_t payloadSize, std::ostream *pDecodedMessageOutputStream)
 {
   int  iCode;
-  UInt uiCode;
+  uint32_t uiCode;
   output_sei_message_header(sei, pDecodedMessageOutputStream, payloadSize);
 
   sei_read_svlc( pDecodedMessageOutputStream, iCode,  "recovery_poc_cnt" );      sei.m_recoveryPocCnt     = iCode;
@@ -612,9 +612,9 @@ void SEIReader::xParseSEIRecoveryPoint(SEIRecoveryPoint& sei, UInt payloadSize, 
   sei_read_flag( pDecodedMessageOutputStream, uiCode, "broken_link_flag" );      sei.m_brokenLinkFlag     = uiCode;
 }
 
-void SEIReader::xParseSEIFramePacking(SEIFramePacking& sei, UInt payloadSize, std::ostream *pDecodedMessageOutputStream)
+void SEIReader::xParseSEIFramePacking(SEIFramePacking& sei, uint32_t payloadSize, std::ostream *pDecodedMessageOutputStream)
 {
-  UInt val;
+  uint32_t val;
   output_sei_message_header(sei, pDecodedMessageOutputStream, payloadSize);
 
   sei_read_uvlc( pDecodedMessageOutputStream, val, "frame_packing_arrangement_id" );                 sei.m_arrangementId = val;
@@ -649,9 +649,9 @@ void SEIReader::xParseSEIFramePacking(SEIFramePacking& sei, UInt payloadSize, st
   sei_read_flag( pDecodedMessageOutputStream, val, "upsampled_aspect_ratio_flag" );                  sei.m_upsampledAspectRatio = val;
 }
 
-void SEIReader::xParseSEISegmentedRectFramePacking(SEISegmentedRectFramePacking& sei, UInt payloadSize, std::ostream *pDecodedMessageOutputStream)
+void SEIReader::xParseSEISegmentedRectFramePacking(SEISegmentedRectFramePacking& sei, uint32_t payloadSize, std::ostream *pDecodedMessageOutputStream)
 {
-  UInt val;
+  uint32_t val;
   output_sei_message_header(sei, pDecodedMessageOutputStream, payloadSize);
   sei_read_flag( pDecodedMessageOutputStream, val,       "segmented_rect_frame_packing_arrangement_cancel_flag" );       sei.m_arrangementCancelFlag            = val;
   if( !sei.m_arrangementCancelFlag )
@@ -661,9 +661,9 @@ void SEIReader::xParseSEISegmentedRectFramePacking(SEISegmentedRectFramePacking&
   }
 }
 
-void SEIReader::xParseSEIDisplayOrientation(SEIDisplayOrientation& sei, UInt payloadSize, std::ostream *pDecodedMessageOutputStream)
+void SEIReader::xParseSEIDisplayOrientation(SEIDisplayOrientation& sei, uint32_t payloadSize, std::ostream *pDecodedMessageOutputStream)
 {
-  UInt val;
+  uint32_t val;
   output_sei_message_header(sei, pDecodedMessageOutputStream, payloadSize);
   sei_read_flag( pDecodedMessageOutputStream, val,       "display_orientation_cancel_flag" );       sei.cancelFlag            = val;
   if( !sei.cancelFlag )
@@ -675,31 +675,31 @@ void SEIReader::xParseSEIDisplayOrientation(SEIDisplayOrientation& sei, UInt pay
   }
 }
 
-void SEIReader::xParseSEITemporalLevel0Index(SEITemporalLevel0Index& sei, UInt payloadSize, std::ostream *pDecodedMessageOutputStream)
+void SEIReader::xParseSEITemporalLevel0Index(SEITemporalLevel0Index& sei, uint32_t payloadSize, std::ostream *pDecodedMessageOutputStream)
 {
-  UInt val;
+  uint32_t val;
   output_sei_message_header(sei, pDecodedMessageOutputStream, payloadSize);
   sei_read_code( pDecodedMessageOutputStream, 8, val, "temporal_sub_layer_zero_idx" );  sei.tl0Idx = val;
   sei_read_code( pDecodedMessageOutputStream, 8, val, "irap_pic_id" );  sei.rapIdx = val;
 }
 
-void SEIReader::xParseSEIRegionRefreshInfo(SEIGradualDecodingRefreshInfo& sei, UInt payloadSize, std::ostream *pDecodedMessageOutputStream)
+void SEIReader::xParseSEIRegionRefreshInfo(SEIGradualDecodingRefreshInfo& sei, uint32_t payloadSize, std::ostream *pDecodedMessageOutputStream)
 {
-  UInt val;
+  uint32_t val;
   output_sei_message_header(sei, pDecodedMessageOutputStream, payloadSize);
   sei_read_flag( pDecodedMessageOutputStream, val, "refreshed_region_flag" ); sei.m_gdrForegroundFlag = val ? 1 : 0;
 }
 
-void SEIReader::xParseSEINoDisplay(SEINoDisplay& sei, UInt payloadSize, std::ostream *pDecodedMessageOutputStream)
+void SEIReader::xParseSEINoDisplay(SEINoDisplay& sei, uint32_t payloadSize, std::ostream *pDecodedMessageOutputStream)
 {
   output_sei_message_header(sei, pDecodedMessageOutputStream, payloadSize);
   sei.m_noDisplay = true;
 }
 
-void SEIReader::xParseSEIToneMappingInfo(SEIToneMappingInfo& sei, UInt payloadSize, std::ostream *pDecodedMessageOutputStream)
+void SEIReader::xParseSEIToneMappingInfo(SEIToneMappingInfo& sei, uint32_t payloadSize, std::ostream *pDecodedMessageOutputStream)
 {
   int i;
-  UInt val;
+  uint32_t val;
   output_sei_message_header(sei, pDecodedMessageOutputStream, payloadSize);
   sei_read_uvlc( pDecodedMessageOutputStream, val, "tone_map_id" );                         sei.m_toneMapId = val;
   sei_read_flag( pDecodedMessageOutputStream, val, "tone_map_cancel_flag" );                sei.m_toneMapCancelFlag = val;
@@ -726,7 +726,7 @@ void SEIReader::xParseSEIToneMappingInfo(SEIToneMappingInfo& sei, UInt payloadSi
       }
     case 2:
       {
-        UInt num = 1u << sei.m_targetBitDepth;
+        uint32_t num = 1u << sei.m_targetBitDepth;
         sei.m_startOfCodedInterval.resize(num+1);
         for(i = 0; i < num; i++)
         {
@@ -781,15 +781,15 @@ void SEIReader::xParseSEIToneMappingInfo(SEIToneMappingInfo& sei, UInt payloadSi
   }// if(!sei.m_toneMapCancelFlag)
 }
 
-void SEIReader::xParseSEISOPDescription(SEISOPDescription &sei, UInt payloadSize, std::ostream *pDecodedMessageOutputStream)
+void SEIReader::xParseSEISOPDescription(SEISOPDescription &sei, uint32_t payloadSize, std::ostream *pDecodedMessageOutputStream)
 {
   int iCode;
-  UInt uiCode;
+  uint32_t uiCode;
   output_sei_message_header(sei, pDecodedMessageOutputStream, payloadSize);
 
   sei_read_uvlc( pDecodedMessageOutputStream, uiCode,           "sop_seq_parameter_set_id"            ); sei.m_sopSeqParameterSetId = uiCode;
   sei_read_uvlc( pDecodedMessageOutputStream, uiCode,           "num_pics_in_sop_minus1"              ); sei.m_numPicsInSopMinus1 = uiCode;
-  for (UInt i = 0; i <= sei.m_numPicsInSopMinus1; i++)
+  for (uint32_t i = 0; i <= sei.m_numPicsInSopMinus1; i++)
   {
     sei_read_code( pDecodedMessageOutputStream, 6, uiCode,                     "sop_vcl_nut[i]" );  sei.m_sopDescVclNaluType[i] = uiCode;
     sei_read_code( pDecodedMessageOutputStream, 3, sei.m_sopDescTemporalId[i], "sop_temporal_id[i]"   );  sei.m_sopDescTemporalId[i] = uiCode;
@@ -804,9 +804,9 @@ void SEIReader::xParseSEISOPDescription(SEISOPDescription &sei, UInt payloadSize
   }
 }
 
-void SEIReader::xParseSEIScalableNesting(SEIScalableNesting& sei, const NalUnitType nalUnitType, UInt payloadSize, const SPS *sps, std::ostream *pDecodedMessageOutputStream)
+void SEIReader::xParseSEIScalableNesting(SEIScalableNesting& sei, const NalUnitType nalUnitType, uint32_t payloadSize, const SPS *sps, std::ostream *pDecodedMessageOutputStream)
 {
-  UInt uiCode;
+  uint32_t uiCode;
   SEIMessages seis;
   output_sei_message_header(sei, pDecodedMessageOutputStream, payloadSize);
 
@@ -816,7 +816,7 @@ void SEIReader::xParseSEIScalableNesting(SEIScalableNesting& sei, const NalUnitT
   {
     sei_read_flag( pDecodedMessageOutputStream, uiCode,            "default_op_flag"               ); sei.m_defaultOpFlag = uiCode;
     sei_read_uvlc( pDecodedMessageOutputStream, uiCode,            "nesting_num_ops_minus1"        ); sei.m_nestingNumOpsMinus1 = uiCode;
-    for (UInt i = sei.m_defaultOpFlag; i <= sei.m_nestingNumOpsMinus1; i++)
+    for (uint32_t i = sei.m_defaultOpFlag; i <= sei.m_nestingNumOpsMinus1; i++)
     {
       sei_read_code( pDecodedMessageOutputStream, 3,        uiCode,  "nesting_max_temporal_id_plus1[i]"   ); sei.m_nestingMaxTemporalIdPlus1[i] = uiCode;
       sei_read_uvlc( pDecodedMessageOutputStream, uiCode,            "nesting_op_idx[i]"                  ); sei.m_nestingOpIdx[i] = uiCode;
@@ -829,7 +829,7 @@ void SEIReader::xParseSEIScalableNesting(SEIScalableNesting& sei, const NalUnitT
     {
       sei_read_code( pDecodedMessageOutputStream, 3,        uiCode,  "nesting_no_op_max_temporal_id_plus1"  ); sei.m_nestingNoOpMaxTemporalIdPlus1 = uiCode;
       sei_read_uvlc( pDecodedMessageOutputStream, uiCode,            "nesting_num_layers_minus1"            ); sei.m_nestingNumLayersMinus1        = uiCode;
-      for (UInt i = 0; i <= sei.m_nestingNumLayersMinus1; i++)
+      for (uint32_t i = 0; i <= sei.m_nestingNumLayersMinus1; i++)
       {
         sei_read_code( pDecodedMessageOutputStream, 6,           uiCode,     "nesting_layer_id[i]"      ); sei.m_nestingLayerId[i]   = uiCode;
       }
@@ -839,7 +839,7 @@ void SEIReader::xParseSEIScalableNesting(SEIScalableNesting& sei, const NalUnitT
   // byte alignment
   while ( m_pcBitstream->getNumBitsRead() % 8 != 0 )
   {
-    UInt code;
+    uint32_t code;
     sei_read_flag( pDecodedMessageOutputStream, code, "nesting_zero_bit" );
   }
 
@@ -856,9 +856,9 @@ void SEIReader::xParseSEIScalableNesting(SEIScalableNesting& sei, const NalUnitT
 }
 
 #if HEVC_TILES_WPP
-void SEIReader::xParseSEITempMotionConstraintsTileSets(SEITempMotionConstrainedTileSets& sei, UInt payloadSize, std::ostream *pDecodedMessageOutputStream)
+void SEIReader::xParseSEITempMotionConstraintsTileSets(SEITempMotionConstrainedTileSets& sei, uint32_t payloadSize, std::ostream *pDecodedMessageOutputStream)
 {
-  UInt code;
+  uint32_t code;
   output_sei_message_header(sei, pDecodedMessageOutputStream, payloadSize);
   sei_read_flag( pDecodedMessageOutputStream, code, "mc_all_tiles_exact_sample_value_match_flag");  sei.m_mc_all_tiles_exact_sample_value_match_flag = (code != 0);
   sei_read_flag( pDecodedMessageOutputStream, code, "each_tile_one_tile_set_flag");                 sei.m_each_tile_one_tile_set_flag                = (code != 0);
@@ -913,9 +913,9 @@ void SEIReader::xParseSEITempMotionConstraintsTileSets(SEITempMotionConstrainedT
 }
 #endif
 
-void SEIReader::xParseSEITimeCode(SEITimeCode& sei, UInt payloadSize, std::ostream *pDecodedMessageOutputStream)
+void SEIReader::xParseSEITimeCode(SEITimeCode& sei, uint32_t payloadSize, std::ostream *pDecodedMessageOutputStream)
 {
-  UInt code;
+  uint32_t code;
   output_sei_message_header(sei, pDecodedMessageOutputStream, payloadSize);
   sei_read_code( pDecodedMessageOutputStream, 2, code, "num_clock_ts"); sei.numClockTs = code;
   for(int i = 0; i < sei.numClockTs; i++)
@@ -973,9 +973,9 @@ void SEIReader::xParseSEITimeCode(SEITimeCode& sei, UInt payloadSize, std::ostre
   }
 }
 
-void SEIReader::xParseSEIChromaResamplingFilterHint(SEIChromaResamplingFilterHint& sei, UInt payloadSize, std::ostream *pDecodedMessageOutputStream)
+void SEIReader::xParseSEIChromaResamplingFilterHint(SEIChromaResamplingFilterHint& sei, uint32_t payloadSize, std::ostream *pDecodedMessageOutputStream)
 {
-  UInt uiCode;
+  uint32_t uiCode;
   output_sei_message_header(sei, pDecodedMessageOutputStream, payloadSize);
 
   sei_read_code( pDecodedMessageOutputStream, 8, uiCode, "ver_chroma_filter_idc"); sei.m_verChromaFilterIdc = uiCode;
@@ -986,13 +986,13 @@ void SEIReader::xParseSEIChromaResamplingFilterHint(SEIChromaResamplingFilterHin
     sei_read_uvlc( pDecodedMessageOutputStream, uiCode, "target_format_idc"); sei.m_targetFormatIdc = uiCode;
     if(sei.m_verChromaFilterIdc == 1)
     {
-      UInt numVerticalFilters;
+      uint32_t numVerticalFilters;
       sei_read_uvlc( pDecodedMessageOutputStream, numVerticalFilters, "num_vertical_filters"); sei.m_verFilterCoeff.resize(numVerticalFilters);
       if(numVerticalFilters > 0)
       {
         for(int i = 0; i < numVerticalFilters; i++)
         {
-          UInt verTapLengthMinus1;
+          uint32_t verTapLengthMinus1;
           sei_read_uvlc( pDecodedMessageOutputStream, verTapLengthMinus1, "ver_tap_length_minus_1"); sei.m_verFilterCoeff[i].resize(verTapLengthMinus1+1);
           for(int j = 0; j < (verTapLengthMinus1 + 1); j++)
           {
@@ -1003,13 +1003,13 @@ void SEIReader::xParseSEIChromaResamplingFilterHint(SEIChromaResamplingFilterHin
     }
     if(sei.m_horChromaFilterIdc == 1)
     {
-      UInt numHorizontalFilters;
+      uint32_t numHorizontalFilters;
       sei_read_uvlc( pDecodedMessageOutputStream, numHorizontalFilters, "num_horizontal_filters"); sei.m_horFilterCoeff.resize(numHorizontalFilters);
       if(numHorizontalFilters  > 0)
       {
         for(int i = 0; i < numHorizontalFilters; i++)
         {
-          UInt horTapLengthMinus1;
+          uint32_t horTapLengthMinus1;
           sei_read_uvlc( pDecodedMessageOutputStream, horTapLengthMinus1, "hor_tap_length_minus_1"); sei.m_horFilterCoeff[i].resize(horTapLengthMinus1+1);
           for(int j = 0; j < (horTapLengthMinus1 + 1); j++)
           {
@@ -1021,10 +1021,10 @@ void SEIReader::xParseSEIChromaResamplingFilterHint(SEIChromaResamplingFilterHin
   }
 }
 
-void SEIReader::xParseSEIKneeFunctionInfo(SEIKneeFunctionInfo& sei, UInt payloadSize, std::ostream *pDecodedMessageOutputStream)
+void SEIReader::xParseSEIKneeFunctionInfo(SEIKneeFunctionInfo& sei, uint32_t payloadSize, std::ostream *pDecodedMessageOutputStream)
 {
   int i;
-  UInt val;
+  uint32_t val;
   output_sei_message_header(sei, pDecodedMessageOutputStream, payloadSize);
 
   sei_read_uvlc( pDecodedMessageOutputStream, val, "knee_function_id" );                   sei.m_kneeId = val;
@@ -1048,9 +1048,9 @@ void SEIReader::xParseSEIKneeFunctionInfo(SEIKneeFunctionInfo& sei, UInt payload
   }
 }
 
-void SEIReader::xParseSEIColourRemappingInfo(SEIColourRemappingInfo& sei, UInt payloadSize, std::ostream *pDecodedMessageOutputStream)
+void SEIReader::xParseSEIColourRemappingInfo(SEIColourRemappingInfo& sei, uint32_t payloadSize, std::ostream *pDecodedMessageOutputStream)
 {
-  UInt  uiVal;
+  uint32_t  uiVal;
   int   iVal;
   output_sei_message_header(sei, pDecodedMessageOutputStream, payloadSize);
 
@@ -1137,9 +1137,9 @@ void SEIReader::xParseSEIColourRemappingInfo(SEIColourRemappingInfo& sei, UInt p
   }
 }
 
-void SEIReader::xParseSEIMasteringDisplayColourVolume(SEIMasteringDisplayColourVolume& sei, UInt payloadSize, std::ostream *pDecodedMessageOutputStream)
+void SEIReader::xParseSEIMasteringDisplayColourVolume(SEIMasteringDisplayColourVolume& sei, uint32_t payloadSize, std::ostream *pDecodedMessageOutputStream)
 {
-  UInt code;
+  uint32_t code;
   output_sei_message_header(sei, pDecodedMessageOutputStream, payloadSize);
 
   sei_read_code( pDecodedMessageOutputStream, 16, code, "display_primaries_x[0]" ); sei.values.primaries[0][0] = code;
@@ -1160,18 +1160,18 @@ void SEIReader::xParseSEIMasteringDisplayColourVolume(SEIMasteringDisplayColourV
 }
 
 #if U0033_ALTERNATIVE_TRANSFER_CHARACTERISTICS_SEI
-void SEIReader::xParseSEIAlternativeTransferCharacteristics(SEIAlternativeTransferCharacteristics& sei, UInt payloadSize, std::ostream* pDecodedMessageOutputStream)
+void SEIReader::xParseSEIAlternativeTransferCharacteristics(SEIAlternativeTransferCharacteristics& sei, uint32_t payloadSize, std::ostream* pDecodedMessageOutputStream)
 {
-  UInt code;
+  uint32_t code;
   output_sei_message_header(sei, pDecodedMessageOutputStream, payloadSize);
 
   sei_read_code(pDecodedMessageOutputStream, 8, code, "preferred_transfer_characteristics"); sei.m_preferredTransferCharacteristics = code;
 }
 #endif
 
-void SEIReader::xParseSEIGreenMetadataInfo(SEIGreenMetadataInfo& sei, UInt payloadSize, std::ostream* pDecodedMessageOutputStream)
+void SEIReader::xParseSEIGreenMetadataInfo(SEIGreenMetadataInfo& sei, uint32_t payloadSize, std::ostream* pDecodedMessageOutputStream)
 {
-  UInt code;
+  uint32_t code;
   output_sei_message_header(sei, pDecodedMessageOutputStream, payloadSize);
 
   sei_read_code(pDecodedMessageOutputStream, 8, code, "green_metadata_type");

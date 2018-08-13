@@ -128,9 +128,9 @@ void EncLib::create ()
 #if JVET_J0090_MEMORY_BANDWITH_MEASURE
   m_cInterSearch.cacheAssign( &m_cacheModel );
 #endif
-  const UInt widthInCtus   = (getSourceWidth()  + m_maxCUWidth  - 1)  / m_maxCUWidth;
-  const UInt heightInCtus  = (getSourceHeight() + m_maxCUHeight - 1) / m_maxCUHeight;
-  const UInt numCtuInFrame = widthInCtus * heightInCtus;
+  const uint32_t widthInCtus   = (getSourceWidth()  + m_maxCUWidth  - 1)  / m_maxCUWidth;
+  const uint32_t heightInCtus  = (getSourceHeight() + m_maxCUHeight - 1) / m_maxCUHeight;
+  const uint32_t numCtuInFrame = widthInCtus * heightInCtus;
 
   if (m_bUseSAO)
   {
@@ -487,11 +487,11 @@ void EncLib::xInitScalingLists(SPS &sps, PPS &pps)
   if (getUseScalingListId() != SCALING_LIST_OFF)
   {
     // Prepare delta's:
-    for(UInt sizeId = 0; sizeId < SCALING_LIST_SIZE_NUM; sizeId++)
+    for(uint32_t sizeId = 0; sizeId < SCALING_LIST_SIZE_NUM; sizeId++)
     {
       const int predListStep = (sizeId == SCALING_LIST_32x32? (SCALING_LIST_NUM/NUMBER_OF_PREDICTION_MODES) : 1); // if 32x32, skip over chroma entries.
 
-      for(UInt listId = 0; listId < SCALING_LIST_NUM; listId+=predListStep)
+      for(uint32_t listId = 0; listId < SCALING_LIST_NUM; listId+=predListStep)
       {
         sps.getScalingList().checkPredMode( sizeId, listId );
       }
@@ -608,7 +608,7 @@ void EncLib::encode( bool flush, PelStorage* pcPicYuvOrg, PelStorage* cPicYuvTru
 /**------------------------------------------------
  Separate interlaced frame into two fields
  -------------------------------------------------**/
-void separateFields(Pel* org, Pel* dstField, UInt stride, UInt width, UInt height, bool isTop)
+void separateFields(Pel* org, Pel* dstField, uint32_t stride, uint32_t width, uint32_t height, bool isTop)
 {
   if (!isTop)
   {
@@ -642,7 +642,7 @@ void EncLib::encode( bool flush, PelStorage* pcPicYuvOrg, PelStorage* pcPicYuvTr
       Picture *pcField;
       xGetNewPicBuffer( rcListPicYuvRecOut, pcField, -1 );
 
-      for (UInt comp = 0; comp < ::getNumberValidComponents(pcPicYuvOrg->chromaFormat); comp++)
+      for (uint32_t comp = 0; comp < ::getNumberValidComponents(pcPicYuvOrg->chromaFormat); comp++)
       {
         const ComponentID compID = ComponentID(comp);
         {
@@ -722,7 +722,7 @@ void EncLib::xGetNewPicBuffer ( std::list<PelUnitBuf*>& rcListPicYuvRecOut, Pict
   Slice::sortPicList(m_cListPic);
 
   // use an entry in the buffered list if the maximum number that need buffering has been reached:
-  if (m_cListPic.size() >= (UInt)(m_iGOPSize + getMaxDecPicBuffering(MAX_TLAYER-1) + 2) )
+  if (m_cListPic.size() >= (uint32_t)(m_iGOPSize + getMaxDecPicBuffering(MAX_TLAYER-1) + 2) )
   {
     PicList::iterator iterPic  = m_cListPic.begin();
     int iSize = int( m_cListPic.size() );
@@ -755,9 +755,9 @@ void EncLib::xGetNewPicBuffer ( std::list<PelUnitBuf*>& rcListPicYuvRecOut, Pict
     rpcPic->create( sps.getChromaFormatIdc(), Size( sps.getPicWidthInLumaSamples(), sps.getPicHeightInLumaSamples()), sps.getMaxCUWidth(), sps.getMaxCUWidth()+16, false );
     if ( getUseAdaptiveQP() )
     {
-      const UInt iMaxDQPLayer = pps.getMaxCuDQPDepth()+1;
+      const uint32_t iMaxDQPLayer = pps.getMaxCuDQPDepth()+1;
       rpcPic->aqlayer.resize( iMaxDQPLayer );
-      for (UInt d = 0; d < iMaxDQPLayer; d++)
+      for (uint32_t d = 0; d < iMaxDQPLayer; d++)
       {
         rpcPic->aqlayer[d] = new AQpLayer( sps.getPicWidthInLumaSamples(), sps.getPicHeightInLumaSamples(), sps.getMaxCUWidth()>>d, sps.getMaxCUHeight()>>d );
       }
@@ -787,7 +787,7 @@ void EncLib::xInitVPS(VPS &vps, const SPS &sps)
   vps.setNumHrdParameters( 0 );
 
   vps.createHrdParamBuffer();
-  for( UInt i = 0; i < vps.getNumHrdParameters(); i ++ )
+  for( uint32_t i = 0; i < vps.getNumHrdParameters(); i ++ )
   {
     vps.setHrdOpSetIdx( 0, i );
     vps.setCprmsPresentFlag( false, i );
@@ -958,7 +958,7 @@ void EncLib::xInitSPS(SPS &sps)
 
   sps.setUseAMP ( m_useAMP );
 
-  for (UInt channelType = 0; channelType < MAX_NUM_CHANNEL_TYPE; channelType++)
+  for (uint32_t channelType = 0; channelType < MAX_NUM_CHANNEL_TYPE; channelType++)
   {
     sps.setBitDepth      (ChannelType(channelType), m_bitDepth[channelType] );
     sps.setQpBDOffset  (ChannelType(channelType), (6 * (m_bitDepth[channelType] - 8)));
@@ -970,7 +970,7 @@ void EncLib::xInitSPS(SPS &sps)
   sps.setMaxTLayers( m_maxTempLayer );
   sps.setTemporalIdNestingFlag( ( m_maxTempLayer == 1 ) ? true : false );
 
-  for (int i = 0; i < min(sps.getMaxTLayers(),(UInt) MAX_TLAYER); i++ )
+  for (int i = 0; i < min(sps.getMaxTLayers(),(uint32_t) MAX_TLAYER); i++ )
   {
     sps.setMaxDecPicBuffering(m_maxDecPicBuffering[i], i);
     sps.setNumReorderPics(m_numReorderPics[i], i);
@@ -1050,7 +1050,7 @@ void EncLib::xInitSPS(SPS &sps)
   // Set up SPS range extension settings
   sps.getSpsRangeExtension().setTransformSkipRotationEnabledFlag(m_transformSkipRotationEnabledFlag);
   sps.getSpsRangeExtension().setTransformSkipContextEnabledFlag(m_transformSkipContextEnabledFlag);
-  for (UInt signallingModeIndex = 0; signallingModeIndex < NUMBER_OF_RDPCM_SIGNALLING_MODES; signallingModeIndex++)
+  for (uint32_t signallingModeIndex = 0; signallingModeIndex < NUMBER_OF_RDPCM_SIGNALLING_MODES; signallingModeIndex++)
   {
     sps.getSpsRangeExtension().setRdpcmEnabledFlag(RDPCMSignallingMode(signallingModeIndex), m_rdpcmEnabledFlag[signallingModeIndex]);
   }
@@ -1069,7 +1069,7 @@ int calcScale(int x)
   {
     return 0;
   }
-  UInt iMask = 0xffffffff;
+  uint32_t iMask = 0xffffffff;
   int ScaleValue = 32;
 
   while ((x&iMask) != 0)
@@ -1126,8 +1126,8 @@ void EncLib::xInitHrdParameters(SPS &sps)
 
   if (getTemporalSubsampleRatio()>1)
   {
-    UInt temporalSubsampleRatio = getTemporalSubsampleRatio();
-    if ( double(timingInfo->getNumUnitsInTick()) * temporalSubsampleRatio > std::numeric_limits<UInt>::max() )
+    uint32_t temporalSubsampleRatio = getTemporalSubsampleRatio();
+    if ( double(timingInfo->getNumUnitsInTick()) * temporalSubsampleRatio > std::numeric_limits<uint32_t>::max() )
     {
       timingInfo->setTimeScale( timingInfo->getTimeScale() / temporalSubsampleRatio );
     }
@@ -1193,9 +1193,9 @@ void EncLib::xInitHrdParameters(SPS &sps)
 
   // Note: parameters for all temporal layers are initialized with the same values
   int i, j;
-  UInt bitrateValue, cpbSizeValue;
-  UInt duCpbSizeValue;
-  UInt duBitRateValue = 0;
+  uint32_t bitrateValue, cpbSizeValue;
+  uint32_t duCpbSizeValue;
+  uint32_t duBitRateValue = 0;
 
   for( i = 0; i < MAX_TLAYER; i ++ )
   {
@@ -1692,8 +1692,8 @@ void  EncCfg::xCheckGSParameters()
 #if HEVC_TILES_WPP
   int   iWidthInCU = ( m_iSourceWidth%m_maxCUWidth ) ? m_iSourceWidth/m_maxCUWidth + 1 : m_iSourceWidth/m_maxCUWidth;
   int   iHeightInCU = ( m_iSourceHeight%m_maxCUHeight ) ? m_iSourceHeight/m_maxCUHeight + 1 : m_iSourceHeight/m_maxCUHeight;
-  UInt  uiCummulativeColumnWidth = 0;
-  UInt  uiCummulativeRowHeight = 0;
+  uint32_t  uiCummulativeColumnWidth = 0;
+  uint32_t  uiCummulativeRowHeight = 0;
 
   //check the column relative parameters
   if( m_iNumColumnsMinus1 >= (1<<(LOG2_MAX_NUM_COLUMNS_MINUS1+1)) )
@@ -1760,7 +1760,7 @@ bool EncLib::SPSNeedsWriting(int spsId)
 }
 
 #if X0038_LAMBDA_FROM_QP_CAPABILITY
-int EncCfg::getQPForPicture(const UInt gopIndex, const Slice *pSlice) const
+int EncCfg::getQPForPicture(const uint32_t gopIndex, const Slice *pSlice) const
 {
   const int lumaQpBDOffset = pSlice->getSPS()->getQpBDOffset(CHANNEL_TYPE_LUMA);
   int qp;

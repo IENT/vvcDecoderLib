@@ -157,7 +157,7 @@ void EncModeCtrl::xGetMinMaxQP( int& minQP, int& maxQP, const CodingStructure& c
     return;
   }
 
-  const UInt currDepth = partitioner.currDepth;
+  const uint32_t currDepth = partitioner.currDepth;
 
   if( !splitMode )
   {
@@ -214,7 +214,7 @@ void EncModeCtrl::xGetMinMaxQP( int& minQP, int& maxQP, const CodingStructure& c
 int EncModeCtrl::xComputeDQP( const CodingStructure &cs, const Partitioner &partitioner )
 {
   Picture* picture    = cs.picture;
-  unsigned uiAQDepth  = std::min( partitioner.currDepth, ( UInt ) picture->aqlayer.size() - 1 );
+  unsigned uiAQDepth  = std::min( partitioner.currDepth, ( uint32_t ) picture->aqlayer.size() - 1 );
   AQpLayer* pcAQLayer = picture->aqlayer[uiAQDepth];
 
   double dMaxQScale   = pow( 2.0, m_pcEncCfg->getQPAdaptationRange() / 6.0 );
@@ -265,9 +265,9 @@ int EncModeCtrl::calculateLumaDQP( const CPelBuf& rcOrg )
   {
     // Use avg method
     int sum = 0;
-    for( UInt y = 0; y < rcOrg.height; y++ )
+    for( uint32_t y = 0; y < rcOrg.height; y++ )
     {
-      for( UInt x = 0; x < rcOrg.width; x++ )
+      for( uint32_t x = 0; x < rcOrg.width; x++ )
       {
         sum += rcOrg.at( x, y );
       }
@@ -279,9 +279,9 @@ int EncModeCtrl::calculateLumaDQP( const CPelBuf& rcOrg )
   {
     // Use maximum luma value
     int maxVal = 0;
-    for( UInt y = 0; y < rcOrg.height; y++ )
+    for( uint32_t y = 0; y < rcOrg.height; y++ )
     {
-      for( UInt x = 0; x < rcOrg.width; x++ )
+      for( uint32_t x = 0; x < rcOrg.width; x++ )
       {
         const Pel& v = rcOrg.at( x, y );
         if( v > maxVal )
@@ -1444,8 +1444,8 @@ bool EncModeCtrlMTnoRQT::tryMode( const EncTestMode& encTestmode, const CodingSt
 #endif
   const Slice&           slice       = *m_slice;
   const SPS&             sps         = *slice.getSPS();
-  const UInt             numComp     = getNumberValidComponents( slice.getSPS()->getChromaFormatIdc() );
-  const UInt             width       = partitioner.currArea().lumaSize().width;
+  const uint32_t             numComp     = getNumberValidComponents( slice.getSPS()->getChromaFormatIdc() );
+  const uint32_t             width       = partitioner.currArea().lumaSize().width;
   const CodingStructure *bestCS      = cuECtx.bestCS;
   const CodingUnit      *bestCU      = cuECtx.bestCU;
   const EncTestMode      bestMode    = bestCS ? getCSEncMode( *bestCS ) : EncTestMode();
@@ -1583,7 +1583,7 @@ bool EncModeCtrlMTnoRQT::tryMode( const EncTestMode& encTestmode, const CodingSt
     if( getFastDeltaQp() )
     {
       const SPS &sps = *cs.sps;
-      const UInt fastDeltaQPCuMaxPCMSize = Clip3( ( UInt ) 1 << sps.getPCMLog2MinSize(), ( UInt ) 1 << sps.getPCMLog2MaxSize(), 32u );
+      const uint32_t fastDeltaQPCuMaxPCMSize = Clip3( ( uint32_t ) 1 << sps.getPCMLog2MinSize(), ( uint32_t ) 1 << sps.getPCMLog2MaxSize(), 32u );
 
       if( cs.area.lumaSize().width > fastDeltaQPCuMaxPCMSize )
       {

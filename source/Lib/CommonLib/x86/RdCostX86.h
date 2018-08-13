@@ -57,9 +57,9 @@ Distortion RdCost::xGetSSE_SIMD( const DistParam &rcDtParam )
   const int iStrideSrc2 = rcDtParam.cur.stride;
 
 #if DISTORTION_LAMBDA_BUGFIX
-  const UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
+  const uint32_t uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
 #else
-  const UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT( ( rcDtParam.bitDepth-8 ) << 1 );
+  const uint32_t uiShift = DISTORTION_PRECISION_ADJUSTMENT( ( rcDtParam.bitDepth-8 ) << 1 );
 #endif
   unsigned int uiRet = 0;
 
@@ -142,9 +142,9 @@ Distortion RdCost::xGetSSE_NxN_SIMD( const DistParam &rcDtParam )
   const int iStrideSrc2 = rcDtParam.cur.stride;
 
 #if DISTORTION_LAMBDA_BUGFIX
-  const UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
+  const uint32_t uiShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
 #else
-  const UInt uiShift = DISTORTION_PRECISION_ADJUSTMENT( ( rcDtParam.bitDepth-8 ) << 1 );
+  const uint32_t uiShift = DISTORTION_PRECISION_ADJUSTMENT( ( rcDtParam.bitDepth-8 ) << 1 );
 #endif
   unsigned int uiRet = 0;
 
@@ -227,7 +227,7 @@ Distortion RdCost::xGetSAD_SIMD( const DistParam &rcDtParam )
   const int iStrideSrc1 = rcDtParam.org.stride * iSubStep;
   const int iStrideSrc2 = rcDtParam.cur.stride * iSubStep;
 
-  UInt uiSum = 0;
+  uint32_t uiSum = 0;
   if( vext >= AVX2 && ( iCols & 15 ) == 0 )
   {
 #ifdef USE_AVX2
@@ -325,7 +325,7 @@ Distortion RdCost::xGetSAD_NxN_SIMD( const DistParam &rcDtParam )
   const int iStrideSrc1 = rcDtParam.org.stride * iSubStep;
   const int iStrideSrc2 = rcDtParam.cur.stride * iSubStep;
 
-  UInt uiSum = 0;
+  uint32_t uiSum = 0;
 
   if( iWidth == 4 )
   {
@@ -433,7 +433,7 @@ Distortion RdCost::xGetSAD_NxN_SIMD( const DistParam &rcDtParam )
 
 
 template< typename Torg, typename Tcur >
-static UInt xCalcHAD4x4_SSE( const Torg *piOrg, const Tcur *piCur, const int iStrideOrg, const int iStrideCur )
+static uint32_t xCalcHAD4x4_SSE( const Torg *piOrg, const Tcur *piCur, const int iStrideOrg, const int iStrideCur )
 {
   __m128i r0 = ( sizeof( Torg ) > 1 ) ? ( _mm_loadl_epi64( ( const __m128i* )&piOrg[0] ) ) : ( _mm_unpacklo_epi8( _mm_cvtsi32_si128( *(const int*)&piOrg[0] ), _mm_setzero_si128() ) );
   __m128i r1 = ( sizeof( Torg ) > 1 ) ? ( _mm_loadl_epi64( ( const __m128i* )&piOrg[iStrideOrg] ) ) : ( _mm_unpacklo_epi8( _mm_cvtsi32_si128( *(const int*)&piOrg[iStrideOrg] ), _mm_setzero_si128() ) );
@@ -509,7 +509,7 @@ static UInt xCalcHAD4x4_SSE( const Torg *piOrg, const Tcur *piCur, const int iSt
   Sum = _mm_hadd_epi32( Sum, Sum );
   Sum = _mm_hadd_epi32( Sum, Sum );
 
-  UInt sad = _mm_cvtsi128_si32( Sum );
+  uint32_t sad = _mm_cvtsi128_si32( Sum );
 
   sad = ( ( sad + 1 ) >> 1 );
 
@@ -518,7 +518,7 @@ static UInt xCalcHAD4x4_SSE( const Torg *piOrg, const Tcur *piCur, const int iSt
 
 //working up to 12-bit
 template< typename Torg, typename Tcur/*, bool bHorDownsampling*/ >
-static UInt xCalcHAD8x8_SSE( const Torg *piOrg, const Tcur *piCur, const int iStrideOrg, const int iStrideCur, const int iBitDepth )
+static uint32_t xCalcHAD8x8_SSE( const Torg *piOrg, const Tcur *piCur, const int iStrideOrg, const int iStrideCur, const int iBitDepth )
 {
   __m128i m1[8], m2[8];
 
@@ -687,7 +687,7 @@ static UInt xCalcHAD8x8_SSE( const Torg *piOrg, const Tcur *piCur, const int iSt
   iSum = _mm_hadd_epi32( iSum, iSum );
   iSum = _mm_hadd_epi32( iSum, iSum );
 
-  UInt sad = _mm_cvtsi128_si32( iSum );
+  uint32_t sad = _mm_cvtsi128_si32( iSum );
   sad = ( ( sad + 2 ) >> 2 );
 
   return sad;
@@ -696,7 +696,7 @@ static UInt xCalcHAD8x8_SSE( const Torg *piOrg, const Tcur *piCur, const int iSt
 
 //working up to 12-bit
 template< typename Torg, typename Tcur/*, bool bHorDownsampling*/ >
-static UInt xCalcHAD16x8_SSE( const Torg *piOrg, const Tcur *piCur, const int iStrideOrg, const int iStrideCur, const int iBitDepth )
+static uint32_t xCalcHAD16x8_SSE( const Torg *piOrg, const Tcur *piCur, const int iStrideOrg, const int iStrideCur, const int iBitDepth )
 {
   __m128i m1[16][2], m2[16][2];
   __m128i iSum = _mm_setzero_si128();
@@ -1051,10 +1051,10 @@ static UInt xCalcHAD16x8_SSE( const Torg *piOrg, const Tcur *piCur, const int iS
   iSum = _mm_hadd_epi32( iSum, iSum );
   iSum = _mm_hadd_epi32( iSum, iSum );
 
-  UInt sad = _mm_cvtsi128_si32( iSum );
+  uint32_t sad = _mm_cvtsi128_si32( iSum );
 
 #if DISTORTION_TYPE_BUGFIX
-  sad = (UInt)(sad / sqrt(16.0 * 8) * 2);
+  sad = (uint32_t)(sad / sqrt(16.0 * 8) * 2);
 #else
   sad = (int)(sad / sqrt( 16.0 * 8 ) * 2);
 #endif
@@ -1065,7 +1065,7 @@ static UInt xCalcHAD16x8_SSE( const Torg *piOrg, const Tcur *piCur, const int iS
 
 //working up to 12-bit
 template< typename Torg, typename Tcur/*, bool bHorDownsampling*/ >
-static UInt xCalcHAD8x16_SSE( const Torg *piOrg, const Tcur *piCur, const int iStrideOrg, const int iStrideCur, const int iBitDepth )
+static uint32_t xCalcHAD8x16_SSE( const Torg *piOrg, const Tcur *piCur, const int iStrideOrg, const int iStrideCur, const int iBitDepth )
 {
   __m128i m1[16], m2[16];
   __m128i iSum = _mm_setzero_si128();
@@ -1286,10 +1286,10 @@ static UInt xCalcHAD8x16_SSE( const Torg *piOrg, const Tcur *piCur, const int iS
   iSum = _mm_hadd_epi32( iSum, iSum );
   iSum = _mm_hadd_epi32( iSum, iSum );
 
-  UInt sad = _mm_cvtsi128_si32( iSum );
+  uint32_t sad = _mm_cvtsi128_si32( iSum );
 
 #if DISTORTION_TYPE_BUGFIX
-  sad = (UInt)(sad / sqrt(16.0 * 8) * 2);
+  sad = (uint32_t)(sad / sqrt(16.0 * 8) * 2);
 #else
   sad        = (int)(sad / sqrt(16.0 * 8) * 2);
 #endif
@@ -1299,7 +1299,7 @@ static UInt xCalcHAD8x16_SSE( const Torg *piOrg, const Tcur *piCur, const int iS
 
 
 template< typename Torg, typename Tcur/*, bool bHorDownsampling*/ >
-static UInt xCalcHAD8x4_SSE( const Torg *piOrg, const Tcur *piCur, const int iStrideOrg, const int iStrideCur, const int iBitDepth )
+static uint32_t xCalcHAD8x4_SSE( const Torg *piOrg, const Tcur *piCur, const int iStrideOrg, const int iStrideCur, const int iBitDepth )
 {
   __m128i m1[8], m2[8];
   __m128i vzero = _mm_setzero_si128();
@@ -1433,10 +1433,10 @@ static UInt xCalcHAD8x4_SSE( const Torg *piOrg, const Tcur *piCur, const int iSt
   iSum = _mm_hadd_epi32( iSum, iSum );
   iSum = _mm_hadd_epi32( iSum, iSum );
 
-  UInt sad = _mm_cvtsi128_si32( iSum );
+  uint32_t sad = _mm_cvtsi128_si32( iSum );
   //sad = ((sad + 2) >> 2);
 #if DISTORTION_TYPE_BUGFIX
-  sad = (UInt)(sad / sqrt(4.0 * 8) * 2);
+  sad = (uint32_t)(sad / sqrt(4.0 * 8) * 2);
 #else
   sad        = (int)(sad / sqrt(4.0 * 8) * 2);
 #endif
@@ -1445,7 +1445,7 @@ static UInt xCalcHAD8x4_SSE( const Torg *piOrg, const Tcur *piCur, const int iSt
 
 
 template< typename Torg, typename Tcur/*, bool bHorDownsampling*/ >
-static UInt xCalcHAD4x8_SSE( const Torg *piOrg, const Tcur *piCur, const int iStrideOrg, const int iStrideCur, const int iBitDepth )
+static uint32_t xCalcHAD4x8_SSE( const Torg *piOrg, const Tcur *piCur, const int iStrideOrg, const int iStrideCur, const int iBitDepth )
 {
   __m128i m1[8], m2[8];
 
@@ -1567,11 +1567,11 @@ static UInt xCalcHAD4x8_SSE( const Torg *piOrg, const Tcur *piCur, const int iSt
   iSum = _mm_hadd_epi32( iSum, iSum );
   iSum = _mm_hadd_epi32( iSum, iSum );
 
-  UInt sad = _mm_cvtsi128_si32( iSum );
+  uint32_t sad = _mm_cvtsi128_si32( iSum );
 
   //sad = ((sad + 2) >> 2);
 #if DISTORTION_TYPE_BUGFIX
-  sad = (UInt)(sad / sqrt(4.0 * 8) * 2);
+  sad = (uint32_t)(sad / sqrt(4.0 * 8) * 2);
 #else
   sad        = (int)(sad / sqrt(4.0 * 8) * 2);
 #endif
@@ -1581,9 +1581,9 @@ static UInt xCalcHAD4x8_SSE( const Torg *piOrg, const Tcur *piCur, const int iSt
 
 
 template< typename Torg, typename Tcur/*, bool bHorDownsampling*/ >
-static UInt xCalcHAD16x16_AVX2( const Torg *piOrg, const Tcur *piCur, const int iStrideOrg, const int iStrideCur, const int iBitDepth )
+static uint32_t xCalcHAD16x16_AVX2( const Torg *piOrg, const Tcur *piCur, const int iStrideOrg, const int iStrideCur, const int iBitDepth )
 {
-  UInt sad = 0;
+  uint32_t sad = 0;
 
 #ifdef USE_AVX2
   // const int iLoops = ( bHorDownsampling && HAD_DOWNSAMPLING_HOR ) ? ( 1 ) : ( 2 );
@@ -1759,7 +1759,7 @@ static UInt xCalcHAD16x16_AVX2( const Torg *piOrg, const Tcur *piCur, const int 
     iSum = _mm256_hadd_epi32( iSum, iSum );
     iSum = _mm256_hadd_epi32( iSum, iSum );
 
-    UInt tmp;
+    uint32_t tmp;
     tmp = _mm_cvtsi128_si32( _mm256_castsi256_si128( iSum ) );
     tmp = ( ( tmp + 2 ) >> 2 );
     sad += tmp;
@@ -1774,9 +1774,9 @@ static UInt xCalcHAD16x16_AVX2( const Torg *piOrg, const Tcur *piCur, const int 
 }
 
 template< typename Torg, typename Tcur/*, bool bHorDownsampling*/ >
-static UInt xCalcHAD16x8_AVX2( const Torg *piOrg, const Tcur *piCur, const int iStrideOrg, const int iStrideCur, const int iBitDepth )
+static uint32_t xCalcHAD16x8_AVX2( const Torg *piOrg, const Tcur *piCur, const int iStrideOrg, const int iStrideCur, const int iBitDepth )
 {
-  UInt sad = 0;
+  uint32_t sad = 0;
 
 #ifdef USE_AVX2
   // const int iLoops = ( bHorDownsampling && HAD_DOWNSAMPLING_HOR ) ? ( 1 ) : ( 2 );
@@ -1965,7 +1965,7 @@ static UInt xCalcHAD16x8_AVX2( const Torg *piOrg, const Tcur *piCur, const int i
     sad = _mm_cvtsi128_si32( _mm256_castsi256_si128( iSum ) );
 
 #if DISTORTION_TYPE_BUGFIX
-    sad = (UInt)(sad / sqrt(16.0 * 8) * 2);
+    sad = (uint32_t)(sad / sqrt(16.0 * 8) * 2);
 #else
     sad = (int)(sad / sqrt(16.0 * 8) * 2);
 #endif
@@ -1978,9 +1978,9 @@ static UInt xCalcHAD16x8_AVX2( const Torg *piOrg, const Tcur *piCur, const int i
 
 
 template< typename Torg, typename Tcur/*, bool bHorDownsampling*/ >
-static UInt xCalcHAD8x16_AVX2( const Torg *piOrg, const Tcur *piCur, const int iStrideOrg, const int iStrideCur, const int iBitDepth )
+static uint32_t xCalcHAD8x16_AVX2( const Torg *piOrg, const Tcur *piCur, const int iStrideOrg, const int iStrideCur, const int iBitDepth )
 {
-  UInt sad = 0;
+  uint32_t sad = 0;
 
 #ifdef USE_AVX2
   // const int iLoops = ( bHorDownsampling && HAD_DOWNSAMPLING_HOR ) ? ( 1 ) : ( 2 );
@@ -2277,7 +2277,7 @@ static UInt xCalcHAD8x16_AVX2( const Torg *piOrg, const Tcur *piCur, const int i
     int sad2 = _mm_cvtsi128_si32( _mm256_castsi256_si128( iSum ) );
 
 #if DISTORTION_TYPE_BUGFIX
-    sad = (UInt)(sad2 / sqrt(16.0 * 8) * 2);
+    sad = (uint32_t)(sad2 / sqrt(16.0 * 8) * 2);
 #else
     sad = (int)(sad2 / sqrt(16.0 * 8) * 2);
 #endif
@@ -2309,7 +2309,7 @@ Distortion RdCost::xGetHADs_SIMD( const DistParam &rcDtParam )
 #if DISTORTION_TYPE_BUGFIX
   Distortion uiSum = 0;
 #else
-  UInt uiSum = 0;
+  uint32_t uiSum = 0;
 #endif
 
   if( rcDtParam.isQtbt && iCols > iRows && ( iCols & 15 ) == 0 && ( iRows & 7 ) == 0 )

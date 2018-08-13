@@ -36,9 +36,9 @@
 #include "EncGOP.h"
 #include "EncLib.h"
 
-UInt calcMD5(const CPelUnitBuf& pic, PictureHash &digest, const BitDepths &bitDepths);
-UInt calcCRC(const CPelUnitBuf& pic, PictureHash &digest, const BitDepths &bitDepths);
-UInt calcChecksum(const CPelUnitBuf& pic, PictureHash &digest, const BitDepths &bitDepths);
+uint32_t calcMD5(const CPelUnitBuf& pic, PictureHash &digest, const BitDepths &bitDepths);
+uint32_t calcCRC(const CPelUnitBuf& pic, PictureHash &digest, const BitDepths &bitDepths);
+uint32_t calcChecksum(const CPelUnitBuf& pic, PictureHash &digest, const BitDepths &bitDepths);
 std::string hashToString(const PictureHash &digest, int numChar);
 
 //! \ingroup EncoderLib
@@ -146,7 +146,7 @@ void SEIEncoder::initSEIToneMappingInfo(SEIToneMappingInfo *seiToneMappingInfo)
     }
   case 2:
     {
-      UInt num = 1u<<(seiToneMappingInfo->m_targetBitDepth);
+      uint32_t num = 1u<<(seiToneMappingInfo->m_targetBitDepth);
       seiToneMappingInfo->m_startOfCodedInterval.resize(num);
       int* ptmp = m_pcCfg->getTMISEIStartOfCodedInterva();
       if(ptmp)
@@ -240,7 +240,7 @@ void SEIEncoder::initSEIBufferingPeriod(SEIBufferingPeriod *bufferingPeriodSEI, 
   CHECK(!(bufferingPeriodSEI != NULL), "Unspecified error");
   CHECK(!(slice != NULL), "Unspecified error");
 
-  UInt uiInitialCpbRemovalDelay = (90000/2);                      // 0.5 sec
+  uint32_t uiInitialCpbRemovalDelay = (90000/2);                      // 0.5 sec
   bufferingPeriodSEI->m_initialCpbRemovalDelay      [0][0]     = uiInitialCpbRemovalDelay;
   bufferingPeriodSEI->m_initialCpbRemovalDelayOffset[0][0]     = uiInitialCpbRemovalDelay;
   bufferingPeriodSEI->m_initialCpbRemovalDelay      [0][1]     = uiInitialCpbRemovalDelay;
@@ -248,7 +248,7 @@ void SEIEncoder::initSEIBufferingPeriod(SEIBufferingPeriod *bufferingPeriodSEI, 
 
   double dTmp = (double)slice->getSPS()->getVuiParameters()->getTimingInfo()->getNumUnitsInTick() / (double)slice->getSPS()->getVuiParameters()->getTimingInfo()->getTimeScale();
 
-  UInt uiTmp = (UInt)( dTmp * 90000.0 );
+  uint32_t uiTmp = (uint32_t)( dTmp * 90000.0 );
   uiInitialCpbRemovalDelay -= uiTmp;
   uiInitialCpbRemovalDelay -= uiTmp / ( slice->getSPS()->getVuiParameters()->getHrdParameters()->getTickDivisorMinus2() + 2 );
   bufferingPeriodSEI->m_initialAltCpbRemovalDelay      [0][0]  = uiInitialCpbRemovalDelay;
@@ -311,20 +311,20 @@ void SEIEncoder::initDecodedPictureHashSEI(SEIDecodedPictureHash *decodedPicture
   {
     case HASHTYPE_MD5:
       {
-        UInt numChar=calcMD5(pic, decodedPictureHashSEI->m_pictureHash, bitDepths);
+        uint32_t numChar=calcMD5(pic, decodedPictureHashSEI->m_pictureHash, bitDepths);
         rHashString = hashToString(decodedPictureHashSEI->m_pictureHash, numChar);
       }
       break;
     case HASHTYPE_CRC:
       {
-        UInt numChar=calcCRC(pic, decodedPictureHashSEI->m_pictureHash, bitDepths);
+        uint32_t numChar=calcCRC(pic, decodedPictureHashSEI->m_pictureHash, bitDepths);
         rHashString = hashToString(decodedPictureHashSEI->m_pictureHash, numChar);
       }
       break;
     case HASHTYPE_CHECKSUM:
     default:
       {
-        UInt numChar=calcChecksum(pic, decodedPictureHashSEI->m_pictureHash, bitDepths);
+        uint32_t numChar=calcChecksum(pic, decodedPictureHashSEI->m_pictureHash, bitDepths);
         rHashString = hashToString(decodedPictureHashSEI->m_pictureHash, numChar);
       }
       break;
@@ -521,7 +521,7 @@ bool SEIEncoder::initSEIColourRemappingInfo(SEIColourRemappingInfo* seiColourRem
 
     // TODO: identify and remove duplication with decoder parsing through abstraction.
 
-    readTokenValueAndValidate(seiColourRemappingInfo->m_colourRemapId,         failed, fic, "colour_remap_id",        UInt(0), UInt(0x7fffffff) );
+    readTokenValueAndValidate(seiColourRemappingInfo->m_colourRemapId,         failed, fic, "colour_remap_id",        uint32_t(0), uint32_t(0x7fffffff) );
     readTokenValueAndValidate(seiColourRemappingInfo->m_colourRemapCancelFlag, failed, fic, "colour_remap_cancel_flag" );
     if( !seiColourRemappingInfo->m_colourRemapCancelFlag )
     {
@@ -675,7 +675,7 @@ void SEIEncoder::initSEIAlternativeTransferCharacteristics(SEIAlternativeTransfe
 }
 #endif
 
-void SEIEncoder::initSEIGreenMetadataInfo(SEIGreenMetadataInfo *seiGreenMetadataInfo, UInt u)
+void SEIEncoder::initSEIGreenMetadataInfo(SEIGreenMetadataInfo *seiGreenMetadataInfo, uint32_t u)
 {
     CHECK(!(m_isInitialized), "Unspecified error");
     CHECK(!(seiGreenMetadataInfo!=NULL), "Unspecified error");

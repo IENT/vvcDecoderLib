@@ -73,12 +73,12 @@ public:
   DecApp();
   virtual ~DecApp         ()  {}
 
-  UInt  decode            (); ///< main decoding function
+  uint32_t  decode            (); ///< main decoding function
 
 private:
   void  xCreateDecLib     (); ///< create internal classes
   void  xDestroyDecLib    (); ///< destroy internal classes
-  void  xWriteOutput      ( PicList* pcListPic , UInt tId); ///< write YUV to file
+  void  xWriteOutput      ( PicList* pcListPic , uint32_t tId); ///< write YUV to file
   void  xFlushOutput      ( PicList* pcListPic ); ///< flush all remaining decoded pictures to file
   bool  isNaluWithinTargetDecLayerIdSet ( InputNALUnit* nalu ); ///< check whether given Nalu is within targetDecLayerIdSet
 };

@@ -52,7 +52,7 @@
 
 #if ENABLE_TRACING
 
-void  VLCWriter::xWriteCodeTr (UInt value, UInt  length, const char *pSymbolName)
+void  VLCWriter::xWriteCodeTr (uint32_t value, uint32_t  length, const char *pSymbolName)
 {
   xWriteCode (value,length);
 
@@ -69,7 +69,7 @@ void  VLCWriter::xWriteCodeTr (UInt value, UInt  length, const char *pSymbolName
   }
 }
 
-void  VLCWriter::xWriteUvlcTr (UInt value, const char *pSymbolName)
+void  VLCWriter::xWriteUvlcTr (uint32_t value, const char *pSymbolName)
 {
   xWriteUvlc (value);
   if( g_HLSTraceEnable )
@@ -87,7 +87,7 @@ void  VLCWriter::xWriteSvlcTr (int value, const char *pSymbolName)
   }
 }
 
-void  VLCWriter::xWriteFlagTr(UInt value, const char *pSymbolName)
+void  VLCWriter::xWriteFlagTr(uint32_t value, const char *pSymbolName)
 {
   xWriteFlag(value);
   if( g_HLSTraceEnable )
@@ -101,16 +101,16 @@ bool g_HLSTraceEnable = true;
 #endif
 
 
-void VLCWriter::xWriteCode     ( UInt uiCode, UInt uiLength )
+void VLCWriter::xWriteCode     ( uint32_t uiCode, uint32_t uiLength )
 {
   CHECK( uiLength == 0, "Code of lenght '0' not supported" );
   m_pcBitIf->write( uiCode, uiLength );
 }
 
-void VLCWriter::xWriteUvlc     ( UInt uiCode )
+void VLCWriter::xWriteUvlc     ( uint32_t uiCode )
 {
-  UInt uiLength = 1;
-  UInt uiTemp = ++uiCode;
+  uint32_t uiLength = 1;
+  uint32_t uiTemp = ++uiCode;
 
   CHECK( !uiTemp, "Integer overflow" );
 
@@ -126,11 +126,11 @@ void VLCWriter::xWriteUvlc     ( UInt uiCode )
 
 void VLCWriter::xWriteSvlc     ( int iCode )
 {
-  UInt uiCode = UInt( iCode <= 0 ? (-iCode)<<1 : (iCode<<1)-1);
+  uint32_t uiCode = uint32_t( iCode <= 0 ? (-iCode)<<1 : (iCode<<1)-1);
   xWriteUvlc( uiCode );
 }
 
-void VLCWriter::xWriteFlag( UInt uiCode )
+void VLCWriter::xWriteFlag( uint32_t uiCode )
 {
   m_pcBitIf->write( uiCode, 1 );
 }
@@ -262,11 +262,11 @@ void HLSWriter::codePPS( const PPS* pcPPS )
     WRITE_FLAG( pcPPS->getTileUniformSpacingFlag(),                                  "uniform_spacing_flag" );
     if( !pcPPS->getTileUniformSpacingFlag() )
     {
-      for(UInt i=0; i<pcPPS->getNumTileColumnsMinus1(); i++)
+      for(uint32_t i=0; i<pcPPS->getNumTileColumnsMinus1(); i++)
       {
         WRITE_UVLC( pcPPS->getTileColumnWidth(i)-1,                                  "column_width_minus1" );
       }
-      for(UInt i=0; i<pcPPS->getNumTileRowsMinus1(); i++)
+      for(uint32_t i=0; i<pcPPS->getNumTileRowsMinus1(); i++)
       {
         WRITE_UVLC( pcPPS->getTileRowHeight(i)-1,                                    "row_height_minus1" );
       }
@@ -346,7 +346,7 @@ void HLSWriter::codePPS( const PPS* pcPPS )
 
           WRITE_FLAG((ppsRangeExtension.getCrossComponentPredictionEnabledFlag() ? 1 : 0), "cross_component_prediction_enabled_flag" );
 
-          WRITE_FLAG(UInt(ppsRangeExtension.getChromaQpOffsetListEnabledFlag()),           "chroma_qp_offset_list_enabled_flag" );
+          WRITE_FLAG(uint32_t(ppsRangeExtension.getChromaQpOffsetListEnabledFlag()),           "chroma_qp_offset_list_enabled_flag" );
           if (ppsRangeExtension.getChromaQpOffsetListEnabledFlag())
           {
             WRITE_UVLC(ppsRangeExtension.getDiffCuChromaQpOffsetDepth(),                   "diff_cu_chroma_qp_offset_depth");
@@ -461,7 +461,7 @@ void HLSWriter::codeVUI( const VUI *pcVUI, const SPS* pcSPS )
   }
 }
 
-void HLSWriter::codeHrdParameters( const HRD *hrd, bool commonInfPresentFlag, UInt maxNumSubLayersMinus1 )
+void HLSWriter::codeHrdParameters( const HRD *hrd, bool commonInfPresentFlag, uint32_t maxNumSubLayersMinus1 )
 {
   if( commonInfPresentFlag )
   {
@@ -774,7 +774,7 @@ void HLSWriter::codeSPS( const SPS* pcSPS )
 
   const bool subLayerOrderingInfoPresentFlag = 1;
   WRITE_FLAG(subLayerOrderingInfoPresentFlag,       "sps_sub_layer_ordering_info_present_flag");
-  for(UInt i=0; i <= pcSPS->getMaxTLayers()-1; i++)
+  for(uint32_t i=0; i <= pcSPS->getMaxTLayers()-1; i++)
   {
     WRITE_UVLC( pcSPS->getMaxDecPicBuffering(i) - 1,       "sps_max_dec_pic_buffering_minus1[i]" );
     WRITE_UVLC( pcSPS->getNumReorderPics(i),               "sps_max_num_reorder_pics[i]" );
@@ -832,7 +832,7 @@ void HLSWriter::codeSPS( const SPS* pcSPS )
   if (pcSPS->getLongTermRefsPresent())
   {
     WRITE_UVLC(pcSPS->getNumLongTermRefPicSPS(), "num_long_term_ref_pics_sps" );
-    for (UInt k = 0; k < pcSPS->getNumLongTermRefPicSPS(); k++)
+    for (uint32_t k = 0; k < pcSPS->getNumLongTermRefPicSPS(); k++)
     {
       WRITE_CODE( pcSPS->getLtRefPicPocLsbSps(k), pcSPS->getBitsForPOC(), "lt_ref_pic_poc_lsb_sps");
       WRITE_FLAG( pcSPS->getUsedByCurrPicLtSPSFlag(k), "used_by_curr_pic_lt_sps_flag[i]");
@@ -938,7 +938,7 @@ void HLSWriter::codeVPS( const VPS* pcVPS )
   codePTL( pcVPS->getPTL(), true, pcVPS->getMaxTLayers() - 1 );
   const bool subLayerOrderingInfoPresentFlag = 1;
   WRITE_FLAG(subLayerOrderingInfoPresentFlag,              "vps_sub_layer_ordering_info_present_flag");
-  for(UInt i=0; i <= pcVPS->getMaxTLayers()-1; i++)
+  for(uint32_t i=0; i <= pcVPS->getMaxTLayers()-1; i++)
   {
     WRITE_UVLC( pcVPS->getMaxDecPicBuffering(i) - 1,       "vps_max_dec_pic_buffering_minus1[i]" );
     WRITE_UVLC( pcVPS->getNumReorderPics(i),               "vps_max_num_reorder_pics[i]" );
@@ -953,10 +953,10 @@ void HLSWriter::codeVPS( const VPS* pcVPS )
   CHECK( pcVPS->getMaxNuhReservedZeroLayerId() >= MAX_VPS_NUH_RESERVED_ZERO_LAYER_ID_PLUS1, "Invalid parameters read" );
   WRITE_CODE( pcVPS->getMaxNuhReservedZeroLayerId(), 6,     "vps_max_layer_id" );
   WRITE_UVLC( pcVPS->getMaxOpSets() - 1,                    "vps_num_layer_sets_minus1" );
-  for( UInt opsIdx = 1; opsIdx <= ( pcVPS->getMaxOpSets() - 1 ); opsIdx ++ )
+  for( uint32_t opsIdx = 1; opsIdx <= ( pcVPS->getMaxOpSets() - 1 ); opsIdx ++ )
   {
     // Operation point set
-    for( UInt i = 0; i <= pcVPS->getMaxNuhReservedZeroLayerId(); i ++ )
+    for( uint32_t i = 0; i <= pcVPS->getMaxNuhReservedZeroLayerId(); i ++ )
     {
       // Only applicable for version 1
       // pcVPS->setLayerIdIncludedFlag( true, opsIdx, i );
@@ -978,7 +978,7 @@ void HLSWriter::codeVPS( const VPS* pcVPS )
 
     if( pcVPS->getNumHrdParameters() > 0 )
     {
-      for( UInt i = 0; i < pcVPS->getNumHrdParameters(); i ++ )
+      for( uint32_t i = 0; i < pcVPS->getNumHrdParameters(); i ++ )
       {
         // Only applicable for version 1
         WRITE_UVLC( pcVPS->getHrdOpSetIdx( i ),                "hrd_layer_set_idx" );
@@ -1005,7 +1005,7 @@ void HLSWriter::codeSliceHeader         ( Slice* pcSlice )
 
   CodingStructure& cs = *pcSlice->getPic()->cs;
   const ChromaFormat format                = pcSlice->getSPS()->getChromaFormatIdc();
-  const UInt         numberValidComponents = getNumberValidComponents(format);
+  const uint32_t         numberValidComponents = getNumberValidComponents(format);
   const bool         chromaEnabled         = isChromaEnabled(format);
 
   //calculate number of bits required for slice address
@@ -1100,7 +1100,7 @@ void HLSWriter::codeSliceHeader         ( Slice* pcSlice )
         int numLtrpInSH = rps->getNumberOfLongtermPictures();
         int ltrpInSPS[MAX_NUM_REF_PICS];
         int numLtrpInSPS = 0;
-        UInt ltrpIndex;
+        uint32_t ltrpIndex;
         int counter = 0;
         // WARNING: The following code only works only if a matching long-term RPS is
         //          found in the SPS for ALL long-term pictures
@@ -1595,7 +1595,7 @@ void HLSWriter::codeProfileTier( const ProfileTierLevel* ptl, const bool /*bIsSu
 
   if (ptl->getProfileIdc() == Profile::MAINREXT || ptl->getProfileIdc() == Profile::HIGHTHROUGHPUTREXT )
   {
-    const UInt         bitDepthConstraint=ptl->getBitDepthConstraint();
+    const uint32_t         bitDepthConstraint=ptl->getBitDepthConstraint();
     WRITE_FLAG(bitDepthConstraint<=12,          PTL_TRACE_TEXT("max_12bit_constraint_flag"       ));
     WRITE_FLAG(bitDepthConstraint<=10,          PTL_TRACE_TEXT("max_10bit_constraint_flag"       ));
     WRITE_FLAG(bitDepthConstraint<= 8,          PTL_TRACE_TEXT("max_8bit_constraint_flag"        ));
@@ -1632,10 +1632,10 @@ void  HLSWriter::codeTilesWPPEntryPoint( Slice* pSlice )
   {
     return;
   }
-  UInt maxOffset = 0;
+  uint32_t maxOffset = 0;
   for(int idx=0; idx<pSlice->getNumberOfSubstreamSizes(); idx++)
   {
-    UInt offset=pSlice->getSubstreamSize(idx);
+    uint32_t offset=pSlice->getSubstreamSize(idx);
     if ( offset > maxOffset )
     {
       maxOffset = offset;
@@ -1643,7 +1643,7 @@ void  HLSWriter::codeTilesWPPEntryPoint( Slice* pSlice )
   }
 
   // Determine number of bits "offsetLenMinus1+1" required for entry point information
-  UInt offsetLenMinus1 = 0;
+  uint32_t offsetLenMinus1 = 0;
   while (maxOffset >= (1u << (offsetLenMinus1 + 1)))
   {
     offsetLenMinus1++;
@@ -1655,7 +1655,7 @@ void  HLSWriter::codeTilesWPPEntryPoint( Slice* pSlice )
   {
     WRITE_UVLC(offsetLenMinus1, "offset_len_minus1");
 
-    for (UInt idx=0; idx<pSlice->getNumberOfSubstreamSizes(); idx++)
+    for (uint32_t idx=0; idx<pSlice->getNumberOfSubstreamSizes(); idx++)
     {
       WRITE_CODE(pSlice->getSubstreamSize(idx)-1, offsetLenMinus1+1, "entry_point_offset_minus1");
     }
@@ -1673,11 +1673,11 @@ void HLSWriter::xCodePredWeightTable( Slice* pcSlice )
 {
   WPScalingParam  *wp;
   const ChromaFormat    format                = pcSlice->getSPS()->getChromaFormatIdc();
-  const UInt            numberValidComponents = getNumberValidComponents(format);
+  const uint32_t            numberValidComponents = getNumberValidComponents(format);
   const bool            bChroma               = isChromaEnabled(format);
   const int             iNbRef                = (pcSlice->getSliceType() == B_SLICE ) ? (2) : (1);
   bool            bDenomCoded           = false;
-  UInt            uiTotalSignalledWeightFlags = 0;
+  uint32_t            uiTotalSignalledWeightFlags = 0;
 
   if ( (pcSlice->getSliceType()==P_SLICE && pcSlice->getPPS()->getUseWP()) || (pcSlice->getSliceType()==B_SLICE && pcSlice->getPPS()->getWPBiPred()) )
   {
@@ -1757,11 +1757,11 @@ void HLSWriter::xCodePredWeightTable( Slice* pcSlice )
 void HLSWriter::codeScalingList( const ScalingList &scalingList )
 {
   //for each size
-  for(UInt sizeId = SCALING_LIST_FIRST_CODED; sizeId <= SCALING_LIST_LAST_CODED; sizeId++)
+  for(uint32_t sizeId = SCALING_LIST_FIRST_CODED; sizeId <= SCALING_LIST_LAST_CODED; sizeId++)
   {
     const int predListStep = (sizeId == SCALING_LIST_32x32? (SCALING_LIST_NUM/NUMBER_OF_PREDICTION_MODES) : 1); // if 32x32, skip over chroma entries.
 
-    for(UInt listId = 0; listId < SCALING_LIST_NUM; listId+=predListStep)
+    for(uint32_t listId = 0; listId < SCALING_LIST_NUM; listId+=predListStep)
     {
       bool scalingListPredModeFlag = scalingList.getScalingListPredModeFlag(sizeId, listId);
       WRITE_FLAG( scalingListPredModeFlag, "scaling_list_pred_mode_flag" );
@@ -1790,10 +1790,10 @@ void HLSWriter::codeScalingList( const ScalingList &scalingList )
 * \param sizeId      size index
 * \param listId      list index
 */
-void HLSWriter::xCodeScalingList(const ScalingList* scalingList, UInt sizeId, UInt listId)
+void HLSWriter::xCodeScalingList(const ScalingList* scalingList, uint32_t sizeId, uint32_t listId)
 {
   int coefNum = std::min( MAX_MATRIX_COEF_NUM, ( int ) g_scalingListSize[sizeId] );
-  UInt* scan = g_scanOrder[SCAN_UNGROUPED][SCAN_DIAG][gp_sizeIdxInfo->idxFrom( 1 << ( sizeId == SCALING_LIST_FIRST_CODED ? 2 : 3 ) )][gp_sizeIdxInfo->idxFrom( 1 << ( sizeId == SCALING_LIST_FIRST_CODED ? 2 : 3 ) )];
+  uint32_t* scan = g_scanOrder[SCAN_UNGROUPED][SCAN_DIAG][gp_sizeIdxInfo->idxFrom( 1 << ( sizeId == SCALING_LIST_FIRST_CODED ? 2 : 3 ) )][gp_sizeIdxInfo->idxFrom( 1 << ( sizeId == SCALING_LIST_FIRST_CODED ? 2 : 3 ) )];
   int nextCoef = SCALING_LIST_START_VALUE;
   int data;
   const int *src = scalingList->getScalingListAddress(sizeId, listId);
@@ -1820,7 +1820,7 @@ void HLSWriter::xCodeScalingList(const ScalingList* scalingList, UInt sizeId, UI
 }
 #endif
 
-bool HLSWriter::xFindMatchingLTRP(Slice* pcSlice, UInt *ltrpsIndex, int ltrpPOC, bool usedFlag)
+bool HLSWriter::xFindMatchingLTRP(Slice* pcSlice, uint32_t *ltrpsIndex, int ltrpPOC, bool usedFlag)
 {
   // bool state = true, state2 = false;
   int lsb = ltrpPOC & ((1<<pcSlice->getSPS()->getBitsForPOC())-1);
@@ -1854,7 +1854,7 @@ void HLSWriter::alf( const AlfSliceParam& alfSliceParam )
   {
     for( int i = 0; i < MAX_NUM_ALF_CLASSES; i++ )
     {
-      xWriteTruncBinCode( (UInt)alfSliceParam.filterCoeffDeltaIdx[i], alfSliceParam.numLumaFilters );  //filter_coeff_delta[i]
+      xWriteTruncBinCode( (uint32_t)alfSliceParam.filterCoeffDeltaIdx[i], alfSliceParam.numLumaFilters );  //filter_coeff_delta[i]
     }
   }
 
@@ -1972,7 +1972,7 @@ void HLSWriter::alfFilter( const AlfSliceParam& alfSliceParam, const bool isChro
   }
 }
 
-void HLSWriter::xWriteTruncBinCode( UInt uiSymbol, const int uiMaxSymbol )
+void HLSWriter::xWriteTruncBinCode( uint32_t uiSymbol, const int uiMaxSymbol )
 {
   int uiThresh;
   if( uiMaxSymbol > 256 )

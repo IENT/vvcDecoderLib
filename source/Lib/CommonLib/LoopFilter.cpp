@@ -79,7 +79,7 @@ const uint8_t LoopFilter::sm_betaTable[MAX_QP + 1] =
 #endif
 };
 
-inline static UInt getRasterIdx(const Position& pos, const PreCalcValues& pcv)
+inline static uint32_t getRasterIdx(const Position& pos, const PreCalcValues& pcv)
 {
   return ( ( pos.x & pcv.maxCUWidthMask ) >> pcv.minCUWidthLog2 ) + ( ( pos.y & pcv.maxCUHeightMask ) >> pcv.minCUHeightLog2 ) * pcv.partsInCtuWidth;
 }
@@ -268,7 +268,7 @@ void LoopFilter::xDeblockCU( CodingUnit& cu, const DeblockEdgeDir edgeDir )
     {
       if( areaPu.width == areaPu.height )
       {
-        for( UInt off = FRUC_MERGE_REFINE_MINBLKSIZE; off < areaPu.height; off += FRUC_MERGE_REFINE_MINBLKSIZE )
+        for( uint32_t off = FRUC_MERGE_REFINE_MINBLKSIZE; off < areaPu.height; off += FRUC_MERGE_REFINE_MINBLKSIZE )
         {
           xSetEdgefilterMultipleSubPu( cu, EDGE_VER, areaPu, areaPu.offset( (PosType) off, 0 ), m_stLFCUParam.internalEdge );
           xSetEdgefilterMultipleSubPu( cu, EDGE_HOR, areaPu, areaPu.offset( 0, (PosType) off ), m_stLFCUParam.internalEdge );
@@ -282,13 +282,13 @@ void LoopFilter::xDeblockCU( CodingUnit& cu, const DeblockEdgeDir edgeDir )
   if ( cu.affine )
   {
     const int widthInBaseUnits = cu.Y().width >> pcv.minCUWidthLog2;
-    for( UInt edgeIdx = 1 ; edgeIdx < widthInBaseUnits ; edgeIdx++ )
+    for( uint32_t edgeIdx = 1 ; edgeIdx < widthInBaseUnits ; edgeIdx++ )
     {
       const Area affiBlockV( cu.Y().x + edgeIdx * pcv.minCUWidth, cu.Y().y, pcv.minCUWidth, cu.Y().height );
       xSetEdgefilterMultiple( cu, EDGE_VER, affiBlockV, m_stLFCUParam.internalEdge, 1 );
     }
     const int heightInBaseUnits = cu.Y().height >> pcv.minCUHeightLog2;
-    for( UInt edgeIdx = 1 ; edgeIdx < heightInBaseUnits ; edgeIdx++ )
+    for( uint32_t edgeIdx = 1 ; edgeIdx < heightInBaseUnits ; edgeIdx++ )
     {
       const Area affiBlockH( cu.Y().x, cu.Y().y + edgeIdx * pcv.minCUHeight, cu.Y().width, pcv.minCUHeight );
       xSetEdgefilterMultiple( cu, EDGE_HOR, affiBlockH, m_stLFCUParam.internalEdge, 1 );
@@ -413,11 +413,11 @@ void LoopFilter::xSetEdgefilterMultipleSubPu(const CodingUnit& cu,
 {
   const PreCalcValues& pcv = *cu.cs->pcv;
 
-  UInt uiAdd     = (edgeDir == EDGE_VER) ? pcv.partsInCtuWidth : 1;
-  UInt uiNumElem = (edgeDir == EDGE_VER) ? (area.height / pcv.minCUHeight) : (area.width / pcv.minCUWidth);
-  UInt uiBsIdx   = getRasterIdx( subPuPos, pcv );
+  uint32_t uiAdd     = (edgeDir == EDGE_VER) ? pcv.partsInCtuWidth : 1;
+  uint32_t uiNumElem = (edgeDir == EDGE_VER) ? (area.height / pcv.minCUHeight) : (area.width / pcv.minCUWidth);
+  uint32_t uiBsIdx   = getRasterIdx( subPuPos, pcv );
 
-  for (UInt ui = 0; ui < uiNumElem; ui++)
+  for (uint32_t ui = 0; ui < uiNumElem; ui++)
   {
     m_aapbEdgeFilter[edgeDir][uiBsIdx] = bValue;
     uiBsIdx += uiAdd;

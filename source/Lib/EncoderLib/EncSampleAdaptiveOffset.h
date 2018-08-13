@@ -86,7 +86,7 @@ public:
   virtual ~EncSampleAdaptiveOffset();
 
   //interface
-  void createEncData(bool isPreDBFSamplesUsed, UInt numCTUsPic);
+  void createEncData(bool isPreDBFSamplesUsed, uint32_t numCTUsPic);
   void destroyEncData();
 #if JEM_TOOLS
   void initCABACEstimator( CABACDataStore* cabacDataStore, CABACEncoder* cabacEncoder, CtxCache* ctxCache, Slice* pcSlice );

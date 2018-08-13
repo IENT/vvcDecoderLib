@@ -220,9 +220,9 @@ bool tryDecodePicture( Picture* pcEncPic, const int expectedPoc, const std::stri
             int numPicsNotYetDisplayed = 0;
             int dpbFullness = 0;
             const SPS* activeSPS = (pcListPic->front()->cs->sps);
-            UInt maxNrSublayers = activeSPS->getMaxTLayers();
-            UInt numReorderPicsHighestTid = activeSPS->getNumReorderPics(maxNrSublayers-1);
-            UInt maxDecPicBufferingHighestTid =  activeSPS->getMaxDecPicBuffering(maxNrSublayers-1);
+            uint32_t maxNrSublayers = activeSPS->getMaxTLayers();
+            uint32_t numReorderPicsHighestTid = activeSPS->getNumReorderPics(maxNrSublayers-1);
+            uint32_t maxDecPicBufferingHighestTid =  activeSPS->getMaxDecPicBuffering(maxNrSublayers-1);
 
             while (iterPic != pcListPic->end())
             {
@@ -447,11 +447,11 @@ void DecLib::deletePicBuffer ( )
 #endif
 }
 
-Picture* DecLib::xGetNewPicBuffer ( const SPS &sps, const PPS &pps, const UInt temporalLayer )
+Picture* DecLib::xGetNewPicBuffer ( const SPS &sps, const PPS &pps, const uint32_t temporalLayer )
 {
   Picture * pcPic = nullptr;
   m_iMaxRefPicNum = sps.getMaxDecPicBuffering(temporalLayer);     // m_uiMaxDecPicBuffering has the space for the picture currently being decoded
-  if (m_cListPic.size() < (UInt)m_iMaxRefPicNum)
+  if (m_cListPic.size() < (uint32_t)m_iMaxRefPicNum)
   {
     pcPic = new Picture();
 
@@ -537,8 +537,8 @@ void DecLib::executeLoopFilters()
   if( cs.sps->getSpsNext().getALFEnabled() )
   {
     ALFParam* alfParams = &cs.picture->getALFParam();
-    const UInt tidxMAX  = E0104_ALF_MAX_TEMPLAYERID - 1u;
-    const UInt tidx     = cs.slice->getTLayer();
+    const uint32_t tidxMAX  = E0104_ALF_MAX_TEMPLAYERID - 1u;
+    const uint32_t tidx     = cs.slice->getTLayer();
     CHECK( tidx > tidxMAX, "index out of range" );
 
     if( cs.slice->getPendingRasInit() || cs.slice->isIDRorBLA() )
@@ -939,7 +939,7 @@ bool DecLib::xDecodeSlice(InputNALUnit &nalu, int &iSkipFrame, int iPOCLastDispl
   m_HLSReader.parseSliceHeader( m_apcSlicePilot, &m_parameterSetManager, m_prevTid0POC );
 
   // update independent slice index
-  UInt uiIndependentSliceIdx = 0;
+  uint32_t uiIndependentSliceIdx = 0;
   if (!m_bFirstSliceInPicture)
   {
     uiIndependentSliceIdx = m_pcPic->slices[m_uiSliceSegmentIdx-1]->getIndependentSliceIdx();
@@ -1362,7 +1362,7 @@ bool DecLib::decode(InputNALUnit& nalu, int& iSkipFrame, int& iPOCLastDisplay)
     case NAL_UNIT_ACCESS_UNIT_DELIMITER:
       {
         AUDReader audReader;
-        UInt picType;
+        uint32_t picType;
         audReader.parseAccessUnitDelimiter(&(nalu.getBitstream()),picType);
         msg( NOTICE, "Note: found NAL_UNIT_ACCESS_UNIT_DELIMITER\n");
         return false;
@@ -1374,7 +1374,7 @@ bool DecLib::decode(InputNALUnit& nalu, int& iSkipFrame, int& iPOCLastDisplay)
     case NAL_UNIT_FILLER_DATA:
       {
         FDReader fdReader;
-        UInt size;
+        uint32_t size;
         fdReader.parseFillerData(&(nalu.getBitstream()),size);
         msg( NOTICE, "Note: found NAL_UNIT_FILLER_DATA with %u bytes payload.\n", size);
         return false;
