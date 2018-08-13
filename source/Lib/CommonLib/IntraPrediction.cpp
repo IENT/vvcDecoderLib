@@ -1657,7 +1657,6 @@ bool IntraPrediction::useFilteredIntraRefSamples( const ComponentID &compID, con
   int predMode = getWideAngle(tuArea.blocks[compID].width, tuArea.blocks[compID].height, dirMode);
   if (predMode != dirMode && (predMode < 2 || predMode > VDIA_IDX))                                      { return true; }
 #endif
-#if JEM_TOOLS
 #if JVET_K0063_PDPC_SIMP
   if (dirMode == DC_IDX)                                                                                 { return false; }
   if (dirMode == PLANAR_IDX)
@@ -1666,9 +1665,6 @@ bool IntraPrediction::useFilteredIntraRefSamples( const ComponentID &compID, con
   }
 #else
   if( dirMode == DC_IDX || (sps.getSpsNext().isPlanarPDPC() && dirMode == PLANAR_IDX) )                  { return false; }
-#endif
-#else
-  if( dirMode == DC_IDX )                                                                                { return false; }
 #endif
 
   int diff = std::min<int>( abs( dirMode - HOR_IDX ), abs( dirMode - VER_IDX ) );

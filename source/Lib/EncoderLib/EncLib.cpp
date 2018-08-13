@@ -899,14 +899,16 @@ Void EncLib::xInitSPS(SPS &sps)
 #if ENABLE_WPP_PARALLELISM
   sps.getSpsNext().setUseNextDQP            ( m_AltDQPCoding );
 #endif
+#if JVET_K1000_SIMPLIFIED_EMT
+  sps.getSpsNext().setUseIntraEMT           ( m_IntraEMT );
+  sps.getSpsNext().setUseInterEMT           ( m_InterEMT );
+#endif
 #if JEM_TOOLS
   sps.getSpsNext().setUseIntraPDPC          ( m_IntraPDPC );
 #if !JVET_K0371_ALF
   sps.getSpsNext().setALFEnabled            ( 0 != m_ALF );
   sps.getSpsNext().setGALFEnabled           ( 2 == m_ALF );
 #endif
-  sps.getSpsNext().setUseIntraEMT           ( m_IntraEMT );
-  sps.getSpsNext().setUseInterEMT           ( m_InterEMT );
   sps.getSpsNext().setUseOBMC               ( m_OBMC );
   sps.getSpsNext().setOBMCBlkSize           ( m_uiObmcBlkSize );
   sps.getSpsNext().setUseFRUCMrgMode        ( m_FRUC );

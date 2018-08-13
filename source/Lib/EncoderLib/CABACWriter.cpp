@@ -3389,7 +3389,7 @@ void CABACWriter::residual_coding_subblock( CoeffCodingContext& cctx, const TCoe
 #else
   m_BinEncoder.encodeBinsEP( signPattern, numNonZero );
 #endif
-#if JEM_TOOLS
+#if JVET_K1000_SIMPLIFIED_EMT
   cctx.setEmtNumSigCoeff(numNonZero);
 #endif
 }
