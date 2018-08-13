@@ -390,6 +390,9 @@ Void EncApp::xInitLibCfg()
   m_cEncLib.setPCMInputBitDepthFlag                              ( m_bPCMInputBitDepthFlag);
   m_cEncLib.setPCMFilterDisableFlag                              ( m_bPCMFilterDisableFlag);
 
+#if K0238_SAO_GREEDY_MERGE_ENCODING
+  m_cEncLib.setSaoGreedyMergeEnc                                 ( m_saoGreedyMergeEnc);
+#endif
   m_cEncLib.setIntraSmoothingDisabledFlag                        (!m_enableIntraReferenceSmoothing );
   m_cEncLib.setDecodedPictureHashSEIType                         ( m_decodedPictureHashSEIType );
   m_cEncLib.setRecoveryPointSEIEnabled                           ( m_recoveryPointSEIEnabled );

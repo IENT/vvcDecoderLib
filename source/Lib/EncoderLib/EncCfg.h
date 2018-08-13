@@ -304,6 +304,9 @@ protected:
   Int       m_maxNumOffsetsPerPic;
   Bool      m_saoCtuBoundary;
 
+#if K0238_SAO_GREEDY_MERGE_ENCODING
+  bool      m_saoGreedyMergeEnc;
+#endif
   //====== Motion search ========
   Bool      m_bDisableIntraPUsInInterSlices;
   MESearchMethod m_motionEstimationSearchMethod;
@@ -1104,6 +1107,11 @@ public:
   Int   getMaxNumOffsetsPerPic                   ()                  { return m_maxNumOffsetsPerPic; }
   Void  setSaoCtuBoundary              (Bool val)                    { m_saoCtuBoundary = val; }
   Bool  getSaoCtuBoundary              ()                            { return m_saoCtuBoundary; }
+
+#if K0238_SAO_GREEDY_MERGE_ENCODING
+  void  setSaoGreedyMergeEnc           (bool val)                    { m_saoGreedyMergeEnc = val; }
+  bool  getSaoGreedyMergeEnc           ()                            { return m_saoGreedyMergeEnc; }
+#endif
 #if HEVC_TILES_WPP
   Void  setLFCrossTileBoundaryFlag               ( Bool   val  )     { m_loopFilterAcrossTilesEnabledFlag = val; }
   Bool  getLFCrossTileBoundaryFlag               ()                  { return m_loopFilterAcrossTilesEnabledFlag;   }
