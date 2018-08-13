@@ -65,7 +65,7 @@ struct GOPEntry
   Int m_temporalId;
   bool m_refPic;
   Int m_numRefPicsActive;
-  SChar m_sliceType;
+  int8_t m_sliceType;
   Int m_numRefPics;
   Int m_referencePics[MAX_NUM_REF_PICS];
   Int m_usedByCurrPic[MAX_NUM_REF_PICS];

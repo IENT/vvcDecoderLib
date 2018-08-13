@@ -191,7 +191,7 @@ public:
 #if HM_QTBT_AS_IN_JEM_SYNTAX
   void        transform_unit_qtbt       ( const TransformUnit&          tu,       CUCtx&            cuCtx,  ChromaCbfs& chromaCbfs );
 #endif
-  void        cu_qp_delta               ( const CodingUnit&             cu,       int               predQP, const SChar qp );
+  void        cu_qp_delta               ( const CodingUnit&             cu,       int               predQP, const int8_t qp );
   void        cu_chroma_qp_offset       ( const CodingUnit&             cu );
 #if (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT) && !HM_EMT_NSST_AS_IN_JEM
   void        cu_emt_pertu_idx          ( const CodingUnit&             cu );

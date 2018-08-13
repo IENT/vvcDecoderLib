@@ -99,8 +99,8 @@ protected:
   PelStorage m_tempBuf;
   UInt m_numberOfComponents;
 
-  std::vector<SChar> m_signLineBuf1;
-  std::vector<SChar> m_signLineBuf2;
+  std::vector<int8_t> m_signLineBuf1;
+  std::vector<int8_t> m_signLineBuf2;
 private:
   bool m_picSAOEnabled[MAX_NUM_COMPONENT];
 };

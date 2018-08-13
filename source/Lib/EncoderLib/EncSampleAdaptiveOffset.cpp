@@ -1134,7 +1134,7 @@ void EncSampleAdaptiveOffset::getBlkStats(const ComponentID compIdx, const Int c
                         )
 {
   Int x,y, startX, startY, endX, endY, edgeType, firstLineStartX, firstLineEndX;
-  SChar signLeft, signRight, signDown;
+  int8_t signLeft, signRight, signDown;
   int64_t *diff, *count;
   Pel *srcLine, *orgLine;
   Int* skipLinesR = m_skipLinesR[compIdx];
@@ -1164,10 +1164,10 @@ void EncSampleAdaptiveOffset::getBlkStats(const ComponentID compIdx, const Int c
                                                  ;
         for (y=0; y<endY; y++)
         {
-          signLeft = (SChar)sgn(srcLine[startX] - srcLine[startX-1]);
+          signLeft = (int8_t)sgn(srcLine[startX] - srcLine[startX-1]);
           for (x=startX; x<endX; x++)
           {
-            signRight =  (SChar)sgn(srcLine[x] - srcLine[x+1]);
+            signRight =  (int8_t)sgn(srcLine[x] - srcLine[x+1]);
             edgeType  =  signRight + signLeft;
             signLeft  = -signRight;
 
@@ -1186,10 +1186,10 @@ void EncSampleAdaptiveOffset::getBlkStats(const ComponentID compIdx, const Int c
 
             for(y=0; y<skipLinesB[typeIdx]; y++)
             {
-              signLeft = (SChar)sgn(srcLine[startX] - srcLine[startX-1]);
+              signLeft = (int8_t)sgn(srcLine[startX] - srcLine[startX-1]);
               for (x=startX; x<endX; x++)
               {
-                signRight =  (SChar)sgn(srcLine[x] - srcLine[x+1]);
+                signRight =  (int8_t)sgn(srcLine[x] - srcLine[x+1]);
                 edgeType  =  signRight + signLeft;
                 signLeft  = -signRight;
 
@@ -1207,7 +1207,7 @@ void EncSampleAdaptiveOffset::getBlkStats(const ComponentID compIdx, const Int c
       {
         diff +=2;
         count+=2;
-        SChar *signUpLine = &m_signLineBuf1[0];
+        int8_t *signUpLine = &m_signLineBuf1[0];
 
         startX = (!isCalculatePreDeblockSamples) ? 0
                                                  : (isRightAvail ? (width - skipLinesR[typeIdx]) : width)
@@ -1226,7 +1226,7 @@ void EncSampleAdaptiveOffset::getBlkStats(const ComponentID compIdx, const Int c
         Pel* srcLineAbove = srcLine - srcStride;
         for (x=startX; x<endX; x++)
         {
-          signUpLine[x] = (SChar)sgn(srcLine[x] - srcLineAbove[x]);
+          signUpLine[x] = (int8_t)sgn(srcLine[x] - srcLineAbove[x]);
         }
 
         Pel* srcLineBelow;
@@ -1236,7 +1236,7 @@ void EncSampleAdaptiveOffset::getBlkStats(const ComponentID compIdx, const Int c
 
           for (x=startX; x<endX; x++)
           {
-            signDown  = (SChar)sgn(srcLine[x] - srcLineBelow[x]);
+            signDown  = (int8_t)sgn(srcLine[x] - srcLineBelow[x]);
             edgeType  = signDown + signUpLine[x];
             signUpLine[x]= -signDown;
 
@@ -1276,7 +1276,7 @@ void EncSampleAdaptiveOffset::getBlkStats(const ComponentID compIdx, const Int c
       {
         diff +=2;
         count+=2;
-        SChar *signUpLine, *signDownLine, *signTmpLine;
+        int8_t *signUpLine, *signDownLine, *signTmpLine;
 
         signUpLine  = &m_signLineBuf1[0];
         signDownLine= &m_signLineBuf2[0];
@@ -1294,7 +1294,7 @@ void EncSampleAdaptiveOffset::getBlkStats(const ComponentID compIdx, const Int c
         Pel* srcLineBelow = srcLine + srcStride;
         for (x=startX; x<endX+1; x++)
         {
-          signUpLine[x] = (SChar)sgn(srcLineBelow[x] - srcLine[x-1]);
+          signUpLine[x] = (int8_t)sgn(srcLineBelow[x] - srcLine[x-1]);
         }
 
         //1st line
@@ -1318,14 +1318,14 @@ void EncSampleAdaptiveOffset::getBlkStats(const ComponentID compIdx, const Int c
 
           for (x=startX; x<endX; x++)
           {
-            signDown = (SChar)sgn(srcLine[x] - srcLineBelow[x+1]);
+            signDown = (int8_t)sgn(srcLine[x] - srcLineBelow[x+1]);
             edgeType = signDown + signUpLine[x];
             diff [edgeType] += (orgLine[x] - srcLine[x]);
             count[edgeType] ++;
 
             signDownLine[x+1] = -signDown;
           }
-          signDownLine[startX] = (SChar)sgn(srcLineBelow[startX] - srcLine[startX-1]);
+          signDownLine[startX] = (int8_t)sgn(srcLineBelow[startX] - srcLine[startX-1]);
 
           signTmpLine  = signUpLine;
           signUpLine   = signDownLine;
@@ -1363,7 +1363,7 @@ void EncSampleAdaptiveOffset::getBlkStats(const ComponentID compIdx, const Int c
       {
         diff +=2;
         count+=2;
-        SChar *signUpLine = &m_signLineBuf1[1];
+        int8_t *signUpLine = &m_signLineBuf1[1];
 
         startX = (!isCalculatePreDeblockSamples) ? (isLeftAvail  ? 0 : 1)
                                                  : (isRightAvail ? (width - skipLinesR[typeIdx]) : (width - 1))
@@ -1377,7 +1377,7 @@ void EncSampleAdaptiveOffset::getBlkStats(const ComponentID compIdx, const Int c
         Pel* srcLineBelow = srcLine + srcStride;
         for (x=startX-1; x<endX; x++)
         {
-          signUpLine[x] = (SChar)sgn(srcLineBelow[x] - srcLine[x+1]);
+          signUpLine[x] = (int8_t)sgn(srcLineBelow[x] - srcLine[x+1]);
         }
 
 
@@ -1406,7 +1406,7 @@ void EncSampleAdaptiveOffset::getBlkStats(const ComponentID compIdx, const Int c
 
           for(x=startX; x<endX; x++)
           {
-            signDown = (SChar)sgn(srcLine[x] - srcLineBelow[x-1]);
+            signDown = (int8_t)sgn(srcLine[x] - srcLineBelow[x-1]);
             edgeType = signDown + signUpLine[x];
 
             diff [edgeType] += (orgLine[x] - srcLine[x]);
@@ -1414,7 +1414,7 @@ void EncSampleAdaptiveOffset::getBlkStats(const ComponentID compIdx, const Int c
 
             signUpLine[x-1] = -signDown;
           }
-          signUpLine[endX-1] = (SChar)sgn(srcLineBelow[endX-1] - srcLine[endX]);
+          signUpLine[endX-1] = (int8_t)sgn(srcLineBelow[endX-1] - srcLine[endX]);
           srcLine  += srcStride;
           orgLine  += orgStride;
         }

@@ -54,7 +54,7 @@ class CrossComponentPrediction
 {
 protected:
 
-  SChar xCalcCrossComponentPredictionAlpha( TransformUnit &tu, const ComponentID &compID, bool useRecoResidual );
+  int8_t xCalcCrossComponentPredictionAlpha( TransformUnit &tu, const ComponentID &compID, bool useRecoResidual );
 
 public:
 

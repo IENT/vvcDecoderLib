@@ -241,10 +241,10 @@ extern const DecisionTreeTemplate g_intraLumaMpmDTT;
 // ====================================================================================================================
 extern SizeIndexInfo* gp_sizeIdxInfo;
 extern int            g_BlockSizeTrafoScale           [MAX_CU_SIZE + 1][MAX_CU_SIZE + 1][2];
-extern SChar          g_aucLog2                       [MAX_CU_SIZE + 1];
-extern SChar          g_aucNextLog2        [MAX_CU_SIZE + 1];
-extern SChar          g_aucPrevLog2        [MAX_CU_SIZE + 1];
-extern const SChar    i2Log2Tab[257];
+extern int8_t          g_aucLog2                       [MAX_CU_SIZE + 1];
+extern int8_t          g_aucNextLog2        [MAX_CU_SIZE + 1];
+extern int8_t          g_aucPrevLog2        [MAX_CU_SIZE + 1];
+extern const int8_t    i2Log2Tab[257];
 
 inline bool is34( const SizeType& size )
 {

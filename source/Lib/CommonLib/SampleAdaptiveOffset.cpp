@@ -295,7 +295,7 @@ void SampleAdaptiveOffset::offsetBlock(const Int channelBitDepth, const ClpRng& 
 {
   Int x,y, startX, startY, endX, endY, edgeType;
   Int firstLineStartX, firstLineEndX, lastLineStartX, lastLineEndX;
-  SChar signLeft, signRight, signDown;
+  int8_t signLeft, signRight, signDown;
 
   const Pel* srcLine = srcBlk;
         Pel* resLine = resBlk;
@@ -309,10 +309,10 @@ void SampleAdaptiveOffset::offsetBlock(const Int channelBitDepth, const ClpRng& 
       endX   = isRightAvail ? width : (width -1);
       for (y=0; y< height; y++)
       {
-        signLeft = (SChar)sgn(srcLine[startX] - srcLine[startX-1]);
+        signLeft = (int8_t)sgn(srcLine[startX] - srcLine[startX-1]);
         for (x=startX; x< endX; x++)
         {
-          signRight = (SChar)sgn(srcLine[x] - srcLine[x+1]);
+          signRight = (int8_t)sgn(srcLine[x] - srcLine[x+1]);
           edgeType =  signRight + signLeft;
           signLeft  = -signRight;
 
@@ -327,7 +327,7 @@ void SampleAdaptiveOffset::offsetBlock(const Int channelBitDepth, const ClpRng& 
   case SAO_TYPE_EO_90:
     {
       offset += 2;
-      SChar *signUpLine = &m_signLineBuf1[0];
+      int8_t *signUpLine = &m_signLineBuf1[0];
 
       startY = isAboveAvail ? 0 : 1;
       endY   = isBelowAvail ? height : height-1;
@@ -340,7 +340,7 @@ void SampleAdaptiveOffset::offsetBlock(const Int channelBitDepth, const ClpRng& 
       const Pel* srcLineAbove= srcLine- srcStride;
       for (x=0; x< width; x++)
       {
-        signUpLine[x] = (SChar)sgn(srcLine[x] - srcLineAbove[x]);
+        signUpLine[x] = (int8_t)sgn(srcLine[x] - srcLineAbove[x]);
       }
 
       const Pel* srcLineBelow;
@@ -350,7 +350,7 @@ void SampleAdaptiveOffset::offsetBlock(const Int channelBitDepth, const ClpRng& 
 
         for (x=0; x< width; x++)
         {
-          signDown  = (SChar)sgn(srcLine[x] - srcLineBelow[x]);
+          signDown  = (int8_t)sgn(srcLine[x] - srcLineBelow[x]);
           edgeType = signDown + signUpLine[x];
           signUpLine[x]= -signDown;
 
@@ -365,7 +365,7 @@ void SampleAdaptiveOffset::offsetBlock(const Int channelBitDepth, const ClpRng& 
   case SAO_TYPE_EO_135:
     {
       offset += 2;
-      SChar *signUpLine, *signDownLine, *signTmpLine;
+      int8_t *signUpLine, *signDownLine, *signTmpLine;
 
       signUpLine  = &m_signLineBuf1[0];
       signDownLine= &m_signLineBuf2[0];
@@ -377,7 +377,7 @@ void SampleAdaptiveOffset::offsetBlock(const Int channelBitDepth, const ClpRng& 
       const Pel* srcLineBelow= srcLine+ srcStride;
       for (x=startX; x< endX+1; x++)
       {
-        signUpLine[x] = (SChar)sgn(srcLineBelow[x] - srcLine[x- 1]);
+        signUpLine[x] = (int8_t)sgn(srcLineBelow[x] - srcLine[x- 1]);
       }
 
       //1st line
@@ -401,13 +401,13 @@ void SampleAdaptiveOffset::offsetBlock(const Int channelBitDepth, const ClpRng& 
 
         for (x=startX; x<endX; x++)
         {
-          signDown =  (SChar)sgn(srcLine[x] - srcLineBelow[x+ 1]);
+          signDown =  (int8_t)sgn(srcLine[x] - srcLineBelow[x+ 1]);
           edgeType =  signDown + signUpLine[x];
           resLine[x] = ClipPel<int>( srcLine[x] + offset[edgeType], clpRng);
 
           signDownLine[x+1] = -signDown;
         }
-        signDownLine[startX] = (SChar)sgn(srcLineBelow[startX] - srcLine[startX-1]);
+        signDownLine[startX] = (int8_t)sgn(srcLineBelow[startX] - srcLine[startX-1]);
 
         signTmpLine  = signUpLine;
         signUpLine   = signDownLine;
@@ -432,7 +432,7 @@ void SampleAdaptiveOffset::offsetBlock(const Int channelBitDepth, const ClpRng& 
   case SAO_TYPE_EO_45:
     {
       offset += 2;
-      SChar *signUpLine = &m_signLineBuf1[1];
+      int8_t *signUpLine = &m_signLineBuf1[1];
 
       startX = isLeftAvail ? 0 : 1;
       endX   = isRightAvail ? width : (width -1);
@@ -441,7 +441,7 @@ void SampleAdaptiveOffset::offsetBlock(const Int channelBitDepth, const ClpRng& 
       const Pel* srcLineBelow= srcLine+ srcStride;
       for (x=startX-1; x< endX; x++)
       {
-        signUpLine[x] = (SChar)sgn(srcLineBelow[x] - srcLine[x+1]);
+        signUpLine[x] = (int8_t)sgn(srcLineBelow[x] - srcLine[x+1]);
       }
 
 
@@ -464,12 +464,12 @@ void SampleAdaptiveOffset::offsetBlock(const Int channelBitDepth, const ClpRng& 
 
         for(x= startX; x< endX; x++)
         {
-          signDown =  (SChar)sgn(srcLine[x] - srcLineBelow[x-1]);
+          signDown =  (int8_t)sgn(srcLine[x] - srcLineBelow[x-1]);
           edgeType =  signDown + signUpLine[x];
           resLine[x] = ClipPel<int>(srcLine[x] + offset[edgeType], clpRng);
           signUpLine[x-1] = -signDown;
         }
-        signUpLine[endX-1] = (SChar)sgn(srcLineBelow[endX-1] - srcLine[endX]);
+        signUpLine[endX-1] = (int8_t)sgn(srcLineBelow[endX-1] - srcLine[endX]);
         srcLine  += srcStride;
         resLine += resStride;
       }

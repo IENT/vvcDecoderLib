@@ -4454,7 +4454,7 @@ void InterSearch::xEstimateInterResidualQT(CodingStructure &cs, Partitioner &par
 
       const bool isCrossCPredictionAvailable = TU::hasCrossCompPredInfo( tu, compID );
 
-      SChar preCalcAlpha = 0;
+      int8_t preCalcAlpha = 0;
       const CPelBuf lumaResi = csFull->getResiBuf(tu.Y());
 
       if (isCrossCPredictionAvailable)

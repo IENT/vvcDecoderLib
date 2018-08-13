@@ -2677,7 +2677,7 @@ void CABACReader::transform_unit_qtbt( TransformUnit& tu, CUCtx& cuCtx, ChromaCb
 }
 #endif
 
-void CABACReader::cu_qp_delta( CodingUnit& cu, int predQP, SChar& qp )
+void CABACReader::cu_qp_delta( CodingUnit& cu, int predQP, int8_t& qp )
 {
   RExt__DECODER_DEBUG_BIT_STATISTICS_CREATE_SET( STATS__CABAC_BITS__DELTA_QP_EP );
 
@@ -2701,7 +2701,7 @@ void CABACReader::cu_qp_delta( CodingUnit& cu, int predQP, SChar& qp )
     qpY = ( ( predQP + DQp + 52 + 2*qpBdOffsetY ) % (52 + qpBdOffsetY) ) - qpBdOffsetY;
 #endif
   }
-  qp = (SChar)qpY;
+  qp = (int8_t)qpY;
 
   DTRACE( g_trace_ctx, D_DQP, "x=%d, y=%d, d=%d, pred_qp=%d, DQp=%d, qp=%d\n", cu.blocks[cu.chType].lumaPos().x, cu.blocks[cu.chType].lumaPos().y, cu.qtDepth, predQP, DQp, qp );
 }

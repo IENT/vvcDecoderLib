@@ -544,7 +544,7 @@ public:
   bool      isDQPCoded;
   bool      isChromaQpAdjCoded;
   UInt      numNonZeroCoeffNonTs;
-  SChar     qp;                   // used as a previous(last) QP and for QP prediction
+  int8_t     qp;                   // used as a previous(last) QP and for QP prediction
 };
 
 class MergeCtx

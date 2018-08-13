@@ -944,9 +944,9 @@ const int g_pdpc_pred_param[5][35][6] = {
 // ====================================================================================================================
 SizeIndexInfo*           gp_sizeIdxInfo = NULL;
 int                      g_BlockSizeTrafoScale[MAX_CU_SIZE + 1][MAX_CU_SIZE + 1][2];
-SChar                    g_aucLog2    [MAX_CU_SIZE + 1];
-SChar                    g_aucNextLog2[MAX_CU_SIZE + 1];
-SChar                    g_aucPrevLog2[MAX_CU_SIZE + 1];
+int8_t                    g_aucLog2    [MAX_CU_SIZE + 1];
+int8_t                    g_aucNextLog2[MAX_CU_SIZE + 1];
+int8_t                    g_aucPrevLog2[MAX_CU_SIZE + 1];
 
 UnitScale g_miScaling( MIN_CU_LOG2, MIN_CU_LOG2 );
 

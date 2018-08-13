@@ -45,14 +45,14 @@
 //! \ingroup CommonLib
 //! \{
 
-SChar CrossComponentPrediction::xCalcCrossComponentPredictionAlpha( TransformUnit &tu, const ComponentID &compID, bool useRecoResidual )
+int8_t CrossComponentPrediction::xCalcCrossComponentPredictionAlpha( TransformUnit &tu, const ComponentID &compID, bool useRecoResidual )
 {
   const CPelBuf pResiL = useRecoResidual ? tu.cs->getResiBuf( tu.Y() ) : tu.cs->getOrgResiBuf( tu.Y() );
   const CPelBuf pResiC = tu.cs->getResiBuf( tu.blocks[compID] );
 
   const Int diffBitDepth = tu.cs->sps->getDifferentialLumaChromaBitDepth();
 
-  SChar alpha = 0;
+  int8_t alpha = 0;
   Int SSxy = 0;
   Int SSxx = 0;
 
@@ -69,9 +69,9 @@ SChar CrossComponentPrediction::xCalcCrossComponentPredictionAlpha( TransformUni
   if( SSxx != 0 )
   {
     double dAlpha = SSxy / double( SSxx );
-    alpha = SChar( Clip3<Int>( -16, 16, ( Int ) ( dAlpha * 16 ) ) );
+    alpha = int8_t( Clip3<Int>( -16, 16, ( Int ) ( dAlpha * 16 ) ) );
 
-    static const SChar alphaQuant[17] = { 0, 1, 1, 2, 2, 2, 4, 4, 4, 4, 4, 4, 8, 8, 8, 8, 8 };
+    static const int8_t alphaQuant[17] = { 0, 1, 1, 2, 2, 2, 4, 4, 4, 4, 4, 4, 8, 8, 8, 8, 8 };
 
     alpha = ( alpha < 0 ) ? -alphaQuant[Int( -alpha )] : alphaQuant[Int( alpha )];
   }

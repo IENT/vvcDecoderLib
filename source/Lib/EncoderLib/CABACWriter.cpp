@@ -2839,7 +2839,7 @@ void CABACWriter::transform_unit_qtbt( const TransformUnit& tu, CUCtx& cuCtx, Ch
 }
 #endif
 
-void CABACWriter::cu_qp_delta( const CodingUnit& cu, int predQP, const SChar qp )
+void CABACWriter::cu_qp_delta( const CodingUnit& cu, int predQP, const int8_t qp )
 {
   CHECK(!( predQP != std::numeric_limits<int>::max()), "Unspecified error");
   int       DQp         = qp - predQP;

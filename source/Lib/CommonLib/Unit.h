@@ -291,8 +291,8 @@ struct CodingUnit : public UnitArea
   // a triple split would increase the mtDepth by 1, but the qtDepth by 2 in the first and last part and by 1 in the middle part (because of the 1-2-1 split proportions)
   UChar          btDepth; // number of applied binary splits, after switching to the mtt (or it's equivalent)
   UChar          mtDepth; // the actual number of splits after switching to mtt (equals btDepth if only binary splits are allowed)
-  SChar          chromaQpAdj;
-  SChar          qp;
+  int8_t          chromaQpAdj;
+  int8_t          qp;
   SplitSeries    splitSeries;
   bool           skip;
 #if JEM_TOOLS || JVET_K_AFFINE
@@ -325,7 +325,7 @@ struct CodingUnit : public UnitArea
 #endif
 
   // needed for fast imv mode decisions
-  SChar          imvNumCand;
+  int8_t          imvNumCand;
 
 
   CodingUnit() : chType( CH_L ) { }
@@ -438,7 +438,7 @@ struct TransformUnit : public UnitArea
   UChar        cbf          [ MAX_NUM_TBLOCKS ];
   RDPCMMode    rdpcm        [ MAX_NUM_TBLOCKS ];
   bool         transformSkip[ MAX_NUM_TBLOCKS ];
-  SChar        compAlpha    [ MAX_NUM_TBLOCKS ];
+  int8_t        compAlpha    [ MAX_NUM_TBLOCKS ];
 
   TransformUnit() : chType( CH_L ) { }
   TransformUnit(const UnitArea& unit);
