@@ -108,14 +108,9 @@ private:
 public:
   Int getGopId()        const { return m_gopID; }
   Double  calculateLambda( const Slice* slice, const Int GOPid, const Int depth, const Double refQP, const Double dQP, Int &iQP );
-#if WCG_EXT
   Void    setUpLambda( Slice* slice, const Double dLambda, Int iQP );
-#endif
   
 private:
-#endif
-#if !WCG_EXT
-  Void    setUpLambda( Slice* slice, const Double dLambda, Int iQP );
 #endif
 #if HEVC_TILES_WPP
   Void    calculateBoundingCtuTsAddrForSlice( UInt &startCtuTSAddrSlice, UInt &boundingCtuTSAddrSlice, Bool &haveReachedTileBoundary, Picture* pcPic, const Int sliceMode, const Int sliceArgument );
