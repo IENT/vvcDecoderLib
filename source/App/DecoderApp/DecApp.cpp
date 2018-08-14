@@ -43,7 +43,7 @@
 #include "DecApp.h"
 #include "DecoderLib/AnnexBread.h"
 #include "DecoderLib/NALread.h"
-#if RExt__DECODER_DEBUG_BIT_STATISTICS
+#if RExt__DECODER_DEBUG_STATISTICS
 #include "CommonLib/CodingStatistics.h"
 #endif
 #include "CommonLib/dtrace_codingstruct.h"
@@ -120,8 +120,11 @@ UInt DecApp::decode()
      * the process of reading a new slice that is the first slice of a new frame
      * requires the DecApp::decode() method to be called again with the same
      * nal unit. */
-#if RExt__DECODER_DEBUG_BIT_STATISTICS
+#if RExt__DECODER_DEBUG_STATISTICS
     CodingStatistics::CodingStatisticsData* backupStats = new CodingStatistics::CodingStatisticsData(CodingStatistics::GetStatistics());
+#endif
+
+#if RExt__DECODER_DEBUG_BIT_STATISTICS
     streampos location = bitstreamFile.tellg() - streampos(bytestream.GetNumBufferedBytes());
 #else
     streampos location = bitstreamFile.tellg();
@@ -240,7 +243,7 @@ UInt DecApp::decode()
         xWriteOutput( pcListPic, nalu.m_temporalId );
       }
     }
-#if RExt__DECODER_DEBUG_BIT_STATISTICS
+#if RExt__DECODER_DEBUG_STATISTICS
     delete backupStats;
 #endif
   }
@@ -255,7 +258,7 @@ UInt DecApp::decode()
   // destroy internal classes
   xDestroyDecLib();
 
-#if RExt__DECODER_DEBUG_BIT_STATISTICS
+#if RExt__DECODER_DEBUG_STATISTICS
   CodingStatistics::DestroyInstance();
 #endif
 

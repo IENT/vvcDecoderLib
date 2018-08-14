@@ -45,6 +45,9 @@
 
 #include "CommonLib/dtrace_buffer.h"
 
+#if RExt__DECODER_DEBUG_TOOL_STATISTICS
+#include "CommonLib/CodingStatistics.h"
+#endif
 
 //! \ingroup DecoderLib
 //! \{
@@ -433,6 +436,13 @@ Void DecCu::xDeriveCUMV( CodingUnit &cu )
   for( auto &pu : CU::traversePUs( cu ) )
   {
     MergeCtx mrgCtx;
+
+#if RExt__DECODER_DEBUG_TOOL_STATISTICS
+#if JEM_TOOLS
+    if (pu.cu->affine)
+      CodingStatistics::IncrementStatisticTool(CodingStatisticsClassType{ STATS__TOOL_AFF, pu.Y().width, pu.Y().height });
+#endif
+#endif
 
     if( pu.mergeFlag )
     {
