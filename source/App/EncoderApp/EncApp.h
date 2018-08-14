@@ -61,31 +61,31 @@ private:
   EncLib            m_cEncLib;                    ///< encoder class
   VideoIOYuv        m_cVideoIOYuvInputFile;       ///< input YUV file
   VideoIOYuv        m_cVideoIOYuvReconFile;       ///< output reconstruction file
-  Int               m_iFrameRcvd;                 ///< number of received frames
-  UInt              m_essentialBytes;
-  UInt              m_totalBytes;
+  int               m_iFrameRcvd;                 ///< number of received frames
+  uint32_t              m_essentialBytes;
+  uint32_t              m_totalBytes;
   fstream           m_bitstream;
 
 private:
   // initialization
-  Void xCreateLib  ( std::list<PelUnitBuf*>& recBufList
+  void xCreateLib  ( std::list<PelUnitBuf*>& recBufList
                     );                           ///< create files & encoder class
-  Void xInitLibCfg ();                           ///< initialize internal variables
-  Void xInitLib    (Bool isFieldCoding);         ///< initialize encoder class
-  Void xDestroyLib ();                           ///< destroy encoder class
+  void xInitLibCfg ();                           ///< initialize internal variables
+  void xInitLib    (bool isFieldCoding);         ///< initialize encoder class
+  void xDestroyLib ();                           ///< destroy encoder class
 
   // file I/O
-  Void xWriteOutput     ( Int iNumEncoded, std::list<PelUnitBuf*>& recBufList
+  void xWriteOutput     ( int iNumEncoded, std::list<PelUnitBuf*>& recBufList
                          );                      ///< write bitstream to file
-  Void rateStatsAccum   ( const AccessUnit& au, const std::vector<UInt>& stats);
-  Void printRateSummary ();
-  Void printChromaFormat();
+  void rateStatsAccum   ( const AccessUnit& au, const std::vector<uint32_t>& stats);
+  void printRateSummary ();
+  void printChromaFormat();
 
 public:
   EncApp();
   virtual ~EncApp();
 
-  Void  encode();                               ///< main encoding function
+  void  encode();                               ///< main encoding function
 
   void  outputAU( const AccessUnit& au );
 

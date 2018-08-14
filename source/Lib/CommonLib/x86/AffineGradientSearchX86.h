@@ -196,7 +196,7 @@ static void simdVerticalSobelFilter( Pel *const pPred, const int predStride, int
 }
 
 template<X86_VEXT vext>
-static void simdEqualCoeffComputer( Pel *pResidue, int residueStride, int **ppDerivate, int derivateBufStride, Int64( *pEqualCoeff )[7], int width, int height, bool b6Param )
+static void simdEqualCoeffComputer( Pel *pResidue, int residueStride, int **ppDerivate, int derivateBufStride, int64_t( *pEqualCoeff )[7], int width, int height, bool b6Param )
 {
   __m128i mmTwo, mmFour;
   __m128i mmTmp[4];

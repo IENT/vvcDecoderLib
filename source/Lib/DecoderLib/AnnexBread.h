@@ -74,7 +74,7 @@ public:
    * Reset the internal state.  Must be called if input stream is
    * modified externally to this class
    */
-  Void reset()
+  void reset()
   {
     m_NumFutureBytes = 0;
     m_FutureBytes = 0;
@@ -84,7 +84,7 @@ public:
    * returns true if an EOF will be encountered within the next
    * n bytes.
    */
-  Bool eofBeforeNBytes(UInt n)
+  bool eofBeforeNBytes(uint32_t n)
   {
     CHECK(n > 4, "Unsupported look-ahead value");
     if (m_NumFutureBytes >= n)
@@ -95,7 +95,7 @@ public:
     n -= m_NumFutureBytes;
     try
     {
-      for (UInt i = 0; i < n; i++)
+      for (uint32_t i = 0; i < n; i++)
       {
         m_FutureBytes = (m_FutureBytes << 8) | m_Input.get();
         m_NumFutureBytes++;
@@ -120,7 +120,7 @@ public:
    * is undefined.
    *
    */
-  uint32_t peekBytes(UInt n)
+  uint32_t peekBytes(uint32_t n)
   {
     eofBeforeNBytes(n);
     return m_FutureBytes >> 8*(m_NumFutureBytes - n);
@@ -150,10 +150,10 @@ public:
    * bytestream are interpreted as bigendian when assembling
    * the return value.
    */
-  uint32_t readBytes(UInt n)
+  uint32_t readBytes(uint32_t n)
   {
     uint32_t val = 0;
-    for (UInt i = 0; i < n; i++)
+    for (uint32_t i = 0; i < n; i++)
     {
       val = (val << 8) | readByte();
     }
@@ -161,11 +161,11 @@ public:
   }
 
 #if RExt__DECODER_DEBUG_BIT_STATISTICS
-  UInt GetNumBufferedBytes() const { return m_NumFutureBytes; }
+  uint32_t GetNumBufferedBytes() const { return m_NumFutureBytes; }
 #endif
 
 private:
-  UInt m_NumFutureBytes; /* number of valid bytes in m_FutureBytes */
+  uint32_t m_NumFutureBytes; /* number of valid bytes in m_FutureBytes */
   uint32_t m_FutureBytes; /* bytes that have been peeked */
   std::istream& m_Input; /* Input stream to read from */
 };
@@ -175,11 +175,11 @@ private:
  */
 struct AnnexBStats
 {
-  UInt m_numLeadingZero8BitsBytes;
-  UInt m_numZeroByteBytes;
-  UInt m_numStartCodePrefixBytes;
-  UInt m_numBytesInNALUnit;
-  UInt m_numTrailingZero8BitsBytes;
+  uint32_t m_numLeadingZero8BitsBytes;
+  uint32_t m_numZeroByteBytes;
+  uint32_t m_numStartCodePrefixBytes;
+  uint32_t m_numBytesInNALUnit;
+  uint32_t m_numTrailingZero8BitsBytes;
 
   AnnexBStats& operator+=(const AnnexBStats& rhs)
   {
@@ -192,7 +192,7 @@ struct AnnexBStats
   }
 };
 
-Bool byteStreamNALUnit(InputByteStream& bs, std::vector<uint8_t>& nalUnit, AnnexBStats& stats);
+bool byteStreamNALUnit(InputByteStream& bs, std::vector<uint8_t>& nalUnit, AnnexBStats& stats);
 
 //! \}
 

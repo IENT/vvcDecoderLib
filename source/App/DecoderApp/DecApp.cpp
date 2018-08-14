@@ -73,9 +73,9 @@ DecApp::DecApp()
  - destroy internal class
  - returns the number of mismatching pictures
  */
-UInt DecApp::decode()
+uint32_t DecApp::decode()
 {
-  Int                 poc;
+  int                 poc;
   PicList* pcListPic = NULL;
 
   ifstream bitstreamFile(m_bitstreamFileName.c_str(), ifstream::in | ifstream::binary);
@@ -111,8 +111,8 @@ UInt DecApp::decode()
   }
 
   // main decoder loop
-  Bool openedReconFile = false; // reconstruction file not yet opened. (must be performed after SPS is seen)
-  Bool loopFiltered = false;
+  bool openedReconFile = false; // reconstruction file not yet opened. (must be performed after SPS is seen)
+  bool loopFiltered = false;
 
   while (!!bitstreamFile)
   {
@@ -135,7 +135,7 @@ UInt DecApp::decode()
     byteStreamNALUnit(bytestream, nalu.getBitstream().getFifo(), stats);
 
     // call actual decoding function
-    Bool bNewPicture = false;
+    bool bNewPicture = false;
     if (nalu.getBitstream().getFifo().empty())
     {
       /* this can happen if the following occur:
@@ -202,7 +202,7 @@ UInt DecApp::decode()
       if ( (!m_reconFileName.empty()) && (!openedReconFile) )
       {
         const BitDepths &bitDepths=pcListPic->front()->cs->sps->getBitDepths(); // use bit depths of first reconstructed picture.
-        for( UInt channelType = 0; channelType < MAX_NUM_CHANNEL_TYPE; channelType++ )
+        for( uint32_t channelType = 0; channelType < MAX_NUM_CHANNEL_TYPE; channelType++ )
         {
             if( m_outputBitDepth[channelType] == 0 )
             {
@@ -251,7 +251,7 @@ UInt DecApp::decode()
   xFlushOutput( pcListPic );
 
   // get the number of checksum errors
-  UInt nRet = m_cDecLib.getNumberOfChecksumErrorsDetected();
+  uint32_t nRet = m_cDecLib.getNumberOfChecksumErrorsDetected();
 
   // delete buffers
   m_cDecLib.deletePicBuffer();
@@ -271,7 +271,7 @@ UInt DecApp::decode()
 // Protected member functions
 // ====================================================================================================================
 
-Void DecApp::xCreateDecLib()
+void DecApp::xCreateDecLib()
 {
   initROM();
 
@@ -292,7 +292,7 @@ Void DecApp::xCreateDecLib()
   }
 }
 
-Void DecApp::xDestroyDecLib()
+void DecApp::xDestroyDecLib()
 {
   if ( !m_reconFileName.empty() )
   {
@@ -307,7 +307,7 @@ Void DecApp::xDestroyDecLib()
 /** \param pcListPic list of pictures to be written to file
     \param tId       temporal sub-layer ID
  */
-Void DecApp::xWriteOutput( PicList* pcListPic, UInt tId )
+void DecApp::xWriteOutput( PicList* pcListPic, uint32_t tId )
 {
   if (pcListPic->empty())
   {
@@ -315,12 +315,12 @@ Void DecApp::xWriteOutput( PicList* pcListPic, UInt tId )
   }
 
   PicList::iterator iterPic   = pcListPic->begin();
-  Int numPicsNotYetDisplayed = 0;
-  Int dpbFullness = 0;
+  int numPicsNotYetDisplayed = 0;
+  int dpbFullness = 0;
   const SPS* activeSPS = (pcListPic->front()->cs->sps);
-  UInt numReorderPicsHighestTid;
-  UInt maxDecPicBufferingHighestTid;
-  UInt maxNrSublayers = activeSPS->getMaxTLayers();
+  uint32_t numReorderPicsHighestTid;
+  uint32_t maxDecPicBufferingHighestTid;
+  uint32_t maxNrSublayers = activeSPS->getMaxTLayers();
 
   if(m_iMaxTemporalLayer == -1 || m_iMaxTemporalLayer >= maxNrSublayers)
   {
@@ -378,9 +378,9 @@ Void DecApp::xWriteOutput( PicList* pcListPic, UInt tId )
         {
           const Window &conf = pcPicTop->cs->sps->getConformanceWindow();
           const Window  defDisp = (m_respectDefDispWindow && pcPicTop->cs->sps->getVuiParametersPresentFlag()) ? pcPicTop->cs->sps->getVuiParameters()->getDefaultDisplayWindow() : Window();
-          const Bool isTff = pcPicTop->topField;
+          const bool isTff = pcPicTop->topField;
 
-          Bool display = true;
+          bool display = true;
           if( m_decodedNoDisplaySEIEnabled )
           {
             SEIMessages noDisplay = getSeisByType( pcPic->SEIs, SEI::NO_DISPLAY );
@@ -475,7 +475,7 @@ Void DecApp::xWriteOutput( PicList* pcListPic, UInt tId )
 
 /** \param pcListPic list of pictures to be written to file
  */
-Void DecApp::xFlushOutput( PicList* pcListPic )
+void DecApp::xFlushOutput( PicList* pcListPic )
 {
   if(!pcListPic || pcListPic->empty())
   {
@@ -504,7 +504,7 @@ Void DecApp::xFlushOutput( PicList* pcListPic )
         {
           const Window &conf = pcPicTop->cs->sps->getConformanceWindow();
           const Window  defDisp = (m_respectDefDispWindow && pcPicTop->cs->sps->getVuiParametersPresentFlag()) ? pcPicTop->cs->sps->getVuiParameters()->getDefaultDisplayWindow() : Window();
-          const Bool isTff = pcPicTop->topField;
+          const bool isTff = pcPicTop->topField;
           m_cVideoIOYuvReconFile.write( pcPicTop->getRecoBuf(), pcPicBottom->getRecoBuf(),
                                          m_outputColourSpaceConvert,
                                          conf.getWindowLeftOffset() + defDisp.getWindowLeftOffset(),
@@ -597,13 +597,13 @@ Void DecApp::xFlushOutput( PicList* pcListPic )
 
 /** \param nalu Input nalu to check whether its LayerId is within targetDecLayerIdSet
  */
-Bool DecApp::isNaluWithinTargetDecLayerIdSet( InputNALUnit* nalu )
+bool DecApp::isNaluWithinTargetDecLayerIdSet( InputNALUnit* nalu )
 {
   if ( m_targetDecLayerIdSet.size() == 0 ) // By default, the set is empty, meaning all LayerIds are allowed
   {
     return true;
   }
-  for (std::vector<Int>::iterator it = m_targetDecLayerIdSet.begin(); it != m_targetDecLayerIdSet.end(); it++)
+  for (std::vector<int>::iterator it = m_targetDecLayerIdSet.begin(); it != m_targetDecLayerIdSet.end(); it++)
   {
     if ( nalu->m_nuhLayerId == (*it) )
     {

@@ -220,7 +220,7 @@ void AdaptiveDepthPartitioner::setMaxMinDepth( unsigned& minDepth, unsigned& max
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
-Void QTBTPartitioner::initCtu( const UnitArea& ctuArea, const ChannelType _chType, const Slice& slice )
+void QTBTPartitioner::initCtu( const UnitArea& ctuArea, const ChannelType _chType, const Slice& slice )
 {
 #if _DEBUG
   m_currArea = ctuArea;
@@ -241,7 +241,7 @@ Void QTBTPartitioner::initCtu( const UnitArea& ctuArea, const ChannelType _chTyp
   m_partStack.push_back( PartLevel( CTU_LEVEL, Partitioning{ ctuArea } ) );
 }
 
-Void QTBTPartitioner::splitCurrArea( const PartSplit split, const CodingStructure& cs )
+void QTBTPartitioner::splitCurrArea( const PartSplit split, const CodingStructure& cs )
 {
   CHECKD( !canSplit( split, cs ), "Trying to apply a prohibited split!" );
 
@@ -559,7 +559,7 @@ PartSplit QTBTPartitioner::getImplicitSplit( const CodingStructure &cs )
   return split;
 }
 
-Void QTBTPartitioner::exitCurrSplit()
+void QTBTPartitioner::exitCurrSplit()
 {
   PartSplit currSplit = m_partStack.back().split;
   unsigned  currIdx = m_partStack.back().idx;
@@ -606,7 +606,7 @@ Void QTBTPartitioner::exitCurrSplit()
   }
 }
 
-Bool QTBTPartitioner::nextPart( const CodingStructure &cs, bool autoPop /*= false*/ )
+bool QTBTPartitioner::nextPart( const CodingStructure &cs, bool autoPop /*= false*/ )
 {
   const Position &prevPos = currArea().blocks[chType].pos();
 
@@ -680,7 +680,7 @@ Partitioning PartitionerImpl::getCUSubPartitions( const UnitArea &cuArea, const 
 
       sub.resize( 4, cuArea );
 
-      for( UInt i = 0; i < 4; i++ )
+      for( uint32_t i = 0; i < 4; i++ )
       {
         for( auto &blk : sub[i].blocks )
         {
@@ -697,9 +697,9 @@ Partitioning PartitionerImpl::getCUSubPartitions( const UnitArea &cuArea, const 
     }
     else
     {
-      const UInt minCUSize = ( cs.sps->getMaxCUWidth() >> cs.sps->getMaxCodingDepth() );
+      const uint32_t minCUSize = ( cs.sps->getMaxCUWidth() >> cs.sps->getMaxCodingDepth() );
 
-      Bool canSplit = cuArea.lumaSize().width > minCUSize && cuArea.lumaSize().height > minCUSize;
+      bool canSplit = cuArea.lumaSize().width > minCUSize && cuArea.lumaSize().height > minCUSize;
 
       Partitioning ret;
 
@@ -728,7 +728,7 @@ Partitioning PartitionerImpl::getCUSubPartitions( const UnitArea &cuArea, const 
         }
         else
         {
-          for( UInt i = 0; i < 4; i++ )
+          for( uint32_t i = 0; i < 4; i++ )
           {
             ret[i] = cuArea;
 
@@ -779,7 +779,7 @@ Partitioning PartitionerImpl::getCUSubPartitions( const UnitArea &cuArea, const 
 
     sub.resize(2, cuArea);
 
-    for (UInt i = 0; i < 2; i++)
+    for (uint32_t i = 0; i < 2; i++)
     {
       for (auto &blk : sub[i].blocks)
       {
@@ -798,7 +798,7 @@ Partitioning PartitionerImpl::getCUSubPartitions( const UnitArea &cuArea, const 
 
     sub.resize( 2, cuArea );
 
-    for( UInt i = 0; i < 2; i++ )
+    for( uint32_t i = 0; i < 2; i++ )
     {
       for( auto &blk : sub[i].blocks )
       {

@@ -54,10 +54,10 @@ namespace po = df::program_options_lite;
 /** \param argc number of arguments
     \param argv array of arguments
  */
-Bool SEIRemovalAppCfg::parseCfg( Int argc, TChar* argv[] )
+bool SEIRemovalAppCfg::parseCfg( int argc, char* argv[] )
 {
-  Bool do_help = false;
-  Int warnUnknowParameter = 0;
+  bool do_help = false;
+  int warnUnknowParameter = 0;
   po::Options opts;
   opts.addOptions()
 
@@ -74,9 +74,9 @@ Bool SEIRemovalAppCfg::parseCfg( Int argc, TChar* argv[] )
 
   po::setDefaults(opts);
   po::ErrorReporter err;
-  const list<const TChar*>& argv_unhandled = po::scanArgv(opts, argc, (const TChar**) argv, err);
+  const list<const char*>& argv_unhandled = po::scanArgv(opts, argc, (const char**) argv, err);
 
-  for (list<const TChar*>::const_iterator it = argv_unhandled.begin(); it != argv_unhandled.end(); it++)
+  for (list<const char*>::const_iterator it = argv_unhandled.begin(); it != argv_unhandled.end(); it++)
   {
     std::cerr << "Unhandled argument ignored: "<< *it << std::endl;
   }

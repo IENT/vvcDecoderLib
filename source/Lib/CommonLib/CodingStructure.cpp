@@ -67,7 +67,7 @@ CodingStructure::CodingStructure(CUCache& cuCache, PUCache& puCache, TUCache& tu
   , m_puCache ( puCache )
   , m_tuCache ( tuCache )
 {
-  for( UInt i = 0; i < MAX_NUM_COMPONENT; i++ )
+  for( uint32_t i = 0; i < MAX_NUM_COMPONENT; i++ )
   {
     m_coeffs[ i ] = nullptr;
     m_pcmbuf[ i ] = nullptr;
@@ -75,7 +75,7 @@ CodingStructure::CodingStructure(CUCache& cuCache, PUCache& puCache, TUCache& tu
     m_offsets[ i ] = 0;
   }
 
-  for( UInt i = 0; i < MAX_NUM_CHANNEL_TYPE; i++ )
+  for( uint32_t i = 0; i < MAX_NUM_CHANNEL_TYPE; i++ )
   {
     m_cuIdx   [ i ] = nullptr;
     m_puIdx   [ i ] = nullptr;
@@ -103,7 +103,7 @@ void CodingStructure::destroy()
 
   destroyCoeffs();
 
-  for( UInt i = 0; i < MAX_NUM_CHANNEL_TYPE; i++ )
+  for( uint32_t i = 0; i < MAX_NUM_CHANNEL_TYPE; i++ )
   {
     delete[] m_isDecomp[ i ];
     m_isDecomp[ i ] = nullptr;
@@ -174,7 +174,7 @@ void CodingStructure::setDecomp(const CompArea &_area, const bool _isCoded /*= t
 {
   const UnitScale& scale = unitScale[_area.compID];
 
-  AreaBuf<Bool> isCodedBlk( m_isDecomp[toChannelType( _area.compID )] + rsAddr( _area, area.blocks[_area.compID].pos(), area.blocks[_area.compID].width, scale ),
+  AreaBuf<bool> isCodedBlk( m_isDecomp[toChannelType( _area.compID )] + rsAddr( _area, area.blocks[_area.compID].pos(), area.blocks[_area.compID].width, scale ),
                             area.blocks[_area.compID].width >> scale.posx,
                             _area.width                     >> scale.posx,
                             _area.height                    >> scale.posy);
@@ -183,7 +183,7 @@ void CodingStructure::setDecomp(const CompArea &_area, const bool _isCoded /*= t
 
 void CodingStructure::setDecomp(const UnitArea &_area, const bool _isCoded /*= true*/)
 {
-  for( UInt i = 0; i < _area.blocks.size(); i++ )
+  for( uint32_t i = 0; i < _area.blocks.size(); i++ )
   {
     if( _area.blocks[i].valid() ) setDecomp( _area.blocks[i], _isCoded );
   }
@@ -329,12 +329,12 @@ CodingUnit& CodingStructure::addCU( const UnitArea &unit, const ChannelType chTy
 
   cus.push_back( cu );
 
-  UInt idx = ++m_numCUs;
+  uint32_t idx = ++m_numCUs;
   cu->idx  = idx;
 
-  UInt numCh = ::getNumberValidChannels( area.chromaFormat );
+  uint32_t numCh = ::getNumberValidChannels( area.chromaFormat );
 
-  for( UInt i = 0; i < numCh; i++ )
+  for( uint32_t i = 0; i < numCh; i++ )
   {
     if( !cu->blocks[i].valid() )
     {
@@ -349,7 +349,7 @@ CodingUnit& CodingStructure::addCU( const UnitArea &unit, const ChannelType chTy
     const Area scaledBlk   = scale.scale(     _blk );
     unsigned *idxPtr       = m_cuIdx[i] + rsAddr( scaledBlk.pos(), scaledSelf.pos(), scaledSelf.width );
     CHECK( *idxPtr, "Overwriting a pre-existing value, should be '0'!" );
-    AreaBuf<UInt>( idxPtr, scaledSelf.width, scaledBlk.size() ).fill( idx );
+    AreaBuf<uint32_t>( idxPtr, scaledSelf.width, scaledBlk.size() ).fill( idx );
   }
 
   return *cu;
@@ -393,11 +393,11 @@ PredictionUnit& CodingStructure::addPU( const UnitArea &unit, const ChannelType 
   }
   pu->cu->lastPU = pu;
 
-  UInt idx = ++m_numPUs;
+  uint32_t idx = ++m_numPUs;
   pu->idx  = idx;
 
-  UInt numCh = ::getNumberValidChannels( area.chromaFormat );
-  for( UInt i = 0; i < numCh; i++ )
+  uint32_t numCh = ::getNumberValidChannels( area.chromaFormat );
+  for( uint32_t i = 0; i < numCh; i++ )
   {
     if( !pu->blocks[i].valid() )
     {
@@ -412,7 +412,7 @@ PredictionUnit& CodingStructure::addPU( const UnitArea &unit, const ChannelType 
     const Area scaledBlk   = scale.scale(     _blk );
     unsigned *idxPtr       = m_puIdx[i] + rsAddr( scaledBlk.pos(), scaledSelf.pos(), scaledSelf.width );
     CHECK( *idxPtr, "Overwriting a pre-existing value, should be '0'!" );
-    AreaBuf<UInt>( idxPtr, scaledSelf.width, scaledBlk.size() ).fill( idx );
+    AreaBuf<uint32_t>( idxPtr, scaledSelf.width, scaledBlk.size() ).fill( idx );
   }
 
   return *pu;
@@ -457,15 +457,15 @@ TransformUnit& CodingStructure::addTU( const UnitArea &unit, const ChannelType c
     tu->cu->lastTU = tu;
   }
 
-  UInt idx = ++m_numTUs;
+  uint32_t idx = ++m_numTUs;
   tu->idx  = idx;
 
   TCoeff *coeffs[5] = { nullptr, nullptr, nullptr, nullptr, nullptr };
   Pel    *pcmbuf[5] = { nullptr, nullptr, nullptr, nullptr, nullptr };
 
-  UInt numCh = ::getNumberValidComponents( area.chromaFormat );
+  uint32_t numCh = ::getNumberValidComponents( area.chromaFormat );
 
-  for( UInt i = 0; i < numCh; i++ )
+  for( uint32_t i = 0; i < numCh; i++ )
   {
     if( !tu->blocks[i].valid() )
     {
@@ -484,7 +484,7 @@ TransformUnit& CodingStructure::addTU( const UnitArea &unit, const ChannelType c
         const Area scaledBlk   = scale.scale(     _blk );
         unsigned *idxPtr       = m_tuIdx[i] + rsAddr( scaledBlk.pos(), scaledSelf.pos(), scaledSelf.width );
         CHECK( *idxPtr, "Overwriting a pre-existing value, should be '0'!" );
-        AreaBuf<UInt>( idxPtr, scaledSelf.width, scaledBlk.size() ).fill( idx );
+        AreaBuf<uint32_t>( idxPtr, scaledSelf.width, scaledBlk.size() ).fill( idx );
       }
     }
 
@@ -671,7 +671,7 @@ void CodingStructure::createCoeffs()
 
 void CodingStructure::destroyCoeffs()
 {
-  for( UInt i = 0; i < MAX_NUM_COMPONENT; i++ )
+  for( uint32_t i = 0; i < MAX_NUM_COMPONENT; i++ )
   {
     if( m_coeffs[i] ) { xFree( m_coeffs[i] ); m_coeffs[i] = nullptr; }
     if( m_pcmbuf[i] ) { xFree( m_pcmbuf[i] ); m_pcmbuf[i] = nullptr; }
@@ -682,7 +682,7 @@ void CodingStructure::initSubStructure( CodingStructure& subStruct, const Channe
 {
   CHECK( this == &subStruct, "Trying to init self as sub-structure" );
 
-  for( UInt i = 0; i < subStruct.area.blocks.size(); i++ )
+  for( uint32_t i = 0; i < subStruct.area.blocks.size(); i++ )
   {
     CHECKD( subStruct.area.blocks[i].size() != subArea.blocks[i].size(), "Trying to init sub-structure of incompatible size" );
 
@@ -734,7 +734,7 @@ void CodingStructure::initSubStructure( CodingStructure& subStruct, const Channe
     unsigned numComp = ::getNumberValidChannels( area.chromaFormat );
     for( unsigned i = 0; i < numComp; i++)
     {
-      ::memcpy( subStruct.m_isDecomp[i], m_isDecomp[i], (unitScale[i].scale( area.blocks[i].size() ).area() * sizeof( Bool ) ) );
+      ::memcpy( subStruct.m_isDecomp[i], m_isDecomp[i], (unitScale[i].scale( area.blocks[i].size() ).area() * sizeof( bool ) ) );
     }
   }
 }

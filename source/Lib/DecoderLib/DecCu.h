@@ -67,26 +67,26 @@ public:
   virtual ~DecCu();
 
   /// initialize access channels
-  Void  init              ( TrQuant* pcTrQuant, IntraPrediction* pcIntra, InterPrediction* pcInter );
+  void  init              ( TrQuant* pcTrQuant, IntraPrediction* pcIntra, InterPrediction* pcInter );
 
   /// destroy internal buffers
-  Void  decompressCtu     ( CodingStructure& cs, const UnitArea& ctuArea );
+  void  decompressCtu     ( CodingStructure& cs, const UnitArea& ctuArea );
 
   /// reconstruct Ctu information
 protected:
-  Void xIntraRecQT        ( CodingUnit&      cu, const ChannelType chType );
+  void xIntraRecQT        ( CodingUnit&      cu, const ChannelType chType );
 
-  Void xReconInter        ( CodingUnit&      cu );
-  Void xDecodeInterTexture( CodingUnit&      cu );
-  Void xReconIntraQT      ( CodingUnit&      cu );
-  Void xFillPCMBuffer     ( CodingUnit&      cu );
+  void xReconInter        ( CodingUnit&      cu );
+  void xDecodeInterTexture( CodingUnit&      cu );
+  void xReconIntraQT      ( CodingUnit&      cu );
+  void xFillPCMBuffer     ( CodingUnit&      cu );
 
-  Void xIntraRecBlk       ( TransformUnit&   tu, const ComponentID compID );
-  Void xReconPCM          ( TransformUnit&   tu);
-  Void xDecodePCMTexture  ( TransformUnit&   tu, const ComponentID compID );
-  Void xDecodeInterTU     ( TransformUnit&   tu, const ComponentID compID );
+  void xIntraRecBlk       ( TransformUnit&   tu, const ComponentID compID );
+  void xReconPCM          ( TransformUnit&   tu);
+  void xDecodePCMTexture  ( TransformUnit&   tu, const ComponentID compID );
+  void xDecodeInterTU     ( TransformUnit&   tu, const ComponentID compID );
 
-  Void xDeriveCUMV        ( CodingUnit&      cu );
+  void xDeriveCUMV        ( CodingUnit&      cu );
 
 private:
   TrQuant*          m_pcTrQuant;

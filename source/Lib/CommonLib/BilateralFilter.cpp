@@ -52,10 +52,10 @@ BilateralFilter::BilateralFilter()
 {
   int numQP = MAX_QP-18+1;
   // allocation
-  m_bilateralFilterTable = new UShort*[numQP];
+  m_bilateralFilterTable = new uint16_t*[numQP];
   for(int i = 0; i < numQP; i++)
   {
-    m_bilateralFilterTable[i] = new UShort[maxPosList[i]+1];
+    m_bilateralFilterTable[i] = new uint16_t[maxPosList[i]+1];
   }
 
   // initialization
@@ -77,7 +77,7 @@ void BilateralFilter::create()
 {
   createdivToMulLUTs();
 
-  for( Int qp = 18; qp < MAX_QP + 1; qp++ )
+  for( int qp = 18; qp < MAX_QP + 1; qp++ )
   {
     createBilateralFilterTable( qp );
   }
@@ -102,15 +102,15 @@ void BilateralFilter::destroy()
 
 void BilateralFilter::createdivToMulLUTs()
 {
-  UInt one = 1 << BITS_PER_DIV_LUT_ENTRY; // 1 is represented by 2^14 (not 2^14 -1)
+  uint32_t one = 1 << BITS_PER_DIV_LUT_ENTRY; // 1 is represented by 2^14 (not 2^14 -1)
   divToMulOneOverN[0] = one; // We can never divide by zero since the centerweight is non-zero, so we can set this value to something arbitrary.
   divToMulShift[0] = 0;
 
-  for (UInt n=1; n<BILATERAL_FILTER_MAX_DENOMINATOR_PLUS_ONE; n++)
+  for (uint32_t n=1; n<BILATERAL_FILTER_MAX_DENOMINATOR_PLUS_ONE; n++)
   {
-    UInt tryLUT = one / n;
+    uint32_t tryLUT = one / n;
 
-    UInt tryShift = 0;
+    uint32_t tryShift = 0;
     // Make sure the LUT entry stored does not start with (binary) zeros.
     while(tryLUT <= one)
     {
@@ -123,7 +123,7 @@ void BilateralFilter::createdivToMulLUTs()
     }
 
     // We may need to add 1 to the LUT entry in order to make 3/3, 4/4, 5/5, ... come out right.
-    UInt adiv = divToMulOneOverN[n] * n / (one << divToMulShift[n]);
+    uint32_t adiv = divToMulOneOverN[n] * n / (one << divToMulShift[n]);
     if(adiv != 1)
       divToMulOneOverN[n]++;
   }
@@ -131,44 +131,44 @@ void BilateralFilter::createdivToMulLUTs()
 
 void BilateralFilter::createBilateralFilterTable(int qp)
 {
-  Int spatialSigmaValue;
-  Int intensitySigmaValue = (qp - 17) * 50;
-  Int sqrtSpatialSigmaMulTwo;
-  Int sqrtIntensitySigmaMulTwo = 2 * intensitySigmaValue * intensitySigmaValue;
+  int spatialSigmaValue;
+  int intensitySigmaValue = (qp - 17) * 50;
+  int sqrtSpatialSigmaMulTwo;
+  int sqrtIntensitySigmaMulTwo = 2 * intensitySigmaValue * intensitySigmaValue;
   int centerWeightTableSize = 5;
 
   spatialSigmaValue = SpatialSigmaValue;;
-  for (Int i = 0; i < centerWeightTableSize; i++)
+  for (int i = 0; i < centerWeightTableSize; i++)
   {
     sqrtSpatialSigmaMulTwo = 2 * (spatialSigmaValue + spatialSigmaBlockLengthOffsets[i]) * (spatialSigmaValue + spatialSigmaBlockLengthOffsets[i]);
 
     // Calculate the multiplication factor that we will use to convert the first table (with the strongest filter) to one of the
     // tables that gives weaker filtering (such as when TU = 8 or 16 or when we have inter filtering).
-    Int sqrtSpatialSigmaMulTwoStrongestFiltering = 2 * (spatialSigmaValue + spatialSigmaBlockLengthOffsets[0]) * (spatialSigmaValue + spatialSigmaBlockLengthOffsets[0]);
+    int sqrtSpatialSigmaMulTwoStrongestFiltering = 2 * (spatialSigmaValue + spatialSigmaBlockLengthOffsets[0]) * (spatialSigmaValue + spatialSigmaBlockLengthOffsets[0]);
 
     // multiplication factor equals exp(-1/stronger)/exp(-1/weaker)
     double centerWeightMultiplier = exp(-(10000.0 / sqrtSpatialSigmaMulTwoStrongestFiltering))/exp(-(10000.0 / sqrtSpatialSigmaMulTwo));
-    m_bilateralCenterWeightTable[i] = (Int)(centerWeightMultiplier*65 + 0.5);
+    m_bilateralCenterWeightTable[i] = (int)(centerWeightMultiplier*65 + 0.5);
   }
-  Int i = 0;
+  int i = 0;
   sqrtSpatialSigmaMulTwo = 2 * (spatialSigmaValue + spatialSigmaBlockLengthOffsets[i]) * (spatialSigmaValue + spatialSigmaBlockLengthOffsets[i]);
-  for (Int j = 0; j < (maxPosList[qp-18]+1); j++)
+  for (int j = 0; j < (maxPosList[qp-18]+1); j++)
   {
-    Int temp = j * 25;
-    m_bilateralFilterTable[qp-18][j] = UShort(exp(-(10000.0 / sqrtSpatialSigmaMulTwo) - (temp * temp / (sqrtIntensitySigmaMulTwo * 1.0))) * 65 + 0.5);
+    int temp = j * 25;
+    m_bilateralFilterTable[qp-18][j] = uint16_t(exp(-(10000.0 / sqrtSpatialSigmaMulTwo) - (temp * temp / (sqrtIntensitySigmaMulTwo * 1.0))) * 65 + 0.5);
   }
 }
 
 void BilateralFilter::smoothBlockBilateralFilter(unsigned uiWidth, unsigned uiHeight, short block[], int isInterBlock, int qp)
 {
-  Int length = (Int)std::min(uiWidth, uiHeight);
-  Int rightPixel, centerPixel;
-  Int rightWeight, bottomWeight, centerWeight;
-  Int sumWeights[MAX_CU_SIZE];
-  Int sumDelta[MAX_CU_SIZE];
-  Int blockLengthIndex;
+  int length = (int)std::min(uiWidth, uiHeight);
+  int rightPixel, centerPixel;
+  int rightWeight, bottomWeight, centerWeight;
+  int sumWeights[MAX_CU_SIZE];
+  int sumDelta[MAX_CU_SIZE];
+  int blockLengthIndex;
 
-  Int dIB, dIR;
+  int dIB, dIR;
 
   if( length >= 16 )
   {
@@ -184,11 +184,11 @@ void BilateralFilter::smoothBlockBilateralFilter(unsigned uiWidth, unsigned uiHe
   }
 
 
-  UShort *lookupTablePtr;
+  uint16_t *lookupTablePtr;
 
   centerWeight = m_bilateralCenterWeightTable[blockLengthIndex + 3 * isInterBlock];
 
-  Int theMaxPos = maxPosList[qp-18];
+  int theMaxPos = maxPosList[qp-18];
   lookupTablePtr = m_bilateralFilterTable[qp-18];
 
   // for each pixel in block
@@ -216,21 +216,21 @@ void BilateralFilter::smoothBlockBilateralFilter(unsigned uiWidth, unsigned uiHe
   // G    H     I
   // GG  HHH   II
   // C uses a filter of type x
-  Int currentPixelDeltaSum;
-  Int currentPixelSumWeights;
-  Int rightPixelDeltaSum;
-  Int rightPixelSumWeights;
-  Int rightWeightTimesdIR;
-  Int bottomWeightTimesdIB;
+  int currentPixelDeltaSum;
+  int currentPixelSumWeights;
+  int rightPixelDeltaSum;
+  int rightPixelSumWeights;
+  int rightWeightTimesdIR;
+  int bottomWeightTimesdIB;
 
-  Int mySignIfNeg;
-  Int mySign;
+  int mySignIfNeg;
+  int mySign;
 
-  Short *blockCurrentPixelPtr = block;
-  Short *blockRightPixelPtr = blockCurrentPixelPtr+1;
-  Short *blockNextLinePixelPtr = blockCurrentPixelPtr + uiWidth;
-  Int *sumWeightsPtr = sumWeights;
-  Int *sumDeltaPtr = sumDelta;
+  int16_t *blockCurrentPixelPtr = block;
+  int16_t *blockRightPixelPtr = blockCurrentPixelPtr+1;
+  int16_t *blockNextLinePixelPtr = blockCurrentPixelPtr + uiWidth;
+  int *sumWeightsPtr = sumWeights;
+  int *sumDeltaPtr = sumDelta;
 
   // A pixel. uses filter type xx
   //                           x
@@ -267,7 +267,7 @@ void BilateralFilter::smoothBlockBilateralFilter(unsigned uiWidth, unsigned uiHe
 
   *(blockCurrentPixelPtr++) = centerPixel + mySign*((((mySign*currentPixelDeltaSum + ((currentPixelSumWeights+mySignIfNeg) >> 1))*divToMulOneOverN[currentPixelSumWeights]) >> (BITS_PER_DIV_LUT_ENTRY + divToMulShift[currentPixelSumWeights])));
 
-  for (Int i = 1; i < (uiWidth-1); i++)
+  for (int i = 1; i < (uiWidth-1); i++)
   {
     // B pixel. uses filter type xxx
     //                            x
@@ -330,7 +330,7 @@ void BilateralFilter::smoothBlockBilateralFilter(unsigned uiWidth, unsigned uiHe
 
   *(blockCurrentPixelPtr++) = centerPixel + mySign*((((mySign*currentPixelDeltaSum + ((currentPixelSumWeights+mySignIfNeg) >> 1))*divToMulOneOverN[currentPixelSumWeights]) >> (BITS_PER_DIV_LUT_ENTRY + divToMulShift[currentPixelSumWeights])));
 
-  for (Int j = 1; j < (uiHeight-1); j++)
+  for (int j = 1; j < (uiHeight-1); j++)
   {
     sumWeightsPtr = sumWeights;
     sumDeltaPtr = sumDelta;
@@ -369,7 +369,7 @@ void BilateralFilter::smoothBlockBilateralFilter(unsigned uiWidth, unsigned uiHe
 
     *(blockCurrentPixelPtr++) = centerPixel + mySign*((((mySign*currentPixelDeltaSum + ((currentPixelSumWeights+mySignIfNeg) >> 1))*divToMulOneOverN[currentPixelSumWeights]) >> (BITS_PER_DIV_LUT_ENTRY + divToMulShift[currentPixelSumWeights])));
 
-    for (Int i = 1; i < (uiWidth-1); i++)
+    for (int i = 1; i < (uiWidth-1); i++)
     {
       //                            x
       // E pixel. uses filter type xxx
@@ -465,7 +465,7 @@ void BilateralFilter::smoothBlockBilateralFilter(unsigned uiWidth, unsigned uiHe
 
   *(blockCurrentPixelPtr++) = centerPixel + mySign*((((mySign*currentPixelDeltaSum + ((currentPixelSumWeights+mySignIfNeg) >> 1))*divToMulOneOverN[currentPixelSumWeights]) >> (BITS_PER_DIV_LUT_ENTRY + divToMulShift[currentPixelSumWeights])));
 
-  for (Int i = 1; i < (uiWidth-1); i++)
+  for (int i = 1; i < (uiWidth-1); i++)
   {
     //                            x
     // H pixel. uses filter type xxx
@@ -568,9 +568,9 @@ void BilateralFilter::bilateralFilterInter( PelBuf& resiBuf, const CPelBuf& pred
 
   // need to be performed if residual  is used
   // Resi' = Reco' - Pred
-  for (UInt uiY = 0; uiY < uiHeight; ++uiY)
+  for (uint32_t uiY = 0; uiY < uiHeight; ++uiY)
   {
-    for (UInt uiX = 0; uiX < uiWidth; ++uiX)
+    for (uint32_t uiX = 0; uiX < uiWidth; ++uiX)
     {
       piResi[uiX] = tempblock[ uiX + uiY*uiWidth ] - piPred[uiX];
     }

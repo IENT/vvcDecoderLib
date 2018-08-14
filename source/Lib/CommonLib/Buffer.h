@@ -539,7 +539,7 @@ template<typename T>
 template<int N>
 T AreaBuf<T>::average( unsigned x, unsigned y ) const
 {
-  Int s = 0;
+  int s = 0;
 
   for( int i = -N / 2; i <= N / 2; ++i )
   {

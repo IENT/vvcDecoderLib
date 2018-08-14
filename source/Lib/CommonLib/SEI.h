@@ -96,12 +96,12 @@ public:
   SEI() {}
   virtual ~SEI() {}
 
-  static const TChar *getSEIMessageString(SEI::PayloadType payloadType);
+  static const char *getSEIMessageString(SEI::PayloadType payloadType);
 
   virtual PayloadType payloadType() const = 0;
 };
 
-static const UInt ISO_IEC_11578_LEN=16;
+static const uint32_t ISO_IEC_11578_LEN=16;
 
 class SEIuserDataUnregistered : public SEI
 {
@@ -117,9 +117,9 @@ public:
     delete userData;
   }
 
-  UChar uuid_iso_iec_11578[ISO_IEC_11578_LEN];
-  UInt  userDataLength;
-  UChar *userData;
+  uint8_t uuid_iso_iec_11578[ISO_IEC_11578_LEN];
+  uint32_t  userDataLength;
+  uint8_t *userData;
 };
 
 class SEIDecodedPictureHash : public SEI
@@ -153,12 +153,12 @@ public:
   virtual ~SEIActiveParameterSets() {}
 
 #if HEVC_VPS
-  Int activeVPSId;
+  int activeVPSId;
 #endif
-  Bool m_selfContainedCvsFlag;
-  Bool m_noParameterSetUpdateFlag;
-  Int numSpsIdsMinus1;
-  std::vector<Int> activeSeqParameterSetId;
+  bool m_selfContainedCvsFlag;
+  bool m_noParameterSetUpdateFlag;
+  int numSpsIdsMinus1;
+  std::vector<int> activeSeqParameterSetId;
 };
 
 class SEIBufferingPeriod : public SEI
@@ -180,16 +180,16 @@ public:
   }
   virtual ~SEIBufferingPeriod() {}
 
-  UInt m_bpSeqParameterSetId;
-  Bool m_rapCpbParamsPresentFlag;
-  UInt m_cpbDelayOffset;
-  UInt m_dpbDelayOffset;
-  UInt m_initialCpbRemovalDelay         [MAX_CPB_CNT][2];
-  UInt m_initialCpbRemovalDelayOffset   [MAX_CPB_CNT][2];
-  UInt m_initialAltCpbRemovalDelay      [MAX_CPB_CNT][2];
-  UInt m_initialAltCpbRemovalDelayOffset[MAX_CPB_CNT][2];
-  Bool m_concatenationFlag;
-  UInt m_auCpbRemovalDelayDelta;
+  uint32_t m_bpSeqParameterSetId;
+  bool m_rapCpbParamsPresentFlag;
+  uint32_t m_cpbDelayOffset;
+  uint32_t m_dpbDelayOffset;
+  uint32_t m_initialCpbRemovalDelay         [MAX_CPB_CNT][2];
+  uint32_t m_initialCpbRemovalDelayOffset   [MAX_CPB_CNT][2];
+  uint32_t m_initialAltCpbRemovalDelay      [MAX_CPB_CNT][2];
+  uint32_t m_initialAltCpbRemovalDelayOffset[MAX_CPB_CNT][2];
+  bool m_concatenationFlag;
+  uint32_t m_auCpbRemovalDelayDelta;
 };
 class SEIPictureTiming : public SEI
 {
@@ -207,18 +207,18 @@ public:
   {
   }
 
-  UInt  m_picStruct;
-  UInt  m_sourceScanType;
-  Bool  m_duplicateFlag;
+  uint32_t  m_picStruct;
+  uint32_t  m_sourceScanType;
+  bool  m_duplicateFlag;
 
-  UInt  m_auCpbRemovalDelay;
-  UInt  m_picDpbOutputDelay;
-  UInt  m_picDpbOutputDuDelay;
-  UInt  m_numDecodingUnitsMinus1;
-  Bool  m_duCommonCpbRemovalDelayFlag;
-  UInt  m_duCommonCpbRemovalDelayMinus1;
-  std::vector<UInt> m_numNalusInDuMinus1;
-  std::vector<UInt> m_duCpbRemovalDelayMinus1;
+  uint32_t  m_auCpbRemovalDelay;
+  uint32_t  m_picDpbOutputDelay;
+  uint32_t  m_picDpbOutputDuDelay;
+  uint32_t  m_numDecodingUnitsMinus1;
+  bool  m_duCommonCpbRemovalDelayFlag;
+  uint32_t  m_duCommonCpbRemovalDelayMinus1;
+  std::vector<uint32_t> m_numNalusInDuMinus1;
+  std::vector<uint32_t> m_duCpbRemovalDelayMinus1;
 };
 
 class SEIDecodingUnitInfo : public SEI
@@ -233,10 +233,10 @@ public:
     , m_picSptDpbOutputDuDelay(0)
   {}
   virtual ~SEIDecodingUnitInfo() {}
-  Int m_decodingUnitIdx;
-  Int m_duSptCpbRemovalDelay;
-  Bool m_dpbOutputDuDelayPresentFlag;
-  Int m_picSptDpbOutputDuDelay;
+  int m_decodingUnitIdx;
+  int m_duSptCpbRemovalDelay;
+  bool m_dpbOutputDuDelayPresentFlag;
+  int m_picSptDpbOutputDuDelay;
 };
 
 class SEIRecoveryPoint : public SEI
@@ -247,9 +247,9 @@ public:
   SEIRecoveryPoint() {}
   virtual ~SEIRecoveryPoint() {}
 
-  Int  m_recoveryPocCnt;
-  Bool m_exactMatchingFlag;
-  Bool m_brokenLinkFlag;
+  int  m_recoveryPocCnt;
+  bool m_exactMatchingFlag;
+  bool m_brokenLinkFlag;
 };
 
 class SEIFramePacking : public SEI
@@ -260,24 +260,24 @@ public:
   SEIFramePacking() {}
   virtual ~SEIFramePacking() {}
 
-  Int  m_arrangementId;
-  Bool m_arrangementCancelFlag;
-  Int  m_arrangementType;
-  Bool m_quincunxSamplingFlag;
-  Int  m_contentInterpretationType;
-  Bool m_spatialFlippingFlag;
-  Bool m_frame0FlippedFlag;
-  Bool m_fieldViewsFlag;
-  Bool m_currentFrameIsFrame0Flag;
-  Bool m_frame0SelfContainedFlag;
-  Bool m_frame1SelfContainedFlag;
-  Int  m_frame0GridPositionX;
-  Int  m_frame0GridPositionY;
-  Int  m_frame1GridPositionX;
-  Int  m_frame1GridPositionY;
-  Int  m_arrangementReservedByte;
-  Bool m_arrangementPersistenceFlag;
-  Bool m_upsampledAspectRatio;
+  int  m_arrangementId;
+  bool m_arrangementCancelFlag;
+  int  m_arrangementType;
+  bool m_quincunxSamplingFlag;
+  int  m_contentInterpretationType;
+  bool m_spatialFlippingFlag;
+  bool m_frame0FlippedFlag;
+  bool m_fieldViewsFlag;
+  bool m_currentFrameIsFrame0Flag;
+  bool m_frame0SelfContainedFlag;
+  bool m_frame1SelfContainedFlag;
+  int  m_frame0GridPositionX;
+  int  m_frame0GridPositionY;
+  int  m_frame1GridPositionX;
+  int  m_frame1GridPositionY;
+  int  m_arrangementReservedByte;
+  bool m_arrangementPersistenceFlag;
+  bool m_upsampledAspectRatio;
 };
 
 class SEISegmentedRectFramePacking : public SEI
@@ -288,9 +288,9 @@ public:
   SEISegmentedRectFramePacking() {}
   virtual ~SEISegmentedRectFramePacking() {}
 
-  Bool m_arrangementCancelFlag;
-  Int  m_contentInterpretationType;
-  Bool m_arrangementPersistenceFlag;
+  bool m_arrangementCancelFlag;
+  int  m_contentInterpretationType;
+  bool m_arrangementPersistenceFlag;
 };
 
 class SEIDisplayOrientation : public SEI
@@ -305,13 +305,13 @@ public:
     {}
   virtual ~SEIDisplayOrientation() {}
 
-  Bool cancelFlag;
-  Bool horFlip;
-  Bool verFlip;
+  bool cancelFlag;
+  bool horFlip;
+  bool verFlip;
 
-  UInt anticlockwiseRotation;
-  Bool persistenceFlag;
-  Bool extensionFlag;
+  uint32_t anticlockwiseRotation;
+  bool persistenceFlag;
+  bool extensionFlag;
 };
 
 class SEITemporalLevel0Index : public SEI
@@ -325,8 +325,8 @@ public:
     {}
   virtual ~SEITemporalLevel0Index() {}
 
-  UInt tl0Idx;
-  UInt rapIdx;
+  uint32_t tl0Idx;
+  uint32_t rapIdx;
 };
 
 class SEIGradualDecodingRefreshInfo : public SEI
@@ -339,7 +339,7 @@ public:
   {}
   virtual ~SEIGradualDecodingRefreshInfo() {}
 
-  Bool m_gdrForegroundFlag;
+  bool m_gdrForegroundFlag;
 };
 
 class SEINoDisplay : public SEI
@@ -352,7 +352,7 @@ public:
   {}
   virtual ~SEINoDisplay() {}
 
-  Bool m_noDisplay;
+  bool m_noDisplay;
 };
 
 class SEISOPDescription : public SEI
@@ -363,13 +363,13 @@ public:
   SEISOPDescription() {}
   virtual ~SEISOPDescription() {}
 
-  UInt m_sopSeqParameterSetId;
-  UInt m_numPicsInSopMinus1;
+  uint32_t m_sopSeqParameterSetId;
+  uint32_t m_numPicsInSopMinus1;
 
-  UInt m_sopDescVclNaluType[MAX_NUM_PICS_IN_SOP];
-  UInt m_sopDescTemporalId[MAX_NUM_PICS_IN_SOP];
-  UInt m_sopDescStRpsIdx[MAX_NUM_PICS_IN_SOP];
-  Int m_sopDescPocDelta[MAX_NUM_PICS_IN_SOP];
+  uint32_t m_sopDescVclNaluType[MAX_NUM_PICS_IN_SOP];
+  uint32_t m_sopDescTemporalId[MAX_NUM_PICS_IN_SOP];
+  uint32_t m_sopDescStRpsIdx[MAX_NUM_PICS_IN_SOP];
+  int m_sopDescPocDelta[MAX_NUM_PICS_IN_SOP];
 };
 
 class SEIToneMappingInfo : public SEI
@@ -379,32 +379,32 @@ public:
   SEIToneMappingInfo() {}
   virtual ~SEIToneMappingInfo() {}
 
-  Int    m_toneMapId;
-  Bool   m_toneMapCancelFlag;
-  Bool   m_toneMapPersistenceFlag;
-  Int    m_codedDataBitDepth;
-  Int    m_targetBitDepth;
-  Int    m_modelId;
-  Int    m_minValue;
-  Int    m_maxValue;
-  Int    m_sigmoidMidpoint;
-  Int    m_sigmoidWidth;
-  std::vector<Int> m_startOfCodedInterval;
-  Int    m_numPivots;
-  std::vector<Int> m_codedPivotValue;
-  std::vector<Int> m_targetPivotValue;
-  Int    m_cameraIsoSpeedIdc;
-  Int    m_cameraIsoSpeedValue;
-  Int    m_exposureIndexIdc;
-  Int    m_exposureIndexValue;
-  Bool   m_exposureCompensationValueSignFlag;
-  Int    m_exposureCompensationValueNumerator;
-  Int    m_exposureCompensationValueDenomIdc;
-  Int    m_refScreenLuminanceWhite;
-  Int    m_extendedRangeWhiteLevel;
-  Int    m_nominalBlackLevelLumaCodeValue;
-  Int    m_nominalWhiteLevelLumaCodeValue;
-  Int    m_extendedWhiteLevelLumaCodeValue;
+  int    m_toneMapId;
+  bool   m_toneMapCancelFlag;
+  bool   m_toneMapPersistenceFlag;
+  int    m_codedDataBitDepth;
+  int    m_targetBitDepth;
+  int    m_modelId;
+  int    m_minValue;
+  int    m_maxValue;
+  int    m_sigmoidMidpoint;
+  int    m_sigmoidWidth;
+  std::vector<int> m_startOfCodedInterval;
+  int    m_numPivots;
+  std::vector<int> m_codedPivotValue;
+  std::vector<int> m_targetPivotValue;
+  int    m_cameraIsoSpeedIdc;
+  int    m_cameraIsoSpeedValue;
+  int    m_exposureIndexIdc;
+  int    m_exposureIndexValue;
+  bool   m_exposureCompensationValueSignFlag;
+  int    m_exposureCompensationValueNumerator;
+  int    m_exposureCompensationValueDenomIdc;
+  int    m_refScreenLuminanceWhite;
+  int    m_extendedRangeWhiteLevel;
+  int    m_nominalBlackLevelLumaCodeValue;
+  int    m_nominalWhiteLevelLumaCodeValue;
+  int    m_extendedWhiteLevelLumaCodeValue;
 };
 
 class SEIKneeFunctionInfo : public SEI
@@ -414,16 +414,16 @@ public:
   SEIKneeFunctionInfo() {}
   virtual ~SEIKneeFunctionInfo() {}
 
-  Int   m_kneeId;
-  Bool  m_kneeCancelFlag;
-  Bool  m_kneePersistenceFlag;
-  Int   m_kneeInputDrange;
-  Int   m_kneeInputDispLuminance;
-  Int   m_kneeOutputDrange;
-  Int   m_kneeOutputDispLuminance;
-  Int   m_kneeNumKneePointsMinus1;
-  std::vector<Int> m_kneeInputKneePoint;
-  std::vector<Int> m_kneeOutputKneePoint;
+  int   m_kneeId;
+  bool  m_kneeCancelFlag;
+  bool  m_kneePersistenceFlag;
+  int   m_kneeInputDrange;
+  int   m_kneeInputDispLuminance;
+  int   m_kneeOutputDrange;
+  int   m_kneeOutputDispLuminance;
+  int   m_kneeNumKneePointsMinus1;
+  std::vector<int> m_kneeInputKneePoint;
+  std::vector<int> m_kneeOutputKneePoint;
 };
 
 class SEIColourRemappingInfo : public SEI
@@ -432,8 +432,8 @@ public:
 
   struct CRIlut
   {
-    Int codedValue;
-    Int targetValue;
+    int codedValue;
+    int targetValue;
     bool operator < (const CRIlut& a) const
     {
       return codedValue < a.codedValue;
@@ -444,27 +444,27 @@ public:
   SEIColourRemappingInfo() {}
   ~SEIColourRemappingInfo() {}
 
-  Void copyFrom( const SEIColourRemappingInfo &seiCriInput)
+  void copyFrom( const SEIColourRemappingInfo &seiCriInput)
   {
     (*this) = seiCriInput;
   }
 
-  UInt                m_colourRemapId;
-  Bool                m_colourRemapCancelFlag;
-  Bool                m_colourRemapPersistenceFlag;
-  Bool                m_colourRemapVideoSignalInfoPresentFlag;
-  Bool                m_colourRemapFullRangeFlag;
-  Int                 m_colourRemapPrimaries;
-  Int                 m_colourRemapTransferFunction;
-  Int                 m_colourRemapMatrixCoefficients;
-  Int                 m_colourRemapInputBitDepth;
-  Int                 m_colourRemapBitDepth;
-  Int                 m_preLutNumValMinus1[3];
+  uint32_t                m_colourRemapId;
+  bool                m_colourRemapCancelFlag;
+  bool                m_colourRemapPersistenceFlag;
+  bool                m_colourRemapVideoSignalInfoPresentFlag;
+  bool                m_colourRemapFullRangeFlag;
+  int                 m_colourRemapPrimaries;
+  int                 m_colourRemapTransferFunction;
+  int                 m_colourRemapMatrixCoefficients;
+  int                 m_colourRemapInputBitDepth;
+  int                 m_colourRemapBitDepth;
+  int                 m_preLutNumValMinus1[3];
   std::vector<CRIlut> m_preLut[3];
-  Bool                m_colourRemapMatrixPresentFlag;
-  Int                 m_log2MatrixDenom;
-  Int                 m_colourRemapCoeffs[3][3];
-  Int                 m_postLutNumValMinus1[3];
+  bool                m_colourRemapMatrixPresentFlag;
+  int                 m_log2MatrixDenom;
+  int                 m_colourRemapCoeffs[3][3];
+  int                 m_postLutNumValMinus1[3];
   std::vector<CRIlut> m_postLut[3];
 };
 
@@ -475,13 +475,13 @@ public:
   SEIChromaResamplingFilterHint() {}
   virtual ~SEIChromaResamplingFilterHint() {}
 
-  Int                            m_verChromaFilterIdc;
-  Int                            m_horChromaFilterIdc;
-  Bool                           m_verFilteringFieldProcessingFlag;
-  Int                            m_targetFormatIdc;
-  Bool                           m_perfectReconstructionFlag;
-  std::vector<std::vector<Int> > m_verFilterCoeff;
-  std::vector<std::vector<Int> > m_horFilterCoeff;
+  int                            m_verChromaFilterIdc;
+  int                            m_horChromaFilterIdc;
+  bool                           m_verFilteringFieldProcessingFlag;
+  int                            m_targetFormatIdc;
+  bool                           m_perfectReconstructionFlag;
+  std::vector<std::vector<int> > m_verFilterCoeff;
+  std::vector<std::vector<int> > m_horFilterCoeff;
 };
 
 class SEIMasteringDisplayColourVolume : public SEI
@@ -503,7 +503,7 @@ SEIMessages getSeisByType(SEIMessages &seiList, SEI::PayloadType seiType);
 SEIMessages extractSeisByType(SEIMessages &seiList, SEI::PayloadType seiType);
 
 /// delete list of SEI messages (freeing the referenced objects)
-Void deleteSEIs (SEIMessages &seiList);
+void deleteSEIs (SEIMessages &seiList);
 
 class SEIScalableNesting : public SEI
 {
@@ -517,17 +517,17 @@ public:
     deleteSEIs(m_nestedSEIs);
   }
 
-  Bool  m_bitStreamSubsetFlag;
-  Bool  m_nestingOpFlag;
-  Bool  m_defaultOpFlag;                             //value valid if m_nestingOpFlag != 0
-  UInt  m_nestingNumOpsMinus1;                       // -"-
-  UInt  m_nestingMaxTemporalIdPlus1[MAX_TLAYER];     // -"-
-  UInt  m_nestingOpIdx[MAX_NESTING_NUM_OPS];         // -"-
+  bool  m_bitStreamSubsetFlag;
+  bool  m_nestingOpFlag;
+  bool  m_defaultOpFlag;                             //value valid if m_nestingOpFlag != 0
+  uint32_t  m_nestingNumOpsMinus1;                       // -"-
+  uint32_t  m_nestingMaxTemporalIdPlus1[MAX_TLAYER];     // -"-
+  uint32_t  m_nestingOpIdx[MAX_NESTING_NUM_OPS];         // -"-
 
-  Bool  m_allLayersFlag;                             //value valid if m_nestingOpFlag == 0
-  UInt  m_nestingNoOpMaxTemporalIdPlus1;             //value valid if m_nestingOpFlag == 0 and m_allLayersFlag == 0
-  UInt  m_nestingNumLayersMinus1;                    //value valid if m_nestingOpFlag == 0 and m_allLayersFlag == 0
-  UChar m_nestingLayerId[MAX_NESTING_NUM_LAYER];     //value valid if m_nestingOpFlag == 0 and m_allLayersFlag == 0. This can e.g. be a static array of 64 UChar values
+  bool  m_allLayersFlag;                             //value valid if m_nestingOpFlag == 0
+  uint32_t  m_nestingNoOpMaxTemporalIdPlus1;             //value valid if m_nestingOpFlag == 0 and m_allLayersFlag == 0
+  uint32_t  m_nestingNumLayersMinus1;                    //value valid if m_nestingOpFlag == 0 and m_allLayersFlag == 0
+  uint8_t m_nestingLayerId[MAX_NESTING_NUM_LAYER];     //value valid if m_nestingOpFlag == 0 and m_allLayersFlag == 0. This can e.g. be a static array of 64 uint8_t values
 
   SEIMessages m_nestedSEIs;
 };
@@ -539,7 +539,7 @@ public:
   SEITimeCode() {}
   virtual ~SEITimeCode(){}
 
-  UInt numClockTs;
+  uint32_t numClockTs;
   SEITimeSet timeSetArray[MAX_TIMECODE_SEI_SETS];
 };
 
@@ -550,34 +550,34 @@ class SEITempMotionConstrainedTileSets: public SEI
   struct TileSetData
   {
     protected:
-      std::vector<Int> m_top_left_tile_index;  //[tileSetIdx][tileIdx];
-      std::vector<Int> m_bottom_right_tile_index;
+      std::vector<int> m_top_left_tile_index;  //[tileSetIdx][tileIdx];
+      std::vector<int> m_bottom_right_tile_index;
 
     public:
-      Int     m_mcts_id;
-      Bool    m_display_tile_set_flag;
-      Int     m_num_tile_rects_in_set; //_minus1;
-      Bool    m_exact_sample_value_match_flag;
-      Bool    m_mcts_tier_level_idc_present_flag;
-      Bool    m_mcts_tier_flag;
-      Int     m_mcts_level_idc;
+      int     m_mcts_id;
+      bool    m_display_tile_set_flag;
+      int     m_num_tile_rects_in_set; //_minus1;
+      bool    m_exact_sample_value_match_flag;
+      bool    m_mcts_tier_level_idc_present_flag;
+      bool    m_mcts_tier_flag;
+      int     m_mcts_level_idc;
 
-      Void setNumberOfTileRects(const Int number)
+      void setNumberOfTileRects(const int number)
       {
         m_top_left_tile_index    .resize(number);
         m_bottom_right_tile_index.resize(number);
       }
 
-      Int  getNumberOfTileRects() const
+      int  getNumberOfTileRects() const
       {
         CHECK(m_top_left_tile_index.size() != m_bottom_right_tile_index.size(), "Inconsistent tile arrangement");
-        return Int(m_top_left_tile_index.size());
+        return int(m_top_left_tile_index.size());
       }
 
-            Int &topLeftTileIndex    (const Int tileRectIndex)       { return m_top_left_tile_index    [tileRectIndex]; }
-            Int &bottomRightTileIndex(const Int tileRectIndex)       { return m_bottom_right_tile_index[tileRectIndex]; }
-      const Int &topLeftTileIndex    (const Int tileRectIndex) const { return m_top_left_tile_index    [tileRectIndex]; }
-      const Int &bottomRightTileIndex(const Int tileRectIndex) const { return m_bottom_right_tile_index[tileRectIndex]; }
+            int &topLeftTileIndex    (const int tileRectIndex)       { return m_top_left_tile_index    [tileRectIndex]; }
+            int &bottomRightTileIndex(const int tileRectIndex)       { return m_bottom_right_tile_index[tileRectIndex]; }
+      const int &topLeftTileIndex    (const int tileRectIndex) const { return m_top_left_tile_index    [tileRectIndex]; }
+      const int &bottomRightTileIndex(const int tileRectIndex) const { return m_bottom_right_tile_index[tileRectIndex]; }
   };
 
 protected:
@@ -585,27 +585,27 @@ protected:
 
 public:
 
-  Bool    m_mc_all_tiles_exact_sample_value_match_flag;
-  Bool    m_each_tile_one_tile_set_flag;
-  Bool    m_limited_tile_set_display_flag;
-  Bool    m_max_mcs_tier_level_idc_present_flag;
-  Bool    m_max_mcts_tier_flag;
-  Int     m_max_mcts_level_idc;
+  bool    m_mc_all_tiles_exact_sample_value_match_flag;
+  bool    m_each_tile_one_tile_set_flag;
+  bool    m_limited_tile_set_display_flag;
+  bool    m_max_mcs_tier_level_idc_present_flag;
+  bool    m_max_mcts_tier_flag;
+  int     m_max_mcts_level_idc;
 
   PayloadType payloadType() const { return TEMP_MOTION_CONSTRAINED_TILE_SETS; }
 
-  Void setNumberOfTileSets(const Int number)       { m_tile_set_data.resize(number);     }
-  Int  getNumberOfTileSets()                 const { return Int(m_tile_set_data.size()); }
+  void setNumberOfTileSets(const int number)       { m_tile_set_data.resize(number);     }
+  int  getNumberOfTileSets()                 const { return int(m_tile_set_data.size()); }
 
-        TileSetData &tileSetData (const Int index)       { return m_tile_set_data[index]; }
-  const TileSetData &tileSetData (const Int index) const { return m_tile_set_data[index]; }
+        TileSetData &tileSetData (const int index)       { return m_tile_set_data[index]; }
+  const TileSetData &tileSetData (const int index) const { return m_tile_set_data[index]; }
 
 };
 #endif
 
 #if ENABLE_TRACING
-Void xTraceSEIHeader();
-Void xTraceSEIMessageType( SEI::PayloadType payloadType );
+void xTraceSEIHeader();
+void xTraceSEIMessageType( SEI::PayloadType payloadType );
 #endif
 
 #if U0033_ALTERNATIVE_TRANSFER_CHARACTERISTICS_SEI
@@ -619,7 +619,7 @@ public:
 
   virtual ~SEIAlternativeTransferCharacteristics() {}
 
-  UInt m_preferredTransferCharacteristics;
+  uint32_t m_preferredTransferCharacteristics;
 };
 #endif
 
@@ -631,9 +631,9 @@ public:
 
     virtual ~SEIGreenMetadataInfo() {}
 
-    UInt m_greenMetadataType;
-    UInt m_xsdMetricType;
-    UInt m_xsdMetricValue;
+    uint32_t m_greenMetadataType;
+    uint32_t m_xsdMetricType;
+    uint32_t m_xsdMetricValue;
 };
 
 #endif

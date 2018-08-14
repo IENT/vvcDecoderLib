@@ -58,8 +58,8 @@ struct OutputNALUnit : public NALUnit
    */
   OutputNALUnit(
     NalUnitType nalUnitType,
-    UInt temporalID = 0,
-    UInt reserved_zero_6bits = 0)
+    uint32_t temporalID = 0,
+    uint32_t reserved_zero_6bits = 0)
   : NALUnit(nalUnitType, temporalID, reserved_zero_6bits)
   , m_Bitstream()
   {}
@@ -74,7 +74,7 @@ struct OutputNALUnit : public NALUnit
   OutputBitstream m_Bitstream;
 };
 
-Void write(std::ostream& out, OutputNALUnit& nalu);
+void write(std::ostream& out, OutputNALUnit& nalu);
 
 inline NALUnitEBSP::NALUnitEBSP(OutputNALUnit& nalu)
   : NALUnit(nalu)

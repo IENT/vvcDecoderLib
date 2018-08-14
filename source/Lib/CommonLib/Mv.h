@@ -227,7 +227,7 @@ public:
     return !( *this == rcMv );
   }
 
-  const Mv scaleMv( Int iScale ) const
+  const Mv scaleMv( int iScale ) const
   {
     const int mvx = Clip3( -32768, 32767, (iScale * getHor() + 127 + (iScale * getHor() < 0)) >> 8 );
     const int mvy = Clip3( -32768, 32767, (iScale * getVer() + 127 + (iScale * getVer() < 0)) >> 8 );

@@ -157,7 +157,7 @@ public:
 #if HM_QTBT_AS_IN_JEM_SYNTAX
   void        transform_unit_qtbt       ( TransformUnit&                tu,     CUCtx&          cuCtx,  ChromaCbfs& chromaCbfs );
 #endif
-  void        cu_qp_delta               ( CodingUnit&                   cu,     int             predQP, SChar& qp );
+  void        cu_qp_delta               ( CodingUnit&                   cu,     int             predQP, int8_t& qp );
   void        cu_chroma_qp_offset       ( CodingUnit&                   cu );
 #if (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT) && !HM_EMT_NSST_AS_IN_JEM
   void        cu_emt_pertu_idx          ( CodingUnit&                   cu );
@@ -198,13 +198,13 @@ private:
   void        alf_filter                ( ALFParam&               alfParam, bool isGALF, bool bChroma = false );
   void        alf_chroma                ( ALFParam& alfParam );
   void        alf_cu_ctrl               ( ALFParam& alfParam );
-  UInt        parseAlfUvlc();
-  Int         parseAlfSvlc();
-  Int         alfGolombDecode(Int k);
+  uint32_t        parseAlfUvlc();
+  int         parseAlfSvlc();
+  int         alfGolombDecode(int k);
 #endif
 
-  Void        xReadTruncBinCode   ( UInt& ruiSymbol, UInt uiMaxSymbol );
-  UInt        xReadEpExGolomb     ( UInt uiCount );
+  void        xReadTruncBinCode   ( uint32_t& ruiSymbol, uint32_t uiMaxSymbol );
+  uint32_t        xReadEpExGolomb     ( uint32_t uiCount );
 
 #endif
 private:

@@ -52,7 +52,7 @@
 
 int main(int argc, char* argv[])
 {
-  Int returnCode = EXIT_SUCCESS;
+  int returnCode = EXIT_SUCCESS;
 
   // print information
   fprintf( stdout, "\n" );
@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
   df::program_options_lite::Options optsSimd;
   optsSimd.addOptions()( "SIMD", SIMD, string( "" ), "" );
   df::program_options_lite::SilentReporter err;
-  df::program_options_lite::scanArgv( optsSimd, argc, ( const TChar** ) argv, err );
+  df::program_options_lite::scanArgv( optsSimd, argc, ( const char** ) argv, err );
   fprintf( stdout, "[SIMD=%s] ", read_x86_extension( SIMD ) );
 #endif
 #if ENABLE_TRACING
@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
   }
 
   // starting time
-  Double dResult;
+  double dResult;
   clock_t lBefore = clock();
 
   // call decoding function
@@ -114,7 +114,7 @@ int main(int argc, char* argv[])
 #endif
 
   // ending time
-  dResult = (Double)(clock()-lBefore) / CLOCKS_PER_SEC;
+  dResult = (double)(clock()-lBefore) / CLOCKS_PER_SEC;
   printf("\n Total Time: %12.3f sec.\n", dResult);
 
   delete pcDecApp;

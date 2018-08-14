@@ -41,9 +41,9 @@
 
 #include <math.h>
 
-static Distortion xCalcHADs2x2w( const WPScalingParam &wpCur, const Pel *piOrg, const Pel *piCurr, Int iStrideOrg, Int iStrideCur, Int iStep );
-static Distortion xCalcHADs4x4w( const WPScalingParam &wpCur, const Pel *piOrg, const Pel *piCurr, Int iStrideOrg, Int iStrideCur, Int iStep );
-static Distortion xCalcHADs8x8w( const WPScalingParam &wpCur, const Pel *piOrg, const Pel *piCurr, Int iStrideOrg, Int iStrideCur, Int iStep );
+static Distortion xCalcHADs2x2w( const WPScalingParam &wpCur, const Pel *piOrg, const Pel *piCurr, int iStrideOrg, int iStrideCur, int iStep );
+static Distortion xCalcHADs4x4w( const WPScalingParam &wpCur, const Pel *piOrg, const Pel *piCurr, int iStrideOrg, int iStrideCur, int iStep );
+static Distortion xCalcHADs8x8w( const WPScalingParam &wpCur, const Pel *piOrg, const Pel *piCurr, int iStrideOrg, int iStrideCur, int iStep );
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -57,31 +57,31 @@ Distortion RdCostWeightPrediction::xGetSADw( const DistParam &rcDtParam )
 {
   const Pel            *piOrg      = rcDtParam.org.buf;
   const Pel            *piCur      = rcDtParam.cur.buf;
-  const Int             iCols      = rcDtParam.org.width;
-  const Int             iStrideCur = rcDtParam.cur.stride;
-  const Int             iStrideOrg = rcDtParam.org.stride;
+  const int             iCols      = rcDtParam.org.width;
+  const int             iStrideCur = rcDtParam.cur.stride;
+  const int             iStrideOrg = rcDtParam.org.stride;
   const ComponentID     compID     = rcDtParam.compID;
 
   CHECK( compID >= MAX_NUM_COMPONENT, "Invalid component" );
 
   const WPScalingParam &wpCur      = rcDtParam.wpCur[compID];
 
-  const Int             w0         = wpCur.w;
-  const Int             offset     = wpCur.offset;
-  const Int             shift      = wpCur.shift;
-  const Int             round      = wpCur.round;
+  const int             w0         = wpCur.w;
+  const int             offset     = wpCur.offset;
+  const int             shift      = wpCur.shift;
+  const int             round      = wpCur.round;
 #if DISTORTION_LAMBDA_BUGFIX
-  const Int distortionShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth);
+  const int distortionShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth);
 #else
-  const Int distortionShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth - 8);
+  const int distortionShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth - 8);
 #endif
 
   Distortion uiSum = 0;
 
 #if !U0040_MODIFIED_WEIGHTEDPREDICTION_WITH_BIPRED_AND_CLIPPING
-  for(Int iRows = rcDtParam.org.height; iRows != 0; iRows-- )
+  for(int iRows = rcDtParam.org.height; iRows != 0; iRows-- )
   {
-    for (Int n = 0; n < iCols; n++ )
+    for (int n = 0; n < iCols; n++ )
     {
       const Pel pred = ( (w0*piCur[n] + round) >> shift ) + offset ;
 
@@ -107,9 +107,9 @@ Distortion RdCostWeightPrediction::xGetSADw( const DistParam &rcDtParam )
     // no offset
     if (offset == 0)
     {
-      for(Int iRows = rcDtParam.org.height; iRows != 0; iRows-- )
+      for(int iRows = rcDtParam.org.height; iRows != 0; iRows-- )
       {
-        for (Int n = 0; n < iCols; n++ )
+        for (int n = 0; n < iCols; n++ )
         {
           uiSum += abs( piOrg[n] - piCur[n] );
         }
@@ -128,9 +128,9 @@ Distortion RdCostWeightPrediction::xGetSADw( const DistParam &rcDtParam )
       // method, which is faster but introduces the clipping issue (therefore Bipred is suboptimal).
       if (rcDtParam.isBiPred)
       {
-        for(Int iRows = rcDtParam.org.height; iRows != 0; iRows-- )
+        for(int iRows = rcDtParam.org.height; iRows != 0; iRows-- )
         {
-          for (Int n = 0; n < iCols; n++ )
+          for (int n = 0; n < iCols; n++ )
           {
             uiSum += abs( piOrg[n] - (piCur[n] + offset) );
           }
@@ -145,9 +145,9 @@ Distortion RdCostWeightPrediction::xGetSADw( const DistParam &rcDtParam )
       }
       else
       {
-        for(Int iRows = rcDtParam.org.height; iRows != 0; iRows-- )
+        for(int iRows = rcDtParam.org.height; iRows != 0; iRows-- )
         {
-          for (Int n = 0; n < iCols; n++ )
+          for (int n = 0; n < iCols; n++ )
           {
             const Pel pred = ClipPel( piCur[n] + offset, clpRng);
 
@@ -170,9 +170,9 @@ Distortion RdCostWeightPrediction::xGetSADw( const DistParam &rcDtParam )
     // method, which is faster but introduces the clipping issue (therefore Bipred is suboptimal).
     if (rcDtParam.isBiPred)
     {
-      for(Int iRows = rcDtParam.org.height; iRows != 0; iRows-- )
+      for(int iRows = rcDtParam.org.height; iRows != 0; iRows-- )
       {
-        for (Int n = 0; n < iCols; n++ )
+        for (int n = 0; n < iCols; n++ )
         {
           const Pel pred = ( (w0*piCur[n] + round) >> shift ) + offset ;
           uiSum += abs( piOrg[n] - pred );
@@ -190,9 +190,9 @@ Distortion RdCostWeightPrediction::xGetSADw( const DistParam &rcDtParam )
     {
       if (offset == 0)
       {
-        for(Int iRows = rcDtParam.org.height; iRows != 0; iRows-- )
+        for(int iRows = rcDtParam.org.height; iRows != 0; iRows-- )
         {
-          for (Int n = 0; n < iCols; n++ )
+          for (int n = 0; n < iCols; n++ )
           {
             const Pel pred = ClipPel( (w0*piCur[n] + round) >> shift, clpRng);
 
@@ -208,9 +208,9 @@ Distortion RdCostWeightPrediction::xGetSADw( const DistParam &rcDtParam )
       }
       else
       {
-        for(Int iRows = rcDtParam.org.height; iRows != 0; iRows-- )
+        for(int iRows = rcDtParam.org.height; iRows != 0; iRows-- )
         {
-          for (Int n = 0; n < iCols; n++ )
+          for (int n = 0; n < iCols; n++ )
           {
             const Pel pred = ClipPel(((w0*piCur[n] + round) >> shift ) + offset,  clpRng) ;
 
@@ -244,31 +244,31 @@ Distortion RdCostWeightPrediction::xGetSSEw( const DistParam &rcDtParam )
 {
   const Pel            *piOrg      = rcDtParam.org.buf;
   const Pel            *piCur      = rcDtParam.cur.buf;
-  const Int             iCols      = rcDtParam.org.width;
-  const Int             iStrideCur = rcDtParam.cur.stride;
-  const Int             iStrideOrg = rcDtParam.org.stride;
+  const int             iCols      = rcDtParam.org.width;
+  const int             iStrideCur = rcDtParam.cur.stride;
+  const int             iStrideOrg = rcDtParam.org.stride;
   const ComponentID     compID     = rcDtParam.compID;
 
   CHECK( rcDtParam.subShift != 0, "Subshift not supported" ); // NOTE: what is this protecting?
   CHECK( compID >= MAX_NUM_COMPONENT, "Invalid channel" );
 
   const WPScalingParam &wpCur           = rcDtParam.wpCur[compID];
-  const Int             w0              = wpCur.w;
-  const Int             offset          = wpCur.offset;
-  const Int             shift           = wpCur.shift;
-  const Int             round           = wpCur.round;
+  const int             w0              = wpCur.w;
+  const int             offset          = wpCur.offset;
+  const int             shift           = wpCur.shift;
+  const int             round           = wpCur.round;
 #if DISTORTION_LAMBDA_BUGFIX
-  const UInt distortionShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
+  const uint32_t distortionShift = DISTORTION_PRECISION_ADJUSTMENT(rcDtParam.bitDepth) << 1;
 #else
-  const UInt            distortionShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth-8) << 1);
+  const uint32_t            distortionShift = DISTORTION_PRECISION_ADJUSTMENT((rcDtParam.bitDepth-8) << 1);
 #endif
 
   Distortion sum = 0;
 
 #if !U0040_MODIFIED_WEIGHTEDPREDICTION_WITH_BIPRED_AND_CLIPPING
-  for(Int iRows = rcDtParam.org.height ; iRows != 0; iRows-- )
+  for(int iRows = rcDtParam.org.height ; iRows != 0; iRows-- )
   {
-    for (Int n = 0; n < iCols; n++ )
+    for (int n = 0; n < iCols; n++ )
     {
       const Pel pred     = ( (w0*piCur[n] + round) >> shift ) + offset ;
       const Pel residual = piOrg[n] - pred;
@@ -282,9 +282,9 @@ Distortion RdCostWeightPrediction::xGetSSEw( const DistParam &rcDtParam )
 #else
   if (rcDtParam.isBiPred)
   {
-    for(Int iRows = rcDtParam.org.height ; iRows != 0; iRows-- )
+    for(int iRows = rcDtParam.org.height ; iRows != 0; iRows-- )
     {
-      for (Int n = 0; n < iCols; n++ )
+      for (int n = 0; n < iCols; n++ )
       {
         const Pel pred     = ( (w0*piCur[n] + round) >> shift ) + offset ;
         const Pel residual = piOrg[n] - pred;
@@ -300,9 +300,9 @@ Distortion RdCostWeightPrediction::xGetSSEw( const DistParam &rcDtParam )
     clpRng.min = 0;
     clpRng.max = (1 << rcDtParam.bitDepth) - 1;
 
-    for(Int iRows = rcDtParam.org.height; iRows != 0; iRows-- )
+    for(int iRows = rcDtParam.org.height; iRows != 0; iRows-- )
     {
-      for (Int n = 0; n < iCols; n++ )
+      for (int n = 0; n < iCols; n++ )
       {
         const Pel pred     = ClipPel(( (w0*piCur[n] + round) >> shift ) + offset, clpRng) ;
         const Pel residual = piOrg[n] - pred;
@@ -324,12 +324,12 @@ Distortion RdCostWeightPrediction::xGetSSEw( const DistParam &rcDtParam )
 // HADAMARD with step (used in fractional search)
 // --------------------------------------------------------------------------------------------------------------------
 //! get weighted Hadamard cost for 2x2 block
-Distortion xCalcHADs2x2w( const WPScalingParam &wpCur, const Pel *piOrg, const Pel *piCur, Int iStrideOrg, Int iStrideCur, Int iStep )
+Distortion xCalcHADs2x2w( const WPScalingParam &wpCur, const Pel *piOrg, const Pel *piCur, int iStrideOrg, int iStrideCur, int iStep )
 {
-  const Int round  = wpCur.round;
-  const Int shift  = wpCur.shift;
-  const Int offset = wpCur.offset;
-  const Int w0     = wpCur.w;
+  const int round  = wpCur.round;
+  const int shift  = wpCur.shift;
+  const int offset = wpCur.offset;
+  const int w0     = wpCur.w;
 
   Distortion satd  = 0;
   TCoeff     diff[4];
@@ -361,12 +361,12 @@ Distortion xCalcHADs2x2w( const WPScalingParam &wpCur, const Pel *piOrg, const P
 
 
 //! get weighted Hadamard cost for 4x4 block
-Distortion xCalcHADs4x4w( const WPScalingParam &wpCur, const Pel *piOrg, const Pel *piCur, Int iStrideOrg, Int iStrideCur, Int iStep )
+Distortion xCalcHADs4x4w( const WPScalingParam &wpCur, const Pel *piOrg, const Pel *piCur, int iStrideOrg, int iStrideCur, int iStep )
 {
-  const Int round  = wpCur.round;
-  const Int shift  = wpCur.shift;
-  const Int offset = wpCur.offset;
-  const Int w0     = wpCur.w;
+  const int round  = wpCur.round;
+  const int shift  = wpCur.shift;
+  const int offset = wpCur.offset;
+  const int w0     = wpCur.w;
 
   Distortion satd = 0;
   TCoeff     diff[16];
@@ -374,7 +374,7 @@ Distortion xCalcHADs4x4w( const WPScalingParam &wpCur, const Pel *piOrg, const P
   TCoeff     d[16];
 
 
-  for(Int k = 0; k < 16; k+=4 )
+  for(int k = 0; k < 16; k+=4 )
   {
     Pel pred;
     pred      = ( (w0*piCur[0*iStep] + round) >> shift ) + offset ;
@@ -459,7 +459,7 @@ Distortion xCalcHADs4x4w( const WPScalingParam &wpCur, const Pel *piOrg, const P
   d[14] = m[14] + m[15];
   d[15] = m[15] - m[14];
 
-  for (Int k=0; k<16; ++k)
+  for (int k=0; k<16; ++k)
   {
     satd += abs(d[k]);
   }
@@ -470,24 +470,24 @@ Distortion xCalcHADs4x4w( const WPScalingParam &wpCur, const Pel *piOrg, const P
 
 
 //! get weighted Hadamard cost for 8x8 block
-Distortion xCalcHADs8x8w( const WPScalingParam &wpCur, const Pel *piOrg, const Pel *piCur, Int iStrideOrg, Int iStrideCur, Int iStep )
+Distortion xCalcHADs8x8w( const WPScalingParam &wpCur, const Pel *piOrg, const Pel *piCur, int iStrideOrg, int iStrideCur, int iStep )
 {
   Distortion sad=0;
   TCoeff diff[64], m1[8][8], m2[8][8], m3[8][8];
-  Int iStep2 = iStep<<1;
-  Int iStep3 = iStep2 + iStep;
-  Int iStep4 = iStep3 + iStep;
-  Int iStep5 = iStep4 + iStep;
-  Int iStep6 = iStep5 + iStep;
-  Int iStep7 = iStep6 + iStep;
-  const Int round  = wpCur.round;
-  const Int shift  = wpCur.shift;
-  const Int offset = wpCur.offset;
-  const Int w0     = wpCur.w;
+  int iStep2 = iStep<<1;
+  int iStep3 = iStep2 + iStep;
+  int iStep4 = iStep3 + iStep;
+  int iStep5 = iStep4 + iStep;
+  int iStep6 = iStep5 + iStep;
+  int iStep7 = iStep6 + iStep;
+  const int round  = wpCur.round;
+  const int shift  = wpCur.shift;
+  const int offset = wpCur.offset;
+  const int w0     = wpCur.w;
 
   Pel   pred;
 
-  for(Int k = 0; k < 64; k+=8 )
+  for(int k = 0; k < 64; k+=8 )
   {
     pred      = ( (w0*piCur[     0] + round) >> shift ) + offset ;
     diff[k+0] = piOrg[0] - pred;
@@ -511,9 +511,9 @@ Distortion xCalcHADs8x8w( const WPScalingParam &wpCur, const Pel *piOrg, const P
   }
 
   //horizontal
-  for (Int j=0; j < 8; j++)
+  for (int j=0; j < 8; j++)
   {
-    const Int jj = j << 3;
+    const int jj = j << 3;
     m2[j][0] = diff[jj  ] + diff[jj+4];
     m2[j][1] = diff[jj+1] + diff[jj+5];
     m2[j][2] = diff[jj+2] + diff[jj+6];
@@ -543,7 +543,7 @@ Distortion xCalcHADs8x8w( const WPScalingParam &wpCur, const Pel *piOrg, const P
   }
 
   //vertical
-  for (Int i=0; i < 8; i++)
+  for (int i=0; i < 8; i++)
   {
     m3[0][i] = m2[0][i] + m2[4][i];
     m3[1][i] = m2[1][i] + m2[5][i];
@@ -573,9 +573,9 @@ Distortion xCalcHADs8x8w( const WPScalingParam &wpCur, const Pel *piOrg, const P
     m2[7][i] = m1[6][i] - m1[7][i];
   }
 
-  for (Int j=0; j < 8; j++)
+  for (int j=0; j < 8; j++)
   {
-    for (Int i=0; i < 8; i++)
+    for (int i=0; i < 8; i++)
     {
       sad += (abs(m2[j][i]));
     }
@@ -592,11 +592,11 @@ Distortion RdCostWeightPrediction::xGetHADsw( const DistParam &rcDtParam )
 {
   const Pel        *piOrg      = rcDtParam.org.buf;
   const Pel        *piCur      = rcDtParam.cur.buf;
-  const Int         iRows      = rcDtParam.org.height;
-  const Int         iCols      = rcDtParam.org.width;
-  const Int         iStrideCur = rcDtParam.cur.stride;
-  const Int         iStrideOrg = rcDtParam.org.stride;
-  const Int         iStep      = rcDtParam.step;
+  const int         iRows      = rcDtParam.org.height;
+  const int         iCols      = rcDtParam.org.width;
+  const int         iStrideCur = rcDtParam.cur.stride;
+  const int         iStrideOrg = rcDtParam.org.stride;
+  const int         iStep      = rcDtParam.step;
   const ComponentID compIdx    = rcDtParam.compID;
   CHECK(compIdx>=MAX_NUM_COMPONENT, "Invalid component");
   const WPScalingParam &wpCur  = rcDtParam.wpCur[compIdx];
@@ -606,11 +606,11 @@ Distortion RdCostWeightPrediction::xGetHADsw( const DistParam &rcDtParam )
 
   if( ( iRows % 8 == 0) && (iCols % 8 == 0) )
   {
-    const Int iOffsetOrg = iStrideOrg<<3;
-    const Int iOffsetCur = iStrideCur<<3;
-    for (Int y=0; y<iRows; y+= 8 )
+    const int iOffsetOrg = iStrideOrg<<3;
+    const int iOffsetCur = iStrideCur<<3;
+    for (int y=0; y<iRows; y+= 8 )
     {
-      for (Int x=0; x<iCols; x+= 8 )
+      for (int x=0; x<iCols; x+= 8 )
       {
         uiSum += xCalcHADs8x8w( wpCur, &piOrg[x], &piCur[x*iStep], iStrideOrg, iStrideCur, iStep );
       }
@@ -620,12 +620,12 @@ Distortion RdCostWeightPrediction::xGetHADsw( const DistParam &rcDtParam )
   }
   else if( ( iRows % 4 == 0) && (iCols % 4 == 0) )
   {
-    const Int iOffsetOrg = iStrideOrg<<2;
-    const Int iOffsetCur = iStrideCur<<2;
+    const int iOffsetOrg = iStrideOrg<<2;
+    const int iOffsetCur = iStrideCur<<2;
 
-    for (Int y=0; y<iRows; y+= 4 )
+    for (int y=0; y<iRows; y+= 4 )
     {
-      for (Int x=0; x<iCols; x+= 4 )
+      for (int x=0; x<iCols; x+= 4 )
       {
         uiSum += xCalcHADs4x4w( wpCur, &piOrg[x], &piCur[x*iStep], iStrideOrg, iStrideCur, iStep );
       }
@@ -635,9 +635,9 @@ Distortion RdCostWeightPrediction::xGetHADsw( const DistParam &rcDtParam )
   }
   else
   {
-    for (Int y=0; y<iRows; y+=2 )
+    for (int y=0; y<iRows; y+=2 )
     {
-      for (Int x=0; x<iCols; x+=2 )
+      for (int x=0; x<iCols; x+=2 )
       {
         uiSum += xCalcHADs2x2w( wpCur, &piOrg[x], &piCur[x*iStep], iStrideOrg, iStrideCur, iStep );
       }

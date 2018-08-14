@@ -181,7 +181,7 @@ public:
 
 #if JVET_K0357_AMVR
   // mvd coding (clause 7.3.8.9)
-  void        mvd_coding                ( const Mv &rMvd, UChar imv );
+  void        mvd_coding                ( const Mv &rMvd, uint8_t imv );
 #else
   void        mvd_coding                ( const Mv &rMvd );
 #endif
@@ -191,7 +191,7 @@ public:
 #if HM_QTBT_AS_IN_JEM_SYNTAX
   void        transform_unit_qtbt       ( const TransformUnit&          tu,       CUCtx&            cuCtx,  ChromaCbfs& chromaCbfs );
 #endif
-  void        cu_qp_delta               ( const CodingUnit&             cu,       int               predQP, const SChar qp );
+  void        cu_qp_delta               ( const CodingUnit&             cu,       int               predQP, const int8_t qp );
   void        cu_chroma_qp_offset       ( const CodingUnit&             cu );
 #if (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT) && !HM_EMT_NSST_AS_IN_JEM
   void        cu_emt_pertu_idx          ( const CodingUnit&             cu );
@@ -219,9 +219,9 @@ public:
   void        cross_comp_pred           ( const TransformUnit&          tu,       ComponentID       compID );
 
 #if JVET_K0371_ALF
-  Void        codeAlfCtuEnableFlags     ( CodingStructure& cs, ChannelType channel, AlfSliceParam* alfParam);
-  Void        codeAlfCtuEnableFlags     ( CodingStructure& cs, ComponentID compID, AlfSliceParam* alfParam);
-  Void        codeAlfCtuEnableFlag      ( CodingStructure& cs, UInt ctuRsAddr, const Int compIdx, AlfSliceParam* alfParam = NULL );
+  void        codeAlfCtuEnableFlags     ( CodingStructure& cs, ChannelType channel, AlfSliceParam* alfParam);
+  void        codeAlfCtuEnableFlags     ( CodingStructure& cs, ComponentID compID, AlfSliceParam* alfParam);
+  void        codeAlfCtuEnableFlag      ( CodingStructure& cs, uint32_t ctuRsAddr, const int compIdx, AlfSliceParam* alfParam = NULL );
 #endif
 
 private:
@@ -236,9 +236,9 @@ private:
   void        alf_filter                ( const ALFParam&               alfParam, bool isGALF, bool bChroma = false );
   void        alf_cu_ctrl               ( const ALFParam&               alfParam );
   void        alf_chroma                ( const ALFParam&               alfParam );
-  Int         alf_lengthGolomb          ( int coeffVal, int k );
-  void        codeAlfUvlc               ( UInt uiCode );
-  void        codeAlfSvlc               ( Int iCode );
+  int         alf_lengthGolomb          ( int coeffVal, int k );
+  void        codeAlfUvlc               ( uint32_t uiCode );
+  void        codeAlfSvlc               ( int iCode );
   void        alfGolombEncode           ( int coeff, int k );
 
 #endif
@@ -246,9 +246,9 @@ private:
   unsigned    get_num_written_bits()    { return m_BinEncoder.getNumWrittenBits(); }
 
 #if JEM_TOOLS
-  Void  xWriteTruncBinCode(UInt uiSymbol, UInt uiMaxSymbol);
+  void  xWriteTruncBinCode(uint32_t uiSymbol, uint32_t uiMaxSymbol);
 #if JVET_C0038_NO_PREV_FILTERS
-  Void  xWriteEpExGolomb(UInt uiSymbol, UInt uiCount);
+  void  xWriteEpExGolomb(uint32_t uiSymbol, uint32_t uiCount);
 #endif
 
 #endif

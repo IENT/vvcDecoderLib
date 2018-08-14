@@ -64,9 +64,9 @@
 // Class definition
 // ====================================================================================================================
 
-static const UInt MAX_NUM_REF_LIST_ADAPT_SR = 2;
-static const UInt MAX_IDX_ADAPT_SR          = 33;
-static const UInt NUM_MV_PREDICTORS         = 3;
+static const uint32_t MAX_NUM_REF_LIST_ADAPT_SR = 2;
+static const uint32_t MAX_IDX_ADAPT_SR          = 33;
+static const uint32_t NUM_MV_PREDICTORS         = 3;
 
 class EncModeCtrl;
 
@@ -87,8 +87,8 @@ private:
   Pel*            m_tmpAffiError;
   int*            m_tmpAffiDeri[2];
 #else
-  Int*            m_tmpAffiError;
-  Double*         m_tmpAffiDeri[2];
+  int*            m_tmpAffiError;
+  double*         m_tmpAffiDeri[2];
 #endif
 
   CodingStructure ****m_pSplitCS;
@@ -115,10 +115,10 @@ protected:
 
 #endif
   // ME parameters
-  Int             m_iSearchRange;
-  Int             m_bipredSearchRange; // Search range for bi-prediction
+  int             m_iSearchRange;
+  int             m_bipredSearchRange; // Search range for bi-prediction
   MESearchMethod  m_motionEstimationSearchMethod;
-  Int             m_aaiAdaptSR                  [MAX_NUM_REF_LIST_ADAPT_SR][MAX_IDX_ADAPT_SR];
+  int             m_aaiAdaptSR                  [MAX_NUM_REF_LIST_ADAPT_SR][MAX_IDX_ADAPT_SR];
 
   // RD computation
   CABACWriter*    m_CABACEstimator;
@@ -129,11 +129,11 @@ protected:
   Pel            *m_pTempPel;
 
   // AMVP cost computation
-  UInt            m_auiMVPIdxCost               [AMVP_MAX_NUM_CANDS+1][AMVP_MAX_NUM_CANDS+1]; //th array bounds
+  uint32_t            m_auiMVPIdxCost               [AMVP_MAX_NUM_CANDS+1][AMVP_MAX_NUM_CANDS+1]; //th array bounds
 
   Mv              m_integerMv2Nx2N              [NUM_REF_PIC_LIST_01][MAX_NUM_REF];
 
-  Bool            m_isInitialized;
+  bool            m_isInitialized;
 
 #if JEM_TOOLS
   MotionInfo      m_SubPuFrucBuf                [( MAX_CU_SIZE * MAX_CU_SIZE ) >> ( MIN_CU_LOG2 << 1 )];
@@ -143,42 +143,42 @@ public:
   InterSearch();
   virtual ~InterSearch();
 
-  Void init                         ( EncCfg*        pcEncCfg,
+  void init                         ( EncCfg*        pcEncCfg,
                                       TrQuant*       pcTrQuant,
 #if JEM_TOOLS
                                       BilateralFilter*
                                                      bilateralFilter,
 #endif
-                                      Int            iSearchRange,
-                                      Int            bipredSearchRange,
+                                      int            iSearchRange,
+                                      int            bipredSearchRange,
                                       MESearchMethod motionEstimationSearchMethod,
-                                      const UInt     maxCUWidth,
-                                      const UInt     maxCUHeight,
-                                      const UInt     maxTotalCUDepth,
+                                      const uint32_t     maxCUWidth,
+                                      const uint32_t     maxCUHeight,
+                                      const uint32_t     maxTotalCUDepth,
                                       RdCost*        pcRdCost,
                                       CABACWriter*   CABACEstimator,
                                       CtxCache*      ctxCache
                                     );
 
-  Void destroy                      ();
+  void destroy                      ();
 
-  Void setTempBuffers               (CodingStructure ****pSlitCS, CodingStructure ****pFullCS, CodingStructure **pSaveCS );
+  void setTempBuffers               (CodingStructure ****pSlitCS, CodingStructure ****pFullCS, CodingStructure **pSaveCS );
 
 #if ENABLE_SPLIT_PARALLELISM
-  Void copyState                    ( const InterSearch& other );
+  void copyState                    ( const InterSearch& other );
 #endif
 
 protected:
 
   /// sub-function for motion vector refinement used in fractional-pel accuracy
-  Distortion  xPatternRefinement    ( const CPelBuf* pcPatternKey, Mv baseRefMv, Int iFrac, Mv& rcMvFrac, Bool bAllowUseOfHadamard );
+  Distortion  xPatternRefinement    ( const CPelBuf* pcPatternKey, Mv baseRefMv, int iFrac, Mv& rcMvFrac, bool bAllowUseOfHadamard );
 
    typedef struct
    {
-     Int left;
-     Int right;
-     Int top;
-     Int bottom;
+     int left;
+     int right;
+     int top;
+     int bottom;
    }SearchRange;
 
   typedef struct
@@ -186,24 +186,24 @@ protected:
     SearchRange searchRange;
     const CPelBuf* pcPatternKey;
     const Pel*  piRefY;
-    Int         iRefStride;
-    Int         iBestX;
-    Int         iBestY;
-    UInt        uiBestRound;
-    UInt        uiBestDistance;
+    int         iRefStride;
+    int         iBestX;
+    int         iBestY;
+    uint32_t        uiBestRound;
+    uint32_t        uiBestDistance;
     Distortion  uiBestSad;
-    UChar       ucPointNr;
-    Int         subShiftMode;
+    uint8_t       ucPointNr;
+    int         subShiftMode;
 #if JVET_K0357_AMVR
     unsigned    imvShift;
 #endif
   } IntTZSearchStruct;
 
   // sub-functions for ME
-  inline Void xTZSearchHelp         ( IntTZSearchStruct& rcStruct, const Int iSearchX, const Int iSearchY, const UChar ucPointNr, const UInt uiDistance );
-  inline Void xTZ2PointSearch       ( IntTZSearchStruct& rcStruct );
-  inline Void xTZ8PointSquareSearch ( IntTZSearchStruct& rcStruct, const Int iStartX, const Int iStartY, const Int iDist );
-  inline Void xTZ8PointDiamondSearch( IntTZSearchStruct& rcStruct, const Int iStartX, const Int iStartY, const Int iDist, const Bool bCheckCornersAtDist1 );
+  inline void xTZSearchHelp         ( IntTZSearchStruct& rcStruct, const int iSearchX, const int iSearchY, const uint8_t ucPointNr, const uint32_t uiDistance );
+  inline void xTZ2PointSearch       ( IntTZSearchStruct& rcStruct );
+  inline void xTZ8PointSquareSearch ( IntTZSearchStruct& rcStruct, const int iStartX, const int iStartY, const int iDist );
+  inline void xTZ8PointDiamondSearch( IntTZSearchStruct& rcStruct, const int iStartX, const int iStartY, const int iDist, const bool bCheckCornersAtDist1 );
 
   Distortion xGetInterPredictionError( PredictionUnit& pu, PelUnitBuf& origBuf, const RefPicList &eRefPicList = REF_PIC_LIST_X );
 
@@ -212,10 +212,10 @@ public:
 
   void setModeCtrl( EncModeCtrl *modeCtrl ) { m_modeCtrl = modeCtrl;}
 
-  Void predInterSearch(CodingUnit& cu, Partitioner& partitioner );
+  void predInterSearch(CodingUnit& cu, Partitioner& partitioner );
 
   /// set ME search range
-  Void setAdaptiveSearchRange       ( Int iDir, Int iRefIdx, Int iSearchRange) { CHECK(iDir >= MAX_NUM_REF_LIST_ADAPT_SR || iRefIdx>=Int(MAX_IDX_ADAPT_SR), "Invalid index"); m_aaiAdaptSR[iDir][iRefIdx] = iSearchRange; }
+  void setAdaptiveSearchRange       ( int iDir, int iRefIdx, int iSearchRange) { CHECK(iDir >= MAX_NUM_REF_LIST_ADAPT_SR || iRefIdx>=int(MAX_IDX_ADAPT_SR), "Invalid index"); m_aaiAdaptSR[iDir][iRefIdx] = iSearchRange; }
 
 
 protected:
@@ -224,26 +224,26 @@ protected:
   // Inter search (AMP)
   // -------------------------------------------------------------------------------------------------------------------
 
-  Void xEstimateMvPredAMVP        ( PredictionUnit&       pu,
+  void xEstimateMvPredAMVP        ( PredictionUnit&       pu,
                                     PelUnitBuf&           origBuf,
                                     RefPicList            eRefPicList,
-                                    Int                   iRefIdx,
+                                    int                   iRefIdx,
                                     Mv&                   rcMvPred,
                                     AMVPInfo&             amvpInfo,
-                                    Bool                  bFilled = false,
+                                    bool                  bFilled = false,
                                     Distortion*           puiDistBiP = NULL
                                   );
 
-  Void xCheckBestMVP              ( RefPicList  eRefPicList,
+  void xCheckBestMVP              ( RefPicList  eRefPicList,
                                     Mv          cMv,
                                     Mv&         rcMvPred,
-                                    Int&        riMVPIdx,
+                                    int&        riMVPIdx,
                                     AMVPInfo&   amvpInfo,
-                                    UInt&       ruiBits,
+                                    uint32_t&       ruiBits,
                                     Distortion& ruiCost
 #if JVET_K0357_AMVR
                                     ,
-                                    const UChar  imv
+                                    const uint8_t  imv
 #endif
                                   );
 
@@ -251,30 +251,30 @@ protected:
                                     PelUnitBuf&           origBuf,
                                     PelUnitBuf&           predBuf,
                                     Mv                    cMvCand,
-                                    Int                   iMVPIdx,
-                                    Int                   iMVPNum,
+                                    int                   iMVPIdx,
+                                    int                   iMVPNum,
                                     RefPicList            eRefPicList,
-                                    Int                   iRefIdx
+                                    int                   iRefIdx
                                   );
 
 
-  Void xCopyAMVPInfo              ( AMVPInfo*   pSrc, AMVPInfo* pDst );
-  UInt xGetMvpIdxBits             ( Int iIdx, Int iNum );
-  Void xGetBlkBits                ( PartSize  eCUMode, Bool bPSlice, Int iPartIdx,  UInt uiLastMode, UInt uiBlkBit[3]);
+  void xCopyAMVPInfo              ( AMVPInfo*   pSrc, AMVPInfo* pDst );
+  uint32_t xGetMvpIdxBits             ( int iIdx, int iNum );
+  void xGetBlkBits                ( PartSize  eCUMode, bool bPSlice, int iPartIdx,  uint32_t uiLastMode, uint32_t uiBlkBit[3]);
 
-  Void xMergeEstimation           ( PredictionUnit&       pu,
+  void xMergeEstimation           ( PredictionUnit&       pu,
                                     PelUnitBuf&           origBuf,
-                                    Int                   iPartIdx,
-                                    UInt&                 uiMergeIndex,
+                                    int                   iPartIdx,
+                                    uint32_t&                 uiMergeIndex,
                                     Distortion&           ruiCost,
                                     MergeCtx &            mergeCtx
                                   );
 
 #if JEM_TOOLS
-  Void xFRUCMrgEstimation         ( PredictionUnit&       pu,
+  void xFRUCMrgEstimation         ( PredictionUnit&       pu,
                                     PelUnitBuf&           origBuf,
                                     Distortion&           ruiMinCost,
-                                    UChar&                ruhFRUCMode,
+                                    uint8_t&                ruhFRUCMode,
                                     MergeCtx&             mrgCtx
                                   );
 #endif
@@ -284,67 +284,67 @@ protected:
   // motion estimation
   // -------------------------------------------------------------------------------------------------------------------
 
-  Void xMotionEstimation          ( PredictionUnit&       pu,
+  void xMotionEstimation          ( PredictionUnit&       pu,
                                     PelUnitBuf&           origBuf,
                                     RefPicList            eRefPicList,
                                     Mv&                   rcMvPred,
-                                    Int                   iRefIdxPred,
+                                    int                   iRefIdxPred,
                                     Mv&                   rcMv,
-                                    Int&                  riMVPIdx,
-                                    UInt&                 ruiBits,
+                                    int&                  riMVPIdx,
+                                    uint32_t&                 ruiBits,
                                     Distortion&           ruiCost,
                                     const AMVPInfo&       amvpInfo,
-                                    Bool                  bBi = false
+                                    bool                  bBi = false
                                   );
 
-  Void xTZSearch                  ( const PredictionUnit& pu,
+  void xTZSearch                  ( const PredictionUnit& pu,
                                     IntTZSearchStruct&    cStruct,
                                     Mv&                   rcMv,
                                     Distortion&           ruiSAD,
                                     const Mv* const       pIntegerMv2Nx2NPred,
-                                    const Bool            bExtendedSettings,
-                                    const Bool            bFastSettings = false
+                                    const bool            bExtendedSettings,
+                                    const bool            bFastSettings = false
                                   );
 
-  Void xTZSearchSelective         ( const PredictionUnit& pu,
+  void xTZSearchSelective         ( const PredictionUnit& pu,
                                     IntTZSearchStruct&    cStruct,
                                     Mv&                   rcMv,
                                     Distortion&           ruiSAD,
                                     const Mv* const       pIntegerMv2Nx2NPred
                                   );
 
-  Void xSetSearchRange            ( const PredictionUnit& pu,
+  void xSetSearchRange            ( const PredictionUnit& pu,
                                     const Mv&             cMvPred,
-                                    const Int             iSrchRng,
+                                    const int             iSrchRng,
                                     SearchRange&          sr
                                   );
 
-  Void xPatternSearchFast         ( const PredictionUnit& pu,
+  void xPatternSearchFast         ( const PredictionUnit& pu,
                                     IntTZSearchStruct&    cStruct,
                                     Mv&                   rcMv,
                                     Distortion&           ruiSAD,
                                     const Mv* const       pIntegerMv2Nx2NPred
                                   );
 
-  Void xPatternSearch             ( IntTZSearchStruct&    cStruct,
+  void xPatternSearch             ( IntTZSearchStruct&    cStruct,
                                     Mv&                   rcMv,
                                     Distortion&           ruiSAD
                                   );
 
-  Void xPatternSearchIntRefine    ( PredictionUnit&     pu,
+  void xPatternSearchIntRefine    ( PredictionUnit&     pu,
                                     IntTZSearchStruct&  cStruct,
                                     Mv&                 rcMv,
                                     Mv&                 rcMvPred,
-                                    Int&                riMVPIdx,
-                                    UInt&               ruiBits,
+                                    int&                riMVPIdx,
+                                    uint32_t&               ruiBits,
                                     Distortion&         ruiCost,
                                     const AMVPInfo&     amvpInfo,
-                                    Double              fWeight
+                                    double              fWeight
                                   );
 
-  Void xPatternSearchFracDIF      ( const PredictionUnit& pu,
+  void xPatternSearchFracDIF      ( const PredictionUnit& pu,
                                     RefPicList            eRefPicList,
-                                    Int                   iRefIdx,
+                                    int                   iRefIdx,
                                     IntTZSearchStruct&    cStruct,
                                     const Mv&             rcMvInt,
                                     Mv&                   rcMvHalf,
@@ -353,16 +353,16 @@ protected:
                                   );
 
 #if JEM_TOOLS || JVET_K_AFFINE
-  Void xPredAffineInterSearch     ( PredictionUnit&       pu,
+  void xPredAffineInterSearch     ( PredictionUnit&       pu,
                                     PelUnitBuf&           origBuf,
-                                    Int                   puIdx,
-                                    UInt&                 lastMode,
+                                    int                   puIdx,
+                                    uint32_t&                 lastMode,
                                     Distortion&           affineCost,
 #if JVET_K0220_ENC_CTRL
                                     Mv                    hevcMv[2][33]
 #else
                                     Mv                    hevcMv[2][33],
-                                    Bool                  bFastSkipBi
+                                    bool                  bFastSkipBi
 #endif
 #if JVET_K0185_AFFINE_6PARA_ENC
                                   , Mv                    mvAffine4Para[2][33][3]
@@ -370,47 +370,47 @@ protected:
 #endif
                                   );
 
-  Void xAffineMotionEstimation    ( PredictionUnit& pu,
+  void xAffineMotionEstimation    ( PredictionUnit& pu,
                                     PelUnitBuf&     origBuf,
                                     RefPicList      eRefPicList,
                                     Mv              acMvPred[3],
-                                    Int             iRefIdxPred,
+                                    int             iRefIdxPred,
                                     Mv              acMv[3],
-                                    UInt&           ruiBits,
+                                    uint32_t&           ruiBits,
                                     Distortion&     ruiCost,
-                                    Bool            bBi = false
+                                    bool            bBi = false
                                   );
 
-  Void xEstimateAffineAMVP        ( PredictionUnit&  pu,
+  void xEstimateAffineAMVP        ( PredictionUnit&  pu,
                                     AffineAMVPInfo&  affineAMVPInfo,
                                     PelUnitBuf&      origBuf,
                                     RefPicList       eRefPicList,
-                                    Int              iRefIdx,
+                                    int              iRefIdx,
                                     Mv               acMvPred[3],
                                     Distortion*      puiDistBiP
                                   );
 
-  Distortion xGetAffineTemplateCost( PredictionUnit& pu, PelUnitBuf& origBuf, PelUnitBuf& predBuf, Mv acMvCand[3], Int iMVPIdx, Int iMVPNum, RefPicList eRefPicList, Int iRefIdx );
+  Distortion xGetAffineTemplateCost( PredictionUnit& pu, PelUnitBuf& origBuf, PelUnitBuf& predBuf, Mv acMvCand[3], int iMVPIdx, int iMVPNum, RefPicList eRefPicList, int iRefIdx );
 
-  Void xCopyAffineAMVPInfo        ( AffineAMVPInfo& src, AffineAMVPInfo& dst );
-  Void xCheckBestAffineMVP        ( PredictionUnit &pu, AffineAMVPInfo &affineAMVPInfo, RefPicList eRefPicList, Mv acMv[3], Mv acMvPred[3], Int& riMVPIdx, UInt& ruiBits, Distortion& ruiCost );
+  void xCopyAffineAMVPInfo        ( AffineAMVPInfo& src, AffineAMVPInfo& dst );
+  void xCheckBestAffineMVP        ( PredictionUnit &pu, AffineAMVPInfo &affineAMVPInfo, RefPicList eRefPicList, Mv acMv[3], Mv acMvPred[3], int& riMVPIdx, uint32_t& ruiBits, Distortion& ruiCost );
 #endif
-  Void xExtDIFUpSamplingH         ( CPelBuf* pcPattern );
-  Void xExtDIFUpSamplingQ         ( CPelBuf* pcPatternKey, Mv halfPelRef );
+  void xExtDIFUpSamplingH         ( CPelBuf* pcPattern );
+  void xExtDIFUpSamplingQ         ( CPelBuf* pcPatternKey, Mv halfPelRef );
 
   // -------------------------------------------------------------------------------------------------------------------
   // compute symbol bits
   // -------------------------------------------------------------------------------------------------------------------
 
-  Void  setWpScalingDistParam     ( Int iRefIdx, RefPicList eRefPicListCur, Slice *slice );
+  void  setWpScalingDistParam     ( int iRefIdx, RefPicList eRefPicListCur, Slice *slice );
 
 
 public:
 
-  Void encodeResAndCalcRdInterCU  (CodingStructure &cs, Partitioner &partitioner, const Bool &skipResidual);
-  Void xEncodeInterResidualQT     (CodingStructure &cs, Partitioner &partitioner, const ComponentID &compID);
-  Void xEstimateInterResidualQT   (CodingStructure &cs, Partitioner &partitioner, Distortion *puiZeroDist = NULL);
-  UInt64 xGetSymbolFracBitsInter  (CodingStructure &cs, Partitioner &partitioner);
+  void encodeResAndCalcRdInterCU  (CodingStructure &cs, Partitioner &partitioner, const bool &skipResidual);
+  void xEncodeInterResidualQT     (CodingStructure &cs, Partitioner &partitioner, const ComponentID &compID);
+  void xEstimateInterResidualQT   (CodingStructure &cs, Partitioner &partitioner, Distortion *puiZeroDist = NULL);
+  uint64_t xGetSymbolFracBitsInter  (CodingStructure &cs, Partitioner &partitioner);
 
 };// END CLASS DEFINITION EncSearch
 

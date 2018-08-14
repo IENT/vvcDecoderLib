@@ -67,7 +67,7 @@ DecCu::~DecCu()
 #endif
 }
 
-Void DecCu::init( TrQuant* pcTrQuant, IntraPrediction* pcIntra, InterPrediction* pcInter)
+void DecCu::init( TrQuant* pcTrQuant, IntraPrediction* pcIntra, InterPrediction* pcInter)
 {
   m_pcTrQuant       = pcTrQuant;
   m_pcIntraPred     = pcIntra;
@@ -82,7 +82,7 @@ Void DecCu::init( TrQuant* pcTrQuant, IntraPrediction* pcIntra, InterPrediction*
 // Public member functions
 // ====================================================================================================================
 
-Void DecCu::decompressCtu( CodingStructure& cs, const UnitArea& ctuArea )
+void DecCu::decompressCtu( CodingStructure& cs, const UnitArea& ctuArea )
 {
   const int maxNumChannelType = cs.pcv->chrFormat != CHROMA_400 && CS::isDualITree( cs ) ? 2 : 1;
 
@@ -120,7 +120,7 @@ Void DecCu::decompressCtu( CodingStructure& cs, const UnitArea& ctuArea )
 // Protected member functions
 // ====================================================================================================================
 
-Void DecCu::xIntraRecBlk( TransformUnit& tu, const ComponentID compID )
+void DecCu::xIntraRecBlk( TransformUnit& tu, const ComponentID compID )
 {
   if( !tu.blocks[ compID ].valid() )
   {
@@ -139,7 +139,7 @@ Void DecCu::xIntraRecBlk( TransformUnit& tu, const ComponentID compID )
 
   const PredictionUnit &pu  = *tu.cs->getPU( area.pos(), chType );
 #if JEM_TOOLS||JVET_K0190
-  const UInt uiChFinalMode  = PU::getFinalIntraMode( pu, chType );
+  const uint32_t uiChFinalMode  = PU::getFinalIntraMode( pu, chType );
 #endif
 
   //===== init availability pattern =====
@@ -219,7 +219,7 @@ Void DecCu::xIntraRecBlk( TransformUnit& tu, const ComponentID compID )
 #endif
 }
 
-Void DecCu::xReconIntraQT( CodingUnit &cu )
+void DecCu::xReconIntraQT( CodingUnit &cu )
 {
   if( cu.ipcm )
   {
@@ -227,9 +227,9 @@ Void DecCu::xReconIntraQT( CodingUnit &cu )
     return;
   }
 
-  const UInt numChType = ::getNumberValidChannels( cu.chromaFormat );
+  const uint32_t numChType = ::getNumberValidChannels( cu.chromaFormat );
 
-  for( UInt chType = CHANNEL_TYPE_LUMA; chType < numChType; chType++ )
+  for( uint32_t chType = CHANNEL_TYPE_LUMA; chType < numChType; chType++ )
   {
     if( cu.blocks[chType].valid() )
     {
@@ -247,19 +247,19 @@ Void DecCu::xReconIntraQT( CodingUnit &cu )
 * \param uiWidth CU width
 * \param uiHeight CU height
 * \param compID colour component ID
-* \returns Void
+* \returns void
 */
-Void DecCu::xDecodePCMTexture(TransformUnit &tu, const ComponentID compID)
+void DecCu::xDecodePCMTexture(TransformUnit &tu, const ComponentID compID)
 {
   const CompArea &area         = tu.blocks[compID];
         PelBuf piPicReco       = tu.cs->getRecoBuf( area );
   const CPelBuf piPicPcm       = tu.getPcmbuf(compID);
   const SPS &sps               = *tu.cs->sps;
-  const UInt uiPcmLeftShiftBit = sps.getBitDepth(toChannelType(compID)) - sps.getPCMBitDepth(toChannelType(compID));
+  const uint32_t uiPcmLeftShiftBit = sps.getBitDepth(toChannelType(compID)) - sps.getPCMBitDepth(toChannelType(compID));
 
-  for (UInt uiY = 0; uiY < area.height; uiY++)
+  for (uint32_t uiY = 0; uiY < area.height; uiY++)
   {
-    for (UInt uiX = 0; uiX < area.width; uiX++)
+    for (uint32_t uiX = 0; uiX < area.width; uiX++)
     {
       piPicReco.at(uiX, uiY) = (piPicPcm.at(uiX, uiY) << uiPcmLeftShiftBit);
     }
@@ -272,11 +272,11 @@ Void DecCu::xDecodePCMTexture(TransformUnit &tu, const ComponentID compID)
 /** Function for reconstructing a PCM mode CU.
 * \param pcCU pointer to current CU
 * \param uiDepth CU Depth
-* \returns Void
+* \returns void
 */
-Void DecCu::xReconPCM(TransformUnit &tu)
+void DecCu::xReconPCM(TransformUnit &tu)
 {
-  for (UInt ch = 0; ch < tu.blocks.size(); ch++)
+  for (uint32_t ch = 0; ch < tu.blocks.size(); ch++)
   {
     ComponentID compID = ComponentID(ch);
 
@@ -294,7 +294,7 @@ Void DecCu::xReconPCM(TransformUnit &tu)
 \ This function derives reconstructed PU/CU chroma samples with QTree recursive structure
 */
 
-Void
+void
 DecCu::xIntraRecQT(CodingUnit &cu, const ChannelType chType)
 {
   for( auto &currTU : CU::traverseTUs( cu ) )
@@ -305,9 +305,9 @@ DecCu::xIntraRecQT(CodingUnit &cu, const ChannelType chType)
     }
     else
     {
-      const UInt numValidComp = getNumberValidComponents( cu.chromaFormat );
+      const uint32_t numValidComp = getNumberValidComponents( cu.chromaFormat );
 
-      for( UInt compID = COMPONENT_Cb; compID < numValidComp; compID++ )
+      for( uint32_t compID = COMPONENT_Cb; compID < numValidComp; compID++ )
       {
         xIntraRecBlk( currTU, ComponentID( compID ) );
       }
@@ -319,7 +319,7 @@ DecCu::xIntraRecQT(CodingUnit &cu, const ChannelType chType)
 * \param pCU   pointer to current CU
 * \param depth CU Depth
 */
-Void DecCu::xFillPCMBuffer(CodingUnit &cu)
+void DecCu::xFillPCMBuffer(CodingUnit &cu)
 {
   for( auto &currTU : CU::traverseTUs( cu ) )
   {
@@ -337,7 +337,7 @@ Void DecCu::xFillPCMBuffer(CodingUnit &cu)
 
 #include "CommonLib/dtrace_buffer.h"
 
-Void DecCu::xReconInter(CodingUnit &cu)
+void DecCu::xReconInter(CodingUnit &cu)
 {
   // inter prediction
   m_pcInterPred->motionCompensation( cu );
@@ -374,7 +374,7 @@ Void DecCu::xReconInter(CodingUnit &cu)
   cs.setDecomp(cu);
 }
 
-Void DecCu::xDecodeInterTU( TransformUnit & currTU, const ComponentID compID )
+void DecCu::xDecodeInterTU( TransformUnit & currTU, const ComponentID compID )
 {
   if( !currTU.blocks[compID].valid() ) return;
 
@@ -410,16 +410,16 @@ Void DecCu::xDecodeInterTU( TransformUnit & currTU, const ComponentID compID )
   }
 }
 
-Void DecCu::xDecodeInterTexture(CodingUnit &cu)
+void DecCu::xDecodeInterTexture(CodingUnit &cu)
 {
   if( !cu.rootCbf )
   {
     return;
   }
 
-  const UInt uiNumVaildComp = getNumberValidComponents(cu.chromaFormat);
+  const uint32_t uiNumVaildComp = getNumberValidComponents(cu.chromaFormat);
 
-  for (UInt ch = 0; ch < uiNumVaildComp; ch++)
+  for (uint32_t ch = 0; ch < uiNumVaildComp; ch++)
   {
     const ComponentID compID = ComponentID(ch);
 
@@ -431,7 +431,7 @@ Void DecCu::xDecodeInterTexture(CodingUnit &cu)
 }
 
 #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
-Void DecCu::xDeriveCUMV( CodingUnit &cu )
+void DecCu::xDeriveCUMV( CodingUnit &cu )
 {
   for( auto &pu : CU::traversePUs( cu ) )
   {
@@ -451,7 +451,7 @@ Void DecCu::xDeriveCUMV( CodingUnit &cu )
       {
         pu.mergeType = MRG_TYPE_FRUC;
 
-        Bool bAvailable = m_pcInterPred->deriveFRUCMV( pu );
+        bool bAvailable = m_pcInterPred->deriveFRUCMV( pu );
 
         CHECK( !bAvailable, "fruc mode not availabe" );
         //normal merge data should be set already, to be checked
@@ -545,7 +545,7 @@ Void DecCu::xDeriveCUMV( CodingUnit &cu )
 #if JEM_TOOLS || JVET_K_AFFINE
         if( pu.cu->affine )
         {
-          for ( UInt uiRefListIdx = 0; uiRefListIdx < 2; uiRefListIdx++ )
+          for ( uint32_t uiRefListIdx = 0; uiRefListIdx < 2; uiRefListIdx++ )
           {
             RefPicList eRefList = RefPicList( uiRefListIdx );
             if ( pu.cs->slice->getNumRefIdx( eRefList ) > 0 && ( pu.interDir & ( 1 << uiRefListIdx ) ) )
@@ -582,10 +582,10 @@ Void DecCu::xDeriveCUMV( CodingUnit &cu )
               }
 #endif
 #else
-              Int iWidth = pu.Y().width;
-              Int iHeight = pu.Y().height;
-              Int vx2 =  - ( mvRT.getVer() - mvLT.getVer() ) * iHeight / iWidth + mvLT.getHor();
-              Int vy2 =    ( mvRT.getHor() - mvLT.getHor() ) * iHeight / iWidth + mvLT.getVer();
+              int iWidth = pu.Y().width;
+              int iHeight = pu.Y().height;
+              int vx2 =  - ( mvRT.getVer() - mvLT.getVer() ) * iHeight / iWidth + mvLT.getHor();
+              int vy2 =    ( mvRT.getHor() - mvLT.getHor() ) * iHeight / iWidth + mvLT.getVer();
               //    Mv mvLB( vx2, vy2 );
               Mv mvLB( vx2, vy2, true );
 
@@ -600,7 +600,7 @@ Void DecCu::xDeriveCUMV( CodingUnit &cu )
         else
 #endif
         {
-          for ( UInt uiRefListIdx = 0; uiRefListIdx < 2; uiRefListIdx++ )
+          for ( uint32_t uiRefListIdx = 0; uiRefListIdx < 2; uiRefListIdx++ )
           {
             RefPicList eRefList = RefPicList( uiRefListIdx );
             if ( pu.cs->slice->getNumRefIdx( eRefList ) > 0 && ( pu.interDir & ( 1 << uiRefListIdx ) ) )
@@ -629,7 +629,7 @@ Void DecCu::xDeriveCUMV( CodingUnit &cu )
   }
 }
 #else
-Void DecCu::xDeriveCUMV( CodingUnit &cu )
+void DecCu::xDeriveCUMV( CodingUnit &cu )
 {
   for( auto &pu : CU::traversePUs( cu ) )
   {
@@ -680,7 +680,7 @@ Void DecCu::xDeriveCUMV( CodingUnit &cu )
       else
       {
 #endif
-        for ( UInt uiRefListIdx = 0; uiRefListIdx < 2; uiRefListIdx++ )
+        for ( uint32_t uiRefListIdx = 0; uiRefListIdx < 2; uiRefListIdx++ )
         {
           RefPicList eRefList = RefPicList( uiRefListIdx );
           if ( pu.cs->slice->getNumRefIdx( eRefList ) > 0 && ( pu.interDir & ( 1 << uiRefListIdx ) ) )

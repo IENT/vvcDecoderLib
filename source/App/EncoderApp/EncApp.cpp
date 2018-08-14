@@ -68,7 +68,7 @@ EncApp::~EncApp()
 {
 }
 
-Void EncApp::xInitLibCfg()
+void EncApp::xInitLibCfg()
 {
 #if HEVC_VPS
   VPS vps;
@@ -79,7 +79,7 @@ Void EncApp::xInitLibCfg()
     vps.setTemporalNestingFlag(true);
   }
   vps.setMaxLayers                                                ( 1 );
-  for(Int i = 0; i < MAX_TLAYER; i++)
+  for(int i = 0; i < MAX_TLAYER; i++)
   {
     vps.setNumReorderPics                                         ( m_numReorderPics[i], i );
     vps.setMaxDecPicBuffering                                     ( m_maxDecPicBuffering[i], i );
@@ -118,12 +118,12 @@ Void EncApp::xInitLibCfg()
   m_cEncLib.setGOPSize                                           ( m_iGOPSize );
   m_cEncLib.setGopList                                           ( m_GOPList );
   m_cEncLib.setExtraRPSs                                         ( m_extraRPSs );
-  for(Int i = 0; i < MAX_TLAYER; i++)
+  for(int i = 0; i < MAX_TLAYER; i++)
   {
     m_cEncLib.setNumReorderPics                                  ( m_numReorderPics[i], i );
     m_cEncLib.setMaxDecPicBuffering                              ( m_maxDecPicBuffering[i], i );
   }
-  for( UInt uiLoop = 0; uiLoop < MAX_TLAYER; ++uiLoop )
+  for( uint32_t uiLoop = 0; uiLoop < MAX_TLAYER; ++uiLoop )
   {
     m_cEncLib.setLambdaModifier                                  ( uiLoop, m_adLambdaModifier[ uiLoop ] );
   }
@@ -337,7 +337,7 @@ Void EncApp::xInitLibCfg()
   m_cEncLib.setPersistentRiceAdaptationEnabledFlag               ( m_persistentRiceAdaptationEnabledFlag );
   m_cEncLib.setCabacBypassAlignmentEnabledFlag                   ( m_cabacBypassAlignmentEnabledFlag );
   m_cEncLib.setLog2MaxTransformSkipBlockSize                     ( m_log2MaxTransformSkipBlockSize  );
-  for (UInt signallingModeIndex = 0; signallingModeIndex < NUMBER_OF_RDPCM_SIGNALLING_MODES; signallingModeIndex++)
+  for (uint32_t signallingModeIndex = 0; signallingModeIndex < NUMBER_OF_RDPCM_SIGNALLING_MODES; signallingModeIndex++)
   {
     m_cEncLib.setRdpcmEnabledFlag                                ( RDPCMSignallingMode(signallingModeIndex), m_rdpcmEnabledFlag[signallingModeIndex]);
   }
@@ -349,7 +349,7 @@ Void EncApp::xInitLibCfg()
   m_cEncLib.setUsePCM                                            ( m_usePCM );
 
   // set internal bit-depth and constants
-  for (UInt channelType = 0; channelType < MAX_NUM_CHANNEL_TYPE; channelType++)
+  for (uint32_t channelType = 0; channelType < MAX_NUM_CHANNEL_TYPE; channelType++)
   {
     m_cEncLib.setBitDepth((ChannelType)channelType, m_internalBitDepth[channelType]);
     m_cEncLib.setInputBitDepth((ChannelType)channelType, m_inputBitDepth[channelType]);
@@ -449,7 +449,7 @@ Void EncApp::xInitLibCfg()
   m_cEncLib.setTMCTSSEIEnabled                                   ( m_tmctsSEIEnabled );
   m_cEncLib.setTimeCodeSEIEnabled                                ( m_timeCodeSEIEnabled );
   m_cEncLib.setNumberOfTimeSets                                  ( m_timeCodeSEINumTs );
-  for(Int i = 0; i < m_timeCodeSEINumTs; i++)
+  for(int i = 0; i < m_timeCodeSEINumTs; i++)
   {
     m_cEncLib.setTimeSet(m_timeSetArray[i], i);
   }
@@ -468,11 +468,11 @@ Void EncApp::xInitLibCfg()
   m_cEncLib.setMasteringDisplaySEI                               ( m_masteringDisplay );
 #if U0033_ALTERNATIVE_TRANSFER_CHARACTERISTICS_SEI
   m_cEncLib.setSEIAlternativeTransferCharacteristicsSEIEnable    ( m_preferredTransferCharacteristics>=0     );
-  m_cEncLib.setSEIPreferredTransferCharacteristics               ( UChar(m_preferredTransferCharacteristics) );
+  m_cEncLib.setSEIPreferredTransferCharacteristics               ( uint8_t(m_preferredTransferCharacteristics) );
 #endif
   m_cEncLib.setSEIGreenMetadataInfoSEIEnable                     ( m_greenMetadataType > 0 );
-  m_cEncLib.setSEIGreenMetadataType                              ( UChar(m_greenMetadataType) );
-  m_cEncLib.setSEIXSDMetricType                                  ( UChar(m_xsdMetricType) );
+  m_cEncLib.setSEIGreenMetadataType                              ( uint8_t(m_greenMetadataType) );
+  m_cEncLib.setSEIXSDMetricType                                  ( uint8_t(m_xsdMetricType) );
 
 #if HEVC_TILES_WPP
   m_cEncLib.setTileUniformSpacingFlag                            ( m_tileUniformSpacingFlag );
@@ -486,7 +486,7 @@ Void EncApp::xInitLibCfg()
 #endif
   m_cEncLib.xCheckGSParameters();
 #if HEVC_TILES_WPP
-  Int uiTilesCount = (m_numTileRowsMinus1+1) * (m_numTileColumnsMinus1+1);
+  int uiTilesCount = (m_numTileRowsMinus1+1) * (m_numTileColumnsMinus1+1);
   if(uiTilesCount == 1)
   {
     m_bLFCrossTileBoundaryFlag = true;
@@ -590,7 +590,7 @@ Void EncApp::xInitLibCfg()
 #endif
 }
 
-Void EncApp::xCreateLib( std::list<PelUnitBuf*>& recBufList
+void EncApp::xCreateLib( std::list<PelUnitBuf*>& recBufList
                         )
 {
   // Video I/O
@@ -615,7 +615,7 @@ Void EncApp::xCreateLib( std::list<PelUnitBuf*>& recBufList
   }
 }
 
-Void EncApp::xDestroyLib()
+void EncApp::xDestroyLib()
 {
   // Video I/O
   m_cVideoIOYuvInputFile.close();
@@ -625,7 +625,7 @@ Void EncApp::xDestroyLib()
   m_cEncLib.destroy();
 }
 
-Void EncApp::xInitLib(Bool isFieldCoding)
+void EncApp::xInitLib(bool isFieldCoding)
 {
   m_cEncLib.init(isFieldCoding, this );
 }
@@ -642,7 +642,7 @@ Void EncApp::xInitLib(Bool isFieldCoding)
  - destroy internal class
  .
  */
-Void EncApp::encode()
+void EncApp::encode()
 {
   m_bitstream.open(m_bitstreamFileName.c_str(), fstream::binary | fstream::out);
   if (!m_bitstream)
@@ -660,15 +660,15 @@ Void EncApp::encode()
   printChromaFormat();
 
   // main encoder loop
-  Int   iNumEncoded = 0;
-  Bool  bEos = false;
+  int   iNumEncoded = 0;
+  bool  bEos = false;
 
   const InputColourSpaceConversion ipCSC  =  m_inputColourSpaceConvert;
   const InputColourSpaceConversion snrCSC = (!m_snrInternalColourSpace) ? m_inputColourSpaceConvert : IPCOLOURSPACE_UNCHANGED;
 
   PelStorage trueOrgPic;
   PelStorage orgPic;
-  const Int sourceHeight = m_isField ? m_iSourceHeightOrg : m_iSourceHeight;
+  const int sourceHeight = m_isField ? m_iSourceHeightOrg : m_iSourceHeight;
   UnitArea unitArea( m_chromaFormatIDC, Area( 0, 0, m_iSourceWidth, sourceHeight ) );
 
   orgPic.create( unitArea );
@@ -698,7 +698,7 @@ Void EncApp::encode()
 
     bEos = (m_isField && (m_iFrameRcvd == (m_framesToBeEncoded >> 1) )) || ( !m_isField && (m_iFrameRcvd == m_framesToBeEncoded) );
 
-    Bool flush = 0;
+    bool flush = 0;
     // if end of file (which is only detected on a read failure) flush the encoder of any queued pictures
     if (m_cVideoIOYuvInputFile.isEof())
     {
@@ -768,12 +768,12 @@ Void EncApp::encode()
   \param iNumEncoded    number of encoded frames
   \param accessUnits    list of access units to be written
  */
-Void EncApp::xWriteOutput( Int iNumEncoded, std::list<PelUnitBuf*>& recBufList
+void EncApp::xWriteOutput( int iNumEncoded, std::list<PelUnitBuf*>& recBufList
                           )
 {
   const InputColourSpaceConversion ipCSC = (!m_outputInternalColourSpace) ? m_inputColourSpaceConvert : IPCOLOURSPACE_UNCHANGED;
   std::list<PelUnitBuf*>::iterator iterPicYuvRec = recBufList.end();
-  Int i;
+  int i;
 
   for ( i = 0; i < iNumEncoded; i++ )
   {
@@ -811,7 +811,7 @@ Void EncApp::xWriteOutput( Int iNumEncoded, std::list<PelUnitBuf*>& recBufList
 
 void EncApp::outputAU( const AccessUnit& au )
 {
-  const vector<UInt>& stats = writeAnnexB(m_bitstream, au);
+  const vector<uint32_t>& stats = writeAnnexB(m_bitstream, au);
   rateStatsAccum(au, stats);
   m_bitstream.flush();
 }
@@ -820,10 +820,10 @@ void EncApp::outputAU( const AccessUnit& au )
 /**
  *
  */
-Void EncApp::rateStatsAccum(const AccessUnit& au, const std::vector<UInt>& annexBsizes)
+void EncApp::rateStatsAccum(const AccessUnit& au, const std::vector<uint32_t>& annexBsizes)
 {
   AccessUnit::const_iterator it_au = au.begin();
-  vector<UInt>::const_iterator it_stats = annexBsizes.begin();
+  vector<uint32_t>::const_iterator it_stats = annexBsizes.begin();
 
   for (; it_au != au.end(); it_au++, it_stats++)
   {
@@ -860,9 +860,9 @@ Void EncApp::rateStatsAccum(const AccessUnit& au, const std::vector<UInt>& annex
   }
 }
 
-Void EncApp::printRateSummary()
+void EncApp::printRateSummary()
 {
-  Double time = (Double) m_iFrameRcvd / m_iFrameRate * m_temporalSubsampleRatio;
+  double time = (double) m_iFrameRcvd / m_iFrameRate * m_temporalSubsampleRatio;
   msg( DETAILS,"Bytes written to file: %u (%.3f kbps)\n", m_totalBytes, 0.008 * m_totalBytes / time );
   if (m_summaryVerboseness > 0)
   {
@@ -870,7 +870,7 @@ Void EncApp::printRateSummary()
   }
 }
 
-Void EncApp::printChromaFormat()
+void EncApp::printChromaFormat()
 {
   if( g_verbosity >= DETAILS )
   {

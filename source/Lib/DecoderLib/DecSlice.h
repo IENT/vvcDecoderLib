@@ -77,14 +77,14 @@ public:
   virtual ~DecSlice();
 
 #if JEM_TOOLS
-  Void  init              ( CABACDataStore* cabacDataStore, CABACDecoder* cabacDecoder, DecCu* pcMbDecoder );
+  void  init              ( CABACDataStore* cabacDataStore, CABACDecoder* cabacDecoder, DecCu* pcMbDecoder );
 #else
-  Void  init              ( CABACDecoder* cabacDecoder, DecCu* pcMbDecoder );
+  void  init              ( CABACDecoder* cabacDecoder, DecCu* pcMbDecoder );
 #endif
-  Void  create            ();
-  Void  destroy           ();
+  void  create            ();
+  void  destroy           ();
 
-  Void  decompressSlice   ( Slice* slice, InputBitstream* bitstream );
+  void  decompressSlice   ( Slice* slice, InputBitstream* bitstream );
 };
 
 //! \}

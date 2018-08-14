@@ -44,9 +44,9 @@ using namespace std;
 //! \ingroup EncoderLib
 //! \{
 
-static const UChar emulation_prevention_three_byte[] = {3};
+static const uint8_t emulation_prevention_three_byte[] = {3};
 
-Void writeNalUnitHeader(ostream& out, OutputNALUnit& nalu)       // nal_unit_header()
+void writeNalUnitHeader(ostream& out, OutputNALUnit& nalu)       // nal_unit_header()
 {
 OutputBitstream bsNALUHeader;
 
@@ -55,13 +55,13 @@ OutputBitstream bsNALUHeader;
   bsNALUHeader.write(nalu.m_nuhLayerId, 6);   // nuh_layer_id
   bsNALUHeader.write(nalu.m_temporalId+1, 3); // nuh_temporal_id_plus1
 
-  out.write(reinterpret_cast<const TChar*>(bsNALUHeader.getByteStream()), bsNALUHeader.getByteStreamLength());
+  out.write(reinterpret_cast<const char*>(bsNALUHeader.getByteStream()), bsNALUHeader.getByteStreamLength());
 }
 /**
  * write nalu to bytestream out, performing RBSP anti startcode
  * emulation as required.  nalu.m_RBSPayload must be byte aligned.
  */
-Void write(ostream& out, OutputNALUnit& nalu)
+void write(ostream& out, OutputNALUnit& nalu)
 {
   writeNalUnitHeader(out, nalu);
   /* write out rsbp_byte's, inserting any required
@@ -89,7 +89,7 @@ Void write(ostream& out, OutputNALUnit& nalu)
   vector<uint8_t> outputBuffer;
   outputBuffer.resize(rbsp.size()*2+1); //there can never be enough emulation_prevention_three_bytes to require this much space
   std::size_t outputAmount = 0;
-  Int         zeroCount    = 0;
+  int         zeroCount    = 0;
   for (vector<uint8_t>::iterator it = rbsp.begin(); it != rbsp.end(); it++)
   {
     const uint8_t v=(*it);
@@ -119,7 +119,7 @@ Void write(ostream& out, OutputNALUnit& nalu)
   {
     outputBuffer[outputAmount++]=emulation_prevention_three_byte[0];
   }
-  out.write(reinterpret_cast<const TChar*>(&(*outputBuffer.begin())), outputAmount);
+  out.write(reinterpret_cast<const char*>(&(*outputBuffer.begin())), outputAmount);
 }
 
 //! \}

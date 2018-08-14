@@ -43,7 +43,7 @@
 
 /** Constructor
  */
-AQpLayer::AQpLayer( Int iWidth, Int iHeight, UInt uiAQPartWidth, UInt uiAQPartHeight )
+AQpLayer::AQpLayer( int iWidth, int iHeight, uint32_t uiAQPartWidth, uint32_t uiAQPartHeight )
 : m_uiAQPartWidth(uiAQPartWidth)
 , m_uiAQPartHeight(uiAQPartHeight)
 , m_uiNumAQPartInWidth((iWidth + uiAQPartWidth-1) / uiAQPartWidth)
@@ -63,38 +63,38 @@ AQpLayer::~AQpLayer()
 
 /** Analyze source picture and compute local image characteristics used for QP adaptation
  * \param pcEPic Picture object to be analyzed
- * \return Void
+ * \return void
  */
 
-Void AQpPreanalyzer::preanalyze( Picture* pcEPic )
+void AQpPreanalyzer::preanalyze( Picture* pcEPic )
 {
   const CPelBuf lumaPlane = pcEPic->getOrigBuf().Y();
-  const Int iWidth  = lumaPlane.width;
-  const Int iHeight = lumaPlane.height;
-  const Int iStride = lumaPlane.stride;
+  const int iWidth  = lumaPlane.width;
+  const int iHeight = lumaPlane.height;
+  const int iStride = lumaPlane.stride;
 
-  for ( UInt d = 0; d < pcEPic->aqlayer.size(); d++ )
+  for ( uint32_t d = 0; d < pcEPic->aqlayer.size(); d++ )
   {
     const Pel* pLineY = lumaPlane.bufAt( 0, 0);
     AQpLayer* pcAQLayer = pcEPic->aqlayer[d];
-    const UInt uiAQPartWidth = pcAQLayer->getAQPartWidth();
-    const UInt uiAQPartHeight = pcAQLayer->getAQPartHeight();
-    Double* pcAQU = &pcAQLayer->getQPAdaptationUnit()[0];
+    const uint32_t uiAQPartWidth = pcAQLayer->getAQPartWidth();
+    const uint32_t uiAQPartHeight = pcAQLayer->getAQPartHeight();
+    double* pcAQU = &pcAQLayer->getQPAdaptationUnit()[0];
 
-    Double dSumAct = 0.0;
-    for ( UInt y = 0; y < iHeight; y += uiAQPartHeight )
+    double dSumAct = 0.0;
+    for ( uint32_t y = 0; y < iHeight; y += uiAQPartHeight )
     {
-      const UInt uiCurrAQPartHeight = std::min(uiAQPartHeight, iHeight-y);
-      for ( UInt x = 0; x < iWidth; x += uiAQPartWidth, pcAQU++ )
+      const uint32_t uiCurrAQPartHeight = std::min(uiAQPartHeight, iHeight-y);
+      for ( uint32_t x = 0; x < iWidth; x += uiAQPartWidth, pcAQU++ )
       {
-        const UInt uiCurrAQPartWidth = std::min(uiAQPartWidth, iWidth-x);
+        const uint32_t uiCurrAQPartWidth = std::min(uiAQPartWidth, iWidth-x);
         const Pel* pBlkY = &pLineY[x];
-        UInt64 uiSum[4] = {0, 0, 0, 0};
-        UInt64 uiSumSq[4] = {0, 0, 0, 0};
-        UInt by = 0;
+        uint64_t uiSum[4] = {0, 0, 0, 0};
+        uint64_t uiSumSq[4] = {0, 0, 0, 0};
+        uint32_t by = 0;
         for ( ; by < uiCurrAQPartHeight>>1; by++ )
         {
-          UInt bx = 0;
+          uint32_t bx = 0;
           for ( ; bx < uiCurrAQPartWidth>>1; bx++ )
           {
             uiSum  [0] += pBlkY[bx];
@@ -109,7 +109,7 @@ Void AQpPreanalyzer::preanalyze( Picture* pcEPic )
         }
         for ( ; by < uiCurrAQPartHeight; by++ )
         {
-          UInt bx = 0;
+          uint32_t bx = 0;
           for ( ; bx < uiCurrAQPartWidth>>1; bx++ )
           {
             uiSum  [2] += pBlkY[bx];
@@ -125,17 +125,17 @@ Void AQpPreanalyzer::preanalyze( Picture* pcEPic )
 
         CHECK((uiCurrAQPartWidth&1)!=0,  "Odd part width unsupported");
         CHECK((uiCurrAQPartHeight&1)!=0, "Odd part height unsupported");
-        const UInt pixelWidthOfQuadrants  = uiCurrAQPartWidth >>1;
-        const UInt pixelHeightOfQuadrants = uiCurrAQPartHeight>>1;
-        const UInt numPixInAQPart         = pixelWidthOfQuadrants * pixelHeightOfQuadrants;
+        const uint32_t pixelWidthOfQuadrants  = uiCurrAQPartWidth >>1;
+        const uint32_t pixelHeightOfQuadrants = uiCurrAQPartHeight>>1;
+        const uint32_t numPixInAQPart         = pixelWidthOfQuadrants * pixelHeightOfQuadrants;
 
-        Double dMinVar = DBL_MAX;
+        double dMinVar = DBL_MAX;
         if (numPixInAQPart!=0)
         {
-          for ( Int i=0; i<4; i++)
+          for ( int i=0; i<4; i++)
           {
-            const Double dAverage = Double(uiSum[i]) / numPixInAQPart;
-            const Double dVariance = Double(uiSumSq[i]) / numPixInAQPart - dAverage * dAverage;
+            const double dAverage = double(uiSum[i]) / numPixInAQPart;
+            const double dVariance = double(uiSumSq[i]) / numPixInAQPart - dAverage * dAverage;
             dMinVar = std::min(dMinVar, dVariance);
           }
         }
@@ -143,14 +143,14 @@ Void AQpPreanalyzer::preanalyze( Picture* pcEPic )
         {
           dMinVar = 0.0;
         }
-        const Double dActivity = 1.0 + dMinVar;
+        const double dActivity = 1.0 + dMinVar;
         *pcAQU = dActivity;
         dSumAct += dActivity;
       }
       pLineY += iStride * uiCurrAQPartHeight;
     }
 
-    const Double dAvgAct = dSumAct / (pcAQLayer->getNumAQPartInWidth() * pcAQLayer->getNumAQPartInHeight());
+    const double dAvgAct = dSumAct / (pcAQLayer->getNumAQPartInWidth() * pcAQLayer->getNumAQPartInHeight());
     pcAQLayer->setAvgActivity( dAvgAct );
   }
 }

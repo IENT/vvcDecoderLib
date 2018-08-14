@@ -56,30 +56,30 @@ DecSlice::~DecSlice()
 {
 }
 
-Void DecSlice::create()
+void DecSlice::create()
 {
 }
 
-Void DecSlice::destroy()
+void DecSlice::destroy()
 {
 }
 
 #if JEM_TOOLS
-Void DecSlice::init( CABACDataStore* cabacDataStore, CABACDecoder* cabacDecoder, DecCu* pcCuDecoder )
+void DecSlice::init( CABACDataStore* cabacDataStore, CABACDecoder* cabacDecoder, DecCu* pcCuDecoder )
 {
   m_CABACDataStore  = cabacDataStore;
   m_CABACDecoder    = cabacDecoder;
   m_pcCuDecoder     = pcCuDecoder;
 }
 #else
-Void DecSlice::init( CABACDecoder* cabacDecoder, DecCu* pcCuDecoder )
+void DecSlice::init( CABACDecoder* cabacDecoder, DecCu* pcCuDecoder )
 {
   m_CABACDecoder    = cabacDecoder;
   m_pcCuDecoder     = pcCuDecoder;
 }
 #endif
 
-Void DecSlice::decompressSlice( Slice* slice, InputBitstream* bitstream )
+void DecSlice::decompressSlice( Slice* slice, InputBitstream* bitstream )
 {
   //-- For time output for each slice
   slice->startProcessingTimer();
@@ -164,7 +164,7 @@ Void DecSlice::decompressSlice( Slice* slice, InputBitstream* bitstream )
 #if HEVC_DEPENDENT_SLICES
   }
 #endif
-  CHECK( pic->m_prevQP[0] == std::numeric_limits<Int>::max(), "Invalid previous QP" );
+  CHECK( pic->m_prevQP[0] == std::numeric_limits<int>::max(), "Invalid previous QP" );
 
   DTRACE( g_trace_ctx, D_HEADER, "=========== POC: %d ===========\n", slice->getPOC() );
 

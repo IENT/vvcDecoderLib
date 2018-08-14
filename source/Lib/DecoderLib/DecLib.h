@@ -70,12 +70,12 @@ bool tryDecodePicture( Picture* pcPic, const int expectedPoc, const std::string&
 class DecLib
 {
 private:
-  Int                     m_iMaxRefPicNum;
+  int                     m_iMaxRefPicNum;
 
   NalUnitType             m_associatedIRAPType; ///< NAL unit type of the associated IRAP picture
-  Int                     m_pocCRA;            ///< POC number of the latest CRA picture
-  Int                     m_pocRandomAccess;   ///< POC number of the random access point (the first IDR or CRA picture)
-  Int                     m_lastRasPoc;
+  int                     m_pocCRA;            ///< POC number of the latest CRA picture
+  int                     m_pocRandomAccess;   ///< POC number of the random access point (the first IDR or CRA picture)
+  int                     m_lastRasPoc;
 
   PicList                 m_cListPic;         //  Dynamic buffer
   ParameterSetManager     m_parameterSetManager;  // storage for parameter sets
@@ -107,74 +107,74 @@ private:
   CacheModel              m_cacheModel;
 #endif
 
-  Bool isSkipPictureForBLA(Int& iPOCLastDisplay);
-  Bool isRandomAccessSkipPicture(Int& iSkipFrame,  Int& iPOCLastDisplay);
+  bool isSkipPictureForBLA(int& iPOCLastDisplay);
+  bool isRandomAccessSkipPicture(int& iSkipFrame,  int& iPOCLastDisplay);
   Picture*                m_pcPic;
-  UInt                    m_uiSliceSegmentIdx;
-  Int                     m_prevPOC;
-  Int                     m_prevTid0POC;
-  Bool                    m_bFirstSliceInPicture;
-  Bool                    m_bFirstSliceInSequence;
-  Bool                    m_prevSliceSkipped;
-  Int                     m_skippedPOC;
-  Bool                    m_bFirstSliceInBitstream;
-  Int                     m_lastPOCNoOutputPriorPics;
-  Bool                    m_isNoOutputPriorPics;
-  Bool                    m_craNoRaslOutputFlag;    //value of variable NoRaslOutputFlag of the last CRA pic
+  uint32_t                    m_uiSliceSegmentIdx;
+  int                     m_prevPOC;
+  int                     m_prevTid0POC;
+  bool                    m_bFirstSliceInPicture;
+  bool                    m_bFirstSliceInSequence;
+  bool                    m_prevSliceSkipped;
+  int                     m_skippedPOC;
+  bool                    m_bFirstSliceInBitstream;
+  int                     m_lastPOCNoOutputPriorPics;
+  bool                    m_isNoOutputPriorPics;
+  bool                    m_craNoRaslOutputFlag;    //value of variable NoRaslOutputFlag of the last CRA pic
   std::ostream           *m_pDecodedSEIOutputStream;
 
-  Int                     m_decodedPictureHashSEIEnabled;  ///< Checksum(3)/CRC(2)/MD5(1)/disable(0) acting on decoded picture hash SEI message
-  UInt                    m_numberOfChecksumErrorsDetected;
+  int                     m_decodedPictureHashSEIEnabled;  ///< Checksum(3)/CRC(2)/MD5(1)/disable(0) acting on decoded picture hash SEI message
+  uint32_t                    m_numberOfChecksumErrorsDetected;
 
-  Bool                    m_warningMessageSkipPicture;
+  bool                    m_warningMessageSkipPicture;
 
   std::list<InputNALUnit*> m_prefixSEINALUs; /// Buffered up prefix SEI NAL Units.
 public:
   DecLib();
   virtual ~DecLib();
 
-  Void  create  ();
-  Void  destroy ();
+  void  create  ();
+  void  destroy ();
 
-  Void  setDecodedPictureHashSEIEnabled(Int enabled) { m_decodedPictureHashSEIEnabled=enabled; }
+  void  setDecodedPictureHashSEIEnabled(int enabled) { m_decodedPictureHashSEIEnabled=enabled; }
 
   void  init(
 #if JVET_J0090_MEMORY_BANDWITH_MEASURE
     const std::string& cacheCfgFileName
 #endif
   );
-  Bool  decode(InputNALUnit& nalu, Int& iSkipFrame, Int& iPOCLastDisplay);
-  Void  deletePicBuffer();
+  bool  decode(InputNALUnit& nalu, int& iSkipFrame, int& iPOCLastDisplay);
+  void  deletePicBuffer();
 
-  Void  executeLoopFilters();
-  Void  finishPicture(Int& poc, PicList*& rpcListPic, MsgLevel msgl = INFO);
-  Void  finishPictureLight(Int& poc, PicList*& rpcListPic );
-  Void  checkNoOutputPriorPics (PicList* rpcListPic);
+  void  executeLoopFilters();
+  void  finishPicture(int& poc, PicList*& rpcListPic, MsgLevel msgl = INFO);
+  void  finishPictureLight(int& poc, PicList*& rpcListPic );
+  void  checkNoOutputPriorPics (PicList* rpcListPic);
 
-  Bool  getNoOutputPriorPicsFlag () const   { return m_isNoOutputPriorPics; }
-  Void  setNoOutputPriorPicsFlag (Bool val) { m_isNoOutputPriorPics = val; }
-  Void  setFirstSliceInPicture (bool val)  { m_bFirstSliceInPicture = val; }
-  Bool  getFirstSliceInSequence () const   { return m_bFirstSliceInSequence; }
-  Void  setFirstSliceInSequence (bool val) { m_bFirstSliceInSequence = val; }
-  Void  setDecodedSEIMessageOutputStream(std::ostream *pOpStream) { m_pDecodedSEIOutputStream = pOpStream; }
-  UInt  getNumberOfChecksumErrorsDetected() const { return m_numberOfChecksumErrorsDetected; }
+  bool  getNoOutputPriorPicsFlag () const   { return m_isNoOutputPriorPics; }
+  void  setNoOutputPriorPicsFlag (bool val) { m_isNoOutputPriorPics = val; }
+  void  setFirstSliceInPicture (bool val)  { m_bFirstSliceInPicture = val; }
+  bool  getFirstSliceInSequence () const   { return m_bFirstSliceInSequence; }
+  void  setFirstSliceInSequence (bool val) { m_bFirstSliceInSequence = val; }
+  void  setDecodedSEIMessageOutputStream(std::ostream *pOpStream) { m_pDecodedSEIOutputStream = pOpStream; }
+  uint32_t  getNumberOfChecksumErrorsDetected() const { return m_numberOfChecksumErrorsDetected; }
 
 protected:
-  Void  xUpdateRasInit(Slice* slice);
+  void  xUpdateRasInit(Slice* slice);
 
-  Picture * xGetNewPicBuffer(const SPS &sps, const PPS &pps, const UInt temporalLayer);
-  Void  xCreateLostPicture (Int iLostPOC);
+  Picture * xGetNewPicBuffer(const SPS &sps, const PPS &pps, const uint32_t temporalLayer);
+  void  xCreateLostPicture (int iLostPOC);
 
-  Void      xActivateParameterSets();
-  Bool      xDecodeSlice(InputNALUnit &nalu, Int &iSkipFrame, Int iPOCLastDisplay);
+  void      xActivateParameterSets();
+  bool      xDecodeSlice(InputNALUnit &nalu, int &iSkipFrame, int iPOCLastDisplay);
 #if HEVC_VPS
-  Void      xDecodeVPS( InputNALUnit& nalu );
+  void      xDecodeVPS( InputNALUnit& nalu );
 #endif
-  Void      xDecodeSPS( InputNALUnit& nalu );
-  Void      xDecodePPS( InputNALUnit& nalu );
-  Void      xUpdatePreviousTid0POC( Slice *pSlice ) { if ((pSlice->getTLayer()==0) && (pSlice->isReferenceNalu() && (pSlice->getNalUnitType()!=NAL_UNIT_CODED_SLICE_RASL_R)&& (pSlice->getNalUnitType()!=NAL_UNIT_CODED_SLICE_RADL_R))) { m_prevTid0POC=pSlice->getPOC(); } }
-  Void      xParsePrefixSEImessages();
-  Void      xParsePrefixSEIsForUnknownVCLNal();
+  void      xDecodeSPS( InputNALUnit& nalu );
+  void      xDecodePPS( InputNALUnit& nalu );
+  void      xUpdatePreviousTid0POC( Slice *pSlice ) { if ((pSlice->getTLayer()==0) && (pSlice->isReferenceNalu() && (pSlice->getNalUnitType()!=NAL_UNIT_CODED_SLICE_RASL_R)&& (pSlice->getNalUnitType()!=NAL_UNIT_CODED_SLICE_RADL_R))) { m_prevTid0POC=pSlice->getPOC(); } }
+  void      xParsePrefixSEImessages();
+  void      xParsePrefixSEIsForUnknownVCLNal();
 
 };// END CLASS DEFINITION DecLib
 
