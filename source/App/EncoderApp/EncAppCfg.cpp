@@ -1385,7 +1385,11 @@ bool EncAppCfg::parseCfg( int argc, char* argv[] )
   m_ext360.setMaxCUInfo(m_uiCTUSize, 1 << MIN_CU_LOG2);
 #endif
 
-  m_inputFileName   = inputPathPrefix + "/" + m_inputFileName;
+  if (!inputPathPrefix.empty() && inputPathPrefix.back() != '/' && inputPathPrefix.back() != '\\' )
+  {
+    inputPathPrefix += "/";
+  }
+  m_inputFileName   = inputPathPrefix + m_inputFileName;
   m_framesToBeEncoded = ( m_framesToBeEncoded + m_temporalSubsampleRatio - 1 ) / m_temporalSubsampleRatio;
   m_adIntraLambdaModifier = cfg_adIntraLambdaModifier.values;
   if(m_isField)
