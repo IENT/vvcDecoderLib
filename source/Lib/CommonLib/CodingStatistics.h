@@ -737,10 +737,9 @@ public:
     s.sum   += getNumOnes( value );
   }
 
-#if JEM_TOOLS
   static Void IncrementStatisticTool( const CodingStatisticsClassType &stat )
   {
-    CHECK( stat.type < STATS__TOOL_AFF || stat.type >= STATS__TOOL_TOTAL, "Should never be used." );
+    CHECK( stat.type < STATS__TOOL_TOTAL_FRAME || stat.type >= STATS__TOOL_TOTAL, "Should never be used." );
     StatTool &s = GetStatisticTool( stat );
     s.count++;
 
@@ -749,7 +748,6 @@ public:
 
     s.pixels = s.count * gp_sizeIdxInfo->sizeFrom( wIdx ) * gp_sizeIdxInfo->sizeFrom( hIdx );
   }
-#endif
 
   StatLogValue values;
 
