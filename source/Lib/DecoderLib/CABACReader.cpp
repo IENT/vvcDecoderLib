@@ -201,6 +201,7 @@ bool CABACReader::coding_tree_unit( CodingStructure& cs, const UnitArea& area, i
         }
         else
         {
+          RExt__DECODER_DEBUG_BIT_STATISTICS_CREATE_SET(STATS__CABAC_BITS__ALF);
           ctbAlfFlag[ctuRsAddr] = m_BinDecoder.decodeBin( Ctx::ctbAlfFlag( compIdx * 3 + ctx ) );
         }
       }

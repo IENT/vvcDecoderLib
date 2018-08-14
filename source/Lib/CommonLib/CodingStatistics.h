@@ -39,6 +39,7 @@
 #include <string>
 #include <map>
 #include <math.h>
+#include <cinttypes>
 #include "ChromaFormat.h"
 
 static const int64_t CODINGSTATISTICS_ENTROPYSCALE = 32768;
@@ -93,8 +94,10 @@ enum CodingStatisticsType
   STATS__CABAC_BITS__SIGN_BIT,
   STATS__CABAC_BITS__ESCAPE_BITS,
   STATS__CABAC_BITS__SAO,
-#if JEM_TOOLS
+#if JVET_K0371_ALF
   STATS__CABAC_BITS__ALF,
+#endif
+#if JEM_TOOLS
   STATS__CABAC_BITS__NSST,
 #endif
   STATS__CABAC_TRM_BITS,
@@ -371,13 +374,13 @@ private:
       {
         const double quote = 100.0 * sCABAC.count / ( double ) sCABAC.classCount;
         const double ratio = 100.0 * sCABAC.bits / ( double ) sCABAC.count;
-        printf( "%11.2f%% %12lld %12lld %12lld %11.2f%%", quote, sCABAC.count, sCABAC.sum, sCABAC.bits, ratio );
+        printf( "%11.2f%% %12" PRId64 " %12" PRId64 " %12" PRId64 " %11.2f%%", quote, sCABAC.count, sCABAC.sum, sCABAC.bits, ratio );
       }
       else
       {
-        printf( "         -/- %12lld %12lld %12lld          -/-", sCABAC.count, sCABAC.sum, sCABAC.bits );
+        printf( "         -/- %12" PRId64 " %12" PRId64 " %12" PRId64 "          -/-", sCABAC.count, sCABAC.sum, sCABAC.bits );
       }
-      printf( " %12lld %12lld %12lld %12lld (%12lld)%c\n", sEP.count, sEP.sum, sEP.bits, sCABAC.bits + sEP.bits, ( sCABAC.bits + sEP.bits ) / 8, sep == '~' ? ']' : ' ' );
+      printf( " %12" PRId64 " %12" PRId64 " %12" PRId64 " %12" PRId64 " (%12" PRId64 ")%c\n", sEP.count, sEP.sum, sEP.bits, sCABAC.bits + sEP.bits, ( sCABAC.bits + sEP.bits ) / 8, sep == '~' ? ']' : ' ' );
     }
   }
   static void OutputLine( const char *pName, const char sep, const char *pWidthString, const char *pHeightString, const char *pSubClassStr, const SStat &sCABAC, const SStat &sEP )
@@ -387,17 +390,17 @@ private:
     {
       const double quote = 100.0 * sCABAC.count / ( double ) sCABAC.classCount;
       const double ratio = 100.0 * sCABAC.bits / ( double ) sCABAC.count;
-      printf( "%11.2f%% %12lld %12lld %12lld %11.2f%%", quote, sCABAC.count, sCABAC.sum, sCABAC.bits, ratio );
+      printf( "%11.2f%% %12" PRId64 " %12" PRId64 " %12" PRId64 " %11.2f%%", quote, sCABAC.count, sCABAC.sum, sCABAC.bits, ratio );
     }
     else
     {
-      printf( "         -/- %12lld %12lld %12lld          -/-", sCABAC.count, sCABAC.sum, sCABAC.bits );
+      printf( "         -/- %12" PRId64 " %12" PRId64 " %12" PRId64 "          -/-", sCABAC.count, sCABAC.sum, sCABAC.bits );
     }
-    printf( " %12lld %12lld %12lld %12lld (%12lld)%c\n", sEP.count, sEP.sum, sEP.bits, sCABAC.bits + sEP.bits, ( sCABAC.bits + sEP.bits ) / 8, sep == '~' ? ']' : ' ' );
+    printf( " %12" PRId64 " %12" PRId64 " %12" PRId64 " %12" PRId64 " (%12" PRId64 ")%c\n", sEP.count, sEP.sum, sEP.bits, sCABAC.bits + sEP.bits, ( sCABAC.bits + sEP.bits ) / 8, sep == '~' ? ']' : ' ' );
   }
   static void OutputLine( const char *pName, const char sep, const char *pWidthString, const char *pHeightString, const char *pSubClassStr, const SStat &sEP )
   {
-    printf( "%c%-45s%c  %6s %6s %6s          -/- %12s %12s %12s %9s-/- %12lld %12lld %12lld %12lld (%12lld)%c\n",
+    printf( "%c%-45s%c  %6s %6s %6s          -/- %12s %12s %12s %9s-/- %12" PRId64 " %12" PRId64 " %12" PRId64 " %12" PRId64 " (%12" PRId64 ")%c\n",
             sep == '~' ? '[' : ' ', pName, sep, pWidthString, pHeightString, pSubClassStr,
             "", "", "", "", sEP.count, sEP.sum, sEP.bits, sEP.bits, ( sEP.bits ) / 8, sep == '~' ? ']' : ' ' );
   }
@@ -405,7 +408,7 @@ private:
   static void OutputLine( const char *pName, const char sep, const char *pWidthString, const char *pHeightString, const char *pSubClassStr, const StatTool &sTool, uint64_t totalPixels )
   {
     const double ratio = 100.0 * sTool.pixels / ( double ) totalPixels;
-    printf( "%c%-45s%c  %6s %6s %6s %12lld     %12lld       %11.2f%%%c\n",
+    printf( "%c%-45s%c  %6s %6s %6s %12" PRId64 "     %12" PRId64 "       %11.2f%%%c\n",
             sep == '~' ? '[' : ' ', pName, sep, pWidthString, pHeightString, pSubClassStr,
             sTool.count, sTool.pixels, ratio, sep == '~' ? ']' : ' ' );
   }
@@ -413,7 +416,7 @@ private:
   static void OutputLine( const char *pName, const char sep, uint32_t wIdx, uint32_t hIdx, const char *pSubClassStr, const StatTool &sTool, uint64_t totalPixels )
   {
     const double ratio = 100.0 * sTool.pixels / ( double ) totalPixels;
-    printf( "%c%-45s%c  %6d %6d %6s %12lld     %12lld       %11.2f%%%c\n",
+    printf( "%c%-45s%c  %6d %6d %6s %12" PRId64 "     %12" PRId64 "       %11.2f%%%c\n",
             sep == '~' ? '[' : ' ', pName, sep, gp_sizeIdxInfo->sizeFrom( wIdx ), gp_sizeIdxInfo->sizeFrom( hIdx ), pSubClassStr,
             sTool.count, sTool.pixels, ratio, sep == '~' ? ']' : ' ' );
   }
