@@ -40,7 +40,6 @@
 #if JVET_K0371_ALF
 #include "CodingStructure.h"
 #include "Picture.h"
-#include <nmmintrin.h>
 
 AdaptiveLoopFilter::AdaptiveLoopFilter()
   : m_classifier( nullptr )
