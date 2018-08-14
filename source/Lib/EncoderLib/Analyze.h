@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -67,11 +67,11 @@
 class Analyze
 {
 private:
-  Double    m_dPSNRSum[MAX_NUM_COMPONENT];
-  Double    m_dAddBits;
-  UInt      m_uiNumPic;
-  Double    m_dFrmRate; //--CFG_KDY
-  Double    m_MSEyuvframe[MAX_NUM_COMPONENT]; // sum of MSEs
+  double    m_dPSNRSum[MAX_NUM_COMPONENT];
+  double    m_dAddBits;
+  uint32_t      m_uiNumPic;
+  double    m_dFrmRate; //--CFG_KDY
+  double    m_MSEyuvframe[MAX_NUM_COMPONENT]; // sum of MSEs
 #if ENABLE_QPA && FRAME_WEIGHTING
   double    m_sumWSSD[MAX_NUM_COMPONENT];   // weighted SSDs
   double    m_sumW;
@@ -84,10 +84,10 @@ public:
   virtual ~Analyze()  {}
   Analyze() { clear(); }
 
-  Void  addResult( Double psnr[MAX_NUM_COMPONENT], Double bits, const Double MSEyuvframe[MAX_NUM_COMPONENT])
+  void  addResult( double psnr[MAX_NUM_COMPONENT], double bits, const double MSEyuvframe[MAX_NUM_COMPONENT])
   {
     m_dAddBits  += bits;
-    for(UInt i=0; i<MAX_NUM_COMPONENT; i++)
+    for(uint32_t i=0; i<MAX_NUM_COMPONENT; i++)
     {
       m_dPSNRSum[i] += psnr[i];
       m_MSEyuvframe[i] += MSEyuvframe[i];
@@ -97,26 +97,26 @@ public:
   }
 #if ENABLE_QPA
  #if FRAME_WEIGHTING
-  Void    addWeightedSSD(const double dWeightedSSD, const ComponentID compID) { m_sumWSSD[compID] += dWeightedSSD; }
-  Void    addWeight     (const double dWeight) { m_sumW += dWeight; }
-  Double  getWPSNR      (const ComponentID compID) const { return (m_sumWSSD[compID] > 0.0 ? 10.0 * log10(m_sumW / m_sumWSSD[compID]) : 999.99); }
+  void    addWeightedSSD(const double dWeightedSSD, const ComponentID compID) { m_sumWSSD[compID] += dWeightedSSD; }
+  void    addWeight     (const double dWeight) { m_sumW += dWeight; }
+  double  getWPSNR      (const ComponentID compID) const { return (m_sumWSSD[compID] > 0.0 ? 10.0 * log10(m_sumW / m_sumWSSD[compID]) : 999.99); }
  #else
-  Double  getWPSNR      (const ComponentID compID) const { return m_dPSNRSum[compID] / (double)m_uiNumPic; }
+  double  getWPSNR      (const ComponentID compID) const { return m_dPSNRSum[compID] / (double)m_uiNumPic; }
  #endif
 #endif
-  Double  getPsnr(ComponentID compID) const { return  m_dPSNRSum[compID];  }
-  Double  getBits()                   const { return  m_dAddBits;   }
-  Void    setBits(Double numBits)     { m_dAddBits = numBits; }
-  UInt    getNumPic()                 const { return  m_uiNumPic;   }
+  double  getPsnr(ComponentID compID) const { return  m_dPSNRSum[compID];  }
+  double  getBits()                   const { return  m_dAddBits;   }
+  void    setBits(double numBits)     { m_dAddBits = numBits; }
+  uint32_t    getNumPic()                 const { return  m_uiNumPic;   }
 #if EXTENSION_360_VIDEO
   TExt360EncAnalyze& getExt360Info() { return m_ext360; }
 #endif
 
-  Void    setFrmRate  (Double dFrameRate) { m_dFrmRate = dFrameRate; } //--CFG_KDY
-  Void    clear()
+  void    setFrmRate  (double dFrameRate) { m_dFrmRate = dFrameRate; } //--CFG_KDY
+  void    clear()
   {
     m_dAddBits = 0;
-    for(UInt i=0; i<MAX_NUM_COMPONENT; i++)
+    for(uint32_t i=0; i<MAX_NUM_COMPONENT; i++)
     {
       m_dPSNRSum[i] = 0;
       m_MSEyuvframe[i] = 0;
@@ -134,13 +134,13 @@ public:
   }
 
 
-  Void calculateCombinedValues(const ChromaFormat chFmt, Double &PSNRyuv, Double &MSEyuv, const BitDepths &bitDepths)
+  void calculateCombinedValues(const ChromaFormat chFmt, double &PSNRyuv, double &MSEyuv, const BitDepths &bitDepths)
   {
     MSEyuv    = 0;
-    Int scale = 0;
+    int scale = 0;
 
-    Int maximumBitDepth = bitDepths.recon[CHANNEL_TYPE_LUMA];
-    for (UInt channelTypeIndex = 1; channelTypeIndex < MAX_NUM_CHANNEL_TYPE; channelTypeIndex++)
+    int maximumBitDepth = bitDepths.recon[CHANNEL_TYPE_LUMA];
+    for (uint32_t channelTypeIndex = 1; channelTypeIndex < MAX_NUM_CHANNEL_TYPE; channelTypeIndex++)
     {
       if (bitDepths.recon[channelTypeIndex] > maximumBitDepth)
       {
@@ -149,35 +149,35 @@ public:
     }
 
 #if ENABLE_QPA
-    const UInt maxval                = /*useWPSNR ? (1 << maximumBitDepth) - 1 :*/ 255 << (maximumBitDepth - 8); // fix with WPSNR: 1023 (4095) instead of 1020 (4080) for bit depth 10 (12)
+    const uint32_t maxval                = /*useWPSNR ? (1 << maximumBitDepth) - 1 :*/ 255 << (maximumBitDepth - 8); // fix with WPSNR: 1023 (4095) instead of 1020 (4080) for bit depth 10 (12)
 #else
-    const UInt maxval                = 255 << (maximumBitDepth - 8);
+    const uint32_t maxval                = 255 << (maximumBitDepth - 8);
 #endif
-    const UInt numberValidComponents = getNumberValidComponents(chFmt);
+    const uint32_t numberValidComponents = getNumberValidComponents(chFmt);
 
-    for (UInt comp=0; comp<numberValidComponents; comp++)
+    for (uint32_t comp=0; comp<numberValidComponents; comp++)
     {
       const ComponentID compID        = ComponentID(comp);
-      const UInt        csx           = getComponentScaleX(compID, chFmt);
-      const UInt        csy           = getComponentScaleY(compID, chFmt);
-      const Int         scaleChan     = (4>>(csx+csy));
-      const UInt        bitDepthShift = 2 * (maximumBitDepth - bitDepths.recon[toChannelType(compID)]); //*2 because this is a squared number
+      const uint32_t        csx           = getComponentScaleX(compID, chFmt);
+      const uint32_t        csy           = getComponentScaleY(compID, chFmt);
+      const int         scaleChan     = (4>>(csx+csy));
+      const uint32_t        bitDepthShift = 2 * (maximumBitDepth - bitDepths.recon[toChannelType(compID)]); //*2 because this is a squared number
 
-      const Double      channelMSE    = (m_MSEyuvframe[compID] * Double(1 << bitDepthShift)) / Double(getNumPic());
+      const double      channelMSE    = (m_MSEyuvframe[compID] * double(1 << bitDepthShift)) / double(getNumPic());
 
       scale  += scaleChan;
       MSEyuv += scaleChan * channelMSE;
     }
 
-    MSEyuv /= Double(scale);  // i.e. divide by 6 for 4:2:0, 8 for 4:2:2 etc.
+    MSEyuv /= double(scale);  // i.e. divide by 6 for 4:2:0, 8 for 4:2:2 etc.
     PSNRyuv = (MSEyuv == 0) ? 999.99 : 10.0 * log10((maxval * maxval) / MSEyuv);
   }
 
 
 #if ENABLE_QPA || WCG_WPSNR
-  Void    printOut ( TChar cDelim, const ChromaFormat chFmt, const Bool printMSEBasedSNR, const Bool printSequenceMSE, const BitDepths &bitDepths, const bool useWPSNR = false )
+  void    printOut ( char cDelim, const ChromaFormat chFmt, const bool printMSEBasedSNR, const bool printSequenceMSE, const BitDepths &bitDepths, const bool useWPSNR = false )
 #else
-  Void    printOut ( TChar cDelim, const ChromaFormat chFmt, const Bool printMSEBasedSNR, const Bool printSequenceMSE, const BitDepths &bitDepths )
+  void    printOut ( char cDelim, const ChromaFormat chFmt, const bool printMSEBasedSNR, const bool printSequenceMSE, const BitDepths &bitDepths )
 #endif
   {
 #if !WCG_WPSNR
@@ -185,13 +185,13 @@ public:
 #else
     MsgLevel e_msg_level = (cDelim == 'a') || (cDelim == 'w') ? INFO : DETAILS;
 #endif
-    Double dFps     =   m_dFrmRate; //--CFG_KDY
-    Double dScale   = dFps / 1000 / (Double)m_uiNumPic;
+    double dFps     =   m_dFrmRate; //--CFG_KDY
+    double dScale   = dFps / 1000 / (double)m_uiNumPic;
 
-    Double MSEBasedSNR[MAX_NUM_COMPONENT];
+    double MSEBasedSNR[MAX_NUM_COMPONENT];
     if (printMSEBasedSNR)
     {
-      for (UInt componentIndex = 0; componentIndex < MAX_NUM_COMPONENT; componentIndex++)
+      for (uint32_t componentIndex = 0; componentIndex < MAX_NUM_COMPONENT; componentIndex++)
       {
         const ComponentID compID = ComponentID(componentIndex);
 
@@ -202,14 +202,14 @@ public:
         else
         {
 #if ENABLE_QPA
-          const UInt maxval = /*useWPSNR ? (1 << bitDepths.recon[toChannelType(compID)]) - 1 :*/ 255 << (bitDepths.recon[toChannelType(compID)] - 8); // fix with WPSNR: 1023 (4095) instead of 1020 (4080) for bit depth 10 (12)
+          const uint32_t maxval = /*useWPSNR ? (1 << bitDepths.recon[toChannelType(compID)]) - 1 :*/ 255 << (bitDepths.recon[toChannelType(compID)] - 8); // fix with WPSNR: 1023 (4095) instead of 1020 (4080) for bit depth 10 (12)
 #else
           //NOTE: this is not the true maximum value for any bitDepth other than 8. It comes from the original HM PSNR calculation
-          const UInt maxval = 255 << (bitDepths.recon[toChannelType(compID)] - 8);
+          const uint32_t maxval = 255 << (bitDepths.recon[toChannelType(compID)] - 8);
 #endif
-          const Double MSE  = m_MSEyuvframe[compID];
+          const double MSE  = m_MSEyuvframe[compID];
 
-          MSEBasedSNR[compID] = (MSE == 0) ? 999.99 : 10.0 * log10((maxval * maxval) / (MSE / (Double)getNumPic()));
+          MSEBasedSNR[compID] = (MSE == 0) ? 999.99 : 10.0 * log10((maxval * maxval) / (MSE / (double)getNumPic()));
         }
       }
     }
@@ -242,11 +242,11 @@ public:
 #if ENABLE_QPA
                  useWPSNR ? getWPSNR(COMPONENT_Y) :
 #endif
-                 getPsnr(COMPONENT_Y) / (Double)getNumPic() );
+                 getPsnr(COMPONENT_Y) / (double)getNumPic() );
 
           if (printSequenceMSE)
           {
-            msg( e_msg_level, "  %8.4lf\n", m_MSEyuvframe[COMPONENT_Y] / (Double)getNumPic() );
+            msg( e_msg_level, "  %8.4lf\n", m_MSEyuvframe[COMPONENT_Y] / (double)getNumPic() );
           }
           else
           {
@@ -283,11 +283,11 @@ public:
 #if ENABLE_QPA
                  useWPSNR ? getWPSNR(COMPONENT_Y) :
 #endif
-                 getPsnr(COMPONENT_Y) / (Double)getNumPic() );
+                 getPsnr(COMPONENT_Y) / (double)getNumPic() );
 
           if (printSequenceMSE)
           {
-            msg( e_msg_level, "  %8.4lf\n", m_MSEyuvframe[COMPONENT_Y] / (Double)getNumPic() );
+            msg( e_msg_level, "  %8.4lf\n", m_MSEyuvframe[COMPONENT_Y] / (double)getNumPic() );
           }
           else
           {
@@ -299,8 +299,8 @@ public:
       case CHROMA_422:
       case CHROMA_444:
         {
-          Double PSNRyuv = MAX_DOUBLE;
-          Double MSEyuv  = MAX_DOUBLE;
+          double PSNRyuv = MAX_DOUBLE;
+          double MSEyuv  = MAX_DOUBLE;
 
           calculateCombinedValues(chFmt, PSNRyuv, MSEyuv, bitDepths);
 
@@ -329,23 +329,23 @@ public:
 #if ENABLE_QPA
                    useWPSNR ? getWPSNR(COMPONENT_Y ) :
 #endif
-                   getPsnr(COMPONENT_Y ) / (Double)getNumPic(),
+                   getPsnr(COMPONENT_Y ) / (double)getNumPic(),
 #if ENABLE_QPA
                    useWPSNR ? getWPSNR(COMPONENT_Cb) :
 #endif
-                   getPsnr(COMPONENT_Cb) / (Double)getNumPic(),
+                   getPsnr(COMPONENT_Cb) / (double)getNumPic(),
 #if ENABLE_QPA
                    useWPSNR ? getWPSNR(COMPONENT_Cr) :
 #endif
-                   getPsnr(COMPONENT_Cr) / (Double)getNumPic(),
+                   getPsnr(COMPONENT_Cr) / (double)getNumPic(),
                    PSNRyuv );
 
             if (printSequenceMSE)
             {
               msg( e_msg_level, "  %8.4lf  "   "%8.4lf  "    "%8.4lf  "   "%8.4lf\n",
-                     m_MSEyuvframe[COMPONENT_Y ] / (Double)getNumPic(),
-                     m_MSEyuvframe[COMPONENT_Cb] / (Double)getNumPic(),
-                     m_MSEyuvframe[COMPONENT_Cr] / (Double)getNumPic(),
+                     m_MSEyuvframe[COMPONENT_Y ] / (double)getNumPic(),
+                     m_MSEyuvframe[COMPONENT_Cb] / (double)getNumPic(),
+                     m_MSEyuvframe[COMPONENT_Cr] / (double)getNumPic(),
                      MSEyuv );
             }
             else
@@ -389,15 +389,15 @@ public:
 #if ENABLE_QPA
                    useWPSNR ? getWPSNR(COMPONENT_Y ) :
 #endif
-                   getPsnr(COMPONENT_Y ) / (Double)getNumPic(),
+                   getPsnr(COMPONENT_Y ) / (double)getNumPic(),
 #if ENABLE_QPA
                    useWPSNR ? getWPSNR(COMPONENT_Cb) :
 #endif
-                   getPsnr(COMPONENT_Cb) / (Double)getNumPic(),
+                   getPsnr(COMPONENT_Cb) / (double)getNumPic(),
 #if ENABLE_QPA
                    useWPSNR ? getWPSNR(COMPONENT_Cr) :
 #endif
-                   getPsnr(COMPONENT_Cr) / (Double)getNumPic(),
+                   getPsnr(COMPONENT_Cr) / (double)getNumPic(),
                    PSNRyuv );
 
 #if EXTENSION_360_VIDEO
@@ -407,9 +407,9 @@ public:
             if (printSequenceMSE)
             {
               msg( e_msg_level, "  %8.4lf  "   "%8.4lf  "    "%8.4lf  "   "%8.4lf\n",
-                     m_MSEyuvframe[COMPONENT_Y ] / (Double)getNumPic(),
-                     m_MSEyuvframe[COMPONENT_Cb] / (Double)getNumPic(),
-                     m_MSEyuvframe[COMPONENT_Cr] / (Double)getNumPic(),
+                     m_MSEyuvframe[COMPONENT_Y ] / (double)getNumPic(),
+                     m_MSEyuvframe[COMPONENT_Cb] / (double)getNumPic(),
+                     m_MSEyuvframe[COMPONENT_Cr] / (double)getNumPic(),
                      MSEyuv );
             }
             else
@@ -427,41 +427,41 @@ public:
   }
 
 
-  Void    printSummary(const ChromaFormat chFmt, const Bool printSequenceMSE, const BitDepths &bitDepths, const std::string &sFilename)
+  void    printSummary(const ChromaFormat chFmt, const bool printSequenceMSE, const BitDepths &bitDepths, const std::string &sFilename)
   {
     FILE* pFile = fopen (sFilename.c_str(), "at");
 
-    Double dFps     =   m_dFrmRate; //--CFG_KDY
-    Double dScale   = dFps / 1000 / (Double)m_uiNumPic;
+    double dFps     =   m_dFrmRate; //--CFG_KDY
+    double dScale   = dFps / 1000 / (double)m_uiNumPic;
     switch (chFmt)
     {
       case CHROMA_400:
         fprintf(pFile, "%f\t %f\n",
             getBits() * dScale,
-            getPsnr(COMPONENT_Y) / (Double)getNumPic() );
+            getPsnr(COMPONENT_Y) / (double)getNumPic() );
         break;
       case CHROMA_420:
       case CHROMA_422:
       case CHROMA_444:
         {
-          Double PSNRyuv = MAX_DOUBLE;
-          Double MSEyuv  = MAX_DOUBLE;
+          double PSNRyuv = MAX_DOUBLE;
+          double MSEyuv  = MAX_DOUBLE;
 
           calculateCombinedValues(chFmt, PSNRyuv, MSEyuv, bitDepths);
 
           fprintf(pFile, "%f\t %f\t %f\t %f\t %f",
               getBits() * dScale,
-              getPsnr(COMPONENT_Y ) / (Double)getNumPic(),
-              getPsnr(COMPONENT_Cb) / (Double)getNumPic(),
-              getPsnr(COMPONENT_Cr) / (Double)getNumPic(),
+              getPsnr(COMPONENT_Y ) / (double)getNumPic(),
+              getPsnr(COMPONENT_Cb) / (double)getNumPic(),
+              getPsnr(COMPONENT_Cr) / (double)getNumPic(),
               PSNRyuv );
 
           if (printSequenceMSE)
           {
             fprintf(pFile, "\t %f\t %f\t %f\t %f\n",
-                m_MSEyuvframe[COMPONENT_Y ] / (Double)getNumPic(),
-                m_MSEyuvframe[COMPONENT_Cb] / (Double)getNumPic(),
-                m_MSEyuvframe[COMPONENT_Cr] / (Double)getNumPic(),
+                m_MSEyuvframe[COMPONENT_Y ] / (double)getNumPic(),
+                m_MSEyuvframe[COMPONENT_Cb] / (double)getNumPic(),
+                m_MSEyuvframe[COMPONENT_Cr] / (double)getNumPic(),
                 MSEyuv );
           }
           else

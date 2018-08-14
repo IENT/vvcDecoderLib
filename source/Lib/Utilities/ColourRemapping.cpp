@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -75,16 +75,16 @@ ColourRemapping::~ColourRemapping()
   reset();
 }
 
-Void ColourRemapping::reset()
+void ColourRemapping::reset()
 {
   delete m_pcSeiColourRemappingInfoPrevious;
   m_pcSeiColourRemappingInfoPrevious = NULL;
 }
 
 
-Void applyColourRemapping(const PelUnitBuf& pic, SEIColourRemappingInfo& criSEI, const SPS &activeSPS, std::ofstream& outstream);
+void applyColourRemapping(const PelUnitBuf& pic, SEIColourRemappingInfo& criSEI, const SPS &activeSPS, std::ofstream& outstream);
 
-Void ColourRemapping::outputColourRemapPic(Picture* pcPic, std::ofstream& outstream)
+void ColourRemapping::outputColourRemapPic(Picture* pcPic, std::ofstream& outstream)
 {
   const SPS &sps=*pcPic->cs->sps;
   SEIMessages colourRemappingInfo = getSeisByType(pcPic->SEIs, SEI::COLOUR_REMAPPING_INFO );
@@ -122,41 +122,41 @@ Void ColourRemapping::outputColourRemapPic(Picture* pcPic, std::ofstream& outstr
 // compute lut from SEI
 // use at lutPoints points aligned on a power of 2 value
 // SEI Lut must be in ascending values of coded Values
-static std::vector<Int>
-initColourRemappingInfoLut(const Int                                          bitDepth_in,     // bit-depth of the input values of the LUT
-                           const Int                                          nbDecimalValues, // Position of the fixed point
+static std::vector<int>
+initColourRemappingInfoLut(const int                                          bitDepth_in,     // bit-depth of the input values of the LUT
+                           const int                                          nbDecimalValues, // Position of the fixed point
                            const std::vector<SEIColourRemappingInfo::CRIlut> &lut,
-                           const Int                                          maxValue, // maximum output value
-                           const Int                                          lutOffset)
+                           const int                                          maxValue, // maximum output value
+                           const int                                          lutOffset)
 {
-  const Int lutPoints = (1 << bitDepth_in) + 1 ;
-  std::vector<Int> retLut(lutPoints);
+  const int lutPoints = (1 << bitDepth_in) + 1 ;
+  std::vector<int> retLut(lutPoints);
 
   // missing values: need to define default values before first definition (check codedValue[0] == 0)
-  Int iTargetPrev = (lut.size() && lut[0].codedValue == 0) ? lut[0].targetValue: 0;
-  Int startPivot = (lut.size())? ((lut[0].codedValue == 0)? 1: 0): 1;
-  Int iCodedPrev  = 0;
+  int iTargetPrev = (lut.size() && lut[0].codedValue == 0) ? lut[0].targetValue: 0;
+  int startPivot = (lut.size())? ((lut[0].codedValue == 0)? 1: 0): 1;
+  int iCodedPrev  = 0;
   // set max value with the coded bit-depth
   // + ((1 << nbDecimalValues) - 1) is for the added bits
-  const Int maxValueFixedPoint = (maxValue << nbDecimalValues) + ((1 << nbDecimalValues) - 1);
+  const int maxValueFixedPoint = (maxValue << nbDecimalValues) + ((1 << nbDecimalValues) - 1);
 
-  Int iValue = 0;
+  int iValue = 0;
 
-  for ( Int iPivot=startPivot ; iPivot < (Int)lut.size(); iPivot++ )
+  for ( int iPivot=startPivot ; iPivot < (int)lut.size(); iPivot++ )
   {
-    Int iCodedNext  = lut[iPivot].codedValue;
-    Int iTargetNext = lut[iPivot].targetValue;
+    int iCodedNext  = lut[iPivot].codedValue;
+    int iTargetNext = lut[iPivot].targetValue;
 
     // ensure correct bit depth and avoid overflow in lut address
-    Int iCodedNext_bitDepth = std::min(iCodedNext, (1 << bitDepth_in));
+    int iCodedNext_bitDepth = std::min(iCodedNext, (1 << bitDepth_in));
 
-    const Int divValue =  (iCodedNext - iCodedPrev > 0)? (iCodedNext - iCodedPrev): 1;
-    const Int lutValInit = (lutOffset + iTargetPrev) << nbDecimalValues;
-    const Int roundValue = divValue / 2;
+    const int divValue =  (iCodedNext - iCodedPrev > 0)? (iCodedNext - iCodedPrev): 1;
+    const int lutValInit = (lutOffset + iTargetPrev) << nbDecimalValues;
+    const int roundValue = divValue / 2;
     for ( ; iValue<iCodedNext_bitDepth; iValue++ )
     {
-      Int value = iValue;
-      Int interpol = ((((value-iCodedPrev) * (iTargetNext - iTargetPrev)) << nbDecimalValues) + roundValue) / divValue;
+      int value = iValue;
+      int interpol = ((((value-iCodedPrev) * (iTargetNext - iTargetPrev)) << nbDecimalValues) + roundValue) / divValue;
       retLut[iValue]  = std::min(lutValInit + interpol , maxValueFixedPoint);
     }
     iCodedPrev  = iCodedNext;
@@ -165,31 +165,31 @@ initColourRemappingInfoLut(const Int                                          bi
   // fill missing values if necessary
   if(iCodedPrev < (1 << bitDepth_in)+1)
   {
-    Int iCodedNext  = (1 << bitDepth_in);
-    Int iTargetNext = (1 << bitDepth_in) - 1;
+    int iCodedNext  = (1 << bitDepth_in);
+    int iTargetNext = (1 << bitDepth_in) - 1;
 
-    const Int divValue =  (iCodedNext - iCodedPrev > 0)? (iCodedNext - iCodedPrev): 1;
-    const Int lutValInit = (lutOffset + iTargetPrev) << nbDecimalValues;
-    const Int roundValue = divValue / 2;
+    const int divValue =  (iCodedNext - iCodedPrev > 0)? (iCodedNext - iCodedPrev): 1;
+    const int lutValInit = (lutOffset + iTargetPrev) << nbDecimalValues;
+    const int roundValue = divValue / 2;
 
     for ( ; iValue<=iCodedNext; iValue++ )
     {
-      Int value = iValue;
-      Int interpol = ((((value-iCodedPrev) * (iTargetNext - iTargetPrev)) << nbDecimalValues) + roundValue) / divValue;
+      int value = iValue;
+      int interpol = ((((value-iCodedPrev) * (iTargetNext - iTargetPrev)) << nbDecimalValues) + roundValue) / divValue;
       retLut[iValue]  = std::min(lutValInit + interpol , maxValueFixedPoint);
     }
   }
   return retLut;
 }
 
-static Void
-initColourRemappingInfoLuts(std::vector<Int>      (&preLut)[3],
-                            std::vector<Int>      (&postLut)[3],
+static void
+initColourRemappingInfoLuts(std::vector<int>      (&preLut)[3],
+                            std::vector<int>      (&postLut)[3],
                             SEIColourRemappingInfo &pCriSEI,
-                            const Int               maxBitDepth)
+                            const int               maxBitDepth)
 {
-  Int internalBitDepth = pCriSEI.m_colourRemapBitDepth;
-  for ( Int c=0 ; c<3 ; c++ )
+  int internalBitDepth = pCriSEI.m_colourRemapBitDepth;
+  for ( int c=0 ; c<3 ; c++ )
   {
     std::sort(pCriSEI.m_preLut[c].begin(), pCriSEI.m_preLut[c].end()); // ensure preLut is ordered in ascending values of codedValues
     preLut[c] = initColourRemappingInfoLut(pCriSEI.m_colourRemapInputBitDepth, maxBitDepth - pCriSEI.m_colourRemapInputBitDepth, pCriSEI.m_preLut[c], ((1 << internalBitDepth) - 1), 0); //Fill preLut
@@ -201,47 +201,47 @@ initColourRemappingInfoLuts(std::vector<Int>      (&preLut)[3],
 
 // apply lut.
 // Input lut values are aligned on power of 2 boundaries
-static Int
-applyColourRemappingInfoLut1D(Int inVal, const std::vector<Int> &lut, const Int inValPrecisionBits)
+static int
+applyColourRemappingInfoLut1D(int inVal, const std::vector<int> &lut, const int inValPrecisionBits)
 {
-  const Int roundValue = (inValPrecisionBits)? 1 << (inValPrecisionBits - 1): 0;
-  inVal = std::min(std::max(0, inVal), (Int)(((lut.size()-1) << inValPrecisionBits)));
-  Int index  = (Int) std::min((inVal >> inValPrecisionBits), (Int)(lut.size()-2));
-  Int outVal = (( inVal - (index<<inValPrecisionBits) ) * (lut[index+1] - lut[index]) + roundValue) >> inValPrecisionBits;
+  const int roundValue = (inValPrecisionBits)? 1 << (inValPrecisionBits - 1): 0;
+  inVal = std::min(std::max(0, inVal), (int)(((lut.size()-1) << inValPrecisionBits)));
+  int index  = (int) std::min((inVal >> inValPrecisionBits), (int)(lut.size()-2));
+  int outVal = (( inVal - (index<<inValPrecisionBits) ) * (lut[index+1] - lut[index]) + roundValue) >> inValPrecisionBits;
   outVal +=  lut[index] ;
 
   return outVal;
 }
 
-static Int
-applyColourRemappingInfoMatrix(const Int (&colourRemapCoeffs)[3], const Int postOffsetShift, const Int p0, const Int p1, const Int p2, const Int offset)
+static int
+applyColourRemappingInfoMatrix(const int (&colourRemapCoeffs)[3], const int postOffsetShift, const int p0, const int p1, const int p2, const int offset)
 {
-  Int YUVMat = (colourRemapCoeffs[0]* p0 + colourRemapCoeffs[1]* p1 + colourRemapCoeffs[2]* p2  + offset) >> postOffsetShift;
+  int YUVMat = (colourRemapCoeffs[0]* p0 + colourRemapCoeffs[1]* p1 + colourRemapCoeffs[2]* p2  + offset) >> postOffsetShift;
   return YUVMat;
 }
 
-static Void
-setColourRemappingInfoMatrixOffset(Int (&matrixOffset)[3], Int offset0, Int offset1, Int offset2)
+static void
+setColourRemappingInfoMatrixOffset(int (&matrixOffset)[3], int offset0, int offset1, int offset2)
 {
   matrixOffset[0] = offset0;
   matrixOffset[1] = offset1;
   matrixOffset[2] = offset2;
 }
 
-static Void
-setColourRemappingInfoMatrixOffsets(      Int  (&matrixInputOffset)[3],
-                                          Int  (&matrixOutputOffset)[3],
-                                    const Int  bitDepth,
-                                    const Bool crInputFullRangeFlag,
-                                    const Int  crInputMatrixCoefficients,
-                                    const Bool crFullRangeFlag,
-                                    const Int  crMatrixCoefficients)
+static void
+setColourRemappingInfoMatrixOffsets(      int  (&matrixInputOffset)[3],
+                                          int  (&matrixOutputOffset)[3],
+                                    const int  bitDepth,
+                                    const bool crInputFullRangeFlag,
+                                    const int  crInputMatrixCoefficients,
+                                    const bool crFullRangeFlag,
+                                    const int  crMatrixCoefficients)
 {
   // set static matrix offsets
-  Int crInputOffsetLuma = (crInputFullRangeFlag)? 0:-(16 << (bitDepth-8));
-  Int crOffsetLuma = (crFullRangeFlag)? 0:(16 << (bitDepth-8));
-  Int crInputOffsetChroma = 0;
-  Int crOffsetChroma = 0;
+  int crInputOffsetLuma = (crInputFullRangeFlag)? 0:-(16 << (bitDepth-8));
+  int crOffsetLuma = (crFullRangeFlag)? 0:(16 << (bitDepth-8));
+  int crInputOffsetChroma = 0;
+  int crOffsetChroma = 0;
 
   switch(crInputMatrixCoefficients)
   {
@@ -285,9 +285,9 @@ setColourRemappingInfoMatrixOffsets(      Int  (&matrixInputOffset)[3],
   setColourRemappingInfoMatrixOffset(matrixOutputOffset, crOffsetLuma, crOffsetChroma, crOffsetChroma);
 }
 
-Void applyColourRemapping(const PelUnitBuf& pic, SEIColourRemappingInfo& criSEI, const SPS &activeSPS, std::ofstream& outstream)
+void applyColourRemapping(const PelUnitBuf& pic, SEIColourRemappingInfo& criSEI, const SPS &activeSPS, std::ofstream& outstream)
 {
-  const Int maxBitDepth = 16;
+  const int maxBitDepth = 16;
 
   // create colour remapped picture
   if( !criSEI.m_colourRemapCancelFlag && pic.chromaFormat!=CHROMA_400) // 4:0:0 not supported.
@@ -295,28 +295,28 @@ Void applyColourRemapping(const PelUnitBuf& pic, SEIColourRemappingInfo& criSEI,
     PelBuf picY  = pic.Y();
     PelBuf picCb = pic.Cb();
     PelBuf picCr = pic.Cr();
-    const Int          iHeight         = picY.width;
-    const Int          iWidth          = picY.height;
+    const int          iHeight         = picY.width;
+    const int          iWidth          = picY.height;
 
     PelStorage cRemapped;
     cRemapped.create( pic.chromaFormat, Area( Position(), pic.Y()));
 
-    const Int  iStrideIn   = picY.stride;
-    const Int  iCStrideIn  = picCb.stride;
+    const int  iStrideIn   = picY.stride;
+    const int  iCStrideIn  = picCb.stride;
 
     PelBuf remapY  = cRemapped.Y();
     PelBuf remapCb = cRemapped.Cb();
     PelBuf remapCr = cRemapped.Cr();
-    const Int  iStrideOut  = remapY.stride;
-    const Int  iCStrideOut = remapCb.stride;
-    const Bool b444        = ( pic.chromaFormat == CHROMA_444 );
-    const Bool b422        = ( pic.chromaFormat == CHROMA_422 );
-    const Bool b420        = ( pic.chromaFormat == CHROMA_420 );
+    const int  iStrideOut  = remapY.stride;
+    const int  iCStrideOut = remapCb.stride;
+    const bool b444        = ( pic.chromaFormat == CHROMA_444 );
+    const bool b422        = ( pic.chromaFormat == CHROMA_422 );
+    const bool b420        = ( pic.chromaFormat == CHROMA_420 );
 
-    std::vector<Int> preLut[3];
-    std::vector<Int> postLut[3];
-    Int matrixInputOffset[3];
-    Int matrixOutputOffset[3];
+    std::vector<int> preLut[3];
+    std::vector<int> postLut[3];
+    int matrixInputOffset[3];
+    int matrixOutputOffset[3];
     const Pel *YUVIn[MAX_NUM_COMPONENT];
     Pel *YUVOut[MAX_NUM_COMPONENT];
     YUVIn[COMPONENT_Y]  = picY.buf;
@@ -326,14 +326,14 @@ Void applyColourRemapping(const PelUnitBuf& pic, SEIColourRemappingInfo& criSEI,
     YUVOut[COMPONENT_Cb] = remapCb.buf;
     YUVOut[COMPONENT_Cr] = remapCr.buf;
 
-    const Int bitDepth = criSEI.m_colourRemapBitDepth;
+    const int bitDepth = criSEI.m_colourRemapBitDepth;
 //    BitDepths        bitDepthsCriFile;
 //    bitDepthsCriFile.recon[CHANNEL_TYPE_LUMA]   = bitDepth;
 //    bitDepthsCriFile.recon[CHANNEL_TYPE_CHROMA] = bitDepth; // Different bitdepth is not implemented
 
-    const Int postOffsetShift = criSEI.m_log2MatrixDenom;
-    const Int matrixRound = 1 << (postOffsetShift - 1);
-    const Int postLutInputPrecision = (maxBitDepth - criSEI.m_colourRemapBitDepth);
+    const int postOffsetShift = criSEI.m_log2MatrixDenom;
+    const int matrixRound = 1 << (postOffsetShift - 1);
+    const int postLutInputPrecision = (maxBitDepth - criSEI.m_colourRemapBitDepth);
 
     if ( ! criSEI.m_colourRemapVideoSignalInfoPresentFlag ) // setting default
     {
@@ -359,38 +359,38 @@ Void applyColourRemapping(const PelUnitBuf& pic, SEIColourRemappingInfo& criSEI,
     matrixOutputOffset[2] += applyColourRemappingInfoMatrix(criSEI.m_colourRemapCoeffs[2], 0, matrixInputOffset[0], matrixInputOffset[1], matrixInputOffset[2], 0);
 
     // rescaling output: include CRI/output frame difference
-    const Int scaleShiftOut_neg = abs(bitDepth - maxBitDepth);
-    const Int scaleOut_round = 1 << (scaleShiftOut_neg-1);
+    const int scaleShiftOut_neg = abs(bitDepth - maxBitDepth);
+    const int scaleOut_round = 1 << (scaleShiftOut_neg-1);
 
     initColourRemappingInfoLuts(preLut, postLut, criSEI, maxBitDepth);
 
     CHECK(pic.chromaFormat == CHROMA_400, "Chroma format (400) not supported");
-    const Int hs = ::getComponentScaleX(ComponentID(COMPONENT_Cb), pic.chromaFormat);
-    const Int maxOutputValue = (1 << bitDepth) - 1;
+    const int hs = ::getComponentScaleX(ComponentID(COMPONENT_Cb), pic.chromaFormat);
+    const int maxOutputValue = (1 << bitDepth) - 1;
 
-    for( Int y = 0; y < iHeight; y++ )
+    for( int y = 0; y < iHeight; y++ )
     {
-      for( Int x = 0; x < iWidth; x++ )
+      for( int x = 0; x < iWidth; x++ )
       {
-        const Int xc = (x>>hs);
-        Bool computeChroma = b444 || ((b422 || !(y&1)) && !(x&1));
+        const int xc = (x>>hs);
+        bool computeChroma = b444 || ((b422 || !(y&1)) && !(x&1));
 
-        Int YUVPre_0 = applyColourRemappingInfoLut1D(YUVIn[COMPONENT_Y][x], preLut[0], 0);
-        Int YUVPre_1 = applyColourRemappingInfoLut1D(YUVIn[COMPONENT_Cb][xc], preLut[1], 0);
-        Int YUVPre_2 = applyColourRemappingInfoLut1D(YUVIn[COMPONENT_Cr][xc], preLut[2], 0);
+        int YUVPre_0 = applyColourRemappingInfoLut1D(YUVIn[COMPONENT_Y][x], preLut[0], 0);
+        int YUVPre_1 = applyColourRemappingInfoLut1D(YUVIn[COMPONENT_Cb][xc], preLut[1], 0);
+        int YUVPre_2 = applyColourRemappingInfoLut1D(YUVIn[COMPONENT_Cr][xc], preLut[2], 0);
 
-        Int YUVMat_0 = applyColourRemappingInfoMatrix(criSEI.m_colourRemapCoeffs[0], postOffsetShift, YUVPre_0, YUVPre_1, YUVPre_2, matrixOutputOffset[0]);
-        Int YUVLutB_0 = applyColourRemappingInfoLut1D(YUVMat_0, postLut[0], postLutInputPrecision);
+        int YUVMat_0 = applyColourRemappingInfoMatrix(criSEI.m_colourRemapCoeffs[0], postOffsetShift, YUVPre_0, YUVPre_1, YUVPre_2, matrixOutputOffset[0]);
+        int YUVLutB_0 = applyColourRemappingInfoLut1D(YUVMat_0, postLut[0], postLutInputPrecision);
         YUVOut[COMPONENT_Y][x] = std::min(maxOutputValue, (YUVLutB_0 + scaleOut_round) >> scaleShiftOut_neg);
 
         if( computeChroma )
         {
-          Int YUVMat_1 = applyColourRemappingInfoMatrix(criSEI.m_colourRemapCoeffs[1], postOffsetShift, YUVPre_0, YUVPre_1, YUVPre_2, matrixOutputOffset[1]);
-          Int YUVLutB_1 = applyColourRemappingInfoLut1D(YUVMat_1, postLut[1], postLutInputPrecision);
+          int YUVMat_1 = applyColourRemappingInfoMatrix(criSEI.m_colourRemapCoeffs[1], postOffsetShift, YUVPre_0, YUVPre_1, YUVPre_2, matrixOutputOffset[1]);
+          int YUVLutB_1 = applyColourRemappingInfoLut1D(YUVMat_1, postLut[1], postLutInputPrecision);
           YUVOut[COMPONENT_Cb][xc] = std::min(maxOutputValue, (YUVLutB_1 + scaleOut_round) >> scaleShiftOut_neg);
 
-          Int YUVMat_2 = applyColourRemappingInfoMatrix(criSEI.m_colourRemapCoeffs[2], postOffsetShift, YUVPre_0, YUVPre_1, YUVPre_2, matrixOutputOffset[2]);
-          Int YUVLutB_2 = applyColourRemappingInfoLut1D(YUVMat_2, postLut[2], postLutInputPrecision);
+          int YUVMat_2 = applyColourRemappingInfoMatrix(criSEI.m_colourRemapCoeffs[2], postOffsetShift, YUVPre_0, YUVPre_1, YUVPre_2, matrixOutputOffset[2]);
+          int YUVLutB_2 = applyColourRemappingInfoLut1D(YUVMat_2, postLut[2], postLutInputPrecision);
           YUVOut[COMPONENT_Cr][xc] = std::min(maxOutputValue, (YUVLutB_2 + scaleOut_round) >> scaleShiftOut_neg);
         }
       }

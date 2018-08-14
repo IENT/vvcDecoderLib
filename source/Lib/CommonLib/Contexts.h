@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -364,7 +364,7 @@ public:
   static const CtxSet   MVPIdx;
   static const CtxSet   SaoMergeFlag;
   static const CtxSet   SaoTypeIdx;
-#if JEM_TOOLS
+#if JEM_TOOLS && !JVET_K0371_ALF
   static const CtxSet   AlfCUCtrlFlags;
   static const CtxSet   AlfUvlcSCModel;
 #endif
@@ -382,12 +382,17 @@ public:
   static const CtxSet   CrossCompPred;
   static const CtxSet   ChromaQpAdjFlag;
   static const CtxSet   ChromaQpAdjIdc;
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   static const CtxSet   ImvFlag;
+#endif
+#if JEM_TOOLS
   static const CtxSet   LICFlag;
   static const CtxSet   ObmcFlag;
   static const CtxSet   FrucFlag;
   static const CtxSet   FrucMode;
+#endif
+#if JVET_K0371_ALF
+  static const CtxSet   ctbAlfFlag;
 #endif
   static const unsigned NumberOfContexts;
 

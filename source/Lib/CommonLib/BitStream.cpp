@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -82,7 +82,7 @@ InputBitstream::InputBitstream(const InputBitstream &src)
 // Public member functions
 // ====================================================================================================================
 
-Void InputBitstream::resetToStart()
+void InputBitstream::resetToStart()
 {
   m_fifo_idx=0;
   m_num_held_bits=0;
@@ -90,32 +90,32 @@ Void InputBitstream::resetToStart()
   m_numBitsRead=0;
 }
 
-UChar* OutputBitstream::getByteStream() const
+uint8_t* OutputBitstream::getByteStream() const
 {
-  return (UChar*) &m_fifo.front();
+  return (uint8_t*) &m_fifo.front();
 }
 
-UInt OutputBitstream::getByteStreamLength()
+uint32_t OutputBitstream::getByteStreamLength()
 {
-  return UInt(m_fifo.size());
+  return uint32_t(m_fifo.size());
 }
 
-Void OutputBitstream::clear()
+void OutputBitstream::clear()
 {
   m_fifo.clear();
   m_held_bits = 0;
   m_num_held_bits = 0;
 }
 
-Void OutputBitstream::write   ( UInt uiBits, UInt uiNumberOfBits )
+void OutputBitstream::write   ( uint32_t uiBits, uint32_t uiNumberOfBits )
 {
   CHECK( uiNumberOfBits > 32, "Number of bits is exceeds '32'" );
   CHECK( uiNumberOfBits != 32 && (uiBits & (~0 << uiNumberOfBits)) != 0, "Unsupported parameters" );
 
   /* any modulo 8 remainder of num_total_bits cannot be written this time,
    * and will be held until next time. */
-  UInt num_total_bits = uiNumberOfBits + m_num_held_bits;
-  UInt next_num_held_bits = num_total_bits % 8;
+  uint32_t num_total_bits = uiNumberOfBits + m_num_held_bits;
+  uint32_t next_num_held_bits = num_total_bits % 8;
 
   /* form a byte aligned word (write_bits), by concatenating any held bits
    * with the new bits, discarding the bits that will form the next_held_bits.
@@ -123,7 +123,7 @@ Void OutputBitstream::write   ( UInt uiBits, UInt uiNumberOfBits )
    * len(H)=7, len(V)=1: ... ---- HHHH HHHV . 0000 0000, next_num_held_bits=0
    * len(H)=7, len(V)=2: ... ---- HHHH HHHV . V000 0000, next_num_held_bits=1
    * if total_bits < 8, the value of v_ is not used */
-  UChar next_held_bits = uiBits << (8 - next_num_held_bits);
+  uint8_t next_held_bits = uiBits << (8 - next_num_held_bits);
 
   if (!(num_total_bits >> 3))
   {
@@ -136,8 +136,8 @@ Void OutputBitstream::write   ( UInt uiBits, UInt uiNumberOfBits )
   }
 
   /* topword serves to justify held_bits to align with the msb of uiBits */
-  UInt topword = (uiNumberOfBits - next_num_held_bits) & ~((1 << 3) -1);
-  UInt write_bits = (m_held_bits << topword) | (uiBits >> next_num_held_bits);
+  uint32_t topword = (uiNumberOfBits - next_num_held_bits) & ~((1 << 3) -1);
+  uint32_t write_bits = (m_held_bits << topword) | (uiBits >> next_num_held_bits);
 
   switch (num_total_bits >> 3)
   {
@@ -151,14 +151,14 @@ Void OutputBitstream::write   ( UInt uiBits, UInt uiNumberOfBits )
   m_num_held_bits = next_num_held_bits;
 }
 
-Void OutputBitstream::writeAlignOne()
+void OutputBitstream::writeAlignOne()
 {
-  UInt num_bits = getNumBitsUntilByteAligned();
+  uint32_t num_bits = getNumBitsUntilByteAligned();
   write((1 << num_bits) - 1, num_bits);
   return;
 }
 
-Void OutputBitstream::writeAlignZero()
+void OutputBitstream::writeAlignZero()
 {
   if (0 == m_num_held_bits)
   {
@@ -174,9 +174,9 @@ Void OutputBitstream::writeAlignZero()
  .
  \param  pcSubstream  substream to be added
  */
-Void   OutputBitstream::addSubstream( OutputBitstream* pcSubstream )
+void   OutputBitstream::addSubstream( OutputBitstream* pcSubstream )
 {
-  UInt uiNumBits = pcSubstream->getNumberOfWrittenBits();
+  uint32_t uiNumBits = pcSubstream->getNumberOfWrittenBits();
 
   const vector<uint8_t>& rbsp = pcSubstream->getFIFO();
   for (vector<uint8_t>::const_iterator it = rbsp.begin(); it != rbsp.end();)
@@ -189,15 +189,15 @@ Void   OutputBitstream::addSubstream( OutputBitstream* pcSubstream )
   }
 }
 
-Void OutputBitstream::writeByteAlignment()
+void OutputBitstream::writeByteAlignment()
 {
   write( 1, 1);
   writeAlignZero();
 }
 
-Int OutputBitstream::countStartCodeEmulations()
+int OutputBitstream::countStartCodeEmulations()
 {
-  UInt cnt = 0;
+  uint32_t cnt = 0;
   vector<uint8_t>& rbsp   = getFIFO();
   for (vector<uint8_t>::iterator it = rbsp.begin(); it != rbsp.end();)
   {
@@ -235,13 +235,13 @@ Int OutputBitstream::countStartCodeEmulations()
  * the bitstream is effectively padded with sufficient zero-bits to
  * avoid the overrun.
  */
-Void InputBitstream::pseudoRead ( UInt uiNumberOfBits, UInt& ruiBits )
+void InputBitstream::pseudoRead ( uint32_t uiNumberOfBits, uint32_t& ruiBits )
 {
-  UInt saved_num_held_bits = m_num_held_bits;
-  UChar saved_held_bits = m_held_bits;
-  UInt saved_fifo_idx = m_fifo_idx;
+  uint32_t saved_num_held_bits = m_num_held_bits;
+  uint8_t saved_held_bits = m_held_bits;
+  uint32_t saved_fifo_idx = m_fifo_idx;
 
-  UInt num_bits_to_read = min(uiNumberOfBits, getNumBitsLeft());
+  uint32_t num_bits_to_read = min(uiNumberOfBits, getNumBitsLeft());
   read(num_bits_to_read, ruiBits);
   ruiBits <<= (uiNumberOfBits - num_bits_to_read);
 
@@ -251,14 +251,14 @@ Void InputBitstream::pseudoRead ( UInt uiNumberOfBits, UInt& ruiBits )
 }
 
 
-Void InputBitstream::read (UInt uiNumberOfBits, UInt& ruiBits)
+void InputBitstream::read (uint32_t uiNumberOfBits, uint32_t& ruiBits)
 {
   CHECK( uiNumberOfBits > 32, "Too many bits read" );
 
   m_numBitsRead += uiNumberOfBits;
 
   /* NB, bits are extracted from the MSB of each byte. */
-  UInt retval = 0;
+  uint32_t retval = 0;
   if (uiNumberOfBits <= m_num_held_bits)
   {
     /* n=1, len(H)=7:   -VHH HHHH, shift_down=6, mask=0xfe
@@ -288,8 +288,8 @@ Void InputBitstream::read (UInt uiNumberOfBits, UInt& ruiBits)
    * n=8,  len(H)=3, load 1byte,  shift_down=3
    * n=5,  len(H)=1, load 1byte,  shift_down=1+3
    */
-  UInt aligned_word = 0;
-  UInt num_bytes_to_load = (uiNumberOfBits - 1) >> 3;
+  uint32_t aligned_word = 0;
+  uint32_t num_bytes_to_load = (uiNumberOfBits - 1) >> 3;
   CHECK(m_fifo_idx + num_bytes_to_load >= m_fifo.size(), "Exceeded FIFO size");
 
   switch (num_bytes_to_load)
@@ -301,7 +301,7 @@ Void InputBitstream::read (UInt uiNumberOfBits, UInt& ruiBits)
   }
 
   /* resolve remainder bits */
-  UInt next_num_held_bits = (32 - uiNumberOfBits) % 8;
+  uint32_t next_num_held_bits = (32 - uiNumberOfBits) % 8;
 
   /* copy required part of aligned_word into retval */
   retval |= aligned_word >> next_num_held_bits;
@@ -317,7 +317,7 @@ Void InputBitstream::read (UInt uiNumberOfBits, UInt& ruiBits)
  * insert the contents of the bytealigned (and flushed) bitstream src
  * into this at byte position pos.
  */
-Void OutputBitstream::insertAt(const OutputBitstream& src, UInt pos)
+void OutputBitstream::insertAt(const OutputBitstream& src, uint32_t pos)
 {
   CHECK(0 != src.getNumberOfWrittenBits() % 8, "Number of written bits is not a multiple of 8");
 
@@ -325,10 +325,10 @@ Void OutputBitstream::insertAt(const OutputBitstream& src, UInt pos)
   m_fifo.insert(at, src.m_fifo.begin(), src.m_fifo.end());
 }
 
-UInt InputBitstream::readOutTrailingBits ()
+uint32_t InputBitstream::readOutTrailingBits ()
 {
-  UInt count=0;
-  UInt uiBits = 0;
+  uint32_t count=0;
+  uint32_t uiBits = 0;
 
   while ( ( getNumBitsLeft() > 0 ) && (getNumBitsUntilByteAligned()!=0) )
   {
@@ -354,9 +354,9 @@ UInt InputBitstream::readOutTrailingBits ()
 
  \param  uiNumBits    number of bits to transfer
  */
-InputBitstream *InputBitstream::extractSubstream( UInt uiNumBits )
+InputBitstream *InputBitstream::extractSubstream( uint32_t uiNumBits )
 {
-  UInt uiNumBytes = uiNumBits/8;
+  uint32_t uiNumBytes = uiNumBits/8;
   InputBitstream *pResult = new InputBitstream;
 
   std::vector<uint8_t> &buf = pResult->getFifo();
@@ -365,7 +365,7 @@ InputBitstream *InputBitstream::extractSubstream( UInt uiNumBits )
   if (m_num_held_bits == 0)
   {
     std::size_t currentOutputBufferSize=buf.size();
-    const UInt uiNumBytesToReadFromFifo = std::min<UInt>(uiNumBytes, (UInt)m_fifo.size() - m_fifo_idx);
+    const uint32_t uiNumBytesToReadFromFifo = std::min<uint32_t>(uiNumBytes, (uint32_t)m_fifo.size() - m_fifo_idx);
     buf.resize(currentOutputBufferSize+uiNumBytes);
     memcpy(&(buf[currentOutputBufferSize]), &(m_fifo[m_fifo_idx]), uiNumBytesToReadFromFifo); m_fifo_idx+=uiNumBytesToReadFromFifo;
     if (uiNumBytesToReadFromFifo != uiNumBytes)
@@ -375,16 +375,16 @@ InputBitstream *InputBitstream::extractSubstream( UInt uiNumBits )
   }
   else
   {
-    for (UInt ui = 0; ui < uiNumBytes; ui++)
+    for (uint32_t ui = 0; ui < uiNumBytes; ui++)
     {
-      UInt uiByte;
+      uint32_t uiByte;
       read(8, uiByte);
       buf.push_back(uiByte);
     }
   }
   if (uiNumBits&0x7)
   {
-    UInt uiByte = 0;
+    uint32_t uiByte = 0;
     read(uiNumBits&0x7, uiByte);
     uiByte <<= 8-(uiNumBits&0x7);
     buf.push_back(uiByte);
@@ -392,13 +392,13 @@ InputBitstream *InputBitstream::extractSubstream( UInt uiNumBits )
   return pResult;
 }
 
-UInt InputBitstream::readByteAlignment()
+uint32_t InputBitstream::readByteAlignment()
 {
-  UInt code = 0;
+  uint32_t code = 0;
   read( 1, code );
   CHECK(code != 1, "Code is not '1'");
 
-  UInt numBits = getNumBitsUntilByteAligned();
+  uint32_t numBits = getNumBitsUntilByteAligned();
   if(numBits)
   {
     CHECK(numBits > getNumBitsLeft(), "More bits available than left");

@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -58,7 +58,7 @@ public:
   {};
   virtual ~SEIEncoder(){};
 
-  Void init(EncCfg* encCfg, EncLib *encTop, EncGOP *encGOP)
+  void init(EncCfg* encCfg, EncLib *encTop, EncGOP *encGOP)
   {
     m_pcCfg = encCfg;
     m_pcEncGOP = encGOP;
@@ -68,33 +68,33 @@ public:
 
   // leading SEIs
 #if HEVC_VPS
-  Void initSEIActiveParameterSets (SEIActiveParameterSets *sei, const VPS *vps, const SPS *sps);
+  void initSEIActiveParameterSets (SEIActiveParameterSets *sei, const VPS *vps, const SPS *sps);
 #else
-  Void initSEIActiveParameterSets (SEIActiveParameterSets *sei, const SPS *sps);
+  void initSEIActiveParameterSets (SEIActiveParameterSets *sei, const SPS *sps);
 #endif
-  Void initSEIFramePacking(SEIFramePacking *sei, Int currPicNum);
-  Void initSEIDisplayOrientation(SEIDisplayOrientation *sei);
-  Void initSEIToneMappingInfo(SEIToneMappingInfo *sei);
-  Void initSEISOPDescription(SEISOPDescription *sei, Slice *slice, Int picInGOP, Int lastIdr, Int currGOPSize);
-  Void initSEIBufferingPeriod(SEIBufferingPeriod *sei, Slice *slice);
-  Void initSEIScalableNesting(SEIScalableNesting *sei, SEIMessages &nestedSEIs);
-  Void initSEIRecoveryPoint(SEIRecoveryPoint *sei, Slice *slice);
-  Void initSEISegmentedRectFramePacking(SEISegmentedRectFramePacking *sei);
+  void initSEIFramePacking(SEIFramePacking *sei, int currPicNum);
+  void initSEIDisplayOrientation(SEIDisplayOrientation *sei);
+  void initSEIToneMappingInfo(SEIToneMappingInfo *sei);
+  void initSEISOPDescription(SEISOPDescription *sei, Slice *slice, int picInGOP, int lastIdr, int currGOPSize);
+  void initSEIBufferingPeriod(SEIBufferingPeriod *sei, Slice *slice);
+  void initSEIScalableNesting(SEIScalableNesting *sei, SEIMessages &nestedSEIs);
+  void initSEIRecoveryPoint(SEIRecoveryPoint *sei, Slice *slice);
+  void initSEISegmentedRectFramePacking(SEISegmentedRectFramePacking *sei);
 #if HEVC_TILES_WPP
-  Void initSEITempMotionConstrainedTileSets (SEITempMotionConstrainedTileSets *sei, const PPS *pps);
+  void initSEITempMotionConstrainedTileSets (SEITempMotionConstrainedTileSets *sei, const PPS *pps);
 #endif
-  Void initSEIKneeFunctionInfo(SEIKneeFunctionInfo *sei);
-  Void initSEIChromaResamplingFilterHint(SEIChromaResamplingFilterHint *sei, Int iHorFilterIndex, Int iVerFilterIndex);
-  Void initSEITimeCode(SEITimeCode *sei);
-  Bool initSEIColourRemappingInfo(SEIColourRemappingInfo *sei, Int currPOC); // returns true on success, false on failure.
+  void initSEIKneeFunctionInfo(SEIKneeFunctionInfo *sei);
+  void initSEIChromaResamplingFilterHint(SEIChromaResamplingFilterHint *sei, int iHorFilterIndex, int iVerFilterIndex);
+  void initSEITimeCode(SEITimeCode *sei);
+  bool initSEIColourRemappingInfo(SEIColourRemappingInfo *sei, int currPOC); // returns true on success, false on failure.
 #if U0033_ALTERNATIVE_TRANSFER_CHARACTERISTICS_SEI
-  Void initSEIAlternativeTransferCharacteristics(SEIAlternativeTransferCharacteristics *sei);
+  void initSEIAlternativeTransferCharacteristics(SEIAlternativeTransferCharacteristics *sei);
 #endif
 
   // trailing SEIs
-  Void initDecodedPictureHashSEI(SEIDecodedPictureHash *sei, PelUnitBuf& pic, std::string &rHashString, const BitDepths &bitDepths);
-  Void initTemporalLevel0IndexSEI(SEITemporalLevel0Index *sei, Slice *slice);
-  Void initSEIGreenMetadataInfo(SEIGreenMetadataInfo *sei, UInt u);
+  void initDecodedPictureHashSEI(SEIDecodedPictureHash *sei, PelUnitBuf& pic, std::string &rHashString, const BitDepths &bitDepths);
+  void initTemporalLevel0IndexSEI(SEITemporalLevel0Index *sei, Slice *slice);
+  void initSEIGreenMetadataInfo(SEIGreenMetadataInfo *sei, uint32_t u);
 
 private:
   EncCfg* m_pcCfg;
@@ -102,10 +102,10 @@ private:
   EncGOP* m_pcEncGOP;
 
   // for temporal level 0 index SEI
-  UInt m_tl0Idx;
-  UInt m_rapIdx;
+  uint32_t m_tl0Idx;
+  uint32_t m_rapIdx;
 
-  Bool m_isInitialized;
+  bool m_isInitialized;
 };
 
 

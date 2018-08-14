@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -1320,7 +1320,7 @@ const CtxSet ContextSetCfg::SaoTypeIdx = ContextSetCfg::addCtxSet
   {  200,},
 });
 
-#if JEM_TOOLS
+#if JEM_TOOLS && !JVET_K0371_ALF
 const CtxSet ContextSetCfg::AlfCUCtrlFlags = ContextSetCfg::addCtxSet
 ({
   {  CNU, CNU, CNU,},
@@ -1410,14 +1410,15 @@ const CtxSet ContextSetCfg::ChromaQpAdjIdc = ContextSetCfg::addCtxSet
   {  154,},
 });
 
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
 const CtxSet ContextSetCfg::ImvFlag = ContextSetCfg::addCtxSet
 ({
   {  197, 185, 201, 185,},
   {  197, 185, 201, 185,},
   {  CNU, CNU, CNU, CNU,},
 });
-
+#endif
+#if JEM_TOOLS
 const CtxSet ContextSetCfg::LICFlag = ContextSetCfg::addCtxSet
 ({
   {  154,},
@@ -1447,6 +1448,17 @@ const CtxSet ContextSetCfg::FrucMode = ContextSetCfg::addCtxSet
 });
 #endif
 
+#if JVET_K0371_ALF
+const CtxSet ContextSetCfg::ctbAlfFlag =
+{
+  ContextSetCfg::addCtxSet
+  ( {
+    { 100, 100, 100, 100, 100, 100, 100, 100, 100 },
+    { 153, 153, 153, 153, 153, 153, 153, 153, 153 },
+    { 200, 200, 200, 200, 200, 200, 200, 200, 200 },
+    } )
+};
+#endif
 
 
 const unsigned ContextSetCfg::NumberOfContexts = (unsigned)ContextSetCfg::sm_InitTables[0].size();
@@ -1706,7 +1718,7 @@ void CtxWSizeStore::xInitMappingTable( const SPS* sps )
   unsigned        numCtxTransSubdiv   = ( spsNext.getUseLargeCTU() || spsNext.getUseQTBT() ? 4 : 3 ); // hard-wired in JEM
   unsigned        numCtxLastXY        = ( spsNext.getUseLargeCTU() || spsNext.getUseQTBT() ? 25 : 15 ); // hard-wired in JEM
   unsigned        numCtxEmtCUFlag     = ( spsNext.getUseLargeCTU() || spsNext.getUseQTBT() ? 6 : 4 ); // hard-wired in JEM
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   unsigned        numImvCtx           = ( spsNext.getImvMode() > 1 ? 4 : 3 );
 #endif
   addCtxSetToMapping      ( m_codeId2ctxId, Ctx::SplitFlag,              0, numCtxSplitFlag );
@@ -1813,15 +1825,18 @@ void CtxWSizeStore::xInitMappingTable( const SPS* sps )
   {
     addCtxSetToMapping    ( m_codeId2ctxId, Ctx::ObmcFlag,               0, 1 );
   }
+#if JVET_K0357_AMVR
   if( true /* VCEG_AZ07_IMV */ )
   {
     addCtxSetToMapping    ( m_codeId2ctxId, Ctx::ImvFlag,                0, numImvCtx );
   }
+#endif
   if( spsNext.getLICEnabled() ) // hard-wired in JEM
   {
     addCtxSetToMapping    ( m_codeId2ctxId, Ctx::LICFlag,                0, 1 );
   }
 #endif
+#if !JVET_K0371_ALF
   if( true /* ALF_HM3_REFACTOR */ )
   {
     if( spsNext.getGALFEnabled() )
@@ -1837,6 +1852,7 @@ void CtxWSizeStore::xInitMappingTable( const SPS* sps )
       addDummySetToMapping( m_codeId2ctxId,                                 3 );
     }
   }
+#endif
   if( true /* COM16_C806_EMT */ )
   {
     addCtxSetToMapping    ( m_codeId2ctxId, Ctx::EMTTuIndex,             0, 4 );

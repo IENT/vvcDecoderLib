@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -223,10 +223,10 @@ InterpolationFilter::InterpolationFilter()
 //  If you change the functionality here, consider to switch off the SIMD implementation of this function.
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<Bool isFirst, Bool isLast>
-Void InterpolationFilter::filterCopy( const ClpRng& clpRng, const Pel *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height )
+template<bool isFirst, bool isLast>
+void InterpolationFilter::filterCopy( const ClpRng& clpRng, const Pel *src, int srcStride, Pel *dst, int dstStride, int width, int height )
 {
-  Int row, col;
+  int row, col;
 
   if ( isFirst == isLast )
   {
@@ -248,7 +248,7 @@ Void InterpolationFilter::filterCopy( const ClpRng& clpRng, const Pel *src, Int 
   }
   else if ( isFirst )
   {
-    const Int shift = std::max<Int>(2, (IF_INTERNAL_PREC - clpRng.bd));
+    const int shift = std::max<int>(2, (IF_INTERNAL_PREC - clpRng.bd));
 
     for (row = 0; row < height; row++)
     {
@@ -265,7 +265,7 @@ Void InterpolationFilter::filterCopy( const ClpRng& clpRng, const Pel *src, Int 
   }
   else
   {
-    const Int shift = std::max<Int>(2, (IF_INTERNAL_PREC - clpRng.bd));
+    const int shift = std::max<int>(2, (IF_INTERNAL_PREC - clpRng.bd));
 
     for (row = 0; row < height; row++)
     {
@@ -308,10 +308,10 @@ Void InterpolationFilter::filterCopy( const ClpRng& clpRng, const Pel *src, Int 
 //  If you change the functionality here, consider to switch off the SIMD implementation of this function.
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<Int N, Bool isVertical, Bool isFirst, Bool isLast>
-Void InterpolationFilter::filter(const ClpRng& clpRng, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, TFilterCoeff const *coeff)
+template<int N, bool isVertical, bool isFirst, bool isLast>
+void InterpolationFilter::filter(const ClpRng& clpRng, Pel const *src, int srcStride, Pel *dst, int dstStride, int width, int height, TFilterCoeff const *coeff)
 {
-  Int row, col;
+  int row, col;
 
   Pel c[8];
   c[0] = coeff[0];
@@ -332,12 +332,12 @@ Void InterpolationFilter::filter(const ClpRng& clpRng, Pel const *src, Int srcSt
     c[7] = coeff[7];
   }
 
-  Int cStride = ( isVertical ) ? srcStride : 1;
+  int cStride = ( isVertical ) ? srcStride : 1;
   src -= ( N/2 - 1 ) * cStride;
 
-  Int offset;
-  Int headRoom = std::max<Int>(2, (IF_INTERNAL_PREC - clpRng.bd));
-  Int shift    = IF_FILTER_PREC;
+  int offset;
+  int headRoom = std::max<int>(2, (IF_INTERNAL_PREC - clpRng.bd));
+  int shift    = IF_FILTER_PREC;
   // with the current settings (IF_INTERNAL_PREC = 14 and IF_FILTER_PREC = 6), though headroom can be
   // negative for bit depths greater than 14, shift will remain non-negative for bit depths of 8->20
   CHECK(shift < 0, "Negative shift");
@@ -358,7 +358,7 @@ Void InterpolationFilter::filter(const ClpRng& clpRng, Pel const *src, Int srcSt
   {
     for (col = 0; col < width; col++)
     {
-      Int sum;
+      int sum;
 
       sum  = src[ col + 0 * cStride] * c[0];
       sum += src[ col + 1 * cStride] * c[1];
@@ -413,8 +413,8 @@ Void InterpolationFilter::filter(const ClpRng& clpRng, Pel const *src, Int srcSt
  * \param  isLast     Flag indicating whether it is the last filtering operation
  * \param  coeff      Pointer to filter taps
  */
-template<Int N>
-Void InterpolationFilter::filterHor(const ClpRng& clpRng, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Bool isLast, TFilterCoeff const *coeff)
+template<int N>
+void InterpolationFilter::filterHor(const ClpRng& clpRng, Pel const *src, int srcStride, Pel *dst, int dstStride, int width, int height, bool isLast, TFilterCoeff const *coeff)
 {
 //#if ENABLE_SIMD_OPT_MCIF
   if( N == 8 )
@@ -450,8 +450,8 @@ Void InterpolationFilter::filterHor(const ClpRng& clpRng, Pel const *src, Int sr
  * \param  isLast     Flag indicating whether it is the last filtering operation
  * \param  coeff      Pointer to filter taps
  */
-template<Int N>
-Void InterpolationFilter::filterVer(const ClpRng& clpRng, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Bool isFirst, Bool isLast, TFilterCoeff const *coeff)
+template<int N>
+void InterpolationFilter::filterVer(const ClpRng& clpRng, Pel const *src, int srcStride, Pel *dst, int dstStride, int width, int height, bool isFirst, bool isLast, TFilterCoeff const *coeff)
 {
 //#if ENABLE_SIMD_OPT_MCIF
   if( N == 8 )
@@ -491,9 +491,9 @@ Void InterpolationFilter::filterVer(const ClpRng& clpRng, Pel const *src, Int sr
  * \param  bitDepth   Bit depth
  */
 #if JEM_TOOLS
-Void InterpolationFilter::filterHor( const ComponentID compID, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Int frac, Bool isLast, const ChromaFormat fmt, const ClpRng& clpRng, Int nFilterIdx )
+void InterpolationFilter::filterHor( const ComponentID compID, Pel const *src, int srcStride, Pel *dst, int dstStride, int width, int height, int frac, bool isLast, const ChromaFormat fmt, const ClpRng& clpRng, int nFilterIdx )
 #else
-Void InterpolationFilter::filterHor( const ComponentID compID, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Int frac, Bool isLast, const ChromaFormat fmt, const ClpRng& clpRng )
+void InterpolationFilter::filterHor( const ComponentID compID, Pel const *src, int srcStride, Pel *dst, int dstStride, int width, int height, int frac, bool isLast, const ChromaFormat fmt, const ClpRng& clpRng )
 #endif
 {
   if( frac == 0 )
@@ -520,7 +520,7 @@ Void InterpolationFilter::filterHor( const ComponentID compID, Pel const *src, I
   }
   else
   {
-    const UInt csx = getComponentScaleX( compID, fmt );
+    const uint32_t csx = getComponentScaleX( compID, fmt );
 #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
     CHECK( frac < 0 || csx >= 2 || ( frac << ( 1 - csx ) ) >= ( CHROMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE ), "Invalid fraction" );
 #else
@@ -548,9 +548,9 @@ Void InterpolationFilter::filterHor( const ComponentID compID, Pel const *src, I
  * \param  bitDepth   Bit depth
  */
 #if JEM_TOOLS
-Void InterpolationFilter::filterVer( const ComponentID compID, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Int frac, Bool isFirst, Bool isLast, const ChromaFormat fmt, const ClpRng& clpRng, Int nFilterIdx )
+void InterpolationFilter::filterVer( const ComponentID compID, Pel const *src, int srcStride, Pel *dst, int dstStride, int width, int height, int frac, bool isFirst, bool isLast, const ChromaFormat fmt, const ClpRng& clpRng, int nFilterIdx )
 #else
-Void InterpolationFilter::filterVer( const ComponentID compID, Pel const *src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Int frac, Bool isFirst, Bool isLast, const ChromaFormat fmt, const ClpRng& clpRng )
+void InterpolationFilter::filterVer( const ComponentID compID, Pel const *src, int srcStride, Pel *dst, int dstStride, int width, int height, int frac, bool isFirst, bool isLast, const ChromaFormat fmt, const ClpRng& clpRng )
 #endif
 {
   if( frac == 0 )
@@ -577,7 +577,7 @@ Void InterpolationFilter::filterVer( const ComponentID compID, Pel const *src, I
   }
   else
   {
-    const UInt csy = getComponentScaleY( compID, fmt );
+    const uint32_t csy = getComponentScaleY( compID, fmt );
 #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
     CHECK( frac < 0 || csy >= 2 || ( frac << ( 1 - csy ) ) >= ( CHROMA_INTERPOLATION_FILTER_SUB_SAMPLE_POSITIONS << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE ), "Invalid fraction" );
 #else

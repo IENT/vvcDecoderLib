@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -64,7 +64,7 @@ private:
   VideoIOYuv      m_cVideoIOYuvReconFile;        ///< reconstruction YUV class
 
   // for output control
-  Int             m_iPOCLastDisplay;              ///< last POC in display order
+  int             m_iPOCLastDisplay;              ///< last POC in display order
   std::ofstream   m_seiMessageFileStream;         ///< Used for outputing SEI messages.
   ColourRemapping m_cColourRemapping;             ///< colour remapping handler
 
@@ -73,14 +73,14 @@ public:
   DecApp();
   virtual ~DecApp         ()  {}
 
-  UInt  decode            (); ///< main decoding function
+  uint32_t  decode            (); ///< main decoding function
 
 private:
-  Void  xCreateDecLib     (); ///< create internal classes
-  Void  xDestroyDecLib    (); ///< destroy internal classes
-  Void  xWriteOutput      ( PicList* pcListPic , UInt tId); ///< write YUV to file
-  Void  xFlushOutput      ( PicList* pcListPic ); ///< flush all remaining decoded pictures to file
-  Bool  isNaluWithinTargetDecLayerIdSet ( InputNALUnit* nalu ); ///< check whether given Nalu is within targetDecLayerIdSet
+  void  xCreateDecLib     (); ///< create internal classes
+  void  xDestroyDecLib    (); ///< destroy internal classes
+  void  xWriteOutput      ( PicList* pcListPic , uint32_t tId); ///< write YUV to file
+  void  xFlushOutput      ( PicList* pcListPic ); ///< flush all remaining decoded pictures to file
+  bool  isNaluWithinTargetDecLayerIdSet ( InputNALUnit* nalu ); ///< check whether given Nalu is within targetDecLayerIdSet
 };
 
 //! \}

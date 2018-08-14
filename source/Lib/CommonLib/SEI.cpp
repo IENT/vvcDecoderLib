@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -41,12 +41,12 @@
 #include "dtrace_next.h"
 
 #if ENABLE_TRACING
-Void xTraceSEIHeader()
+void xTraceSEIHeader()
 {
   DTRACE( g_trace_ctx, D_HEADER, "=========== SEI message ===========\n" );
 }
 
-Void xTraceSEIMessageType( SEI::PayloadType payloadType )
+void xTraceSEIMessageType( SEI::PayloadType payloadType )
 {
   DTRACE( g_trace_ctx, D_HEADER, "=========== %s SEI message ===========\n", SEI::getSEIMessageString( payloadType ) );
 }
@@ -87,7 +87,7 @@ SEIMessages extractSeisByType(SEIMessages &seiList, SEI::PayloadType seiType)
 }
 
 
-Void deleteSEIs (SEIMessages &seiList)
+void deleteSEIs (SEIMessages &seiList)
 {
   for (SEIMessages::iterator it=seiList.begin(); it!=seiList.end(); it++)
   {
@@ -128,7 +128,7 @@ void SEIPictureTiming::copyTo (SEIPictureTiming& target)
 }
 
 // Static member
-const TChar *SEI::getSEIMessageString(SEI::PayloadType payloadType)
+const char *SEI::getSEIMessageString(SEI::PayloadType payloadType)
 {
   switch (payloadType)
   {

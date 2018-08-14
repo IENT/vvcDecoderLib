@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -61,7 +61,7 @@ CDTrace *g_trace_ctx = NULL;
 
 MsgLevel g_verbosity = VERBOSE;
 
-const TChar* nalUnitTypeToString(NalUnitType type)
+const char* nalUnitTypeToString(NalUnitType type)
 {
   switch (type)
   {
@@ -99,22 +99,22 @@ const TChar* nalUnitTypeToString(NalUnitType type)
 class ScanGenerator
 {
 private:
-  UInt m_line, m_column;
-  const UInt m_blockWidth, m_blockHeight;
-  const UInt m_stride;
+  uint32_t m_line, m_column;
+  const uint32_t m_blockWidth, m_blockHeight;
+  const uint32_t m_stride;
   const CoeffScanType m_scanType;
 
 public:
-  ScanGenerator(UInt blockWidth, UInt blockHeight, UInt stride, CoeffScanType scanType)
+  ScanGenerator(uint32_t blockWidth, uint32_t blockHeight, uint32_t stride, CoeffScanType scanType)
     : m_line(0), m_column(0), m_blockWidth(blockWidth), m_blockHeight(blockHeight), m_stride(stride), m_scanType(scanType)
   { }
 
-  UInt GetCurrentX() const { return m_column; }
-  UInt GetCurrentY() const { return m_line; }
+  uint32_t GetCurrentX() const { return m_column; }
+  uint32_t GetCurrentY() const { return m_line; }
 
-  UInt GetNextIndex(UInt blockOffsetX, UInt blockOffsetY)
+  uint32_t GetNextIndex(uint32_t blockOffsetX, uint32_t blockOffsetY)
   {
-    const UInt rtn = ((m_line + blockOffsetY) * m_stride) + m_column + blockOffsetX;
+    const uint32_t rtn = ((m_line + blockOffsetY) * m_stride) + m_column + blockOffsetX;
 
     //advance line and column to the next position
     switch (m_scanType)
@@ -185,50 +185,50 @@ public:
 };
 
 #if JEM_TOOLS&&!JVET_K0190
-Int g_aiLMDivTableLow[] = {
+int g_aiLMDivTableLow[] = {
   0, 0, 21845, 0, 13107, 43690, 18724, 0, 50972, 39321, 53620, 21845, 15123, 9362, 4369, 0, 3855, 58254, 17246, 52428, 49932, 59578, 25644, 43690, 28835, 40329, 16990, 37449, 56496, 34952, 4228, 0, 61564, 34695, 29959, 29127, 15941, 41391, 26886, 26214, 28771, 24966, 6096, 29789, 23301, 45590, 25098, 21845, 30761, 47185, 1285, 20164, 34622, 41263, 36938, 18724, 49439, 61016, 51095, 17476, 23635, 2114, 16644, 0, 16131, 63550, 9781, 50115, 52238, 14979, 2769, 14563, 49376, 40738, 53302, 20695, 7660, 13443, 37330, 13107, 5663, 14385, 38689, 12483, 771, 3048, 18832, 47662, 23563, 11650, 11522, 22795, 45100, 12549, 55878, 43690, 41213, 48148, 64212, 23592, 57100, 33410, 17815, 10082, 9986, 17311, 31849, 53399, 16233, 51237, 27159, 9362, 63216, 57487, 57557, 63276, 8962, 25547, 47362, 8738, 40621, 11817, 53281, 33825, 18874, 8322, 2064, 0, 2032, 8065, 18009, 31775, 49275, 4890, 29612, 57825, 23918, 58887, 31589, 7489, 52056, 34152, 19248, 7281, 63728, 57456, 53944, 53137, 54979, 59419, 868, 10347, 22273, 36598, 53274, 6721, 27967, 51433, 11540, 39321, 3663, 35599, 4020, 39960, 12312, 52112, 28255, 6241, 51575, 33153, 16479, 1524, 53792, 42184, 32206, 23831, 17031, 11781, 8054, 5825, 5069, 5761, 7878, 11397, 16295, 22550, 30139, 39042, 49238, 60707, 7891, 21845, 37012, 53374, 5377, 24074, 43912, 64874, 21406, 44564, 3260, 28550, 54882, 16705, 45075, 8907, 39258, 5041, 37314, 4993, 39135, 8655, 44613, 15924, 53648, 26699, 604, 40884, 16458, 58386, 35585, 13579, 57895, 37449, 17767, 64376, 46192, 28743, 12019, 61546, 46244, 31638, 17720, 4481, 57448, 45541, 34288, 23681, 13710, 4369, 61185, 53078, 45578, 38676, 32366, 26640, 21491, 16912, 12896, 9437, 6527, 4161, 2331, 1032, 257, 0, 255, 1016, 2277, 4032, 6277, 9004, 12210, 15887, 20031, 24637, 29699, 35213, 41173, 47574, 54411, 61680, 3840, 11959, 20494, 29443, 38801, 48562, 58724, 3744, 14693, 26028, 37746, 49844, 62316, 9624, 22834, 36408, 50342, 64632, 13737, 28728, 44063, 59740, 10219, 26568, 43249, 60257, 12055, 29709, 47682, 434, 19033, 37941, 57155, 11136, 30953, 51067, 5938, 26637, 47624, 3360, 24916, 46751, 3328, 25716, 48376, 5770, 28967, 52428, 10616, 34599, 58840, 17799, 42547, 2010, 27256, 52748, 12947, 38924, 65140, 26056, 52743, 14127, 41277, 3120, 30726, 58555, 21072, 49344, 12300, 41007, 4394, 33530, 62876, 26896, 56659, 21092, 51264, 16103, 46678, 11915, 42886, 8515, 39875, 5890, 37632, 4027, 36145, 2912, 35400, 2534, 35385, 2880, 36089, 3939, 37500, 5698, 39605, 8147, 42395, 11275, 45857, 15069, 49982, 19521, 54758, 24619, 60175, 30353, 688, 36713, 7357, 43690, 14639, 51274, 22522, 59455, 30999, 2688, 40059, 12037, 49693, 21956, 59894, 32437, 5117, 43471, 16425, 55050, 28273, 1630, 40655, 14275, 53561, 27441, 1449, 41120, 15382, 55305, 29818, 4453, 44748, 19629, 60166, 35288, 10529, 51425, 26902, 2496, 43742, 19567, 61042, 37095, 13261, 55074, 31463, 7962, 50106, 26824, 3649, 46117, 23157, 302, 43088, 20442, 63436, 40997, 18660, 61961, 39826, 17792, 61393, 39557, 17819, 61715, 40171, 18724, 62908, 41651, 20489, 64956, 43980, 23096, 2304, 47139, 26529, 6009, 51115, 30773, 10519, 55890, 35811, 15819, 61448, 41628, 21892, 2240, 48208, 28724, 9322, 55538, 36301, 17144, 63604, 44608, 25692, 6855, 53632, 34952, 16349, 63360, 44911, 26539, 8242, 55557, 37410, 19338, 1340, 48951, 31099, 13320, 61149, 43513, 25949, 8456, 56569, 39216, 21932, 4718, 53109, 36031, 19022, 2080, 50741, 33933, 17191, 516, 49441, 32896, 16416, 0,
 };
-Int g_aiLMDivTableHigh[] = {
+int g_aiLMDivTableHigh[] = {
   65536, 32768, 21845, 16384, 13107, 10922, 9362, 8192, 7281, 6553, 5957, 5461, 5041, 4681, 4369, 4096, 3855, 3640, 3449, 3276, 3120, 2978, 2849, 2730, 2621, 2520, 2427, 2340, 2259, 2184, 2114, 2048, 1985, 1927, 1872, 1820, 1771, 1724, 1680, 1638, 1598, 1560, 1524, 1489, 1456, 1424, 1394, 1365, 1337, 1310, 1285, 1260, 1236, 1213, 1191, 1170, 1149, 1129, 1110, 1092, 1074, 1057, 1040, 1024, 1008, 992, 978, 963, 949, 936, 923, 910, 897, 885, 873, 862, 851, 840, 829, 819, 809, 799, 789, 780, 771, 762, 753, 744, 736, 728, 720, 712, 704, 697, 689, 682, 675, 668, 661, 655, 648, 642, 636, 630, 624, 618, 612, 606, 601, 595, 590, 585, 579, 574, 569, 564, 560, 555, 550, 546, 541, 537, 532, 528, 524, 520, 516, 512, 508, 504, 500, 496, 492, 489, 485, 481, 478, 474, 471, 468, 464, 461, 458, 455, 451, 448, 445, 442, 439, 436, 434, 431, 428, 425, 422, 420, 417, 414, 412, 409, 407, 404, 402, 399, 397, 394, 392, 390, 387, 385, 383, 381, 378, 376, 374, 372, 370, 368, 366, 364, 362, 360, 358, 356, 354, 352, 350, 348, 346, 344, 343, 341, 339, 337, 336, 334, 332, 330, 329, 327, 326, 324, 322, 321, 319, 318, 316, 315, 313, 312, 310, 309, 307, 306, 304, 303, 302, 300, 299, 297, 296, 295, 293, 292, 291, 289, 288, 287, 286, 284, 283, 282, 281, 280, 278, 277, 276, 275, 274, 273, 271, 270, 269, 268, 267, 266, 265, 264, 263, 262, 261, 260, 259, 258, 257, 256, 255, 254, 253, 252, 251, 250, 249, 248, 247, 246, 245, 244, 243, 242, 241, 240, 240, 239, 238, 237, 236, 235, 234, 234, 233, 232, 231, 230, 229, 229, 228, 227, 226, 225, 225, 224, 223, 222, 222, 221, 220, 219, 219, 218, 217, 217, 216, 215, 214, 214, 213, 212, 212, 211, 210, 210, 209, 208, 208, 207, 206, 206, 205, 204, 204, 203, 202, 202, 201, 201, 200, 199, 199, 198, 197, 197, 196, 196, 195, 195, 194, 193, 193, 192, 192, 191, 191, 190, 189, 189, 188, 188, 187, 187, 186, 186, 185, 185, 184, 184, 183, 183, 182, 182, 181, 181, 180, 180, 179, 179, 178, 178, 177, 177, 176, 176, 175, 175, 174, 174, 173, 173, 172, 172, 172, 171, 171, 170, 170, 169, 169, 168, 168, 168, 167, 167, 166, 166, 165, 165, 165, 164, 164, 163, 163, 163, 162, 162, 161, 161, 161, 160, 160, 159, 159, 159, 158, 158, 157, 157, 157, 156, 156, 156, 155, 155, 154, 154, 154, 153, 153, 153, 152, 152, 152, 151, 151, 151, 150, 150, 149, 149, 149, 148, 148, 148, 147, 147, 147, 146, 146, 146, 145, 145, 145, 144, 144, 144, 144, 143, 143, 143, 142, 142, 142, 141, 141, 141, 140, 140, 140, 140, 139, 139, 139, 138, 138, 138, 137, 137, 137, 137, 136, 136, 136, 135, 135, 135, 135, 134, 134, 134, 134, 133, 133, 133, 132, 132, 132, 132, 131, 131, 131, 131, 130, 130, 130, 130, 129, 129, 129, 129, 128, 128, 128, 128,
 };
 
-const Int g_aiMFLM_MinSize[] = {  0,  0 };
-const Int g_aiMMLM_MinSize[] = {  0,  0 };
+const int g_aiMFLM_MinSize[] = {  0,  0 };
+const int g_aiMMLM_MinSize[] = {  0,  0 };
 #endif
 #if JEM_TOOLS||JVET_K0190
-const Int g_aiNonLMPosThrs[] = {  3,  1,  0 };
+const int g_aiNonLMPosThrs[] = {  3,  1,  0 };
 #endif
 #if JEM_TOOLS
-Int g_aiLMCodeWord[LM_SYMBOL_NUM][16];
+int g_aiLMCodeWord[LM_SYMBOL_NUM][16];
 
 #endif
 
 #if JEM_TOOLS
 #if !INTRA67_3MPM
 #if JVET_B0051_NON_MPM_MODE
-const Int g_ipred_mode_table[] = { 1,1,1,2,2,2,3,3,3,4,4,4,5,5,5,6,6,6,7,7,7,8,8,8,9,9,9,10,10,10,11,11,11,12,12,12,13,13,13,14,14,14,15,15,15 };
+const int g_ipred_mode_table[] = { 1,1,1,2,2,2,3,3,3,4,4,4,5,5,5,6,6,6,7,7,7,8,8,8,9,9,9,10,10,10,11,11,11,12,12,12,13,13,13,14,14,14,15,15,15 };
 #endif
 #endif
 
 #endif
 
 // initialize ROM variables
-Void initROM()
+void initROM()
 {
-  Int i, c;
+  int i, c;
 
 #if RExt__HIGH_BIT_DEPTH_SUPPORT
   {
     c = 64;
-    const Double s = sqrt((Double)c) * (64 << COM16_C806_TRANS_PREC);
+    const double s = sqrt((double)c) * (64 << COM16_C806_TRANS_PREC);
 
 
-    for (Int k = 0; k < c; k++)
+    for (int k = 0; k < c; k++)
     {
-      for (Int n = 0; n < c; n++)
+      for (int n = 0; n < c; n++)
       {
-        Double w0, v;
-        const Double PI = 3.14159265358979323846;
+        double w0, v;
+        const double PI = 3.14159265358979323846;
 
         // DCT-II
         w0 = k == 0 ? sqrt(0.5) : 1;
@@ -267,12 +267,12 @@ Void initROM()
 
   c = 2; //for the 2x2 transforms if QTBT is on
 
-  const Double PI = 3.14159265358979323846;
+  const double PI = 3.14159265358979323846;
 
   for (i = 0; i < g_numTransformMatrixSizes; i++)
   {
     TMatrixCoeff *iT = NULL;
-    const Double s = sqrt((Double)c) * (64 << COM16_C806_TRANS_PREC);
+    const double s = sqrt((double)c) * (64 << COM16_C806_TRANS_PREC);
 
     switch (i)
     {
@@ -288,35 +288,35 @@ Void initROM()
       default: exit(0); break;
     }
 
-    for (Int k = 0; k < c; k++)
+    for (int k = 0; k < c; k++)
     {
-      for (Int n = 0; n < c; n++)
+      for (int n = 0; n < c; n++)
       {
-        Double w0, v;
+        double w0, v;
 
         // DCT-II
         w0 = k == 0 ? sqrt(0.5) : 1;
         v = cos(PI*(n + 0.5)*k / c) * w0 * sqrt(2.0 / c);
-        iT[DCT2*c*c + k*c + n] = (Short)(s * v + (v > 0 ? 0.5 : -0.5));
+        iT[DCT2*c*c + k*c + n] = (int16_t)(s * v + (v > 0 ? 0.5 : -0.5));
 
         // DCT-VIII
         v = cos(PI*(k + 0.5)*(n + 0.5) / (c + 0.5)) * sqrt(2.0 / (c + 0.5));
-        iT[DCT8*c*c + k*c + n] = (Short)(s * v + (v > 0 ? 0.5 : -0.5));
+        iT[DCT8*c*c + k*c + n] = (int16_t)(s * v + (v > 0 ? 0.5 : -0.5));
 
         // DST-VII
         v = sin(PI*(k + 0.5)*(n + 1) / (c + 0.5)) * sqrt(2.0 / (c + 0.5));
-        iT[DST7*c*c + k*c + n] = (Short)(s * v + (v > 0 ? 0.5 : -0.5));
+        iT[DST7*c*c + k*c + n] = (int16_t)(s * v + (v > 0 ? 0.5 : -0.5));
 
 #if !JVET_K1000_SIMPLIFIED_EMT
         // DCT-V
         w0 = (k == 0) ? sqrt(0.5) : 1.0;
-        Double w1 = (n == 0) ? sqrt(0.5) : 1.0;
+        double w1 = (n == 0) ? sqrt(0.5) : 1.0;
         v = cos(PI*n*k / (c - 0.5)) * w0 * w1 * sqrt(2.0 / (c - 0.5));
-        iT[DCT5*c*c + k*c + n] = (Short)(s * v + (v > 0 ? 0.5 : -0.5));
+        iT[DCT5*c*c + k*c + n] = (int16_t)(s * v + (v > 0 ? 0.5 : -0.5));
 
         // DST-I
         v = sin(PI*(n + 1)*(k + 1) / (c + 1)) * sqrt(2.0 / (c + 1));
-        iT[DST1*c*c + k*c + n] = (Short)(s * v + (v > 0 ? 0.5 : -0.5));
+        iT[DST1*c*c + k*c + n] = (int16_t)(s * v + (v > 0 ? 0.5 : -0.5));
 #endif
       }
     }
@@ -329,11 +329,11 @@ Void initROM()
   generateTrafoBlockSizeScaling(*gp_sizeIdxInfo);
 
 #if JEM_TOOLS
-  const Double scPi = 2.0 * 3.14159265358979323846 / (Double)NSST_HYGT_PTS;
+  const double scPi = 2.0 * 3.14159265358979323846 / (double)NSST_HYGT_PTS;
   for (i = 0; i < NSST_HYGT_PTS; i++)
   {
-    g_tabSinCos[i].c = Int(floor(cos(i * scPi) * 1024.0 + 0.5));
-    g_tabSinCos[i].s = Int(floor(sin(i * scPi) * 1024.0 + 0.5));
+    g_tabSinCos[i].c = int(floor(cos(i * scPi) * 1024.0 + 0.5));
+    g_tabSinCos[i].s = int(floor(sin(i * scPi) * 1024.0 + 0.5));
   }
 
 #endif
@@ -341,29 +341,29 @@ Void initROM()
   sizeInfo.init(MAX_CU_SIZE);
 
   // initialize scan orders
-  for (UInt blockHeightIdx = 0; blockHeightIdx < sizeInfo.numAllHeights(); blockHeightIdx++)
+  for (uint32_t blockHeightIdx = 0; blockHeightIdx < sizeInfo.numAllHeights(); blockHeightIdx++)
   {
-    for (UInt blockWidthIdx = 0; blockWidthIdx < sizeInfo.numAllWidths(); blockWidthIdx++)
+    for (uint32_t blockWidthIdx = 0; blockWidthIdx < sizeInfo.numAllWidths(); blockWidthIdx++)
     {
-      const UInt blockWidth  = sizeInfo.sizeFrom(blockWidthIdx);
-      const UInt blockHeight = sizeInfo.sizeFrom(blockHeightIdx);
-      const UInt totalValues = blockWidth * blockHeight;
+      const uint32_t blockWidth  = sizeInfo.sizeFrom(blockWidthIdx);
+      const uint32_t blockHeight = sizeInfo.sizeFrom(blockHeightIdx);
+      const uint32_t totalValues = blockWidth * blockHeight;
 
       //--------------------------------------------------------------------------------------------------
 
       //non-grouped scan orders
 
-      for (UInt scanTypeIndex = 0; scanTypeIndex < SCAN_NUMBER_OF_TYPES; scanTypeIndex++)
+      for (uint32_t scanTypeIndex = 0; scanTypeIndex < SCAN_NUMBER_OF_TYPES; scanTypeIndex++)
       {
         const CoeffScanType scanType = CoeffScanType(scanTypeIndex);
 
-        g_scanOrder     [SCAN_UNGROUPED][scanType][blockWidthIdx][blockHeightIdx]    = new UInt[totalValues];
-        g_scanOrderPosXY[SCAN_UNGROUPED][scanType][blockWidthIdx][blockHeightIdx][0] = new UInt[totalValues];
-        g_scanOrderPosXY[SCAN_UNGROUPED][scanType][blockWidthIdx][blockHeightIdx][1] = new UInt[totalValues];
+        g_scanOrder     [SCAN_UNGROUPED][scanType][blockWidthIdx][blockHeightIdx]    = new uint32_t[totalValues];
+        g_scanOrderPosXY[SCAN_UNGROUPED][scanType][blockWidthIdx][blockHeightIdx][0] = new uint32_t[totalValues];
+        g_scanOrderPosXY[SCAN_UNGROUPED][scanType][blockWidthIdx][blockHeightIdx][1] = new uint32_t[totalValues];
 
         ScanGenerator fullBlockScan(blockWidth, blockHeight, blockWidth, scanType);
 
-        for (UInt scanPosition = 0; scanPosition < totalValues; scanPosition++)
+        for (uint32_t scanPosition = 0; scanPosition < totalValues; scanPosition++)
         {
           const int rasterPos = fullBlockScan.GetNextIndex( 0, 0 );
           const int posY      = rasterPos / blockWidth;
@@ -377,7 +377,7 @@ Void initROM()
       if( blockWidthIdx >= sizeInfo.numWidths() || blockHeightIdx >= sizeInfo.numHeights() )
       {
         // size indizes greater than numIdxs are sizes than are only used when grouping - they will never come up as a block size - thus they can be skipped at this point
-        for( UInt scanTypeIndex = 0; scanTypeIndex < SCAN_NUMBER_OF_TYPES; scanTypeIndex++ )
+        for( uint32_t scanTypeIndex = 0; scanTypeIndex < SCAN_NUMBER_OF_TYPES; scanTypeIndex++ )
         {
           g_scanOrder     [SCAN_GROUPED_4x4][scanTypeIndex][blockWidthIdx][blockHeightIdx]    = nullptr;
           g_scanOrderPosXY[SCAN_GROUPED_4x4][scanTypeIndex][blockWidthIdx][blockHeightIdx][0] = nullptr;
@@ -391,39 +391,39 @@ Void initROM()
       //--------------------------------------------------------------------------------------------------
 
       //grouped scan orders
-      const UInt  log2CGWidth    = (blockWidth & 3) + (blockHeight & 3) > 0 ? 1 : 2;
-      const UInt  log2CGHeight   = (blockWidth & 3) + (blockHeight & 3) > 0 ? 1 : 2;
+      const uint32_t  log2CGWidth    = (blockWidth & 3) + (blockHeight & 3) > 0 ? 1 : 2;
+      const uint32_t  log2CGHeight   = (blockWidth & 3) + (blockHeight & 3) > 0 ? 1 : 2;
 
-      const UInt  groupWidth     = 1 << log2CGWidth;
-      const UInt  groupHeight    = 1 << log2CGHeight;
-      const UInt  widthInGroups  = blockWidth >> log2CGWidth;
-      const UInt  heightInGroups = blockHeight >> log2CGHeight;
+      const uint32_t  groupWidth     = 1 << log2CGWidth;
+      const uint32_t  groupHeight    = 1 << log2CGHeight;
+      const uint32_t  widthInGroups  = blockWidth >> log2CGWidth;
+      const uint32_t  heightInGroups = blockHeight >> log2CGHeight;
 
-      const UInt  groupSize      = groupWidth    * groupHeight;
-      const UInt  totalGroups    = widthInGroups * heightInGroups;
+      const uint32_t  groupSize      = groupWidth    * groupHeight;
+      const uint32_t  totalGroups    = widthInGroups * heightInGroups;
 
-      for (UInt scanTypeIndex = 0; scanTypeIndex < SCAN_NUMBER_OF_TYPES; scanTypeIndex++)
+      for (uint32_t scanTypeIndex = 0; scanTypeIndex < SCAN_NUMBER_OF_TYPES; scanTypeIndex++)
       {
         const CoeffScanType scanType = CoeffScanType(scanTypeIndex);
 
-        g_scanOrder     [SCAN_GROUPED_4x4][scanType][blockWidthIdx][blockHeightIdx]    = new UInt[totalValues];
-        g_scanOrderPosXY[SCAN_GROUPED_4x4][scanType][blockWidthIdx][blockHeightIdx][0] = new UInt[totalValues];
-        g_scanOrderPosXY[SCAN_GROUPED_4x4][scanType][blockWidthIdx][blockHeightIdx][1] = new UInt[totalValues];
+        g_scanOrder     [SCAN_GROUPED_4x4][scanType][blockWidthIdx][blockHeightIdx]    = new uint32_t[totalValues];
+        g_scanOrderPosXY[SCAN_GROUPED_4x4][scanType][blockWidthIdx][blockHeightIdx][0] = new uint32_t[totalValues];
+        g_scanOrderPosXY[SCAN_GROUPED_4x4][scanType][blockWidthIdx][blockHeightIdx][1] = new uint32_t[totalValues];
 
 
         ScanGenerator fullBlockScan(widthInGroups, heightInGroups, groupWidth, scanType);
 
-        for (UInt groupIndex = 0; groupIndex < totalGroups; groupIndex++)
+        for (uint32_t groupIndex = 0; groupIndex < totalGroups; groupIndex++)
         {
-          const UInt groupPositionY  = fullBlockScan.GetCurrentY();
-          const UInt groupPositionX  = fullBlockScan.GetCurrentX();
-          const UInt groupOffsetX    = groupPositionX * groupWidth;
-          const UInt groupOffsetY    = groupPositionY * groupHeight;
-          const UInt groupOffsetScan = groupIndex     * groupSize;
+          const uint32_t groupPositionY  = fullBlockScan.GetCurrentY();
+          const uint32_t groupPositionX  = fullBlockScan.GetCurrentX();
+          const uint32_t groupOffsetX    = groupPositionX * groupWidth;
+          const uint32_t groupOffsetY    = groupPositionY * groupHeight;
+          const uint32_t groupOffsetScan = groupIndex     * groupSize;
 
           ScanGenerator groupScan(groupWidth, groupHeight, blockWidth, scanType);
 
-          for (UInt scanPosition = 0; scanPosition < groupSize; scanPosition++)
+          for (uint32_t scanPosition = 0; scanPosition < groupSize; scanPosition++)
           {
             const int rasterPos = groupScan.GetNextIndex( groupOffsetX, groupOffsetY );
             const int posY      = rasterPos / blockWidth;
@@ -444,11 +444,11 @@ Void initROM()
 #if JEM_TOOLS && !ENABLE_BMS
 
   // initialize CoefTopLeftDiagScan8x8 for NSST
-  for (UInt blockWidthIdx = 0; blockWidthIdx < sizeInfo.numAllWidths(); blockWidthIdx++)
+  for (uint32_t blockWidthIdx = 0; blockWidthIdx < sizeInfo.numAllWidths(); blockWidthIdx++)
   {
-    const UInt blockWidth = sizeInfo.sizeFrom(blockWidthIdx);
+    const uint32_t blockWidth = sizeInfo.sizeFrom(blockWidthIdx);
 
-    const static UChar g_auiXYDiagScan8x8[64][2] =
+    const static uint8_t g_auiXYDiagScan8x8[64][2] =
     {
       { 0, 0 }, { 0, 1 }, { 1, 0 }, { 0, 2 }, { 1, 1 }, { 2, 0 }, { 0, 3 }, { 1, 2 },
       { 2, 1 }, { 3, 0 }, { 1, 3 }, { 2, 2 }, { 3, 1 }, { 2, 3 }, { 3, 2 }, { 3, 3 },
@@ -467,18 +467,18 @@ Void initROM()
 #endif
 }
 
-Void destroyROM()
+void destroyROM()
 {
   unsigned numWidths = gp_sizeIdxInfo->numAllWidths();
   unsigned numHeights = gp_sizeIdxInfo->numAllHeights();
 
-  for (UInt groupTypeIndex = 0; groupTypeIndex < SCAN_NUMBER_OF_GROUP_TYPES; groupTypeIndex++)
+  for (uint32_t groupTypeIndex = 0; groupTypeIndex < SCAN_NUMBER_OF_GROUP_TYPES; groupTypeIndex++)
   {
-    for (UInt scanOrderIndex = 0; scanOrderIndex < SCAN_NUMBER_OF_TYPES; scanOrderIndex++)
+    for (uint32_t scanOrderIndex = 0; scanOrderIndex < SCAN_NUMBER_OF_TYPES; scanOrderIndex++)
     {
-      for (UInt blockWidthIdx = 0; blockWidthIdx <= numWidths; blockWidthIdx++)
+      for (uint32_t blockWidthIdx = 0; blockWidthIdx <= numWidths; blockWidthIdx++)
       {
-        for (UInt blockHeightIdx = 0; blockHeightIdx <= numHeights; blockHeightIdx++)
+        for (uint32_t blockHeightIdx = 0; blockHeightIdx <= numHeights; blockHeightIdx++)
         {
           delete[] g_scanOrder[groupTypeIndex][scanOrderIndex][blockWidthIdx][blockHeightIdx];
           g_scanOrder[groupTypeIndex][scanOrderIndex][blockWidthIdx][blockHeightIdx] = nullptr;
@@ -520,12 +520,12 @@ void generateTrafoBlockSizeScaling(SizeIndexInfo& sizeIdxInfo)
 // Data structure related table & variable
 // ====================================================================================================================
 
-const Int g_quantScales[SCALING_LIST_REM_NUM] =
+const int g_quantScales[SCALING_LIST_REM_NUM] =
 {
   26214,23302,20560,18396,16384,14564
 };
 
-const Int g_invQuantScales[SCALING_LIST_REM_NUM] =
+const int g_invQuantScales[SCALING_LIST_REM_NUM] =
 {
   40,45,51,57,64,72
 };
@@ -535,31 +535,31 @@ const Int g_invQuantScales[SCALING_LIST_REM_NUM] =
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
 //EMT transform sets
 #if JVET_K1000_SIMPLIFIED_EMT
-const Int g_aiTrSubsetIntra[3][2] = { { DST7, DCT8 }, { DST7, DCT8 }, { DST7, DCT8 } };
+const int g_aiTrSubsetIntra[3][2] = { { DST7, DCT8 }, { DST7, DCT8 }, { DST7, DCT8 } };
 #else
-const Int g_aiTrSubsetIntra[3][2] = { { DST7, DCT8 }, { DST7, DST1 }, { DST7, DCT5 } };
+const int g_aiTrSubsetIntra[3][2] = { { DST7, DCT8 }, { DST7, DST1 }, { DST7, DCT5 } };
 #endif
-const Int g_aiTrSubsetInter[4] = { DCT8, DST7 };
+const int g_aiTrSubsetInter[4] = { DCT8, DST7 };
 
-const UChar g_aucTrSetVert[NUM_INTRA_MODE - 1] =
+const uint8_t g_aucTrSetVert[NUM_INTRA_MODE - 1] =
 {//0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66
    2, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0
 };
-const UChar g_aucTrSetVert35[35] =
+const uint8_t g_aucTrSetVert35[35] =
 {//0  1  2     3     4     5     6     7     8     9    10    11    12    13    14    15    16    17    18    19    20    21    22    23    24    25    26    27    28    29    30    31    32    33    34
    2, 1, 0,    1,    0,    1,    0,    1,    0,    0,    0,    0,    0,    1,    0,    1,    0,    1,    0,    1,    0,    1,    0,    1,    2,    2,    2,    2,    2,    1,    0,    1,    0,    1,    0
 };
-const UChar g_aucTrSetHorz[NUM_INTRA_MODE - 1] =
+const uint8_t g_aucTrSetHorz[NUM_INTRA_MODE - 1] =
 {//0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66
    2, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0
 };
-const UChar g_aucTrSetHorz35[35] =
+const uint8_t g_aucTrSetHorz35[35] =
 {//0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34
    2, 1, 0, 1, 0, 1, 0, 1, 2, 2, 2, 2, 2, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0
 };
 
 //EMT threshold
-const UInt g_EmtSigNumThr = 2;
+const uint32_t g_EmtSigNumThr = 2;
 
 #endif
 
@@ -578,7 +578,7 @@ TMatrixCoeff g_aiTr128[NUM_TRANS_TYPE][128][128];
 //coefficients
 //--------------------------------------------------------------------------------------------------
 
-const UChar g_aucChromaScale[NUM_CHROMA_FORMAT][chromaQPMappingTableSize] =
+const uint8_t g_aucChromaScale[NUM_CHROMA_FORMAT][chromaQPMappingTableSize] =
 {
 #if JVET_K0251_QP_EXT
   //0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69
@@ -599,7 +599,7 @@ const UChar g_aucChromaScale[NUM_CHROMA_FORMAT][chromaQPMappingTableSize] =
 // Intra prediction
 // ====================================================================================================================
 
-const UChar g_aucIntraModeNumFast_UseMPM_2D[7 - MIN_CU_LOG2 + 1][7 - MIN_CU_LOG2 + 1] =
+const uint8_t g_aucIntraModeNumFast_UseMPM_2D[7 - MIN_CU_LOG2 + 1][7 - MIN_CU_LOG2 + 1] =
 {
   {3, 3, 3, 3, 2, 2},  //   4x4,   4x8,   4x16,   4x32,   4x64,   4x128,
   {3, 3, 3, 3, 3, 2},  //   8x4,   8x8,   8x16,   8x32,   8x64,   8x128,
@@ -609,7 +609,7 @@ const UChar g_aucIntraModeNumFast_UseMPM_2D[7 - MIN_CU_LOG2 + 1][7 - MIN_CU_LOG2
   {2, 2, 2, 2, 2, 3},  // 128x4, 128x8, 128x16, 128x32, 128x64, 128x128,
 };
 
-const UChar g_aucIntraModeNumFast_UseMPM[MAX_CU_DEPTH] =
+const uint8_t g_aucIntraModeNumFast_UseMPM[MAX_CU_DEPTH] =
 {
   3,  //   2x2
   8,  //   4x4
@@ -619,7 +619,7 @@ const UChar g_aucIntraModeNumFast_UseMPM[MAX_CU_DEPTH] =
   3,  //  64x64
   3   // 128x128
 };
-const UChar g_aucIntraModeNumFast_NotUseMPM[MAX_CU_DEPTH] =
+const uint8_t g_aucIntraModeNumFast_NotUseMPM[MAX_CU_DEPTH] =
 {
   3,  //   2x2
   9,  //   4x4
@@ -630,25 +630,25 @@ const UChar g_aucIntraModeNumFast_NotUseMPM[MAX_CU_DEPTH] =
   5   // 128x128
 };
 
-const UChar g_chroma422IntraAngleMappingTable[NUM_INTRA_MODE] =
+const uint8_t g_chroma422IntraAngleMappingTable[NUM_INTRA_MODE] =
 //                                                               H                                                               D                                                               V
 //0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, DM
 { 0, 1, 2, 2, 2, 2, 2, 2, 2, 3,  4,  6,  8, 10, 12, 13, 14, 16, 18, 20, 22, 23, 24, 26, 28, 30, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 44, 44, 45, 46, 46, 46, 47, 48, 48, 48, 49, 50, 51, 52, 52, 52, 53, 54, 54, 54, 55, 56, 56, 56, 57, 58, 59, 60, DM_CHROMA_IDX };
 
 #if !INTRA67_3MPM
-extern const UChar  g_intraMode65to33AngMapping[NUM_INTRA_MODE] =
+extern const uint8_t  g_intraMode65to33AngMapping[NUM_INTRA_MODE] =
 //                                                               H                                                               D                                                               V
 //0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, DM
 { 0, 1, 2, 2, 3, 3, 4, 4, 5, 5,  6,  6,  7,  7,  8,  8,  9,  9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 20, 20, 21, 21, 22, 22, 23, 23, 24, 24, 25, 25, 26, 26, 27, 27, 28, 28, 29, 29, 30, 30, 31, 31, 32, 32, 33, 33, 34, DM_CHROMA_IDX };
 
-extern const UChar g_intraMode33to65AngMapping[36] =
+extern const uint8_t g_intraMode33to65AngMapping[36] =
 //                                   H                               D                               V
 //0, 1, 2, 3, 4, 5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, DM
 { 0, 1, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, DM_CHROMA_IDX };
 #endif
 
 #if JEM_TOOLS
-const Int g_intraCubicFilter[32][4] = {
+const int g_intraCubicFilter[32][4] = {
   {   0, 256,   0,   0 }, //  0 Integer-Pel
   {  -3, 252,   8,  -1 }, //  1
   {  -5, 247,  17,  -3 }, //  2
@@ -682,7 +682,7 @@ const Int g_intraCubicFilter[32][4] = {
   {  -3,  17, 247,  -5 }, // 30
   {  -1,   8, 252,  -3 }, // 31
 };
-const Int g_intraGaussFilter[32][4] = {
+const int g_intraGaussFilter[32][4] = {
 #if HM_4TAPIF_AS_IN_JEM
   {  47, 161,  47,   1 }, //  0 Integer-Pel
 #else
@@ -944,9 +944,9 @@ const int g_pdpc_pred_param[5][35][6] = {
 // ====================================================================================================================
 SizeIndexInfo*           gp_sizeIdxInfo = NULL;
 int                      g_BlockSizeTrafoScale[MAX_CU_SIZE + 1][MAX_CU_SIZE + 1][2];
-SChar                    g_aucLog2    [MAX_CU_SIZE + 1];
-SChar                    g_aucNextLog2[MAX_CU_SIZE + 1];
-SChar                    g_aucPrevLog2[MAX_CU_SIZE + 1];
+int8_t                    g_aucLog2    [MAX_CU_SIZE + 1];
+int8_t                    g_aucNextLog2[MAX_CU_SIZE + 1];
+int8_t                    g_aucPrevLog2[MAX_CU_SIZE + 1];
 
 UnitScale g_miScaling( MIN_CU_LOG2, MIN_CU_LOG2 );
 
@@ -956,14 +956,14 @@ UnitScale g_miScaling( MIN_CU_LOG2, MIN_CU_LOG2 );
 // ====================================================================================================================
 
 // scanning order table
-UInt* g_scanOrder     [SCAN_NUMBER_OF_GROUP_TYPES][SCAN_NUMBER_OF_TYPES][MAX_CU_SIZE / 2 + 1][MAX_CU_SIZE / 2 + 1];
-UInt* g_scanOrderPosXY[SCAN_NUMBER_OF_GROUP_TYPES][SCAN_NUMBER_OF_TYPES][MAX_CU_SIZE / 2 + 1][MAX_CU_SIZE / 2 + 1][2];
+uint32_t* g_scanOrder     [SCAN_NUMBER_OF_GROUP_TYPES][SCAN_NUMBER_OF_TYPES][MAX_CU_SIZE / 2 + 1][MAX_CU_SIZE / 2 + 1];
+uint32_t* g_scanOrderPosXY[SCAN_NUMBER_OF_GROUP_TYPES][SCAN_NUMBER_OF_TYPES][MAX_CU_SIZE / 2 + 1][MAX_CU_SIZE / 2 + 1][2];
 #if JEM_TOOLS && !ENABLE_BMS
-UInt  g_auiCoefTopLeftDiagScan8x8[MAX_CU_SIZE / 2 + 1][64];
+uint32_t  g_auiCoefTopLeftDiagScan8x8[MAX_CU_SIZE / 2 + 1][64];
 
 #endif
 
-const UInt ctxIndMap4x4[4 * 4] =
+const uint32_t ctxIndMap4x4[4 * 4] =
 {
   0, 1, 4, 5,
   2, 3, 4, 5,
@@ -972,12 +972,12 @@ const UInt ctxIndMap4x4[4 * 4] =
 };
 
 
-const UInt g_uiMinInGroup[LAST_SIGNIFICANT_GROUPS] = { 0,1,2,3,4,6,8,12,16,24,32,48,64,96 };
-const UInt g_uiGroupIdx[MAX_TU_SIZE] = { 0,1,2,3,4,4,5,5,6,6,6,6,7,7,7,7,8,8,8,8,8,8,8,8,9,9,9,9,9,9,9,9, 10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11
+const uint32_t g_uiMinInGroup[LAST_SIGNIFICANT_GROUPS] = { 0,1,2,3,4,6,8,12,16,24,32,48,64,96 };
+const uint32_t g_uiGroupIdx[MAX_TU_SIZE] = { 0,1,2,3,4,4,5,5,6,6,6,6,7,7,7,7,8,8,8,8,8,8,8,8,9,9,9,9,9,9,9,9, 10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11
 ,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12
 ,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13 };
 #if JVET_K0072
-const UInt g_auiGoRicePars[ 32 ] =
+const uint32_t g_auiGoRicePars[ 32 ] =
 {
   0, 0, 0, 0,
   0, 0, 0, 0, 0, 0,
@@ -985,13 +985,13 @@ const UInt g_auiGoRicePars[ 32 ] =
   1, 1, 1, 2, 2, 2, 2, 2, 2, 2
 };
 #endif
-const UInt g_auiGoRiceRange[MAX_GR_ORDER_RESIDUAL] =
+const uint32_t g_auiGoRiceRange[MAX_GR_ORDER_RESIDUAL] =
 {
   6, 5, 6, COEF_REMAIN_BIN_REDUCTION, COEF_REMAIN_BIN_REDUCTION, COEF_REMAIN_BIN_REDUCTION, COEF_REMAIN_BIN_REDUCTION, COEF_REMAIN_BIN_REDUCTION, COEF_REMAIN_BIN_REDUCTION, COEF_REMAIN_BIN_REDUCTION
 };
 
 #if HEVC_USE_SCALING_LISTS
-const TChar *MatrixType[SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM] =
+const char *MatrixType[SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM] =
 {
   {
     "INTRA2X2_LUMA",
@@ -1035,7 +1035,7 @@ const TChar *MatrixType[SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM] =
   },
 };
 
-const TChar *MatrixType_DC[SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM] =
+const char *MatrixType_DC[SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM] =
 {
   {
   },
@@ -1061,7 +1061,7 @@ const TChar *MatrixType_DC[SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM] =
   },
 };
 
-const Int g_quantTSDefault4x4[4 * 4] =
+const int g_quantTSDefault4x4[4 * 4] =
 {
   16,16,16,16,
   16,16,16,16,
@@ -1069,7 +1069,7 @@ const Int g_quantTSDefault4x4[4 * 4] =
   16,16,16,16
 };
 
-const Int g_quantIntraDefault8x8[8 * 8] =
+const int g_quantIntraDefault8x8[8 * 8] =
 {
   16,16,16,16,17,18,21,24,
   16,16,16,16,17,19,22,25,
@@ -1081,7 +1081,7 @@ const Int g_quantIntraDefault8x8[8 * 8] =
   24,25,29,36,47,65,88,115
 };
 
-const Int g_quantInterDefault8x8[8 * 8] =
+const int g_quantInterDefault8x8[8 * 8] =
 {
   16,16,16,16,17,18,20,24,
   16,16,16,17,18,20,24,25,
@@ -1093,11 +1093,11 @@ const Int g_quantInterDefault8x8[8 * 8] =
   24,25,28,33,41,54,71,91
 };
 
-const UInt g_scalingListSize [SCALING_LIST_SIZE_NUM] = { 4, 16, 64, 256, 1024, 4096, 16384 };
-const UInt g_scalingListSizeX[SCALING_LIST_SIZE_NUM] = { 2,  4,  8,  16,   32,   64,   128 };
+const uint32_t g_scalingListSize [SCALING_LIST_SIZE_NUM] = { 4, 16, 64, 256, 1024, 4096, 16384 };
+const uint32_t g_scalingListSizeX[SCALING_LIST_SIZE_NUM] = { 2,  4,  8,  16,   32,   64,   128 };
 #endif
 
-const UChar g_NonMPM[257] = { 0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+const uint8_t g_NonMPM[257] = { 0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,

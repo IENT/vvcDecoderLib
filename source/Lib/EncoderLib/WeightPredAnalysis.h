@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -50,18 +50,18 @@ private:
 
   // member functions
 
-  Bool  xSelectWP            (Slice *const slice, const Int log2Denom);
-  Bool  xSelectWPHistExtClip (Slice *const slice, const Int log2Denom, const Bool bDoEnhancement, const Bool bClipInitialSADWP, const Bool bUseHistogram);
-  Bool  xUpdatingWPParameters(Slice *const slice, const Int log2Denom);
+  bool  xSelectWP            (Slice *const slice, const int log2Denom);
+  bool  xSelectWPHistExtClip (Slice *const slice, const int log2Denom, const bool bDoEnhancement, const bool bClipInitialSADWP, const bool bUseHistogram);
+  bool  xUpdatingWPParameters(Slice *const slice, const int log2Denom);
 
 public:
 
   WeightPredAnalysis();
 
   // WP analysis :
-  Void  xCalcACDCParamSlice  (Slice *const slice);
-  Void  xEstimateWPParamSlice(Slice *const slice, const WeightedPredictionMethod method);
-  Void  xCheckWPEnable       (Slice *const slice);
+  void  xCalcACDCParamSlice  (Slice *const slice);
+  void  xEstimateWPParamSlice(Slice *const slice, const WeightedPredictionMethod method);
+  void  xCheckWPEnable       (Slice *const slice);
 };
 
 #endif // __WEIGHTPREDANALYSIS__

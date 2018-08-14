@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,8 +40,8 @@
 
 #include "CommonDef.h"
 
-typedef Int PosType;
-typedef UInt SizeType;
+typedef int PosType;
+typedef uint32_t SizeType;
 struct Position
 {
   PosType x;
@@ -50,13 +50,13 @@ struct Position
   Position()                                   : x(0),  y(0)  { }
   Position(const PosType _x, const PosType _y) : x(_x), y(_y) { }
 
-  Bool operator!=(const Position &other)  const { return x != other.x || y != other.y; }
-  Bool operator==(const Position &other)  const { return x == other.x && y == other.y; }
+  bool operator!=(const Position &other)  const { return x != other.x || y != other.y; }
+  bool operator==(const Position &other)  const { return x == other.x && y == other.y; }
 
   Position offset(const Position pos)                 const { return Position(x + pos.x, y + pos.y); }
   Position offset(const PosType _x, const PosType _y) const { return Position(x + _x   , y + _y   ); }
-  Void     repositionTo(const Position newPos)              { x  = newPos.x; y  = newPos.y; }
-  Void     relativeTo  (const Position origin)              { x -= origin.x; y -= origin.y; }
+  void     repositionTo(const Position newPos)              { x  = newPos.x; y  = newPos.y; }
+  void     relativeTo  (const Position origin)              { x -= origin.x; y -= origin.y; }
 
   Position operator-( const Position &other )         const { return{ x - other.x, y - other.y }; }
 };
@@ -69,9 +69,9 @@ struct Size
   Size()                                              : width(0),      height(0)       { }
   Size(const SizeType _width, const SizeType _height) : width(_width), height(_height) { }
 
-  Bool operator!=(const Size &other)      const { return (width != other.width) || (height != other.height); }
-  Bool operator==(const Size &other)      const { return (width == other.width) && (height == other.height); }
-  UInt area()                             const { return (UInt) width * (UInt) height; }
+  bool operator!=(const Size &other)      const { return (width != other.width) || (height != other.height); }
+  bool operator==(const Size &other)      const { return (width == other.width) && (height == other.height); }
+  uint32_t area()                             const { return (uint32_t) width * (uint32_t) height; }
 };
 
 struct Area : public Position, public Size
@@ -91,11 +91,11 @@ struct Area : public Position, public Size
         Position  bottomRight()             const { return { (PosType) (x + width - 1), (PosType) (y + height - 1) }; }
         Position  center()                  const { return { (PosType) (x + width / 2), (PosType) (y + height / 2) }; }
 
-  Bool contains(const Position &_pos)       const { return (_pos.x >= x) && (_pos.x < (x + width)) && (_pos.y >= y) && (_pos.y < (y + height)); }
-  Bool contains(const Area &_area)          const { return contains(_area.pos()) && contains(_area.bottomRight()); }
+  bool contains(const Position &_pos)       const { return (_pos.x >= x) && (_pos.x < (x + width)) && (_pos.y >= y) && (_pos.y < (y + height)); }
+  bool contains(const Area &_area)          const { return contains(_area.pos()) && contains(_area.bottomRight()); }
 
-  Bool operator!=(const Area &other)        const { return (Size::operator!=(other)) || (Position::operator!=(other)); }
-  Bool operator==(const Area &other)        const { return (Size::operator==(other)) && (Position::operator==(other)); }
+  bool operator!=(const Area &other)        const { return (Size::operator!=(other)) || (Position::operator!=(other)); }
+  bool operator==(const Area &other)        const { return (Size::operator==(other)) && (Position::operator==(other)); }
 };
 
 struct UnitScale
@@ -115,22 +115,22 @@ struct UnitScale
   Area     scale( const Area    &_area ) const { return Area( scale( _area.pos() ), scale( _area.size() ) ); }
 };
 
-inline size_t rsAddr(const Position &pos, const UInt stride, const UnitScale &unitScale )
+inline size_t rsAddr(const Position &pos, const uint32_t stride, const UnitScale &unitScale )
 {
   return (size_t)(stride >> unitScale.posx) * (size_t)(pos.y >> unitScale.posy) + (size_t)(pos.x >> unitScale.posx);
 }
 
-inline size_t rsAddr(const Position &pos, const Position &origin, const UInt stride, const UnitScale &unitScale )
+inline size_t rsAddr(const Position &pos, const Position &origin, const uint32_t stride, const UnitScale &unitScale )
 {
   return (stride >> unitScale.posx) * ((pos.y - origin.y) >> unitScale.posy) + ((pos.x - origin.x) >> unitScale.posx);
 }
 
-inline size_t rsAddr(const Position &pos, const UInt stride )
+inline size_t rsAddr(const Position &pos, const uint32_t stride )
 {
   return stride * (size_t)pos.y + (size_t)pos.x;
 }
 
-inline size_t rsAddr(const Position &pos, const Position &origin, const UInt stride )
+inline size_t rsAddr(const Position &pos, const Position &origin, const uint32_t stride )
 {
   return stride * (pos.y - origin.y) + (pos.x - origin.x);
 }

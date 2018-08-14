@@ -3,7 +3,7 @@
 * and contributor rights, including patent rights, and no such rights are
 * granted under this license.
 *
-* Copyright (c) 2010-2017, ITU/ISO/IEC
+* Copyright (c) 2010-2018, ITU/ISO/IEC
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -172,7 +172,7 @@ void BinEncoderBase::encodeBinEP( unsigned bin )
 
 void BinEncoderBase::encodeBinsEP( unsigned bins, unsigned numBins )
 {
-  for(Int i = 0; i < numBins; i++)
+  for(int i = 0; i < numBins; i++)
   {
     DTRACE( g_trace_ctx, D_CABAC, "%d" "  " "%d" "  EP=%d \n", DTRACE_GET_COUNTER( g_trace_ctx, D_CABAC ), m_Range, ( bins >> ( numBins - 1 - i ) ) & 1 );
   }

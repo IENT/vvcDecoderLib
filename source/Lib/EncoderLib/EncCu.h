@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -109,7 +109,7 @@ private:
 
   CABACWriter*          m_CABACEstimator;
   RateCtrl*             m_pcRateCtrl;
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   CodingStructure    ***m_pImvTempCS;
 #endif
   EncModeCtrl          *m_modeCtrl;
@@ -137,7 +137,7 @@ private:
 #endif
 
 #if SHARP_LUMA_DELTA_QP
-  Void    updateLambda      ( Slice* slice, Double dQP );
+  void    updateLambda      ( Slice* slice, double dQP );
 #endif
 
 public:
@@ -204,8 +204,10 @@ protected:
                               ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode );
 #endif
   void xCheckRDCostInter      ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &pm, const EncTestMode& encTestMode );
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   bool xCheckRDCostInterIMV   ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &pm, const EncTestMode& encTestMode );
+#endif
+#if JEM_TOOLS
   void xCheckRDCostInterWoOBMC( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &pm, const EncTestMode& encTestMode );
 #endif
   void xEncodeDontSplit       ( CodingStructure &cs, Partitioner &partitioner);
@@ -216,7 +218,7 @@ protected:
   void xCheckRDCostMerge2Nx2NFRUC
                               ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode );
 #endif
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0357_AMVR
   void xEncodeInterResidual   ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode, int residualPass = 0, CodingStructure* imvCS = NULL, int emtMode = 1, bool* bestHasNonResi = NULL );
 #else
   void xEncodeInterResidual   ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode, int residualPass, bool* bestHasNonResi );

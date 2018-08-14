@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -51,11 +51,11 @@
 //! \{
 
 #if JVET_K1000_SIMPLIFIED_EMT
-typedef void FwdTrans(const TCoeff*, TCoeff*, Int, Int, Int, Int);
-typedef void InvTrans(const TCoeff*, TCoeff*, Int, Int, Int, Int, const TCoeff, const TCoeff);
+typedef void FwdTrans(const TCoeff*, TCoeff*, int, int, int, int);
+typedef void InvTrans(const TCoeff*, TCoeff*, int, int, int, int, const TCoeff, const TCoeff);
 #else
-typedef void FwdTrans(const TCoeff*, TCoeff*, Int, Int, Int, Int, Int);
-typedef void InvTrans(const TCoeff*, TCoeff*, Int, Int, Int, Int, Int, const TCoeff, const TCoeff);
+typedef void FwdTrans(const TCoeff*, TCoeff*, int, int, int, int, int);
+typedef void InvTrans(const TCoeff*, TCoeff*, int, int, int, int, int, const TCoeff, const TCoeff);
 #endif
 
 // ====================================================================================================================
@@ -71,9 +71,9 @@ public:
   ~TrQuant();
 
   // initialize class
-  Void init      (
+  void init      (
                     const Quant* otherQuant,
-                    const UInt uiMaxTrSize,
+                    const uint32_t uiMaxTrSize,
                     const bool bUseRDOQ             = false,
                     const bool bUseRDOQTS           = false,
 #if T0196_SELECTIVE_RDOQ
@@ -82,7 +82,7 @@ public:
 #if JVET_K0072
 #else
 #if JEM_TOOLS
-                    const UInt uiAltResiCompId      = 0,
+                    const uint32_t uiAltResiCompId      = 0,
 #endif
 #endif
                     const bool bEnc                 = false,
@@ -96,40 +96,40 @@ public:
   );
 
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
-  UChar getEmtTrIdx( TransformUnit tu, const ComponentID compID );
-  UChar getEmtMode ( TransformUnit tu, const ComponentID compID );
+  uint8_t getEmtTrIdx( TransformUnit tu, const ComponentID compID );
+  uint8_t getEmtMode ( TransformUnit tu, const ComponentID compID );
 #endif
 
 #if JEM_TOOLS
-  Void FwdNsstNxN( Int* src, const UInt uiMode, const UInt uiIndex, const UInt uiSize );
-  Void InvNsstNxN( Int* src, const UInt uiMode, const UInt uiIndex, const UInt uiSize );
+  void FwdNsstNxN( int* src, const uint32_t uiMode, const uint32_t uiIndex, const uint32_t uiSize );
+  void InvNsstNxN( int* src, const uint32_t uiMode, const uint32_t uiIndex, const uint32_t uiSize );
 #endif
 
 protected:
 
 #if JEM_TOOLS
-  Void xFwdNsst( const TransformUnit &tu, const ComponentID compID );
-  Void xInvNsst( const TransformUnit &tu, const ComponentID compID );
+  void xFwdNsst( const TransformUnit &tu, const ComponentID compID );
+  void xInvNsst( const TransformUnit &tu, const ComponentID compID );
 #endif
 public:
 
-  Void invTransformNxN  (TransformUnit &tu, const ComponentID &compID, PelBuf &pResi, const QpParam &cQPs);
+  void invTransformNxN  (TransformUnit &tu, const ComponentID &compID, PelBuf &pResi, const QpParam &cQPs);
 
-  Void transformNxN     (TransformUnit &tu, const ComponentID &compID, const QpParam &cQP, TCoeff &uiAbsSum, const Ctx &ctx);
-  Void rdpcmNxN         (TransformUnit &tu, const ComponentID &compID, const QpParam &cQP, TCoeff &uiAbsSum,       RDPCMMode &rdpcmMode);
-  Void applyForwardRDPCM(TransformUnit &tu, const ComponentID &compID, const QpParam &cQP, TCoeff &uiAbsSum, const RDPCMMode &rdpcmMode);
+  void transformNxN     (TransformUnit &tu, const ComponentID &compID, const QpParam &cQP, TCoeff &uiAbsSum, const Ctx &ctx);
+  void rdpcmNxN         (TransformUnit &tu, const ComponentID &compID, const QpParam &cQP, TCoeff &uiAbsSum,       RDPCMMode &rdpcmMode);
+  void applyForwardRDPCM(TransformUnit &tu, const ComponentID &compID, const QpParam &cQP, TCoeff &uiAbsSum, const RDPCMMode &rdpcmMode);
 
-  Void transformSkipQuantOneSample(TransformUnit &tu, const ComponentID &compID, const TCoeff &resiDiff, TCoeff &coeff,    const UInt &uiPos, const QpParam &cQP, const Bool bUseHalfRoundingPoint);
-  Void invTrSkipDeQuantOneSample  (TransformUnit &tu, const ComponentID &compID, const TCoeff &pcCoeff,  Pel &reconSample, const UInt &uiPos, const QpParam &cQP);
+  void transformSkipQuantOneSample(TransformUnit &tu, const ComponentID &compID, const TCoeff &resiDiff, TCoeff &coeff,    const uint32_t &uiPos, const QpParam &cQP, const bool bUseHalfRoundingPoint);
+  void invTrSkipDeQuantOneSample  (TransformUnit &tu, const ComponentID &compID, const TCoeff &pcCoeff,  Pel &reconSample, const uint32_t &uiPos, const QpParam &cQP);
 
-  Void invRdpcmNxN(TransformUnit& tu, const ComponentID &compID, PelBuf &pcResidual);
+  void invRdpcmNxN(TransformUnit& tu, const ComponentID &compID, PelBuf &pcResidual);
 #if RDOQ_CHROMA_LAMBDA
-  Void   setLambdas  ( const Double lambdas[MAX_NUM_COMPONENT] )   { m_quant->setLambdas( lambdas ); }
-  Void   selectLambda( const ComponentID compIdx )                 { m_quant->selectLambda( compIdx ); }
-  Void   getLambdas  ( Double (&lambdas)[MAX_NUM_COMPONENT]) const { m_quant->getLambdas( lambdas ); }
+  void   setLambdas  ( const double lambdas[MAX_NUM_COMPONENT] )   { m_quant->setLambdas( lambdas ); }
+  void   selectLambda( const ComponentID compIdx )                 { m_quant->selectLambda( compIdx ); }
+  void   getLambdas  ( double (&lambdas)[MAX_NUM_COMPONENT]) const { m_quant->getLambdas( lambdas ); }
 #endif
-  Void   setLambda   ( const Double dLambda )                      { m_quant->setLambda( dLambda ); }
-  Double getLambda   () const                                      { return m_quant->getLambda(); }
+  void   setLambda   ( const double dLambda )                      { m_quant->setLambda( dLambda ); }
+  double getLambda   () const                                      { return m_quant->getLambda(); }
 
   Quant* getQuant() { return m_quant;  }
 
@@ -140,9 +140,9 @@ public:
 
 protected:
   TCoeff*  m_plTempCoeff;
-  UInt     m_uiMaxTrSize;
-  Bool     m_bEnc;
-  Bool     m_useTransformSkipFast;
+  uint32_t     m_uiMaxTrSize;
+  bool     m_bEnc;
+  bool     m_useTransformSkipFast;
 
 #if !INTRA67_3MPM
 #if JEM_TOOLS
@@ -151,7 +151,7 @@ protected:
 #endif
   bool     m_rectTUs;
 
-  Bool     m_scalingListEnabledFlag;
+  bool     m_scalingListEnabledFlag;
 
 private:
   Quant    *m_quant;          //!< Quantizer
@@ -179,13 +179,13 @@ private:
 #endif
 
   // skipping Transform
-  Void xTransformSkip   (const TransformUnit &tu, const ComponentID &compID, const CPelBuf &resi, TCoeff* psCoeff);
+  void xTransformSkip   (const TransformUnit &tu, const ComponentID &compID, const CPelBuf &resi, TCoeff* psCoeff);
 
   // quantization
-  Void xQuant           (TransformUnit &tu, const ComponentID &compID, const CCoeffBuf &pSrc, TCoeff &uiAbsSum, const QpParam &cQP, const Ctx& ctx);
+  void xQuant           (TransformUnit &tu, const ComponentID &compID, const CCoeffBuf &pSrc, TCoeff &uiAbsSum, const QpParam &cQP, const Ctx& ctx);
 
   // dequantization
-  Void xDeQuant( const TransformUnit &tu,
+  void xDeQuant( const TransformUnit &tu,
                        CoeffBuf      &dstCoeff,
                  const ComponentID   &compID,
                  const QpParam       &cQP      );
@@ -194,7 +194,7 @@ private:
   void xIT     ( const TransformUnit &tu, const ComponentID &compID, const CCoeffBuf &pCoeff, PelBuf &pResidual );
 
   // inverse skipping transform
-  Void xITransformSkip(
+  void xITransformSkip(
                  const CCoeffBuf     &plCoef,
                        PelBuf        &pResidual,
                  const TransformUnit &tu,
@@ -203,8 +203,8 @@ private:
 
 #ifdef TARGET_SIMD_X86
   template<X86_VEXT vext>
-  Void _initTrQuantX86();
-  Void initTrQuantX86();
+  void _initTrQuantX86();
+  void initTrQuantX86();
 #endif
 };// END CLASS DEFINITION TrQuant
 

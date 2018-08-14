@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -54,8 +54,8 @@
 // Initialize / destroy functions
 // ====================================================================================================================
 
-Void         initROM();
-Void         destroyROM();
+void         initROM();
+void         destroyROM();
 
 void         generateTrafoBlockSizeScaling( SizeIndexInfo& sizeIdxInfo );
 
@@ -64,25 +64,25 @@ void         generateTrafoBlockSizeScaling( SizeIndexInfo& sizeIdxInfo );
 // ====================================================================================================================
 
 // flexible conversion from relative to absolute index
-extern       UInt*  g_scanOrder     [SCAN_NUMBER_OF_GROUP_TYPES][SCAN_NUMBER_OF_TYPES][MAX_CU_SIZE / 2 + 1][MAX_CU_SIZE / 2 + 1];
-extern       UInt*  g_scanOrderPosXY[SCAN_NUMBER_OF_GROUP_TYPES][SCAN_NUMBER_OF_TYPES][MAX_CU_SIZE / 2 + 1][MAX_CU_SIZE / 2 + 1][2];
+extern       uint32_t*  g_scanOrder     [SCAN_NUMBER_OF_GROUP_TYPES][SCAN_NUMBER_OF_TYPES][MAX_CU_SIZE / 2 + 1][MAX_CU_SIZE / 2 + 1];
+extern       uint32_t*  g_scanOrderPosXY[SCAN_NUMBER_OF_GROUP_TYPES][SCAN_NUMBER_OF_TYPES][MAX_CU_SIZE / 2 + 1][MAX_CU_SIZE / 2 + 1][2];
 #if JEM_TOOLS && !ENABLE_BMS
-extern       UInt   g_auiCoefTopLeftDiagScan8x8[ MAX_CU_SIZE / 2 + 1 ][64];
+extern       uint32_t   g_auiCoefTopLeftDiagScan8x8[ MAX_CU_SIZE / 2 + 1 ][64];
 
 #endif
 
-extern const Int g_quantScales   [SCALING_LIST_REM_NUM];          // Q(QP%6)
-extern const Int g_invQuantScales[SCALING_LIST_REM_NUM];          // IQ(QP%6)
+extern const int g_quantScales   [SCALING_LIST_REM_NUM];          // Q(QP%6)
+extern const int g_invQuantScales[SCALING_LIST_REM_NUM];          // IQ(QP%6)
 
 #if JVET_K1000_SIMPLIFIED_EMT
-static const Int g_numTransformMatrixSizes = 6;
-static const Int g_transformMatrixShift[TRANSFORM_NUMBER_OF_DIRECTIONS] = {  6, 6 };
+static const int g_numTransformMatrixSizes = 6;
+static const int g_transformMatrixShift[TRANSFORM_NUMBER_OF_DIRECTIONS] = {  6, 6 };
 #else
-static const Int g_numTransformMatrixSizes = 7;
+static const int g_numTransformMatrixSizes = 7;
 #if RExt__HIGH_PRECISION_FORWARD_TRANSFORM
-static const Int g_transformMatrixShift[TRANSFORM_NUMBER_OF_DIRECTIONS] = { 14, 6 };
+static const int g_transformMatrixShift[TRANSFORM_NUMBER_OF_DIRECTIONS] = { 14, 6 };
 #else
-static const Int g_transformMatrixShift[TRANSFORM_NUMBER_OF_DIRECTIONS] = {  6, 6 };
+static const int g_transformMatrixShift[TRANSFORM_NUMBER_OF_DIRECTIONS] = {  6, 6 };
 #endif
 
 extern const TMatrixCoeff g_aiT2  [TRANSFORM_NUMBER_OF_DIRECTIONS][  2][  2];
@@ -99,40 +99,40 @@ extern const TMatrixCoeff g_aiT128[TRANSFORM_NUMBER_OF_DIRECTIONS][128][128];
 // Luma QP to Chroma QP mapping
 // ====================================================================================================================
 #if JVET_K0251_QP_EXT
-static const Int chromaQPMappingTableSize = (MAX_QP + 7);
+static const int chromaQPMappingTableSize = (MAX_QP + 7);
 #else
-static const Int chromaQPMappingTableSize = 58;
+static const int chromaQPMappingTableSize = 58;
 #endif
 
-extern const UChar  g_aucChromaScale[NUM_CHROMA_FORMAT][chromaQPMappingTableSize];
+extern const uint8_t  g_aucChromaScale[NUM_CHROMA_FORMAT][chromaQPMappingTableSize];
 
 
 // ====================================================================================================================
 // Scanning order & context mapping table
 // ====================================================================================================================
 
-extern const UInt   ctxIndMap4x4[4*4];
+extern const uint32_t   ctxIndMap4x4[4*4];
 
-extern const UInt   g_uiGroupIdx[ MAX_TU_SIZE ];
-extern const UInt   g_uiMinInGroup[ LAST_SIGNIFICANT_GROUPS ];
+extern const uint32_t   g_uiGroupIdx[ MAX_TU_SIZE ];
+extern const uint32_t   g_uiMinInGroup[ LAST_SIGNIFICANT_GROUPS ];
 #if JVET_K0072
-extern const UInt   g_auiGoRicePars [ 32 ];
+extern const uint32_t   g_auiGoRicePars [ 32 ];
 #endif
-extern const UInt   g_auiGoRiceRange[ MAX_GR_ORDER_RESIDUAL ];                  //!< maximum value coded with Rice codes
+extern const uint32_t   g_auiGoRiceRange[ MAX_GR_ORDER_RESIDUAL ];                  //!< maximum value coded with Rice codes
 
 // ====================================================================================================================
 // Intra prediction table
 // ====================================================================================================================
 
-extern const UChar  g_aucIntraModeNumFast_UseMPM_2D[7 - MIN_CU_LOG2 + 1][7 - MIN_CU_LOG2 + 1];
-extern const UChar  g_aucIntraModeNumFast_UseMPM   [MAX_CU_DEPTH];
-extern const UChar  g_aucIntraModeNumFast_NotUseMPM[MAX_CU_DEPTH];
+extern const uint8_t  g_aucIntraModeNumFast_UseMPM_2D[7 - MIN_CU_LOG2 + 1][7 - MIN_CU_LOG2 + 1];
+extern const uint8_t  g_aucIntraModeNumFast_UseMPM   [MAX_CU_DEPTH];
+extern const uint8_t  g_aucIntraModeNumFast_NotUseMPM[MAX_CU_DEPTH];
 
-extern const UChar  g_chroma422IntraAngleMappingTable[NUM_INTRA_MODE];
+extern const uint8_t  g_chroma422IntraAngleMappingTable[NUM_INTRA_MODE];
 #if !INTRA67_3MPM
-extern const UChar  g_intraMode65to33AngMapping[NUM_INTRA_MODE];
+extern const uint8_t  g_intraMode65to33AngMapping[NUM_INTRA_MODE];
 
-extern const UChar  g_intraMode33to65AngMapping[36];
+extern const uint8_t  g_intraMode33to65AngMapping[36];
 
 static const unsigned mpmCtx[NUM_INTRA_MODE] =
 { 1, 1,                                                                                              // PLANAR, DC
@@ -142,8 +142,8 @@ static const unsigned mpmCtx[NUM_INTRA_MODE] =
 #endif
 
 #if JEM_TOOLS
-extern const Int g_intraCubicFilter[32][4];
-extern const Int g_intraGaussFilter[32][4];
+extern const int g_intraCubicFilter[32][4];
+extern const int g_intraGaussFilter[32][4];
 
 extern const int g_pdpc_pred_param[5][35][6];
 extern const int g_pdpcParam[5][6];
@@ -159,16 +159,16 @@ extern const TMatrixCoeff g_as_DST_MAT_4 [TRANSFORM_NUMBER_OF_DIRECTIONS][4][4];
 #endif
 
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
-extern const Int g_aiTrSubsetIntra[3][2];
-extern const Int g_aiTrSubsetInter[4];
+extern const int g_aiTrSubsetIntra[3][2];
+extern const int g_aiTrSubsetInter[4];
 
-extern const UChar g_aucTrSetVert[NUM_INTRA_MODE - 1];
-extern const UChar g_aucTrSetHorz[NUM_INTRA_MODE - 1];
+extern const uint8_t g_aucTrSetVert[NUM_INTRA_MODE - 1];
+extern const uint8_t g_aucTrSetHorz[NUM_INTRA_MODE - 1];
 
-extern const UChar g_aucTrSetVert35[35];
-extern const UChar g_aucTrSetHorz35[35];
+extern const uint8_t g_aucTrSetVert35[35];
+extern const uint8_t g_aucTrSetHorz35[35];
 
-extern const UInt g_EmtSigNumThr;
+extern const uint32_t g_EmtSigNumThr;
 #endif
 
 extern TMatrixCoeff g_aiTr2   [NUM_TRANS_TYPE][  2][  2];
@@ -182,14 +182,14 @@ extern TMatrixCoeff g_aiTr128 [NUM_TRANS_TYPE][128][128];
 #endif
 
 #if JEM_TOOLS
-extern const UChar  g_NsstLut           [NUM_INTRA_MODE-1];
-struct tabSinCos { Int c, s; };
+extern const uint8_t  g_NsstLut           [NUM_INTRA_MODE-1];
+struct tabSinCos { int c, s; };
 extern tabSinCos    g_tabSinCos         [NSST_HYGT_PTS];
-extern const UChar  g_nsstHyGTPermut4x4 [35][3][16];
-extern const Int    g_nsstHyGTPar4x4    [35][3][64];
+extern const uint8_t  g_nsstHyGTPermut4x4 [35][3][16];
+extern const int    g_nsstHyGTPar4x4    [35][3][64];
 #if !ENABLE_BMS
-extern const UChar  g_nsstHyGTPermut8x8 [35][3][64];
-extern const Int    g_nsstHyGTPar8x8    [35][3][768];
+extern const uint8_t  g_nsstHyGTPermut8x8 [35][3][64];
+extern const int    g_nsstHyGTPar8x8    [35][3][768];
 #endif
 #endif
 
@@ -241,19 +241,19 @@ extern const DecisionTreeTemplate g_intraLumaMpmDTT;
 // ====================================================================================================================
 extern SizeIndexInfo* gp_sizeIdxInfo;
 extern int            g_BlockSizeTrafoScale           [MAX_CU_SIZE + 1][MAX_CU_SIZE + 1][2];
-extern SChar          g_aucLog2                       [MAX_CU_SIZE + 1];
-extern SChar          g_aucNextLog2        [MAX_CU_SIZE + 1];
-extern SChar          g_aucPrevLog2        [MAX_CU_SIZE + 1];
-extern const SChar    i2Log2Tab[257];
+extern int8_t          g_aucLog2                       [MAX_CU_SIZE + 1];
+extern int8_t          g_aucNextLog2        [MAX_CU_SIZE + 1];
+extern int8_t          g_aucPrevLog2        [MAX_CU_SIZE + 1];
+extern const int8_t    i2Log2Tab[257];
 
 inline bool is34( const SizeType& size )
 {
-  return ( size & ( ( Int64 ) 1 << ( g_aucLog2[size] - 1 ) ) );
+  return ( size & ( ( int64_t ) 1 << ( g_aucLog2[size] - 1 ) ) );
 }
 
 inline bool is58( const SizeType& size )
 {
-  return ( size & ( ( Int64 ) 1 << ( g_aucLog2[size] - 2 ) ) );
+  return ( size & ( ( int64_t ) 1 << ( g_aucLog2[size] - 2 ) ) );
 }
 
 inline bool isNonLog2BlockSize( const Size& size )
@@ -274,18 +274,18 @@ extern UnitScale     g_miScaling; // scaling object for motion scaling
 extern CDTrace* g_trace_ctx;
 #endif
 
-const TChar* nalUnitTypeToString(NalUnitType type);
+const char* nalUnitTypeToString(NalUnitType type);
 
 #if HEVC_USE_SCALING_LISTS
-extern const TChar *MatrixType   [SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM];
-extern const TChar *MatrixType_DC[SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM];
+extern const char *MatrixType   [SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM];
+extern const char *MatrixType_DC[SCALING_LIST_SIZE_NUM][SCALING_LIST_NUM];
 
-extern const Int g_quantTSDefault4x4   [4*4];
-extern const Int g_quantIntraDefault8x8[8*8];
-extern const Int g_quantInterDefault8x8[8*8];
+extern const int g_quantTSDefault4x4   [4*4];
+extern const int g_quantIntraDefault8x8[8*8];
+extern const int g_quantInterDefault8x8[8*8];
 
-extern const UInt g_scalingListSize [SCALING_LIST_SIZE_NUM];
-extern const UInt g_scalingListSizeX[SCALING_LIST_SIZE_NUM];
+extern const uint32_t g_scalingListSize [SCALING_LIST_SIZE_NUM];
+extern const uint32_t g_scalingListSizeX[SCALING_LIST_SIZE_NUM];
 #endif
 
 extern MsgLevel g_verbosity;
@@ -293,22 +293,35 @@ extern MsgLevel g_verbosity;
 
 #if JEM_TOOLS
 
-extern Int g_aiLMDivTableLow[];
-extern Int g_aiLMDivTableHigh[];
+extern int g_aiLMDivTableLow[];
+extern int g_aiLMDivTableHigh[];
 
-extern const Int g_aiMFLM_MinSize[];
-extern const Int g_aiMMLM_MinSize[];
+extern const int g_aiMFLM_MinSize[];
+extern const int g_aiMMLM_MinSize[];
 #endif
 #if JEM_TOOLS||JVET_K0190
-extern const Int g_aiNonLMPosThrs[];
+extern const int g_aiNonLMPosThrs[];
 #endif
 #if JEM_TOOLS
-extern const UChar g_NonMPM[257];
+extern const uint8_t g_NonMPM[257];
 #if !INTRA67_3MPM
 #if JVET_B0051_NON_MPM_MODE
-extern const Int g_ipred_mode_table[];
+extern const int g_ipred_mode_table[];
 #endif
 #endif
+#endif
+
+#if JVET_K0371_ALF
+constexpr uint8_t g_tbMax[257] = { 0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7,
+7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 8 };
 #endif
 
 //! \}

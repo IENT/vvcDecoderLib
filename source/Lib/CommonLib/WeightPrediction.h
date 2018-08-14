@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -55,36 +55,36 @@ class WeightPrediction
 public:
   WeightPrediction();
 
-  Void  getWpScaling(           const Slice                *slice,
-                                const Int                  &iRefIdx0,
-                                const Int                  &iRefIdx1,
+  void  getWpScaling(           const Slice                *slice,
+                                const int                  &iRefIdx0,
+                                const int                  &iRefIdx1,
                                       WPScalingParam      *&wp0,
                                       WPScalingParam      *&wp1,
                                 const ComponentID           maxNumComp = MAX_NUM_COMPONENT );
 
-  Void addWeightBi(             const CPelUnitBuf          &pcYuvSrc0,
+  void addWeightBi(             const CPelUnitBuf          &pcYuvSrc0,
                                 const CPelUnitBuf          &pcYuvSrc1,
                                 const ClpRngs              &clpRngs,
                                 const WPScalingParam *const wp0,
                                 const WPScalingParam *const wp1,
                                       PelUnitBuf           &rpcYuvDst,
-                                const Bool                  bRoundLuma = true,
+                                const bool                  bRoundLuma = true,
                                 const ComponentID           maxNumComp = MAX_NUM_COMPONENT );
 
-  Void  addWeightUni(           const CPelUnitBuf          &pcYuvSrc0,
+  void  addWeightUni(           const CPelUnitBuf          &pcYuvSrc0,
                                 const ClpRngs              &clpRngs,
                                 const WPScalingParam *const wp0,
                                       PelUnitBuf           &rpcYuvDst,
                                 const ComponentID           maxNumComp = MAX_NUM_COMPONENT);
 
-  Void  xWeightedPredictionUni( const PredictionUnit       &pu,
+  void  xWeightedPredictionUni( const PredictionUnit       &pu,
                                 const CPelUnitBuf          &pcYuvSrc,
                                 const RefPicList           &eRefPicList,
                                       PelUnitBuf           &pcYuvPred,
-                                const Int                   iRefIdx=-1,
+                                const int                   iRefIdx=-1,
                                 const ComponentID           maxNumComp = MAX_NUM_COMPONENT);
 
-  Void  xWeightedPredictionBi(  const PredictionUnit       &pu,
+  void  xWeightedPredictionBi(  const PredictionUnit       &pu,
                                 const CPelUnitBuf          &pcYuvSrc0,
                                 const CPelUnitBuf          &pcYuvSrc1,
                                       PelUnitBuf           &pcYuvDst,

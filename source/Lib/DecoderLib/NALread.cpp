@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -56,12 +56,12 @@ using namespace std;
 
 //! \ingroup DecoderLib
 //! \{
-static Void convertPayloadToRBSP(vector<uint8_t>& nalUnitBuf, InputBitstream *bitstream, Bool isVclNalUnit)
+static void convertPayloadToRBSP(vector<uint8_t>& nalUnitBuf, InputBitstream *bitstream, bool isVclNalUnit)
 {
-  UInt zeroCount = 0;
+  uint32_t zeroCount = 0;
   vector<uint8_t>::iterator it_read, it_write;
 
-  UInt pos = 0;
+  uint32_t pos = 0;
   bitstream->clearEmulationPreventionByteLocation();
   for (it_read = it_write = nalUnitBuf.begin(); it_read != nalUnitBuf.end(); it_read++, it_write++, pos++)
   {
@@ -89,7 +89,7 @@ static Void convertPayloadToRBSP(vector<uint8_t>& nalUnitBuf, InputBitstream *bi
   if (isVclNalUnit)
   {
     // Remove cabac_zero_word from payload if present
-    Int n = 0;
+    int n = 0;
 
     while (it_write[-1] == 0x00)
     {
@@ -118,11 +118,11 @@ static void xTraceNalUnitHeader(InputNALUnit& nalu)
 }
 #endif
 
-Void readNalUnitHeader(InputNALUnit& nalu)
+void readNalUnitHeader(InputNALUnit& nalu)
 {
   InputBitstream& bs = nalu.getBitstream();
 
-  Bool forbidden_zero_bit = bs.read(1);           // forbidden_zero_bit
+  bool forbidden_zero_bit = bs.read(1);           // forbidden_zero_bit
   if(forbidden_zero_bit != 0) { THROW( "Forbidden zero-bit not '0'" );}
   nalu.m_nalUnitType = (NalUnitType) bs.read(6);  // nal_unit_type
   nalu.m_nuhLayerId = bs.read(6);                 // nuh_layer_id
@@ -179,7 +179,7 @@ Void readNalUnitHeader(InputNALUnit& nalu)
  * create a NALunit structure with given header values and storage for
  * a bitstream
  */
-Void read(InputNALUnit& nalu)
+void read(InputNALUnit& nalu)
 {
   InputBitstream &bitstream = nalu.getBitstream();
   vector<uint8_t>& nalUnitBuf=bitstream.getFifo();

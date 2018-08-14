@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,7 +38,7 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
-InputColourSpaceConversion stringToInputColourSpaceConvert(const std::string &value, const Bool bIsForward)
+InputColourSpaceConversion stringToInputColourSpaceConvert(const std::string &value, const bool bIsForward)
 {
   if (value.empty() || value=="UNCHANGED")
   {
@@ -73,7 +73,7 @@ InputColourSpaceConversion stringToInputColourSpaceConvert(const std::string &va
   return NUMBER_INPUT_COLOUR_SPACE_CONVERSIONS;
 }
 
-std::string getListOfColourSpaceConverts(const Bool bIsForward)
+std::string getListOfColourSpaceConverts(const bool bIsForward)
 {
   if (bIsForward)
   {

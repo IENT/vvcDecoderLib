@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@
 #include "Common.h"
 #include "Slice.h"
 
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
 void roundMV( Mv & rMV, unsigned imvShift )
 {
   CHECK( imvShift == 0, "roundMV called for imvShift=0" );
@@ -61,7 +61,7 @@ void roundAffineMv( int& mvx, int& mvy, int nShift )
 }
 #endif
 
-Void clipMv( Mv& rcMv, const Position& pos, const SPS& sps )
+void clipMv( Mv& rcMv, const Position& pos, const SPS& sps )
 {
 #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
   int iMvShift = 2 + ( rcMv.highPrec ? VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : 0 );

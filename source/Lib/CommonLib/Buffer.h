@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -539,7 +539,7 @@ template<typename T>
 template<int N>
 T AreaBuf<T>::average( unsigned x, unsigned y ) const
 {
-  Int s = 0;
+  int s = 0;
 
   for( int i = -N / 2; i <= N / 2; ++i )
   {

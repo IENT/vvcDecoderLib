@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -48,11 +48,15 @@
 #include "CommonLib/AffineGradientSearch.h"
 #endif
 
+#if JVET_K0371_ALF
+#include "CommonLib/AdaptiveLoopFilter.h"
+#endif
+
 #ifdef TARGET_SIMD_X86
 
 
 #if ENABLE_SIMD_OPT_MCIF
-Void InterpolationFilter::initInterpolationFilterX86( /*Int iBitDepthY, Int iBitDepthC*/ )
+void InterpolationFilter::initInterpolationFilterX86( /*int iBitDepthY, int iBitDepthC*/ )
 {
   auto vext = read_x86_extension_flags();
   switch (vext){
@@ -74,7 +78,7 @@ Void InterpolationFilter::initInterpolationFilterX86( /*Int iBitDepthY, Int iBit
 #endif
 
 #if ENABLE_SIMD_OPT_BUFFER
-Void PelBufferOps::initPelBufOpsX86()
+void PelBufferOps::initPelBufOpsX86()
 {
   auto vext = read_x86_extension_flags();
   switch (vext){
@@ -99,7 +103,7 @@ Void PelBufferOps::initPelBufOpsX86()
 
 
 #if ENABLE_SIMD_OPT_DIST
-Void RdCost::initRdCostX86()
+void RdCost::initRdCostX86()
 {
   auto vext = read_x86_extension_flags();
   switch (vext){
@@ -135,6 +139,29 @@ void AffineGradientSearch::initAffineGradientSearchX86()
   case SSE42:
   case SSE41:
     _initAffineGradientSearchX86<SSE41>();
+    break;
+  default:
+    break;
+  }
+}
+#endif
+
+#if ENABLE_SIMD_OPT_ALF
+void AdaptiveLoopFilter::initAdaptiveLoopFilterX86()
+{
+  auto vext = read_x86_extension_flags();
+  switch ( vext )
+  {
+  case AVX512:
+  case AVX2:
+    _initAdaptiveLoopFilterX86<AVX2>();
+    break;
+  case AVX:
+    _initAdaptiveLoopFilterX86<AVX>();
+    break;
+  case SSE42:
+  case SSE41:
+    _initAdaptiveLoopFilterX86<SSE41>();
     break;
   default:
     break;

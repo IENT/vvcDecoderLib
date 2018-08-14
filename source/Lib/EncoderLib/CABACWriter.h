@@ -3,7 +3,7 @@
 * and contributor rights, including patent rights, and no such rights are
 * granted under this license.
 *
-* Copyright (c) 2010-2017, ITU/ISO/IEC
+* Copyright (c) 2010-2018, ITU/ISO/IEC
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -102,7 +102,7 @@ public:
   void        sao                       ( const Slice&                  slice,    unsigned          ctuRsAddr );
   void        sao_block_pars            ( const SAOBlkParam&            saoPars,  const BitDepths&  bitDepths,  bool* sliceEnabled, bool leftMergeAvail, bool aboveMergeAvail, bool onlyEstMergeInfo );
   void        sao_offset_pars           ( const SAOOffset&              ctbPars,  ComponentID       compID,     bool sliceEnabled,  int bitDepth );
-#if JEM_TOOLS
+#if JEM_TOOLS && !JVET_K0371_ALF
   void        alf                       ( const Slice&                  slice,    const ALFParam& alfParam );
   void        alf                       ( const ALFParam&               alfParam, SliceType sliceType, bool isGALF );
 
@@ -149,7 +149,7 @@ public:
   void        affine_flag               ( const CodingUnit&             cu );
 #endif
   void        merge_idx                 ( const PredictionUnit&         pu );
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   void        imv_mode                  ( const CodingUnit&             cu );
 #endif
   void        inter_pred_idc            ( const PredictionUnit&         pu );
@@ -179,9 +179,9 @@ public:
 #endif
 #endif
 
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   // mvd coding (clause 7.3.8.9)
-  void        mvd_coding                ( const Mv &rMvd, UChar imv );
+  void        mvd_coding                ( const Mv &rMvd, uint8_t imv );
 #else
   void        mvd_coding                ( const Mv &rMvd );
 #endif
@@ -191,7 +191,7 @@ public:
 #if HM_QTBT_AS_IN_JEM_SYNTAX
   void        transform_unit_qtbt       ( const TransformUnit&          tu,       CUCtx&            cuCtx,  ChromaCbfs& chromaCbfs );
 #endif
-  void        cu_qp_delta               ( const CodingUnit&             cu,       int               predQP, const SChar qp );
+  void        cu_qp_delta               ( const CodingUnit&             cu,       int               predQP, const int8_t qp );
   void        cu_chroma_qp_offset       ( const CodingUnit&             cu );
 #if (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT) && !HM_EMT_NSST_AS_IN_JEM
   void        cu_emt_pertu_idx          ( const CodingUnit&             cu );
@@ -218,21 +218,27 @@ public:
   // cross component prediction (clause 7.3.8.12)
   void        cross_comp_pred           ( const TransformUnit&          tu,       ComponentID       compID );
 
+#if JVET_K0371_ALF
+  void        codeAlfCtuEnableFlags     ( CodingStructure& cs, ChannelType channel, AlfSliceParam* alfParam);
+  void        codeAlfCtuEnableFlags     ( CodingStructure& cs, ComponentID compID, AlfSliceParam* alfParam);
+  void        codeAlfCtuEnableFlag      ( CodingStructure& cs, uint32_t ctuRsAddr, const int compIdx, AlfSliceParam* alfParam = NULL );
+#endif
+
 private:
   void        unary_max_symbol          ( unsigned symbol, unsigned ctxId0, unsigned ctxIdN, unsigned maxSymbol );
   void        unary_max_eqprob          ( unsigned symbol,                                   unsigned maxSymbol );
   void        exp_golomb_eqprob         ( unsigned symbol, unsigned count );
   void        encode_sparse_dt          ( DecisionTree& dt, unsigned toCodeId );
 
-#if JEM_TOOLS
+#if JEM_TOOLS && !JVET_K0371_ALF
   // alf
   void        alf_aux                   ( const ALFParam&               alfParam, bool isGALF );
   void        alf_filter                ( const ALFParam&               alfParam, bool isGALF, bool bChroma = false );
   void        alf_cu_ctrl               ( const ALFParam&               alfParam );
   void        alf_chroma                ( const ALFParam&               alfParam );
-  Int         alf_lengthGolomb          ( int coeffVal, int k );
-  void        codeAlfUvlc               ( UInt uiCode );
-  void        codeAlfSvlc               ( Int iCode );
+  int         alf_lengthGolomb          ( int coeffVal, int k );
+  void        codeAlfUvlc               ( uint32_t uiCode );
+  void        codeAlfSvlc               ( int iCode );
   void        alfGolombEncode           ( int coeff, int k );
 
 #endif
@@ -240,9 +246,9 @@ private:
   unsigned    get_num_written_bits()    { return m_BinEncoder.getNumWrittenBits(); }
 
 #if JEM_TOOLS
-  Void  xWriteTruncBinCode(UInt uiSymbol, UInt uiMaxSymbol);
+  void  xWriteTruncBinCode(uint32_t uiSymbol, uint32_t uiMaxSymbol);
 #if JVET_C0038_NO_PREV_FILTERS
-  Void  xWriteEpExGolomb(UInt uiSymbol, UInt uiCount);
+  void  xWriteEpExGolomb(uint32_t uiSymbol, uint32_t uiCount);
 #endif
 
 #endif

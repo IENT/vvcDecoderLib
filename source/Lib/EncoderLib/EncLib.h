@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -56,7 +56,7 @@
 #include "InterSearch.h"
 #include "IntraSearch.h"
 #include "EncSampleAdaptiveOffset.h"
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0371_ALF
 #include "EncAdaptiveLoopFilter.h"
 #endif
 #include "RateCtrl.h"
@@ -74,9 +74,9 @@ class EncLib : public EncCfg
 {
 private:
   // picture
-  Int                       m_iPOCLast;                           ///< time index (POC)
-  Int                       m_iNumPicRcvd;                        ///< number of received pictures
-  UInt                      m_uiNumAllPicCoded;                   ///< number of coded pictures
+  int                       m_iPOCLast;                           ///< time index (POC)
+  int                       m_iNumPicRcvd;                        ///< number of received pictures
+  uint32_t                      m_uiNumAllPicCoded;                   ///< number of coded pictures
   PicList                   m_cListPic;                           ///< dynamic list of pictures
 
   // encoder search
@@ -95,7 +95,7 @@ private:
 #endif
   LoopFilter                m_cLoopFilter;                        ///< deblocking filter class
   EncSampleAdaptiveOffset   m_cEncSAO;                            ///< sample adaptive offset class
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0371_ALF
   EncAdaptiveLoopFilter     m_cEncALF;
 #endif
   HLSWriter                 m_HLSWriter;                          ///< CAVLC encoder
@@ -153,30 +153,30 @@ public:
 #endif
 
 protected:
-  Void  xGetNewPicBuffer  ( std::list<PelUnitBuf*>& rcListPicYuvRecOut, Picture*& rpcPic, Int ppsId ); ///< get picture buffer which will be processed. If ppsId<0, then the ppsMap will be queried for the first match.
+  void  xGetNewPicBuffer  ( std::list<PelUnitBuf*>& rcListPicYuvRecOut, Picture*& rpcPic, int ppsId ); ///< get picture buffer which will be processed. If ppsId<0, then the ppsMap will be queried for the first match.
 #if HEVC_VPS
-  Void  xInitVPS          (VPS &vps, const SPS &sps); ///< initialize VPS from encoder options
+  void  xInitVPS          (VPS &vps, const SPS &sps); ///< initialize VPS from encoder options
 #endif
-  Void  xInitSPS          (SPS &sps);                 ///< initialize SPS from encoder options
-  Void  xInitPPS          (PPS &pps, const SPS &sps); ///< initialize PPS from encoder options
+  void  xInitSPS          (SPS &sps);                 ///< initialize SPS from encoder options
+  void  xInitPPS          (PPS &pps, const SPS &sps); ///< initialize PPS from encoder options
 #if HEVC_USE_SCALING_LISTS
-  Void  xInitScalingLists (SPS &sps, PPS &pps);   ///< initialize scaling lists
+  void  xInitScalingLists (SPS &sps, PPS &pps);   ///< initialize scaling lists
 #endif
-  Void  xInitHrdParameters(SPS &sps);                 ///< initialize HRD parameters
+  void  xInitHrdParameters(SPS &sps);                 ///< initialize HRD parameters
 
 #if HEVC_TILES_WPP
-  Void  xInitPPSforTiles  (PPS &pps);
+  void  xInitPPSforTiles  (PPS &pps);
 #endif
-  Void  xInitRPS          (SPS &sps, Bool isFieldCoding);           ///< initialize PPS from encoder options
+  void  xInitRPS          (SPS &sps, bool isFieldCoding);           ///< initialize PPS from encoder options
 
 public:
   EncLib();
   virtual ~EncLib();
 
-  Void      create          ();
-  Void      destroy         ();
-  Void      init            ( Bool isFieldCoding, AUWriterIf* auWriterIf );
-  Void      deletePicBuffer ();
+  void      create          ();
+  void      destroy         ();
+  void      init            ( bool isFieldCoding, AUWriterIf* auWriterIf );
+  void      deletePicBuffer ();
 
   // -------------------------------------------------------------------------------------------------------------------
   // member access functions
@@ -197,7 +197,7 @@ public:
 #endif
   LoopFilter*             getLoopFilter         ()              { return  &m_cLoopFilter;          }
   EncSampleAdaptiveOffset* getSAO               ()              { return  &m_cEncSAO;              }
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K0371_ALF
   EncAdaptiveLoopFilter*  getALF                ()              { return  &m_cEncALF;              }
 #endif
   EncGOP*                 getGOPEncoder         ()              { return  &m_cGOPEncoder;          }
@@ -230,11 +230,11 @@ public:
 #endif
   RateCtrl*               getRateCtrl           ()              { return  &m_cRateCtrl;            }
 
-  Void selectReferencePictureSet(Slice* slice, Int POCCurr, Int GOPid );
-  Int getReferencePictureSetIdxForSOP(Int POCCurr, Int GOPid );
+  void selectReferencePictureSet(Slice* slice, int POCCurr, int GOPid );
+  int getReferencePictureSetIdxForSOP(int POCCurr, int GOPid );
 
-  Bool                   PPSNeedsWriting(Int ppsId);
-  Bool                   SPSNeedsWriting(Int spsId);
+  bool                   PPSNeedsWriting(int ppsId);
+  bool                   SPSNeedsWriting(int spsId);
   const PPS* getPPS( int Id ) { return m_ppsMap.getPS( Id); }
 
 #if ENABLE_SPLIT_PARALLELISM || ENABLE_WPP_PARALLELISM
@@ -247,21 +247,21 @@ public:
   // -------------------------------------------------------------------------------------------------------------------
 
   /// encode several number of pictures until end-of-sequence
-  Void encode( Bool bEos,
+  void encode( bool bEos,
                PelStorage* pcPicYuvOrg,
                PelStorage* pcPicYuvTrueOrg, const InputColourSpaceConversion snrCSC, // used for SNR calculations. Picture in original colour space.
                std::list<PelUnitBuf*>& rcListPicYuvRecOut,
-               Int& iNumEncoded );
+               int& iNumEncoded );
 
   /// encode several number of pictures until end-of-sequence
-  Void encode( Bool bEos,
+  void encode( bool bEos,
                PelStorage* pcPicYuvOrg,
                PelStorage* pcPicYuvTrueOrg, const InputColourSpaceConversion snrCSC, // used for SNR calculations. Picture in original colour space.
                std::list<PelUnitBuf*>& rcListPicYuvRecOut,
-               Int& iNumEncoded, Bool isTff );
+               int& iNumEncoded, bool isTff );
 
 
-  Void printSummary(Bool isField) { m_cGOPEncoder.printOutSummary (m_uiNumAllPicCoded, isField, m_printMSEBasedSequencePSNR, m_printSequenceMSE, m_spsMap.getFirstPS()->getBitDepths()); }
+  void printSummary(bool isField) { m_cGOPEncoder.printOutSummary (m_uiNumAllPicCoded, isField, m_printMSEBasedSequencePSNR, m_printSequenceMSE, m_spsMap.getFirstPS()->getBitDepths()); }
 
 };
 

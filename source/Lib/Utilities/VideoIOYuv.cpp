@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -66,7 +66,7 @@ using namespace std;
  * @param minval  minimum clipping value when dividing.
  * @param maxval  maximum clipping value when dividing.
  */
-static Void scalePlane( PelBuf& areaBuf, const Int shiftbits, const Pel minval, const Pel maxval)
+static void scalePlane( PelBuf& areaBuf, const int shiftbits, const Pel minval, const Pel maxval)
 {
   const unsigned width  = areaBuf.width;
   const unsigned height = areaBuf.height;
@@ -124,12 +124,12 @@ static Void scalePlane( PelBuf& areaBuf, const Int shiftbits, const Pel minval, 
  * \param MSBExtendedBitDepth
  * \param internalBitDepth bit-depth array to scale image data to/from when reading/writing.
  */
-Void VideoIOYuv::open( const std::string &fileName, Bool bWriteMode, const Int fileBitDepth[MAX_NUM_CHANNEL_TYPE], const Int MSBExtendedBitDepth[MAX_NUM_CHANNEL_TYPE], const Int internalBitDepth[MAX_NUM_CHANNEL_TYPE] )
+void VideoIOYuv::open( const std::string &fileName, bool bWriteMode, const int fileBitDepth[MAX_NUM_CHANNEL_TYPE], const int MSBExtendedBitDepth[MAX_NUM_CHANNEL_TYPE], const int internalBitDepth[MAX_NUM_CHANNEL_TYPE] )
 {
   //NOTE: files cannot have bit depth greater than 16
-  for(UInt ch=0; ch<MAX_NUM_CHANNEL_TYPE; ch++)
+  for(uint32_t ch=0; ch<MAX_NUM_CHANNEL_TYPE; ch++)
   {
-    m_fileBitdepth       [ch] = std::min<UInt>(fileBitDepth[ch], 16);
+    m_fileBitdepth       [ch] = std::min<uint32_t>(fileBitDepth[ch], 16);
     m_MSBExtendedBitDepth[ch] = MSBExtendedBitDepth[ch];
     m_bitdepthShift      [ch] = internalBitDepth[ch] - m_MSBExtendedBitDepth[ch];
 
@@ -152,7 +152,7 @@ Void VideoIOYuv::open( const std::string &fileName, Bool bWriteMode, const Int f
 
     if( m_cHandle.fail() )
     {
-      EXIT( "failed to write reconstructed YUV file" );
+      EXIT( "Failed to write reconstructed YUV file: " << fileName.c_str() );
     }
   }
   else
@@ -161,24 +161,24 @@ Void VideoIOYuv::open( const std::string &fileName, Bool bWriteMode, const Int f
 
     if( m_cHandle.fail() )
     {
-      EXIT( "failed to open Input YUV file");
+      EXIT( "Failed to open input YUV file: " << fileName.c_str() );
     }
   }
 
   return;
 }
 
-Void VideoIOYuv::close()
+void VideoIOYuv::close()
 {
   m_cHandle.close();
 }
 
-Bool VideoIOYuv::isEof()
+bool VideoIOYuv::isEof()
 {
   return m_cHandle.eof();
 }
 
-Bool VideoIOYuv::isFail()
+bool VideoIOYuv::isFail()
 {
   return m_cHandle.fail();
 }
@@ -190,9 +190,9 @@ Bool VideoIOYuv::isFail()
  * seekable, by consuming bytes.
  */
 #if EXTENSION_360_VIDEO
-Void VideoIOYuv::skipFrames(Int numFrames, UInt width, UInt height, ChromaFormat format)
+void VideoIOYuv::skipFrames(int numFrames, uint32_t width, uint32_t height, ChromaFormat format)
 #else
-Void VideoIOYuv::skipFrames(UInt numFrames, UInt width, UInt height, ChromaFormat format)
+void VideoIOYuv::skipFrames(uint32_t numFrames, uint32_t width, uint32_t height, ChromaFormat format)
 #endif
 {
   if (!numFrames)
@@ -203,8 +203,8 @@ Void VideoIOYuv::skipFrames(UInt numFrames, UInt width, UInt height, ChromaForma
   //------------------
   //set the frame size according to the chroma format
   streamoff frameSize = 0;
-  UInt wordsize=1; // default to 8-bit, unless a channel with more than 8-bits is detected.
-  for (UInt component = 0; component < getNumberValidComponents(format); component++)
+  uint32_t wordsize=1; // default to 8-bit, unless a channel with more than 8-bits is detected.
+  for (uint32_t component = 0; component < getNumberValidComponents(format); component++)
   {
     ComponentID compID=ComponentID(component);
     frameSize += (width >> getComponentScaleX(compID, format)) * (height >> getComponentScaleY(compID, format));
@@ -226,7 +226,7 @@ Void VideoIOYuv::skipFrames(UInt numFrames, UInt width, UInt height, ChromaForma
   m_cHandle.clear();
 
   /* fall back to consuming the input */
-  TChar buf[512];
+  char buf[512];
   const streamoff offset_mod_bufsize = offset % sizeof(buf);
   for (streamoff i = 0; i < offset - offset_mod_bufsize; i += sizeof(buf))
   {
@@ -254,43 +254,43 @@ Void VideoIOYuv::skipFrames(UInt numFrames, UInt width, UInt height, ChromaForma
  * @param fileBitDepth component bit depth in file
  * @return true for success, false in case of error
  */
-static Bool readPlane(Pel* dst,
+static bool readPlane(Pel* dst,
                       istream& fd,
-                      Bool is16bit,
-                      UInt stride444,
-                      UInt width444,
-                      UInt height444,
-                      UInt pad_x444,
-                      UInt pad_y444,
+                      bool is16bit,
+                      uint32_t stride444,
+                      uint32_t width444,
+                      uint32_t height444,
+                      uint32_t pad_x444,
+                      uint32_t pad_y444,
                       const ComponentID compID,
                       const ChromaFormat destFormat,
                       const ChromaFormat fileFormat,
-                      const UInt fileBitDepth)
+                      const uint32_t fileBitDepth)
 {
-  const UInt csx_file =getComponentScaleX(compID, fileFormat);
-  const UInt csy_file =getComponentScaleY(compID, fileFormat);
-  const UInt csx_dest =getComponentScaleX(compID, destFormat);
-  const UInt csy_dest =getComponentScaleY(compID, destFormat);
+  const uint32_t csx_file =getComponentScaleX(compID, fileFormat);
+  const uint32_t csy_file =getComponentScaleY(compID, fileFormat);
+  const uint32_t csx_dest =getComponentScaleX(compID, destFormat);
+  const uint32_t csy_dest =getComponentScaleY(compID, destFormat);
 
-  const UInt width_dest       = width444 >>csx_dest;
-  const UInt height_dest      = height444>>csy_dest;
-  const UInt pad_x_dest       = pad_x444>>csx_dest;
-  const UInt pad_y_dest       = pad_y444>>csy_dest;
+  const uint32_t width_dest       = width444 >>csx_dest;
+  const uint32_t height_dest      = height444>>csy_dest;
+  const uint32_t pad_x_dest       = pad_x444>>csx_dest;
+  const uint32_t pad_y_dest       = pad_y444>>csy_dest;
 #if EXTENSION_360_VIDEO
-  const UInt stride_dest = stride444;
+  const uint32_t stride_dest = stride444;
 #else
-  const UInt stride_dest      = stride444>>csx_dest;
+  const uint32_t stride_dest      = stride444>>csx_dest;
 #endif
-  const UInt full_width_dest  = width_dest+pad_x_dest;
-  const UInt full_height_dest = height_dest+pad_y_dest;
+  const uint32_t full_width_dest  = width_dest+pad_x_dest;
+  const uint32_t full_height_dest = height_dest+pad_y_dest;
 
-  const UInt stride_file      = (width444 * (is16bit ? 2 : 1)) >> csx_file;
-  std::vector<UChar> bufVec(stride_file);
-  UChar *buf=&(bufVec[0]);
+  const uint32_t stride_file      = (width444 * (is16bit ? 2 : 1)) >> csx_file;
+  std::vector<uint8_t> bufVec(stride_file);
+  uint8_t *buf=&(bufVec[0]);
 
   Pel  *pDstPad              = dst + stride_dest * height_dest;
   Pel  *pDstBuf              = dst;
-  const Int dstbuf_stride    = stride_dest;
+  const int dstbuf_stride    = stride_dest;
 
   if (compID!=COMPONENT_Y && (fileFormat==CHROMA_400 || destFormat==CHROMA_400))
   {
@@ -298,9 +298,9 @@ static Bool readPlane(Pel* dst,
     {
       // set chrominance data to mid-range: (1<<(fileBitDepth-1))
       const Pel value=Pel(1<<(fileBitDepth-1));
-      for (UInt y = 0; y < full_height_dest; y++, pDstBuf+= dstbuf_stride)
+      for (uint32_t y = 0; y < full_height_dest; y++, pDstBuf+= dstbuf_stride)
       {
-        for (UInt x = 0; x < full_width_dest; x++)
+        for (uint32_t x = 0; x < full_width_dest; x++)
         {
           pDstBuf[x] = value;
         }
@@ -309,7 +309,7 @@ static Bool readPlane(Pel* dst,
 
     if (fileFormat!=CHROMA_400)
     {
-      const UInt height_file      = height444>>csy_file;
+      const uint32_t height_file      = height444>>csy_file;
       fd.seekg(height_file*stride_file, ios::cur);
       if (fd.eof() || fd.fail() )
       {
@@ -319,14 +319,14 @@ static Bool readPlane(Pel* dst,
   }
   else
   {
-    const UInt mask_y_file=(1<<csy_file)-1;
-    const UInt mask_y_dest=(1<<csy_dest)-1;
-    for(UInt y444=0; y444<height444; y444++)
+    const uint32_t mask_y_file=(1<<csy_file)-1;
+    const uint32_t mask_y_dest=(1<<csy_dest)-1;
+    for(uint32_t y444=0; y444<height444; y444++)
     {
       if ((y444&mask_y_file)==0)
       {
         // read a new line
-        fd.read(reinterpret_cast<TChar*>(buf), stride_file);
+        fd.read(reinterpret_cast<char*>(buf), stride_file);
         if (fd.eof() || fd.fail() )
         {
           return false;
@@ -339,17 +339,17 @@ static Bool readPlane(Pel* dst,
         if (csx_file < csx_dest)
         {
           // eg file is 444, dest is 422.
-          const UInt sx=csx_dest-csx_file;
+          const uint32_t sx=csx_dest-csx_file;
           if (!is16bit)
           {
-            for (UInt x = 0; x < width_dest; x++)
+            for (uint32_t x = 0; x < width_dest; x++)
             {
               pDstBuf[x] = buf[x<<sx];
             }
           }
           else
           {
-            for (UInt x = 0; x < width_dest; x++)
+            for (uint32_t x = 0; x < width_dest; x++)
             {
               pDstBuf[x] = Pel(buf[(x<<sx)*2+0]) | (Pel(buf[(x<<sx)*2+1])<<8);
             }
@@ -358,17 +358,17 @@ static Bool readPlane(Pel* dst,
         else
         {
           // eg file is 422, dest is 444.
-          const UInt sx=csx_file-csx_dest;
+          const uint32_t sx=csx_file-csx_dest;
           if (!is16bit)
           {
-            for (UInt x = 0; x < width_dest; x++)
+            for (uint32_t x = 0; x < width_dest; x++)
             {
               pDstBuf[x] = buf[x>>sx];
             }
           }
           else
           {
-            for (UInt x = 0; x < width_dest; x++)
+            for (uint32_t x = 0; x < width_dest; x++)
             {
               pDstBuf[x] = Pel(buf[(x>>sx)*2+0]) | (Pel(buf[(x>>sx)*2+1])<<8);
             }
@@ -377,7 +377,7 @@ static Bool readPlane(Pel* dst,
 
         // process right hand side padding
         const Pel val=dst[width_dest-1];
-        for (UInt x = width_dest; x < full_width_dest; x++)
+        for (uint32_t x = width_dest; x < full_width_dest; x++)
         {
           pDstBuf[x] = val;
         }
@@ -387,9 +387,9 @@ static Bool readPlane(Pel* dst,
     }
 
     // process lower padding
-    for (UInt y = height_dest; y < full_height_dest; y++, pDstPad+=stride_dest)
+    for (uint32_t y = height_dest; y < full_height_dest; y++, pDstPad+=stride_dest)
     {
-      for (UInt x = 0; x < full_width_dest; x++)
+      for (uint32_t x = 0; x < full_width_dest; x++)
       {
         pDstPad[x] = (pDstPad - stride_dest)[x];
       }
@@ -413,30 +413,30 @@ static Bool readPlane(Pel* dst,
  * @param fileBitDepth component bit depth in file
  * @return true for success, false in case of error
  */
-static Bool writePlane(ostream& fd, const Pel* src, Bool is16bit,
-                       const UInt stride_src,
-                       UInt width444, UInt height444,
+static bool writePlane(ostream& fd, const Pel* src, bool is16bit,
+                       const uint32_t stride_src,
+                       uint32_t width444, uint32_t height444,
                        const ComponentID compID,
                        const ChromaFormat srcFormat,
                        const ChromaFormat fileFormat,
-                       const Int fileBitDepth)
+                       const int fileBitDepth)
 {
-  const UInt csx_file =getComponentScaleX(compID, fileFormat);
-  const UInt csy_file =getComponentScaleY(compID, fileFormat);
-  const UInt csx_src  =getComponentScaleX(compID, srcFormat);
-  const UInt csy_src  =getComponentScaleY(compID, srcFormat);
+  const uint32_t csx_file =getComponentScaleX(compID, fileFormat);
+  const uint32_t csy_file =getComponentScaleY(compID, fileFormat);
+  const uint32_t csx_src  =getComponentScaleX(compID, srcFormat);
+  const uint32_t csy_src  =getComponentScaleY(compID, srcFormat);
 
-/*  const UInt stride_src      = stride444>>csx_src;*/
+/*  const uint32_t stride_src      = stride444>>csx_src;*/
 
-  const UInt stride_file      = (width444 * (is16bit ? 2 : 1)) >> csx_file;
-  const UInt width_file       = width444 >>csx_file;
-  const UInt height_file      = height444>>csy_file;
+  const uint32_t stride_file      = (width444 * (is16bit ? 2 : 1)) >> csx_file;
+  const uint32_t width_file       = width444 >>csx_file;
+  const uint32_t height_file      = height444>>csy_file;
 
-  std::vector<UChar> bufVec(stride_file);
-  UChar *buf=&(bufVec[0]);
+  std::vector<uint8_t> bufVec(stride_file);
+  uint8_t *buf=&(bufVec[0]);
 
   const Pel *pSrcBuf         = src;
-  const Int srcbuf_stride    = stride_src;
+  const int srcbuf_stride    = stride_src;
 
 
 
@@ -444,29 +444,29 @@ static Bool writePlane(ostream& fd, const Pel* src, Bool is16bit,
   {
     if (fileFormat!=CHROMA_400)
     {
-      const UInt value = 1u << (fileBitDepth - 1);
+      const uint32_t value = 1u << (fileBitDepth - 1);
 
-      for(UInt y=0; y< height_file; y++)
+      for(uint32_t y=0; y< height_file; y++)
       {
         if (!is16bit)
         {
-          UChar val(value);
-          for (UInt x = 0; x < width_file; x++)
+          uint8_t val(value);
+          for (uint32_t x = 0; x < width_file; x++)
           {
             buf[x]=val;
           }
         }
         else
         {
-          UShort val(value);
-          for (UInt x = 0; x < width_file; x++)
+          uint16_t val(value);
+          for (uint32_t x = 0; x < width_file; x++)
           {
             buf[2*x+0]= (val>>0) & 0xff;
             buf[2*x+1]= (val>>8) & 0xff;
           }
         }
 
-        fd.write(reinterpret_cast<const TChar*>(buf), stride_file);
+        fd.write(reinterpret_cast<const char*>(buf), stride_file);
         if (fd.eof() || fd.fail() )
         {
           return false;
@@ -476,10 +476,10 @@ static Bool writePlane(ostream& fd, const Pel* src, Bool is16bit,
   }
   else
   {
-    const UInt mask_y_file = (1 << csy_file) - 1;
-    const UInt mask_y_src  = (1 << csy_src ) - 1;
+    const uint32_t mask_y_file = (1 << csy_file) - 1;
+    const uint32_t mask_y_src  = (1 << csy_src ) - 1;
 
-    for (UInt y444 = 0; y444 < height444; y444++)
+    for (uint32_t y444 = 0; y444 < height444; y444++)
     {
       if ((y444 & mask_y_file) == 0)
       {
@@ -487,17 +487,17 @@ static Bool writePlane(ostream& fd, const Pel* src, Bool is16bit,
         if (csx_file < csx_src)
         {
           // eg file is 444, source is 422.
-          const UInt sx = csx_src - csx_file;
+          const uint32_t sx = csx_src - csx_file;
           if (!is16bit)
           {
-            for (UInt x = 0; x < width_file; x++)
+            for (uint32_t x = 0; x < width_file; x++)
             {
-              buf[x] = (UChar)(pSrcBuf[x>>sx]);
+              buf[x] = (uint8_t)(pSrcBuf[x>>sx]);
             }
           }
           else
           {
-            for (UInt x = 0; x < width_file; x++)
+            for (uint32_t x = 0; x < width_file; x++)
             {
               buf[2*x  ] = (pSrcBuf[x>>sx]>>0) & 0xff;
               buf[2*x+1] = (pSrcBuf[x>>sx]>>8) & 0xff;
@@ -507,17 +507,17 @@ static Bool writePlane(ostream& fd, const Pel* src, Bool is16bit,
         else
         {
           // eg file is 422, source is 444.
-          const UInt sx = csx_file - csx_src;
+          const uint32_t sx = csx_file - csx_src;
           if (!is16bit)
           {
-            for (UInt x = 0; x < width_file; x++)
+            for (uint32_t x = 0; x < width_file; x++)
             {
-              buf[x] = (UChar)(pSrcBuf[x<<sx]);
+              buf[x] = (uint8_t)(pSrcBuf[x<<sx]);
             }
           }
           else
           {
-            for (UInt x = 0; x < width_file; x++)
+            for (uint32_t x = 0; x < width_file; x++)
             {
               buf[2*x  ] = (pSrcBuf[x<<sx]>>0) & 0xff;
               buf[2*x+1] = (pSrcBuf[x<<sx]>>8) & 0xff;
@@ -525,7 +525,7 @@ static Bool writePlane(ostream& fd, const Pel* src, Bool is16bit,
           }
         }
 
-        fd.write (reinterpret_cast<const TChar*>(buf), stride_file);
+        fd.write (reinterpret_cast<const char*>(buf), stride_file);
         if (fd.eof() || fd.fail())
         {
           return false;
@@ -541,52 +541,52 @@ static Bool writePlane(ostream& fd, const Pel* src, Bool is16bit,
   return true;
 }
 
-static Bool writeField(ostream& fd, const Pel* top, const Pel* bottom, Bool is16bit,
-                       const UInt stride_src,
-                       UInt width444, UInt height444,
+static bool writeField(ostream& fd, const Pel* top, const Pel* bottom, bool is16bit,
+                       const uint32_t stride_src,
+                       uint32_t width444, uint32_t height444,
                        const ComponentID compID,
                        const ChromaFormat srcFormat,
                        const ChromaFormat fileFormat,
-                       const UInt fileBitDepth, const Bool isTff)
+                       const uint32_t fileBitDepth, const bool isTff)
 {
-  const UInt csx_file =getComponentScaleX(compID, fileFormat);
-  const UInt csy_file =getComponentScaleY(compID, fileFormat);
-  const UInt csx_src  =getComponentScaleX(compID, srcFormat);
-  const UInt csy_src  =getComponentScaleY(compID, srcFormat);
+  const uint32_t csx_file =getComponentScaleX(compID, fileFormat);
+  const uint32_t csy_file =getComponentScaleY(compID, fileFormat);
+  const uint32_t csx_src  =getComponentScaleX(compID, srcFormat);
+  const uint32_t csy_src  =getComponentScaleY(compID, srcFormat);
 
-  /*const UInt stride_src      = stride444>>csx_src;*/
+  /*const uint32_t stride_src      = stride444>>csx_src;*/
 
-  const UInt stride_file      = (width444 * (is16bit ? 2 : 1)) >> csx_file;
-  const UInt width_file       = width444 >>csx_file;
-  const UInt height_file      = height444>>csy_file;
+  const uint32_t stride_file      = (width444 * (is16bit ? 2 : 1)) >> csx_file;
+  const uint32_t width_file       = width444 >>csx_file;
+  const uint32_t height_file      = height444>>csy_file;
 
-  std::vector<UChar> bufVec(stride_file * 2);
-  UChar *buf=&(bufVec[0]);
+  std::vector<uint8_t> bufVec(stride_file * 2);
+  uint8_t *buf=&(bufVec[0]);
 
   if (compID!=COMPONENT_Y && (fileFormat==CHROMA_400 || srcFormat==CHROMA_400))
   {
     if (fileFormat!=CHROMA_400)
     {
-      const UInt value=1<<(fileBitDepth-1);
+      const uint32_t value=1<<(fileBitDepth-1);
 
-      for(UInt y=0; y< height_file; y++)
+      for(uint32_t y=0; y< height_file; y++)
       {
-        for (UInt field = 0; field < 2; field++)
+        for (uint32_t field = 0; field < 2; field++)
         {
-          UChar *fieldBuffer = buf + (field * stride_file);
+          uint8_t *fieldBuffer = buf + (field * stride_file);
 
           if (!is16bit)
           {
-            UChar val(value);
-            for (UInt x = 0; x < width_file; x++)
+            uint8_t val(value);
+            for (uint32_t x = 0; x < width_file; x++)
             {
               fieldBuffer[x]=val;
             }
           }
           else
           {
-            UShort val(value);
-            for (UInt x = 0; x < width_file; x++)
+            uint16_t val(value);
+            for (uint32_t x = 0; x < width_file; x++)
             {
               fieldBuffer[2*x+0]= (val>>0) & 0xff;
               fieldBuffer[2*x+1]= (val>>8) & 0xff;
@@ -594,7 +594,7 @@ static Bool writeField(ostream& fd, const Pel* top, const Pel* bottom, Bool is16
           }
         }
 
-        fd.write(reinterpret_cast<const TChar*>(buf), (stride_file * 2));
+        fd.write(reinterpret_cast<const char*>(buf), (stride_file * 2));
         if (fd.eof() || fd.fail() )
         {
           return false;
@@ -604,32 +604,32 @@ static Bool writeField(ostream& fd, const Pel* top, const Pel* bottom, Bool is16
   }
   else
   {
-    const UInt mask_y_file=(1<<csy_file)-1;
-    const UInt mask_y_src =(1<<csy_src )-1;
-    for(UInt y444=0; y444<height444; y444++)
+    const uint32_t mask_y_file=(1<<csy_file)-1;
+    const uint32_t mask_y_src =(1<<csy_src )-1;
+    for(uint32_t y444=0; y444<height444; y444++)
     {
       if ((y444&mask_y_file)==0)
       {
-        for (UInt field = 0; field < 2; field++)
+        for (uint32_t field = 0; field < 2; field++)
         {
-          UChar *fieldBuffer = buf + (field * stride_file);
+          uint8_t *fieldBuffer = buf + (field * stride_file);
           const Pel *src     = (((field == 0) && isTff) || ((field == 1) && (!isTff))) ? top : bottom;
 
           // write a new line
           if (csx_file < csx_src)
           {
             // eg file is 444, source is 422.
-            const UInt sx=csx_src-csx_file;
+            const uint32_t sx=csx_src-csx_file;
             if (!is16bit)
             {
-              for (UInt x = 0; x < width_file; x++)
+              for (uint32_t x = 0; x < width_file; x++)
               {
-                fieldBuffer[x] = (UChar)(src[x>>sx]);
+                fieldBuffer[x] = (uint8_t)(src[x>>sx]);
               }
             }
             else
             {
-              for (UInt x = 0; x < width_file; x++)
+              for (uint32_t x = 0; x < width_file; x++)
               {
                 fieldBuffer[2*x  ] = (src[x>>sx]>>0) & 0xff;
                 fieldBuffer[2*x+1] = (src[x>>sx]>>8) & 0xff;
@@ -639,17 +639,17 @@ static Bool writeField(ostream& fd, const Pel* top, const Pel* bottom, Bool is16
           else
           {
             // eg file is 422, src is 444.
-            const UInt sx=csx_file-csx_src;
+            const uint32_t sx=csx_file-csx_src;
             if (!is16bit)
             {
-              for (UInt x = 0; x < width_file; x++)
+              for (uint32_t x = 0; x < width_file; x++)
               {
-                fieldBuffer[x] = (UChar)(src[x<<sx]);
+                fieldBuffer[x] = (uint8_t)(src[x<<sx]);
               }
             }
             else
             {
-              for (UInt x = 0; x < width_file; x++)
+              for (uint32_t x = 0; x < width_file; x++)
               {
                 fieldBuffer[2*x  ] = (src[x<<sx]>>0) & 0xff;
                 fieldBuffer[2*x+1] = (src[x<<sx]>>8) & 0xff;
@@ -658,7 +658,7 @@ static Bool writeField(ostream& fd, const Pel* top, const Pel* bottom, Bool is16
           }
         }
 
-        fd.write(reinterpret_cast<const TChar*>(buf), (stride_file * 2));
+        fd.write(reinterpret_cast<const char*>(buf), (stride_file * 2));
         if (fd.eof() || fd.fail() )
         {
           return false;
@@ -692,7 +692,7 @@ static Bool writeField(ostream& fd, const Pel* top, const Pel* bottom, Bool is16
  * @param format           chroma format
  * @return true for success, false in case of error
  */
-Bool VideoIOYuv::read ( PelUnitBuf& pic, PelUnitBuf& picOrg, const InputColourSpaceConversion ipcsc, Int aiPad[2], ChromaFormat format, const Bool bClipToRec709 )
+bool VideoIOYuv::read ( PelUnitBuf& pic, PelUnitBuf& picOrg, const InputColourSpaceConversion ipcsc, int aiPad[2], ChromaFormat format, const bool bClipToRec709 )
 {
   // check end-of-file
   if ( isEof() )
@@ -705,9 +705,9 @@ Bool VideoIOYuv::read ( PelUnitBuf& pic, PelUnitBuf& picOrg, const InputColourSp
     format = picOrg.chromaFormat;
   }
 
-  Bool is16bit = false;
+  bool is16bit = false;
 
-  for(UInt ch=0; ch<MAX_NUM_CHANNEL_TYPE; ch++)
+  for(uint32_t ch=0; ch<MAX_NUM_CHANNEL_TYPE; ch++)
   {
     if (m_fileBitdepth[ch] > 8)
     {
@@ -717,31 +717,31 @@ Bool VideoIOYuv::read ( PelUnitBuf& pic, PelUnitBuf& picOrg, const InputColourSp
 
   const PelBuf areaBufY = picOrg.get(COMPONENT_Y);
 #if !EXTENSION_360_VIDEO
-  const UInt stride444      = areaBufY.stride;
+  const uint32_t stride444      = areaBufY.stride;
 #endif
   // compute actual YUV width & height excluding padding size
-  const UInt pad_h444       = aiPad[0];
-  const UInt pad_v444       = aiPad[1];
+  const uint32_t pad_h444       = aiPad[0];
+  const uint32_t pad_v444       = aiPad[1];
 
-  const UInt width_full444  = areaBufY.width;
-  const UInt height_full444 = areaBufY.height;
+  const uint32_t width_full444  = areaBufY.width;
+  const uint32_t height_full444 = areaBufY.height;
 
-  const UInt width444       = width_full444 - pad_h444;
-  const UInt height444      = height_full444 - pad_v444;
+  const uint32_t width444       = width_full444 - pad_h444;
+  const uint32_t height444      = height_full444 - pad_v444;
 
-  for( UInt comp=0; comp < ::getNumberValidComponents(format); comp++)
+  for( uint32_t comp=0; comp < ::getNumberValidComponents(format); comp++)
   {
     const ComponentID compID = ComponentID(comp);
     const ChannelType chType=toChannelType(compID);
 
-    const Int desired_bitdepth = m_MSBExtendedBitDepth[chType] + m_bitdepthShift[chType];
+    const int desired_bitdepth = m_MSBExtendedBitDepth[chType] + m_bitdepthShift[chType];
 
-    const Bool b709Compliance=(bClipToRec709) && (m_bitdepthShift[chType] < 0 && desired_bitdepth >= 8);     /* ITU-R BT.709 compliant clipping for converting say 10b to 8b */
+    const bool b709Compliance=(bClipToRec709) && (m_bitdepthShift[chType] < 0 && desired_bitdepth >= 8);     /* ITU-R BT.709 compliant clipping for converting say 10b to 8b */
     const Pel minval = b709Compliance? ((   1 << (desired_bitdepth - 8))   ) : 0;
     const Pel maxval = b709Compliance? ((0xff << (desired_bitdepth - 8)) -1) : (1 << desired_bitdepth) - 1;
     Pel* const dst = picOrg.get(compID).bufAt(0,0);
 #if EXTENSION_360_VIDEO
-    const UInt stride444 = picOrg.get(compID).stride;
+    const uint32_t stride444 = picOrg.get(compID).stride;
 #endif
     if ( ! readPlane( dst, m_cHandle, is16bit, stride444, width444, height444, pad_h444, pad_v444, compID, picOrg.chromaFormat, format, m_fileBitdepth[chType]))
     {
@@ -776,8 +776,8 @@ Bool VideoIOYuv::read ( PelUnitBuf& pic, PelUnitBuf& picOrg, const InputColourSp
  * @param format           chroma format
  * @return true for success, false in case of error
  */
-Bool VideoIOYuv::write( const CPelUnitBuf& pic,
-                        const InputColourSpaceConversion ipCSC, Int confLeft, Int confRight, Int confTop, Int confBottom, ChromaFormat format, const Bool bClipToRec709 )
+bool VideoIOYuv::write( const CPelUnitBuf& pic,
+                        const InputColourSpaceConversion ipCSC, int confLeft, int confRight, int confTop, int confBottom, ChromaFormat format, const bool bClipToRec709 )
 {
   PelStorage interm;
 
@@ -790,10 +790,10 @@ Bool VideoIOYuv::write( const CPelUnitBuf& pic,
   const CPelUnitBuf& picC = (ipCSC==IPCOLOURSPACE_UNCHANGED) ? pic : interm;
 
   // compute actual YUV frame size excluding padding size
-  Bool is16bit = false;
-  Bool nonZeroBitDepthShift=false;
+  bool is16bit = false;
+  bool nonZeroBitDepthShift=false;
 
-  for(UInt ch=0; ch<MAX_NUM_CHANNEL_TYPE; ch++)
+  for(uint32_t ch=0; ch<MAX_NUM_CHANNEL_TYPE; ch++)
   {
     if (m_fileBitdepth[ch] > 8)
     {
@@ -805,7 +805,7 @@ Bool VideoIOYuv::write( const CPelUnitBuf& pic,
     }
   }
 
-  Bool retval = true;
+  bool retval = true;
   if (format>=NUM_CHROMA_FORMAT)
   {
     format= picC.chromaFormat;
@@ -817,11 +817,11 @@ Bool VideoIOYuv::write( const CPelUnitBuf& pic,
     picZ.create( picC.chromaFormat, Area( Position(), picC.Y() ) );
     picZ.copyFrom( picC );
 
-    for(UInt comp=0; comp < ::getNumberValidComponents( picZ.chromaFormat ); comp++)
+    for(uint32_t comp=0; comp < ::getNumberValidComponents( picZ.chromaFormat ); comp++)
     {
       const ComponentID compID=ComponentID(comp);
       const ChannelType ch=toChannelType(compID);
-      const Bool b709Compliance = bClipToRec709 && (-m_bitdepthShift[ch] < 0 && m_MSBExtendedBitDepth[ch] >= 8);     /* ITU-R BT.709 compliant clipping for converting say 10b to 8b */
+      const bool b709Compliance = bClipToRec709 && (-m_bitdepthShift[ch] < 0 && m_MSBExtendedBitDepth[ch] >= 8);     /* ITU-R BT.709 compliant clipping for converting say 10b to 8b */
       const Pel minval = b709Compliance? ((   1 << (m_MSBExtendedBitDepth[ch] - 8))   ) : 0;
       const Pel maxval = b709Compliance? ((0xff << (m_MSBExtendedBitDepth[ch] - 8)) -1) : (1 << m_MSBExtendedBitDepth[ch]) - 1;
 
@@ -832,22 +832,22 @@ Bool VideoIOYuv::write( const CPelUnitBuf& pic,
   const CPelUnitBuf& picO = nonZeroBitDepthShift ? picZ : picC;
 
   const CPelBuf areaY     = picO.get(COMPONENT_Y);
-  const UInt    width444  = areaY.width - confLeft - confRight;
-  const UInt    height444 = areaY.height -  confTop  - confBottom;
+  const uint32_t    width444  = areaY.width - confLeft - confRight;
+  const uint32_t    height444 = areaY.height -  confTop  - confBottom;
 
   if ((width444 == 0) || (height444 == 0))
   {
     msg( WARNING, "\nWarning: writing %d x %d luma sample output picture!", width444, height444);
   }
 
-  for(UInt comp=0; retval && comp < ::getNumberValidComponents(format); comp++)
+  for(uint32_t comp=0; retval && comp < ::getNumberValidComponents(format); comp++)
   {
     const ComponentID compID      = ComponentID(comp);
     const ChannelType ch          = toChannelType(compID);
-    const UInt        csx         = ::getComponentScaleX(compID, format);
-    const UInt        csy         = ::getComponentScaleY(compID, format);
+    const uint32_t        csx         = ::getComponentScaleX(compID, format);
+    const uint32_t        csy         = ::getComponentScaleY(compID, format);
     const CPelBuf     area        = picO.get(compID);
-    const Int         planeOffset = (confLeft >> csx) + (confTop >> csy) * area.stride;
+    const int         planeOffset = (confLeft >> csx) + (confTop >> csy) * area.stride;
     if (!writePlane (m_cHandle, area.bufAt (0, 0) + planeOffset, is16bit, area.stride,
                      width444, height444, compID, picO.chromaFormat, format, m_fileBitdepth[ch]))
     {
@@ -858,7 +858,7 @@ Bool VideoIOYuv::write( const CPelUnitBuf& pic,
   return retval;
 }
 
-Bool VideoIOYuv::write( const CPelUnitBuf& picTop, const CPelUnitBuf& picBottom, const InputColourSpaceConversion ipCSC, Int confLeft, Int confRight, Int confTop, Int confBottom, ChromaFormat format, const Bool isTff, const Bool bClipToRec709 )
+bool VideoIOYuv::write( const CPelUnitBuf& picTop, const CPelUnitBuf& picBottom, const InputColourSpaceConversion ipCSC, int confLeft, int confRight, int confTop, int confBottom, ChromaFormat format, const bool isTff, const bool bClipToRec709 )
 {
   PelStorage intermTop;
   PelStorage intermBottom;
@@ -873,10 +873,10 @@ Bool VideoIOYuv::write( const CPelUnitBuf& picTop, const CPelUnitBuf& picBottom,
   const CPelUnitBuf& picTopC    = (ipCSC==IPCOLOURSPACE_UNCHANGED) ? picTop    : intermTop;
   const CPelUnitBuf& picBottomC = (ipCSC==IPCOLOURSPACE_UNCHANGED) ? picBottom : intermBottom;
 
-  Bool is16bit = false;
-  Bool nonZeroBitDepthShift=false;
+  bool is16bit = false;
+  bool nonZeroBitDepthShift=false;
 
-  for(UInt ch=0; ch<MAX_NUM_CHANNEL_TYPE; ch++)
+  for(uint32_t ch=0; ch<MAX_NUM_CHANNEL_TYPE; ch++)
   {
     if (m_fileBitdepth[ch] > 8)
     {
@@ -891,7 +891,7 @@ Bool VideoIOYuv::write( const CPelUnitBuf& picTop, const CPelUnitBuf& picBottom,
   PelStorage picTopZ;
   PelStorage picBottomZ;
 
-  for (UInt field = 0; field < 2; field++)
+  for (uint32_t field = 0; field < 2; field++)
   {
     const CPelUnitBuf& picC    = (field == 0) ? picTopC : picBottomC;
 
@@ -907,11 +907,11 @@ Bool VideoIOYuv::write( const CPelUnitBuf& picTop, const CPelUnitBuf& picBottom,
       picZ.create( picC.chromaFormat, Area( Position(), picC.Y() ) );
       picZ.copyFrom( picC );
 
-      for(UInt comp=0; comp < ::getNumberValidComponents( picZ.chromaFormat ); comp++)
+      for(uint32_t comp=0; comp < ::getNumberValidComponents( picZ.chromaFormat ); comp++)
       {
         const ComponentID compID=ComponentID(comp);
         const ChannelType ch=toChannelType(compID);
-        const Bool b709Compliance=bClipToRec709 && (-m_bitdepthShift[ch] < 0 && m_MSBExtendedBitDepth[ch] >= 8);     /* ITU-R BT.709 compliant clipping for converting say 10b to 8b */
+        const bool b709Compliance=bClipToRec709 && (-m_bitdepthShift[ch] < 0 && m_MSBExtendedBitDepth[ch] >= 8);     /* ITU-R BT.709 compliant clipping for converting say 10b to 8b */
         const Pel minval = b709Compliance? ((   1 << (m_MSBExtendedBitDepth[ch] - 8))   ) : 0;
         const Pel maxval = b709Compliance? ((0xff << (m_MSBExtendedBitDepth[ch] - 8)) -1) : (1 << m_MSBExtendedBitDepth[ch]) - 1;
 
@@ -923,19 +923,19 @@ Bool VideoIOYuv::write( const CPelUnitBuf& picTop, const CPelUnitBuf& picBottom,
   const CPelUnitBuf& picTopO     = nonZeroBitDepthShift ? picTopZ    : picTopC;
   const CPelUnitBuf& picBottomO  = nonZeroBitDepthShift ? picBottomZ : picBottomC;
 
-  Bool retval = true;
+  bool retval = true;
   CHECK( picTopO.chromaFormat != picBottomO.chromaFormat, "Incompatible formats of bottom and top fields" );
 
   const ChromaFormat dstChrFormat = picTopO.chromaFormat;
-  for (UInt comp = 0; retval && comp < ::getNumberValidComponents(dstChrFormat); comp++)
+  for (uint32_t comp = 0; retval && comp < ::getNumberValidComponents(dstChrFormat); comp++)
   {
     const ComponentID compID     = ComponentID(comp);
     const ChannelType ch         = toChannelType(compID);
     const CPelBuf     areaTop    = picTopO.   get( compID );
     const CPelBuf     areaBottom = picBottomO.get( compID );
     const CPelBuf     areaTopY   = picTopO.Y();
-    const UInt        width444   = areaTopY.width  - (confLeft + confRight);
-    const UInt        height444  = areaTopY.height - (confTop + confBottom);
+    const uint32_t        width444   = areaTopY.width  - (confLeft + confRight);
+    const uint32_t        height444  = areaTopY.height - (confTop + confBottom);
 
     CHECK(areaTop.width  == areaBottom.width , "Incompatible formats");
     CHECK(areaTop.height == areaBottom.height, "Incompatible formats");
@@ -946,9 +946,9 @@ Bool VideoIOYuv::write( const CPelUnitBuf& picTop, const CPelUnitBuf& picBottom,
       msg( WARNING, "\nWarning: writing %d x %d luma sample output picture!", width444, height444);
     }
 
-    const UInt csx = ::getComponentScaleX(compID, dstChrFormat );
-    const UInt csy = ::getComponentScaleY(compID, dstChrFormat );
-    const Int planeOffset  = (confLeft>>csx) + ( confTop>>csy) * areaTop.stride; //offset is for entire frame - round up for top field and down for bottom field
+    const uint32_t csx = ::getComponentScaleX(compID, dstChrFormat );
+    const uint32_t csy = ::getComponentScaleY(compID, dstChrFormat );
+    const int planeOffset  = (confLeft>>csx) + ( confTop>>csy) * areaTop.stride; //offset is for entire frame - round up for top field and down for bottom field
 
     if (! writeField(m_cHandle,
                      (areaTop.   bufAt(0,0) + planeOffset),
@@ -966,10 +966,10 @@ Bool VideoIOYuv::write( const CPelUnitBuf& picTop, const CPelUnitBuf& picBottom,
 
 
 // static member
-Void VideoIOYuv::ColourSpaceConvert(const CPelUnitBuf &src, PelUnitBuf &dest, const InputColourSpaceConversion conversion, Bool bIsForwards)
+void VideoIOYuv::ColourSpaceConvert(const CPelUnitBuf &src, PelUnitBuf &dest, const InputColourSpaceConversion conversion, bool bIsForwards)
 {
   const ChromaFormat  format       = src.chromaFormat;
-  const UInt          numValidComp = ::getNumberValidComponents(format);
+  const uint32_t          numValidComp = ::getNumberValidComponents(format);
 
   switch (conversion)
   {
@@ -981,7 +981,7 @@ Void VideoIOYuv::ColourSpaceConvert(const CPelUnitBuf &src, PelUnitBuf &dest, co
       }
 
       {
-        for(UInt comp=0; comp<numValidComp; comp++)
+        for(uint32_t comp=0; comp<numValidComp; comp++)
         {
           dest.get( ComponentID(comp) ).copyFrom( src.get( ComponentID(bIsForwards?0:comp) ) );
         }
@@ -989,7 +989,7 @@ Void VideoIOYuv::ColourSpaceConvert(const CPelUnitBuf &src, PelUnitBuf &dest, co
       break;
     case IPCOLOURSPACE_YCbCrtoYCrCb:
       {
-        for(UInt comp=0; comp<numValidComp; comp++)
+        for(uint32_t comp=0; comp<numValidComp; comp++)
         {
           dest.get( ComponentID((numValidComp-comp)%numValidComp) ).copyFrom( src.get( ComponentID(comp) ) );
         }
@@ -1005,7 +1005,7 @@ Void VideoIOYuv::ColourSpaceConvert(const CPelUnitBuf &src, PelUnitBuf &dest, co
         }
 
         // channel re-mapping
-        for(UInt comp=0; comp<numValidComp; comp++)
+        for(uint32_t comp=0; comp<numValidComp; comp++)
         {
           const ComponentID compIDsrc=ComponentID((comp+1)%numValidComp);
           const ComponentID compIDdst=ComponentID(comp);
@@ -1018,7 +1018,7 @@ Void VideoIOYuv::ColourSpaceConvert(const CPelUnitBuf &src, PelUnitBuf &dest, co
     case IPCOLOURSPACE_UNCHANGED:
     default:
       {
-        for(UInt comp=0; comp<numValidComp; comp++)
+        for(uint32_t comp=0; comp<numValidComp; comp++)
         {
           dest.get( ComponentID(comp) ).copyFrom( src.get( ComponentID(comp) ) );
         }

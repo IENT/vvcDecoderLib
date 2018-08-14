@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2012, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,7 @@
 #ifdef TARGET_SIMD_X86
 
 template< X86_VEXT vext, int W >
-Void addAvg_SSE( const Short* src0, Int src0Stride, const Short* src1, Int src1Stride, Short *dst, Int dstStride, Int width, Int height, Int shift, Int offset, const ClpRng& clpRng )
+void addAvg_SSE( const int16_t* src0, int src0Stride, const int16_t* src1, int src1Stride, int16_t *dst, int dstStride, int width, int height, int shift, int offset, const ClpRng& clpRng )
 {
   if( W == 8 )
   {
@@ -60,9 +60,9 @@ Void addAvg_SSE( const Short* src0, Int src0Stride, const Short* src1, Int src1S
       __m128i vibdimin = _mm_set1_epi16( clpRng.min );
       __m128i vibdimax = _mm_set1_epi16( clpRng.max );
 
-      for( Int row = 0; row < height; row++ )
+      for( int row = 0; row < height; row++ )
       {
-        for( Int col = 0; col < width; col += 8 )
+        for( int col = 0; col < width; col += 8 )
         {
           __m128i vsrc0 = _mm_loadu_si128( ( const __m128i * )&src0[col] );
           __m128i vsrc1 = _mm_loadu_si128( ( const __m128i * )&src1[col] );
@@ -100,9 +100,9 @@ Void addAvg_SSE( const Short* src0, Int src0Stride, const Short* src1, Int src1S
     __m128i vibdimin  = _mm_set1_epi16( clpRng.min );
     __m128i vibdimax  = _mm_set1_epi16( clpRng.max );
 
-    for( Int row = 0; row < height; row++ )
+    for( int row = 0; row < height; row++ )
     {
-      for( Int col = 0; col < width; col += 4 )
+      for( int col = 0; col < width; col += 4 )
       {
         __m128i vsum = _mm_loadl_epi64  ( ( const __m128i * )&src0[col] );
         __m128i vdst = _mm_loadl_epi64  ( ( const __m128i * )&src1[col] );
@@ -129,7 +129,7 @@ Void addAvg_SSE( const Short* src0, Int src0Stride, const Short* src1, Int src1S
 }
 
 template< X86_VEXT vext, int W >
-Void reco_SSE( const Short* src0, Int src0Stride, const Short* src1, Int src1Stride, Short *dst, Int dstStride, Int width, Int height, const ClpRng& clpRng )
+void reco_SSE( const int16_t* src0, int src0Stride, const int16_t* src1, int src1Stride, int16_t *dst, int dstStride, int width, int height, const ClpRng& clpRng )
 {
   if( W == 8 )
   {
@@ -139,9 +139,9 @@ Void reco_SSE( const Short* src0, Int src0Stride, const Short* src1, Int src1Str
       __m256i vbdmin = _mm256_set1_epi16( clpRng.min );
       __m256i vbdmax = _mm256_set1_epi16( clpRng.max );
 
-      for( Int row = 0; row < height; row++ )
+      for( int row = 0; row < height; row++ )
       {
-        for( Int col = 0; col < width; col += 16 )
+        for( int col = 0; col < width; col += 16 )
         {
           __m256i vdest = _mm256_lddqu_si256( ( const __m256i * )&src0[col] );
           __m256i vsrc1 = _mm256_lddqu_si256( ( const __m256i * )&src1[col] );
@@ -163,9 +163,9 @@ Void reco_SSE( const Short* src0, Int src0Stride, const Short* src1, Int src1Str
       __m128i vbdmin = _mm_set1_epi16( clpRng.min );
       __m128i vbdmax = _mm_set1_epi16( clpRng.max );
 
-      for( Int row = 0; row < height; row++ )
+      for( int row = 0; row < height; row++ )
       {
-        for( Int col = 0; col < width; col += 8 )
+        for( int col = 0; col < width; col += 8 )
         {
           __m128i vdest = _mm_loadu_si128( ( const __m128i * )&src0[col] );
           __m128i vsrc1 = _mm_loadu_si128( ( const __m128i * )&src1[col] );
@@ -187,9 +187,9 @@ Void reco_SSE( const Short* src0, Int src0Stride, const Short* src1, Int src1Str
     __m128i vbdmin = _mm_set1_epi16( clpRng.min );
     __m128i vbdmax = _mm_set1_epi16( clpRng.max );
 
-    for( Int row = 0; row < height; row++ )
+    for( int row = 0; row < height; row++ )
     {
-      for( Int col = 0; col < width; col += 4 )
+      for( int col = 0; col < width; col += 4 )
       {
         __m128i vsrc = _mm_loadl_epi64( ( const __m128i * )&src0[col] );
         __m128i vdst = _mm_loadl_epi64( ( const __m128i * )&src1[col] );
@@ -255,7 +255,7 @@ template<> inline void do_clip<true,  __m256i>( __m256i& vreg, __m256i& vbdmin, 
 
 
 template<X86_VEXT vext, int W, bool doAdd, bool mult, bool doShift, bool shiftR, bool clip>
-Void linTf_SSE( const Pel* src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Int scale, Int shift, Int offset, const ClpRng& clpRng )
+void linTf_SSE( const Pel* src, int srcStride, Pel *dst, int dstStride, int width, int height, int scale, int shift, int offset, const ClpRng& clpRng )
 {
   if( vext >= AVX2 && ( width & 7 ) == 0 && W == 8 )
   {
@@ -297,7 +297,7 @@ Void linTf_SSE( const Pel* src, Int srcStride, Pel *dst, Int dstStride, Int widt
 
     for( int row = 0; row < height; row++ )
     {
-      for( Int col = 0; col < width; col += 4 )
+      for( int col = 0; col < width; col += 4 )
       {
         __m128i val;
         val = _mm_loadl_epi64             ( ( const __m128i * )&src[col] );
@@ -318,7 +318,7 @@ Void linTf_SSE( const Pel* src, Int srcStride, Pel *dst, Int dstStride, Int widt
 }
 
 template<X86_VEXT vext, int W>
-Void linTf_SSE_entry( const Pel* src, Int srcStride, Pel *dst, Int dstStride, Int width, Int height, Int scale, Int shift, Int offset, const ClpRng& clpRng, bool clip )
+void linTf_SSE_entry( const Pel* src, int srcStride, Pel *dst, int dstStride, int width, int height, int scale, int shift, int offset, const ClpRng& clpRng, bool clip )
 {
   int fn = ( offset == 0 ? 16 : 0 ) + ( scale == 1 ? 8 : 0 ) + ( shift == 0 ? 4 : 0 ) + ( shift < 0 ? 2 : 0 ) + ( !clip ? 1 : 0 );
 
@@ -363,7 +363,7 @@ Void linTf_SSE_entry( const Pel* src, Int srcStride, Pel *dst, Int dstStride, In
 }
 
 template<X86_VEXT vext>
-Void PelBufferOps::_initPelBufOpsX86()
+void PelBufferOps::_initPelBufOpsX86()
 {
   addAvg8 = addAvg_SSE<vext, 8>;
   addAvg4 = addAvg_SSE<vext, 4>;
@@ -375,7 +375,7 @@ Void PelBufferOps::_initPelBufOpsX86()
   linTf4 = linTf_SSE_entry<vext, 4>;
 }
 
-template Void PelBufferOps::_initPelBufOpsX86<SIMDX86>();
+template void PelBufferOps::_initPelBufOpsX86<SIMDX86>();
 
 #endif // TARGET_SIMD_X86
 #endif

@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -65,8 +65,8 @@ class InputNALUnit : public NALUnit
           InputBitstream &getBitstream()       { return m_Bitstream; }
 };
 
-Void read(InputNALUnit& nalu);
-Void readNalUnitHeader(InputNALUnit& nalu);
+void read(InputNALUnit& nalu);
+void readNalUnitHeader(InputNALUnit& nalu);
 
 //! \}
 

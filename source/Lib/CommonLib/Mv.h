@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -227,7 +227,7 @@ public:
     return !( *this == rcMv );
   }
 
-  const Mv scaleMv( Int iScale ) const
+  const Mv scaleMv( int iScale ) const
   {
     const int mvx = Clip3( -32768, 32767, (iScale * getHor() + 127 + (iScale * getHor() < 0)) >> 8 );
     const int mvy = Clip3( -32768, 32767, (iScale * getVer() + 127 + (iScale * getVer() < 0)) >> 8 );
@@ -266,7 +266,7 @@ public:
 #endif
 };// END CLASS DEFINITION MV
 
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
 void roundMV( Mv& rcMv, unsigned imvShift );
 #endif
 void clipMv ( Mv& rcMv, const struct Position& pos, const class SPS& sps );

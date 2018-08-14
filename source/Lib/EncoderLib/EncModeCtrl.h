@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -73,7 +73,7 @@ enum EncTestModeType
 #if REUSE_CU_RESULTS
   ETM_RECO_CACHED,
 #endif
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   ETM_TRIGGER_IMV_LIST,
 #endif
   ETM_INVALID
@@ -83,9 +83,11 @@ enum EncTestModeOpts
 {
   ETO_STANDARD    =  0,                   // empty      (standard option)
   ETO_FORCE_MERGE =  1<<0,                // bit   0    (indicates forced merge)
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   ETO_IMV_SHIFT   =     1,                // bits  1-3  (imv parameter starts at bit 1)
   ETO_IMV         =  7<<ETO_IMV_SHIFT,    // bits  1-3  (imv parameter uses 3 bits)
+#endif
+#if JEM_TOOLS
   ETO_LIC         =  1<<4,                // bit   4    (local illumination compensation)
 #endif
   ETO_DUMMY       =  1<<5,                // bit   5    (dummy)
@@ -193,7 +195,7 @@ struct ComprCUCtx
   {
   }
 
-  ComprCUCtx( const CodingStructure& cs, const UInt _minDepth, const UInt _maxDepth, const UInt numExtraFeatures )
+  ComprCUCtx( const CodingStructure& cs, const uint32_t _minDepth, const uint32_t _maxDepth, const uint32_t numExtraFeatures )
     : minDepth      ( _minDepth  )
     , maxDepth      ( _maxDepth  )
     , testModes     (            )
@@ -240,7 +242,7 @@ struct ComprCUCtx
   CodingStructure                  *bestCS;
   CodingUnit                       *bestCU;
   TransformUnit                    *bestTU;
-  static_vector<Int64,  30>         extraFeatures;
+  static_vector<int64_t,  30>         extraFeatures;
   static_vector<double, 30>         extraFeaturesd;
   double                            bestInterCost;
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
@@ -253,7 +255,7 @@ struct ComprCUCtx
 #endif
 
   template<typename T> T    get( int ft )       const { return typeid(T) == typeid(double) ? (T&)extraFeaturesd[ft] : T(extraFeatures[ft]); }
-  template<typename T> void set( int ft, T val )      { extraFeatures [ft] = Int64( val ); }
+  template<typename T> void set( int ft, T val )      { extraFeatures [ft] = int64_t( val ); }
   void                      set( int ft, double val ) { extraFeaturesd[ft] = val; }
 };
 
@@ -356,7 +358,11 @@ struct SaveLoadStruct
   bool            mergeFlag;
 #if JEM_TOOLS
   bool            LICFlag;
+#endif
+#if JVET_K0357_AMVR
   unsigned        imv;
+#endif
+#if JEM_TOOLS
   unsigned        nsstIdx;
   bool            pdpc;
 #endif
@@ -542,9 +548,11 @@ class EncModeCtrlMTnoRQT : public EncModeCtrl, public SaveLoadEncInfoCtrl, publi
     HISTORY_DO_SAVE,
     SAVE_LOAD_TAG,
 #endif
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
     BEST_NO_IMV_COST,
     BEST_IMV_COST,
+#endif
+#if JEM_TOOLS
     LAST_NSST_IDX,
     SKIP_OTHER_NSST,
 #endif

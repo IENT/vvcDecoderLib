@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -80,7 +80,7 @@ EncLib::~EncLib()
 {
 }
 
-Void EncLib::create ()
+void EncLib::create ()
 {
   // initialize global variables
   initROM();
@@ -128,9 +128,9 @@ Void EncLib::create ()
 #if JVET_J0090_MEMORY_BANDWITH_MEASURE
   m_cInterSearch.cacheAssign( &m_cacheModel );
 #endif
-  const UInt widthInCtus   = (getSourceWidth()  + m_maxCUWidth  - 1)  / m_maxCUWidth;
-  const UInt heightInCtus  = (getSourceHeight() + m_maxCUHeight - 1) / m_maxCUHeight;
-  const UInt numCtuInFrame = widthInCtus * heightInCtus;
+  const uint32_t widthInCtus   = (getSourceWidth()  + m_maxCUWidth  - 1)  / m_maxCUWidth;
+  const uint32_t heightInCtus  = (getSourceHeight() + m_maxCUHeight - 1) / m_maxCUHeight;
+  const uint32_t numCtuInFrame = widthInCtus * heightInCtus;
 
   if (m_bUseSAO)
   {
@@ -139,7 +139,13 @@ Void EncLib::create ()
   }
 
   m_cLoopFilter.create( m_maxTotalCUDepth );
-#if JEM_TOOLS
+
+#if JVET_K0371_ALF
+  if( m_alf )
+  {
+    m_cEncALF.create( getSourceWidth(), getSourceHeight(), m_chromaFormatIDC, m_maxCUWidth, m_maxCUHeight, m_maxTotalCUDepth, m_bitDepth, m_inputBitDepth );
+  }
+#elif JEM_TOOLS
 
   if( m_ALF )
   {
@@ -149,13 +155,13 @@ Void EncLib::create ()
 
   if ( m_RCEnableRateControl )
   {
-    m_cRateCtrl.init( m_framesToBeEncoded, m_RCTargetBitrate, (Int)( (Double)m_iFrameRate/m_temporalSubsampleRatio + 0.5), m_iGOPSize, m_iSourceWidth, m_iSourceHeight,
+    m_cRateCtrl.init( m_framesToBeEncoded, m_RCTargetBitrate, (int)( (double)m_iFrameRate/m_temporalSubsampleRatio + 0.5), m_iGOPSize, m_iSourceWidth, m_iSourceHeight,
                       m_maxCUWidth, m_maxCUHeight,m_RCKeepHierarchicalBit, m_RCUseLCUSeparateModel, m_GOPList );
   }
 
 }
 
-Void EncLib::destroy ()
+void EncLib::destroy ()
 {
   // destroy processing unit classes
   m_cGOPEncoder.        destroy();
@@ -168,7 +174,12 @@ Void EncLib::destroy ()
 #else
   m_cCuEncoder.         destroy();
 #endif
-#if JEM_TOOLS
+#if JVET_K0371_ALF
+  if( m_alf )
+  {
+    m_cEncALF.destroy();
+  }
+#elif JEM_TOOLS
   m_cEncALF.            destroy();
 #endif
   m_cEncSAO.            destroyEncData();
@@ -213,7 +224,7 @@ Void EncLib::destroy ()
   return;
 }
 
-Void EncLib::init( Bool isFieldCoding, AUWriterIf* auWriterIf )
+void EncLib::init( bool isFieldCoding, AUWriterIf* auWriterIf )
 {
   m_AUWriterIf = auWriterIf;
 
@@ -407,11 +418,11 @@ Void EncLib::init( Bool isFieldCoding, AUWriterIf* auWriterIf )
 }
 
 #if HEVC_USE_SCALING_LISTS
-Void EncLib::xInitScalingLists(SPS &sps, PPS &pps)
+void EncLib::xInitScalingLists(SPS &sps, PPS &pps)
 {
   // Initialise scaling lists
   // The encoder will only use the SPS scaling lists. The PPS will never be marked present.
-  const Int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE] =
+  const int maxLog2TrDynamicRange[MAX_NUM_CHANNEL_TYPE] =
   {
       sps.getMaxLog2TrDynamicRange(CHANNEL_TYPE_LUMA),
       sps.getMaxLog2TrDynamicRange(CHANNEL_TYPE_CHROMA)
@@ -476,11 +487,11 @@ Void EncLib::xInitScalingLists(SPS &sps, PPS &pps)
   if (getUseScalingListId() != SCALING_LIST_OFF)
   {
     // Prepare delta's:
-    for(UInt sizeId = 0; sizeId < SCALING_LIST_SIZE_NUM; sizeId++)
+    for(uint32_t sizeId = 0; sizeId < SCALING_LIST_SIZE_NUM; sizeId++)
     {
-      const Int predListStep = (sizeId == SCALING_LIST_32x32? (SCALING_LIST_NUM/NUMBER_OF_PREDICTION_MODES) : 1); // if 32x32, skip over chroma entries.
+      const int predListStep = (sizeId == SCALING_LIST_32x32? (SCALING_LIST_NUM/NUMBER_OF_PREDICTION_MODES) : 1); // if 32x32, skip over chroma entries.
 
-      for(UInt listId = 0; listId < SCALING_LIST_NUM; listId+=predListStep)
+      for(uint32_t listId = 0; listId < SCALING_LIST_NUM; listId+=predListStep)
       {
         sps.getScalingList().checkPredMode( sizeId, listId );
       }
@@ -493,12 +504,12 @@ Void EncLib::xInitScalingLists(SPS &sps, PPS &pps)
 // Public member functions
 // ====================================================================================================================
 
-Void EncLib::deletePicBuffer()
+void EncLib::deletePicBuffer()
 {
   PicList::iterator iterPic = m_cListPic.begin();
-  Int iSize = Int( m_cListPic.size() );
+  int iSize = int( m_cListPic.size() );
 
-  for ( Int i = 0; i < iSize; i++ )
+  for ( int i = 0; i < iSize; i++ )
   {
     Picture* pcPic = *(iterPic++);
 
@@ -528,8 +539,8 @@ Void EncLib::deletePicBuffer()
  \retval  accessUnitsOut      list of output access units
  \retval  iNumEncoded         number of encoded pictures
  */
-Void EncLib::encode( Bool flush, PelStorage* pcPicYuvOrg, PelStorage* cPicYuvTrueOrg, const InputColourSpaceConversion snrCSC, std::list<PelUnitBuf*>& rcListPicYuvRecOut,
-                     Int& iNumEncoded )
+void EncLib::encode( bool flush, PelStorage* pcPicYuvOrg, PelStorage* cPicYuvTrueOrg, const InputColourSpaceConversion snrCSC, std::list<PelUnitBuf*>& rcListPicYuvRecOut,
+                     int& iNumEncoded )
 {
   //PROF_ACCUM_AND_START_NEW_SET( getProfilerPic(), P_GOP_LEVEL );
   if (pcPicYuvOrg != NULL)
@@ -538,7 +549,7 @@ Void EncLib::encode( Bool flush, PelStorage* pcPicYuvOrg, PelStorage* cPicYuvTru
     Picture* pcPicCurr = NULL;
 
 #if ER_CHROMA_QP_WCG_PPS
-    Int ppsID=-1; // Use default PPS ID
+    int ppsID=-1; // Use default PPS ID
     if (getWCGChromaQPControl().isEnabled())
     {
       ppsID=getdQPs()[ m_iPOCLast+1 ];
@@ -597,15 +608,15 @@ Void EncLib::encode( Bool flush, PelStorage* pcPicYuvOrg, PelStorage* cPicYuvTru
 /**------------------------------------------------
  Separate interlaced frame into two fields
  -------------------------------------------------**/
-Void separateFields(Pel* org, Pel* dstField, UInt stride, UInt width, UInt height, Bool isTop)
+void separateFields(Pel* org, Pel* dstField, uint32_t stride, uint32_t width, uint32_t height, bool isTop)
 {
   if (!isTop)
   {
     org += stride;
   }
-  for (Int y = 0; y < height>>1; y++)
+  for (int y = 0; y < height>>1; y++)
   {
-    for (Int x = 0; x < width; x++)
+    for (int x = 0; x < width; x++)
     {
       dstField[x] = org[x];
     }
@@ -616,22 +627,22 @@ Void separateFields(Pel* org, Pel* dstField, UInt stride, UInt width, UInt heigh
 
 }
 
-Void EncLib::encode( Bool flush, PelStorage* pcPicYuvOrg, PelStorage* pcPicYuvTrueOrg, const InputColourSpaceConversion snrCSC, std::list<PelUnitBuf*>& rcListPicYuvRecOut,
-                     Int& iNumEncoded, Bool isTff )
+void EncLib::encode( bool flush, PelStorage* pcPicYuvOrg, PelStorage* pcPicYuvTrueOrg, const InputColourSpaceConversion snrCSC, std::list<PelUnitBuf*>& rcListPicYuvRecOut,
+                     int& iNumEncoded, bool isTff )
 {
   iNumEncoded = 0;
 
-  for (Int fieldNum=0; fieldNum<2; fieldNum++)
+  for (int fieldNum=0; fieldNum<2; fieldNum++)
   {
     if (pcPicYuvOrg)
     {
       /* -- field initialization -- */
-      const Bool isTopField=isTff==(fieldNum==0);
+      const bool isTopField=isTff==(fieldNum==0);
 
       Picture *pcField;
       xGetNewPicBuffer( rcListPicYuvRecOut, pcField, -1 );
 
-      for (UInt comp = 0; comp < ::getNumberValidComponents(pcPicYuvOrg->chromaFormat); comp++)
+      for (uint32_t comp = 0; comp < ::getNumberValidComponents(pcPicYuvOrg->chromaFormat); comp++)
       {
         const ComponentID compID = ComponentID(comp);
         {
@@ -646,7 +657,7 @@ Void EncLib::encode( Bool flush, PelStorage* pcPicYuvOrg, PelStorage* pcPicYuvTr
       }
 
       {
-        Int ppsID=-1; // Use default PPS ID
+        int ppsID=-1; // Use default PPS ID
         const PPS *pPPS=(ppsID<0) ? m_ppsMap.getFirstPS() : m_ppsMap.getPS(ppsID);
         const SPS *pSPS=m_spsMap.getPS(pPPS->getSPSId());
 
@@ -692,7 +703,7 @@ Void EncLib::encode( Bool flush, PelStorage* pcPicYuvOrg, PelStorage* pcPicYuvTr
  .
  \retval rpcPic obtained picture buffer
  */
-Void EncLib::xGetNewPicBuffer ( std::list<PelUnitBuf*>& rcListPicYuvRecOut, Picture*& rpcPic, Int ppsId )
+void EncLib::xGetNewPicBuffer ( std::list<PelUnitBuf*>& rcListPicYuvRecOut, Picture*& rpcPic, int ppsId )
 {
   // rotate he output buffer
   rcListPicYuvRecOut.push_back( rcListPicYuvRecOut.front() ); rcListPicYuvRecOut.pop_front();
@@ -711,11 +722,11 @@ Void EncLib::xGetNewPicBuffer ( std::list<PelUnitBuf*>& rcListPicYuvRecOut, Pict
   Slice::sortPicList(m_cListPic);
 
   // use an entry in the buffered list if the maximum number that need buffering has been reached:
-  if (m_cListPic.size() >= (UInt)(m_iGOPSize + getMaxDecPicBuffering(MAX_TLAYER-1) + 2) )
+  if (m_cListPic.size() >= (uint32_t)(m_iGOPSize + getMaxDecPicBuffering(MAX_TLAYER-1) + 2) )
   {
     PicList::iterator iterPic  = m_cListPic.begin();
-    Int iSize = Int( m_cListPic.size() );
-    for ( Int i = 0; i < iSize; i++ )
+    int iSize = int( m_cListPic.size() );
+    for ( int i = 0; i < iSize; i++ )
     {
       rpcPic = *iterPic;
       if( ! rpcPic->referenced )
@@ -744,9 +755,9 @@ Void EncLib::xGetNewPicBuffer ( std::list<PelUnitBuf*>& rcListPicYuvRecOut, Pict
     rpcPic->create( sps.getChromaFormatIdc(), Size( sps.getPicWidthInLumaSamples(), sps.getPicHeightInLumaSamples()), sps.getMaxCUWidth(), sps.getMaxCUWidth()+16, false );
     if ( getUseAdaptiveQP() )
     {
-      const UInt iMaxDQPLayer = pps.getMaxCuDQPDepth()+1;
+      const uint32_t iMaxDQPLayer = pps.getMaxCuDQPDepth()+1;
       rpcPic->aqlayer.resize( iMaxDQPLayer );
-      for (UInt d = 0; d < iMaxDQPLayer; d++)
+      for (uint32_t d = 0; d < iMaxDQPLayer; d++)
       {
         rpcPic->aqlayer[d] = new AQpLayer( sps.getPicWidthInLumaSamples(), sps.getPicHeightInLumaSamples(), sps.getMaxCUWidth()>>d, sps.getMaxCUHeight()>>d );
       }
@@ -766,7 +777,7 @@ Void EncLib::xGetNewPicBuffer ( std::list<PelUnitBuf*>& rcListPicYuvRecOut, Pict
 
 
 #if HEVC_VPS
-Void EncLib::xInitVPS(VPS &vps, const SPS &sps)
+void EncLib::xInitVPS(VPS &vps, const SPS &sps)
 {
   // The SPS must have already been set up.
   // set the VPS profile information.
@@ -776,7 +787,7 @@ Void EncLib::xInitVPS(VPS &vps, const SPS &sps)
   vps.setNumHrdParameters( 0 );
 
   vps.createHrdParamBuffer();
-  for( UInt i = 0; i < vps.getNumHrdParameters(); i ++ )
+  for( uint32_t i = 0; i < vps.getNumHrdParameters(); i ++ )
   {
     vps.setHrdOpSetIdx( 0, i );
     vps.setCprmsPresentFlag( false, i );
@@ -785,7 +796,7 @@ Void EncLib::xInitVPS(VPS &vps, const SPS &sps)
 }
 #endif
 
-Void EncLib::xInitSPS(SPS &sps)
+void EncLib::xInitSPS(SPS &sps)
 {
   ProfileTierLevel& profileTierLevel = *sps.getPTL()->getGeneralPTL();
   profileTierLevel.setLevelIdc                    (m_level);
@@ -850,7 +861,7 @@ Void EncLib::xInitSPS(SPS &sps)
 #if JEM_TOOLS
   sps.getSpsNext().setCABACEngineMode       ( m_CABACEngineMode );
 #endif
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   sps.getSpsNext().setImvMode               ( ImvMode(m_ImvMode) );
   sps.getSpsNext().setUseIMV                ( m_ImvMode != IMV_OFF );
 #endif
@@ -888,12 +899,16 @@ Void EncLib::xInitSPS(SPS &sps)
 #if ENABLE_WPP_PARALLELISM
   sps.getSpsNext().setUseNextDQP            ( m_AltDQPCoding );
 #endif
-#if JEM_TOOLS
-  sps.getSpsNext().setUseIntraPDPC          ( m_IntraPDPC );
-  sps.getSpsNext().setALFEnabled            ( 0 != m_ALF );
-  sps.getSpsNext().setGALFEnabled           ( 2 == m_ALF );
+#if JVET_K1000_SIMPLIFIED_EMT
   sps.getSpsNext().setUseIntraEMT           ( m_IntraEMT );
   sps.getSpsNext().setUseInterEMT           ( m_InterEMT );
+#endif
+#if JEM_TOOLS
+  sps.getSpsNext().setUseIntraPDPC          ( m_IntraPDPC );
+#if !JVET_K0371_ALF
+  sps.getSpsNext().setALFEnabled            ( 0 != m_ALF );
+  sps.getSpsNext().setGALFEnabled           ( 2 == m_ALF );
+#endif
   sps.getSpsNext().setUseOBMC               ( m_OBMC );
   sps.getSpsNext().setOBMCBlkSize           ( m_uiObmcBlkSize );
   sps.getSpsNext().setUseFRUCMrgMode        ( m_FRUC );
@@ -918,8 +933,8 @@ Void EncLib::xInitSPS(SPS &sps)
 
   // ADD_NEW_TOOL : (encoder lib) set tool enabling flags and associated parameters here
 
-  Int minCUSize = ( /*sps.getSpsNext().getUseQTBT() ? 1 << MIN_CU_LOG2 :*/ sps.getMaxCUWidth() >> sps.getLog2DiffMaxMinCodingBlockSize() );
-  Int log2MinCUSize = 0;
+  int minCUSize = ( /*sps.getSpsNext().getUseQTBT() ? 1 << MIN_CU_LOG2 :*/ sps.getMaxCUWidth() >> sps.getLog2DiffMaxMinCodingBlockSize() );
+  int log2MinCUSize = 0;
   while(minCUSize > 1)
   {
     minCUSize >>= 1;
@@ -943,7 +958,7 @@ Void EncLib::xInitSPS(SPS &sps)
 
   sps.setUseAMP ( m_useAMP );
 
-  for (UInt channelType = 0; channelType < MAX_NUM_CHANNEL_TYPE; channelType++)
+  for (uint32_t channelType = 0; channelType < MAX_NUM_CHANNEL_TYPE; channelType++)
   {
     sps.setBitDepth      (ChannelType(channelType), m_bitDepth[channelType] );
     sps.setQpBDOffset  (ChannelType(channelType), (6 * (m_bitDepth[channelType] - 8)));
@@ -955,7 +970,7 @@ Void EncLib::xInitSPS(SPS &sps)
   sps.setMaxTLayers( m_maxTempLayer );
   sps.setTemporalIdNestingFlag( ( m_maxTempLayer == 1 ) ? true : false );
 
-  for (Int i = 0; i < min(sps.getMaxTLayers(),(UInt) MAX_TLAYER); i++ )
+  for (int i = 0; i < min(sps.getMaxTLayers(),(uint32_t) MAX_TLAYER); i++ )
   {
     sps.setMaxDecPicBuffering(m_maxDecPicBuffering[i], i);
     sps.setNumReorderPics(m_numReorderPics[i], i);
@@ -967,6 +982,9 @@ Void EncLib::xInitSPS(SPS &sps)
 #endif
 #if HEVC_USE_INTRA_SMOOTHING_T32 || HEVC_USE_INTRA_SMOOTHING_T64
   sps.setUseStrongIntraSmoothing( m_useStrongIntraSmoothing );
+#endif
+#if JVET_K0371_ALF
+  sps.setUseALF( m_alf );
 #endif
   sps.setVuiParametersPresentFlag(getVuiParametersPresentFlag());
 
@@ -1010,7 +1028,7 @@ Void EncLib::xInitSPS(SPS &sps)
 
   sps.setNumLongTermRefPicSPS(NUM_LONG_TERM_REF_PIC_SPS);
   CHECK(!(NUM_LONG_TERM_REF_PIC_SPS <= MAX_NUM_LONG_TERM_REF_PICS), "Unspecified error");
-  for (Int k = 0; k < NUM_LONG_TERM_REF_PIC_SPS; k++)
+  for (int k = 0; k < NUM_LONG_TERM_REF_PIC_SPS; k++)
   {
     sps.setLtRefPicPocLsbSps(k, 0);
     sps.setUsedByCurrPicLtSPSFlag(k, 0);
@@ -1032,7 +1050,7 @@ Void EncLib::xInitSPS(SPS &sps)
   // Set up SPS range extension settings
   sps.getSpsRangeExtension().setTransformSkipRotationEnabledFlag(m_transformSkipRotationEnabledFlag);
   sps.getSpsRangeExtension().setTransformSkipContextEnabledFlag(m_transformSkipContextEnabledFlag);
-  for (UInt signallingModeIndex = 0; signallingModeIndex < NUMBER_OF_RDPCM_SIGNALLING_MODES; signallingModeIndex++)
+  for (uint32_t signallingModeIndex = 0; signallingModeIndex < NUMBER_OF_RDPCM_SIGNALLING_MODES; signallingModeIndex++)
   {
     sps.getSpsRangeExtension().setRdpcmEnabledFlag(RDPCMSignallingMode(signallingModeIndex), m_rdpcmEnabledFlag[signallingModeIndex]);
   }
@@ -1045,14 +1063,14 @@ Void EncLib::xInitSPS(SPS &sps)
 
 #if U0132_TARGET_BITS_SATURATION
 // calculate scale value of bitrate and initial delay
-Int calcScale(Int x)
+int calcScale(int x)
 {
   if (x==0)
   {
     return 0;
   }
-  UInt iMask = 0xffffffff;
-  Int ScaleValue = 32;
+  uint32_t iMask = 0xffffffff;
+  int ScaleValue = 32;
 
   while ((x&iMask) != 0)
   {
@@ -1063,13 +1081,13 @@ Int calcScale(Int x)
   return ScaleValue;
 }
 #endif
-Void EncLib::xInitHrdParameters(SPS &sps)
+void EncLib::xInitHrdParameters(SPS &sps)
 {
-  Bool useSubCpbParams = (getSliceMode() > 0) || (getSliceSegmentMode() > 0);
-  Int  bitRate         = getTargetBitrate();
-  Bool isRandomAccess  = getIntraPeriod() > 0;
+  bool useSubCpbParams = (getSliceMode() > 0) || (getSliceSegmentMode() > 0);
+  int  bitRate         = getTargetBitrate();
+  bool isRandomAccess  = getIntraPeriod() > 0;
 # if U0132_TARGET_BITS_SATURATION
-  Int cpbSize          = getCpbSize();
+  int cpbSize          = getCpbSize();
   CHECK(!(cpbSize!=0), "Unspecified error");  // CPB size may not be equal to zero. ToDo: have a better default and check for level constraints
   if( !getVuiParametersPresentFlag() && !getCpbSaturationEnabled() )
 #else
@@ -1108,8 +1126,8 @@ Void EncLib::xInitHrdParameters(SPS &sps)
 
   if (getTemporalSubsampleRatio()>1)
   {
-    UInt temporalSubsampleRatio = getTemporalSubsampleRatio();
-    if ( Double(timingInfo->getNumUnitsInTick()) * temporalSubsampleRatio > std::numeric_limits<UInt>::max() )
+    uint32_t temporalSubsampleRatio = getTemporalSubsampleRatio();
+    if ( double(timingInfo->getNumUnitsInTick()) * temporalSubsampleRatio > std::numeric_limits<uint32_t>::max() )
     {
       timingInfo->setTimeScale( timingInfo->getTimeScale() / temporalSubsampleRatio );
     }
@@ -1119,7 +1137,7 @@ Void EncLib::xInitHrdParameters(SPS &sps)
     }
   }
 
-  Bool rateCnt = ( bitRate > 0 );
+  bool rateCnt = ( bitRate > 0 );
   hrd->setNalHrdParametersPresentFlag( rateCnt );
   hrd->setVclHrdParametersPresentFlag( rateCnt );
   hrd->setSubPicCpbParamsPresentFlag( useSubCpbParams );
@@ -1174,10 +1192,10 @@ Void EncLib::xInitHrdParameters(SPS &sps)
   }
 
   // Note: parameters for all temporal layers are initialized with the same values
-  Int i, j;
-  UInt bitrateValue, cpbSizeValue;
-  UInt duCpbSizeValue;
-  UInt duBitRateValue = 0;
+  int i, j;
+  uint32_t bitrateValue, cpbSizeValue;
+  uint32_t duCpbSizeValue;
+  uint32_t duBitRateValue = 0;
 
   for( i = 0; i < MAX_TLAYER; i ++ )
   {
@@ -1219,13 +1237,13 @@ Void EncLib::xInitHrdParameters(SPS &sps)
   }
 }
 
-Void EncLib::xInitPPS(PPS &pps, const SPS &sps)
+void EncLib::xInitPPS(PPS &pps, const SPS &sps)
 {
   // pps ID already initialised.
   pps.setSPSId(sps.getSPSId());
 
   pps.setConstrainedIntraPred( m_bUseConstrainedIntraPred );
-  Bool bUseDQP = (getMaxCuDQPDepth() > 0)? true : false;
+  bool bUseDQP = (getMaxCuDQPDepth() > 0)? true : false;
 
   if((getMaxDeltaQP() != 0 )|| getUseAdaptiveQP())
   {
@@ -1303,12 +1321,12 @@ Void EncLib::xInitPPS(PPS &pps, const SPS &sps)
 #if ER_CHROMA_QP_WCG_PPS
   if (getWCGChromaQPControl().isEnabled())
   {
-    const Int baseQp=m_iQP+pps.getPPSId();
-    const Double chromaQp = m_wcgChromaQpControl.chromaQpScale * baseQp + m_wcgChromaQpControl.chromaQpOffset;
-    const Double dcbQP = m_wcgChromaQpControl.chromaCbQpScale * chromaQp;
-    const Double dcrQP = m_wcgChromaQpControl.chromaCrQpScale * chromaQp;
-    const Int cbQP =(Int)(dcbQP + ( dcbQP < 0 ? -0.5 : 0.5) );
-    const Int crQP =(Int)(dcrQP + ( dcrQP < 0 ? -0.5 : 0.5) );
+    const int baseQp=m_iQP+pps.getPPSId();
+    const double chromaQp = m_wcgChromaQpControl.chromaQpScale * baseQp + m_wcgChromaQpControl.chromaQpOffset;
+    const double dcbQP = m_wcgChromaQpControl.chromaCbQpScale * chromaQp;
+    const double dcrQP = m_wcgChromaQpControl.chromaCrQpScale * chromaQp;
+    const int cbQP =(int)(dcbQP + ( dcbQP < 0 ? -0.5 : 0.5) );
+    const int crQP =(int)(dcrQP + ( dcrQP < 0 ? -0.5 : 0.5) );
     pps.setQpOffset(COMPONENT_Cb, Clip3( -12, 12, min(0, cbQP) + m_chromaCbQpOffset ));
     pps.setQpOffset(COMPONENT_Cr, Clip3( -12, 12, min(0, crQP) + m_chromaCrQpOffset));
   }
@@ -1321,12 +1339,12 @@ Void EncLib::xInitPPS(PPS &pps, const SPS &sps)
   }
 #endif
 #if W0038_CQP_ADJ
-  Bool bChromaDeltaQPEnabled = false;
+  bool bChromaDeltaQPEnabled = false;
   {
     bChromaDeltaQPEnabled = ( m_sliceChromaQpOffsetIntraOrPeriodic[0] || m_sliceChromaQpOffsetIntraOrPeriodic[1] );
     if( !bChromaDeltaQPEnabled )
     {
-      for( Int i=0; i<m_iGOPSize; i++ )
+      for( int i=0; i<m_iGOPSize; i++ )
       {
         if( m_GOPList[i].m_CbQPoffset || m_GOPList[i].m_CrQPoffset )
         {
@@ -1380,7 +1398,7 @@ Void EncLib::xInitPPS(PPS &pps, const SPS &sps)
   }
 
   // deblockingFilterControlPresentFlag is true if any of the settings differ from the inferred values:
-  const Bool deblockingFilterControlPresentFlag = pps.getDeblockingFilterOverrideEnabledFlag() ||
+  const bool deblockingFilterControlPresentFlag = pps.getDeblockingFilterOverrideEnabledFlag() ||
                                                   pps.getPPSDeblockingFilterDisabledFlag()     ||
                                                   pps.getDeblockingFilterBetaOffsetDiv2() != 0 ||
                                                   pps.getDeblockingFilterTcOffsetDiv2() != 0;
@@ -1392,20 +1410,20 @@ Void EncLib::xInitPPS(PPS &pps, const SPS &sps)
   pps.setLoopFilterAcrossSlicesEnabledFlag( m_bLFCrossSliceBoundaryFlag );
 
 
-  Int histogram[MAX_NUM_REF + 1];
-  for( Int i = 0; i <= MAX_NUM_REF; i++ )
+  int histogram[MAX_NUM_REF + 1];
+  for( int i = 0; i <= MAX_NUM_REF; i++ )
   {
     histogram[i]=0;
   }
-  for( Int i = 0; i < getGOPSize(); i++)
+  for( int i = 0; i < getGOPSize(); i++)
   {
     CHECK(!(getGOPEntry(i).m_numRefPicsActive >= 0 && getGOPEntry(i).m_numRefPicsActive <= MAX_NUM_REF), "Unspecified error");
     histogram[getGOPEntry(i).m_numRefPicsActive]++;
   }
 
-  Int maxHist=-1;
-  Int bestPos=0;
-  for( Int i = 0; i <= MAX_NUM_REF; i++ )
+  int maxHist=-1;
+  int bestPos=0;
+  for( int i = 0; i <= MAX_NUM_REF; i++ )
   {
     if(histogram[i]>maxHist)
     {
@@ -1435,22 +1453,22 @@ Void EncLib::xInitPPS(PPS &pps, const SPS &sps)
 }
 
 //Function for initializing m_RPSList, a list of ReferencePictureSet, based on the GOPEntry objects read from the config file.
-Void EncLib::xInitRPS(SPS &sps, Bool isFieldCoding)
+void EncLib::xInitRPS(SPS &sps, bool isFieldCoding)
 {
   ReferencePictureSet*      rps;
 
   sps.createRPSList(getGOPSize() + m_extraRPSs + 1);
   RPSList* rpsList = sps.getRPSList();
 
-  for( Int i = 0; i < getGOPSize()+m_extraRPSs; i++)
+  for( int i = 0; i < getGOPSize()+m_extraRPSs; i++)
   {
     const GOPEntry &ge = getGOPEntry(i);
     rps = rpsList->getReferencePictureSet(i);
     rps->setNumberOfPictures(ge.m_numRefPics);
     rps->setNumRefIdc(ge.m_numRefIdc);
-    Int numNeg = 0;
-    Int numPos = 0;
-    for( Int j = 0; j < ge.m_numRefPics; j++)
+    int numNeg = 0;
+    int numPos = 0;
+    for( int j = 0; j < ge.m_numRefPics; j++)
     {
       rps->setDeltaPOC(j,ge.m_referencePics[j]);
       rps->setUsed(j,ge.m_usedByCurrPic[j]);
@@ -1474,17 +1492,17 @@ Void EncLib::xInitRPS(SPS &sps, Bool isFieldCoding)
     if (ge.m_interRPSPrediction == 2)  // Automatic generation of the inter RPS idc based on the RIdx provided.
     {
       CHECK(!(RPSRef!=NULL), "Unspecified error");
-      Int deltaRPS = getGOPEntry(i-1).m_POC - ge.m_POC;  // the ref POC - current POC
-      Int numRefDeltaPOC = RPSRef->getNumberOfPictures();
+      int deltaRPS = getGOPEntry(i-1).m_POC - ge.m_POC;  // the ref POC - current POC
+      int numRefDeltaPOC = RPSRef->getNumberOfPictures();
 
       rps->setDeltaRPS(deltaRPS);           // set delta RPS
       rps->setNumRefIdc(numRefDeltaPOC+1);  // set the numRefIdc to the number of pictures in the reference RPS + 1.
-      Int count=0;
-      for (Int j = 0; j <= numRefDeltaPOC; j++ ) // cycle through pics in reference RPS.
+      int count=0;
+      for (int j = 0; j <= numRefDeltaPOC; j++ ) // cycle through pics in reference RPS.
       {
-        Int RefDeltaPOC = (j<numRefDeltaPOC)? RPSRef->getDeltaPOC(j): 0;  // if it is the last decoded picture, set RefDeltaPOC = 0
+        int RefDeltaPOC = (j<numRefDeltaPOC)? RPSRef->getDeltaPOC(j): 0;  // if it is the last decoded picture, set RefDeltaPOC = 0
         rps->setRefIdc(j, 0);
-        for (Int k = 0; k < rps->getNumberOfPictures(); k++ )  // cycle through pics in current RPS.
+        for (int k = 0; k < rps->getNumberOfPictures(); k++ )  // cycle through pics in current RPS.
         {
           if (rps->getDeltaPOC(k) == ( RefDeltaPOC + deltaRPS))  // if the current RPS has a same picture as the reference RPS.
           {
@@ -1505,7 +1523,7 @@ Void EncLib::xInitRPS(SPS &sps, Bool isFieldCoding)
       CHECK(!(RPSRef!=NULL), "Unspecified error");
       rps->setDeltaRPS(ge.m_deltaRPS);
       rps->setNumRefIdc(ge.m_numRefIdc);
-      for (Int j = 0; j < ge.m_numRefIdc; j++ )
+      for (int j = 0; j < ge.m_numRefIdc; j++ )
       {
         rps->setRefIdc(j, ge.m_refIdc[j]);
       }
@@ -1515,11 +1533,11 @@ Void EncLib::xInitRPS(SPS &sps, Bool isFieldCoding)
       numPos = 0;
       ReferencePictureSet      RPSTemp;  // temporary variable
 
-      for (Int j = 0; j < ge.m_numRefIdc; j++ )
+      for (int j = 0; j < ge.m_numRefIdc; j++ )
       {
         if (ge.m_refIdc[j])
         {
-          Int deltaPOC = ge.m_deltaRPS + ((j < RPSRef->getNumberOfPictures())? RPSRef->getDeltaPOC(j) : 0);
+          int deltaPOC = ge.m_deltaRPS + ((j < RPSRef->getNumberOfPictures())? RPSRef->getDeltaPOC(j) : 0);
           RPSTemp.setDeltaPOC((numNeg+numPos),deltaPOC);
           RPSTemp.setUsed((numNeg+numPos),ge.m_refIdc[j]==1?1:0);
           if (deltaPOC<0)
@@ -1549,7 +1567,7 @@ Void EncLib::xInitRPS(SPS &sps, Bool isFieldCoding)
       RPSTemp.sortDeltaPOC();     // sort the created delta POC before comparing
       // check if Delta POC and Used are the same
       // print warning if they are not.
-      for (Int j = 0; j < ge.m_numRefIdc; j++ )
+      for (int j = 0; j < ge.m_numRefIdc; j++ )
       {
         if (RPSTemp.getDeltaPOC(j) != rps->getDeltaPOC(j))
         {
@@ -1586,15 +1604,15 @@ Void EncLib::xInitRPS(SPS &sps, Bool isFieldCoding)
    // This is a function that
    // determines what Reference Picture Set to use
    // for a specific slice (with POC = POCCurr)
-Void EncLib::selectReferencePictureSet(Slice* slice, Int POCCurr, Int GOPid )
+void EncLib::selectReferencePictureSet(Slice* slice, int POCCurr, int GOPid )
 {
   slice->setRPSidx(GOPid);
 
-  for(Int extraNum=m_iGOPSize; extraNum<m_extraRPSs+m_iGOPSize; extraNum++)
+  for(int extraNum=m_iGOPSize; extraNum<m_extraRPSs+m_iGOPSize; extraNum++)
   {
     if(m_uiIntraPeriod > 0 && getDecodingRefreshType() > 0)
     {
-      Int POCIndex = POCCurr%m_uiIntraPeriod;
+      int POCIndex = POCCurr%m_uiIntraPeriod;
       if(POCIndex == 0)
       {
         POCIndex = m_uiIntraPeriod;
@@ -1622,15 +1640,15 @@ Void EncLib::selectReferencePictureSet(Slice* slice, Int POCCurr, Int GOPid )
   slice->setRPS(rps);
 }
 
-Int EncLib::getReferencePictureSetIdxForSOP(Int POCCurr, Int GOPid )
+int EncLib::getReferencePictureSetIdxForSOP(int POCCurr, int GOPid )
 {
-  Int rpsIdx = GOPid;
+  int rpsIdx = GOPid;
 
-  for(Int extraNum=m_iGOPSize; extraNum<m_extraRPSs+m_iGOPSize; extraNum++)
+  for(int extraNum=m_iGOPSize; extraNum<m_extraRPSs+m_iGOPSize; extraNum++)
   {
     if(m_uiIntraPeriod > 0 && getDecodingRefreshType() > 0)
     {
-      Int POCIndex = POCCurr%m_uiIntraPeriod;
+      int POCIndex = POCCurr%m_uiIntraPeriod;
       if(POCIndex == 0)
       {
         POCIndex = m_uiIntraPeriod;
@@ -1653,7 +1671,7 @@ Int EncLib::getReferencePictureSetIdxForSOP(Int POCCurr, Int GOPid )
 }
 
 #if HEVC_TILES_WPP
-Void  EncLib::xInitPPSforTiles(PPS &pps)
+void  EncLib::xInitPPSforTiles(PPS &pps)
 {
   pps.setTileUniformSpacingFlag( m_tileUniformSpacingFlag );
   pps.setNumTileColumnsMinus1( m_iNumColumnsMinus1 );
@@ -1669,13 +1687,13 @@ Void  EncLib::xInitPPSforTiles(PPS &pps)
 }
 #endif
 
-Void  EncCfg::xCheckGSParameters()
+void  EncCfg::xCheckGSParameters()
 {
 #if HEVC_TILES_WPP
-  Int   iWidthInCU = ( m_iSourceWidth%m_maxCUWidth ) ? m_iSourceWidth/m_maxCUWidth + 1 : m_iSourceWidth/m_maxCUWidth;
-  Int   iHeightInCU = ( m_iSourceHeight%m_maxCUHeight ) ? m_iSourceHeight/m_maxCUHeight + 1 : m_iSourceHeight/m_maxCUHeight;
-  UInt  uiCummulativeColumnWidth = 0;
-  UInt  uiCummulativeRowHeight = 0;
+  int   iWidthInCU = ( m_iSourceWidth%m_maxCUWidth ) ? m_iSourceWidth/m_maxCUWidth + 1 : m_iSourceWidth/m_maxCUWidth;
+  int   iHeightInCU = ( m_iSourceHeight%m_maxCUHeight ) ? m_iSourceHeight/m_maxCUHeight + 1 : m_iSourceHeight/m_maxCUHeight;
+  uint32_t  uiCummulativeColumnWidth = 0;
+  uint32_t  uiCummulativeRowHeight = 0;
 
   //check the column relative parameters
   if( m_iNumColumnsMinus1 >= (1<<(LOG2_MAX_NUM_COLUMNS_MINUS1+1)) )
@@ -1690,7 +1708,7 @@ Void  EncCfg::xCheckGSParameters()
 
   if( m_iNumColumnsMinus1 && !m_tileUniformSpacingFlag )
   {
-    for(Int i=0; i<m_iNumColumnsMinus1; i++)
+    for(int i=0; i<m_iNumColumnsMinus1; i++)
     {
       uiCummulativeColumnWidth += m_tileColumnWidth[i];
     }
@@ -1714,7 +1732,7 @@ Void  EncCfg::xCheckGSParameters()
 
   if( m_iNumRowsMinus1 && !m_tileUniformSpacingFlag )
   {
-    for(Int i=0; i<m_iNumRowsMinus1; i++)
+    for(int i=0; i<m_iNumRowsMinus1; i++)
     {
       uiCummulativeRowHeight += m_tileRowHeight[i];
     }
@@ -1727,25 +1745,25 @@ Void  EncCfg::xCheckGSParameters()
 #endif
 }
 
-Bool EncLib::PPSNeedsWriting(Int ppsId)
+bool EncLib::PPSNeedsWriting(int ppsId)
 {
-  Bool bChanged=m_ppsMap.getChangedFlag(ppsId);
+  bool bChanged=m_ppsMap.getChangedFlag(ppsId);
   m_ppsMap.clearChangedFlag(ppsId);
   return bChanged;
 }
 
-Bool EncLib::SPSNeedsWriting(Int spsId)
+bool EncLib::SPSNeedsWriting(int spsId)
 {
-  Bool bChanged=m_spsMap.getChangedFlag(spsId);
+  bool bChanged=m_spsMap.getChangedFlag(spsId);
   m_spsMap.clearChangedFlag(spsId);
   return bChanged;
 }
 
 #if X0038_LAMBDA_FROM_QP_CAPABILITY
-Int EncCfg::getQPForPicture(const UInt gopIndex, const Slice *pSlice) const
+int EncCfg::getQPForPicture(const uint32_t gopIndex, const Slice *pSlice) const
 {
-  const Int lumaQpBDOffset = pSlice->getSPS()->getQpBDOffset(CHANNEL_TYPE_LUMA);
-  Int qp;
+  const int lumaQpBDOffset = pSlice->getSPS()->getQpBDOffset(CHANNEL_TYPE_LUMA);
+  int qp;
 
   if (getCostMode()==COST_LOSSLESS_CODING)
   {
@@ -1766,7 +1784,7 @@ Int EncCfg::getQPForPicture(const UInt gopIndex, const Slice *pSlice) const
     qp += appliedSwitchDQQ;
 
 #if QP_SWITCHING_FOR_PARALLEL
-    const Int* pdQPs = getdQPs();
+    const int* pdQPs = getdQPs();
     if ( pdQPs )
     {
       qp += pdQPs[ pSlice->getPOC() ];
@@ -1792,15 +1810,15 @@ Int EncCfg::getQPForPicture(const UInt gopIndex, const Slice *pSlice) const
         qp +=gopEntry.m_QPOffset;
 
         // adjust QP according to QPOffsetModel for the GOP entry.
-        Double dqpOffset=qp*gopEntry.m_QPOffsetModelScale+gopEntry.m_QPOffsetModelOffset+0.5;
-        Int qpOffset = (Int)floor(Clip3<Double>(0.0, 3.0, dqpOffset));
+        double dqpOffset=qp*gopEntry.m_QPOffsetModelScale+gopEntry.m_QPOffsetModelOffset+0.5;
+        int qpOffset = (int)floor(Clip3<double>(0.0, 3.0, dqpOffset));
         qp += qpOffset ;
       }
     }
 
 #if !QP_SWITCHING_FOR_PARALLEL
     // modify QP if a fractional QP was originally specified, cause dQPs to be 0 or 1.
-    const Int* pdQPs = getdQPs();
+    const int* pdQPs = getdQPs();
     if ( pdQPs )
     {
       qp += pdQPs[ pSlice->getPOC() ];

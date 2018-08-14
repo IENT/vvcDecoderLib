@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -48,9 +48,9 @@
 //! \ingroup EncoderApp
 //! \{
 
-static const UInt settingNameWidth = 66;
-static const UInt settingHelpWidth = 84;
-static const UInt settingValueWidth = 3;
+static const uint32_t settingNameWidth = 66;
+static const uint32_t settingHelpWidth = 84;
+static const uint32_t settingValueWidth = 3;
 // --------------------------------------------------------------------------------------------------------------------- //
 
 //macro value printing function
@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
     ( "SIMD", SIMD, string( "" ), "" )
     ( "c", df::program_options_lite::parseConfigFile, "" );
   df::program_options_lite::SilentReporter err;
-  df::program_options_lite::scanArgv( opts, argc, ( const TChar** ) argv, err );
+  df::program_options_lite::scanArgv( opts, argc, ( const char** ) argv, err );
   fprintf( stdout, "[SIMD=%s] ", read_x86_extension( SIMD ) );
 #endif
 #if ENABLE_TRACING

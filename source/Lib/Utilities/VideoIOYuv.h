@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -55,37 +55,37 @@ class VideoIOYuv
 {
 private:
   fstream   m_cHandle;                                      ///< file handle
-  Int       m_fileBitdepth[MAX_NUM_CHANNEL_TYPE]; ///< bitdepth of input/output video file
-  Int       m_MSBExtendedBitDepth[MAX_NUM_CHANNEL_TYPE];  ///< bitdepth after addition of MSBs (with value 0)
-  Int       m_bitdepthShift[MAX_NUM_CHANNEL_TYPE];  ///< number of bits to increase or decrease image by before/after write/read
+  int       m_fileBitdepth[MAX_NUM_CHANNEL_TYPE]; ///< bitdepth of input/output video file
+  int       m_MSBExtendedBitDepth[MAX_NUM_CHANNEL_TYPE];  ///< bitdepth after addition of MSBs (with value 0)
+  int       m_bitdepthShift[MAX_NUM_CHANNEL_TYPE];  ///< number of bits to increase or decrease image by before/after write/read
 
 public:
   VideoIOYuv()           {}
   virtual ~VideoIOYuv()  {}
 
-  Void  open  ( const std::string &fileName, Bool bWriteMode, const Int fileBitDepth[MAX_NUM_CHANNEL_TYPE], const Int MSBExtendedBitDepth[MAX_NUM_CHANNEL_TYPE], const Int internalBitDepth[MAX_NUM_CHANNEL_TYPE] ); ///< open or create file
-  Void  close ();                                           ///< close file
+  void  open  ( const std::string &fileName, bool bWriteMode, const int fileBitDepth[MAX_NUM_CHANNEL_TYPE], const int MSBExtendedBitDepth[MAX_NUM_CHANNEL_TYPE], const int internalBitDepth[MAX_NUM_CHANNEL_TYPE] ); ///< open or create file
+  void  close ();                                           ///< close file
 #if EXTENSION_360_VIDEO
-  Void skipFrames(Int numFrames, UInt width, UInt height, ChromaFormat format);
+  void skipFrames(int numFrames, uint32_t width, uint32_t height, ChromaFormat format);
 #else
-  Void skipFrames(UInt numFrames, UInt width, UInt height, ChromaFormat format);
+  void skipFrames(uint32_t numFrames, uint32_t width, uint32_t height, ChromaFormat format);
 #endif
   // if fileFormat<NUM_CHROMA_FORMAT, the format of the file is that format specified, else it is the format of the PicYuv.
 
 
   // If fileFormat=NUM_CHROMA_FORMAT, use the format defined by pPicYuvTrueOrg
-  Bool  read ( PelUnitBuf& pic, PelUnitBuf& picOrg, const InputColourSpaceConversion ipcsc, Int aiPad[2], ChromaFormat fileFormat=NUM_CHROMA_FORMAT, const Bool bClipToRec709=false );     ///< read one frame with padding parameter
+  bool  read ( PelUnitBuf& pic, PelUnitBuf& picOrg, const InputColourSpaceConversion ipcsc, int aiPad[2], ChromaFormat fileFormat=NUM_CHROMA_FORMAT, const bool bClipToRec709=false );     ///< read one frame with padding parameter
 
   // If fileFormat=NUM_CHROMA_FORMAT, use the format defined by pPicYuv
-  Bool  write( const CPelUnitBuf& pic,
-               const InputColourSpaceConversion ipCSC, Int confLeft = 0, Int confRight = 0, Int confTop = 0, Int confBottom = 0, ChromaFormat format = NUM_CHROMA_FORMAT, const Bool bClipToRec709 = false ); ///< write one YUV frame with padding parameter
+  bool  write( const CPelUnitBuf& pic,
+               const InputColourSpaceConversion ipCSC, int confLeft = 0, int confRight = 0, int confTop = 0, int confBottom = 0, ChromaFormat format = NUM_CHROMA_FORMAT, const bool bClipToRec709 = false ); ///< write one YUV frame with padding parameter
 
   // If fileFormat=NUM_CHROMA_FORMAT, use the format defined by pPicYuvTop and pPicYuvBottom
-  Bool  write( const CPelUnitBuf& picTop, const CPelUnitBuf& picBot, const InputColourSpaceConversion ipCSC, Int confLeft=0, Int confRight=0, Int confTop=0, Int confBottom=0, ChromaFormat fileFormat=NUM_CHROMA_FORMAT, const Bool isTff=false, const Bool bClipToRec709=false);
-  static Void ColourSpaceConvert(const CPelUnitBuf &src, PelUnitBuf &dest, const InputColourSpaceConversion conversion, Bool bIsForwards);
+  bool  write( const CPelUnitBuf& picTop, const CPelUnitBuf& picBot, const InputColourSpaceConversion ipCSC, int confLeft=0, int confRight=0, int confTop=0, int confBottom=0, ChromaFormat fileFormat=NUM_CHROMA_FORMAT, const bool isTff=false, const bool bClipToRec709=false);
+  static void ColourSpaceConvert(const CPelUnitBuf &src, PelUnitBuf &dest, const InputColourSpaceConversion conversion, bool bIsForwards);
 
-  Bool  isEof ();                                           ///< check for end-of-file
-  Bool  isFail();                                           ///< check for failure
+  bool  isEof ();                                           ///< check for end-of-file
+  bool  isFail();                                           ///< check for failure
 
 
 };

@@ -3,7 +3,7 @@
 * and contributor rights, including patent rights, and no such rights are
 * granted under this license.
 *
-* Copyright (c) 2010-2017, ITU/ISO/IEC
+* Copyright (c) 2010-2018, ITU/ISO/IEC
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -283,7 +283,7 @@ public:
 public:
   uint32_t  getNumBins          ()                                      { THROW("Not supported"); return 0; }
   bool      isEncoding          ()                                      { return false; }
-  unsigned  getNumWrittenBits   ()                                      { /*THROW( "Not supported" );*/ return (UInt)( 0/*m_EstFracBits*//* >> SCALE_BITS*/ ); }
+  unsigned  getNumWrittenBits   ()                                      { /*THROW( "Not supported" );*/ return (uint32_t)( 0/*m_EstFracBits*//* >> SCALE_BITS*/ ); }
 
 protected:
   uint64_t                m_EstFracBits;

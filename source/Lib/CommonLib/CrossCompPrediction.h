@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -54,16 +54,16 @@ class CrossComponentPrediction
 {
 protected:
 
-  SChar xCalcCrossComponentPredictionAlpha( TransformUnit &tu, const ComponentID &compID, Bool useRecoResidual );
+  int8_t xCalcCrossComponentPredictionAlpha( TransformUnit &tu, const ComponentID &compID, bool useRecoResidual );
 
 public:
 
-  static Void crossComponentPrediction(       TransformUnit &tu,
+  static void crossComponentPrediction(       TransformUnit &tu,
                                         const ComponentID   &compID,
                                         const CPelBuf       &piResiL,
                                         const CPelBuf       &piResiC,
                                               PelBuf        &piResiT,
-                                        const Bool          &reverse );
+                                        const bool          &reverse );
 };
 
 //! \}

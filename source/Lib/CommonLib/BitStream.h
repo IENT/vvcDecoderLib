@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -68,8 +68,8 @@ class OutputBitstream
    */
   std::vector<uint8_t> m_fifo;
 
-  UInt m_num_held_bits; /// number of bits not flushed to bytestream.
-  UChar m_held_bits; /// the bits held and not flushed to bytestream.
+  uint32_t m_num_held_bits; /// number of bits not flushed to bytestream.
+  uint8_t m_held_bits; /// the bits held and not flushed to bytestream.
                              /// this value is always msb-aligned, bigendian.
 public:
   // create / destroy
@@ -81,13 +81,13 @@ public:
    * append uiNumberOfBits least significant bits of uiBits to
    * the current bitstream
    */
-  Void        write           ( UInt uiBits, UInt uiNumberOfBits );
+  void        write           ( uint32_t uiBits, uint32_t uiNumberOfBits );
 
   /** insert one bits until the bitstream is byte-aligned */
-  Void        writeAlignOne   ();
+  void        writeAlignOne   ();
 
   /** insert zero bits until the bitstream is byte-aligned */
-  Void        writeAlignZero  ();
+  void        writeAlignZero  ();
 
   // utility functions
 
@@ -97,47 +97,47 @@ public:
    * NB, data is arranged such that subsequent bytes in the
    * bytestream are stored in ascending addresses.
    */
-  UChar* getByteStream() const;
+  uint8_t* getByteStream() const;
 
   /**
    * Return the number of valid bytes available from  getByteStream()
    */
-  UInt getByteStreamLength();
+  uint32_t getByteStreamLength();
 
   /**
    * Reset all internal state.
    */
-  Void clear();
+  void clear();
 
   /**
    * returns the number of bits that need to be written to
    * achieve byte alignment.
    */
-  Int getNumBitsUntilByteAligned() const { return (8 - m_num_held_bits) & 0x7; }
+  int getNumBitsUntilByteAligned() const { return (8 - m_num_held_bits) & 0x7; }
 
   /**
    * Return the number of bits that have been written since the last clear()
    */
-  UInt getNumberOfWrittenBits() const { return UInt(m_fifo.size()) * 8 + m_num_held_bits; }
+  uint32_t getNumberOfWrittenBits() const { return uint32_t(m_fifo.size()) * 8 + m_num_held_bits; }
 
-  Void insertAt(const OutputBitstream& src, UInt pos);
+  void insertAt(const OutputBitstream& src, uint32_t pos);
 
   /**
    * Return a reference to the internal fifo
    */
   std::vector<uint8_t>& getFIFO() { return m_fifo; }
 
-  UChar getHeldBits  ()          { return m_held_bits;          }
+  uint8_t getHeldBits  ()          { return m_held_bits;          }
 
   //OutputBitstream& operator= (const OutputBitstream& src);
   /** Return a reference to the internal fifo */
   const std::vector<uint8_t>& getFIFO() const { return m_fifo; }
 
-  Void          addSubstream    ( OutputBitstream* pcSubstream );
-  Void writeByteAlignment();
+  void          addSubstream    ( OutputBitstream* pcSubstream );
+  void writeByteAlignment();
 
   //! returns the number of start code emulations contained in the current buffer
-  Int countStartCodeEmulations();
+  int countStartCodeEmulations();
 };
 
 /**
@@ -148,13 +148,13 @@ class InputBitstream
 {
 protected:
   std::vector<uint8_t> m_fifo; /// FIFO for storage of complete bytes
-  std::vector<UInt>    m_emulationPreventionByteLocation;
+  std::vector<uint32_t>    m_emulationPreventionByteLocation;
 
-  UInt m_fifo_idx; /// Read index into m_fifo
+  uint32_t m_fifo_idx; /// Read index into m_fifo
 
-  UInt m_num_held_bits;
-  UChar m_held_bits;
-  UInt  m_numBitsRead;
+  uint32_t m_num_held_bits;
+  uint8_t m_held_bits;
+  uint32_t  m_numBitsRead;
 
 public:
   /**
@@ -164,12 +164,12 @@ public:
   virtual ~InputBitstream() { }
   InputBitstream(const InputBitstream &src);
 
-  Void resetToStart();
+  void resetToStart();
 
   // interface for decoding
-  Void        pseudoRead      ( UInt uiNumberOfBits, UInt& ruiBits );
-  Void        read            ( UInt uiNumberOfBits, UInt& ruiBits );
-  Void        readByte        ( UInt &ruiBits )
+  void        pseudoRead      ( uint32_t uiNumberOfBits, uint32_t& ruiBits );
+  void        read            ( uint32_t uiNumberOfBits, uint32_t& ruiBits );
+  void        readByte        ( uint32_t &ruiBits )
   {
     CHECK( m_fifo_idx >= m_fifo.size(), "FIFO exceeded" );
     ruiBits = m_fifo[m_fifo_idx++];
@@ -178,35 +178,35 @@ public:
 #endif
   }
 
-  Void        peekPreviousByte( UInt &byte )
+  void        peekPreviousByte( uint32_t &byte )
   {
     CHECK( m_fifo_idx == 0, "FIFO empty" );
     byte = m_fifo[m_fifo_idx - 1];
   }
 
-  UInt        readOutTrailingBits ();
-  UChar getHeldBits  ()          { return m_held_bits;          }
+  uint32_t        readOutTrailingBits ();
+  uint8_t getHeldBits  ()          { return m_held_bits;          }
   OutputBitstream& operator= (const OutputBitstream& src);
-  UInt  getByteLocation              ( )                     { return m_fifo_idx                    ; }
+  uint32_t  getByteLocation              ( )                     { return m_fifo_idx                    ; }
 
   // Peek at bits in word-storage. Used in determining if we have completed reading of current bitstream and therefore slice in LCEC.
-  UInt        peekBits (UInt uiBits) { UInt tmp; pseudoRead(uiBits, tmp); return tmp; }
+  uint32_t        peekBits (uint32_t uiBits) { uint32_t tmp; pseudoRead(uiBits, tmp); return tmp; }
 
   // utility functions
-  UInt read(UInt numberOfBits)      { UInt tmp; read(numberOfBits, tmp); return tmp; }
-  UInt readByte()                   { UInt tmp; readByte( tmp ); return tmp; }
-  UInt getNumBitsUntilByteAligned() { return m_num_held_bits & (0x7); }
-  UInt getNumBitsLeft()             { return 8*((UInt)m_fifo.size() - m_fifo_idx) + m_num_held_bits; }
-  InputBitstream *extractSubstream( UInt uiNumBits ); // Read the nominated number of bits, and return as a bitstream.
-  UInt  getNumBitsRead()            { return m_numBitsRead; }
-  UInt  readByteAlignment();
+  uint32_t read(uint32_t numberOfBits)      { uint32_t tmp; read(numberOfBits, tmp); return tmp; }
+  uint32_t readByte()                   { uint32_t tmp; readByte( tmp ); return tmp; }
+  uint32_t getNumBitsUntilByteAligned() { return m_num_held_bits & (0x7); }
+  uint32_t getNumBitsLeft()             { return 8*((uint32_t)m_fifo.size() - m_fifo_idx) + m_num_held_bits; }
+  InputBitstream *extractSubstream( uint32_t uiNumBits ); // Read the nominated number of bits, and return as a bitstream.
+  uint32_t  getNumBitsRead()            { return m_numBitsRead; }
+  uint32_t  readByteAlignment();
 
-  Void      pushEmulationPreventionByteLocation ( UInt pos )                         { m_emulationPreventionByteLocation.push_back( pos ); }
-  UInt      numEmulationPreventionBytesRead     ()                                   { return (UInt) m_emulationPreventionByteLocation.size();    }
-  const std::vector<UInt> &getEmulationPreventionByteLocation  () const              { return m_emulationPreventionByteLocation;           }
-  UInt      getEmulationPreventionByteLocation  ( UInt idx )                         { return m_emulationPreventionByteLocation[ idx ];    }
-  Void      clearEmulationPreventionByteLocation()                                   { m_emulationPreventionByteLocation.clear();          }
-  Void      setEmulationPreventionByteLocation  ( const std::vector<UInt> &vec )     { m_emulationPreventionByteLocation = vec;            }
+  void      pushEmulationPreventionByteLocation ( uint32_t pos )                         { m_emulationPreventionByteLocation.push_back( pos ); }
+  uint32_t      numEmulationPreventionBytesRead     ()                                   { return (uint32_t) m_emulationPreventionByteLocation.size();    }
+  const std::vector<uint32_t> &getEmulationPreventionByteLocation  () const              { return m_emulationPreventionByteLocation;           }
+  uint32_t      getEmulationPreventionByteLocation  ( uint32_t idx )                         { return m_emulationPreventionByteLocation[ idx ];    }
+  void      clearEmulationPreventionByteLocation()                                   { m_emulationPreventionByteLocation.clear();          }
+  void      setEmulationPreventionByteLocation  ( const std::vector<uint32_t> &vec )     { m_emulationPreventionByteLocation = vec;            }
 
   const std::vector<uint8_t> &getFifo() const { return m_fifo; }
         std::vector<uint8_t> &getFifo()       { return m_fifo; }

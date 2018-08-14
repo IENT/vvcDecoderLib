@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -41,7 +41,7 @@
 #include <math.h>
 #include "ChromaFormat.h"
 
-static const Int64 CODINGSTATISTICS_ENTROPYSCALE = 32768;
+static const int64_t CODINGSTATISTICS_ENTROPYSCALE = 32768;
 
 
 enum CodingStatisticsType
@@ -109,6 +109,8 @@ enum CodingStatisticsType
   STATS__CABAC_BITS__ALIGNED_ESCAPE_BITS,
 #if JEM_TOOLS
   STATS__CABAC_BITS__OBMC_FLAG,
+#endif
+#if JVET_K0357_AMVR
   STATS__CABAC_BITS__IMV_FLAG,
 #endif
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
@@ -117,12 +119,19 @@ enum CodingStatisticsType
 #endif
   STATS__CABAC_BITS__OTHER,
   STATS__CABAC_BITS__INVALID,
+  STATS__TOOL_TOTAL_FRAME,// This is a special case and is not included in the report.
+#if JEM_TOOLS
+  STATS__TOOL_AFF,
+  STATS__TOOL_NSST,
+  STATS__TOOL_EMT,
+#endif
+  STATS__TOOL_TOTAL,
   STATS__NUM_STATS
 };
 
-static inline const TChar* getName(CodingStatisticsType name)
+static inline const char* getName(CodingStatisticsType name)
 {
-  static const TChar *statNames[]=
+  static const char *statNames[]=
   {
     "NAL_UNIT_TOTAL_BODY", // This is a special case and is not included in the total sums.
     "NAL_UNIT_PACKING",
@@ -187,6 +196,8 @@ static inline const TChar* getName(CodingStatisticsType name)
     "CABAC_BITS__ALIGNED_ESCAPE_BITS",
 #if JEM_TOOLS
     "CABAC_BITS__OBMC_FLAG",
+#endif
+#if JVET_K0357_AMVR
     "CABAC_BITS__IMV_FLAG",
 #endif
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
@@ -194,18 +205,25 @@ static inline const TChar* getName(CodingStatisticsType name)
     "CABAC_BITS__EMT_TU_INDX",
 #endif
     "CABAC_BITS__OTHER",
-    "CABAC_BITS__INVALID"
+    "CABAC_BITS__INVALID",
+    "TOOL_FRAME",
+#if JEM_TOOLS
+    "TOOL_AFF",
+    "TOOL_NSST",
+    "TOOL_EMT",
+#endif
+    "TOOL_TOTAL"
   };
-  CHECK( STATS__NUM_STATS != sizeof( statNames ) / sizeof( TChar* ) || name >= STATS__NUM_STATS, "stats out of range" );
+  CHECK( STATS__NUM_STATS != sizeof( statNames ) / sizeof( char* ) || name >= STATS__NUM_STATS, "stats out of range" );
   return statNames[name];
 }
 
-static inline Bool isAlignedBins( CodingStatisticsType statT ) { return statT == STATS__CABAC_BITS__ALIGNED_SIGN_BIT || statT == STATS__CABAC_BITS__ALIGNED_ESCAPE_BITS; }
+static inline bool isAlignedBins( CodingStatisticsType statT ) { return statT == STATS__CABAC_BITS__ALIGNED_SIGN_BIT || statT == STATS__CABAC_BITS__ALIGNED_ESCAPE_BITS; }
 
-static const UInt CODING_STATS_NUM_WIDTHS     = 20; // just define the number of widths and heigts as 15
-static const UInt CODING_STATS_NUM_HEIGHTS    = 20;
-static const UInt CODING_STATS_NUM_SIZES      = CODING_STATS_NUM_HEIGHTS * CODING_STATS_NUM_WIDTHS;
-static const UInt CODING_STATS_NUM_SUBCLASSES = CODING_STATS_NUM_SIZES * (1 + MAX_NUM_COMPONENT + MAX_NUM_CHANNEL_TYPE);
+static const uint32_t CODING_STATS_NUM_WIDTHS     = 20; // just define the number of widths and heigts as 15
+static const uint32_t CODING_STATS_NUM_HEIGHTS    = 20;
+static const uint32_t CODING_STATS_NUM_SIZES      = CODING_STATS_NUM_HEIGHTS * CODING_STATS_NUM_WIDTHS;
+static const uint32_t CODING_STATS_NUM_SUBCLASSES = CODING_STATS_NUM_SIZES * (1 + MAX_NUM_COMPONENT + MAX_NUM_CHANNEL_TYPE);
 
 class CodingStatisticsClassType
 {
@@ -215,11 +233,11 @@ public:
   {
   }
 
-  CodingStatisticsClassType( const CodingStatisticsType t, const UInt width, const UInt height ) : type( t ), subClass( gp_sizeIdxInfo->idxFrom( height ) * CODING_STATS_NUM_WIDTHS + gp_sizeIdxInfo->idxFrom( width ) )
+  CodingStatisticsClassType( const CodingStatisticsType t, const uint32_t width, const uint32_t height ) : type( t ), subClass( gp_sizeIdxInfo->idxFrom( height ) * CODING_STATS_NUM_WIDTHS + gp_sizeIdxInfo->idxFrom( width ) )
   {
   }
 
-  CodingStatisticsClassType( const CodingStatisticsType t, const Int width, const Int height ) : type( t ), subClass( gp_sizeIdxInfo->idxFrom( height ) * CODING_STATS_NUM_WIDTHS + gp_sizeIdxInfo->idxFrom( width ) )
+  CodingStatisticsClassType( const CodingStatisticsType t, const int width, const int height ) : type( t ), subClass( gp_sizeIdxInfo->idxFrom( height ) * CODING_STATS_NUM_WIDTHS + gp_sizeIdxInfo->idxFrom( width ) )
   {
   }
 
@@ -231,11 +249,11 @@ public:
   {
   }
 
-  CodingStatisticsClassType( const CodingStatisticsType t, const UInt width, const UInt height, const ComponentID cid ) : type( t ), subClass( ( cid + 1 ) * CODING_STATS_NUM_SIZES + gp_sizeIdxInfo->idxFrom( height ) * CODING_STATS_NUM_WIDTHS + gp_sizeIdxInfo->idxFrom( width ) )
+  CodingStatisticsClassType( const CodingStatisticsType t, const uint32_t width, const uint32_t height, const ComponentID cid ) : type( t ), subClass( ( cid + 1 ) * CODING_STATS_NUM_SIZES + gp_sizeIdxInfo->idxFrom( height ) * CODING_STATS_NUM_WIDTHS + gp_sizeIdxInfo->idxFrom( width ) )
   {
   }
 
-  CodingStatisticsClassType( const CodingStatisticsType t, const UInt width, const UInt height, const ChannelType chid ) : type( t ), subClass( ( chid + MAX_NUM_COMPONENT + 1 ) * CODING_STATS_NUM_SIZES + gp_sizeIdxInfo->idxFrom( height ) * CODING_STATS_NUM_WIDTHS + gp_sizeIdxInfo->idxFrom( width ) )
+  CodingStatisticsClassType( const CodingStatisticsType t, const uint32_t width, const uint32_t height, const ChannelType chid ) : type( t ), subClass( ( chid + MAX_NUM_COMPONENT + 1 ) * CODING_STATS_NUM_SIZES + gp_sizeIdxInfo->idxFrom( height ) * CODING_STATS_NUM_WIDTHS + gp_sizeIdxInfo->idxFrom( width ) )
   {
   }
 
@@ -246,25 +264,25 @@ public:
     subClass = 0;
   }
 
-  static UInt GetSubClassWidth( const UInt subClass )
+  static uint32_t GetSubClassWidth( const uint32_t subClass )
   {
     return subClass % CODING_STATS_NUM_WIDTHS;
   }
 
-  static UInt GetSubClassHeight( const UInt subClass )
+  static uint32_t GetSubClassHeight( const uint32_t subClass )
   {
     return ( subClass % CODING_STATS_NUM_SIZES ) / CODING_STATS_NUM_WIDTHS;
   }
 
-  static const TChar *GetSubClassString( const UInt subClass )
+  static const char *GetSubClassString( const uint32_t subClass )
   {
     CHECK( subClass >= CODING_STATS_NUM_SUBCLASSES, "Subclass does not exist" );
-    static const TChar *strings[1 + MAX_NUM_COMPONENT + MAX_NUM_CHANNEL_TYPE] = { "-", "Y", "Cb", "Cr", "Luma", "Chroma" };
+    static const char *strings[1 + MAX_NUM_COMPONENT + MAX_NUM_CHANNEL_TYPE] = { "-", "Y", "Cb", "Cr", "Luma", "Chroma" };
     return strings[subClass / CODING_STATS_NUM_SIZES];
   }
 
   CodingStatisticsType type;
-  UInt subClass;
+  uint32_t subClass;
 };
 
 
@@ -275,16 +293,16 @@ public:
 
   struct StatLogValue
   {
-    UInt values[512 + 1];
+    uint32_t values[512 + 1];
     StatLogValue()
     {
-      const Double es = Double( CODINGSTATISTICS_ENTROPYSCALE );
+      const double es = double( CODINGSTATISTICS_ENTROPYSCALE );
 
       values[0] = 0;
 
-      for( UInt i = 1; i < sizeof( values ) / sizeof( UInt ); i++ )
+      for( uint32_t i = 1; i < sizeof( values ) / sizeof( uint32_t ); i++ )
       {
-        values[i] = UInt( log( Double( i ) )*es / log( 2.0 ) );
+        values[i] = uint32_t( log( double( i ) )*es / log( 2.0 ) );
       }
     }
   };
@@ -293,12 +311,12 @@ public:
   {
     SStat() : bits( 0 ), count( 0 ), sum( 0 ), classCount( 0 ) { }
 
-    Int64 bits;
-    Int64 count;
-    Int64 sum;
-    Int64 classCount;
+    int64_t bits;
+    int64_t count;
+    int64_t sum;
+    int64_t classCount;
 
-    Void clear() { bits = 0; count = 0; sum = 0; classCount = 0; }
+    void clear() { bits = 0; count = 0; sum = 0; classCount = 0; }
 
     SStat &operator+=( const SStat &src )
     {
@@ -306,11 +324,28 @@ public:
     }
   };
 
+  struct StatTool
+  {
+    StatTool() : count( 0 ), pixels( 0 ), classCount( 0 ) { }
+
+    int64_t  count;
+    int64_t  pixels;
+    int64_t  classCount;
+
+    void clear() { count = 0; pixels = 0; classCount = 0; }
+
+    StatTool &operator+=( const StatTool &src )
+    {
+      count += src.count; pixels += src.pixels; classCount += src.classCount; return *this;
+    }
+  };
+
   class CodingStatisticsData
   {
   private:
-    SStat statistics    [STATS__NUM_STATS + 1][CODING_STATS_NUM_SUBCLASSES];
-    SStat statistics_ep [STATS__NUM_STATS + 1][CODING_STATS_NUM_SUBCLASSES];
+    SStat statistics         [STATS__NUM_STATS + 1][CODING_STATS_NUM_SUBCLASSES];
+    SStat statistics_ep      [STATS__NUM_STATS + 1][CODING_STATS_NUM_SUBCLASSES];
+    StatTool statistics_tool [STATS__NUM_STATS + 1][CODING_STATS_NUM_SUBCLASSES];
     std::map<std::string, SStat> mappings_ep;
     friend class CodingStatistics;
   };
@@ -323,7 +358,7 @@ private:
   {
   }
 
-  static Void OutputLine( const TChar *pName, const TChar sep, UInt wIdx, UInt hIdx, const TChar *pSubClassStr, const SStat &sCABAC, const SStat &sEP )
+  static void OutputLine( const char *pName, const char sep, uint32_t wIdx, uint32_t hIdx, const char *pSubClassStr, const SStat &sCABAC, const SStat &sEP )
   {
     if( wIdx == 0 && hIdx == 0 )
     {
@@ -334,8 +369,8 @@ private:
       printf( "%c%-45s%c  %6d %6d %6s ", sep == '~' ? '[' : ' ', pName, sep, gp_sizeIdxInfo->sizeFrom( wIdx ), gp_sizeIdxInfo->sizeFrom( hIdx ), pSubClassStr );
       if( sCABAC.count > 0 )
       {
-        const Double quote = 100.0 * sCABAC.count / ( Double ) sCABAC.classCount;
-        const Double ratio = 100.0 * sCABAC.bits / ( Double ) sCABAC.count;
+        const double quote = 100.0 * sCABAC.count / ( double ) sCABAC.classCount;
+        const double ratio = 100.0 * sCABAC.bits / ( double ) sCABAC.count;
         printf( "%11.2f%% %12lld %12lld %12lld %11.2f%%", quote, sCABAC.count, sCABAC.sum, sCABAC.bits, ratio );
       }
       else
@@ -345,13 +380,13 @@ private:
       printf( " %12lld %12lld %12lld %12lld (%12lld)%c\n", sEP.count, sEP.sum, sEP.bits, sCABAC.bits + sEP.bits, ( sCABAC.bits + sEP.bits ) / 8, sep == '~' ? ']' : ' ' );
     }
   }
-  static Void OutputLine( const TChar *pName, const TChar sep, const TChar *pWidthString, const TChar *pHeightString, const TChar *pSubClassStr, const SStat &sCABAC, const SStat &sEP )
+  static void OutputLine( const char *pName, const char sep, const char *pWidthString, const char *pHeightString, const char *pSubClassStr, const SStat &sCABAC, const SStat &sEP )
   {
     printf( "%c%-45s%c  %6s %6s %6s ", sep == '~' ? '[' : ' ', pName, sep, pWidthString, pHeightString, pSubClassStr );
     if( sCABAC.count > 0 )
     {
-      const Double quote = 100.0 * sCABAC.count / ( Double ) sCABAC.classCount;
-      const Double ratio = 100.0 * sCABAC.bits / ( Double ) sCABAC.count;
+      const double quote = 100.0 * sCABAC.count / ( double ) sCABAC.classCount;
+      const double ratio = 100.0 * sCABAC.bits / ( double ) sCABAC.count;
       printf( "%11.2f%% %12lld %12lld %12lld %11.2f%%", quote, sCABAC.count, sCABAC.sum, sCABAC.bits, ratio );
     }
     else
@@ -360,17 +395,33 @@ private:
     }
     printf( " %12lld %12lld %12lld %12lld (%12lld)%c\n", sEP.count, sEP.sum, sEP.bits, sCABAC.bits + sEP.bits, ( sCABAC.bits + sEP.bits ) / 8, sep == '~' ? ']' : ' ' );
   }
-  static Void OutputLine( const TChar *pName, const TChar sep, const TChar *pWidthString, const TChar *pHeightString, const TChar *pSubClassStr, const SStat &sEP )
+  static void OutputLine( const char *pName, const char sep, const char *pWidthString, const char *pHeightString, const char *pSubClassStr, const SStat &sEP )
   {
     printf( "%c%-45s%c  %6s %6s %6s          -/- %12s %12s %12s %9s-/- %12lld %12lld %12lld %12lld (%12lld)%c\n",
             sep == '~' ? '[' : ' ', pName, sep, pWidthString, pHeightString, pSubClassStr,
             "", "", "", "", sEP.count, sEP.sum, sEP.bits, sEP.bits, ( sEP.bits ) / 8, sep == '~' ? ']' : ' ' );
   }
 
-  static Void OutputDashedLine( const TChar *pText )
+  static void OutputLine( const char *pName, const char sep, const char *pWidthString, const char *pHeightString, const char *pSubClassStr, const StatTool &sTool, uint64_t totalPixels )
+  {
+    const double ratio = 100.0 * sTool.pixels / ( double ) totalPixels;
+    printf( "%c%-45s%c  %6s %6s %6s %12lld     %12lld       %11.2f%%%c\n",
+            sep == '~' ? '[' : ' ', pName, sep, pWidthString, pHeightString, pSubClassStr,
+            sTool.count, sTool.pixels, ratio, sep == '~' ? ']' : ' ' );
+  }
+
+  static void OutputLine( const char *pName, const char sep, uint32_t wIdx, uint32_t hIdx, const char *pSubClassStr, const StatTool &sTool, uint64_t totalPixels )
+  {
+    const double ratio = 100.0 * sTool.pixels / ( double ) totalPixels;
+    printf( "%c%-45s%c  %6d %6d %6s %12lld     %12lld       %11.2f%%%c\n",
+            sep == '~' ? '[' : ' ', pName, sep, gp_sizeIdxInfo->sizeFrom( wIdx ), gp_sizeIdxInfo->sizeFrom( hIdx ), pSubClassStr,
+            sTool.count, sTool.pixels, ratio, sep == '~' ? ']' : ' ' );
+  }
+
+  static void OutputDashedLine( const char *pText )
   {
     printf( "--%s", pText );
-    UInt tot = 0;
+    uint32_t tot = 0;
     for( ; pText[tot] != 0; tot++ );
 
     tot += 2;
@@ -385,27 +436,28 @@ public:
 
   ~CodingStatistics()
   {
-    const Int64 es = CODINGSTATISTICS_ENTROPYSCALE;
+#if RExt__DECODER_DEBUG_BIT_STATISTICS
+    const int64_t es = CODINGSTATISTICS_ENTROPYSCALE;
 
-    Int64 countTotal = 0;
-    Int64 classCounts[STATS__NUM_STATS];
+    int64_t countTotal = 0;
+    int64_t classCounts[STATS__NUM_STATS];
     std::fill_n( classCounts, ( size_t ) STATS__NUM_STATS, 0 );
 
-    Int64 cr = 0; // CABAC remainder, which is added to "STATS__CABAC_INITIALISATION"
+    int64_t cr = 0; // CABAC remainder, which is added to "STATS__CABAC_INITIALISATION"
     {
-      Int64 totalCABACbits = 0, roundedCABACbits = 0;
-      for( Int i = STATS__NAL_UNIT_PACKING; i < STATS__NUM_STATS; i++ )
+      int64_t totalCABACbits = 0, roundedCABACbits = 0;
+      for( int i = STATS__NAL_UNIT_PACKING; i < STATS__NUM_STATS; i++ )
       {
-        Int64 classCount = 0;
+        int64_t classCount = 0;
 
-        for( UInt c = 0; c < CODING_STATS_NUM_SUBCLASSES; c++ )
+        for( uint32_t c = 0; c < CODING_STATS_NUM_SUBCLASSES; c++ )
         {
           totalCABACbits    += data.statistics[i][c].bits;
           roundedCABACbits  += data.statistics[i][c].bits / es;
           classCount        += data.statistics[i][c].count;
         }
 
-        for( UInt c = 0; c < CODING_STATS_NUM_SUBCLASSES; c++ )
+        for( uint32_t c = 0; c < CODING_STATS_NUM_SUBCLASSES; c++ )
         {
           data.statistics[i][c].classCount = classCount;
         }
@@ -413,7 +465,7 @@ public:
         classCounts[i] = classCount;
         countTotal    += classCount;
       }
-      Int64 remainder = totalCABACbits - roundedCABACbits * es;
+      int64_t remainder = totalCABACbits - roundedCABACbits * es;
       cr = ( remainder + es / 2 ) / es;
     }
 
@@ -431,16 +483,16 @@ public:
     SStat statTotals_cabac[CODING_STATS_NUM_SUBCLASSES];
     SStat statTotals_ep   [CODING_STATS_NUM_SUBCLASSES];
 
-    for( Int i = 0; i < STATS__NUM_STATS; i++ )
+    for( int i = 0; i < STATS__NUM_STATS; i++ )
     {
       SStat cabacSubTotal, epSubTotal;
       cabacSubTotal.classCount = classCounts[i];
       epSubTotal   .classCount = classCounts[i];
-      Bool bHadClassifiedEntry = false;
+      bool bHadClassifiedEntry = false;
 
-      const TChar *pName = getName( CodingStatisticsType( i ) );
+      const char *pName = getName( CodingStatisticsType( i ) );
 
-      for( UInt c = 0; c < CODING_STATS_NUM_SUBCLASSES; c++ )
+      for( uint32_t c = 0; c < CODING_STATS_NUM_SUBCLASSES; c++ )
       {
         SStat &sCABACorig = data.statistics[i][c];
         SStat &sEP        = data.statistics_ep[i][c];
@@ -452,7 +504,7 @@ public:
 
         SStat sCABAC;
         {
-          Int64 thisCABACbits = sCABACorig.bits / es;
+          int64_t thisCABACbits = sCABACorig.bits / es;
           if( i == STATS__CABAC_INITIALISATION && sCABACorig.bits != 0 )
           {
             thisCABACbits += cr;
@@ -463,8 +515,8 @@ public:
           sCABAC.sum        = sCABACorig.sum;
           sCABAC.classCount = classCounts[i];
         }
-        UInt wIdx = CodingStatisticsClassType::GetSubClassWidth( c );
-        UInt hIdx = CodingStatisticsClassType::GetSubClassHeight( c );
+        uint32_t wIdx = CodingStatisticsClassType::GetSubClassWidth( c );
+        uint32_t hIdx = CodingStatisticsClassType::GetSubClassHeight( c );
         OutputLine( pName, ':', wIdx, hIdx, CodingStatisticsClassType::GetSubClassString( c ), sCABAC, sEP );
         cabacSubTotal += sCABAC;
         epSubTotal    += sEP;
@@ -507,12 +559,12 @@ public:
 
     // Now output the breakdowns
     OutputDashedLine( "CABAC Break down by size" );
-    for( UInt w = 0; w < CODING_STATS_NUM_WIDTHS; w++ )
+    for( uint32_t w = 0; w < CODING_STATS_NUM_WIDTHS; w++ )
     {
-      for( UInt h = 0; h < CODING_STATS_NUM_HEIGHTS; h++ )
+      for( uint32_t h = 0; h < CODING_STATS_NUM_HEIGHTS; h++ )
       {
         SStat subTotalCabac, subTotalEP;
-        for( UInt c = 0; c < CODING_STATS_NUM_SUBCLASSES; c += CODING_STATS_NUM_SIZES )
+        for( uint32_t c = 0; c < CODING_STATS_NUM_SUBCLASSES; c += CODING_STATS_NUM_SIZES )
         {
           subTotalCabac += statTotals_cabac[c + h * CODING_STATS_NUM_WIDTHS + w];
           subTotalEP    += statTotals_ep   [c + h * CODING_STATS_NUM_WIDTHS + w];
@@ -524,12 +576,12 @@ public:
       }
     }
     OutputDashedLine( "Break down by component/Channel type" );
-    for( UInt c = 0; c < CODING_STATS_NUM_SUBCLASSES; c += CODING_STATS_NUM_SIZES )
+    for( uint32_t c = 0; c < CODING_STATS_NUM_SUBCLASSES; c += CODING_STATS_NUM_SIZES )
     {
       SStat subTotalCabac, subTotalEP;
-      for( UInt w = 0; w < CODING_STATS_NUM_WIDTHS; w++ )
+      for( uint32_t w = 0; w < CODING_STATS_NUM_WIDTHS; w++ )
       {
-        for( UInt h = 0; h < CODING_STATS_NUM_HEIGHTS; h++ )
+        for( uint32_t h = 0; h < CODING_STATS_NUM_HEIGHTS; h++ )
         {
           subTotalCabac += statTotals_cabac[c + h * CODING_STATS_NUM_WIDTHS + w];
           subTotalEP    += statTotals_ep   [c + h * CODING_STATS_NUM_WIDTHS + w];
@@ -541,11 +593,11 @@ public:
       }
     }
     OutputDashedLine( "Break down by size and component/Channel type" );
-    for( UInt c = 0; c < CODING_STATS_NUM_SUBCLASSES; c += CODING_STATS_NUM_SIZES )
+    for( uint32_t c = 0; c < CODING_STATS_NUM_SUBCLASSES; c += CODING_STATS_NUM_SIZES )
     {
-      for( UInt w = 0; w < CODING_STATS_NUM_WIDTHS; w++ )
+      for( uint32_t w = 0; w < CODING_STATS_NUM_WIDTHS; w++ )
       {
-        for( UInt h = 0; h < CODING_STATS_NUM_HEIGHTS; h++ )
+        for( uint32_t h = 0; h < CODING_STATS_NUM_HEIGHTS; h++ )
         {
           SStat subTotalCabac, subTotalEP;
           subTotalCabac += statTotals_cabac[c + h * CODING_STATS_NUM_WIDTHS + w];
@@ -566,9 +618,73 @@ public:
     OutputDashedLine( "GRAND TOTAL" );
     epTotalBits += cavlcTotalBits;
     OutputLine      ( "TOTAL",                  '~', "~~GT~~", "~~GT~~", "~~GT~~", cabacTotalBits, epTotalBits );
+#endif //RExt__DECODER_DEBUG_BIT_STATISTICS
+
+#ifdef RExt__DECODER_DEBUG_TOOL_STATISTICS
+#if JEM_TOOLS
+    printf("\n");
+    printf( " %-45s-   Width Height   Type        Count  Impacted pixels  %% Impacted pixels\n", "Tools statistics" );
+    OutputDashedLine( "" );
+
+    const uint64_t toolCount = STATS__TOOL_TOTAL - (STATS__TOOL_TOTAL_FRAME + 1);
+    StatTool subTotalTool[toolCount];
+    StatTool statTotalTool[toolCount][CODING_STATS_NUM_SUBCLASSES];
+    uint64_t totalPixels = GetStatisticTool( STATS__TOOL_TOTAL_FRAME ).pixels;
+    for( int i = 0; i < toolCount; i++ )
+    {
+      const int type = i + (STATS__TOOL_TOTAL_FRAME + 1);
+      const char *pName = getName( CodingStatisticsType( type ) );
+
+      for( uint32_t c = 0; c < CODING_STATS_NUM_SUBCLASSES; c++ )
+      {
+        StatTool &sTool   = data.statistics_tool[type][c];
+        if( sTool.count == 0 )
+        {
+          continue;
+        }
+
+        uint32_t wIdx = CodingStatisticsClassType::GetSubClassWidth( c );
+        uint32_t hIdx = CodingStatisticsClassType::GetSubClassHeight( c );
+        OutputLine( pName, ':', wIdx, hIdx, CodingStatisticsClassType::GetSubClassString( c ), sTool, totalPixels );
+
+        statTotalTool[i][c] += sTool;
+        subTotalTool[i] += sTool;
+      }
+
+      if (subTotalTool[i].count != 0)
+      {
+        OutputLine( pName, '~', "~~ST~~", "~~ST~~", "~~ST~~", subTotalTool[i], totalPixels );
+      }
+    }
+
+    for( int i = 0; i < toolCount; i++ )
+    {
+      const int type = i + (STATS__TOOL_TOTAL_FRAME + 1);
+      const char *pName = getName( CodingStatisticsType( type ) );
+
+      if (subTotalTool[i].count != 0)
+        OutputDashedLine( "Break down by tool/Channel type" );
+
+      for( uint32_t c = 0; c < CODING_STATS_NUM_SUBCLASSES; c += CODING_STATS_NUM_SIZES )
+      {
+        StatTool typeTotalTool;
+        for( uint32_t w = 0; w < CODING_STATS_NUM_WIDTHS; w++ )
+        {
+          for( uint32_t h = 0; h < CODING_STATS_NUM_HEIGHTS; h++ )
+            typeTotalTool += statTotalTool[i][c + h * CODING_STATS_NUM_WIDTHS + w];
+        }
+
+        if( typeTotalTool.count != 0 )
+        {
+          OutputLine( pName, '=', "-", "-", CodingStatisticsClassType::GetSubClassString( c ), typeTotalTool, totalPixels );
+        }
+      }
+    }
+#endif //JEM_TOOLS
+#endif //RExt__DECODER_DEBUG_TOOL_STATISTICS
   }
 
-  static CodingStatistics& GetSingletonInstance()
+   static CodingStatistics& GetSingletonInstance()
   {
     static CodingStatistics* inst = nullptr;
     if( !inst )
@@ -587,15 +703,17 @@ public:
 
   static const CodingStatisticsData &GetStatistics()                        { return GetSingletonInstance().data; }
 
-  static Void SetStatistics       ( const CodingStatisticsData &src )       { GetSingletonInstance().data = src; }
+  static void SetStatistics       ( const CodingStatisticsData &src )       { GetSingletonInstance().data = src; }
 
   static SStat &GetStatisticEP    ( const CodingStatisticsClassType &stat ) { return GetSingletonInstance().data.statistics_ep[stat.type][stat.subClass]; }
 
   static SStat &GetStatisticEP    ( const std::string &str )                { return GetSingletonInstance().data.mappings_ep[str]; }
 
-  static SStat &GetStatisticEP    ( const TChar *pKey )                     { return GetStatisticEP( std::string( pKey ) ); }
+  static SStat &GetStatisticEP    ( const char *pKey )                     { return GetStatisticEP( std::string( pKey ) ); }
 
-  static int getNumOnes( Int bins )
+  static StatTool &GetStatisticTool ( const CodingStatisticsClassType &stat ) { return GetSingletonInstance().data.statistics_tool[stat.type][stat.subClass]; }
+
+  static int getNumOnes( int bins )
   {
     CHECK( bins < 0, "Bins should not be nagative" );
 
@@ -608,7 +726,7 @@ public:
     return count;
   }
 
-  static Void IncrementStatisticEP( const CodingStatisticsClassType &stat, const Int numBits, const Int value )
+  static void IncrementStatisticEP( const CodingStatisticsClassType &stat, const int numBits, const int value )
   {
     CHECK( stat.type == STATS__CABAC_BITS__INVALID, "Should never be used." );
     SStat &s = GetStatisticEP( stat );
@@ -617,7 +735,7 @@ public:
     s.sum   += getNumOnes( value );
   }
 
-  static Void IncrementStatisticEP( const std::string &str, const Int numBits, const Int value )
+  static void IncrementStatisticEP( const std::string &str, const int numBits, const int value )
   {
     SStat &s = GetStatisticEP( str );
     s.bits  += numBits;
@@ -625,7 +743,7 @@ public:
     s.sum   += getNumOnes( value );
   }
 
-  static Void IncrementStatisticEP( const TChar *pKey, const Int numBits, const Int value )
+  static void IncrementStatisticEP( const char *pKey, const int numBits, const int value )
   {
     SStat &s = GetStatisticEP( pKey );
     s.bits  += numBits;
@@ -633,9 +751,21 @@ public:
     s.sum   += getNumOnes( value );
   }
 
+  static void IncrementStatisticTool( const CodingStatisticsClassType &stat )
+  {
+    CHECK( stat.type < STATS__TOOL_TOTAL_FRAME || stat.type >= STATS__TOOL_TOTAL, "Should never be used." );
+    StatTool &s = GetStatisticTool( stat );
+    s.count++;
+
+    uint32_t wIdx = CodingStatisticsClassType::GetSubClassWidth( stat.subClass );
+    uint32_t hIdx = CodingStatisticsClassType::GetSubClassHeight( stat.subClass );
+
+    s.pixels = s.count * gp_sizeIdxInfo->sizeFrom( wIdx ) * gp_sizeIdxInfo->sizeFrom( hIdx );
+  }
+
   StatLogValue values;
 
-  static Void UpdateCABACStat( const CodingStatisticsClassType &stat, UInt uiRangeBefore, UInt uiRangeAfter, Int val )
+  static void UpdateCABACStat( const CodingStatisticsClassType &stat, uint32_t uiRangeBefore, uint32_t uiRangeAfter, int val )
   {
     CHECK( stat.type == STATS__CABAC_BITS__INVALID, "Should never be used." );
     CodingStatistics &inst = GetSingletonInstance();

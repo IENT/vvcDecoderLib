@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -129,7 +129,7 @@ void AffineGradientSearch::xVerticalSobelFilter( Pel *const pPred, const int pre
   }
 }
 
-void AffineGradientSearch::xEqualCoeffComputer( Pel *pResidue, int residueStride, int **ppDerivate, int derivateBufStride, Int64( *pEqualCoeff )[7], int width, int height, bool b6Param )
+void AffineGradientSearch::xEqualCoeffComputer( Pel *pResidue, int residueStride, int **ppDerivate, int derivateBufStride, int64_t( *pEqualCoeff )[7], int width, int height, bool b6Param )
 {
   int affineParamNum = b6Param ? 6 : 4;
 
@@ -160,9 +160,9 @@ void AffineGradientSearch::xEqualCoeffComputer( Pel *pResidue, int residueStride
       {
         for ( int row = 0; row < affineParamNum; row++ )
         {
-          pEqualCoeff[col + 1][row] += (Int64)iC[col] * iC[row];
+          pEqualCoeff[col + 1][row] += (int64_t)iC[col] * iC[row];
         }
-        pEqualCoeff[col + 1][affineParamNum] += ((Int64)iC[col] * pResidue[idx]) << 3;
+        pEqualCoeff[col + 1][affineParamNum] += ((int64_t)iC[col] * pResidue[idx]) << 3;
       }
     }
   }

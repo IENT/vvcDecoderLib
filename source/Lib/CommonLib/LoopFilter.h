@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -76,11 +76,11 @@ private:
                                     const bool            bValue,
                                     const bool            EdgeIdx = false );
 #if JEM_TOOLS
-  Void xSetEdgefilterMultipleSubPu( const CodingUnit&    cu,
+  void xSetEdgefilterMultipleSubPu( const CodingUnit&    cu,
                                           DeblockEdgeDir edgeDir,
                                     const Area&          area,
                                     const Position       subPuPos,
-                                          Bool           bValue );
+                                          bool           bValue );
 #endif
 
   void xEdgeFilterLuma            ( const CodingUnit& cu, const DeblockEdgeDir edgeDir, const int iEdge );
@@ -93,11 +93,11 @@ private:
   inline int xCalcDP              ( Pel* piSrc, const int iOffset ) const;
   inline int xCalcDQ              ( Pel* piSrc, const int iOffset ) const;
 #if JVET_K0251_QP_EXT
-  static const UChar sm_tcTable[MAX_QP + 3];
-  static const UChar sm_betaTable[MAX_QP + 1];
+  static const uint8_t sm_tcTable[MAX_QP + 3];
+  static const uint8_t sm_betaTable[MAX_QP + 1];
 #else
-  static const UChar sm_tcTable[54];
-  static const UChar sm_betaTable[52];
+  static const uint8_t sm_tcTable[54];
+  static const uint8_t sm_betaTable[52];
 #endif
 
 public:

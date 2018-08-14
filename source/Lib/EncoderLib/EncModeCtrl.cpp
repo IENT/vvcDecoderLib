@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,7 @@
 
 #include <cmath>
 
-Void EncModeCtrl::init( EncCfg *pCfg, RateCtrl *pRateCtrl, RdCost* pRdCost )
+void EncModeCtrl::init( EncCfg *pCfg, RateCtrl *pRateCtrl, RdCost* pRdCost )
 {
   m_pcEncCfg      = pCfg;
   m_pcRateCtrl    = pRateCtrl;
@@ -81,16 +81,16 @@ void EncModeCtrl::setEarlySkipDetected()
   m_ComprCUCtxList.back().earlySkip = true;
 }
 
-Void EncModeCtrl::xExtractFeatures( const EncTestMode encTestmode, CodingStructure& cs )
+void EncModeCtrl::xExtractFeatures( const EncTestMode encTestmode, CodingStructure& cs )
 {
   CHECK( cs.features.size() < NUM_ENC_FEATURES, "Features vector is not initialized" );
 
-  cs.features[ENC_FT_DISTORTION     ] = Double( cs.dist              );
-  cs.features[ENC_FT_FRAC_BITS      ] = Double( cs.fracBits          );
-  cs.features[ENC_FT_RD_COST        ] = Double( cs.cost              );
-  cs.features[ENC_FT_ENC_MODE_TYPE  ] = Double( encTestmode.type     );
-  cs.features[ENC_FT_ENC_MODE_OPTS  ] = Double( encTestmode.opts     );
-  cs.features[ENC_FT_ENC_MODE_PART  ] = Double( encTestmode.partSize );
+  cs.features[ENC_FT_DISTORTION     ] = double( cs.dist              );
+  cs.features[ENC_FT_FRAC_BITS      ] = double( cs.fracBits          );
+  cs.features[ENC_FT_RD_COST        ] = double( cs.cost              );
+  cs.features[ENC_FT_ENC_MODE_TYPE  ] = double( encTestmode.type     );
+  cs.features[ENC_FT_ENC_MODE_OPTS  ] = double( encTestmode.opts     );
+  cs.features[ENC_FT_ENC_MODE_PART  ] = double( encTestmode.partSize );
 }
 
 bool EncModeCtrl::nextMode( const CodingStructure &cs, Partitioner &partitioner )
@@ -157,13 +157,13 @@ void EncModeCtrl::xGetMinMaxQP( int& minQP, int& maxQP, const CodingStructure& c
     return;
   }
 
-  const UInt currDepth = partitioner.currDepth;
+  const uint32_t currDepth = partitioner.currDepth;
 
   if( !splitMode )
   {
     if( currDepth <= pps.getMaxCuDQPDepth() )
     {
-      Int deltaQP = m_pcEncCfg->getMaxDeltaQP();
+      int deltaQP = m_pcEncCfg->getMaxDeltaQP();
       minQP = Clip3( -sps.getQpBDOffset( CHANNEL_TYPE_LUMA ), MAX_QP, baseQP - deltaQP );
       maxQP = Clip3( -sps.getQpBDOffset( CHANNEL_TYPE_LUMA ), MAX_QP, baseQP + deltaQP );
     }
@@ -185,7 +185,7 @@ void EncModeCtrl::xGetMinMaxQP( int& minQP, int& maxQP, const CodingStructure& c
   {
     if( currDepth == pps.getMaxCuDQPDepth() )
     {
-      Int deltaQP = m_pcEncCfg->getMaxDeltaQP();
+      int deltaQP = m_pcEncCfg->getMaxDeltaQP();
       minQP = Clip3( -sps.getQpBDOffset( CHANNEL_TYPE_LUMA ), MAX_QP, baseQP - deltaQP );
       maxQP = Clip3( -sps.getQpBDOffset( CHANNEL_TYPE_LUMA ), MAX_QP, baseQP + deltaQP );
     }
@@ -214,7 +214,7 @@ void EncModeCtrl::xGetMinMaxQP( int& minQP, int& maxQP, const CodingStructure& c
 int EncModeCtrl::xComputeDQP( const CodingStructure &cs, const Partitioner &partitioner )
 {
   Picture* picture    = cs.picture;
-  unsigned uiAQDepth  = std::min( partitioner.currDepth, ( UInt ) picture->aqlayer.size() - 1 );
+  unsigned uiAQDepth  = std::min( partitioner.currDepth, ( uint32_t ) picture->aqlayer.size() - 1 );
   AQpLayer* pcAQLayer = picture->aqlayer[uiAQDepth];
 
   double dMaxQScale   = pow( 2.0, m_pcEncCfg->getQPAdaptationRange() / 6.0 );
@@ -222,13 +222,13 @@ int EncModeCtrl::xComputeDQP( const CodingStructure &cs, const Partitioner &part
   double dCUAct       = pcAQLayer->getActivity( cs.area.Y().topLeft() );
   double dNormAct     = ( dMaxQScale*dCUAct + dAvgAct ) / ( dCUAct + dMaxQScale*dAvgAct );
   double dQpOffset    = log( dNormAct ) / log( 2.0 ) * 6.0;
-  int    iQpOffset    = Int( floor( dQpOffset + 0.49999 ) );
+  int    iQpOffset    = int( floor( dQpOffset + 0.49999 ) );
   return iQpOffset;
 }
 
 
 #if SHARP_LUMA_DELTA_QP
-Void EncModeCtrl::initLumaDeltaQpLUT()
+void EncModeCtrl::initLumaDeltaQpLUT()
 {
   const LumaLevelToDeltaQPMapping &mapping = m_pcEncCfg->getLumaLevelToDeltaQPMapping();
 
@@ -239,9 +239,9 @@ Void EncModeCtrl::initLumaDeltaQpLUT()
 
   // map the sparse LumaLevelToDeltaQPMapping.mapping to a fully populated linear table.
 
-  Int         lastDeltaQPValue = 0;
+  int         lastDeltaQPValue = 0;
   std::size_t nextSparseIndex = 0;
-  for( Int index = 0; index < LUMA_LEVEL_TO_DQP_LUT_MAXSIZE; index++ )
+  for( int index = 0; index < LUMA_LEVEL_TO_DQP_LUT_MAXSIZE; index++ )
   {
     while( nextSparseIndex < mapping.mapping.size() && index >= mapping.mapping[nextSparseIndex].first )
     {
@@ -252,9 +252,9 @@ Void EncModeCtrl::initLumaDeltaQpLUT()
   }
 }
 
-Int EncModeCtrl::calculateLumaDQP( const CPelBuf& rcOrg )
+int EncModeCtrl::calculateLumaDQP( const CPelBuf& rcOrg )
 {
-  Double avg = 0;
+  double avg = 0;
 
   // Get QP offset derived from Luma level
 #if !WCG_EXT
@@ -264,24 +264,24 @@ Int EncModeCtrl::calculateLumaDQP( const CPelBuf& rcOrg )
 #endif
   {
     // Use avg method
-    Int sum = 0;
-    for( UInt y = 0; y < rcOrg.height; y++ )
+    int sum = 0;
+    for( uint32_t y = 0; y < rcOrg.height; y++ )
     {
-      for( UInt x = 0; x < rcOrg.width; x++ )
+      for( uint32_t x = 0; x < rcOrg.width; x++ )
       {
         sum += rcOrg.at( x, y );
       }
     }
-    avg = ( Double ) sum / rcOrg.area();
+    avg = ( double ) sum / rcOrg.area();
   }
 #if !WCG_EXT
   else
   {
     // Use maximum luma value
-    Int maxVal = 0;
-    for( UInt y = 0; y < rcOrg.height; y++ )
+    int maxVal = 0;
+    for( uint32_t y = 0; y < rcOrg.height; y++ )
     {
-      for( UInt x = 0; x < rcOrg.width; x++ )
+      for( uint32_t x = 0; x < rcOrg.width; x++ )
       {
         const Pel& v = rcOrg.at( x, y );
         if( v > maxVal )
@@ -291,11 +291,11 @@ Int EncModeCtrl::calculateLumaDQP( const CPelBuf& rcOrg )
       }
     }
     // use a percentage of the maxVal
-    avg = ( Double ) maxVal * m_pcEncCfg->getLumaLevelToDeltaQPMapping().maxMethodWeight;
+    avg = ( double ) maxVal * m_pcEncCfg->getLumaLevelToDeltaQPMapping().maxMethodWeight;
   }
 #endif
-  Int lumaIdx = Clip3<Int>( 0, Int( LUMA_LEVEL_TO_DQP_LUT_MAXSIZE ) - 1, Int( avg + 0.5 ) );
-  Int QP = m_lumaLevelToDeltaQPLUT[lumaIdx];
+  int lumaIdx = Clip3<int>( 0, int( LUMA_LEVEL_TO_DQP_LUT_MAXSIZE ) - 1, int( avg + 0.5 ) );
+  int QP = m_lumaLevelToDeltaQPLUT[lumaIdx];
   return QP;
 }
 #endif
@@ -964,7 +964,7 @@ void EncModeCtrlMTnoRQT::destroy()
 }
 
 #endif
-Void EncModeCtrlMTnoRQT::initCTUEncoding( const Slice &slice )
+void EncModeCtrlMTnoRQT::initCTUEncoding( const Slice &slice )
 {
   CacheBlkInfoCtrl::init( slice );
 #if REUSE_CU_RESULTS
@@ -1053,9 +1053,11 @@ void EncModeCtrlMTnoRQT::initCULevel( Partitioner &partitioner, const CodingStru
   cuECtx.set( SAVE_LOAD_TAG,        sls.partIdx == cuECtx.partIdx  ? sls.tag  : SAVE_LOAD_INIT );
   cuECtx.set( HISTORY_NEED_TO_SAVE, m_pcEncCfg->getUseSaveLoadEncInfo() && cs.area.lwidth() > ( 1 << MIN_CU_LOG2 ) && cs.area.lheight() > ( 1 << MIN_CU_LOG2 ) );
 #endif
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   cuECtx.set( BEST_IMV_COST,        MAX_DOUBLE * .5 );
   cuECtx.set( BEST_NO_IMV_COST,     MAX_DOUBLE * .5 );
+#endif
+#if JEM_TOOLS
   cuECtx.set( LAST_NSST_IDX,        0 );
   cuECtx.set( SKIP_OTHER_NSST,      false );
 #endif
@@ -1238,27 +1240,32 @@ void EncModeCtrlMTnoRQT::initCULevel( Partitioner &partitioner, const CodingStru
       const int  qp       = std::max( qpLoop, lowestQP );
       const bool lossless = useLossless && qpLoop == minQP;
 
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
       if( m_pcEncCfg->getIMV() )
       {
         if( m_pcEncCfg->getIMV() == IMV_4PEL )
         {
-          Int imv = m_pcEncCfg->getIMV4PelFast() ? 3 : 2;
+          int imv = m_pcEncCfg->getIMV4PelFast() ? 3 : 2;
+#if JEM_TOOLS
           // inter with imv and illumination compensation
           if( m_slice->getUseLIC() )
           {
             m_ComprCUCtxList.back().testModes.push_back( { ETM_INTER_ME, SIZE_2Nx2N, EncTestModeOpts( ( imv << ETO_IMV_SHIFT ) | ETO_LIC ), qp, lossless } );
           }
+#endif
           m_ComprCUCtxList.back().testModes.push_back( { ETM_INTER_ME, SIZE_2Nx2N, EncTestModeOpts( imv << ETO_IMV_SHIFT ), qp, lossless } );
         }
+#if JEM_TOOLS
         // inter with imv and illumination compensation
         if( m_slice->getUseLIC() )
         {
           m_ComprCUCtxList.back().testModes.push_back( { ETM_INTER_ME, SIZE_2Nx2N, EncTestModeOpts( ( 1 << ETO_IMV_SHIFT ) | ETO_LIC ), qp, lossless } );
         }
+#endif
         m_ComprCUCtxList.back().testModes.push_back( { ETM_INTER_ME, SIZE_2Nx2N, EncTestModeOpts( 1 << ETO_IMV_SHIFT ), qp, lossless } );
       }
-
+#endif
+#if JEM_TOOLS
       // inter with illumination compensation
       if( m_slice->getUseLIC() )
       {
@@ -1343,9 +1350,9 @@ void EncModeCtrlMTnoRQT::finishCULevel( Partitioner &partitioner )
     DTRACE( g_trace_ctx, D_SAVE_LOAD, "saving tag at %d,%d (%dx%d) -> %d\n", area.x, area.y, area.width >> 1, area.height >> 1, SAVE_LOAD_INIT );
   }
 
-  if( m_pcEncCfg->getUseSaveLoadSplitDecision() && m_pcEncCfg->getUseSaveLoadEncInfo() && area.width > ( 1 << MIN_CU_LOG2 ) && area.height > ( 1 << MIN_CU_LOG2 ) && cuECtx.get<UChar>( SAVE_LOAD_TAG ) == SAVE_ENC_INFO )
+  if( m_pcEncCfg->getUseSaveLoadSplitDecision() && m_pcEncCfg->getUseSaveLoadEncInfo() && area.width > ( 1 << MIN_CU_LOG2 ) && area.height > ( 1 << MIN_CU_LOG2 ) && cuECtx.get<uint8_t>( SAVE_LOAD_TAG ) == SAVE_ENC_INFO )
   {
-    UChar c = 0;
+    uint8_t c = 0;
     double bestNonSplit = cuECtx.get<double>( BEST_NON_SPLIT_COST  );
     double horzCost     = cuECtx.get<double>( BEST_HORZ_SPLIT_COST );
     double vertCost     = cuECtx.get<double>( BEST_VERT_SPLIT_COST );
@@ -1383,7 +1390,7 @@ void EncModeCtrlMTnoRQT::finishCULevel( Partitioner &partitioner )
 }
 
 
-Bool EncModeCtrlMTnoRQT::tryMode( const EncTestMode& encTestmode, const CodingStructure &cs, Partitioner& partitioner )
+bool EncModeCtrlMTnoRQT::tryMode( const EncTestMode& encTestmode, const CodingStructure &cs, Partitioner& partitioner )
 {
   CHECK( encTestmode.partSize != SIZE_2Nx2N, "Only 2Nx2N supported with QTBT" );
 
@@ -1437,14 +1444,14 @@ Bool EncModeCtrlMTnoRQT::tryMode( const EncTestMode& encTestmode, const CodingSt
 #endif
   const Slice&           slice       = *m_slice;
   const SPS&             sps         = *slice.getSPS();
-  const UInt             numComp     = getNumberValidComponents( slice.getSPS()->getChromaFormatIdc() );
-  const UInt             width       = partitioner.currArea().lumaSize().width;
+  const uint32_t             numComp     = getNumberValidComponents( slice.getSPS()->getChromaFormatIdc() );
+  const uint32_t             width       = partitioner.currArea().lumaSize().width;
   const CodingStructure *bestCS      = cuECtx.bestCS;
   const CodingUnit      *bestCU      = cuECtx.bestCU;
   const EncTestMode      bestMode    = bestCS ? getCSEncMode( *bestCS ) : EncTestMode();
 
 #if !JVET_K0220_ENC_CTRL
-  UChar       saveLoadSplit          = 0;
+  uint8_t       saveLoadSplit          = 0;
   SaveLoadTag saveLoadTag            = cuECtx.get<SaveLoadTag>( SAVE_LOAD_TAG );
   SaveLoadStruct &sls                = getSaveLoadStruct( partitioner.currArea() );
 #endif
@@ -1576,7 +1583,7 @@ Bool EncModeCtrlMTnoRQT::tryMode( const EncTestMode& encTestmode, const CodingSt
     if( getFastDeltaQp() )
     {
       const SPS &sps = *cs.sps;
-      const UInt fastDeltaQPCuMaxPCMSize = Clip3( ( UInt ) 1 << sps.getPCMLog2MinSize(), ( UInt ) 1 << sps.getPCMLog2MaxSize(), 32u );
+      const uint32_t fastDeltaQPCuMaxPCMSize = Clip3( ( uint32_t ) 1 << sps.getPCMLog2MinSize(), ( uint32_t ) 1 << sps.getPCMLog2MaxSize(), 32u );
 
       if( cs.area.lumaSize().width > fastDeltaQPCuMaxPCMSize )
       {
@@ -1633,6 +1640,17 @@ Bool EncModeCtrlMTnoRQT::tryMode( const EncTestMode& encTestmode, const CodingSt
         return false;
       }
 #endif
+#if JVET_K0357_AMVR
+      else if ((encTestmode.opts & ETO_IMV) != 0)
+      {
+        int imvOpt = (encTestmode.opts & ETO_IMV) >> ETO_IMV_SHIFT;
+
+        if (imvOpt == 3 && cuECtx.get<double>(BEST_NO_IMV_COST) * 1.06 < cuECtx.get<double>(BEST_IMV_COST))
+        {
+          return false;
+        }
+      }
+#endif
 #if JEM_TOOLS
 #if JVET_K0220_ENC_CTRL
       else if( relatedCU.isSkip || relatedCU.isIntra )
@@ -1645,17 +1663,6 @@ Bool EncModeCtrlMTnoRQT::tryMode( const EncTestMode& encTestmode, const CodingSt
 #endif
       {
         return false;
-      }
-#endif
-#if JEM_TOOLS
-      else if( ( encTestmode.opts & ETO_IMV ) != 0 )
-      {
-        int imvOpt = ( encTestmode.opts & ETO_IMV ) >> ETO_IMV_SHIFT;
-
-        if( imvOpt == 3 && cuECtx.get<double>( BEST_NO_IMV_COST ) * 1.06 < cuECtx.get<double>( BEST_IMV_COST ) )
-        {
-          return false;
-        }
       }
 #endif
     }
@@ -2013,7 +2020,11 @@ Bool EncModeCtrlMTnoRQT::tryMode( const EncTestMode& encTestmode, const CodingSt
           sls.interDir   = bestCU->firstPU->interDir;
 #if JEM_TOOLS
           sls.LICFlag    = bestCU->LICFlag;
+#endif
+#if JVET_K0357_AMVR
           sls.imv        = bestCU->imv;
+#endif
+#if JEM_TOOLS
           sls.frucMode   = bestCU->firstPU->frucMrgMode;
           sls.affineFlag = bestCU->affine;
 #endif
@@ -2049,7 +2060,7 @@ Bool EncModeCtrlMTnoRQT::tryMode( const EncTestMode& encTestmode, const CodingSt
   }
 }
 
-Bool EncModeCtrlMTnoRQT::useModeResult( const EncTestMode& encTestmode, CodingStructure*& tempCS, Partitioner& partitioner )
+bool EncModeCtrlMTnoRQT::useModeResult( const EncTestMode& encTestmode, CodingStructure*& tempCS, Partitioner& partitioner )
 {
   xExtractFeatures( encTestmode, *tempCS );
 
@@ -2084,7 +2095,7 @@ Bool EncModeCtrlMTnoRQT::useModeResult( const EncTestMode& encTestmode, CodingSt
   }
 #endif
 
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   if( m_pcEncCfg->getIMV4PelFast() && m_pcEncCfg->getIMV() && encTestmode.type == ETM_INTER_ME )
   {
     int imvMode = ( encTestmode.opts & ETO_IMV ) >> ETO_IMV_SHIFT;

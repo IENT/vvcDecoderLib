@@ -3,7 +3,7 @@
 * and contributor rights, including patent rights, and no such rights are
 * granted under this license.
 *
-* Copyright (c) 2010-2017, ITU/ISO/IEC
+* Copyright (c) 2010-2018, ITU/ISO/IEC
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -75,19 +75,19 @@ protected:
   VLCWriter() : m_pcBitIf(NULL) {}
   virtual ~VLCWriter() {}
 
-  Void  setBitstream          ( OutputBitstream* p )  { m_pcBitIf = p;  }
+  void  setBitstream          ( OutputBitstream* p )  { m_pcBitIf = p;  }
 
-  Void  xWriteCode            ( UInt uiCode, UInt uiLength );
-  Void  xWriteUvlc            ( UInt uiCode );
-  Void  xWriteSvlc            ( Int  iCode   );
-  Void  xWriteFlag            ( UInt uiCode );
+  void  xWriteCode            ( uint32_t uiCode, uint32_t uiLength );
+  void  xWriteUvlc            ( uint32_t uiCode );
+  void  xWriteSvlc            ( int  iCode   );
+  void  xWriteFlag            ( uint32_t uiCode );
 #if ENABLE_TRACING
-  Void  xWriteCodeTr          ( UInt value, UInt  length, const TChar *pSymbolName);
-  Void  xWriteUvlcTr          ( UInt value,               const TChar *pSymbolName);
-  Void  xWriteSvlcTr          ( Int  value,               const TChar *pSymbolName);
-  Void  xWriteFlagTr          ( UInt value,               const TChar *pSymbolName);
+  void  xWriteCodeTr          ( uint32_t value, uint32_t  length, const char *pSymbolName);
+  void  xWriteUvlcTr          ( uint32_t value,               const char *pSymbolName);
+  void  xWriteSvlcTr          ( int  value,               const char *pSymbolName);
+  void  xWriteFlagTr          ( uint32_t value,               const char *pSymbolName);
 #endif
-  Void  xWriteRbspTrailingBits();
+  void  xWriteRbspTrailingBits();
 };
 
 
@@ -98,7 +98,7 @@ public:
   AUDWriter() {};
   virtual ~AUDWriter() {};
 
-  Void  codeAUD(OutputBitstream& bs, const Int pictureType);
+  void  codeAUD(OutputBitstream& bs, const int pictureType);
 };
 
 
@@ -113,34 +113,44 @@ public:
   void  init( CABACDataStore& cabacDataStore ) { m_CABACDataStore = &cabacDataStore; }
 #endif
 private:
-  Void xCodeShortTermRefPicSet  ( const ReferencePictureSet* pcRPS, Bool calledFromSliceHeader, Int idx );
-  Bool xFindMatchingLTRP        ( Slice* pcSlice, UInt *ltrpsIndex, Int ltrpPOC, Bool usedFlag );
-  Void xCodePredWeightTable     ( Slice* pcSlice );
+  void xCodeShortTermRefPicSet  ( const ReferencePictureSet* pcRPS, bool calledFromSliceHeader, int idx );
+  bool xFindMatchingLTRP        ( Slice* pcSlice, uint32_t *ltrpsIndex, int ltrpPOC, bool usedFlag );
+  void xCodePredWeightTable     ( Slice* pcSlice );
 #if HEVC_USE_SCALING_LISTS
-  Void xCodeScalingList         ( const ScalingList* scalingList, UInt sizeId, UInt listId);
+  void xCodeScalingList         ( const ScalingList* scalingList, uint32_t sizeId, uint32_t listId);
 #endif
 #if JEM_TOOLS
   void xCodeCABACWSizes         ( Slice* pcSlice );
 #endif
 public:
-  Void  setBitstream            ( OutputBitstream* p )  { m_pcBitIf = p;  }
-  UInt  getNumberOfWrittenBits  ()                      { return m_pcBitIf->getNumberOfWrittenBits();  }
-  Void  codeVUI                 ( const VUI *pcVUI, const SPS* pcSPS );
-  Void  codeSPSNext             ( const SPSNext& spsNext, const bool usePCM );
-  Void  codeSPS                 ( const SPS* pcSPS );
-  Void  codePPS                 ( const PPS* pcPPS );
+  void  setBitstream            ( OutputBitstream* p )  { m_pcBitIf = p;  }
+  uint32_t  getNumberOfWrittenBits  ()                      { return m_pcBitIf->getNumberOfWrittenBits();  }
+  void  codeVUI                 ( const VUI *pcVUI, const SPS* pcSPS );
+  void  codeSPSNext             ( const SPSNext& spsNext, const bool usePCM );
+  void  codeSPS                 ( const SPS* pcSPS );
+  void  codePPS                 ( const PPS* pcPPS );
 #if HEVC_VPS
-  Void  codeVPS                 ( const VPS* pcVPS );
+  void  codeVPS                 ( const VPS* pcVPS );
 #endif
-  Void  codeSliceHeader         ( Slice* pcSlice );
-  Void  codePTL                 ( const PTL* pcPTL, Bool profilePresentFlag, Int maxNumSubLayersMinus1);
-  Void  codeProfileTier         ( const ProfileTierLevel* ptl, const Bool bIsSubLayer );
-  Void  codeHrdParameters       ( const HRD *hrd, Bool commonInfPresentFlag, UInt maxNumSubLayersMinus1 );
+  void  codeSliceHeader         ( Slice* pcSlice );
+  void  codePTL                 ( const PTL* pcPTL, bool profilePresentFlag, int maxNumSubLayersMinus1);
+  void  codeProfileTier         ( const ProfileTierLevel* ptl, const bool bIsSubLayer );
+  void  codeHrdParameters       ( const HRD *hrd, bool commonInfPresentFlag, uint32_t maxNumSubLayersMinus1 );
 #if HEVC_TILES_WPP
-  Void  codeTilesWPPEntryPoint  ( Slice* pSlice );
+  void  codeTilesWPPEntryPoint  ( Slice* pSlice );
 #endif
 #if HEVC_USE_SCALING_LISTS
-  Void  codeScalingList         ( const ScalingList &scalingList );
+  void  codeScalingList         ( const ScalingList &scalingList );
+#endif
+
+#if JVET_K0371_ALF
+  void alf( const AlfSliceParam& alfSliceParam );
+  void alfFilter( const AlfSliceParam& alfSliceParam, const bool isChroma );
+
+private:
+  void xWriteTruncBinCode( uint32_t uiSymbol, const int uiMaxSymbol );
+  void alfGolombEncode( const int coeff, const int k );
+  void truncatedUnaryEqProb( int symbol, int maxSymbol );
 #endif
 
 #if JEM_TOOLS

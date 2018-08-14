@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -74,7 +74,7 @@ struct AffineAMVPInfo
 struct MvField
 {
   Mv    mv;
-  Short refIdx;
+  int16_t refIdx;
 
   MvField()                                    :            refIdx( NOT_VALID ) {}
   MvField( Mv const & cMv, const int iRefIdx ) : mv( cMv ), refIdx(   iRefIdx ) {}
@@ -107,10 +107,10 @@ struct MotionInfo
   bool     usesLIC;
 #endif
   char     interDir;
-  UShort   sliceIdx;
+  uint16_t   sliceIdx;
 
   Mv      mv     [ NUM_REF_PIC_LIST_01 ];
-  Short   refIdx [ NUM_REF_PIC_LIST_01 ];
+  int16_t   refIdx [ NUM_REF_PIC_LIST_01 ];
 
 #if JEM_TOOLS
   MotionInfo()        : isInter(  false ), usesLIC( false ), interDir( 0 ), sliceIdx( 0 ), refIdx{ NOT_VALID, NOT_VALID } { }

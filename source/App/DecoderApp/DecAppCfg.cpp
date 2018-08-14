@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -56,12 +56,12 @@ namespace po = df::program_options_lite;
 /** \param argc number of arguments
     \param argv array of arguments
  */
-Bool DecAppCfg::parseCfg( Int argc, TChar* argv[] )
+bool DecAppCfg::parseCfg( int argc, char* argv[] )
 {
-  Bool do_help = false;
+  bool do_help = false;
   string cfg_TargetDecLayerIdSetFile;
   string outputColourSpaceConvert;
-  Int warnUnknowParameter = 0;
+  int warnUnknowParameter = 0;
 #if ENABLE_TRACING
   string sTracingRule;
   string sTracingFile;
@@ -108,9 +108,9 @@ Bool DecAppCfg::parseCfg( Int argc, TChar* argv[] )
 
   po::setDefaults(opts);
   po::ErrorReporter err;
-  const list<const TChar*>& argv_unhandled = po::scanArgv(opts, argc, (const TChar**) argv, err);
+  const list<const char*>& argv_unhandled = po::scanArgv(opts, argc, (const char**) argv, err);
 
-  for (list<const TChar*>::const_iterator it = argv_unhandled.begin(); it != argv_unhandled.end(); it++)
+  for (list<const char*>::const_iterator it = argv_unhandled.begin(); it != argv_unhandled.end(); it++)
   {
     msg( ERROR, "Unhandled argument ignored: `%s'\n", *it);
   }
@@ -164,10 +164,10 @@ Bool DecAppCfg::parseCfg( Int argc, TChar* argv[] )
     FILE* targetDecLayerIdSetFile = fopen ( cfg_TargetDecLayerIdSetFile.c_str(), "r" );
     if ( targetDecLayerIdSetFile )
     {
-      Bool isLayerIdZeroIncluded = false;
+      bool isLayerIdZeroIncluded = false;
       while ( !feof(targetDecLayerIdSetFile) )
       {
-        Int layerIdParsed = 0;
+        int layerIdParsed = 0;
         if ( fscanf( targetDecLayerIdSetFile, "%d ", &layerIdParsed ) != 1 )
         {
           if ( m_targetDecLayerIdSet.size() == 0 )
@@ -221,7 +221,7 @@ DecAppCfg::DecAppCfg()
 , m_outputDecodedSEIMessagesFilename()
 , m_bClipOutputVideoToRec709Range(false)
 {
-  for (UInt channelTypeIndex = 0; channelTypeIndex < MAX_NUM_CHANNEL_TYPE; channelTypeIndex++)
+  for (uint32_t channelTypeIndex = 0; channelTypeIndex < MAX_NUM_CHANNEL_TYPE; channelTypeIndex++)
   {
     m_outputBitDepth[channelTypeIndex] = 0;
   }

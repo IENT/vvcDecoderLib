@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -47,27 +47,27 @@
 
 
 static inline ChannelType toChannelType             (const ComponentID id)                         { return (id==COMPONENT_Y)? CHANNEL_TYPE_LUMA : CHANNEL_TYPE_CHROMA; }
-static inline Bool        isLuma                    (const ComponentID id)                         { return (id==COMPONENT_Y);                                          }
-static inline Bool        isLuma                    (const ChannelType id)                         { return (id==CHANNEL_TYPE_LUMA);                                    }
-static inline Bool        isChroma                  (const ComponentID id)                         { return (id!=COMPONENT_Y);                                          }
-static inline Bool        isChroma                  (const ChannelType id)                         { return (id!=CHANNEL_TYPE_LUMA);                                    }
-static inline UInt        getChannelTypeScaleX      (const ChannelType id, const ChromaFormat fmt) { return (isLuma(id) || (fmt==CHROMA_444)) ? 0 : 1;                  }
-static inline UInt        getChannelTypeScaleY      (const ChannelType id, const ChromaFormat fmt) { return (isLuma(id) || (fmt!=CHROMA_420)) ? 0 : 1;                  }
-static inline UInt        getComponentScaleX        (const ComponentID id, const ChromaFormat fmt) { return getChannelTypeScaleX(toChannelType(id), fmt);               }
-static inline UInt        getComponentScaleY        (const ComponentID id, const ChromaFormat fmt) { return getChannelTypeScaleY(toChannelType(id), fmt);               }
-static inline UInt        getNumberValidComponents  (const ChromaFormat fmt)                       { return (fmt==CHROMA_400) ? 1 : MAX_NUM_COMPONENT;                  }
-static inline UInt        getNumberValidChannels    (const ChromaFormat fmt)                       { return (fmt==CHROMA_400) ? 1 : MAX_NUM_CHANNEL_TYPE;               }
-static inline Bool        isChromaEnabled           (const ChromaFormat fmt)                       { return !(fmt==CHROMA_400);                                         }
+static inline bool        isLuma                    (const ComponentID id)                         { return (id==COMPONENT_Y);                                          }
+static inline bool        isLuma                    (const ChannelType id)                         { return (id==CHANNEL_TYPE_LUMA);                                    }
+static inline bool        isChroma                  (const ComponentID id)                         { return (id!=COMPONENT_Y);                                          }
+static inline bool        isChroma                  (const ChannelType id)                         { return (id!=CHANNEL_TYPE_LUMA);                                    }
+static inline uint32_t        getChannelTypeScaleX      (const ChannelType id, const ChromaFormat fmt) { return (isLuma(id) || (fmt==CHROMA_444)) ? 0 : 1;                  }
+static inline uint32_t        getChannelTypeScaleY      (const ChannelType id, const ChromaFormat fmt) { return (isLuma(id) || (fmt!=CHROMA_420)) ? 0 : 1;                  }
+static inline uint32_t        getComponentScaleX        (const ComponentID id, const ChromaFormat fmt) { return getChannelTypeScaleX(toChannelType(id), fmt);               }
+static inline uint32_t        getComponentScaleY        (const ComponentID id, const ChromaFormat fmt) { return getChannelTypeScaleY(toChannelType(id), fmt);               }
+static inline uint32_t        getNumberValidComponents  (const ChromaFormat fmt)                       { return (fmt==CHROMA_400) ? 1 : MAX_NUM_COMPONENT;                  }
+static inline uint32_t        getNumberValidChannels    (const ChromaFormat fmt)                       { return (fmt==CHROMA_400) ? 1 : MAX_NUM_CHANNEL_TYPE;               }
+static inline bool        isChromaEnabled           (const ChromaFormat fmt)                       { return !(fmt==CHROMA_400);                                         }
 static inline ComponentID getFirstComponentOfChannel(const ChannelType id)                         { return (isLuma(id) ? COMPONENT_Y : COMPONENT_Cb);                  }
 
-InputColourSpaceConversion stringToInputColourSpaceConvert(const std::string &value, const Bool bIsForward);
-std::string getListOfColourSpaceConverts(const Bool bIsForward);
+InputColourSpaceConversion stringToInputColourSpaceConvert(const std::string &value, const bool bIsForward);
+std::string getListOfColourSpaceConverts(const bool bIsForward);
 
 //------------------------------------------------
 
-static inline UInt getTotalSamples(const UInt width, const UInt height, const ChromaFormat format)
+static inline uint32_t getTotalSamples(const uint32_t width, const uint32_t height, const ChromaFormat format)
 {
-  const UInt samplesPerChannel = width * height;
+  const uint32_t samplesPerChannel = width * height;
 
   switch (format)
   {
@@ -85,7 +85,7 @@ static inline UInt getTotalSamples(const UInt width, const UInt height, const Ch
 
 //------------------------------------------------
 
-static inline uint64_t getTotalFracBits(const UInt width, const UInt height, const ChromaFormat format, const Int bitDepths[MAX_NUM_CHANNEL_TYPE])
+static inline uint64_t getTotalFracBits(const uint32_t width, const uint32_t height, const ChromaFormat format, const int bitDepths[MAX_NUM_CHANNEL_TYPE])
 {
   unsigned bitsPerSampleTimes2 = MAX_UINT;
   switch (format)
@@ -106,7 +106,7 @@ static inline uint64_t getTotalFracBits(const UInt width, const UInt height, con
 //Intra prediction  ====================================================================================================
 //======================================================================================================================
 
-static inline Bool filterIntraReferenceSamples (const ChannelType chType, const ChromaFormat chFmt, const Bool intraReferenceSmoothingDisabled)
+static inline bool filterIntraReferenceSamples (const ChannelType chType, const ChromaFormat chFmt, const bool intraReferenceSmoothingDisabled)
 {
   return (!intraReferenceSmoothingDisabled) && (isLuma(chType) || (chFmt == CHROMA_444));
 }
@@ -114,7 +114,7 @@ static inline Bool filterIntraReferenceSamples (const ChannelType chType, const 
 
 //------------------------------------------------
 
-static inline Int getTransformShift(const Int channelBitDepth, const Size size, const Int maxLog2TrDynamicRange)
+static inline int getTransformShift(const int channelBitDepth, const Size size, const int maxLog2TrDynamicRange)
 {
   return maxLog2TrDynamicRange - channelBitDepth - ( ( g_aucLog2[size.width] + g_aucLog2[size.height] ) >> 1 );
 }
@@ -122,7 +122,7 @@ static inline Int getTransformShift(const Int channelBitDepth, const Size size, 
 
 //------------------------------------------------
 
-static inline Int getScaledChromaQP(Int unscaledChromaQP, const ChromaFormat chFmt)
+static inline int getScaledChromaQP(int unscaledChromaQP, const ChromaFormat chFmt)
 {
   return g_aucChromaScale[chFmt][Clip3(0, (chromaQPMappingTableSize - 1), unscaledChromaQP)];
 }
@@ -133,7 +133,7 @@ static inline Int getScaledChromaQP(Int unscaledChromaQP, const ChromaFormat chF
 //Scaling lists  =======================================================================================================
 //======================================================================================================================
 
-static inline Int getScalingListType(const PredMode predMode, const ComponentID compID)
+static inline int getScalingListType(const PredMode predMode, const ComponentID compID)
 {
   return ((predMode != MODE_INTER) ? 0 : MAX_NUM_COMPONENT) + MAP_CHROMA(compID);
 }

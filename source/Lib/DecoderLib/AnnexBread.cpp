@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -57,7 +57,7 @@ using namespace std;
  * of std::ios_base::failure is thrown.  The contsnts of stats will
  * be correct at this point.
  */
-static Void
+static void
 _byteStreamNALUnit(
   InputByteStream& bs,
   vector<uint8_t>& nalUnit,
@@ -177,13 +177,13 @@ _byteStreamNALUnit(
  * Returns false if EOF was reached (NB, nalunit data may be valid),
  *         otherwise true.
  */
-Bool
+bool
 byteStreamNALUnit(
   InputByteStream& bs,
   vector<uint8_t>& nalUnit,
   AnnexBStats& stats)
 {
-  Bool eof = false;
+  bool eof = false;
   try
   {
     _byteStreamNALUnit(bs, nalUnit, stats);
@@ -192,7 +192,7 @@ byteStreamNALUnit(
   {
     eof = true;
   }
-  stats.m_numBytesInNALUnit = UInt(nalUnit.size());
+  stats.m_numBytesInNALUnit = uint32_t(nalUnit.size());
   return eof;
 }
 //! \}

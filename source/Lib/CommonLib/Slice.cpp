@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -137,12 +137,12 @@ Slice::Slice()
 , m_dProcessingTime               ( 0 )
 , m_uiMaxBTSize                   ( 0 )
 {
-  for(UInt i=0; i<NUM_REF_PIC_LIST_01; i++)
+  for(uint32_t i=0; i<NUM_REF_PIC_LIST_01; i++)
   {
     m_aiNumRefIdx[i] = 0;
   }
 
-  for (UInt component = 0; component < MAX_NUM_COMPONENT; component++)
+  for (uint32_t component = 0; component < MAX_NUM_COMPONENT; component++)
   {
     m_lambdas            [component] = 0.0;
     m_iSliceChromaQpDelta[component] = 0;
@@ -150,14 +150,14 @@ Slice::Slice()
 
   initEqualRef();
 
-  for ( Int idx = 0; idx < MAX_NUM_REF; idx++ )
+  for ( int idx = 0; idx < MAX_NUM_REF; idx++ )
   {
     m_list1IdxToList0Idx[idx] = -1;
   }
 
-  for(Int iNumCount = 0; iNumCount < MAX_NUM_REF; iNumCount++)
+  for(int iNumCount = 0; iNumCount < MAX_NUM_REF; iNumCount++)
   {
-    for(UInt i=0; i<NUM_REF_PIC_LIST_01; i++)
+    for(uint32_t i=0; i<NUM_REF_PIC_LIST_01; i++)
     {
       m_apcRefPicList [i][iNumCount] = NULL;
       m_aiRefPOCList  [i][iNumCount] = 0;
@@ -167,7 +167,7 @@ Slice::Slice()
   resetWpScaling();
   initWpAcDcParam();
 
-  for(Int ch=0; ch < MAX_NUM_CHANNEL_TYPE; ch++)
+  for(int ch=0; ch < MAX_NUM_CHANNEL_TYPE; ch++)
   {
     m_saoEnabledFlag[ch] = false;
   }
@@ -176,14 +176,14 @@ Slice::Slice()
   m_bFrucRefIdxPairValid = false;
   if( m_bScaleFactorValid == false )
   {
-    for( Int iTDB = -128 ; iTDB <= 127 ; iTDB++ )
+    for( int iTDB = -128 ; iTDB <= 127 ; iTDB++ )
     {
-      for( Int iTDD = -128 ; iTDD <= 127 ; iTDD++ )
+      for( int iTDD = -128 ; iTDD <= 127 ; iTDD++ )
       {
         if( iTDD == 0 )
           continue;
-        Int iX        = (0x4000 + abs(iTDD/2)) / iTDD;
-        Int iScale    = Clip3( -4096, 4095, (iTDB * iX + 32) >> 6 );
+        int iX        = (0x4000 + abs(iTDD/2)) / iTDD;
+        int iScale    = Clip3( -4096, 4095, (iTDB * iX + 32) >> 6 );
         m_iScaleFactor[128+iTDB][128+iTDD] = iScale;
       }
     }
@@ -198,9 +198,9 @@ Slice::~Slice()
 }
 
 
-Void Slice::initSlice()
+void Slice::initSlice()
 {
-  for(UInt i=0; i<NUM_REF_PIC_LIST_01; i++)
+  for(uint32_t i=0; i<NUM_REF_PIC_LIST_01; i++)
   {
     m_aiNumRefIdx[i]      = 0;
   }
@@ -211,7 +211,7 @@ Void Slice::initSlice()
 
   m_bCheckLDC = false;
 
-  for (UInt component = 0; component < MAX_NUM_COMPONENT; component++)
+  for (uint32_t component = 0; component < MAX_NUM_COMPONENT; component++)
   {
     m_iSliceChromaQpDelta[component] = 0;
   }
@@ -230,7 +230,7 @@ Void Slice::initSlice()
 #endif
 }
 
-Void Slice::setDefaultClpRng( const SPS& sps )
+void Slice::setDefaultClpRng( const SPS& sps )
 {
   m_clpRngs.comp[COMPONENT_Y].min = m_clpRngs.comp[COMPONENT_Cb].min  = m_clpRngs.comp[COMPONENT_Cr].min = 0;
   m_clpRngs.comp[COMPONENT_Y].max                                     = (1<< sps.getBitDepth(CHANNEL_TYPE_LUMA))-1;
@@ -243,7 +243,7 @@ Void Slice::setDefaultClpRng( const SPS& sps )
 }
 
 
-Bool Slice::getRapPicFlag() const
+bool Slice::getRapPicFlag() const
 {
   return getNalUnitType() == NAL_UNIT_CODED_SLICE_IDR_W_RADL
       || getNalUnitType() == NAL_UNIT_CODED_SLICE_IDR_N_LP
@@ -254,7 +254,7 @@ Bool Slice::getRapPicFlag() const
 }
 
 
-Void  Slice::sortPicList        (PicList& rcListPic)
+void  Slice::sortPicList        (PicList& rcListPic)
 {
   Picture*    pcPicExtract;
   Picture*    pcPicInsert;
@@ -263,10 +263,10 @@ Void  Slice::sortPicList        (PicList& rcListPic)
   PicList::iterator    iterPicExtract_1;
   PicList::iterator    iterPicInsert;
 
-  for (Int i = 1; i < (Int)(rcListPic.size()); i++)
+  for (int i = 1; i < (int)(rcListPic.size()); i++)
   {
     iterPicExtract = rcListPic.begin();
-    for (Int j = 0; j < i; j++)
+    for (int j = 0; j < i; j++)
     {
       iterPicExtract++;
     }
@@ -292,7 +292,7 @@ Void  Slice::sortPicList        (PicList& rcListPic)
   }
 }
 
-Picture* Slice::xGetRefPic (PicList& rcListPic, Int poc)
+Picture* Slice::xGetRefPic (PicList& rcListPic, int poc)
 {
   PicList::iterator  iterPic = rcListPic.begin();
   Picture*           pcPic   = *(iterPic);
@@ -310,13 +310,13 @@ Picture* Slice::xGetRefPic (PicList& rcListPic, Int poc)
 }
 
 
-Picture* Slice::xGetLongTermRefPic( PicList& rcListPic, Int poc, Bool pocHasMsb)
+Picture* Slice::xGetLongTermRefPic( PicList& rcListPic, int poc, bool pocHasMsb)
 {
   PicList::iterator  iterPic = rcListPic.begin();
   Picture*           pcPic   = *(iterPic);
   Picture*           pcStPic = pcPic;
 
-  Int pocCycle = 1 << getSPS()->getBitsForPOC();
+  int pocCycle = 1 << getSPS()->getBitsForPOC();
   if (!pocHasMsb)
   {
     poc = poc & (pocCycle - 1);
@@ -327,7 +327,7 @@ Picture* Slice::xGetLongTermRefPic( PicList& rcListPic, Int poc, Bool pocHasMsb)
     pcPic = *(iterPic);
     if (pcPic && pcPic->getPOC()!=this->getPOC() && pcPic->referenced)
     {
-      Int picPoc = pcPic->getPOC();
+      int picPoc = pcPic->getPOC();
       if (!pocHasMsb)
       {
         picPoc = picPoc & (pocCycle - 1);
@@ -353,11 +353,11 @@ Picture* Slice::xGetLongTermRefPic( PicList& rcListPic, Int poc, Bool pocHasMsb)
   return pcStPic;
 }
 
-Void Slice::setRefPOCList       ()
+void Slice::setRefPOCList       ()
 {
-  for (Int iDir = 0; iDir < NUM_REF_PIC_LIST_01; iDir++)
+  for (int iDir = 0; iDir < NUM_REF_PIC_LIST_01; iDir++)
   {
-    for (Int iNumRefIdx = 0; iNumRefIdx < m_aiNumRefIdx[iDir]; iNumRefIdx++)
+    for (int iNumRefIdx = 0; iNumRefIdx < m_aiNumRefIdx[iDir]; iNumRefIdx++)
     {
       m_aiRefPOCList[iDir][iNumRefIdx] = m_apcRefPicList[iDir][iNumRefIdx]->getPOC();
     }
@@ -365,9 +365,9 @@ Void Slice::setRefPOCList       ()
 
 }
 
-Void Slice::setList1IdxToList0Idx()
+void Slice::setList1IdxToList0Idx()
 {
-  Int idxL0, idxL1;
+  int idxL0, idxL1;
   for ( idxL1 = 0; idxL1 < getNumRefIdx( REF_PIC_LIST_1 ); idxL1++ )
   {
     m_list1IdxToList0Idx[idxL1] = -1;
@@ -382,7 +382,7 @@ Void Slice::setList1IdxToList0Idx()
   }
 }
 
-Void Slice::setRefPicList( PicList& rcListPic, Bool checkNumPocTotalCurr, Bool bCopyL0toL1ErrorCase )
+void Slice::setRefPicList( PicList& rcListPic, bool checkNumPocTotalCurr, bool bCopyL0toL1ErrorCase )
 {
   if ( m_eSliceType == I_SLICE)
   {
@@ -396,14 +396,14 @@ Void Slice::setRefPicList( PicList& rcListPic, Bool checkNumPocTotalCurr, Bool b
   }
 
   Picture*  pcRefPic= NULL;
-  static const UInt MAX_NUM_NEGATIVE_PICTURES=16;
+  static const uint32_t MAX_NUM_NEGATIVE_PICTURES=16;
   Picture*  RefPicSetStCurr0[MAX_NUM_NEGATIVE_PICTURES];
   Picture*  RefPicSetStCurr1[MAX_NUM_NEGATIVE_PICTURES];
   Picture*  RefPicSetLtCurr[MAX_NUM_NEGATIVE_PICTURES];
-  UInt NumPicStCurr0 = 0;
-  UInt NumPicStCurr1 = 0;
-  UInt NumPicLtCurr = 0;
-  Int i;
+  uint32_t NumPicStCurr0 = 0;
+  uint32_t NumPicStCurr1 = 0;
+  uint32_t NumPicLtCurr = 0;
+  int i;
 
   for(i=0; i < m_pRPS->getNumberOfNegativePictures(); i++)
   {
@@ -448,7 +448,7 @@ Void Slice::setRefPicList( PicList& rcListPic, Bool checkNumPocTotalCurr, Bool b
   // ref_pic_list_init
   Picture*  rpsCurrList0[MAX_NUM_REF+1];
   Picture*  rpsCurrList1[MAX_NUM_REF+1];
-  Int numPicTotalCurr = NumPicStCurr0 + NumPicStCurr1 + NumPicLtCurr;
+  int numPicTotalCurr = NumPicStCurr0 + NumPicStCurr1 + NumPicLtCurr;
 
   if (checkNumPocTotalCurr)
   {
@@ -470,7 +470,7 @@ Void Slice::setRefPicList( PicList& rcListPic, Bool checkNumPocTotalCurr, Bool b
     CHECK(numPicTotalCurr > 8, "Invalid state");
   }
 
-  Int cIdx = 0;
+  int cIdx = 0;
   for ( i=0; i<NumPicStCurr0; i++, cIdx++)
   {
     rpsCurrList0[cIdx] = RefPicSetStCurr0[i];
@@ -505,7 +505,7 @@ Void Slice::setRefPicList( PicList& rcListPic, Bool checkNumPocTotalCurr, Bool b
 
   ::memset(m_bIsUsedAsLongTerm, 0, sizeof(m_bIsUsedAsLongTerm));
 
-  for (Int rIdx = 0; rIdx < m_aiNumRefIdx[REF_PIC_LIST_0]; rIdx ++)
+  for (int rIdx = 0; rIdx < m_aiNumRefIdx[REF_PIC_LIST_0]; rIdx ++)
   {
     cIdx = m_RefPicListModification.getRefPicListModificationFlagL0() ? m_RefPicListModification.getRefPicSetIdxL0(rIdx) : rIdx % numPicTotalCurr;
     CHECK(cIdx < 0 || cIdx >= numPicTotalCurr, "Invalid state");
@@ -519,7 +519,7 @@ Void Slice::setRefPicList( PicList& rcListPic, Bool checkNumPocTotalCurr, Bool b
   }
   else
   {
-    for (Int rIdx = 0; rIdx < m_aiNumRefIdx[REF_PIC_LIST_1]; rIdx ++)
+    for (int rIdx = 0; rIdx < m_aiNumRefIdx[REF_PIC_LIST_1]; rIdx ++)
     {
       cIdx = m_RefPicListModification.getRefPicListModificationFlagL1() ? m_RefPicListModification.getRefPicSetIdxL1(rIdx) : rIdx % numPicTotalCurr;
       CHECK(cIdx < 0 || cIdx >= numPicTotalCurr, "Invalid state");
@@ -532,10 +532,10 @@ Void Slice::setRefPicList( PicList& rcListPic, Bool checkNumPocTotalCurr, Bool b
   // note: maybe not existed case (always L0 is copied to L1 if L1 is empty)
   if( bCopyL0toL1ErrorCase && isInterB() && getNumRefIdx(REF_PIC_LIST_1) == 0)
   {
-    Int iNumRefIdx = getNumRefIdx(REF_PIC_LIST_0);
+    int iNumRefIdx = getNumRefIdx(REF_PIC_LIST_0);
     setNumRefIdx( REF_PIC_LIST_1, iNumRefIdx );
 
-    for (Int iRefIdx = 0; iRefIdx < iNumRefIdx; iRefIdx++)
+    for (int iRefIdx = 0; iRefIdx < iNumRefIdx; iRefIdx++)
     {
       m_apcRefPicList[REF_PIC_LIST_1][iRefIdx] = m_apcRefPicList[REF_PIC_LIST_0] [iRefIdx];
     }
@@ -543,15 +543,15 @@ Void Slice::setRefPicList( PicList& rcListPic, Bool checkNumPocTotalCurr, Bool b
 }
 
 
-Int Slice::getNumRpsCurrTempList() const
+int Slice::getNumRpsCurrTempList() const
 {
-  Int numRpsCurrTempList = 0;
+  int numRpsCurrTempList = 0;
 
   if (m_eSliceType == I_SLICE)
   {
     return 0;
   }
-  for(UInt i=0; i < m_pRPS->getNumberOfNegativePictures()+ m_pRPS->getNumberOfPositivePictures() + m_pRPS->getNumberOfLongtermPictures(); i++)
+  for(uint32_t i=0; i < m_pRPS->getNumberOfNegativePictures()+ m_pRPS->getNumberOfPositivePictures() + m_pRPS->getNumberOfLongtermPictures(); i++)
   {
     if(m_pRPS->getUsed(i))
     {
@@ -561,13 +561,13 @@ Int Slice::getNumRpsCurrTempList() const
   return numRpsCurrTempList;
 }
 
-Void Slice::initEqualRef()
+void Slice::initEqualRef()
 {
-  for (Int iDir = 0; iDir < NUM_REF_PIC_LIST_01; iDir++)
+  for (int iDir = 0; iDir < NUM_REF_PIC_LIST_01; iDir++)
   {
-    for (Int iRefIdx1 = 0; iRefIdx1 < MAX_NUM_REF; iRefIdx1++)
+    for (int iRefIdx1 = 0; iRefIdx1 < MAX_NUM_REF; iRefIdx1++)
     {
-      for (Int iRefIdx2 = iRefIdx1; iRefIdx2 < MAX_NUM_REF; iRefIdx2++)
+      for (int iRefIdx2 = iRefIdx1; iRefIdx2 < MAX_NUM_REF; iRefIdx2++)
       {
         m_abEqualRef[iDir][iRefIdx1][iRefIdx2] = m_abEqualRef[iDir][iRefIdx2][iRefIdx1] = (iRefIdx1 == iRefIdx2? true : false);
       }
@@ -575,18 +575,18 @@ Void Slice::initEqualRef()
   }
 }
 
-Void Slice::checkColRefIdx(UInt curSliceSegmentIdx, const Picture* pic)
+void Slice::checkColRefIdx(uint32_t curSliceSegmentIdx, const Picture* pic)
 {
-  Int i;
+  int i;
   Slice* curSlice = pic->slices[curSliceSegmentIdx];
-  Int currColRefPOC =  curSlice->getRefPOC( RefPicList(1 - curSlice->getColFromL0Flag()), curSlice->getColRefIdx());
+  int currColRefPOC =  curSlice->getRefPOC( RefPicList(1 - curSlice->getColFromL0Flag()), curSlice->getColRefIdx());
 
   for(i=curSliceSegmentIdx-1; i>=0; i--)
   {
     const Slice* preSlice = pic->slices[i];
     if(preSlice->getSliceType() != I_SLICE)
     {
-      const Int preColRefPOC  = preSlice->getRefPOC( RefPicList(1 - preSlice->getColFromL0Flag()), preSlice->getColRefIdx());
+      const int preColRefPOC  = preSlice->getRefPOC( RefPicList(1 - preSlice->getColFromL0Flag()), preSlice->getColRefIdx());
       if(currColRefPOC != preColRefPOC)
       {
         THROW("Collocated_ref_idx shall always be the same for all slices of a coded picture!");
@@ -599,16 +599,16 @@ Void Slice::checkColRefIdx(UInt curSliceSegmentIdx, const Picture* pic)
   }
 }
 
-Void Slice::checkCRA(const ReferencePictureSet *pReferencePictureSet, Int& pocCRA, NalUnitType& associatedIRAPType, PicList& rcListPic)
+void Slice::checkCRA(const ReferencePictureSet *pReferencePictureSet, int& pocCRA, NalUnitType& associatedIRAPType, PicList& rcListPic)
 {
-  for(Int i = 0; i < pReferencePictureSet->getNumberOfNegativePictures()+pReferencePictureSet->getNumberOfPositivePictures(); i++)
+  for(int i = 0; i < pReferencePictureSet->getNumberOfNegativePictures()+pReferencePictureSet->getNumberOfPositivePictures(); i++)
   {
     if(pocCRA < MAX_UINT && getPOC() > pocCRA)
     {
       CHECK(getPOC()+pReferencePictureSet->getDeltaPOC(i) < pocCRA, "Invalid state");
     }
   }
-  for(Int i = pReferencePictureSet->getNumberOfNegativePictures()+pReferencePictureSet->getNumberOfPositivePictures(); i < pReferencePictureSet->getNumberOfPictures(); i++)
+  for(int i = pReferencePictureSet->getNumberOfNegativePictures()+pReferencePictureSet->getNumberOfPositivePictures(); i < pReferencePictureSet->getNumberOfPictures(); i++)
   {
     if(pocCRA < MAX_UINT && getPOC() > pocCRA)
     {
@@ -659,10 +659,10 @@ Void Slice::checkCRA(const ReferencePictureSet *pReferencePictureSet, Int& pocCR
  * Note that the current picture is already placed in the reference list and its marking is not changed.
  * If the current picture has a nal_ref_idc that is not 0, it will remain marked as "used for reference".
  */
-Void Slice::decodingRefreshMarking(Int& pocCRA, Bool& bRefreshPending, PicList& rcListPic, const bool bEfficientFieldIRAPEnabled)
+void Slice::decodingRefreshMarking(int& pocCRA, bool& bRefreshPending, PicList& rcListPic, const bool bEfficientFieldIRAPEnabled)
 {
   Picture* rpcPic;
-  Int      pocCurr = getPOC();
+  int      pocCurr = getPOC();
 
   if ( getNalUnitType() == NAL_UNIT_CODED_SLICE_BLA_W_LP
     || getNalUnitType() == NAL_UNIT_CODED_SLICE_BLA_W_RADL
@@ -736,11 +736,11 @@ Void Slice::decodingRefreshMarking(Int& pocCRA, Bool& bRefreshPending, PicList& 
   }
 }
 
-Void Slice::copySliceInfo(Slice *pSrc, bool cpyAlmostAll)
+void Slice::copySliceInfo(Slice *pSrc, bool cpyAlmostAll)
 {
   CHECK(!pSrc, "Source is NULL");
 
-  Int i, j, k;
+  int i, j, k;
 
   m_iPOC                 = pSrc->m_iPOC;
   m_eNalUnitType         = pSrc->m_eNalUnitType;
@@ -765,7 +765,7 @@ Void Slice::copySliceInfo(Slice *pSrc, bool cpyAlmostAll)
 
   m_bCheckLDC             = pSrc->m_bCheckLDC;
   m_iSliceQpDelta        = pSrc->m_iSliceQpDelta;
-  for (UInt component = 0; component < MAX_NUM_COMPONENT; component++)
+  for (uint32_t component = 0; component < MAX_NUM_COMPONENT; component++)
   {
     m_iSliceChromaQpDelta[component] = pSrc->m_iSliceChromaQpDelta[component];
   }
@@ -828,15 +828,15 @@ Void Slice::copySliceInfo(Slice *pSrc, bool cpyAlmostAll)
   m_clpRngs                       = pSrc->m_clpRngs;
   m_pendingRasInit                = pSrc->m_pendingRasInit;
 
-  for ( UInt e=0 ; e<NUM_REF_PIC_LIST_01 ; e++ )
+  for ( uint32_t e=0 ; e<NUM_REF_PIC_LIST_01 ; e++ )
   {
-    for ( UInt n=0 ; n<MAX_NUM_REF ; n++ )
+    for ( uint32_t n=0 ; n<MAX_NUM_REF ; n++ )
     {
       memcpy(m_weightPredTable[e][n], pSrc->m_weightPredTable[e][n], sizeof(WPScalingParam)*MAX_NUM_COMPONENT );
     }
   }
 
-  for( UInt ch = 0 ; ch < MAX_NUM_CHANNEL_TYPE; ch++)
+  for( uint32_t ch = 0 ; ch < MAX_NUM_CHANNEL_TYPE; ch++)
   {
     m_saoEnabledFlag[ch] = pSrc->m_saoEnabledFlag[ch];
   }
@@ -862,7 +862,7 @@ Void Slice::copySliceInfo(Slice *pSrc, bool cpyAlmostAll)
 
 /** Function for checking if this is a switching-point
 */
-Bool Slice::isTemporalLayerSwitchingPoint(PicList& rcListPic) const
+bool Slice::isTemporalLayerSwitchingPoint(PicList& rcListPic) const
 {
   // loop through all pictures in the reference picture buffer
   PicList::iterator iterPic = rcListPic.begin();
@@ -882,7 +882,7 @@ Bool Slice::isTemporalLayerSwitchingPoint(PicList& rcListPic) const
 
 /** Function for checking if this is a STSA candidate
  */
-Bool Slice::isStepwiseTemporalLayerSwitchingPointCandidate(PicList& rcListPic) const
+bool Slice::isStepwiseTemporalLayerSwitchingPointCandidate(PicList& rcListPic) const
 {
   PicList::iterator iterPic = rcListPic.begin();
   while ( iterPic != rcListPic.end())
@@ -900,9 +900,9 @@ Bool Slice::isStepwiseTemporalLayerSwitchingPointCandidate(PicList& rcListPic) c
 }
 
 
-Void Slice::checkLeadingPictureRestrictions(PicList& rcListPic) const
+void Slice::checkLeadingPictureRestrictions(PicList& rcListPic) const
 {
-  Int nalUnitType = this->getNalUnitType();
+  int nalUnitType = this->getNalUnitType();
 
   // When a picture is a leading picture, it shall be a RADL or RASL picture.
   if(this->getAssociatedIRAPPOC() > this->getPOC())
@@ -1066,9 +1066,9 @@ Void Slice::checkLeadingPictureRestrictions(PicList& rcListPic) const
 
 /** Function for applying picture marking based on the Reference Picture Set in pReferencePictureSet.
 */
-Void Slice::applyReferencePictureSet( PicList& rcListPic, const ReferencePictureSet *pReferencePictureSet) const
+void Slice::applyReferencePictureSet( PicList& rcListPic, const ReferencePictureSet *pReferencePictureSet) const
 {
-  Int i, isReference;
+  int i, isReference;
 
   checkLeadingPictureRestrictions(rcListPic);
 
@@ -1107,9 +1107,9 @@ Void Slice::applyReferencePictureSet( PicList& rcListPic, const ReferencePicture
       }
       else
       {
-        Int pocCycle = 1 << pcPic->cs->sps->getBitsForPOC();
-        Int curPoc = pcPic->poc & (pocCycle-1);
-        Int refPoc = pReferencePictureSet->getPOC(i) & (pocCycle-1);
+        int pocCycle = 1 << pcPic->cs->sps->getBitsForPOC();
+        int curPoc = pcPic->poc & (pocCycle-1);
+        int refPoc = pReferencePictureSet->getPOC(i) & (pocCycle-1);
         if( pcPic->longTerm && curPoc == refPoc)
         {
           isReference = 1;
@@ -1147,15 +1147,15 @@ Void Slice::applyReferencePictureSet( PicList& rcListPic, const ReferencePicture
 
 /** Function for applying picture marking based on the Reference Picture Set in pReferencePictureSet.
 */
-Int Slice::checkThatAllRefPicsAreAvailable( PicList& rcListPic, const ReferencePictureSet *pReferencePictureSet, Bool printErrors, Int pocRandomAccess, Bool bUseRecoveryPoint) const
+int Slice::checkThatAllRefPicsAreAvailable( PicList& rcListPic, const ReferencePictureSet *pReferencePictureSet, bool printErrors, int pocRandomAccess, bool bUseRecoveryPoint) const
 {
-  Int atLeastOneUnabledByRecoveryPoint = 0;
-  Int atLeastOneFlushedByPreviousIDR = 0;
+  int atLeastOneUnabledByRecoveryPoint = 0;
+  int atLeastOneFlushedByPreviousIDR = 0;
   Picture* rpcPic;
-  Int i, isAvailable;
-  Int atLeastOneLost = 0;
-  Int atLeastOneRemoved = 0;
-  Int iPocLost = 0;
+  int i, isAvailable;
+  int atLeastOneLost = 0;
+  int atLeastOneRemoved = 0;
+  int iPocLost = 0;
 
   // loop through all long-term pictures in the Reference Picture Set
   // to see if the picture should be kept as reference picture
@@ -1183,9 +1183,9 @@ Int Slice::checkThatAllRefPicsAreAvailable( PicList& rcListPic, const ReferenceP
       }
       else
       {
-        Int pocCycle = 1<<rpcPic->cs->sps->getBitsForPOC();
-        Int curPoc = rpcPic->getPOC() & (pocCycle-1);
-        Int refPoc = pReferencePictureSet->getPOC(i) & (pocCycle-1);
+        int pocCycle = 1<<rpcPic->cs->sps->getBitsForPOC();
+        int curPoc = rpcPic->getPOC() & (pocCycle-1);
+        int refPoc = pReferencePictureSet->getPOC(i) & (pocCycle-1);
         if(rpcPic->longTerm && curPoc == refPoc && rpcPic->referenced)
         {
           if(bUseRecoveryPoint && this->getPOC() > pocRandomAccess && this->getPOC() + pReferencePictureSet->getDeltaPOC(i) < pocRandomAccess)
@@ -1207,9 +1207,9 @@ Int Slice::checkThatAllRefPicsAreAvailable( PicList& rcListPic, const ReferenceP
       {
         rpcPic = *(iterPic++);
 
-        Int pocCycle = 1 << rpcPic->cs->sps->getBitsForPOC();
-        Int curPoc = rpcPic->getPOC();
-        Int refPoc = pReferencePictureSet->getPOC(i);
+        int pocCycle = 1 << rpcPic->cs->sps->getBitsForPOC();
+        int curPoc = rpcPic->getPOC();
+        int refPoc = pReferencePictureSet->getPOC(i);
         if (!pReferencePictureSet->getCheckLTMSBPresent(i))
         {
           curPoc = curPoc & (pocCycle - 1);
@@ -1343,17 +1343,17 @@ Int Slice::checkThatAllRefPicsAreAvailable( PicList& rcListPic, const ReferenceP
 
 /** Function for constructing an explicit Reference Picture Set out of the available pictures in a referenced Reference Picture Set
 */
-Void Slice::createExplicitReferencePictureSetFromReference( PicList& rcListPic, const ReferencePictureSet *pReferencePictureSet, Bool isRAP, Int pocRandomAccess, Bool bUseRecoveryPoint, const Bool bEfficientFieldIRAPEnabled)
+void Slice::createExplicitReferencePictureSetFromReference( PicList& rcListPic, const ReferencePictureSet *pReferencePictureSet, bool isRAP, int pocRandomAccess, bool bUseRecoveryPoint, const bool bEfficientFieldIRAPEnabled)
 {
   Picture* rpcPic;
-  Int i, j;
-  Int k = 0;
-  Int nrOfNegativePictures = 0;
-  Int nrOfPositivePictures = 0;
+  int i, j;
+  int k = 0;
+  int nrOfNegativePictures = 0;
+  int nrOfPositivePictures = 0;
   ReferencePictureSet* pLocalRPS = this->getLocalRPS();
   (*pLocalRPS)=ReferencePictureSet();
 
-  Bool irapIsInRPS = false; // Used when bEfficientFieldIRAPEnabled==true
+  bool irapIsInRPS = false; // Used when bEfficientFieldIRAPEnabled==true
 
   // loop through all pictures in the Reference Picture Set
   for(i=0;i<pReferencePictureSet->getNumberOfPictures();i++)
@@ -1394,7 +1394,7 @@ Void Slice::createExplicitReferencePictureSetFromReference( PicList& rcListPic, 
     }
   }
 
-  Bool useNewRPS = false;
+  bool useNewRPS = false;
   // if current picture is complimentary field associated to IRAP, add the IRAP to its RPS.
   if(bEfficientFieldIRAPEnabled && m_pcPic->fieldPic && !irapIsInRPS)
   {
@@ -1425,15 +1425,15 @@ Void Slice::createExplicitReferencePictureSetFromReference( PicList& rcListPic, 
   }
   else
   {
-    Int rIdx =  this->getRPSidx() - pReferencePictureSet->getDeltaRIdxMinus1() - 1;
-    Int deltaRPS = pReferencePictureSet->getDeltaRPS();
+    int rIdx =  this->getRPSidx() - pReferencePictureSet->getDeltaRIdxMinus1() - 1;
+    int deltaRPS = pReferencePictureSet->getDeltaRPS();
     const ReferencePictureSet* pcRefRPS = this->getSPS()->getRPSList()->getReferencePictureSet(rIdx);
-    Int iRefPics = pcRefRPS->getNumberOfPictures();
-    Int iNewIdc=0;
+    int iRefPics = pcRefRPS->getNumberOfPictures();
+    int iNewIdc=0;
     for(i=0; i<= iRefPics; i++)
     {
-      Int deltaPOC = ((i != iRefPics)? pcRefRPS->getDeltaPOC(i) : 0);  // check if the reference abs POC is >= 0
-      Int iRefIdc = 0;
+      int deltaPOC = ((i != iRefPics)? pcRefRPS->getDeltaPOC(i) : 0);  // check if the reference abs POC is >= 0
+      int iRefIdc = 0;
       for (j=0; j < pLocalRPS->getNumberOfPictures(); j++) // loop through the  pictures in the new RPS
       {
         if ( (deltaPOC + deltaRPS) == pLocalRPS->getDeltaPOC(j))
@@ -1462,15 +1462,15 @@ Void Slice::createExplicitReferencePictureSetFromReference( PicList& rcListPic, 
 }
 
 //! get AC and DC values for weighted pred
-Void  Slice::getWpAcDcParam(const WPACDCParam *&wp) const
+void  Slice::getWpAcDcParam(const WPACDCParam *&wp) const
 {
   wp = m_weightACDCParam;
 }
 
 //! init AC and DC values for weighted pred
-Void  Slice::initWpAcDcParam()
+void  Slice::initWpAcDcParam()
 {
-  for(Int iComp = 0; iComp < MAX_NUM_COMPONENT; iComp++ )
+  for(int iComp = 0; iComp < MAX_NUM_COMPONENT; iComp++ )
   {
     m_weightACDCParam[iComp].iAC = 0;
     m_weightACDCParam[iComp].iDC = 0;
@@ -1478,20 +1478,20 @@ Void  Slice::initWpAcDcParam()
 }
 
 //! get tables for weighted prediction
-Void  Slice::getWpScaling( RefPicList e, Int iRefIdx, WPScalingParam *&wp ) const
+void  Slice::getWpScaling( RefPicList e, int iRefIdx, WPScalingParam *&wp ) const
 {
   CHECK(e>=NUM_REF_PIC_LIST_01, "Invalid picture reference list");
   wp = (WPScalingParam*) m_weightPredTable[e][iRefIdx];
 }
 
 //! reset Default WP tables settings : no weight.
-Void  Slice::resetWpScaling()
+void  Slice::resetWpScaling()
 {
-  for ( Int e=0 ; e<NUM_REF_PIC_LIST_01 ; e++ )
+  for ( int e=0 ; e<NUM_REF_PIC_LIST_01 ; e++ )
   {
-    for ( Int i=0 ; i<MAX_NUM_REF ; i++ )
+    for ( int i=0 ; i<MAX_NUM_REF ; i++ )
     {
-      for ( Int yuv=0 ; yuv<MAX_NUM_COMPONENT ; yuv++ )
+      for ( int yuv=0 ; yuv<MAX_NUM_COMPONENT ; yuv++ )
       {
         WPScalingParam  *pwp = &(m_weightPredTable[e][i][yuv]);
         pwp->bPresentFlag      = false;
@@ -1505,14 +1505,14 @@ Void  Slice::resetWpScaling()
 }
 
 //! init WP table
-Void  Slice::initWpScaling(const SPS *sps)
+void  Slice::initWpScaling(const SPS *sps)
 {
-  const Bool bUseHighPrecisionPredictionWeighting = sps->getSpsRangeExtension().getHighPrecisionOffsetsEnabledFlag();
-  for ( Int e=0 ; e<NUM_REF_PIC_LIST_01 ; e++ )
+  const bool bUseHighPrecisionPredictionWeighting = sps->getSpsRangeExtension().getHighPrecisionOffsetsEnabledFlag();
+  for ( int e=0 ; e<NUM_REF_PIC_LIST_01 ; e++ )
   {
-    for ( Int i=0 ; i<MAX_NUM_REF ; i++ )
+    for ( int i=0 ; i<MAX_NUM_REF ; i++ )
     {
-      for ( Int yuv=0 ; yuv<MAX_NUM_COMPONENT ; yuv++ )
+      for ( int yuv=0 ; yuv<MAX_NUM_COMPONENT ; yuv++ )
       {
         WPScalingParam  *pwp = &(m_weightPredTable[e][i][yuv]);
         if ( !pwp->bPresentFlag )
@@ -1522,7 +1522,7 @@ Void  Slice::initWpScaling(const SPS *sps)
           pwp->iOffset = 0;
         }
 
-        const Int offsetScalingFactor = bUseHighPrecisionPredictionWeighting ? 1 : (1 << (sps->getBitDepth(toChannelType(ComponentID(yuv)))-8));
+        const int offsetScalingFactor = bUseHighPrecisionPredictionWeighting ? 1 : (1 << (sps->getBitDepth(toChannelType(ComponentID(yuv)))-8));
 
         pwp->w      = pwp->iWeight;
         pwp->o      = pwp->iOffset * offsetScalingFactor; //NOTE: This value of the ".o" variable is never used - .o is set immediately before it gets used
@@ -1597,20 +1597,20 @@ void Slice::stopProcessingTimer()
 }
 
 #if JEM_TOOLS
-Int Slice::getRefIdx4MVPair( RefPicList eCurRefPicList , Int nCurRefIdx )
+int Slice::getRefIdx4MVPair( RefPicList eCurRefPicList , int nCurRefIdx )
 {
   CHECK( !isInterB(), "Invalid frame type" );
   if( !m_bFrucRefIdxPairValid )
   {
     memset( m_iFrucRefIdxPair , -1 , sizeof( m_iFrucRefIdxPair ) );
-    for( Int nRefPicList = 0 ; nRefPicList < 2 ; nRefPicList++ )
+    for( int nRefPicList = 0 ; nRefPicList < 2 ; nRefPicList++ )
     {
-      for( Int nRefIdx = 0 ; nRefIdx < getNumRefIdx( ( RefPicList )nRefPicList ) ; nRefIdx++ )
+      for( int nRefIdx = 0 ; nRefIdx < getNumRefIdx( ( RefPicList )nRefPicList ) ; nRefIdx++ )
       {
-        Int nRefPOC = getRefPOC( ( RefPicList )nRefPicList , nRefIdx );
-        Int nTargetPOC = ( getPOC() << 1 ) - nRefPOC;
+        int nRefPOC = getRefPOC( ( RefPicList )nRefPicList , nRefIdx );
+        int nTargetPOC = ( getPOC() << 1 ) - nRefPOC;
         RefPicList eTargetRefPicList = RefPicList( 1 - nRefPicList );
-        Int nTargetRefIdx = getNumRefIdx( eTargetRefPicList ) - 1;
+        int nTargetRefIdx = getNumRefIdx( eTargetRefPicList ) - 1;
         for( ; nTargetRefIdx >= 0 ; nTargetRefIdx-- )
         {
           if( nTargetPOC == getRefPOC( eTargetRefPicList , nTargetRefIdx ) )
@@ -1621,11 +1621,11 @@ Int Slice::getRefIdx4MVPair( RefPicList eCurRefPicList , Int nCurRefIdx )
 
         if( m_iFrucRefIdxPair[nRefPicList][nRefIdx] == -1 && getCheckLDC() )
         {
-          Int nMinDeltaPOC = MAX_INT;
+          int nMinDeltaPOC = MAX_INT;
           nTargetRefIdx = -1;
-          for( Int nTmpIdx = getNumRefIdx( eTargetRefPicList ) - 1 ; nTmpIdx >= 0 ; nTmpIdx-- )
+          for( int nTmpIdx = getNumRefIdx( eTargetRefPicList ) - 1 ; nTmpIdx >= 0 ; nTmpIdx-- )
           {
-            Int nTmpPOC = getRefPOC( eTargetRefPicList , nTmpIdx );
+            int nTmpPOC = getRefPOC( eTargetRefPicList , nTmpIdx );
             if( nRefPOC != nTmpPOC && abs( nTmpPOC - getPOC() ) < nMinDeltaPOC )
             {
               nMinDeltaPOC = abs( nTmpPOC - getPOC() );
@@ -1648,14 +1648,14 @@ unsigned Slice::getMinPictureDistance() const
   int minPicDist = MAX_INT;
   if( ! isIntra() )
   {
-    const Int currPOC  = getPOC();
-    for (Int refIdx = 0; refIdx < getNumRefIdx(REF_PIC_LIST_0); refIdx++)
+    const int currPOC  = getPOC();
+    for (int refIdx = 0; refIdx < getNumRefIdx(REF_PIC_LIST_0); refIdx++)
     {
       minPicDist = std::min( minPicDist, std::abs(currPOC - getRefPic(REF_PIC_LIST_0, refIdx)->getPOC()));
     }
     if( getSliceType() == B_SLICE )
     {
-      for (Int refIdx = 0; refIdx < getNumRefIdx(REF_PIC_LIST_1); refIdx++)
+      for (int refIdx = 0; refIdx < getNumRefIdx(REF_PIC_LIST_1); refIdx++)
       {
         minPicDist = std::min( minPicDist, std::abs(currPOC - getRefPic(REF_PIC_LIST_0, refIdx)->getPOC()));
       }
@@ -1680,7 +1680,7 @@ VPS::VPS()
 , m_cprmsPresentFlag          ()
 {
 
-  for( Int i = 0; i < MAX_TLAYER; i++)
+  for( int i = 0; i < MAX_TLAYER; i++)
   {
     m_numReorderPics[i] = 0;
     m_uiMaxDecPicBuffering[i] = 1;
@@ -1706,7 +1706,7 @@ SPSRExt::SPSRExt()
  , m_persistentRiceAdaptationEnabledFlag(false)
  , m_cabacBypassAlignmentEnabledFlag    (false)
 {
-  for (UInt signallingModeIndex = 0; signallingModeIndex < NUMBER_OF_RDPCM_SIGNALLING_MODES; signallingModeIndex++)
+  for (uint32_t signallingModeIndex = 0; signallingModeIndex < NUMBER_OF_RDPCM_SIGNALLING_MODES; signallingModeIndex++)
   {
     m_rdpcmEnabledFlag[signallingModeIndex] = false;
   }
@@ -1716,7 +1716,7 @@ SPSRExt::SPSRExt()
 SPSNext::SPSNext( SPS& sps )
   : m_SPS                       ( sps )
   , m_NextEnabled               ( false )
-#if JEM_TOOLS
+#if JEM_TOOLS && !JVET_K0371_ALF
   , m_GALFEnabled               ( false )
 #endif
   // disable all tool enabling flags by default
@@ -1739,7 +1739,7 @@ SPSNext::SPSNext( SPS& sps )
 #if JEM_TOOLS
   , m_ModifiedCABACEngine       ( false )
 #endif
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   , m_IMV                       ( false )
 #endif
 #if JVET_K0072
@@ -1759,6 +1759,8 @@ SPSNext::SPSNext( SPS& sps )
 #if JEM_TOOLS
   , m_LICEnabled                ( false )
   , m_IntraPDPC                 ( false )
+#endif
+#if !JVET_K0371_ALF
   , m_ALFEnabled                ( false )
 #endif
 #if JEM_TOOLS||JVET_K0190
@@ -1808,7 +1810,7 @@ SPSNext::SPSNext( SPS& sps )
 #if JEM_TOOLS
   , m_CABACEngineMode           ( 0 )
 #endif
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   , m_ImvMode                   ( IMV_OFF )
 #endif
 #if JVET_K0072
@@ -1881,14 +1883,14 @@ SPS::SPS()
 , m_vuiParameters             ()
 , m_spsNextExtension          (*this)
 {
-  for(Int ch=0; ch<MAX_NUM_CHANNEL_TYPE; ch++)
+  for(int ch=0; ch<MAX_NUM_CHANNEL_TYPE; ch++)
   {
     m_bitDepths.recon[ch] = 8;
     m_pcmBitDepths[ch] = 8;
     m_qpBDOffset   [ch] = 0;
   }
 
-  for ( Int i = 0; i < MAX_TLAYER; i++ )
+  for ( int i = 0; i < MAX_TLAYER; i++ )
   {
     m_uiMaxLatencyIncreasePlus1[i] = 0;
     m_uiMaxDecPicBuffering[i] = 1;
@@ -1904,7 +1906,7 @@ SPS::~SPS()
   m_RPSList.destroy();
 }
 
-Void  SPS::createRPSList( Int numRPS )
+void  SPS::createRPSList( int numRPS )
 {
   m_RPSList.destroy();
   m_RPSList.create(numRPS);
@@ -1912,8 +1914,8 @@ Void  SPS::createRPSList( Int numRPS )
 
 
 
-const Int SPS::m_winUnitX[]={1,2,2,1};
-const Int SPS::m_winUnitY[]={1,2,1,1};
+const int SPS::m_winUnitX[]={1,2,2,1};
+const int SPS::m_winUnitY[]={1,2,1,1};
 
 PPSRExt::PPSRExt()
 : m_log2MaxTransformSkipBlockSize      (2)
@@ -1925,7 +1927,7 @@ PPSRExt::PPSRExt()
 {
   m_ChromaQpAdjTableIncludingNullEntry[0].u.comp.CbOffset = 0; // Array includes entry [0] for the null offset used when cu_chroma_qp_offset_flag=0. This is initialised here and never subsequently changed.
   m_ChromaQpAdjTableIncludingNullEntry[0].u.comp.CrOffset = 0;
-  for(Int ch=0; ch<MAX_NUM_CHANNEL_TYPE; ch++)
+  for(int ch=0; ch<MAX_NUM_CHANNEL_TYPE; ch++)
   {
     m_log2SaoOffsetScale[ch] = 0;
   }
@@ -2001,64 +2003,64 @@ ReferencePictureSet::~ReferencePictureSet()
 {
 }
 
-Void ReferencePictureSet::setUsed(Int bufferNum, Bool used)
+void ReferencePictureSet::setUsed(int bufferNum, bool used)
 {
   m_used[bufferNum] = used;
 }
 
-Void ReferencePictureSet::setDeltaPOC(Int bufferNum, Int deltaPOC)
+void ReferencePictureSet::setDeltaPOC(int bufferNum, int deltaPOC)
 {
   m_deltaPOC[bufferNum] = deltaPOC;
 }
 
-Void ReferencePictureSet::setNumberOfPictures(Int numberOfPictures)
+void ReferencePictureSet::setNumberOfPictures(int numberOfPictures)
 {
   m_numberOfPictures = numberOfPictures;
 }
 
-Int ReferencePictureSet::getUsed(Int bufferNum) const
+int ReferencePictureSet::getUsed(int bufferNum) const
 {
   return m_used[bufferNum];
 }
 
-Int ReferencePictureSet::getDeltaPOC(Int bufferNum) const
+int ReferencePictureSet::getDeltaPOC(int bufferNum) const
 {
   return m_deltaPOC[bufferNum];
 }
 
-Int ReferencePictureSet::getNumberOfPictures() const
+int ReferencePictureSet::getNumberOfPictures() const
 {
   return m_numberOfPictures;
 }
 
-Int ReferencePictureSet::getPOC(Int bufferNum) const
+int ReferencePictureSet::getPOC(int bufferNum) const
 {
   return m_POC[bufferNum];
 }
 
-Void ReferencePictureSet::setPOC(Int bufferNum, Int POC)
+void ReferencePictureSet::setPOC(int bufferNum, int POC)
 {
   m_POC[bufferNum] = POC;
 }
 
-Bool ReferencePictureSet::getCheckLTMSBPresent(Int bufferNum) const
+bool ReferencePictureSet::getCheckLTMSBPresent(int bufferNum) const
 {
   return m_bCheckLTMSB[bufferNum];
 }
 
-Void ReferencePictureSet::setCheckLTMSBPresent(Int bufferNum, Bool b)
+void ReferencePictureSet::setCheckLTMSBPresent(int bufferNum, bool b)
 {
   m_bCheckLTMSB[bufferNum] = b;
 }
 
 //! set the reference idc value at uiBufferNum entry to the value of iRefIdc
-Void ReferencePictureSet::setRefIdc(Int bufferNum, Int refIdc)
+void ReferencePictureSet::setRefIdc(int bufferNum, int refIdc)
 {
   m_refIdc[bufferNum] = refIdc;
 }
 
 //! get the reference idc value at uiBufferNum
-Int  ReferencePictureSet::getRefIdc(Int bufferNum) const
+int  ReferencePictureSet::getRefIdc(int bufferNum) const
 {
   return m_refIdc[bufferNum];
 }
@@ -2066,18 +2068,18 @@ Int  ReferencePictureSet::getRefIdc(Int bufferNum) const
 /** Sorts the deltaPOC and Used by current values in the RPS based on the deltaPOC values.
  *  deltaPOC values are sorted with -ve values before the +ve values.  -ve values are in decreasing order.
  *  +ve values are in increasing order.
- * \returns Void
+ * \returns void
  */
-Void ReferencePictureSet::sortDeltaPOC()
+void ReferencePictureSet::sortDeltaPOC()
 {
   // sort in increasing order (smallest first)
-  for(Int j=1; j < getNumberOfPictures(); j++)
+  for(int j=1; j < getNumberOfPictures(); j++)
   {
-    Int deltaPOC = getDeltaPOC(j);
-    Bool used = getUsed(j);
-    for (Int k=j-1; k >= 0; k--)
+    int deltaPOC = getDeltaPOC(j);
+    bool used = getUsed(j);
+    for (int k=j-1; k >= 0; k--)
     {
-      Int temp = getDeltaPOC(k);
+      int temp = getDeltaPOC(k);
       if (deltaPOC < temp)
       {
         setDeltaPOC(k+1, temp);
@@ -2088,11 +2090,11 @@ Void ReferencePictureSet::sortDeltaPOC()
     }
   }
   // flip the negative values to largest first
-  Int numNegPics = getNumberOfNegativePictures();
-  for(Int j=0, k=numNegPics-1; j < numNegPics>>1; j++, k--)
+  int numNegPics = getNumberOfNegativePictures();
+  for(int j=0, k=numNegPics-1; j < numNegPics>>1; j++, k--)
   {
-    Int deltaPOC = getDeltaPOC(j);
-    Bool used = getUsed(j);
+    int deltaPOC = getDeltaPOC(j);
+    bool used = getUsed(j);
     setDeltaPOC(j, getDeltaPOC(k));
     setUsed(j, getUsed(k));
     setDeltaPOC(k, deltaPOC);
@@ -2102,19 +2104,19 @@ Void ReferencePictureSet::sortDeltaPOC()
 
 /** Prints the deltaPOC and RefIdc (if available) values in the RPS.
  *  A "*" is added to the deltaPOC value if it is Used bu current.
- * \returns Void
+ * \returns void
  */
-Void ReferencePictureSet::printDeltaPOC() const
+void ReferencePictureSet::printDeltaPOC() const
 {
   DTRACE( g_trace_ctx, D_RPSINFO, "DeltaPOC = { " );
-  for(Int j=0; j < getNumberOfPictures(); j++)
+  for(int j=0; j < getNumberOfPictures(); j++)
   {
     DTRACE( g_trace_ctx, D_RPSINFO, "%d%s ", getDeltaPOC( j ), ( getUsed( j ) == 1 ) ? "*" : "" );
   }
   if (getInterRPSPrediction())
   {
     DTRACE( g_trace_ctx, D_RPSINFO, "}, RefIdc = { " );
-    for(Int j=0; j < getNumRefIdc(); j++)
+    for(int j=0; j < getNumRefIdc(); j++)
     {
       DTRACE( g_trace_ctx, D_RPSINFO, "%d ", getRefIdc( j ) );
     }
@@ -2137,22 +2139,22 @@ RefPicListModification::~RefPicListModification()
 #if HEVC_USE_SCALING_LISTS
 ScalingList::ScalingList()
 {
-  for(UInt sizeId = 0; sizeId < SCALING_LIST_SIZE_NUM; sizeId++)
+  for(uint32_t sizeId = 0; sizeId < SCALING_LIST_SIZE_NUM; sizeId++)
   {
-    for(UInt listId = 0; listId < SCALING_LIST_NUM; listId++)
+    for(uint32_t listId = 0; listId < SCALING_LIST_NUM; listId++)
     {
-      m_scalingListCoef[sizeId][listId].resize(std::min<Int>(MAX_MATRIX_COEF_NUM,(Int)g_scalingListSize[sizeId]));
+      m_scalingListCoef[sizeId][listId].resize(std::min<int>(MAX_MATRIX_COEF_NUM,(int)g_scalingListSize[sizeId]));
     }
   }
 }
 
 /** set default quantization matrix to array
 */
-Void ScalingList::setDefaultScalingList()
+void ScalingList::setDefaultScalingList()
 {
-  for(UInt sizeId = 0; sizeId < SCALING_LIST_SIZE_NUM; sizeId++)
+  for(uint32_t sizeId = 0; sizeId < SCALING_LIST_SIZE_NUM; sizeId++)
   {
-    for(UInt listId=0;listId<SCALING_LIST_NUM;listId++)
+    for(uint32_t listId=0;listId<SCALING_LIST_NUM;listId++)
     {
       processDefaultMatrix(sizeId, listId);
     }
@@ -2161,15 +2163,15 @@ Void ScalingList::setDefaultScalingList()
 /** check if use default quantization matrix
  * \returns true if use default quantization matrix in all size
 */
-Bool ScalingList::checkDefaultScalingList()
+bool ScalingList::checkDefaultScalingList()
 {
-  UInt defaultCounter=0;
+  uint32_t defaultCounter=0;
 
-  for( UInt sizeId = 0; sizeId < SCALING_LIST_SIZE_NUM; sizeId++ )
+  for( uint32_t sizeId = 0; sizeId < SCALING_LIST_SIZE_NUM; sizeId++ )
   {
-    for(UInt listId=0;listId<SCALING_LIST_NUM;listId++)
+    for(uint32_t listId=0;listId<SCALING_LIST_NUM;listId++)
     {
-      if( !::memcmp(getScalingListAddress(sizeId,listId), getScalingListDefaultAddress(sizeId, listId),sizeof(Int)*std::min(MAX_MATRIX_COEF_NUM,(Int)g_scalingListSize[sizeId])) // check value of matrix
+      if( !::memcmp(getScalingListAddress(sizeId,listId), getScalingListDefaultAddress(sizeId, listId),sizeof(int)*std::min(MAX_MATRIX_COEF_NUM,(int)g_scalingListSize[sizeId])) // check value of matrix
      && ((sizeId < SCALING_LIST_16x16) || (getScalingListDC(sizeId,listId) == 16))) // check DC value
       {
         defaultCounter++;
@@ -2185,19 +2187,19 @@ Bool ScalingList::checkDefaultScalingList()
  * \param listId    index of input matrix
  * \param refListId index of reference matrix
  */
-Void ScalingList::processRefMatrix( UInt sizeId, UInt listId , UInt refListId )
+void ScalingList::processRefMatrix( uint32_t sizeId, uint32_t listId , uint32_t refListId )
 {
-  ::memcpy(getScalingListAddress(sizeId, listId),((listId == refListId)? getScalingListDefaultAddress(sizeId, refListId): getScalingListAddress(sizeId, refListId)),sizeof(Int)*std::min(MAX_MATRIX_COEF_NUM,(Int)g_scalingListSize[sizeId]));
+  ::memcpy(getScalingListAddress(sizeId, listId),((listId == refListId)? getScalingListDefaultAddress(sizeId, refListId): getScalingListAddress(sizeId, refListId)),sizeof(int)*std::min(MAX_MATRIX_COEF_NUM,(int)g_scalingListSize[sizeId]));
 }
 
-Void ScalingList::checkPredMode(UInt sizeId, UInt listId)
+void ScalingList::checkPredMode(uint32_t sizeId, uint32_t listId)
 {
-  Int predListStep = (sizeId == SCALING_LIST_32x32? (SCALING_LIST_NUM/NUMBER_OF_PREDICTION_MODES) : 1); // if 32x32, skip over chroma entries.
+  int predListStep = (sizeId == SCALING_LIST_32x32? (SCALING_LIST_NUM/NUMBER_OF_PREDICTION_MODES) : 1); // if 32x32, skip over chroma entries.
 
-  for(Int predListIdx = (Int)listId ; predListIdx >= 0; predListIdx-=predListStep)
+  for(int predListIdx = (int)listId ; predListIdx >= 0; predListIdx-=predListStep)
   {
     if( !::memcmp(getScalingListAddress(sizeId,listId),((listId == predListIdx) ?
-      getScalingListDefaultAddress(sizeId, predListIdx): getScalingListAddress(sizeId, predListIdx)),sizeof(Int)*std::min(MAX_MATRIX_COEF_NUM,(Int)g_scalingListSize[sizeId])) // check value of matrix
+      getScalingListDefaultAddress(sizeId, predListIdx): getScalingListAddress(sizeId, predListIdx)),sizeof(int)*std::min(MAX_MATRIX_COEF_NUM,(int)g_scalingListSize[sizeId])) // check value of matrix
      && ((sizeId < SCALING_LIST_16x16) || (getScalingListDC(sizeId,listId) == getScalingListDC(sizeId,predListIdx)))) // check DC value
     {
       setRefMatrixId(sizeId, listId, predListIdx);
@@ -2208,7 +2210,7 @@ Void ScalingList::checkPredMode(UInt sizeId, UInt listId)
   setScalingListPredModeFlag(sizeId, listId, true);
 }
 
-static Void outputScalingListHelp(std::ostream &os)
+static void outputScalingListHelp(std::ostream &os)
 {
   os << "The scaling list file specifies all matrices and their DC values; none can be missing,\n"
          "but their order is arbitrary.\n\n"
@@ -2226,9 +2228,9 @@ static Void outputScalingListHelp(std::ostream &os)
          "  <value>\n";
 
   os << "The permitted matrix names are:\n";
-  for(UInt sizeIdc = 0; sizeIdc < SCALING_LIST_SIZE_NUM; sizeIdc++)
+  for(uint32_t sizeIdc = 0; sizeIdc < SCALING_LIST_SIZE_NUM; sizeIdc++)
   {
-    for(UInt listIdc = 0; listIdc < SCALING_LIST_NUM; listIdc++)
+    for(uint32_t listIdc = 0; listIdc < SCALING_LIST_NUM; listIdc++)
     {
       if ((sizeIdc!=SCALING_LIST_32x32) || (listIdc%(SCALING_LIST_NUM/NUMBER_OF_PREDICTION_MODES) == 0))
       {
@@ -2238,20 +2240,20 @@ static Void outputScalingListHelp(std::ostream &os)
   }
 }
 
-Void ScalingList::outputScalingLists(std::ostream &os) const
+void ScalingList::outputScalingLists(std::ostream &os) const
 {
-  for(UInt sizeIdc = 0; sizeIdc < SCALING_LIST_SIZE_NUM; sizeIdc++)
+  for(uint32_t sizeIdc = 0; sizeIdc < SCALING_LIST_SIZE_NUM; sizeIdc++)
   {
-    const UInt size = std::min(8,4<<(sizeIdc));
-    for(UInt listIdc = 0; listIdc < SCALING_LIST_NUM; listIdc++)
+    const uint32_t size = std::min(8,4<<(sizeIdc));
+    for(uint32_t listIdc = 0; listIdc < SCALING_LIST_NUM; listIdc++)
     {
       if ((sizeIdc!=SCALING_LIST_32x32) || (listIdc%(SCALING_LIST_NUM/NUMBER_OF_PREDICTION_MODES) == 0))
       {
-        const Int *src = getScalingListAddress(sizeIdc, listIdc);
+        const int *src = getScalingListAddress(sizeIdc, listIdc);
         os << (MatrixType[sizeIdc][listIdc]) << " =\n  ";
-        for(UInt y=0; y<size; y++)
+        for(uint32_t y=0; y<size; y++)
         {
-          for(UInt x=0; x<size; x++, src++)
+          for(uint32_t x=0; x<size; x++, src++)
           {
             os << std::setw(3) << (*src) << ", ";
           }
@@ -2267,11 +2269,11 @@ Void ScalingList::outputScalingLists(std::ostream &os) const
   }
 }
 
-Bool ScalingList::xParseScalingList(const std::string &fileName)
+bool ScalingList::xParseScalingList(const std::string &fileName)
 {
-  static const Int LINE_SIZE=1024;
+  static const int LINE_SIZE=1024;
   FILE *fp = NULL;
-  TChar line[LINE_SIZE];
+  char line[LINE_SIZE];
 
   if (fileName.empty())
   {
@@ -2287,18 +2289,18 @@ Bool ScalingList::xParseScalingList(const std::string &fileName)
     return true;
   }
 
-  for(UInt sizeIdc = SCALING_LIST_FIRST_CODED; sizeIdc < SCALING_LIST_SIZE_NUM; sizeIdc++)
+  for(uint32_t sizeIdc = SCALING_LIST_FIRST_CODED; sizeIdc < SCALING_LIST_SIZE_NUM; sizeIdc++)
   {
-    const UInt size = std::min(MAX_MATRIX_COEF_NUM,(Int)g_scalingListSize[sizeIdc]);
+    const uint32_t size = std::min(MAX_MATRIX_COEF_NUM,(int)g_scalingListSize[sizeIdc]);
 
-    for(UInt listIdc = 0; listIdc < SCALING_LIST_NUM; listIdc++)
+    for(uint32_t listIdc = 0; listIdc < SCALING_LIST_NUM; listIdc++)
     {
-      Int * const src = getScalingListAddress(sizeIdc, listIdc);
+      int * const src = getScalingListAddress(sizeIdc, listIdc);
 
       if ((sizeIdc==SCALING_LIST_32x32) && (listIdc%(SCALING_LIST_NUM/NUMBER_OF_PREDICTION_MODES) != 0)) // derive chroma32x32 from chroma16x16
       {
-        const Int *srcNextSmallerSize = getScalingListAddress(sizeIdc-1, listIdc);
-        for(UInt i=0; i<size; i++)
+        const int *srcNextSmallerSize = getScalingListAddress(sizeIdc-1, listIdc);
+        for(uint32_t i=0; i<size; i++)
         {
           src[i] = srcNextSmallerSize[i];
         }
@@ -2308,11 +2310,11 @@ Bool ScalingList::xParseScalingList(const std::string &fileName)
       {
         {
           fseek(fp, 0, SEEK_SET);
-          Bool bFound=false;
+          bool bFound=false;
           while ((!feof(fp)) && (!bFound))
           {
-            TChar *ret = fgets(line, LINE_SIZE, fp);
-            TChar *findNamePosition= ret==NULL ? NULL : strstr(line, MatrixType[sizeIdc][listIdc]);
+            char *ret = fgets(line, LINE_SIZE, fp);
+            char *findNamePosition= ret==NULL ? NULL : strstr(line, MatrixType[sizeIdc][listIdc]);
             // This could be a match against the DC string as well, so verify it isn't
             if (findNamePosition!= NULL && (MatrixType_DC[sizeIdc][listIdc]==NULL || strstr(line, MatrixType_DC[sizeIdc][listIdc])==NULL))
             {
@@ -2325,9 +2327,9 @@ Bool ScalingList::xParseScalingList(const std::string &fileName)
             return true;
           }
         }
-        for (UInt i=0; i<size; i++)
+        for (uint32_t i=0; i<size; i++)
         {
-          Int data;
+          int data;
           if (fscanf(fp, "%d,", &data)!=1)
           {
             msg( ERROR, "Error: cannot read value #%d for Matrix %s from scaling list file %s at file position %ld\n", i, MatrixType[sizeIdc][listIdc], fileName.c_str(), ftell(fp));
@@ -2348,11 +2350,11 @@ Bool ScalingList::xParseScalingList(const std::string &fileName)
         {
           {
             fseek(fp, 0, SEEK_SET);
-            Bool bFound=false;
+            bool bFound=false;
             while ((!feof(fp)) && (!bFound))
             {
-              TChar *ret = fgets(line, LINE_SIZE, fp);
-              TChar *findNamePosition= ret==NULL ? NULL : strstr(line, MatrixType_DC[sizeIdc][listIdc]);
+              char *ret = fgets(line, LINE_SIZE, fp);
+              char *findNamePosition= ret==NULL ? NULL : strstr(line, MatrixType_DC[sizeIdc][listIdc]);
               if (findNamePosition!= NULL)
               {
                 // This won't be a match against the non-DC string.
@@ -2365,7 +2367,7 @@ Bool ScalingList::xParseScalingList(const std::string &fileName)
               return true;
             }
           }
-          Int data;
+          int data;
           if (fscanf(fp, "%d,", &data)!=1)
           {
             msg( ERROR, "Error: cannot read DC %s from scaling list file %s at file position %ld\n", MatrixType_DC[sizeIdc][listIdc], fileName.c_str(), ftell(fp));
@@ -2395,9 +2397,9 @@ Bool ScalingList::xParseScalingList(const std::string &fileName)
  * \param listId list index
  * \returns pointer of quantization matrix
  */
-const Int* ScalingList::getScalingListDefaultAddress(UInt sizeId, UInt listId)
+const int* ScalingList::getScalingListDefaultAddress(uint32_t sizeId, uint32_t listId)
 {
-  const Int *src = 0;
+  const int *src = 0;
   switch(sizeId)
   {
     case SCALING_LIST_2x2:
@@ -2423,19 +2425,19 @@ const Int* ScalingList::getScalingListDefaultAddress(UInt sizeId, UInt listId)
  * \param sizeId size index
  * \param listId index of input matrix
  */
-Void ScalingList::processDefaultMatrix(UInt sizeId, UInt listId)
+void ScalingList::processDefaultMatrix(uint32_t sizeId, uint32_t listId)
 {
-  ::memcpy(getScalingListAddress(sizeId, listId),getScalingListDefaultAddress(sizeId,listId),sizeof(Int)*std::min(MAX_MATRIX_COEF_NUM,(Int)g_scalingListSize[sizeId]));
+  ::memcpy(getScalingListAddress(sizeId, listId),getScalingListDefaultAddress(sizeId,listId),sizeof(int)*std::min(MAX_MATRIX_COEF_NUM,(int)g_scalingListSize[sizeId]));
   setScalingListDC(sizeId,listId,SCALING_LIST_DC);
 }
 
 /** check DC value of matrix for default matrix signaling
  */
-Void ScalingList::checkDcOfMatrix()
+void ScalingList::checkDcOfMatrix()
 {
-  for(UInt sizeId = 0; sizeId < SCALING_LIST_SIZE_NUM; sizeId++)
+  for(uint32_t sizeId = 0; sizeId < SCALING_LIST_SIZE_NUM; sizeId++)
   {
-    for(UInt listId = 0; listId < SCALING_LIST_NUM; listId++)
+    for(uint32_t listId = 0; listId < SCALING_LIST_NUM; listId++)
     {
       //check default matrix?
       if(getScalingListDC(sizeId,listId) == 0)
@@ -2469,12 +2471,12 @@ ParameterSetManager::~ParameterSetManager()
 
 //! activate a SPS from a active parameter sets SEI message
 //! \returns true, if activation is successful
-//Bool ParameterSetManager::activateSPSWithSEI(Int spsId)
+//bool ParameterSetManager::activateSPSWithSEI(int spsId)
 //{
 //  SPS *sps = m_spsMap.getPS(spsId);
 //  if (sps)
 //  {
-//    Int vpsId = sps->getVPSId();
+//    int vpsId = sps->getVPSId();
 //    VPS *vps = m_vpsMap.getPS(vpsId);
 //    if (vps)
 //    {
@@ -2500,12 +2502,12 @@ ParameterSetManager::~ParameterSetManager()
 //! activate a PPS and depending on isIDR parameter also SPS
 #endif
 //! \returns true, if activation is successful
-Bool ParameterSetManager::activatePPS(Int ppsId, Bool isIRAP)
+bool ParameterSetManager::activatePPS(int ppsId, bool isIRAP)
 {
   PPS *pps = m_ppsMap.getPS(ppsId);
   if (pps)
   {
-    Int spsId = pps->getSPSId();
+    int spsId = pps->getSPSId();
     if (!isIRAP && (spsId != m_activeSPSId ))
     {
       msg( WARNING, "Warning: tried to activate PPS referring to a inactive SPS at non-IDR.");
@@ -2517,7 +2519,7 @@ Bool ParameterSetManager::activatePPS(Int ppsId, Bool isIRAP)
       {
 
 #if HEVC_VPS
-        Int vpsId = sps->getVPSId();
+        int vpsId = sps->getVPSId();
         if (!isIRAP && (vpsId != m_activeVPSId ))
         {
           msg( WARNING, "Warning: tried to activate PPS referring to a inactive VPS at non-IDR.");
@@ -2566,13 +2568,13 @@ Bool ParameterSetManager::activatePPS(Int ppsId, Bool isIRAP)
 }
 
 template <>
-Void ParameterSetMap<PPS>::setID(PPS* parameterSet, const Int psId)
+void ParameterSetMap<PPS>::setID(PPS* parameterSet, const int psId)
 {
   parameterSet->setPPSId(psId);
 }
 
 template <>
-Void ParameterSetMap<SPS>::setID(SPS* parameterSet, const Int psId)
+void ParameterSetMap<SPS>::setID(SPS* parameterSet, const int psId)
 {
   parameterSet->setSPSId(psId);
 }
@@ -2596,7 +2598,7 @@ PTL::PTL()
   ::memset(m_subLayerLevelPresentFlag,   0, sizeof(m_subLayerLevelPresentFlag  ));
 }
 
-Void calculateParameterSetChangedFlag(Bool &bChanged, const std::vector<UChar> *pOldData, const std::vector<UChar> *pNewData)
+void calculateParameterSetChangedFlag(bool &bChanged, const std::vector<uint8_t> *pOldData, const std::vector<uint8_t> *pNewData)
 {
   if (!bChanged)
   {
@@ -2613,8 +2615,8 @@ Void calculateParameterSetChangedFlag(Bool &bChanged, const std::vector<UChar> *
       }
       else
       {
-        const UChar *pNewDataArray=&(*pNewData)[0];
-        const UChar *pOldDataArray=&(*pOldData)[0];
+        const uint8_t *pNewDataArray=&(*pNewData)[0];
+        const uint8_t *pOldDataArray=&(*pOldData)[0];
         if (memcmp(pOldDataArray, pNewDataArray, pOldData->size()))
         {
           bChanged=true;
@@ -2626,36 +2628,36 @@ Void calculateParameterSetChangedFlag(Bool &bChanged, const std::vector<UChar> *
 
 //! \}
 
-UInt PreCalcValues::getValIdx( const Slice &slice, const ChannelType chType ) const
+uint32_t PreCalcValues::getValIdx( const Slice &slice, const ChannelType chType ) const
 {
   return slice.isIntra() ? ( ISingleTree ? 0 : ( chType << 1 ) ) : 1;
 }
 
-UInt PreCalcValues::getMaxBtDepth( const Slice &slice, const ChannelType chType ) const
+uint32_t PreCalcValues::getMaxBtDepth( const Slice &slice, const ChannelType chType ) const
 {
   return maxBtDepth[getValIdx( slice, chType )];
 }
 
-UInt PreCalcValues::getMinBtSize( const Slice &slice, const ChannelType chType ) const
+uint32_t PreCalcValues::getMinBtSize( const Slice &slice, const ChannelType chType ) const
 {
   return minBtSize[getValIdx( slice, chType )];
 }
 
-UInt PreCalcValues::getMaxBtSize( const Slice &slice, const ChannelType chType ) const
+uint32_t PreCalcValues::getMaxBtSize( const Slice &slice, const ChannelType chType ) const
 {
   return ( !slice.isIntra() || isLuma( chType ) || ISingleTree ) ? slice.getMaxBTSize() : MAX_BT_SIZE_C;
 }
 
-UInt PreCalcValues::getMinTtSize( const Slice &slice, const ChannelType chType ) const
+uint32_t PreCalcValues::getMinTtSize( const Slice &slice, const ChannelType chType ) const
 {
   return minTtSize[getValIdx( slice, chType )];
 }
 
-UInt PreCalcValues::getMaxTtSize( const Slice &slice, const ChannelType chType ) const
+uint32_t PreCalcValues::getMaxTtSize( const Slice &slice, const ChannelType chType ) const
 {
   return maxTtSize[getValIdx( slice, chType )];
 }
-UInt PreCalcValues::getMinQtSize( const Slice &slice, const ChannelType chType ) const
+uint32_t PreCalcValues::getMinQtSize( const Slice &slice, const ChannelType chType ) const
 {
   return minQtSize[getValIdx( slice, chType )];
 }

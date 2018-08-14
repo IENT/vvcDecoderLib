@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,16 +49,16 @@
  *  - the initial startcode in the access unit,
  *  - any SPS/PPS nal units
  */
-static std::vector<UInt> writeAnnexB(std::ostream& out, const AccessUnit& au)
+static std::vector<uint32_t> writeAnnexB(std::ostream& out, const AccessUnit& au)
 {
-  std::vector<UInt> annexBsizes;
+  std::vector<uint32_t> annexBsizes;
 
   for (AccessUnit::const_iterator it = au.begin(); it != au.end(); it++)
   {
     const NALUnitEBSP& nalu = **it;
-    UInt size = 0; /* size of annexB unit in bytes */
+    uint32_t size = 0; /* size of annexB unit in bytes */
 
-    static const UChar start_code_prefix[] = {0,0,0,1};
+    static const uint8_t start_code_prefix[] = {0,0,0,1};
 #if HEVC_VPS
     if (it == au.begin() || nalu.m_nalUnitType == NAL_UNIT_VPS || nalu.m_nalUnitType == NAL_UNIT_SPS || nalu.m_nalUnitType == NAL_UNIT_PPS)
 #else
@@ -73,16 +73,16 @@ static std::vector<UInt> writeAnnexB(std::ostream& out, const AccessUnit& au)
        *    unit of an access unit in decoding order, as specified by subclause
        *    7.4.1.2.3.
        */
-      out.write(reinterpret_cast<const TChar*>(start_code_prefix), 4);
+      out.write(reinterpret_cast<const char*>(start_code_prefix), 4);
       size += 4;
     }
     else
     {
-      out.write(reinterpret_cast<const TChar*>(start_code_prefix+1), 3);
+      out.write(reinterpret_cast<const char*>(start_code_prefix+1), 3);
       size += 3;
     }
     out << nalu.m_nalUnitData.str();
-    size += UInt(nalu.m_nalUnitData.str().size());
+    size += uint32_t(nalu.m_nalUnitData.str().size());
 
     annexBsizes.push_back(size);
   }

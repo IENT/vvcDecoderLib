@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,7 @@
 //! \ingroup libMD5
 //! \{
 
-static const UInt MD5_DIGEST_STRING_LENGTH=16;
+static const uint32_t MD5_DIGEST_STRING_LENGTH=16;
 
 class MD5
 {

@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -52,33 +52,33 @@
 class AQpLayer
 {
 private:
-  UInt                  m_uiAQPartWidth;
-  UInt                  m_uiAQPartHeight;
-  UInt                  m_uiNumAQPartInWidth;
-  UInt                  m_uiNumAQPartInHeight;
-  Double                m_dAvgActivity;
-  std::vector<Double>   m_acEncAQU;
+  uint32_t                  m_uiAQPartWidth;
+  uint32_t                  m_uiAQPartHeight;
+  uint32_t                  m_uiNumAQPartInWidth;
+  uint32_t                  m_uiNumAQPartInHeight;
+  double                m_dAvgActivity;
+  std::vector<double>   m_acEncAQU;
 
 public:
-  AQpLayer( Int iWidth, Int iHeight, UInt uiAQPartWidth, UInt uiAQPartHeight );
+  AQpLayer( int iWidth, int iHeight, uint32_t uiAQPartWidth, uint32_t uiAQPartHeight );
   virtual ~AQpLayer();
 
-  UInt                   getAQPartWidth()        { return m_uiAQPartWidth;       }
-  UInt                   getAQPartHeight()       { return m_uiAQPartHeight;      }
-  UInt                   getNumAQPartInWidth()   { return m_uiNumAQPartInWidth;  }
-  UInt                   getNumAQPartInHeight()  { return m_uiNumAQPartInHeight; }
-  UInt                   getAQPartStride()       { return m_uiNumAQPartInWidth;  }
-  std::vector<Double>&   getQPAdaptationUnit()   { return m_acEncAQU;           }
-  Double getActivity( const Position& pos)
+  uint32_t                   getAQPartWidth()        { return m_uiAQPartWidth;       }
+  uint32_t                   getAQPartHeight()       { return m_uiAQPartHeight;      }
+  uint32_t                   getNumAQPartInWidth()   { return m_uiNumAQPartInWidth;  }
+  uint32_t                   getNumAQPartInHeight()  { return m_uiNumAQPartInHeight; }
+  uint32_t                   getAQPartStride()       { return m_uiNumAQPartInWidth;  }
+  std::vector<double>&   getQPAdaptationUnit()   { return m_acEncAQU;           }
+  double getActivity( const Position& pos)
   {
-    UInt uiAQUPosX = pos.x / m_uiAQPartWidth;
-    UInt uiAQUPosY = pos.y / m_uiAQPartHeight;
+    uint32_t uiAQUPosX = pos.x / m_uiAQPartWidth;
+    uint32_t uiAQUPosY = pos.y / m_uiAQPartHeight;
     return m_acEncAQU[uiAQUPosY * m_uiNumAQPartInWidth + uiAQUPosX];
   }
 
-  Double                 getAvgActivity()        { return m_dAvgActivity;        }
+  double                 getAvgActivity()        { return m_dAvgActivity;        }
 
-  Void                   setAvgActivity( Double d )  { m_dAvgActivity = d; }
+  void                   setAvgActivity( double d )  { m_dAvgActivity = d; }
 };
 
 /// Source picture analyzer class
@@ -88,7 +88,7 @@ protected:
   AQpPreanalyzer() {}
   virtual ~AQpPreanalyzer() {}
 public:
-  static Void preanalyze( Picture* picture );
+  static void preanalyze( Picture* picture );
 };
 
 //! \}

@@ -3,7 +3,7 @@
 * and contributor rights, including patent rights, and no such rights are
 * granted under this license.
 *
-* Copyright (c) 2010-2017, ITU/ISO/IEC
+* Copyright (c) 2010-2018, ITU/ISO/IEC
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -46,7 +46,7 @@
 // CS tools
 namespace CS
 {
-  UInt64 getEstBits                   ( const CodingStructure &cs );
+  uint64_t getEstBits                   ( const CodingStructure &cs );
 #if JEM_TOOLS
   void   initFrucMvp                  (       CodingStructure &cs );
 #endif
@@ -72,7 +72,7 @@ namespace CU
   bool isInter                        (const CodingUnit &cu);
   bool isRDPCMEnabled                 (const CodingUnit &cu);
   bool isLosslessCoded                (const CodingUnit &cu);
-  UInt getIntraSizeIdx                (const CodingUnit &cu);
+  uint32_t getIntraSizeIdx                (const CodingUnit &cu);
 
   bool isSameCtu                      (const CodingUnit &cu, const CodingUnit &cu2);
   bool isSameSlice                    (const CodingUnit &cu, const CodingUnit &cu2);
@@ -81,18 +81,18 @@ namespace CU
   bool isSameSliceAndTile             (const CodingUnit &cu, const CodingUnit &cu2);
 #endif
   bool isLastSubCUOfCtu               (const CodingUnit &cu);
-  UInt getCtuAddr                     (const CodingUnit &cu);
+  uint32_t getCtuAddr                     (const CodingUnit &cu);
 
   int  predictQP                      (const CodingUnit& cu, const int prevQP );
   bool isQGStart                      (const CodingUnit& cu); // check if start of a Quantization Group
 
-  UInt getNumPUs                      (const CodingUnit& cu);
+  uint32_t getNumPUs                      (const CodingUnit& cu);
   void addPUs                         (      CodingUnit& cu);
 
   PartSplit getSplitAtDepth           (const CodingUnit& cu, const unsigned depth);
 
   bool hasNonTsCodedBlock             (const CodingUnit& cu);
-  UInt getNumNonZeroCoeffNonTs        (const CodingUnit& cu);
+  uint32_t getNumNonZeroCoeffNonTs        (const CodingUnit& cu);
 #if JEM_TOOLS
   bool isLICFlagPresent               (const CodingUnit& cu);
   bool isObmcFlagCoded                (const CodingUnit& cu);
@@ -103,7 +103,7 @@ namespace CU
   cPUTraverser traversePUs            (const CodingUnit& cu);
   cTUTraverser traverseTUs            (const CodingUnit& cu);
 
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
   bool  hasSubCUNonZeroMVd            (const CodingUnit& cu);
   int   getMaxNeighboriMVCandNum      (const CodingStructure& cs, const Position& pos);
   void  resetMVDandMV2Int             (      CodingUnit& cu, InterPrediction *interPred );
@@ -115,7 +115,7 @@ namespace CU
 namespace PU
 {
 #if JVET_K0190
-  int  getLMSymbolList(const PredictionUnit &pu, Int *pModeList);
+  int  getLMSymbolList(const PredictionUnit &pu, int *pModeList);
 #if JEM_TOOLS
   int  getIntraMPMs(const PredictionUnit &pu, unsigned *mpm, const ChannelType &channelType = CHANNEL_TYPE_LUMA, const bool isChromaMDMS = false, const unsigned startIdx = 0);  
   int  getDMModes(const PredictionUnit &pu, unsigned *modeList);
@@ -125,14 +125,14 @@ namespace PU
 #else
 #if JEM_TOOLS
   int  getIntraMPMs                   (const PredictionUnit &pu, unsigned *mpm, const ChannelType &channelType = CHANNEL_TYPE_LUMA, const bool isChromaMDMS = false, const unsigned startIdx = 0 );
-  int  getLMSymbolList                (const PredictionUnit &pu, Int *pModeList);
+  int  getLMSymbolList                (const PredictionUnit &pu, int *pModeList);
   int  getDMModes                     (const PredictionUnit &pu, unsigned *modeList);
 #else
   int  getIntraMPMs                   (const PredictionUnit &pu, unsigned *mpm, const ChannelType &channelType = CHANNEL_TYPE_LUMA);
 #endif
 #endif
   void getIntraChromaCandModes        (const PredictionUnit &pu, unsigned modeList[NUM_CHROMA_MODE]);
-  UInt getFinalIntraMode              (const PredictionUnit &pu, const ChannelType &chType);
+  uint32_t getFinalIntraMode              (const PredictionUnit &pu, const ChannelType &chType);
 
   void getInterMergeCandidates        (const PredictionUnit &pu, MergeCtx& mrgCtx, const int& mrgCandIdx = -1 );
   bool isDiffMER                      (const PredictionUnit &pu, const PredictionUnit &pu2);
@@ -142,14 +142,14 @@ namespace PU
   void fillAffineMvpCand              (      PredictionUnit &pu, const RefPicList &eRefPicList, const int &refIdx, AffineAMVPInfo &affiAMVPInfo);
   bool addMVPCandUnscaled             (const PredictionUnit &pu, const RefPicList &eRefPicList, const int &iRefIdx, const Position &pos, const MvpDir &eDir, AMVPInfo &amvpInfo, bool affine = false);
   bool addMVPCandWithScaling          (const PredictionUnit &pu, const RefPicList &eRefPicList, const int &iRefIdx, const Position &pos, const MvpDir &eDir, AMVPInfo &amvpInfo, bool affine = false);
-  Void xInheritedAffineMv             ( const PredictionUnit &pu, const PredictionUnit* puNeighbour, RefPicList eRefPicList, Mv rcMv[3] );
+  void xInheritedAffineMv             ( const PredictionUnit &pu, const PredictionUnit* puNeighbour, RefPicList eRefPicList, Mv rcMv[3] );
 #elif JVET_K_AFFINE
   bool getColocatedMVP                (const PredictionUnit &pu, const RefPicList &eRefPicList, const Position &pos, Mv& rcMv, const int &refIdx);
   void fillMvpCand                    (      PredictionUnit &pu, const RefPicList &eRefPicList, const int &refIdx, AMVPInfo &amvpInfo );
   void fillAffineMvpCand              (      PredictionUnit &pu, const RefPicList &eRefPicList, const int &refIdx, AffineAMVPInfo &affiAMVPInfo);
   bool addMVPCandUnscaled             (const PredictionUnit &pu, const RefPicList &eRefPicList, const int &iRefIdx, const Position &pos, const MvpDir &eDir, AMVPInfo &amvpInfo, bool affine = false);
   bool addMVPCandWithScaling          (const PredictionUnit &pu, const RefPicList &eRefPicList, const int &iRefIdx, const Position &pos, const MvpDir &eDir, AMVPInfo &amvpInfo, bool affine = false);
-  Void xInheritedAffineMv             ( const PredictionUnit &pu, const PredictionUnit* puNeighbour, RefPicList eRefPicList, Mv rcMv[3] );
+  void xInheritedAffineMv             ( const PredictionUnit &pu, const PredictionUnit* puNeighbour, RefPicList eRefPicList, Mv rcMv[3] );
 #else
   void fillMvpCand                    (      PredictionUnit &pu, const RefPicList &eRefPicList, const int &refIdx, AMVPInfo &amvpInfo);
   bool addMVPCandUnscaled             (const PredictionUnit &pu, const RefPicList &eRefPicList, const int &iRefIdx, const Position &pos, const MvpDir &eDir, AMVPInfo &amvpInfo);
@@ -163,7 +163,11 @@ namespace PU
 
   bool getInterMergeSubPuMvpCand      (const PredictionUnit &pu, MergeCtx &mrgCtx, bool& LICFlag, const int count );
   bool getInterMergeSubPuRecurCand    (const PredictionUnit &pu, MergeCtx &mrgCtx, const int count );
+#endif
+#if JVET_K0357_AMVR
   void applyImv                       (      PredictionUnit &pu, MergeCtx &mrgCtx, InterPrediction *interPred = NULL );
+#endif
+#if JEM_TOOLS
   bool isAffineMrgFlagCoded           (const PredictionUnit &pu );
   void getAffineMergeCand             (const PredictionUnit &pu, MvField (*mvFieldNeighbours)[3], unsigned char &interDirNeighbours, int &numValidMergeCand );
   void setAllAffineMvField            (      PredictionUnit &pu, MvField *mvField, RefPicList eRefList );
@@ -183,10 +187,10 @@ namespace PU
   bool isBiPredFromDifferentDir       (const PredictionUnit &pu);
   void restrictBiPredMergeCands       (const PredictionUnit &pu, MergeCtx& mrgCtx);
 #if JEM_TOOLS
-  bool getNeighborMotion              (      PredictionUnit &pu, MotionInfo& mi, Position off, Int iDir, Bool bSubPu );
+  bool getNeighborMotion              (      PredictionUnit &pu, MotionInfo& mi, Position off, int iDir, bool bSubPu );
   bool getMvPair                      (const PredictionUnit &pu, RefPicList eCurRefPicList, const MvField & rCurMvField, MvField &rMvPair);
   bool isSameMVField                  (const PredictionUnit &pu, RefPicList eListA, MvField &rMVFieldA, RefPicList eListB, MvField &rMVFieldB);
-  Mv   scaleMv                        (const Mv &rColMV, Int iCurrPOC, Int iCurrRefPOC, Int iColPOC, Int iColRefPOC, Slice *slice);
+  Mv   scaleMv                        (const Mv &rColMV, int iCurrPOC, int iCurrRefPOC, int iColPOC, int iColRefPOC, Slice *slice);
 #endif
 
 #if JEM_TOOLS||JVET_K0190
@@ -205,7 +209,7 @@ namespace PU
 // TU tools
 namespace TU
 {
-  UInt getNumNonZeroCoeffsNonTS       (const TransformUnit &tu, const bool bLuma = true, const bool bChroma = true);
+  uint32_t getNumNonZeroCoeffsNonTS       (const TransformUnit &tu, const bool bLuma = true, const bool bChroma = true);
 #if HEVC_USE_4x4_DSTVII
   bool useDST                         (const TransformUnit &tu, const ComponentID &compID);
 #endif
@@ -218,9 +222,9 @@ namespace TU
   void setCbf                         (      TransformUnit &tu, const ComponentID &compID, const bool &cbf);
 #endif
   bool hasTransformSkipFlag           (const CodingStructure& cs, const CompArea& area);
-  UInt getGolombRiceStatisticsIndex   (const TransformUnit &tu, const ComponentID &compID);
+  uint32_t getGolombRiceStatisticsIndex   (const TransformUnit &tu, const ComponentID &compID);
 #if HEVC_USE_MDCS
-  UInt getCoefScanIdx                 (const TransformUnit &tu, const ComponentID &compID);
+  uint32_t getCoefScanIdx                 (const TransformUnit &tu, const ComponentID &compID);
 #endif
   bool hasCrossCompPredInfo           (const TransformUnit &tu, const ComponentID &compID);
 
@@ -232,10 +236,10 @@ namespace TU
 #endif
 }
 
-UInt getCtuAddr        (const Position& pos, const PreCalcValues &pcv);
+uint32_t getCtuAddr        (const Position& pos, const PreCalcValues &pcv);
 
 template<typename T, size_t N>
-UInt updateCandList( T uiMode, Double uiCost, static_vector<T, N>& candModeList, static_vector<double, N>& candCostList, size_t uiFastCandNum = N )
+uint32_t updateCandList( T uiMode, double uiCost, static_vector<T, N>& candModeList, static_vector<double, N>& candCostList, size_t uiFastCandNum = N )
 {
   CHECK( std::min( uiFastCandNum, candModeList.size() ) != std::min( uiFastCandNum, candCostList.size() ), "Sizes do not match!" );
   CHECK( uiFastCandNum > candModeList.capacity(), "The vector is to small to hold all the candidates!" );

@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -63,7 +63,7 @@
 // Tables
 // ====================================================================================================================
 
-const UChar LoopFilter::sm_tcTable[MAX_QP + 1 + DEFAULT_INTRA_TC_OFFSET] =
+const uint8_t LoopFilter::sm_tcTable[MAX_QP + 1 + DEFAULT_INTRA_TC_OFFSET] =
 {
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,5,5,6,6,7,8,9,10,11,13,14,16,18,20,22,24
 #if JVET_K0251_QP_EXT
@@ -71,7 +71,7 @@ const UChar LoopFilter::sm_tcTable[MAX_QP + 1 + DEFAULT_INTRA_TC_OFFSET] =
 #endif
 };
 
-const UChar LoopFilter::sm_betaTable[MAX_QP + 1] =
+const uint8_t LoopFilter::sm_betaTable[MAX_QP + 1] =
 {
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,7,8,9,10,11,12,13,14,15,16,17,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64
 #if JVET_K0251_QP_EXT
@@ -79,7 +79,7 @@ const UChar LoopFilter::sm_betaTable[MAX_QP + 1] =
 #endif
 };
 
-inline static UInt getRasterIdx(const Position& pos, const PreCalcValues& pcv)
+inline static uint32_t getRasterIdx(const Position& pos, const PreCalcValues& pcv)
 {
   return ( ( pos.x & pcv.maxCUWidthMask ) >> pcv.minCUWidthLog2 ) + ( ( pos.y & pcv.maxCUHeightMask ) >> pcv.minCUHeightLog2 ) * pcv.partsInCtuWidth;
 }
@@ -257,8 +257,8 @@ void LoopFilter::xDeblockCU( CodingUnit& cu, const DeblockEdgeDir edgeDir )
   for( auto &currPU : CU::traversePUs( cu ) )
   {
     const Area& areaPu = cu.Y().valid() ? currPU.block( COMPONENT_Y ) : area;
-    const Bool xOff    = currPU.blocks[cu.chType].x != cu.blocks[cu.chType].x;
-    const Bool yOff    = currPU.blocks[cu.chType].y != cu.blocks[cu.chType].y;
+    const bool xOff    = currPU.blocks[cu.chType].x != cu.blocks[cu.chType].x;
+    const bool yOff    = currPU.blocks[cu.chType].y != cu.blocks[cu.chType].y;
 
     xSetEdgefilterMultiple( cu, EDGE_VER, areaPu, (xOff ? m_stLFCUParam.internalEdge : m_stLFCUParam.leftEdge), xOff );
     xSetEdgefilterMultiple( cu, EDGE_HOR, areaPu, (yOff ? m_stLFCUParam.internalEdge : m_stLFCUParam.topEdge),  yOff );
@@ -268,7 +268,7 @@ void LoopFilter::xDeblockCU( CodingUnit& cu, const DeblockEdgeDir edgeDir )
     {
       if( areaPu.width == areaPu.height )
       {
-        for( UInt off = FRUC_MERGE_REFINE_MINBLKSIZE; off < areaPu.height; off += FRUC_MERGE_REFINE_MINBLKSIZE )
+        for( uint32_t off = FRUC_MERGE_REFINE_MINBLKSIZE; off < areaPu.height; off += FRUC_MERGE_REFINE_MINBLKSIZE )
         {
           xSetEdgefilterMultipleSubPu( cu, EDGE_VER, areaPu, areaPu.offset( (PosType) off, 0 ), m_stLFCUParam.internalEdge );
           xSetEdgefilterMultipleSubPu( cu, EDGE_HOR, areaPu, areaPu.offset( 0, (PosType) off ), m_stLFCUParam.internalEdge );
@@ -281,14 +281,14 @@ void LoopFilter::xDeblockCU( CodingUnit& cu, const DeblockEdgeDir edgeDir )
 #if JEM_TOOLS || JVET_K_AFFINE
   if ( cu.affine )
   {
-    const Int widthInBaseUnits = cu.Y().width >> pcv.minCUWidthLog2;
-    for( UInt edgeIdx = 1 ; edgeIdx < widthInBaseUnits ; edgeIdx++ )
+    const int widthInBaseUnits = cu.Y().width >> pcv.minCUWidthLog2;
+    for( uint32_t edgeIdx = 1 ; edgeIdx < widthInBaseUnits ; edgeIdx++ )
     {
       const Area affiBlockV( cu.Y().x + edgeIdx * pcv.minCUWidth, cu.Y().y, pcv.minCUWidth, cu.Y().height );
       xSetEdgefilterMultiple( cu, EDGE_VER, affiBlockV, m_stLFCUParam.internalEdge, 1 );
     }
-    const Int heightInBaseUnits = cu.Y().height >> pcv.minCUHeightLog2;
-    for( UInt edgeIdx = 1 ; edgeIdx < heightInBaseUnits ; edgeIdx++ )
+    const int heightInBaseUnits = cu.Y().height >> pcv.minCUHeightLog2;
+    for( uint32_t edgeIdx = 1 ; edgeIdx < heightInBaseUnits ; edgeIdx++ )
     {
       const Area affiBlockH( cu.Y().x, cu.Y().y + edgeIdx * pcv.minCUHeight, cu.Y().width, pcv.minCUHeight );
       xSetEdgefilterMultiple( cu, EDGE_HOR, affiBlockH, m_stLFCUParam.internalEdge, 1 );
@@ -405,19 +405,19 @@ void LoopFilter::xSetEdgefilterMultiple( const CodingUnit&    cu,
   }
 }
 #if JEM_TOOLS
-Void LoopFilter::xSetEdgefilterMultipleSubPu(const CodingUnit& cu,
+void LoopFilter::xSetEdgefilterMultipleSubPu(const CodingUnit& cu,
                                              DeblockEdgeDir edgeDir,
                                              const Area&    area,
                                              const Position subPuPos,
-                                             Bool           bValue )
+                                             bool           bValue )
 {
   const PreCalcValues& pcv = *cu.cs->pcv;
 
-  UInt uiAdd     = (edgeDir == EDGE_VER) ? pcv.partsInCtuWidth : 1;
-  UInt uiNumElem = (edgeDir == EDGE_VER) ? (area.height / pcv.minCUHeight) : (area.width / pcv.minCUWidth);
-  UInt uiBsIdx   = getRasterIdx( subPuPos, pcv );
+  uint32_t uiAdd     = (edgeDir == EDGE_VER) ? pcv.partsInCtuWidth : 1;
+  uint32_t uiNumElem = (edgeDir == EDGE_VER) ? (area.height / pcv.minCUHeight) : (area.width / pcv.minCUWidth);
+  uint32_t uiBsIdx   = getRasterIdx( subPuPos, pcv );
 
-  for (UInt ui = 0; ui < uiNumElem; ui++)
+  for (uint32_t ui = 0; ui < uiNumElem; ui++)
   {
     m_aapbEdgeFilter[edgeDir][uiBsIdx] = bValue;
     uiBsIdx += uiAdd;
@@ -499,7 +499,7 @@ unsigned LoopFilter::xGetBoundaryStrengthSingle ( const CodingUnit& cu, const De
     if( 0 <= miQ.refIdx[0] ) { mvQ0 = miQ.mv[0]; }
     if( 0 <= miQ.refIdx[1] ) { mvQ1 = miQ.mv[1]; }
 
-    Int nThreshold = 4;
+    int nThreshold = 4;
 #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
     if( cu.cs->sps->getSpsNext().getUseHighPrecMv() )
     {
@@ -562,7 +562,7 @@ unsigned LoopFilter::xGetBoundaryStrengthSingle ( const CodingUnit& cu, const De
   Mv mvP0 = miP.mv[0];
   Mv mvQ0 = miQ.mv[0];
 
-  Int nThreshold = 4;
+  int nThreshold = 4;
 #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
   if( cu.cs->sps->getSpsNext().getUseHighPrecMv() )
   {
@@ -574,7 +574,7 @@ unsigned LoopFilter::xGetBoundaryStrengthSingle ( const CodingUnit& cu, const De
   return ( ( abs( mvQ0.getHor() - mvP0.getHor() ) >= nThreshold ) || ( abs( mvQ0.getVer() - mvP0.getVer() ) >= nThreshold ) ) ? 1 : 0;
 }
 
-Void LoopFilter::xEdgeFilterLuma(const CodingUnit& cu, const DeblockEdgeDir edgeDir, const int iEdge)
+void LoopFilter::xEdgeFilterLuma(const CodingUnit& cu, const DeblockEdgeDir edgeDir, const int iEdge)
 {
   const CompArea&  lumaArea = cu.block(COMPONENT_Y);
   const PreCalcValues& pcv = *cu.cs->pcv;
@@ -586,8 +586,8 @@ Void LoopFilter::xEdgeFilterLuma(const CodingUnit& cu, const DeblockEdgeDir edge
   const PPS     &pps      = *(cu.cs->pps);
   const SPS     &sps      = *(cu.cs->sps);
   const Slice   &slice    = *(cu.slice);
-  const Bool    ppsTransquantBypassEnabledFlag = pps.getTransquantBypassEnabledFlag();
-  const Int     bitDepthLuma                   = sps.getBitDepth(CHANNEL_TYPE_LUMA);
+  const bool    ppsTransquantBypassEnabledFlag = pps.getTransquantBypassEnabledFlag();
+  const int     bitDepthLuma                   = sps.getBitDepth(CHANNEL_TYPE_LUMA);
   const ClpRng& clpRng( cu.cs->slice->clpRng(COMPONENT_Y) );
 
   int          iQP          = 0;
@@ -659,7 +659,7 @@ Void LoopFilter::xEdgeFilterLuma(const CodingUnit& cu, const DeblockEdgeDir edge
 
       iQP = (cuP.qp + cuQ.qp + 1) >> 1;
 
-      const int iIndexTC  = Clip3(0, MAX_QP + DEFAULT_INTRA_TC_OFFSET, Int(iQP + DEFAULT_INTRA_TC_OFFSET*(uiBs - 1) + (tcOffsetDiv2 << 1)));
+      const int iIndexTC  = Clip3(0, MAX_QP + DEFAULT_INTRA_TC_OFFSET, int(iQP + DEFAULT_INTRA_TC_OFFSET*(uiBs - 1) + (tcOffsetDiv2 << 1)));
       const int iIndexB   = Clip3(0, MAX_QP, iQP + (betaOffsetDiv2 << 1));
 
       const int iTc       = sm_tcTable  [iIndexTC] * iBitdepthScale;

@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -77,14 +77,14 @@ public:
   virtual ~DecSlice();
 
 #if JEM_TOOLS
-  Void  init              ( CABACDataStore* cabacDataStore, CABACDecoder* cabacDecoder, DecCu* pcMbDecoder );
+  void  init              ( CABACDataStore* cabacDataStore, CABACDecoder* cabacDecoder, DecCu* pcMbDecoder );
 #else
-  Void  init              ( CABACDecoder* cabacDecoder, DecCu* pcMbDecoder );
+  void  init              ( CABACDecoder* cabacDecoder, DecCu* pcMbDecoder );
 #endif
-  Void  create            ();
-  Void  destroy           ();
+  void  create            ();
+  void  destroy           ();
 
-  Void  decompressSlice   ( Slice* slice, InputBitstream* bitstream );
+  void  decompressSlice   ( Slice* slice, InputBitstream* bitstream );
 };
 
 //! \}

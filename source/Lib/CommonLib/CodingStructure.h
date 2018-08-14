@@ -3,7 +3,7 @@
 * and contributor rights, including patent rights, and no such rights are
 * granted under this license.
 *
-* Copyright (c) 2010-2017, ITU/ISO/IEC
+* Copyright (c) 2010-2018, ITU/ISO/IEC
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -155,7 +155,7 @@ public:
   static_vector<double, NUM_ENC_FEATURES> features;
 
   double      cost;
-  UInt64      fracBits;
+  uint64_t      fracBits;
   Distortion  dist;
   Distortion  interHad;
 
@@ -199,7 +199,7 @@ private:
   TUCache& m_tuCache;
 
   std::vector<SAOBlkParam> m_sao;
-#if JEM_TOOLS
+#if JEM_TOOLS && !JVET_K0371_ALF
   ALFParam m_alfParam;
 #endif
 
@@ -312,7 +312,7 @@ private:
 };
 
 
-static inline UInt getNumberValidTBlocks(const PreCalcValues& pcv) { return (pcv.chrFormat==CHROMA_400) ? 1 : ( pcv.multiBlock422 ? MAX_NUM_TBLOCKS : MAX_NUM_COMPONENT ); }
+static inline uint32_t getNumberValidTBlocks(const PreCalcValues& pcv) { return (pcv.chrFormat==CHROMA_400) ? 1 : ( pcv.multiBlock422 ? MAX_NUM_TBLOCKS : MAX_NUM_COMPONENT ); }
 
 inline unsigned toWSizeIdx( const CodingStructure* cs ) { return gp_sizeIdxInfo->idxFrom( cs->area.lwidth() ); }
 inline unsigned toHSizeIdx( const CodingStructure* cs ) { return gp_sizeIdxInfo->idxFrom( cs->area.lheight() ); }

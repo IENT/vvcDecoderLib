@@ -3,7 +3,7 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * Copyright (c) 2010-2017, ITU/ISO/IEC
+ * Copyright (c) 2010-2018, ITU/ISO/IEC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -667,7 +667,7 @@ unsigned DeriveCtx::CtxSkipFlag( const CodingUnit& cu )
 }
 
 
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
 unsigned DeriveCtx::CtxIMVFlag( const CodingUnit& cu )
 {
   const CodingStructure *cs = cu.cs;
@@ -746,7 +746,7 @@ unsigned DeriveCtx::CtxFrucMode( const PredictionUnit& pu )
 }
 #endif
 
-Void MergeCtx::setMergeInfo( PredictionUnit& pu, int candIdx )
+void MergeCtx::setMergeInfo( PredictionUnit& pu, int candIdx )
 {
   CHECK( candIdx >= numValidMergeCand, "Merge candidate does not exist" );
 
