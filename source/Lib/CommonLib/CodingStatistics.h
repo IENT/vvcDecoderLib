@@ -182,10 +182,11 @@ static inline const char* getName(CodingStatisticsType name)
     "CABAC_BITS__SIGN_BIT",
     "CABAC_BITS__ESCAPE_BITS",
     "CABAC_BITS__SAO",
-#if JEM_TOOLS
+#if JVET_K0371_ALF
     "CABAC_BITS__ALF",
+#endif
+#if JEM_TOOLS
     "CABAC_BITS__NSST",
-
 #endif
     "CABAC_TRM_BITS",
     "CABAC_FIXED_BITS",
