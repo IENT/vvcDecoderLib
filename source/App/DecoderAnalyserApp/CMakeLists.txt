@@ -26,6 +26,11 @@ add_executable( ${EXE_NAME} ${SRC_FILES} ${INC_FILES} ${NATVIS_FILES} ${CMAKE_CU
 # include the output directory, where the svnrevision.h file is generated
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 target_compile_definitions( ${EXE_NAME} PUBLIC RExt__DECODER_DEBUG_BIT_STATISTICS=1 )
+target_compile_definitions( ${EXE_NAME} PUBLIC RExt__DECODER_DEBUG_TOOL_STATISTICS=1 )
+
+if( ENABLE_VTM )
+  target_compile_definitions( ${EXE_NAME} PUBLIC JEM_TOOLS=0 )
+endif()
 
 if( SET_ENABLE_TRACING )
   if( ENABLE_TRACING )
@@ -60,7 +65,7 @@ if( CMAKE_COMPILER_IS_GNUCC AND BUILD_STATIC )
   target_compile_definitions( ${EXE_NAME} PUBLIC ENABLE_WPP_STATIC_LINK=1 )
 endif()
 
-target_link_libraries( ${EXE_NAME} CommonLib DecoderAnalyserLib Utilities Threads::Threads ${ADDITIONAL_LIBS} )
+target_link_libraries( ${EXE_NAME} CommonAnalyserLib DecoderAnalyserLib Utilities Threads::Threads ${ADDITIONAL_LIBS} )
 
 # Add a SVN revision generator
 # a custom target that is always built
