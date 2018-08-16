@@ -444,7 +444,15 @@ void Slice::setRefPicList( PicList& rcListPic, bool checkNumPocTotalCurr, bool b
       pcRefPic = xGetLongTermRefPic(rcListPic, m_pRPS->getPOC(i), m_pRPS->getCheckLTMSBPresent(i));
     }
   }
-
+#if JVET_K0076_CPR
+  if (getSPS()->getSpsNext().getIBCMode())
+  {
+    RefPicSetLtCurr[NumPicLtCurr] = getPic();
+    //getPic()->setIsLongTerm(true);
+    getPic()->longTerm = true;
+    NumPicLtCurr++;
+  }
+#endif
   // ref_pic_list_init
   Picture*  rpsCurrList0[MAX_NUM_REF+1];
   Picture*  rpsCurrList1[MAX_NUM_REF+1];
@@ -457,7 +465,14 @@ void Slice::setRefPicList( PicList& rcListPic, bool checkNumPocTotalCurr, bool b
     // - Otherwise, when the current picture contains a P or B slice, the value of NumPocTotalCurr shall not be equal to 0.
     if (getRapPicFlag())
     {
-      CHECK(numPicTotalCurr != 0, "Invalid state");
+#if JVET_K0076_CPR
+      if (getSPS()->getSpsNext().getIBCMode())
+      {
+        CHECK(numPicTotalCurr != 1, "Invalid state");
+      }
+      else
+#endif
+        CHECK(numPicTotalCurr != 0, "Invalid state");
     }
 
     if (m_eSliceType == I_SLICE)
@@ -527,7 +542,13 @@ void Slice::setRefPicList( PicList& rcListPic, bool checkNumPocTotalCurr, bool b
       m_bIsUsedAsLongTerm[REF_PIC_LIST_1][rIdx] = ( cIdx >= NumPicStCurr0 + NumPicStCurr1 );
     }
   }
-
+#if JVET_K0076_CPR
+  if (getSPS()->getSpsNext().getIBCMode())
+  {
+    m_apcRefPicList[REF_PIC_LIST_0][m_aiNumRefIdx[REF_PIC_LIST_0] - 1] = getPic();
+    m_bIsUsedAsLongTerm[REF_PIC_LIST_0][m_aiNumRefIdx[REF_PIC_LIST_0] - 1] = true;
+  }
+#endif
     // For generalized B
   // note: maybe not existed case (always L0 is copied to L1 if L1 is empty)
   if( bCopyL0toL1ErrorCase && isInterB() && getNumRefIdx(REF_PIC_LIST_1) == 0)
@@ -558,7 +579,14 @@ int Slice::getNumRpsCurrTempList() const
       numRpsCurrTempList++;
     }
   }
-  return numRpsCurrTempList;
+#if JVET_K0076_CPR
+  if (getSPS()->getSpsNext().getIBCMode())
+  {
+    return numRpsCurrTempList + 1;
+  }
+  else
+#endif
+    return numRpsCurrTempList;
 }
 
 void Slice::initEqualRef()
@@ -1899,6 +1927,9 @@ SPSNext::SPSNext( SPS& sps )
 #endif
 #if JVET_K0157
     , m_compositeRefEnabled     ( false )
+#endif
+#if JVET_K0076_CPR
+    , m_IBCMode(0)
 #endif
   // ADD_NEW_TOOL : (sps extension) add tool enabling flags here (with "false" as default values)
 {

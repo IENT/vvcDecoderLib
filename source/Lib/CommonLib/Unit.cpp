@@ -284,7 +284,9 @@ CodingUnit& CodingUnit::operator=( const CodingUnit& other )
 #if JEM_TOOLS
   obmcFlag          = other.obmcFlag;
 #endif
-
+#if JVET_K0076_CPR
+  ibc               = other.ibc;
+#endif
   return *this;
 }
 
@@ -329,6 +331,9 @@ void CodingUnit::initData()
 #if JEM_TOOLS
   obmcFlag          = false;
 #endif
+#if JVET_K0076_CPR
+  ibc               = false;
+#endif
 }
 
 
@@ -353,6 +358,10 @@ void PredictionUnit::initData()
 #if JEM_TOOLS
   frucMrgMode = 0;
   mvRefine    = false;
+#endif
+#if JVET_K0076_CPR
+  bv.setZero();
+  bvd.setZero();
 #endif
   for (uint32_t i = 0; i < NUM_REF_PIC_LIST_01; i++)
   {
@@ -390,6 +399,10 @@ PredictionUnit& PredictionUnit::operator=(const InterPredictionData& predData)
   frucMrgMode = predData.frucMrgMode;
   mvRefine    = predData.mvRefine;
 #endif
+#if JVET_K0076_CPR
+  bv          = predData.bv;
+  bvd         = predData.bvd;
+#endif
   for (uint32_t i = 0; i < NUM_REF_PIC_LIST_01; i++)
   {
     mvpIdx[i]   = predData.mvpIdx[i];
@@ -422,6 +435,10 @@ PredictionUnit& PredictionUnit::operator=( const PredictionUnit& other )
 #if JEM_TOOLS
   frucMrgMode = other.frucMrgMode;
   mvRefine    = other.mvRefine;
+#endif
+#if JVET_K0076_CPR
+  bv          = other.bv;
+  bvd         = other.bvd;
 #endif
   for (uint32_t i = 0; i < NUM_REF_PIC_LIST_01; i++)
   {

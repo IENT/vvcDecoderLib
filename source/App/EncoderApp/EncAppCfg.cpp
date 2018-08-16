@@ -916,6 +916,15 @@ bool EncAppCfg::parseCfg( int argc, char* argv[] )
 #if JVET_K0157
   ("CompositeLTReference",                            m_compositeRefEnabled,                            false, "Enable Composite Long Term Reference Frame")
 #endif
+#if JVET_K0076_CPR
+  ( "CPR",                                            m_IBCMode,                                           0u, "IBCMode (0x1:enabled, 0x0:disabled)  [default: disabled]")
+  ( "IBCLocalSearchRangeX",                           m_IBCLocalSearchRangeX,                            128u, "Search range of IBC local search in x direction")
+  ( "IBCLocalSearchRangeY",                           m_IBCLocalSearchRangeY,                            128u, "Search range of IBC local search in y direction")
+  ( "IBCHashSearch",                                  m_IBCHashSearch,                                     1u, "Hash based IBC search")
+  ( "IBCHashSearchMaxCand",                           m_IBCHashSearchMaxCand,                            256u, "Max candidates for hash based IBC search")
+  ( "IBCHashSearchRange4SmallBlk",                    m_IBCHashSearchRange4SmallBlk,                     256u, "Small block search range in based IBC search")
+  ( "IBCFastMethod",                                  m_IBCFastMethod,                                     6u, "Fast methods for IBC")
+#endif
   // ADD_NEW_TOOL : (encoder app) add parsing parameters here
 
   ("LCTUFast",                                        m_useFastLCTU,                                    false, "Fast methods for large CTU")
@@ -2036,6 +2045,9 @@ bool EncAppCfg::xCheckParameter()
     xConfirmPara( m_ALF, "ALF is only allowed with NEXT profile" );
 #endif
     xConfirmPara( m_OBMC, "OBMC is only allowed in NEXT profile" );
+#endif
+#if JVET_K0076_CPR
+    xConfirmPara(m_IBCMode, "IBC Mode only allowed with NEXT profile");
 #endif
     xConfirmPara( m_useFastLCTU, "Fast large CTU can only be applied when encoding with NEXT profile" );
 #if !JVET_K0220_ENC_CTRL
@@ -3433,6 +3445,9 @@ void EncAppCfg::xPrintParameter()
 #endif
 #if JVET_K0157
     msg(VERBOSE, "CompositeLTReference:%d ", m_compositeRefEnabled);
+#endif
+#if JVET_K0076_CPR
+    msg(VERBOSE, "CPR:%d ", m_IBCMode);
 #endif
   }
   // ADD_NEW_TOOL (add some output indicating the usage of tools)

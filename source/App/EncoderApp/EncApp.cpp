@@ -304,6 +304,15 @@ void EncApp::xInitLibCfg()
 #if JVET_K0157
   m_cEncLib.setUseCompositeRef                                   ( m_compositeRefEnabled );
 #endif
+#if JVET_K0076_CPR
+  m_cEncLib.setIBCMode                                           ( m_IBCMode );
+  m_cEncLib.setIBCLocalSearchRangeX                              ( m_IBCLocalSearchRangeX );
+  m_cEncLib.setIBCLocalSearchRangeY                              ( m_IBCLocalSearchRangeY );
+  m_cEncLib.setIBCHashSearch                                     ( m_IBCHashSearch );
+  m_cEncLib.setIBCHashSearchMaxCand                              ( m_IBCHashSearchMaxCand );
+  m_cEncLib.setIBCHashSearchRange4SmallBlk                       ( m_IBCHashSearchRange4SmallBlk );
+  m_cEncLib.setIBCFastMethod                                     ( m_IBCFastMethod );
+#endif
   // ADD_NEW_TOOL : (encoder app) add setting of tool enabling flags and associated parameters here
 
   m_cEncLib.setMaxCUWidth                                        ( m_QTBT ? m_uiCTUSize : m_uiMaxCUWidth );

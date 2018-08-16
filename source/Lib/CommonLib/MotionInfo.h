@@ -111,7 +111,9 @@ struct MotionInfo
 
   Mv      mv     [ NUM_REF_PIC_LIST_01 ];
   int16_t   refIdx [ NUM_REF_PIC_LIST_01 ];
-
+#if JVET_K0076_CPR
+  Mv      bv;
+#endif
 #if JEM_TOOLS
   MotionInfo()        : isInter(  false ), usesLIC( false ), interDir( 0 ), sliceIdx( 0 ), refIdx{ NOT_VALID, NOT_VALID } { }
   // ensure that MotionInfo(0) produces '\x000....' bit pattern - needed to work with AreaBuf - don't use this constructor for anything else
