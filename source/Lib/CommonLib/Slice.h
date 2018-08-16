@@ -937,6 +937,9 @@ private:
 #if JEM_TOOLS
   unsigned    m_CIPFMode;
 #endif
+#if JVET_K0076_CPR
+  unsigned    m_IBCMode;
+#endif
   // ADD_NEW_TOOL : (sps extension) add tool enabling flags and associated parameters here
 
 public:
@@ -1157,6 +1160,10 @@ public:
   int       getIntraPDPCMode      ()                                      const     { return m_IntraPDPCMode; }
   bool      isIntraPDPC           ()                                      const     { return 0 != (m_IntraPDPCMode&1); }
   bool      isPlanarPDPC          ()                                      const     { return 0 != (m_IntraPDPCMode&2); }
+#endif
+#if JVET_K0076_CPR
+  void      setIBCMode            (unsigned IBCMode)                                { m_IBCMode = IBCMode; }
+  unsigned  getIBCMode            ()                                      const     { return m_IBCMode; }
 #endif
   // ADD_NEW_TOOL : (sps extension) add access functions for tool enabling flags and associated parameters here
 

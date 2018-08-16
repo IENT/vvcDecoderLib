@@ -56,7 +56,11 @@
 #if JVET_K0367_AFFINE_FIX_POINT
 #include "CommonLib/AffineGradientSearch.h"
 #endif
-
+#if JVET_K0076_CPR
+#include "IbcHashMap.h"
+#include <unordered_map>
+#include <vector>
+#endif
 //! \ingroup EncoderLib
 //! \{
 
@@ -67,7 +71,12 @@
 static const uint32_t MAX_NUM_REF_LIST_ADAPT_SR = 2;
 static const uint32_t MAX_IDX_ADAPT_SR          = 33;
 static const uint32_t NUM_MV_PREDICTORS         = 3;
-
+#if JVET_K0076_CPR
+struct BlkRecord
+{
+  std::unordered_map<Mv, Distortion> bvRecord;
+};
+#endif
 class EncModeCtrl;
 
 /// encoder search class
@@ -101,7 +110,9 @@ private:
 #if JEM_TOOLS
   PelStorage      m_obmcOrgMod;
 #endif
-
+#if JVET_K0076_CPR
+  std::unordered_map< Position, std::unordered_map< Size, BlkRecord> > m_ctuRecord;
+#endif
 protected:
   // interface to option
   EncCfg*         m_pcEncCfg;
@@ -138,7 +149,10 @@ protected:
 #if JEM_TOOLS
   MotionInfo      m_SubPuFrucBuf                [( MAX_CU_SIZE * MAX_CU_SIZE ) >> ( MIN_CU_LOG2 << 1 )];
 #endif
-
+#if JVET_K0076_CPR
+  unsigned int    m_uiNumBVs, m_uiNumBV16s;
+  Mv              m_acBVs[IBC_NUM_CANDIDATES];
+#endif
 public:
   InterSearch();
   virtual ~InterSearch();
@@ -163,7 +177,9 @@ public:
   void destroy                      ();
 
   void setTempBuffers               (CodingStructure ****pSlitCS, CodingStructure ****pFullCS, CodingStructure **pSaveCS );
-
+#if JVET_K0076_CPR
+  void resetCtuRecord               ()             { m_ctuRecord.clear(); }
+#endif
 #if ENABLE_SPLIT_PARALLELISM
   void copyState                    ( const InterSearch& other );
 #endif
@@ -217,7 +233,14 @@ public:
   /// set ME search range
   void setAdaptiveSearchRange       ( int iDir, int iRefIdx, int iSearchRange) { CHECK(iDir >= MAX_NUM_REF_LIST_ADAPT_SR || iRefIdx>=int(MAX_IDX_ADAPT_SR), "Invalid index"); m_aaiAdaptSR[iDir][iRefIdx] = iSearchRange; }
 
-
+#if JVET_K0076_CPR
+  bool  predIntraBCSearch           ( CodingUnit& cu, Partitioner& partitioner, const int localSearchRangeX, const int localSearchRangeY, IbcHashMap& ibcHashMap);
+  void  xIntraPatternSearch         ( PredictionUnit& pu, IntTZSearchStruct&  cStruct, Mv& rcMv, Distortion&  ruiCost, Mv* cMvSrchRngLT, Mv* cMvSrchRngRB, Mv* pcMvPred);
+  void  xSetIntraSearchRange        ( PredictionUnit& pu, Mv& cMvPred, int iRoiWidth, int iRoiHeight, const int localSearchRangeX, const int localSearchRangeY, Mv& rcMvSrchRngLT, Mv& rcMvSrchRngRB);
+  void  xIntraBlockCopyEstimation   ( PredictionUnit& pu, PelUnitBuf& origBuf, Mv     *pcMvPred, Mv     &rcMv, Distortion &ruiCost, const int localSearchRangeX, const int localSearchRangeY);
+  void  xIntraBCSearchMVCandUpdate  ( Distortion  uiSad, int x, int y, Distortion* uiSadBestCand, Mv* cMVCand);
+  int   xIntraBCSearchMVChromaRefine( PredictionUnit& pu, int iRoiWidth, int iRoiHeight, int cuPelX, int cuPelY, Distortion* uiSadBestCand, Mv*     cMVCand);
+#endif
 protected:
 
   // -------------------------------------------------------------------------------------------------------------------
@@ -403,7 +426,10 @@ protected:
   // -------------------------------------------------------------------------------------------------------------------
 
   void  setWpScalingDistParam     ( int iRefIdx, RefPicList eRefPicListCur, Slice *slice );
-
+#if JVET_K0076_CPR
+private:
+  void  xxIntraBlockCopyHashSearch(PredictionUnit& pu, Mv* mvPred, int numMvPred, Mv &mv, int& idxMvPred, IbcHashMap& ibcHashMap);
+#endif
 
 public:
 
