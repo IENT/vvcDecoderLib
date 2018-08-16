@@ -58,6 +58,9 @@
 #include "InterSearch.h"
 #include "RateCtrl.h"
 #include "EncModeCtrl.h"
+#if JVET_K0076_CPR
+#include "IbcHashMap.h"
+#endif
 //! \ingroup EncoderLib
 //! \{
 
