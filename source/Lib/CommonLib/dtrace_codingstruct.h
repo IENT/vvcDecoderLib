@@ -108,6 +108,10 @@ inline void dtraceModeCost(CodingStructure &cs, double lambda)
   else if( isIntra ) intraModeC = g_intraMode65to33AngMapping[intraModeC];
 #endif
 #endif
+  int imvVal = 0;
+#if JVET_K0357_AMVR
+  imvVal = cs.cus[0]->imv;
+#endif
 #if JEM_TOOLS
   DTRACE( g_trace_ctx, D_MODE_COST, "ModeCost: %6lld %3d @(%4d,%4d) [%2dx%2d] %d (qp%d,pm%d,ptSize%d,skip%d,mrg%d,fruc%d,obmc%d,ic%d,imv%d,affn%d,%d,%d) tempCS = %lld (%d,%d)\n",
     DTRACE_GET_COUNTER( g_trace_ctx, D_MODE_COST ),
@@ -123,11 +127,7 @@ inline void dtraceModeCost(CodingStructure &cs, double lambda)
     cs.pus[0]->frucMrgMode,
     cs.cus[0]->obmcFlag,
     cs.cus[0]->LICFlag,
-#if JVET_K0357_AMVR
-    cs.cus[0]->imv,
-#else
-    0,
-#endif
+    imvVal,
     cs.cus[0]->affine,
     intraModeL, intraModeC,
     tempCost, tempBits, tempDist );
@@ -144,11 +144,7 @@ inline void dtraceModeCost(CodingStructure &cs, double lambda)
     cs.cus[0]->skip,
     cs.pus[0]->mergeFlag,
     0, 0, 
-#if JVET_K0357_AMVR
-    cs.cus[0]->imv,
-#else
-    0,
-#endif
+    imvVal,
     0, 0,
           intraModeL, intraModeC,
           tempCost, tempBits, tempDist );
