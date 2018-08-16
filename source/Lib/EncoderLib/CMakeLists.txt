@@ -7,6 +7,8 @@ file( GLOB SRC_FILES "*.cpp" )
 # get include files
 file( GLOB INC_FILES "*.h" )
 
+file( GLOB SSE41_SRC_FILES "IbcHashMap.cpp" )
+
 # NATVIS files for Visual Studio
 if( MSVC )
   file( GLOB NATVIS_FILES "../../VisualStudio/*.natvis" )
@@ -15,10 +17,6 @@ endif()
 # library
 add_library( ${LIB_NAME} STATIC ${SRC_FILES} ${INC_FILES} ${NATVIS_FILES} )
 target_compile_definitions( ${LIB_NAME} PUBLIC )
-
-if( ENABLE_VTM )
-  target_compile_definitions( ${LIB_NAME} PUBLIC JEM_TOOLS=0 )
-endif()
 
 if( EXTENSION_360_VIDEO )
   target_compile_definitions( ${LIB_NAME} PUBLIC EXTENSION_360_VIDEO=1 )
@@ -54,6 +52,10 @@ endif()
 
 target_include_directories( ${LIB_NAME} PUBLIC . )
 target_link_libraries( ${LIB_NAME} CommonLib Threads::Threads )
+
+if( UNIX )
+  set_property( SOURCE ${SSE41_SRC_FILES} APPEND PROPERTY COMPILE_FLAGS "-msse4" )
+endif()
 
 if( CMAKE_COMPILER_IS_GNUCC )
   # this is quite certainly a compiler problem
