@@ -1591,7 +1591,7 @@ void IntraSearch::xIntraCodingTUBlock(TransformUnit &tu, const ComponentID &comp
   m_pcTrQuant->selectLambda(compID);
 #endif
 
-#if JEM_TOOLS||JVET_K0190
+#if JEM_TOOLS&&!JVET_K0190
   if( ! PU::isLMCMode(uiChFinalMode) && sps.getSpsNext().getUseLMChroma() )
   {
     if( compID == COMPONENT_Cb )
