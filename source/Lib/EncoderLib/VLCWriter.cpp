@@ -615,7 +615,9 @@ void HLSWriter::codeSPSNext( const SPSNext& spsNext, const bool usePCM )
   WRITE_FLAG( spsNext.getUseDMVR() ? 1 : 0,                                                     "dmvr_flag" );
   WRITE_FLAG( spsNext.getUseMDMS() ? 1 : 0,                                                     "mdms_flag" );
 #endif
-
+#if JVET_K0076_CPR
+  WRITE_FLAG(spsNext.getIBCMode() ? 1 : 0,                                                      "ibc_flag" );
+#endif
   for( int k = 0; k < SPSNext::NumReservedFlags; k++ )
   {
     WRITE_FLAG( 0,                                                                              "reserved_flag" );
@@ -1298,7 +1300,11 @@ void HLSWriter::codeSliceHeader         ( Slice* pcSlice )
       }
 
       if( pcSlice->getSliceType() != I_SLICE &&
+#if JVET_K0076_CPR
+        ( ( pcSlice->getColFromL0Flag() == 1 && pcSlice->getNumRefIdx(REF_PIC_LIST_0) > 1 + (int)pcSlice->getSPS()->getSpsNext().getIBCMode()) ||
+#else
         ( ( pcSlice->getColFromL0Flag() == 1 && pcSlice->getNumRefIdx( REF_PIC_LIST_0 ) > 1 ) ||
+#endif
           ( pcSlice->getColFromL0Flag() == 0 && pcSlice->getNumRefIdx( REF_PIC_LIST_1 ) > 1 ) ) )
       {
         WRITE_UVLC( pcSlice->getColRefIdx(), "collocated_ref_idx" );

@@ -1373,7 +1373,11 @@ void InterPrediction::motionCompensation( PredictionUnit &pu, PelUnitBuf &predBu
   else
   {
 #if JEM_TOOLS || JVET_K0346
+#if JVET_K0076_CPR
+    if (pu.mergeType != MRG_TYPE_DEFAULT_N && pu.mergeType != MRG_TYPE_IBC)
+#else
     if( pu.mergeType != MRG_TYPE_DEFAULT_N )
+#endif
     {
       xSubPuMC( pu, predBuf, eRefPicList );
     }
@@ -2420,6 +2424,10 @@ void InterPrediction::xFrucCollectBlkStartMv( PredictionUnit& pu, const MergeCtx
   for( int nMergeIndex = 0; nMergeIndex < mergeCtx.numValidMergeCand << 1; nMergeIndex++ )
   {
     bool mrgTpDflt = ( pu.cs->sps->getSpsNext().getUseSubPuMvp() ) ? mergeCtx.mrgTypeNeighbours[nMergeIndex>>1] == MRG_TYPE_DEFAULT_N : true;
+#if JVET_K0076_CPR
+    if ((mergeCtx.interDirNeighbours[nMergeIndex >> 1] == 1 || mergeCtx.interDirNeighbours[nMergeIndex >> 1] == 3) && pu.cs->slice->getRefPic(REF_PIC_LIST_0, mergeCtx.mvFieldNeighbours[nMergeIndex].refIdx)->getPOC() == pu.cs->slice->getPOC())
+      continue;
+#endif
     if( mergeCtx.mvFieldNeighbours[nMergeIndex].refIdx >= 0 && mrgTpDflt )
     {
       if( nTargetRefIdx >= 0 && ( mergeCtx.mvFieldNeighbours[nMergeIndex].refIdx != nTargetRefIdx || ( nMergeIndex & 0x01 ) != ( int )eTargetRefList ) )

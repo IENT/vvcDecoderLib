@@ -55,6 +55,9 @@
 #include "InterSearch.h"
 #include "RateCtrl.h"
 #include "EncModeCtrl.h"
+#if JVET_K0076_CPR
+#include "IbcHashMap.h"
+#endif
 //! \ingroup EncoderLib
 //! \{
 
@@ -109,6 +112,9 @@ private:
 
   CABACWriter*          m_CABACEstimator;
   RateCtrl*             m_pcRateCtrl;
+#if JVET_K0076_CPR
+  IbcHashMap            m_ibcHashMap;
+#endif
 #if JVET_K0357_AMVR
   CodingStructure    ***m_pImvTempCS;
 #endif
@@ -131,7 +137,10 @@ private:
 #if JEM_TOOLS
   MotionInfo            m_SubPuFrucBuf    [( MAX_CU_SIZE * MAX_CU_SIZE ) >> ( MIN_CU_LOG2 << 1 )];
 #endif
-
+#if JVET_K0076_CPR
+  int                   m_ctuIbcSearchRangeX;
+  int                   m_ctuIbcSearchRangeY;
+#endif
 #if ENABLE_SPLIT_PARALLELISM || ENABLE_WPP_PARALLELISM
   EncLib*               m_pcEncLib;
 #endif
@@ -226,6 +235,10 @@ protected:
 #if REUSE_CU_RESULTS
 
   void xReuseCachedResult     ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &Partitioner );
+#endif
+#if JVET_K0076_CPR
+  void xCheckRDCostIntraBC    ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &pm, const EncTestMode& encTestMode );
+  void xCheckRDCostIntraBCMerge2Nx2N( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode );
 #endif
 };
 

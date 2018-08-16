@@ -26,10 +26,6 @@ add_executable( ${EXE_NAME} ${SRC_FILES} ${INC_FILES} ${NATVIS_FILES} ${CMAKE_CU
 # include the output directory, where the svnrevision.h file is generated
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-if( ENABLE_VTM )
-  target_compile_definitions( ${EXE_NAME} PUBLIC JEM_TOOLS=0 )
-endif()
-
 
 if( SET_ENABLE_TRACING )
   if( ENABLE_TRACING )
