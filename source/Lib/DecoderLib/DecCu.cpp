@@ -612,7 +612,20 @@ void DecCu::xDeriveCUMV( CodingUnit &cu )
               PU::fillMvpCand(pu, eRefList, pu.refIdx[eRefList], amvpInfo);
 #endif
               pu.mvpNum [eRefList] = amvpInfo.numCand;
+#if JVET_K0076_CPR
+              Mv mvd = pu.mvd[eRefList];
+              if (eRefList == REF_PIC_LIST_0 && pu.cs->slice->getRefPic(eRefList, pu.refIdx[eRefList])->getPOC() == pu.cs->slice->getPOC())
+              {
+                pu.cu->ibc = true;
+#if REUSE_CU_RESULTS
+                if (!cu.cs->pcv->isEncoder)
+#endif
+                  mvd <<= 2;
+              }
+              pu.mv[eRefList] = amvpInfo.mvCand[pu.mvpIdx[eRefList]] + mvd;
+#else
               pu.mv     [eRefList] = amvpInfo.mvCand[pu.mvpIdx [eRefList]] + pu.mvd[eRefList];
+#endif
 
 #if JEM_TOOLS || JVET_K_AFFINE
               if( pu.cs->sps->getSpsNext().getUseAffine() )

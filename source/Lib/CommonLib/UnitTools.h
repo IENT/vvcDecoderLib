@@ -161,7 +161,11 @@ namespace PU
 #if JEM_TOOLS
   void spanLICFlags                   (      PredictionUnit &pu, const bool LICFlag );
 
-  bool getInterMergeSubPuMvpCand      (const PredictionUnit &pu, MergeCtx &mrgCtx, bool& LICFlag, const int count );
+  bool getInterMergeSubPuMvpCand      (const PredictionUnit &pu, MergeCtx &mrgCtx, bool& LICFlag, const int count 
+#if JVET_K0076_CPR
+    , const int countIBC
+#endif
+  );
   bool getInterMergeSubPuRecurCand    (const PredictionUnit &pu, MergeCtx &mrgCtx, const int count );
 #endif
 #if JVET_K0357_AMVR
@@ -204,6 +208,11 @@ namespace PU
   bool isLMCModeEnabled               (const PredictionUnit &pu, unsigned mode);
 #endif
   bool isChromaIntraModeCrossCheckMode(const PredictionUnit &pu);
+#if JVET_K0076_CPR
+  void getIntraBCMVPsEncOnly          (PredictionUnit &pu, Mv* MvPred, int& nbPred);
+  bool getDerivedBV                   (PredictionUnit &pu, const Mv& currentMv, Mv& derivedMv);
+  bool isBlockVectorValid             (PredictionUnit& pu, int xPos, int yPos, int width, int height, int picWidth, int picHeight, int xStartInCU, int yStartInCU, int xBv, int yBv, int ctuSize);
+#endif
 }
 
 // TU tools

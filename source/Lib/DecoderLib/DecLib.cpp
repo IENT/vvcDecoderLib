@@ -1258,6 +1258,12 @@ bool DecLib::xDecodeSlice(InputNALUnit &nalu, int &iSkipFrame, int iPOCLastDispl
   m_cSliceDecoder.decompressSlice( pcSlice, &(nalu.getBitstream()) );
 
   m_bFirstSliceInPicture = false;
+#if JVET_K0076_CPR
+  if (pcSlice->getSPS()->getSpsNext().getIBCMode())
+  {
+    pcSlice->getPic()->longTerm = false;
+  }
+#endif
   m_uiSliceSegmentIdx++;
 
   return false;

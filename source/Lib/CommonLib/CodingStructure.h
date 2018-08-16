@@ -77,6 +77,9 @@ public:
   Slice           *slice;
 
   UnitScale        unitScale[MAX_NUM_COMPONENT];
+#if JVET_K0076_CPR
+  ChannelType chType;
+#endif
 
   int         baseQP;
   int         prevQP[MAX_NUM_CHANNEL_TYPE];
