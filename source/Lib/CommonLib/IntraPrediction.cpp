@@ -1205,6 +1205,7 @@ void IntraPrediction::xIntraPredFilteringModeDGL(const CPelBuf &pSrc, PelBuf &pD
 }
 #endif
 
+#if JEM_TOOLS
 void IntraPrediction::xReferenceFilter(
 #if JVET_K0500_WAIP
   const int doubleHSize,
@@ -1298,6 +1299,7 @@ void IntraPrediction::xReferenceFilter(
       piLowPassRef[k] = (origWeight * piRefVector[k] + iCmptWeight * piLowPassRef[k] + ParOffset) >> ParShift;
   }
 }
+#endif
 
 bool IntraPrediction::useDPCMForFirstPassIntraEstimation(const PredictionUnit &pu, const uint32_t &uiDirMode)
 {
