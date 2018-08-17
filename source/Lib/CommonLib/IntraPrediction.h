@@ -123,11 +123,13 @@ protected:
   static int getWideAngle         ( int width, int height, int predMode );
   void setReferenceArrayLengths   ( const CompArea &area );
 #endif
+#if JEM_TOOLS
   void xReferenceFilter           (
 #if JVET_K0500_WAIP
     const int doubleHSize,
 #endif
     const int doubleSize, const int origWeight, const int filterOrder, Pel *piRefVector, Pel *piLowPassRef );
+#endif
 
   void destroy                    ();
 
