@@ -8,5 +8,5 @@ core
 deploy
 *.sdf
 *.suo
-.vs
-.vscode
+.vs/
+.vscode/
