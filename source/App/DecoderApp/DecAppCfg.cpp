@@ -104,6 +104,13 @@ bool DecAppCfg::parseCfg( int argc, char* argv[] )
 #if JVET_J0090_MEMORY_BANDWITH_MEASURE
   ("CacheCfg",                  m_cacheCfgFile,                       string( "" ), "CacheCfg File" )
 #endif
+#if RExt__DECODER_DEBUG_STATISTICS
+  ("Stats",                     m_statMode,                           3,           "Control decoder debugging statistic output mode\n"
+                                                                                   "\t0: disable statistic\n"
+                                                                                   "\t1: enable bit statistic\n"
+                                                                                   "\t2: enable tool statistic\n"
+                                                                                   "\t3: enable bit and tool statistic\n")
+#endif
   ;
 
   po::setDefaults(opts);
@@ -220,6 +227,7 @@ DecAppCfg::DecAppCfg()
 , m_respectDefDispWindow(0)
 , m_outputDecodedSEIMessagesFilename()
 , m_bClipOutputVideoToRec709Range(false)
+, m_statMode(0)
 {
   for (uint32_t channelTypeIndex = 0; channelTypeIndex < MAX_NUM_CHANNEL_TYPE; channelTypeIndex++)
   {

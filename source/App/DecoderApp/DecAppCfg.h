@@ -71,6 +71,7 @@ protected:
   std::string   m_outputDecodedSEIMessagesFilename;   ///< filename to output decoded SEI messages to. If '-', then use stdout. If empty, do not output details.
   bool          m_bClipOutputVideoToRec709Range;      ///< If true, clip the output video to the Rec 709 range on saving.
   std::string   m_cacheCfgFile;                       ///< Config file of cache model
+  int           m_statMode;                           ///< Config statistic mode (0 - bit stat, 1 - tool stat, 3 - both)
 
 public:
   DecAppCfg();
