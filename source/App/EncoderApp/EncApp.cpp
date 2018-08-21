@@ -602,6 +602,17 @@ void EncApp::xCreateLib( std::list<PelUnitBuf*>& recBufList
 #endif
   if (!m_reconFileName.empty())
   {
+    if (m_packedYUVMode && ((m_outputBitDepth[CH_L] != 10 && m_outputBitDepth[CH_L] != 12)
+        || ((m_iSourceWidth & (1 + (m_outputBitDepth[CH_L] & 3))) != 0)))
+    {
+      EXIT ("Invalid output bit-depth or image width for packed YUV output, aborting\n");
+    }
+    if (m_packedYUVMode && (m_chromaFormatIDC != CHROMA_400) && ((m_outputBitDepth[CH_C] != 10 && m_outputBitDepth[CH_C] != 12)
+        || (((m_iSourceWidth / SPS::getWinUnitX (m_chromaFormatIDC)) & (1 + (m_outputBitDepth[CH_C] & 3))) != 0)))
+    {
+      EXIT ("Invalid chroma output bit-depth or image width for packed YUV output, aborting\n");
+    }
+
     m_cVideoIOYuvReconFile.open(m_reconFileName, true, m_outputBitDepth, m_outputBitDepth, m_internalBitDepth);  // write mode
   }
 
@@ -790,7 +801,10 @@ void EncApp::xWriteOutput( int iNumEncoded, std::list<PelUnitBuf*>& recBufList
 
       if (!m_reconFileName.empty())
       {
-        m_cVideoIOYuvReconFile.write( *pcPicYuvRecTop, *pcPicYuvRecBottom, ipCSC, m_confWinLeft, m_confWinRight, m_confWinTop, m_confWinBottom, NUM_CHROMA_FORMAT, m_isTopFieldFirst );
+        m_cVideoIOYuvReconFile.write( *pcPicYuvRecTop, *pcPicYuvRecBottom,
+                                      ipCSC,
+                                      false, // TODO: m_packedYUVMode,
+                                      m_confWinLeft, m_confWinRight, m_confWinTop, m_confWinBottom, NUM_CHROMA_FORMAT, m_isTopFieldFirst );
       }
     }
   }
@@ -802,7 +816,9 @@ void EncApp::xWriteOutput( int iNumEncoded, std::list<PelUnitBuf*>& recBufList
       if (!m_reconFileName.empty())
       {
         m_cVideoIOYuvReconFile.write( *pcPicYuvRec,
-                                      ipCSC, m_confWinLeft, m_confWinRight, m_confWinTop, m_confWinBottom, NUM_CHROMA_FORMAT, m_bClipOutputVideoToRec709Range );
+                                      ipCSC,
+                                      m_packedYUVMode,
+                                      m_confWinLeft, m_confWinRight, m_confWinTop, m_confWinBottom, NUM_CHROMA_FORMAT, m_bClipOutputVideoToRec709Range );
       }
     }
   }

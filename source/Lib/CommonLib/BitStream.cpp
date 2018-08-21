@@ -241,7 +241,7 @@ void InputBitstream::pseudoRead ( uint32_t uiNumberOfBits, uint32_t& ruiBits )
   uint8_t saved_held_bits = m_held_bits;
   uint32_t saved_fifo_idx = m_fifo_idx;
 
-  uint32_t num_bits_to_read = min(uiNumberOfBits, getNumBitsLeft());
+  uint32_t num_bits_to_read = std::min(uiNumberOfBits, getNumBitsLeft());
   read(num_bits_to_read, ruiBits);
   ruiBits <<= (uiNumberOfBits - num_bits_to_read);
 

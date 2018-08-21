@@ -359,7 +359,7 @@ void EncGOP::init ( EncLib* pcEncLib )
   m_totalCoded         = 0;
 
   m_AUWriterIf = pcEncLib->getAUWriterIf();
-  
+
 #if WCG_EXT
   pcEncLib->getRdCost()->initLumaLevelToWeightTable();
 #endif
@@ -1756,8 +1756,8 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
     RefPicListModification* refPicListModification = pcSlice->getRefPicListModification();
     refPicListModification->setRefPicListModificationFlagL0(0);
     refPicListModification->setRefPicListModificationFlagL1(0);
-    pcSlice->setNumRefIdx(REF_PIC_LIST_0,min(m_pcCfg->getGOPEntry(iGOPid).m_numRefPicsActive,pcSlice->getRPS()->getNumberOfPictures()));
-    pcSlice->setNumRefIdx(REF_PIC_LIST_1,min(m_pcCfg->getGOPEntry(iGOPid).m_numRefPicsActive,pcSlice->getRPS()->getNumberOfPictures()));
+    pcSlice->setNumRefIdx(REF_PIC_LIST_0, std::min(m_pcCfg->getGOPEntry(iGOPid).m_numRefPicsActive, pcSlice->getRPS()->getNumberOfPictures()));
+    pcSlice->setNumRefIdx(REF_PIC_LIST_1, std::min(m_pcCfg->getGOPEntry(iGOPid).m_numRefPicsActive, pcSlice->getRPS()->getNumberOfPictures()));
 
     //  Set reference list
     pcSlice->setRefPicList ( rcListPic );
@@ -1994,12 +1994,12 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
 #if V0078_ADAPTIVE_LOWER_BOUND
         if (estimatedCpbFullness - estimatedBits < m_pcRateCtrl->getRCPic()->getLowerBound())
         {
-          estimatedBits = max(200, estimatedCpbFullness - m_pcRateCtrl->getRCPic()->getLowerBound());
+          estimatedBits = std::max(200, estimatedCpbFullness - m_pcRateCtrl->getRCPic()->getLowerBound());
         }
 #else
         if (estimatedCpbFullness - estimatedBits < (int)(m_pcRateCtrl->getCpbSize()*0.1f))
         {
-          estimatedBits = max(200, estimatedCpbFullness - (int)(m_pcRateCtrl->getCpbSize()*0.1f));
+          estimatedBits = std::max(200, estimatedCpbFullness - (int)(m_pcRateCtrl->getCpbSize()*0.1f));
         }
 #endif
 
@@ -2153,7 +2153,11 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
     trySkipOrDecodePicture( decPic, encPic, *m_pcCfg, pcPic );
 
     pcPic->cs->slice = pcSlice; // please keep this
-    if (pcSlice->getPPS()->getSliceChromaQpFlag() && CS::isDualITree(*pcSlice->getPic()->cs))
+#if ENABLE_QPA
+    if (pcSlice->getPPS()->getSliceChromaQpFlag() && CS::isDualITree (*pcSlice->getPic()->cs) && !m_pcCfg->getUsePerceptQPA() && (m_pcCfg->getSliceChromaOffsetQpPeriodicity() == 0))
+#else
+    if (pcSlice->getPPS()->getSliceChromaQpFlag() && CS::isDualITree (*pcSlice->getPic()->cs))
+#endif
     {
       // overwrite chroma qp offset for dual tree
       pcSlice->setSliceChromaQpDelta(COMPONENT_Cb, m_pcCfg->getChromaCbQpOffsetDualTree());
@@ -2657,7 +2661,7 @@ void EncGOP::printOutSummary(uint32_t uiNumAllPicCoded, bool isField, const bool
     m_gcAnalyzeWPSNR.setFrmRate(m_pcCfg->getFrameRate()*rateMultiplier / (double)m_pcCfg->getTemporalSubsampleRatio());
   }
 #endif
-  
+
   const ChromaFormat chFmt = m_pcCfg->getChromaFormatIdc();
 
   //-- all
@@ -2676,7 +2680,7 @@ void EncGOP::printOutSummary(uint32_t uiNumAllPicCoded, bool isField, const bool
 
   msg( DETAILS,"\n\nB Slices--------------------------------------------------------\n" );
   m_gcAnalyzeB.printOut('b', chFmt, printMSEBasedSNR, printSequenceMSE, bitDepths);
-  
+
 #if WCG_WPSNR
   if (useLumaWPSNR)
   {
@@ -2824,15 +2828,18 @@ void EncGOP::xGetBuffer( PicList&                  rcListPic,
 #if ENABLE_QPA
 
 #ifndef BETA
- #define BETA (2.0 / 3.0)  // value between 0 and 1; use 0.0 for traditional PSNR
+  #define BETA 0.5 // value between 0.0 and 1; use 0.0 to obtain traditional PSNR
 #endif
 #define GLOBAL_AVERAGING 1 // "global" averaging of a_k across a set instead of one picture
 #if FRAME_WEIGHTING
 static const uint32_t DQP[16] = { 4, 12, 11, 12,  9, 12, 11, 12,  6, 12, 11, 12,  9, 12, 11, 12 };
 #endif
 
-static inline double calcWeightedSquaredError(const CPelBuf& org,    const CPelBuf& rec,     double &sumAct,
-                                              const uint32_t imageWidth, const uint32_t imageHeight, const uint32_t offsetX,  const uint32_t offsetY, int blockWidth, int blockHeight)
+static inline double calcWeightedSquaredError(const CPelBuf& org,        const CPelBuf& rec,
+                                              double &sumAct,            const uint32_t bitDepth,
+                                              const uint32_t imageWidth, const uint32_t imageHeight,
+                                              const uint32_t offsetX,    const uint32_t offsetY,
+                                              int blockWidth,            int blockHeight)
 {
   const int    O = org.stride;
   const int    R = rec.stride;
@@ -2846,8 +2853,8 @@ static inline double calcWeightedSquaredError(const CPelBuf& org,    const CPelB
 
   const int hAct = offsetY + (uint32_t)blockHeight < imageHeight ? blockHeight : blockHeight - 1;
   const int wAct = offsetX + (uint32_t)blockWidth  < imageWidth  ? blockWidth  : blockWidth  - 1;
-  uint64_t ssErr   = 0; // sum of squared diffs
-  uint64_t saAct   = 0; // sum of abs. activity
+  uint64_t ssErr = 0; // sum of squared diffs
+  uint64_t saAct = 0; // sum of abs. activity
   double msAct;
   int x, y;
 
@@ -2856,7 +2863,7 @@ static inline double calcWeightedSquaredError(const CPelBuf& org,    const CPelB
   {
     for (x = 0; x < blockWidth; x++)
     {
-      register  int64_t iDiff = (int64_t)o[y*O + x] - (int64_t)r[y*R + x];
+      const     int64_t iDiff = (int64_t)o[y*O + x] - (int64_t)r[y*R + x];
       ssErr += uint64_t(iDiff * iDiff);
     }
   }
@@ -2866,13 +2873,18 @@ static inline double calcWeightedSquaredError(const CPelBuf& org,    const CPelB
   {
     for (x = xAct; x < wAct; x++)
     {
-      saAct += uint64_t(abs(4 * (int64_t)o[y*O + x] - (int64_t)o[y*O + x-1] - (int64_t)o[y*O + x+1] - (int64_t)o[(y-1)*O + x] - (int64_t)o[(y+1)*O + x]));
+      const int f = 12 * (int)o[y*O + x] - 2 * ((int)o[y*O + x-1] + (int)o[y*O + x+1] + (int)o[(y-1)*O + x] + (int)o[(y+1)*O + x])
+                       - (int)o[(y-1)*O + x-1] - (int)o[(y-1)*O + x+1] - (int)o[(y+1)*O + x-1] - (int)o[(y+1)*O + x+1];
+      saAct += abs(f);
     }
   }
 
   // calculate weight (mean squared activity)
   msAct = (double)saAct / (double(wAct - xAct) * double(hAct - yAct));
-  if (msAct < 8.0) msAct = 8.0;
+
+  // lower limit, accounts for high-pass gain
+  if (msAct < double(1 << (bitDepth - 4))) msAct = double(1 << (bitDepth - 4));
+
   msAct *= msAct; // because ssErr is squared
 
   sumAct += msAct; // includes high-pass gain
@@ -2884,9 +2896,9 @@ static inline double calcWeightedSquaredError(const CPelBuf& org,    const CPelB
 
 uint64_t EncGOP::xFindDistortionPlane(const CPelBuf& pic0, const CPelBuf& pic1, const uint32_t rshift
 #if ENABLE_QPA
-                                  , const uint32_t chromaShift /*= 0*/
+                                    , const uint32_t chromaShift /*= 0*/
 #endif
-                                   )
+                                      )
 {
   uint64_t uiTotalDiff;
   const  Pel*  pSrc0 = pic0.bufAt(0, 0);
@@ -2903,7 +2915,7 @@ uint64_t EncGOP::xFindDistortionPlane(const CPelBuf& pic0, const CPelBuf& pic1, 
     {
       const uint32_t   W = pic0.width;  // image width
       const uint32_t   H = pic0.height; // image height
-      const double R = double(W * H) / (1920.0 * 1080.0);
+      const double     R = double(W * H) / (1920.0 * 1080.0);
       const uint32_t   B = Clip3<uint32_t>(0, 128 >> chromaShift, 4 * uint32_t(16.0 * sqrt(R) + 0.5)); // WPSNR block size in integer multiple of 4 (for SIMD, = 64 at full-HD)
 
       uint32_t x, y;
@@ -2915,7 +2927,7 @@ uint64_t EncGOP::xFindDistortionPlane(const CPelBuf& pic0, const CPelBuf& pic1, 
         {
           for (x = 0; x < W; x++)
           {
-            register int64_t iDiff = (int64_t)pSrc0[x] - (int64_t)pSrc1[x];
+            const           int64_t iDiff = (int64_t)pSrc0[x] - (int64_t)pSrc1[x];
             uiTotalDiff += uint64_t(iDiff * iDiff);
           }
           pSrc0 += pic0.stride;
@@ -2932,7 +2944,11 @@ uint64_t EncGOP::xFindDistortionPlane(const CPelBuf& pic0, const CPelBuf& pic1, 
       {
         for (x = 0; x < W; x += B)
         {
-          wmse += calcWeightedSquaredError(pic1, pic0, sumAct, W, H, x, y, B, B);
+          wmse += calcWeightedSquaredError(pic1,   pic0,
+                                           sumAct, BD,
+                                           W,      H,
+                                           x,      y,
+                                           B,      B);
 #if !GLOBAL_AVERAGING
           numAct += 1.0;
 #endif
@@ -2941,11 +2957,17 @@ uint64_t EncGOP::xFindDistortionPlane(const CPelBuf& pic0, const CPelBuf& pic1, 
 
       // integer weighted distortion
 #if GLOBAL_AVERAGING
-      sumAct = 1.5 * double(1 << BD);
-      if ((W << chromaShift) > 2048 && (H << chromaShift) > 1280)   // UHD luma
+      sumAct = 32.0 * double(1 << BD);
+
+      if ((W << chromaShift) > 2048 && (H << chromaShift) > 1280) // for UHD/4K
       {
-        sumAct /= 1.5;
+        sumAct *= 0.5;
       }
+      else if ((W << chromaShift) <= 1024 || (H << chromaShift) <= 640) // 480p
+      {
+        sumAct *= 2.0;
+      }
+
       return (wmse <= 0.0) ? 0 : uint64_t(wmse * pow(sumAct, BETA) + 0.5);
 #else
       return (wmse <= 0.0 || numAct <= 0.0) ? 0 : uint64_t(wmse * pow(sumAct / numAct, BETA) + 0.5);
@@ -2982,7 +3004,7 @@ uint64_t EncGOP::xFindDistortionPlane(const CPelBuf& pic0, const CPelBuf& pic1, 
   return uiTotalDiff;
 }
 #if WCG_WPSNR
-double EncGOP::xFindDistortionPlaneWPSNR(const CPelBuf& pic0, const CPelBuf& pic1, const uint32_t rshift, const CPelBuf& picLuma0, 
+double EncGOP::xFindDistortionPlaneWPSNR(const CPelBuf& pic0, const CPelBuf& pic1, const uint32_t rshift, const CPelBuf& picLuma0,
   ComponentID compID, const ChromaFormat chfmt    )
 {
   const bool    useLumaWPSNR = m_pcEncLib->getLumaLevelToDeltaQPMapping().isEnabled();
@@ -3172,7 +3194,7 @@ void EncGOP::xCalculateAddPSNR( Picture* pcPic, PelUnitBuf cPicD, const AccessUn
 #else
     const uint64_t uiSSDtemp = xFindDistortionPlane(recPB, orgPB, 0);
 #if WCG_WPSNR
-  const double uiSSDtempWeighted = xFindDistortionPlaneWPSNR(recPB, orgPB, 0, org.get(COMPONENT_Y), compID, format);
+    const double uiSSDtempWeighted = xFindDistortionPlaneWPSNR(recPB, orgPB, 0, org.get(COMPONENT_Y), compID, format);
 #endif
     const uint32_t maxval = 255 << (bitDepth - 8);
 #endif

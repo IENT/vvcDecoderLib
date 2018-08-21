@@ -970,7 +970,7 @@ void EncLib::xInitSPS(SPS &sps)
   sps.setMaxTLayers( m_maxTempLayer );
   sps.setTemporalIdNestingFlag( ( m_maxTempLayer == 1 ) ? true : false );
 
-  for (int i = 0; i < min(sps.getMaxTLayers(),(uint32_t) MAX_TLAYER); i++ )
+  for (int i = 0; i < std::min(sps.getMaxTLayers(), (uint32_t) MAX_TLAYER); i++ )
   {
     sps.setMaxDecPicBuffering(m_maxDecPicBuffering[i], i);
     sps.setNumReorderPics(m_numReorderPics[i], i);
@@ -1260,7 +1260,7 @@ void EncLib::xInitPPS(PPS &pps, const SPS &sps)
   if (getUsePerceptQPA() && !bUseDQP)
   {
     CHECK( m_iMaxCuDQPDepth != 0, "max. delta-QP depth must be zero!" );
-    bUseDQP = true;
+    bUseDQP = (getBaseQP() < 38) && (getSourceWidth() > 512 || getSourceHeight() > 320);
   }
 #endif
 
@@ -1327,8 +1327,8 @@ void EncLib::xInitPPS(PPS &pps, const SPS &sps)
     const double dcrQP = m_wcgChromaQpControl.chromaCrQpScale * chromaQp;
     const int cbQP =(int)(dcbQP + ( dcbQP < 0 ? -0.5 : 0.5) );
     const int crQP =(int)(dcrQP + ( dcrQP < 0 ? -0.5 : 0.5) );
-    pps.setQpOffset(COMPONENT_Cb, Clip3( -12, 12, min(0, cbQP) + m_chromaCbQpOffset ));
-    pps.setQpOffset(COMPONENT_Cr, Clip3( -12, 12, min(0, crQP) + m_chromaCrQpOffset));
+    pps.setQpOffset(COMPONENT_Cb, Clip3(-12, 12, std::min(0, cbQP) + m_chromaCbQpOffset));
+    pps.setQpOffset(COMPONENT_Cr, Clip3(-12, 12, std::min(0, crQP) + m_chromaCrQpOffset));
   }
   else
   {
@@ -1354,9 +1354,15 @@ void EncLib::xInitPPS(PPS &pps, const SPS &sps)
       }
     }
   }
+ #if ENABLE_QPA
+  if ((getUsePerceptQPA() || getSliceChromaOffsetQpPeriodicity() > 0) && (getChromaFormatIdc() != CHROMA_400))
+  {
+    bChromaDeltaQPEnabled = true;
+  }
+ #endif
   pps.setSliceChromaQpFlag(bChromaDeltaQPEnabled);
 #endif
-  if (!pps.getSliceChromaQpFlag() && sps.getSpsNext().getUseDualITree())
+  if (!pps.getSliceChromaQpFlag() && sps.getSpsNext().getUseDualITree() && (getChromaFormatIdc() != CHROMA_400))
   {
     pps.setSliceChromaQpFlag(m_chromaCbQpOffsetDualTree != 0 || m_chromaCrQpOffsetDualTree != 0);
   }
