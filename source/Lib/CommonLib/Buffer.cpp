@@ -62,6 +62,55 @@ void addAvgCore( const T* src1, int src1Stride, const T* src2, int src2Stride, T
 #undef ADD_AVG_CORE_INC
 }
 
+#if JVET_K0485_BIO
+void addBIOAvgCore(const Pel* src0, int src0Stride, const Pel* src1, int src1Stride, Pel *dst, int dstStride, const Pel *pGradX0, const Pel *pGradX1, const Pel *pGradY0, const Pel*pGradY1, int gradStride, int width, int height, int tmpx, int tmpy, int shift, int offset, const ClpRng& clpRng)
+{
+  int b = 0;
+
+  for (int y = 0; y < height; y++)
+  {
+    for (int x = 0; x < width; x += 4)
+    {
+      b = tmpx * (pGradX0[x] - pGradX1[x]) + tmpy * (pGradY0[x] - pGradY1[x]);
+      b = ((b + 32) >> 6);
+      dst[x] = ClipPel((int16_t)rightShift((src0[x] + src1[x] + b + offset), shift), clpRng);
+
+      b = tmpx * (pGradX0[x + 1] - pGradX1[x + 1]) + tmpy * (pGradY0[x + 1] - pGradY1[x + 1]);
+      b = ((b + 32) >> 6);
+      dst[x + 1] = ClipPel((int16_t)rightShift((src0[x + 1] + src1[x + 1] + b + offset), shift), clpRng);
+
+      b = tmpx * (pGradX0[x + 2] - pGradX1[x + 2]) + tmpy * (pGradY0[x + 2] - pGradY1[x + 2]);
+      b = ((b + 32) >> 6);
+      dst[x + 2] = ClipPel((int16_t)rightShift((src0[x + 2] + src1[x + 2] + b + offset), shift), clpRng);
+
+      b = tmpx * (pGradX0[x + 3] - pGradX1[x + 3]) + tmpy * (pGradY0[x + 3] - pGradY1[x + 3]);
+      b = ((b + 32) >> 6);
+      dst[x + 3] = ClipPel((int16_t)rightShift((src0[x + 3] + src1[x + 3] + b + offset), shift), clpRng);
+    }
+    dst += dstStride;       src0 += src0Stride;     src1 += src1Stride;
+    pGradX0 += gradStride; pGradX1 += gradStride; pGradY0 += gradStride; pGradY1 += gradStride;
+  }
+}
+
+Distortion calcHighBDSADCore(const Pel* src0, int src0Stride, const Pel* src1, int src1Stride, int width, int height, int bitDepth)
+{
+  const uint32_t distortionShift = DISTORTION_PRECISION_ADJUSTMENT(bitDepth - 8);
+
+  Distortion sum = 0;
+
+  for (int rows = 0; rows < height; rows++)
+  {
+    for (int cols = 0; cols < width; cols++)
+    {
+      sum += abs(src0[cols] - src1[cols]);
+    }
+    src0 += src0Stride;
+    src1 += src1Stride;
+  }
+
+  return (sum >> distortionShift);
+}
+#endif
 
 template<typename T>
 void reconstructCore( const T* src1, int src1Stride, const T* src2, int src2Stride, T* dest, int dstStride, int width, int height, const ClpRng& clpRng )
@@ -97,6 +146,10 @@ PelBufferOps::PelBufferOps()
 {
   addAvg4 = addAvgCore<Pel>;
   addAvg8 = addAvgCore<Pel>;
+#if JVET_K0485_BIO
+  addBIOAvg4    = addBIOAvgCore;
+  calcHighBDSAD = calcHighBDSADCore;
+#endif
 
   reco4 = reconstructCore<Pel>;
   reco8 = reconstructCore<Pel>;
@@ -149,6 +202,45 @@ void AreaBuf<Pel>::addAvg( const AreaBuf<const Pel> &other1, const AreaBuf<const
 #undef ADD_AVG_INC
   }
 }
+
+#if JVET_K0485_BIO
+template<>
+void AreaBuf<Pel>::avgPel(const Pel* pYuvSrc0, const int src0Stride, const Pel* pYuvSrc1, const int src1Stride, const ClpRng& clpRng)
+{
+  const Pel* src0 = pYuvSrc0;
+  const Pel* src2 = pYuvSrc1;
+  Pel* dest = buf;
+
+  const unsigned destStride = stride;
+  const int     clipbd = clpRng.bd;
+  const int     shiftNum = std::max<int>(2, (IF_INTERNAL_PREC - clipbd)) + 1;
+  const int     offset = (1 << (shiftNum - 1)) + 2 * IF_INTERNAL_OFFS;
+
+#if ENABLE_SIMD_OPT_BUFFER && defined(TARGET_SIMD_X86)
+  if ((width & 7) == 0)
+  {
+    g_pelBufOP.addAvg8(src0, src0Stride, src2, src1Stride, dest, destStride, width, height, shiftNum, offset, clpRng);
+  }
+  else if ((width & 3) == 0)
+  {
+    g_pelBufOP.addAvg4(src0, src0Stride, src2, src1Stride, dest, destStride, width, height, shiftNum, offset, clpRng);
+  }
+  else
+#endif
+  {
+#define ADD_AVG_OP( ADDR ) dest[ADDR] = ClipPel( rightShift( ( src0[ADDR] + src2[ADDR] + offset ), shiftNum ), clpRng )
+#define ADD_AVG_INC     \
+    src0 += src0Stride; \
+    src2 += src1Stride; \
+    dest += destStride; \
+
+    SIZE_AWARE_PER_EL_OP(ADD_AVG_OP, ADD_AVG_INC);
+
+#undef ADD_AVG_OP
+#undef ADD_AVG_INC
+  }
+}
+#endif
 
 template<>
 void AreaBuf<Pel>::toLast( const ClpRng& clpRng )

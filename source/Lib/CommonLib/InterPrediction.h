@@ -62,7 +62,11 @@ class Mv;
 // ====================================================================================================================
 
 #if JEM_TOOLS
+#if JVET_K0485_BIO
+#define BIO_TEMP_BUFFER_SIZE ( MAX_CU_SIZE+2*JVET_K0485_BIO_EXTEND_SIZE ) * ( MAX_CU_SIZE+2*JVET_K0485_BIO_EXTEND_SIZE )
+#else
 #define BIO_TEMP_BUFFER_SIZE ( MAX_CU_SIZE ) * ( MAX_CU_SIZE )
+#endif
 #endif
 
 class InterPrediction : public WeightPrediction
@@ -76,6 +80,11 @@ private:
 #endif
 
 #if JEM_TOOLS
+#if JVET_K0485_BIO
+  Distortion  m_bioDistThres;
+  Distortion  m_bioSubBlkDistThres;
+  Distortion  m_bioPredSubBlkDist[MAX_NUM_PARTS_IN_CTU];
+#endif
   int64_t m_piDotProduct1[BIO_TEMP_BUFFER_SIZE];
   int64_t m_piDotProduct2[BIO_TEMP_BUFFER_SIZE];
   int64_t m_piDotProduct3[BIO_TEMP_BUFFER_SIZE];
@@ -104,12 +113,17 @@ protected:
   Pel*                 m_pGradY0;
   Pel*                 m_pGradX1;
   Pel*                 m_pGradY1;
+#if JVET_K0485_BIO
+  Pel*                 m_pBIOPadRef;
+#endif
 
   PelStorage           m_tmpObmcBuf;
 
   Pel*                 m_cYuvPredTempDMVR[MAX_NUM_COMPONENT];
 
+#if !JVET_K0485_BIO
   uint32_t                 m_uiaBIOShift[64];
+#endif
 #if JVET_J0090_MEMORY_BANDWITH_MEASURE
   CacheModel*          m_cacheModel;
 #endif
@@ -119,6 +133,10 @@ protected:
 #define BIO_FILTER_LENGTH_MINUS_1         (BIO_FILTER_LENGTH-1)
 #define BIO_FILTER_HALF_LENGTH_MINUS_1    ((BIO_FILTER_LENGTH>>1)-1)
 
+#if JVET_K0485_BIO
+  void          (*bioGradFilter)(Pel* pSrc, int srcStride, int width, int height, int gradStride, Pel* pGradX, Pel* pGradY);
+  static void   gradFilter      (Pel* pSrc, int srcStride, int width, int height, int gradStride, Pel* pGradX, Pel* pGradY);
+#else
   void          xGradFilterX    ( const Pel* piRefY, int iRefStride, Pel*  piDstY, int iDstStride, int iWidth, int iHeight, int iMVyFrac, int iMVxFrac, const int bitDepth );
   void          xGradFilterY    ( const Pel* piRefY, int iRefStride, Pel*  piDstY, int iDstStride, int iWidth, int iHeight, int iMVyFrac, int iMVxFrac, const int bitDepth );
   inline void   gradFilter2DVer ( const Pel* piSrc, int iSrcStride, int iWidth, int iHeight, int iDstStride, Pel*& rpiDst, int iMv, const int iShift );
@@ -127,14 +145,22 @@ protected:
   inline void   fracFilter2DVer ( const Pel* piSrc, int iSrcStride, int iWidth, int iHeight, int iDstStride, Pel*& rpiDst, int iMv, const int iShift );
   inline void   gradFilter1DHor ( const Pel* piSrc, int iSrcStride, int iWidth, int iHeight, int iDstStride, Pel*& rpiDst, int iMV, const int iShift );
   inline void   gradFilter1DVer ( const Pel* piSrc, int iSrcStride, int iWidth, int iHeight, int iDstStride, Pel*& rpiDst, int iMV, const int iShift );
+#endif
 
   inline int64_t  divide64        ( int64_t numer, int64_t denom);
+#if JVET_K0485_BIO
+  inline void     calcBlkGradient(int sx, int sy, int64_t *arraysGx2, int64_t *arraysGxGy, int64_t *arraysGxdI, int64_t *arraysGy2, int64_t *arraysGydI,
+                                  int64_t &sGx2,  int64_t &sGy2,      int64_t &sGxGy,      int64_t &sGxdI,      int64_t &sGydI,     int width, int height, int unitSize);
+#else
   inline void   calcBlkGradient ( int sx, int sy, int64_t *arraysGx2, int64_t *arraysGxGy, int64_t *arraysGxdI, int64_t *arraysGy2, int64_t *arraysGydI, int64_t &sGx2, int64_t &sGy2, int64_t &sGxGy, int64_t &sGxdI, int64_t &sGydI, int iWidth, int iHeight);
-
   Pel  optical_flow_averaging   ( int64_t s1, int64_t s2, int64_t s3, int64_t s5, int64_t s6,
                                   Pel pGradX0, Pel pGradX1, Pel pGradY0, Pel pGradY1, Pel pSrcY0Temp, Pel pSrcY1Temp,
                                   const int shiftNum, const int offset, const int64_t limit, const int64_t denom_min_1, const int64_t denom_min_2, const ClpRng& clpRng );
+#endif
   void applyBiOptFlow           ( const PredictionUnit &pu, const CPelUnitBuf &pcYuvSrc0, const CPelUnitBuf &pcYuvSrc1, const int &iRefIdx0, const int &iRefIdx1, PelUnitBuf &pcYuvDst, const BitDepths &clipBitDepths);
+#if JVET_K0485_BIO
+  bool xCalcBiPredSubBlkDist    (const PredictionUnit &pu, const Pel* pYuvSrc0, const int src0Stride, const Pel* pYuvSrc1, const int src1Stride, const BitDepths &clipBitDepths);
+#endif
 #endif
 
 #if JEM_TOOLS
@@ -151,6 +177,9 @@ protected:
                                  );
   
 #if JEM_TOOLS
+#if JVET_K0485_BIO
+  void xPadRefFromFMC           (const Pel* refBufPtr, int refBufStride, int width, int height, Pel* padRefPelPtr, int &padRefStride, bool isFracMC);
+#endif
   void xPredAffineBlk           ( const ComponentID& compID, const PredictionUnit& pu, const Picture* refPic, const Mv* _mv, PelUnitBuf& dstPic, const bool& bi, const ClpRng& clpRng, const bool& bBIOApplied = false );
   void xGetLICParams            ( const CodingUnit& cu, const ComponentID compID, const Picture& refPic, const Mv& mv, int& shift, int& scale, int& offset );
   void xLocalIlluComp           ( const PredictionUnit& pu, const ComponentID compID, const Picture& refPic, const Mv& mv, const bool biPred, PelBuf& dstBuf );
