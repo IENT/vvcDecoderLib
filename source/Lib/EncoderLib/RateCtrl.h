@@ -154,6 +154,10 @@ public:
   int    getAdaptiveBits()              { return m_adaptiveBit;  }
   double getLastLambda()                { return m_lastLambda;   }
   void   setLastLambda( double lamdba ) { m_lastLambda = lamdba; }
+#if RATECTRL_FIX_FULLNBIT
+  void setBitDepth(int bitDepth) { m_bitDepth = bitDepth; }
+  int getbitDepth() { return m_bitDepth; }
+#endif
 
 private:
   int m_totalFrames;
@@ -184,6 +188,9 @@ private:
 
   int m_adaptiveBit;
   double m_lastLambda;
+#if RATECTRL_FIX_FULLNBIT
+  int m_bitDepth;
+#endif
 };
 
 class EncRCGOP
@@ -337,7 +344,11 @@ public:
   ~RateCtrl();
 
 public:
+#if RATECTRL_FIX_FULLNBIT
+  void init(int totalFrames, int targetBitrate, int frameRate, int GOPSize, int picWidth, int picHeight, int LCUWidth, int LCUHeight, int bitDepth, int keepHierBits, bool useLCUSeparateModel, GOPEntry GOPList[MAX_GOP]);
+#else
   void init( int totalFrames, int targetBitrate, int frameRate, int GOPSize, int picWidth, int picHeight, int LCUWidth, int LCUHeight, int keepHierBits, bool useLCUSeparateModel, GOPEntry GOPList[MAX_GOP] );
+#endif
   void destroy();
   void initRCPic( int frameLevel );
   void initRCGOP( int numberOfPictures );
