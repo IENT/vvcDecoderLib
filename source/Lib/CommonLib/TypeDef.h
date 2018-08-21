@@ -104,7 +104,7 @@
 
 #define JVET_K0357_AMVR                                   1 // Adaptive motion vector resolution separated from JEM_TOOLS macro
 
-#define JVET_K0485_BIO                                    0 // BIO simplifications
+#define JVET_K0485_BIO                                    1 // BIO simplifications
 #if JVET_K0485_BIO
 #define JVET_K0485_BIO_EXTEND_SIZE                        1
 #endif

@@ -1345,9 +1345,9 @@ void InterPrediction::applyBiOptFlow( const PredictionUnit &pu, const CPelUnitBu
   const int   offset          = ( 1 << ( shiftNum - 1 ) ) + 2 * IF_INTERNAL_OFFS;
   const bool  bShortRefMV     = ( pu.cs->slice->getCheckLDC() && PU::isBIOLDB(pu) );
 #if JVET_K0485_BIO
-  static const int64_t limit    = (16 << (IF_INTERNAL_PREC - bShortRefMV - bitDepth));
+  const int64_t limit         = (16 << (IF_INTERNAL_PREC - bShortRefMV - bitDepth));
 #else
-  const int64_t limit           = ( 12 << (IF_INTERNAL_PREC - bShortRefMV - bitDepth ) );
+  const int64_t limit         = ( 12 << (IF_INTERNAL_PREC - bShortRefMV - bitDepth ) );
 #endif
   const int64_t regularizator_1 = 500 * (1<<(bitDepth-8)) * (1<<(bitDepth-8));
   const int64_t regularizator_2 = regularizator_1<<1;
@@ -1561,7 +1561,7 @@ void InterPrediction::xWeightedAverage( const PredictionUnit& pu, const CPelUnit
       applyBiOptFlow( pu, pcYuvSrc0, pcYuvSrc1, iRefIdx0, iRefIdx1, pcYuvDst, clipBitDepths );
 #if JVET_K0485_BIO
       else
-        pcYuvDst.bufs[0].avgPel(pSrcY0, src0Stride, pSrcY1, src1Stride, clpRngs.comp[0]);
+        pcYuvDst.bufs[0].addAvg(CPelBuf(pSrcY0, src0Stride, pu.lumaSize()), CPelBuf(pSrcY1, src1Stride, pu.lumaSize()), clpRngs.comp[0]);
 #endif
     }
     pcYuvDst.addAvg( pcYuvSrc0, pcYuvSrc1, clpRngs, bBIOApplied );

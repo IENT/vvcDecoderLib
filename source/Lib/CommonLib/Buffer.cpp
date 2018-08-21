@@ -203,45 +203,6 @@ void AreaBuf<Pel>::addAvg( const AreaBuf<const Pel> &other1, const AreaBuf<const
   }
 }
 
-#if JVET_K0485_BIO
-template<>
-void AreaBuf<Pel>::avgPel(const Pel* pYuvSrc0, const int src0Stride, const Pel* pYuvSrc1, const int src1Stride, const ClpRng& clpRng)
-{
-  const Pel* src0 = pYuvSrc0;
-  const Pel* src2 = pYuvSrc1;
-  Pel* dest = buf;
-
-  const unsigned destStride = stride;
-  const int     clipbd = clpRng.bd;
-  const int     shiftNum = std::max<int>(2, (IF_INTERNAL_PREC - clipbd)) + 1;
-  const int     offset = (1 << (shiftNum - 1)) + 2 * IF_INTERNAL_OFFS;
-
-#if ENABLE_SIMD_OPT_BUFFER && defined(TARGET_SIMD_X86)
-  if ((width & 7) == 0)
-  {
-    g_pelBufOP.addAvg8(src0, src0Stride, src2, src1Stride, dest, destStride, width, height, shiftNum, offset, clpRng);
-  }
-  else if ((width & 3) == 0)
-  {
-    g_pelBufOP.addAvg4(src0, src0Stride, src2, src1Stride, dest, destStride, width, height, shiftNum, offset, clpRng);
-  }
-  else
-#endif
-  {
-#define ADD_AVG_OP( ADDR ) dest[ADDR] = ClipPel( rightShift( ( src0[ADDR] + src2[ADDR] + offset ), shiftNum ), clpRng )
-#define ADD_AVG_INC     \
-    src0 += src0Stride; \
-    src2 += src1Stride; \
-    dest += destStride; \
-
-    SIZE_AWARE_PER_EL_OP(ADD_AVG_OP, ADD_AVG_INC);
-
-#undef ADD_AVG_OP
-#undef ADD_AVG_INC
-  }
-}
-#endif
-
 template<>
 void AreaBuf<Pel>::toLast( const ClpRng& clpRng )
 {

@@ -107,9 +107,6 @@ struct AreaBuf : public Size
   void extendSingleBorderPel();
   void extendBorderPel      (  unsigned margin );
   void addAvg               ( const AreaBuf<const T> &other1, const AreaBuf<const T> &other2, const ClpRng& clpRng );
-#if JVET_K0485_BIO
-  void avgPel               (const Pel* pYuvSrc0, const int src0Stride, const Pel* pYuvSrc1, const int src1Stride, const ClpRng& clpRng);
-#endif
   void removeHighFreq       ( const AreaBuf<T>& other, const bool bClip, const ClpRng& clpRng);
   void updateHistogram      ( std::vector<int32_t>& hist ) const;
 
@@ -378,17 +375,6 @@ void AreaBuf<T>::addAvg( const AreaBuf<const T> &other1, const AreaBuf<const T> 
 
 template<>
 void AreaBuf<Pel>::addAvg( const AreaBuf<const Pel> &other1, const AreaBuf<const Pel> &other2, const ClpRng& clpRng );
-
-#if JVET_K0485_BIO
-template<typename T>
-void AreaBuf<T>::avgPel(const Pel* pYuvSrc0, const int src0Stride, const Pel* pYuvSrc1, const int src1Stride, const ClpRng& clpRng)
-{
-  THROW("Type not supported");
-}
-
-template<>
-void AreaBuf<Pel>::avgPel(const Pel* pYuvSrc0, const int src0Stride, const Pel* pYuvSrc1, const int src1Stride, const ClpRng& clpRng);
-#endif
 
 template<typename T>
 void AreaBuf<T>::linearTransform( const int scale, const int shift, const int offset, bool bClip, const ClpRng& clpRng )
