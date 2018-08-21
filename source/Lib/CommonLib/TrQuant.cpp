@@ -760,7 +760,7 @@ void TrQuant::xInvNsst( const TransformUnit &tu, const ComponentID compID )
     if( uiNSSTIdx < ( uiIntraMode <= DC_IDX ? 3 : 4 ) )
     {
 #if RExt__DECODER_DEBUG_TOOL_STATISTICS
-      CodingStatistics::IncrementStatisticTool(CodingStatisticsClassType{ STATS__TOOL_NSST, tu.Y().width, tu.Y().height, compID });
+      CodingStatistics::IncrementStatisticTool(CodingStatisticsClassType{ STATS__TOOL_NSST, width, height, compID });
 #endif
 
 #if ENABLE_BMS
