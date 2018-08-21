@@ -1721,11 +1721,13 @@ void EncSlice::encodeCtus( Picture* pcPic, const bool bCompressEntireSlice, cons
 
 #if !ENABLE_WPP_PARALLELISM
     int actualBits = int(cs.fracBits >> SCALE_BITS);
+    actualBits    -= (int)m_uiPicTotalBits;
 #endif
     if ( pCfg->getUseRateCtrl() )
     {
 #if ENABLE_WPP_PARALLELISM
       int actualBits      = int( cs.fracBits >> SCALE_BITS );
+      actualBits         -= (int)m_uiPicTotalBits;
 #endif
       int actualQP        = g_RCInvalidQPValue;
       double actualLambda = pRdCost->getLambda();
