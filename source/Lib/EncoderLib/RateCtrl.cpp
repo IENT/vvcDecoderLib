@@ -448,7 +448,7 @@ void EncRCGOP::updateAfterPicture( int bitsCost )
 
 int EncRCGOP::xEstGOPTargetBits( EncRCSeq* encRCSeq, int GOPSize )
 {
-  int realInfluencePicture = std::min( g_RCSmoothWindowSize, encRCSeq->getFramesLeft() );
+  int realInfluencePicture = min( g_RCSmoothWindowSize, encRCSeq->getFramesLeft() );
   int averageTargetBitsPerPic = (int)( encRCSeq->getTargetBits() / encRCSeq->getTotalFrames() );
   int currentTargetBitsPerPic = (int)( ( encRCSeq->getBitsLeft() - averageTargetBitsPerPic * (encRCSeq->getFramesLeft() - realInfluencePicture) ) / realInfluencePicture );
   int targetBits = currentTargetBitsPerPic * GOPSize;
@@ -809,7 +809,7 @@ double EncRCPic::getLCUTargetBpp(SliceType eSliceType)
   if (eSliceType == I_SLICE)
   {
     int noOfLCUsLeft = m_numberOfLCU - LCUIdx + 1;
-    int bitrateWindow = std::min(4, noOfLCUsLeft);
+    int bitrateWindow = min(4,noOfLCUsLeft);
     double MAD      = getLCU(LCUIdx).m_costIntra;
 
     if (m_remainingCostIntra > 0.1 )
@@ -830,7 +830,7 @@ double EncRCPic::getLCUTargetBpp(SliceType eSliceType)
     {
       totalWeight += m_LCUs[i].m_bitWeight;
     }
-    int realInfluenceLCU = std::min( g_RCLCUSmoothWindowSize, getLCULeft() );
+    int realInfluenceLCU = min( g_RCLCUSmoothWindowSize, getLCULeft() );
     avgBits = (int)( m_LCUs[LCUIdx].m_bitWeight - ( totalWeight - m_bitsLeft ) / realInfluenceLCU + 0.5 );
   }
 
@@ -1184,8 +1184,8 @@ double EncRCPic::getLCUEstLambdaAndQP(double bpp, int clipPicQP, int *estQP)
 
   if ( clipNeighbourQP > g_RCInvalidQPValue )
   {
-    maxQP = std::min(clipNeighbourQP + 1, maxQP);
-    minQP = std::max(clipNeighbourQP - 1, minQP);
+    maxQP = min(clipNeighbourQP + 1, maxQP);
+    minQP = max(clipNeighbourQP - 1, minQP);
   }
 
   double maxLambda=exp(((double)(maxQP+0.49)-13.7122)/4.2005);

@@ -1327,8 +1327,8 @@ void EncLib::xInitPPS(PPS &pps, const SPS &sps)
     const double dcrQP = m_wcgChromaQpControl.chromaCrQpScale * chromaQp;
     const int cbQP =(int)(dcbQP + ( dcbQP < 0 ? -0.5 : 0.5) );
     const int crQP =(int)(dcrQP + ( dcrQP < 0 ? -0.5 : 0.5) );
-    pps.setQpOffset(COMPONENT_Cb, Clip3(-12, 12, std::min(0, cbQP) + m_chromaCbQpOffset));
-    pps.setQpOffset(COMPONENT_Cr, Clip3(-12, 12, std::min(0, crQP) + m_chromaCrQpOffset));
+    pps.setQpOffset(COMPONENT_Cb, Clip3( -12, 12, min(0, cbQP) + m_chromaCbQpOffset ));
+    pps.setQpOffset(COMPONENT_Cr, Clip3( -12, 12, min(0, crQP) + m_chromaCrQpOffset));
   }
   else
   {
