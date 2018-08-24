@@ -1514,9 +1514,6 @@ bool InterPrediction::xCalcBiPredSubBlkDist(const PredictionUnit &pu, const Pel*
   m_bioSubBlkDistThres >>= distortionShift;
 
   DistParam cDistParam;
-  cDistParam.applyWeight = false;
-  cDistParam.useMR = false;
-
   Distortion dist = 0;
   for (int yu = 0, blkIdx = 0; yu < yUnit; yu++)
   {
@@ -1525,7 +1522,8 @@ bool InterPrediction::xCalcBiPredSubBlkDist(const PredictionUnit &pu, const Pel*
       const Pel* pPred0 = pYuvSrc0 + ((yu*src0Stride + xu) << 2);
       const Pel* pPred1 = pYuvSrc1 + ((yu*src1Stride + xu) << 2);
 
-      m_bioPredSubBlkDist[blkIdx] = g_pelBufOP.calcHighBDSAD(pPred0, src0Stride, pPred1, src1Stride, (1 << 2), (1 << 2), clipbd);
+      m_pcRdCost->setDistParam(cDistParam, pPred0, pPred1, src0Stride, src1Stride, clipbd, COMPONENT_Y, (1 << 2), (1 << 2), 0, 1, false, true);
+      m_bioPredSubBlkDist[blkIdx] = cDistParam.distFunc(cDistParam);
       dist += m_bioPredSubBlkDist[blkIdx];
     }
   }

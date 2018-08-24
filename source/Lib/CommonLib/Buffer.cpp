@@ -91,25 +91,6 @@ void addBIOAvgCore(const Pel* src0, int src0Stride, const Pel* src1, int src1Str
     pGradX0 += gradStride; pGradX1 += gradStride; pGradY0 += gradStride; pGradY1 += gradStride;
   }
 }
-
-Distortion calcHighBDSADCore(const Pel* src0, int src0Stride, const Pel* src1, int src1Stride, int width, int height, int bitDepth)
-{
-  const uint32_t distortionShift = DISTORTION_PRECISION_ADJUSTMENT(bitDepth - 8);
-
-  Distortion sum = 0;
-
-  for (int rows = 0; rows < height; rows++)
-  {
-    for (int cols = 0; cols < width; cols++)
-    {
-      sum += abs(src0[cols] - src1[cols]);
-    }
-    src0 += src0Stride;
-    src1 += src1Stride;
-  }
-
-  return (sum >> distortionShift);
-}
 #endif
 
 template<typename T>
@@ -148,7 +129,6 @@ PelBufferOps::PelBufferOps()
   addAvg8 = addAvgCore<Pel>;
 #if JVET_K0485_BIO
   addBIOAvg4    = addBIOAvgCore;
-  calcHighBDSAD = calcHighBDSADCore;
 #endif
 
   reco4 = reconstructCore<Pel>;

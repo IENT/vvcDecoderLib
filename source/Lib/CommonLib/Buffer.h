@@ -70,7 +70,6 @@ struct PelBufferOps
   void ( *linTf8 )        ( const Pel* src0, int src0Stride,                                  Pel *dst, int dstStride, int width, int height, int scale, int shift, int offset, const ClpRng& clpRng, bool bClip );
 #if JVET_K0485_BIO
   void(*addBIOAvg4)          (const Pel* src0, int src0Stride, const Pel* src1, int src1Stride, Pel *dst, int dstStride, const Pel *pGradX0, const Pel *pGradX1, const Pel *pGradY0, const Pel*pGradY1, int gradStride, int width, int height, int tmpx, int tmpy, int shift, int offset, const ClpRng& clpRng);
-  Distortion(*calcHighBDSAD) (const Pel* src0, int src0Stride, const Pel* src1, int src1Stride, int width, int height, int bitDepth);
 #endif
 };
 
