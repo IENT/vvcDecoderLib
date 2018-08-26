@@ -1033,8 +1033,8 @@ void IntraPrediction::xPredIntraAng( const CPelBuf &pSrc, PelBuf &pDst, const Ch
           if (wT + wL == 0) break;
 
           int c = x + y + 1;
-          const Pel left = refSide[c + 1];
-          const Pel top = refMain[c + 1];
+          const Pel left = (wL != 0) ? refSide[c + 1] : 0;
+          const Pel top  = (wT != 0) ? refMain[c + 1] : 0;
 
           pDsty[x] = ClipPel((wL * left + wT * top + (64 - wL - wT) * pDsty[x] + 32) >> 6, clpRng);
         }
@@ -1205,6 +1205,7 @@ void IntraPrediction::xIntraPredFilteringModeDGL(const CPelBuf &pSrc, PelBuf &pD
 }
 #endif
 
+#if JEM_TOOLS
 void IntraPrediction::xReferenceFilter(
 #if JVET_K0500_WAIP
   const int doubleHSize,
@@ -1298,6 +1299,7 @@ void IntraPrediction::xReferenceFilter(
       piLowPassRef[k] = (origWeight * piRefVector[k] + iCmptWeight * piLowPassRef[k] + ParOffset) >> ParShift;
   }
 }
+#endif
 
 bool IntraPrediction::useDPCMForFirstPassIntraEstimation(const PredictionUnit &pu, const uint32_t &uiDirMode)
 {

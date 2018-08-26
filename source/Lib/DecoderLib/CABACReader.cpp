@@ -212,7 +212,7 @@ bool CABACReader::coding_tree_unit( CodingStructure& cs, const UnitArea& area, i
 #if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
   bool isLast = false;
 
-  if (CS::isDualITree(cs) && cs.pcv->chrFormat != CHROMA_400)
+  if (CS::isDualITree(cs) && cs.pcv->chrFormat != CHROMA_400 && cs.pcv->maxCUWidth > 64)
   {
     Partitioner *chromaPartitioner = PartitionerFactory::get(*cs.slice);
     chromaPartitioner->initCtu(area, CH_C, *cs.slice);
@@ -225,17 +225,18 @@ bool CABACReader::coding_tree_unit( CodingStructure& cs, const UnitArea& area, i
   else
   {
     isLast = coding_tree(cs, *partitioner, cuCtx);
-    qps[CH_L] = cuCtx.qp;
-  }
 #else
-  bool isLast = coding_tree( cs, *partitioner, cuCtx );
+  bool isLast = coding_tree(cs, *partitioner, cuCtx);
+#endif
   qps[CH_L] = cuCtx.qp;
-  if( !isLast && CS::isDualITree( cs ) && cs.pcv->chrFormat != CHROMA_400 )
+  if (!isLast && CS::isDualITree(cs) && cs.pcv->chrFormat != CHROMA_400)
   {
-    CUCtx cuCtxChroma( qps[CH_C] );
-    partitioner->initCtu( area, CH_C, *cs.slice );
-    isLast = coding_tree( cs, *partitioner, cuCtxChroma );
+    CUCtx cuCtxChroma(qps[CH_C]);
+    partitioner->initCtu(area, CH_C, *cs.slice);
+    isLast = coding_tree(cs, *partitioner, cuCtxChroma);
     qps[CH_C] = cuCtxChroma.qp;
+  }
+#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
   }
 #endif
 
@@ -1256,7 +1257,11 @@ bool CABACReader::coding_unit( CodingUnit &cu, Partitioner &partitioner, CUCtx& 
   }
 
   // skip flag
+#if JVET_K0076_CPR_DT
+  if (!cs.slice->isIntra() && cu.Y().valid())
+#else
   if( !cs.slice->isIntra() )
+#endif
   {
     cu_skip_flag( cu );
   }
@@ -1377,7 +1382,6 @@ void CABACReader::imv_mode( CodingUnit& cu, MergeCtx& mrgCtx )
 void CABACReader::pred_mode( CodingUnit& cu )
 {
   RExt__DECODER_DEBUG_BIT_STATISTICS_CREATE_SET( STATS__CABAC_BITS__PRED_MODE );
-
   if( cu.cs->slice->isIntra() || m_BinDecoder.decodeBin( Ctx::PredMode() ) )
   {
     cu.predMode = MODE_INTRA;
@@ -1424,7 +1428,14 @@ void CABACReader::cu_pred_data( CodingUnit &cu )
     intra_chroma_pred_modes( cu );
     return;
   }
-
+#if JVET_K0076_CPR_DT
+  if (!cu.Y().valid()) // dual tree chroma CU
+  {
+    cu.predMode = MODE_INTER;
+    cu.ibc = true;
+    return;
+  }
+#endif 
   MergeCtx mrgCtx;
 
   for( auto &pu : CU::traversePUs( cu ) )

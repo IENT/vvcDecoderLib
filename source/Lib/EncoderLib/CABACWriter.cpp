@@ -280,7 +280,7 @@ void CABACWriter::coding_tree_unit( CodingStructure& cs, const UnitArea& area, i
 #endif
 
 #if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
-  if (CS::isDualITree(cs) && cs.pcv->chrFormat != CHROMA_400)
+  if (CS::isDualITree(cs) && cs.pcv->chrFormat != CHROMA_400 && cs.pcv->maxCUWidth > 64)
   {
     CUCtx chromaCuCtx(qps[CH_C]);
     Partitioner *chromaPartitioner = PartitionerFactory::get(*cs.slice);
@@ -296,15 +296,14 @@ void CABACWriter::coding_tree_unit( CodingStructure& cs, const UnitArea& area, i
 #endif
   coding_tree( cs, *partitioner, cuCtx );
   qps[CH_L] = cuCtx.qp;
-#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
-  }
-#else
   if( CS::isDualITree( cs ) && cs.pcv->chrFormat != CHROMA_400 )
   {
     CUCtx cuCtxChroma( qps[CH_C] );
     partitioner->initCtu( area, CH_C, *cs.slice );
     coding_tree( cs, *partitioner, cuCtxChroma );
     qps[CH_C] = cuCtxChroma.qp;
+  }
+#if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
   }
 #endif
 
@@ -1282,7 +1281,11 @@ void CABACWriter::coding_unit( const CodingUnit& cu, Partitioner& partitioner, C
   }
 
   // skip flag
+#if JVET_K0076_CPR_DT
+  if (!cs.slice->isIntra() && cu.Y().valid())
+#else
   if( !cs.slice->isIntra() )
+#endif
   {
     cu_skip_flag( cu );
   }
@@ -1395,6 +1398,12 @@ void CABACWriter::cu_pred_data( const CodingUnit& cu )
     intra_chroma_pred_modes( cu );
     return;
   }
+#if JVET_K0076_CPR_DT
+  if (!cu.Y().valid()) // dual tree chroma CU
+  {
+    return;
+  }
+#endif 
   for( auto &pu : CU::traversePUs( cu ) )
   {
     prediction_unit( pu );
