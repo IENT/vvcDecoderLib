@@ -209,7 +209,7 @@ public:
     }
   }
 
-  __inline Distortion getBvCostMultiplePreds(int x, int y, bool useIMV)
+  inline Distortion getBvCostMultiplePreds(int x, int y, bool useIMV)
   {
     return Distortion((m_dCost * getBitsMultiplePreds(x, y, useIMV)) / 65536.0);
   }
@@ -286,20 +286,20 @@ public:
     }
   }
 
-  unsigned int getIComponentBits(int iVal)
+  unsigned int getIComponentBits(int val)
   {
-    if (!iVal) return 1;
+    if (!val) return 1;
 
-    unsigned int uiLength = 1;
-    unsigned int uiTemp = (iVal <= 0) ? (-iVal << 1) + 1 : (iVal << 1);
+    unsigned int length = 1;
+    unsigned int temp = (val <= 0) ? (-val << 1) + 1 : (val << 1);
 
-    while (1 != uiTemp)
+    while (1 != temp)
     {
-      uiTemp >>= 1;
-      uiLength += 2;
+      temp >>= 1;
+      length += 2;
     }
 
-    return uiLength;
+    return length;
   }
 #endif
 

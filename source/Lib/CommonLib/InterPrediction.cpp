@@ -663,8 +663,38 @@ void InterPrediction::xSubPuMC( PredictionUnit& pu, PelUnitBuf& predBuf, const R
 }
 #endif
 
+#if JVET_K0076_CPR_DT
+void InterPrediction::xChromaMC(PredictionUnit &pu, PelUnitBuf& pcYuvPred)
+{
+  // separated tree, chroma
+  const CompArea lumaArea = CompArea(COMPONENT_Y, pu.chromaFormat, pu.Cb().lumaPos(), recalcSize(pu.chromaFormat, CHANNEL_TYPE_CHROMA, CHANNEL_TYPE_LUMA, pu.Cb().size()));
+  PredictionUnit subPu;
+  subPu.cs = pu.cs;
+  subPu.cu = pu.cu;
+  
+  Picture * refPic = pu.cu->slice->getPic();
+  for (int y = lumaArea.y; y < lumaArea.y + lumaArea.height; y += MIN_PU_SIZE)
+  {
+    for (int x = lumaArea.x; x < lumaArea.x + lumaArea.width; x += MIN_PU_SIZE)
+    {
+      const MotionInfo &curMi = pu.cs->picture->cs->getMotionInfo(Position{ x, y });
+      
+      subPu.UnitArea::operator=(UnitArea(pu.chromaFormat, Area(x, y, MIN_PU_SIZE, MIN_PU_SIZE)));
+      PelUnitBuf subPredBuf = pcYuvPred.subBuf(UnitAreaRelative(pu, subPu));
+      
+      xPredInterBlk(COMPONENT_Cb, subPu, refPic, curMi.mv[0], subPredBuf, false, pu.cu->slice->clpRng(COMPONENT_Cb), false, false, FRUC_MERGE_OFF, false);
+      xPredInterBlk(COMPONENT_Cr, subPu, refPic, curMi.mv[0], subPredBuf, false, pu.cu->slice->clpRng(COMPONENT_Cr), false, false, FRUC_MERGE_OFF, false);
+    }
+  }
+}
+#endif
+
 #if JEM_TOOLS
-void InterPrediction::xPredInterUni(const PredictionUnit& pu, const RefPicList& eRefPicList, PelUnitBuf& pcYuvPred, const bool& bi, const bool& bBIOApplied /*= false*/, const bool& bDMVRApplied /*= false*/ )
+void InterPrediction::xPredInterUni(const PredictionUnit& pu, const RefPicList& eRefPicList, PelUnitBuf& pcYuvPred, const bool& bi, const bool& bBIOApplied /*= false*/, const bool& bDMVRApplied /*= false*/ 
+#if JVET_K0076_CPR_DT
+  , const bool luma, const bool chroma
+#endif
+)
 #else
 void InterPrediction::xPredInterUni(const PredictionUnit& pu, const RefPicList& eRefPicList, PelUnitBuf& pcYuvPred, const bool& bi )
 #endif
@@ -702,7 +732,12 @@ void InterPrediction::xPredInterUni(const PredictionUnit& pu, const RefPicList& 
   for( uint32_t comp = COMPONENT_Y; comp < pcYuvPred.bufs.size() && comp <= m_maxCompIDToPred; comp++ )
   {
     const ComponentID compID = ComponentID( comp );
-
+#if JVET_K0076_CPR_DT
+    if (compID == COMPONENT_Y && !luma)
+      continue;
+    if (compID != COMPONENT_Y && !chroma)
+      continue;
+#endif
 #if JEM_TOOLS
     if( pu.cu->affine )
     {
@@ -1811,8 +1846,29 @@ void InterPrediction::xWeightedAverage( const PredictionUnit& pu, const CPelUnit
   }
 }
 
-void InterPrediction::motionCompensation( PredictionUnit &pu, PelUnitBuf &predBuf, const RefPicList &eRefPicList )
+void InterPrediction::motionCompensation( PredictionUnit &pu, PelUnitBuf &predBuf, const RefPicList &eRefPicList 
+#if JVET_K0076_CPR_DT
+  , const bool luma, const bool chroma
+#endif
+)
 {
+#if JVET_K0076_CPR_DT
+    // dual tree handling for CPR as the only ref
+ if (!luma || !chroma)
+ {
+    if (!luma && chroma)
+    {
+      xChromaMC(pu, predBuf);
+      return;
+    }
+    else // (luma && !chroma)
+    {
+      xPredInterUni(pu, eRefPicList, predBuf, false, false, false, luma, chroma);
+      return;
+    }
+ }
+  // else, go with regular MC below
+#endif
         CodingStructure &cs = *pu.cs;
   const PPS &pps            = *cs.pps;
   const SliceType sliceType =  cs.slice->getSliceType();
@@ -1859,14 +1915,22 @@ void InterPrediction::motionCompensation( PredictionUnit &pu, PelUnitBuf &predBu
   return;
 }
 
-void InterPrediction::motionCompensation( CodingUnit &cu, const RefPicList &eRefPicList )
+void InterPrediction::motionCompensation( CodingUnit &cu, const RefPicList &eRefPicList 
+#if JVET_K0076_CPR_DT
+  , const bool luma, const bool chroma
+#endif
+)
 {
   for( auto &pu : CU::traversePUs( cu ) )
   {
     PelUnitBuf predBuf = cu.cs->getPredBuf( pu );
 #if JEM_TOOLS
     pu.mvRefine = true;
-    motionCompensation( pu, predBuf, eRefPicList );
+    motionCompensation( pu, predBuf, eRefPicList 
+#if JVET_K0076_CPR_DT
+      , luma, chroma
+#endif
+    );
     pu.mvRefine = false;
 #else
     motionCompensation( pu, predBuf, eRefPicList );
@@ -1874,10 +1938,18 @@ void InterPrediction::motionCompensation( CodingUnit &cu, const RefPicList &eRef
   }
 }
 
-void InterPrediction::motionCompensation( PredictionUnit &pu, const RefPicList &eRefPicList /*= REF_PIC_LIST_X*/ )
+void InterPrediction::motionCompensation( PredictionUnit &pu, const RefPicList &eRefPicList /*= REF_PIC_LIST_X*/ 
+#if JVET_K0076_CPR_DT
+  , const bool luma, const bool chroma
+#endif
+)
 {
   PelUnitBuf predBuf = pu.cs->getPredBuf( pu );
-  motionCompensation( pu, predBuf, eRefPicList );
+  motionCompensation( pu, predBuf, eRefPicList 
+#if JVET_K0076_CPR_DT
+    , luma, chroma
+#endif
+  );
 }
 
 #if JEM_TOOLS

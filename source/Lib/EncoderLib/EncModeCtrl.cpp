@@ -1114,7 +1114,29 @@ void EncModeCtrlMTnoRQT::initCULevel( Partitioner &partitioner, const CodingStru
 #endif
 
   xGetMinMaxQP( minQP, maxQP, cs, partitioner, baseQP, *cs.sps, *cs.pps, true );
-
+#if JVET_K0076_CPR_DT
+  bool checkIbc = true;
+  if (cs.chType == CHANNEL_TYPE_CHROMA)
+  {
+    IbcLumaCoverage ibcLumaCoverage = cs.getIbcLumaCoverage(cs.area.Cb());
+    switch (ibcLumaCoverage)
+    {
+    case IBC_LUMA_COVERAGE_FULL:
+      // check IBC 
+      break;
+    case IBC_LUMA_COVERAGE_PARTIAL:
+      // do not check IBC
+      checkIbc = false;
+      break;
+    case IBC_LUMA_COVERAGE_NONE:
+      // do not check IBC
+      checkIbc = false;
+      break;
+    default:
+      THROW("Unknown IBC luma coverage type");
+    }
+  }
+#endif
   // Add coding modes here
   // NOTE: Working back to front, as a stack, which is more efficient with the container
   // NOTE: First added modes will be processed at the end.
@@ -1244,7 +1266,11 @@ void EncModeCtrlMTnoRQT::initCULevel( Partitioner &partitioner, const CodingStru
     m_ComprCUCtxList.back().testModes.push_back( { ETM_INTRA, SIZE_2Nx2N, ETO_STANDARD, qp, lossless } );
 #if JVET_K0076_CPR
     // add ibc mode to intra path
-    if (cs.sps->getSpsNext().getIBCMode())
+    if (cs.sps->getSpsNext().getIBCMode()
+#if JVET_K0076_CPR_DT
+      && checkIbc
+#endif
+      )
     {
       m_ComprCUCtxList.back().testModes.push_back({ ETM_IBC,         SIZE_2Nx2N, ETO_STANDARD,  qp, lossless });
       if (cs.chType == CHANNEL_TYPE_LUMA)

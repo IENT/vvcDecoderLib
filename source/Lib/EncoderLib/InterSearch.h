@@ -57,7 +57,7 @@
 #include "CommonLib/AffineGradientSearch.h"
 #endif
 #if JVET_K0076_CPR
-#include "IbcHashMap.h"
+#include "CommonLib/IbcHashMap.h"
 #include <unordered_map>
 #include <vector>
 #endif
@@ -440,9 +440,17 @@ private:
 
 public:
 
-  void encodeResAndCalcRdInterCU  (CodingStructure &cs, Partitioner &partitioner, const bool &skipResidual);
+  void encodeResAndCalcRdInterCU  (CodingStructure &cs, Partitioner &partitioner, const bool &skipResidual
+#if JVET_K0076_CPR_DT
+    , const bool luma = true, const bool chroma = true
+#endif
+  );
   void xEncodeInterResidualQT     (CodingStructure &cs, Partitioner &partitioner, const ComponentID &compID);
-  void xEstimateInterResidualQT   (CodingStructure &cs, Partitioner &partitioner, Distortion *puiZeroDist = NULL);
+  void xEstimateInterResidualQT   (CodingStructure &cs, Partitioner &partitioner, Distortion *puiZeroDist = NULL
+#if JVET_K0076_CPR_DT
+    , const bool luma = true, const bool chroma = true
+#endif
+  );
   uint64_t xGetSymbolFracBitsInter  (CodingStructure &cs, Partitioner &partitioner);
 
 };// END CLASS DEFINITION EncSearch

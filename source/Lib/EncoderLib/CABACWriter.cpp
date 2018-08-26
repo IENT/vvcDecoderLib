@@ -1281,7 +1281,11 @@ void CABACWriter::coding_unit( const CodingUnit& cu, Partitioner& partitioner, C
   }
 
   // skip flag
+#if JVET_K0076_CPR_DT
+  if (!cs.slice->isIntra() && cu.Y().valid())
+#else
   if( !cs.slice->isIntra() )
+#endif
   {
     cu_skip_flag( cu );
   }
@@ -1394,6 +1398,12 @@ void CABACWriter::cu_pred_data( const CodingUnit& cu )
     intra_chroma_pred_modes( cu );
     return;
   }
+#if JVET_K0076_CPR_DT
+  if (!cu.Y().valid()) // dual tree chroma CU
+  {
+    return;
+  }
+#endif 
   for( auto &pu : CU::traversePUs( cu ) )
   {
     prediction_unit( pu );

@@ -51,6 +51,10 @@
 #include <cassert>
 
 #define JVET_K0076_CPR                                    1 // current picture referencing or intra block copy mode
+#if JVET_K0076_CPR
+#define JVET_K0076_CPR_DT                                 1 // dualItree support for CPR
+#endif
+
 
 #define JVET_K1000_SIMPLIFIED_EMT                         1 // EMT with only DCT-2, DCT-8 and DST-7
 
@@ -301,6 +305,9 @@
 #endif
 #if JVET_K0371_ALF
 #define ENABLE_SIMD_OPT_ALF                             ( 1 && ENABLE_SIMD_OPT )                            ///< SIMD optimization for ALF
+#endif
+#if JVET_K0076_CPR
+#define ENABLE_SIMD_OPT_CPR                             ( 1 && ENABLE_SIMD_OPT )                            ///< SIMD optimization for CPR
 #endif
 // End of SIMD optimizations
 
