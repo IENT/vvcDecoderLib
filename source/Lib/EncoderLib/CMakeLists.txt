@@ -7,8 +7,6 @@ file( GLOB SRC_FILES "*.cpp" )
 # get include files
 file( GLOB INC_FILES "*.h" )
 
-file( GLOB SSE41_SRC_FILES "IbcHashMap.cpp" )
-
 # NATVIS files for Visual Studio
 if( MSVC )
   file( GLOB NATVIS_FILES "../../VisualStudio/*.natvis" )
@@ -56,10 +54,6 @@ endif()
 
 target_include_directories( ${LIB_NAME} PUBLIC . )
 target_link_libraries( ${LIB_NAME} CommonLib Threads::Threads )
-
-if( UNIX )
-  set_property( SOURCE ${SSE41_SRC_FILES} APPEND PROPERTY COMPILE_FLAGS "-msse4" )
-endif()
 
 if( CMAKE_COMPILER_IS_GNUCC )
   # this is quite certainly a compiler problem
