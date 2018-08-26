@@ -2303,6 +2303,10 @@ void AdaptiveLoopFilter::xCUAdaptive( CodingStructure& cs, const PelUnitBuf &rec
 
     for( auto &currCU : cs.traverseCUs( ctuArea, CH_L ) )
     {
+#if JVET_K0076_CPR_DT
+      if (currCU.chType != CH_L)
+        break;
+#endif
       const Position&    cuPos   = currCU.lumaPos();
       const int          qtDepth = currCU.qtDepth;
       const unsigned     qtSize  = maxCUSize >> qtDepth;

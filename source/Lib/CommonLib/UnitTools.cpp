@@ -233,7 +233,18 @@ void CS::initFrucMvp( CodingStructure &cs )
 
 bool CS::isDualITree( const CodingStructure &cs )
 {
+#if JVET_K0076_CPR_DT
+  // for I slice, or P slice with CPR is the only ref
+  return (cs.slice->isIntra() ||
+          (
+            cs.slice->getNumRefIdx(REF_PIC_LIST_0) == 1 &&
+            cs.slice->getNumRefIdx(REF_PIC_LIST_1) == 0 &&
+            cs.slice->getRefPOC(REF_PIC_LIST_0, 0) == cs.slice->getPOC()
+          )
+         ) && !cs.pcv->ISingleTree;
+#else
   return cs.slice->isIntra() && !cs.pcv->ISingleTree;
+#endif
 }
 
 UnitArea CS::getArea( const CodingStructure &cs, const UnitArea &area, const ChannelType chType )
@@ -1780,6 +1791,7 @@ bool PU::isBlockVectorValid(PredictionUnit& pu, int xPos, int yPos, int width, i
   {
     return false;
   }
+
   // wavefront
   if (refBottomY >> ctuSizeLog2 < yPos >> ctuSizeLog2)
   {
@@ -1797,6 +1809,7 @@ bool PU::isBlockVectorValid(PredictionUnit& pu, int xPos, int yPos, int width, i
       return true;
     }
   }
+
 
   // in the below CTU line
   if (refBottomY >> ctuSizeLog2 > yPos >> ctuSizeLog2)
@@ -4565,6 +4578,12 @@ void PU::spanMotionInfo( PredictionUnit &pu, const MergeCtx &mrgCtx )
         mi.mv[i]     = pu.mv[i];
         mi.refIdx[i] = pu.refIdx[i];
       }
+#if JVET_K0076_CPR_DT
+      if (pu.cu->slice->getRefPOC(REF_PIC_LIST_0, pu.refIdx[0]) == pu.cu->slice->getPOC())
+      {
+        mi.bv = pu.bv;
+      }
+#endif
     }
 
 #if JEM_TOOLS || JVET_K_AFFINE

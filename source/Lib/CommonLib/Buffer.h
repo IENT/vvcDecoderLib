@@ -667,8 +667,11 @@ struct UnitBuf
   void removeHighFreq       ( const UnitBuf<T>& other, const bool bClip, const ClpRngs& clpRngs);
 
 #if JEM_TOOLS
+#if JVET_K0076_CPR_DT
+  void smoothWithRef(const UnitBuf<const T>& refBuf, const ClpRngs& clpRngs, const bool lumaCh = true, const bool chromaCh = true);
+#else
   void smoothWithRef        ( const UnitBuf<const T>& refBuf, const ClpRngs& clpRngs );
-
+#endif
 #endif
         UnitBuf<      T> subBuf (const UnitArea& subArea);
   const UnitBuf<const T> subBuf (const UnitArea& subArea) const;
@@ -813,11 +816,21 @@ const UnitBuf<const T> UnitBuf<T>::subBuf( const UnitArea& subArea ) const
 
 #if JEM_TOOLS
 template<typename T>
+#if JVET_K0076_CPR_DT
+void UnitBuf<T>::smoothWithRef(const UnitBuf<const T>& refBuf, const ClpRngs& clpRngs, const bool lumaCh, const bool chromaCh)
+#else
 void UnitBuf<T>::smoothWithRef( const UnitBuf<const T>& refBuf, const ClpRngs& clpRngs )
+#endif
 {
   for( int comp = 0; comp < bufs.size(); comp++ )
   {
     const ComponentID compID = ComponentID( comp );
+#if JVET_K0076_CPR_DT
+    if (compID == COMPONENT_Y && !lumaCh)
+      continue;
+    if (compID != COMPONENT_Y && !chromaCh)
+      continue;
+#endif
     get( compID ).smoothWithRef( refBuf.get( compID ), clpRngs.comp[compID] );
   }
 }

@@ -122,7 +122,7 @@ namespace std
   {
     size_t operator()(const Position& value) const
     {
-      return (((unsigned long long)value.x << 32) + value.y);
+      return (((uint64_t)value.x << 32) + value.y);
     }
   };
 
@@ -131,7 +131,7 @@ namespace std
   {
     size_t operator()(const Size& value) const
     {
-      return (((unsigned long long)value.width << 32) + value.height);
+      return (((uint64_t)value.width << 32) + value.height);
     }
   };
 }

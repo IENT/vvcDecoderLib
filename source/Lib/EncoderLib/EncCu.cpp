@@ -409,7 +409,13 @@ void EncCu::compressCtu( CodingStructure& cs, const UnitArea& area, const unsign
   const bool copyUnsplitCTUSignals = bestCS->cus.size() == 1 && KEEP_PRED_AND_RESI_SIGNALS;
   cs.useSubStructure( *bestCS, partitioner->chType, CS::getArea( *bestCS, area, partitioner->chType ), copyUnsplitCTUSignals, false, false, copyUnsplitCTUSignals );
 
-  if( !cs.pcv->ISingleTree && cs.slice->isIntra() && cs.pcv->chrFormat != CHROMA_400 )
+  if( !cs.pcv->ISingleTree && 
+#if JVET_K0076_CPR_DT
+  (cs.slice->isIntra() || (cs.slice->getNumRefIdx(REF_PIC_LIST_0) == 1 && cs.slice->getNumRefIdx(REF_PIC_LIST_1) == 0 && cs.slice->getRefPOC(REF_PIC_LIST_0, 0) == cs.slice->getPOC()))
+#else
+    cs.slice->isIntra() 
+#endif
+    && cs.pcv->chrFormat != CHROMA_400 )
   {
     m_CABACEstimator->getCtx() = m_CurrCtx->start;
 
@@ -1403,7 +1409,11 @@ void EncCu::xCheckRDCostIntra( CodingStructure *&tempCS, CodingStructure *&bestC
       m_CABACEstimator->cu_transquant_bypass_flag( cu );
     }
 
-    if( !cu.cs->slice->isIntra() )
+    if( !cu.cs->slice->isIntra() 
+#if JVET_K0076_CPR_DT
+      && cu.Y().valid()
+#endif
+      )
     {
       m_CABACEstimator->cu_skip_flag ( cu );
     }
@@ -1526,7 +1536,11 @@ void EncCu::xCheckIntraPCM(CodingStructure *&tempCS, CodingStructure *&bestCS, P
     m_CABACEstimator->cu_transquant_bypass_flag( cu );
   }
 
-  if( !cu.cs->slice->isIntra() )
+  if( !cu.cs->slice->isIntra() 
+#if JVET_K0076_CPR_DT
+    && cu.Y().valid()
+#endif
+    )
   {
     m_CABACEstimator->cu_skip_flag ( cu );
   }
@@ -2267,12 +2281,23 @@ void EncCu::xCheckRDCostIntraBCMerge2Nx2N(CodingStructure *&tempCS, CodingStruct
             PU::spanMotionInfo(pu, mergeCtx);
 
             assert(mergeCtx.mrgTypeNeighbours[uiMergeCand] == MRG_TYPE_IBC); //  should be IBC candidate at this round
-
-                                                                             //  MC
-            m_pcInterSearch->motionCompensation(pu);
+#if JVET_K0076_CPR_DT
+            const bool chroma = !(CS::isDualITree(*tempCS));
+#endif
+            //  MC
+            m_pcInterSearch->motionCompensation(pu
+#if JVET_K0076_CPR_DT
+              , REF_PIC_LIST_0
+              , true, chroma
+#endif
+            );
             m_CABACEstimator->getCtx() = m_CurrCtx->start;
 
-            m_pcInterSearch->encodeResAndCalcRdInterCU(*tempCS, partitioner, (uiNoResidualPass != 0));
+            m_pcInterSearch->encodeResAndCalcRdInterCU(*tempCS, partitioner, (uiNoResidualPass != 0)
+#if JVET_K0076_CPR_DT
+              , true, chroma
+#endif
+            );
             xEncodeDontSplit(*tempCS, partitioner);
 
             if (tempCS->pps->getUseDQP() && (partitioner.currDepth) <= tempCS->pps->getMaxCuDQPDepth())
@@ -2341,15 +2366,25 @@ void EncCu::xCheckRDCostIntraBCMerge2Nx2N(CodingStructure *&tempCS, CodingStruct
     pu.interDir = 1; // use list 0 for IBC mode
     pu.refIdx[REF_PIC_LIST_0] = pu.cs->slice->getNumRefIdx(REF_PIC_LIST_0) - 1; // last idx in the list
 
-    
+#if JVET_K0076_CPR_DT
+    if (partitioner.chType == CHANNEL_TYPE_LUMA)
+#endif
     {
       bool bValid = m_pcInterSearch->predIntraBCSearch(cu, partitioner, m_ctuIbcSearchRangeX, m_ctuIbcSearchRangeY, m_ibcHashMap);
 
       if (bValid)
       {
         PU::spanMotionInfo(pu);
+#if JVET_K0076_CPR_DT
+        const bool chroma = !(CS::isDualITree(*tempCS));
+#endif
         //  MC
-        m_pcInterSearch->motionCompensation(pu);
+        m_pcInterSearch->motionCompensation(pu
+#if JVET_K0076_CPR_DT
+          , REF_PIC_LIST_0
+          , true, chroma
+#endif
+        );
 
 #if JEM_TOOLS
         double    bestCost = bestCS->cost;
@@ -2368,7 +2403,11 @@ void EncCu::xCheckRDCostIntraBCMerge2Nx2N(CodingStructure *&tempCS, CodingStruct
 
           tempCS->getCU(tempCS->chType)->emtFlag = emtCuFlag;
 #endif
-          m_pcInterSearch->encodeResAndCalcRdInterCU(*tempCS, partitioner, false);
+          m_pcInterSearch->encodeResAndCalcRdInterCU(*tempCS, partitioner, false
+#if JVET_K0076_CPR_DT
+            , true, chroma
+#endif
+          );
 #if JEM_TOOLS
           if (m_pcEncCfg->getFastInterEMT())
           {
@@ -2423,8 +2462,70 @@ void EncCu::xCheckRDCostIntraBCMerge2Nx2N(CodingStructure *&tempCS, CodingStruct
         tempCS->cost = MAX_DOUBLE;
       }
     }
-    
-  }
+#if JVET_K0076_CPR_DT // chroma CU ibc comp
+    else
+    {
+      bool success = true;
+      // chroma tree, reuse luma bv at minimal block level
+      // enabled search only when each chroma sub-block has a BV from its luma sub-block
+      assert(tempCS->getIbcLumaCoverage(pu.Cb()) == IBC_LUMA_COVERAGE_FULL);
+      // check if each BV for the chroma sub-block is valid
+      //static const UInt unitArea = MIN_PU_SIZE * MIN_PU_SIZE;
+      const CompArea lumaArea = CompArea(COMPONENT_Y, pu.chromaFormat, pu.Cb().lumaPos(), recalcSize(pu.chromaFormat, CHANNEL_TYPE_CHROMA, CHANNEL_TYPE_LUMA, pu.Cb().size()));
+      PredictionUnit subPu;
+      subPu.cs = pu.cs;
+      subPu.cu = pu.cu;
+      const ComponentID compID = COMPONENT_Cb; // use Cb to represent both Cb and CR, as their structures are the same
+      int shiftHor = ::getComponentScaleX(compID, pu.chromaFormat);
+      int shiftVer = ::getComponentScaleY(compID, pu.chromaFormat);
+      //const ChromaFormat  chFmt = pu.chromaFormat;
+
+      for (int y = lumaArea.y; y < lumaArea.y + lumaArea.height; y += MIN_PU_SIZE)
+      {
+        for (int x = lumaArea.x; x < lumaArea.x + lumaArea.width; x += MIN_PU_SIZE)
+        {
+          const MotionInfo &curMi = pu.cs->picture->cs->getMotionInfo(Position{ x, y });
+          int interpolationSamplesX = (pu.chromaFormat == CHROMA_422 || pu.chromaFormat == CHROMA_420) ? ((curMi.bv.getHor() & 0x1) << 1) : 0;
+          int interpolationSamplesY = (pu.chromaFormat == CHROMA_420) ? ((curMi.bv.getVer() & 0x1) << 1) : 0;
+
+          subPu.UnitArea::operator=(UnitArea(pu.chromaFormat, Area(x, y, MIN_PU_SIZE, MIN_PU_SIZE)));
+          Position offset = subPu.blocks[compID].pos().offset(((curMi.bv.getHor() - interpolationSamplesX) >> shiftHor), ((curMi.bv.getVer() - interpolationSamplesY) >> shiftVer));
+          Position refEndPos(offset.x + subPu.blocks[compID].size().width - 1 + (interpolationSamplesX > 0 ? 3 : 0), offset.y + subPu.blocks[compID].size().height - 1 + (interpolationSamplesY > 0 ? 3 : 0));
+
+          if (!subPu.cs->isDecomp(refEndPos, toChannelType(compID)) || !subPu.cs->isDecomp(offset, toChannelType(compID))) // ref block is not yet available for this chroma sub-block
+          {
+            success = false;
+            break;
+          }
+        }
+        if (!success)
+          break;
+      }
+      ////////////////////////////////////////////////////////////////////////////
+
+      if (success)
+      {
+        //pu.mergeType = MRG_TYPE_IBC;
+        m_pcInterSearch->motionCompensation(pu, REF_PIC_LIST_0, false, true); // luma=0, chroma=1
+        m_pcInterSearch->encodeResAndCalcRdInterCU(*tempCS, partitioner, false, false, true);
+
+        xEncodeDontSplit(*tempCS, partitioner);
+
+        xCheckDQP(*tempCS, partitioner);
+
+        DTRACE_MODE_COST(*tempCS, m_pcRdCost->getLambda());
+
+        xCheckBestMode(tempCS, bestCS, partitioner, encTestMode);
+      }
+      else
+      {
+        tempCS->dist = 0;
+        tempCS->fracBits = 0;
+        tempCS->cost = MAX_DOUBLE;
+      }
+    }
+#endif
+}
   // check ibc mode in encoder RD
   //////////////////////////////////////////////////////////////////////////////////////////////
 #endif // CPR
