@@ -273,7 +273,7 @@ namespace std
   {
     size_t operator()(const Mv& value) const
     {
-      return (((unsigned long long)value.hor << 32) + value.ver);
+      return (((uint64_t)value.hor << 32) + value.ver);
     }
   };
 };

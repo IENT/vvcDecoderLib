@@ -92,10 +92,19 @@ void DecCu::decompressCtu( CodingStructure& cs, const UnitArea& ctuArea )
 
     for( auto &currCU : cs.traverseCUs( CS::getArea( cs, ctuArea, chType ), chType ) )
     {
+#if JVET_K0076_CPR_DT
+      cs.chType = chType;
+      if (currCU.predMode != MODE_INTRA && currCU.Y().valid())
+      {
+        xDeriveCUMV(currCU);
+      }
+#endif
       switch( currCU.predMode )
       {
       case MODE_INTER:
+#if !JVET_K0076_CPR
         xDeriveCUMV( currCU );
+#endif
         xReconInter( currCU );
         break;
       case MODE_INTRA:
@@ -340,7 +349,20 @@ void DecCu::xFillPCMBuffer(CodingUnit &cu)
 void DecCu::xReconInter(CodingUnit &cu)
 {
   // inter prediction
+#if JVET_K0076_CPR_DT
+  const bool luma = cu.Y().valid();
+  const bool chroma = cu.Cb().valid();
+  if (luma && chroma)
+  {
+    m_pcInterPred->motionCompensation(cu);
+  }
+  else
+  {
+    m_pcInterPred->motionCompensation(cu, REF_PIC_LIST_0, luma, chroma);
+  }
+#else
   m_pcInterPred->motionCompensation( cu );
+#endif
 #if JEM_TOOLS
   m_pcInterPred->subBlockOBMC      ( cu );
 #endif

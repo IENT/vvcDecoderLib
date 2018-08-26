@@ -45,6 +45,9 @@
 #include "CommonLib/TrQuant.h"
 #include "CommonLib/Unit.h"
 #include "CommonLib/UnitPartitioner.h"
+#if JVET_K0076_CPR
+#include "CommonLib/IbcHashMap.h"
+#endif
 
 #if REUSE_CU_RESULTS
 #include "DecoderLib/DecCu.h"
@@ -55,9 +58,6 @@
 #include "InterSearch.h"
 #include "RateCtrl.h"
 #include "EncModeCtrl.h"
-#if JVET_K0076_CPR
-#include "IbcHashMap.h"
-#endif
 //! \ingroup EncoderLib
 //! \{
 

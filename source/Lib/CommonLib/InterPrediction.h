@@ -138,7 +138,11 @@ protected:
 #endif
 
 #if JEM_TOOLS
-  void xPredInterUni            ( const PredictionUnit& pu, const RefPicList& eRefPicList, PelUnitBuf& pcYuvPred, const bool& bi, const bool& bBIOApplied = false, const bool& bDMVRApplied = false );
+  void xPredInterUni            ( const PredictionUnit& pu, const RefPicList& eRefPicList, PelUnitBuf& pcYuvPred, const bool& bi, const bool& bBIOApplied = false, const bool& bDMVRApplied = false 
+#if JVET_K0076_CPR_DT
+  , const bool luma = true, const bool chroma = true
+#endif
+  );
   void xPredInterBi             ( PredictionUnit& pu, PelUnitBuf &pcYuvPred, bool obmc = false );
 #else
   void xPredInterUni            ( const PredictionUnit& pu, const RefPicList& eRefPicList, PelUnitBuf& pcYuvPred, const bool& bi );
@@ -175,7 +179,9 @@ protected:
 #if JEM_TOOLS
   void xSubBlockMotionCompensation( PredictionUnit &pu, PelUnitBuf &pcYuvPred );
 #endif
-
+#if JVET_K0076_CPR_DT
+  void xChromaMC                ( PredictionUnit &pu, PelUnitBuf& pcYuvPred );
+#endif
   void destroy();
 
 #if JEM_TOOLS
@@ -262,9 +268,21 @@ public:
   void    init                (RdCost* pcRdCost, ChromaFormat chromaFormatIDC);
 
   // inter
-  void    motionCompensation  (PredictionUnit &pu, PelUnitBuf& predBuf, const RefPicList &eRefPicList = REF_PIC_LIST_X);
-  void    motionCompensation  (PredictionUnit &pu, const RefPicList &eRefPicList = REF_PIC_LIST_X);
-  void    motionCompensation  (CodingUnit &cu,     const RefPicList &eRefPicList = REF_PIC_LIST_X);
+  void    motionCompensation  (PredictionUnit &pu, PelUnitBuf& predBuf, const RefPicList &eRefPicList = REF_PIC_LIST_X
+#if JVET_K0076_CPR_DT
+ , const bool luma = true, const bool chroma = true
+#endif
+  );
+  void    motionCompensation  (PredictionUnit &pu, const RefPicList &eRefPicList = REF_PIC_LIST_X
+#if JVET_K0076_CPR_DT
+    , const bool luma = true, const bool chroma = true
+#endif
+  );
+  void    motionCompensation  (CodingUnit &cu,     const RefPicList &eRefPicList = REF_PIC_LIST_X
+#if JVET_K0076_CPR_DT
+    , const bool luma = true, const bool chroma = true
+#endif
+  );
 
 #if JEM_TOOLS
   void    subBlockOBMC        (CodingUnit      &cu);

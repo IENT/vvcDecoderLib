@@ -48,7 +48,6 @@
 
 #include <unordered_map>
 #include <vector>
-
 //! \ingroup EncoderLib
 //! \{
 
@@ -64,13 +63,15 @@ private:
   unsigned int**  m_pos2Hash;
   std::unordered_map<unsigned int, std::vector<Position>> m_hash2Pos;
 
-  template<int maskBit>
   unsigned int xxCalcBlockHash(const Pel* pel, const int stride, const int width, const int height, unsigned int crc);
 
-  template<ChromaFormat chromaFormat, int maskBit>
+  template<ChromaFormat chromaFormat>
   void    xxBuildPicHashMap(const PelUnitBuf& pic);
 
+  static  uint32_t xxComputeCrc32c16bit(uint32_t crc, const Pel pel);
+
 public:
+  uint32_t (*m_computeCrc32c) (uint32_t crc, const Pel pel);
 
   IbcHashMap();
   virtual ~IbcHashMap();
@@ -80,6 +81,12 @@ public:
   void    rebuildPicHashMap(const PelUnitBuf& pic);
   bool    ibcHashMatch(const Area& lumaArea, std::vector<Position>& cand, const CodingStructure& cs, const int maxCand, const int searchRange4SmallBlk);
   int     getHashHitRatio(const Area& lumaArea);
+
+#ifdef TARGET_SIMD_X86
+  void    initIbcHashMapX86();
+  template <X86_VEXT vext>
+  void    _initIbcHashMapX86();
+#endif
 
 };
 
