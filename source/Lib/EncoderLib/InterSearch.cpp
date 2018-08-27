@@ -4988,7 +4988,7 @@ void InterSearch::encodeResAndCalcRdInterCU(CodingStructure &cs, Partitioner &pa
   const int  numValidTBlocks   = ::getNumberValidTBlocks( *cs.pcv );
   for (uint32_t i = 0; i < numValidTBlocks; i++)
   {
-    cu.rootCbf |= TU::getCbf( firstTU, ComponentID( i ) );
+    cu.rootCbf |= TU::getCbfAtDepth(firstTU, ComponentID(i), 0);
   }
 
   // -------------------------------------------------------
