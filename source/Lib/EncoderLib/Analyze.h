@@ -443,7 +443,7 @@ public:
   }
 
 
-  void    printSummary(const ChromaFormat chFmt, const bool printSequenceMSE, const bool printHexPsnr, const BitDepths &bitDepths, const std::string &sFilename)
+  void    printSummary(const ChromaFormat chFmt, const bool printSequenceMSE, const BitDepths &bitDepths, const std::string &sFilename)
   {
     FILE* pFile = fopen (sFilename.c_str(), "at");
 
