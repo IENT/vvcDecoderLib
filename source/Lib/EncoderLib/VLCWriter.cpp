@@ -1300,9 +1300,7 @@ void HLSWriter::codeSliceHeader         ( Slice* pcSlice )
       }
 
       if( pcSlice->getSliceType() != I_SLICE &&
-
         ( ( pcSlice->getColFromL0Flag() == 1 && pcSlice->getNumRefIdx( REF_PIC_LIST_0 ) > 1 ) ||
-
           ( pcSlice->getColFromL0Flag() == 0 && pcSlice->getNumRefIdx( REF_PIC_LIST_1 ) > 1 ) ) )
       {
         WRITE_UVLC( pcSlice->getColRefIdx(), "collocated_ref_idx" );
