@@ -2689,7 +2689,7 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
 
 }
 
-void EncGOP::printOutSummary(uint32_t uiNumAllPicCoded, bool isField, const bool printMSEBasedSNR, const bool printSequenceMSE, const bool printHexPsnr, const BitDepths &bitDepths)
+void EncGOP::printOutSummary(uint32_t uiNumAllPicCoded, bool isField, const bool printMSEBasedSNR, const bool printSequenceMSE, const BitDepths &bitDepths)
 {
 #if ENABLE_QPA
   const bool    useWPSNR = m_pcEncLib->getUseWPSNR();
@@ -2724,16 +2724,16 @@ void EncGOP::printOutSummary(uint32_t uiNumAllPicCoded, bool isField, const bool
 #if ENABLE_QPA
   m_gcAnalyzeAll.printOut('a', chFmt, printMSEBasedSNR, printSequenceMSE, bitDepths, useWPSNR);
 #else
-  m_gcAnalyzeAll.printOut('a', chFmt, printMSEBasedSNR, printSequenceMSE, printHexPsnr, bitDepths);
+  m_gcAnalyzeAll.printOut('a', chFmt, printMSEBasedSNR, printSequenceMSE, bitDepths);
 #endif
   msg( DETAILS,"\n\nI Slices--------------------------------------------------------\n" );
-  m_gcAnalyzeI.printOut('i', chFmt, printMSEBasedSNR, printSequenceMSE, printHexPsnr, bitDepths);
+  m_gcAnalyzeI.printOut('i', chFmt, printMSEBasedSNR, printSequenceMSE, bitDepths);
 
   msg( DETAILS,"\n\nP Slices--------------------------------------------------------\n" );
-  m_gcAnalyzeP.printOut('p', chFmt, printMSEBasedSNR, printSequenceMSE, printHexPsnr, bitDepths);
+  m_gcAnalyzeP.printOut('p', chFmt, printMSEBasedSNR, printSequenceMSE, bitDepths);
 
   msg( DETAILS,"\n\nB Slices--------------------------------------------------------\n" );
-  m_gcAnalyzeB.printOut('b', chFmt, printMSEBasedSNR, printSequenceMSE, printHexPsnr, bitDepths);
+  m_gcAnalyzeB.printOut('b', chFmt, printMSEBasedSNR, printSequenceMSE, bitDepths);
 
 #if WCG_WPSNR
   if (useLumaWPSNR)
@@ -2744,14 +2744,14 @@ void EncGOP::printOutSummary(uint32_t uiNumAllPicCoded, bool isField, const bool
 #endif
   if (!m_pcCfg->getSummaryOutFilename().empty())
   {
-    m_gcAnalyzeAll.printSummary(chFmt, printSequenceMSE, printHexPsnr, bitDepths, m_pcCfg->getSummaryOutFilename());
+    m_gcAnalyzeAll.printSummary(chFmt, printSequenceMSE, bitDepths, m_pcCfg->getSummaryOutFilename());
   }
 
   if (!m_pcCfg->getSummaryPicFilenameBase().empty())
   {
-    m_gcAnalyzeI.printSummary(chFmt, printSequenceMSE, printHexPsnr, bitDepths, m_pcCfg->getSummaryPicFilenameBase()+"I.txt");
-    m_gcAnalyzeP.printSummary(chFmt, printSequenceMSE, printHexPsnr, bitDepths, m_pcCfg->getSummaryPicFilenameBase()+"P.txt");
-    m_gcAnalyzeB.printSummary(chFmt, printSequenceMSE, printHexPsnr, bitDepths, m_pcCfg->getSummaryPicFilenameBase()+"B.txt");
+    m_gcAnalyzeI.printSummary(chFmt, printSequenceMSE, bitDepths, m_pcCfg->getSummaryPicFilenameBase()+"I.txt");
+    m_gcAnalyzeP.printSummary(chFmt, printSequenceMSE, bitDepths, m_pcCfg->getSummaryPicFilenameBase()+"P.txt");
+    m_gcAnalyzeB.printSummary(chFmt, printSequenceMSE, bitDepths, m_pcCfg->getSummaryPicFilenameBase()+"B.txt");
   }
 
 #if WCG_WPSNR
@@ -2771,11 +2771,11 @@ void EncGOP::printOutSummary(uint32_t uiNumAllPicCoded, bool isField, const bool
 #if ENABLE_QPA
     m_gcAnalyzeAll_in.printOut('a', chFmt, printMSEBasedSNR, printSequenceMSE, bitDepths, useWPSNR);
 #else
-    m_gcAnalyzeAll_in.printOut('a', chFmt, printMSEBasedSNR, printSequenceMSE, printHexPsnr, bitDepths);
+    m_gcAnalyzeAll_in.printOut('a', chFmt, printMSEBasedSNR, printSequenceMSE, bitDepths);
 #endif
     if (!m_pcCfg->getSummaryOutFilename().empty())
     {
-      m_gcAnalyzeAll_in.printSummary(chFmt, printSequenceMSE, printHexPsnr, bitDepths, m_pcCfg->getSummaryOutFilename());
+      m_gcAnalyzeAll_in.printSummary(chFmt, printSequenceMSE, bitDepths, m_pcCfg->getSummaryOutFilename());
 #if WCG_WPSNR
       if (useLumaWPSNR)
       {
