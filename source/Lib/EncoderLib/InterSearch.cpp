@@ -1458,7 +1458,7 @@ bool InterSearch::predIntraBCSearch(CodingUnit& cu, Partitioner& partitioner, co
     for (int bvpIdxTemp = 0; bvpIdxTemp<iBvpNum; bvpIdxTemp++)
     {
       m_pcRdCost->setPredictor(cMvPred[bvpIdxTemp]);
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
       bitsBVPTemp = m_pcRdCost->getBitsOfVectorWithPredictor(cMv.getHor(), cMv.getVer(), 0);
 #else
       bitsBVPTemp = m_pcRdCost->getBitsOfVectorWithPredictor(cMv.getHor(), cMv.getVer());
@@ -1490,7 +1490,7 @@ bool InterSearch::predIntraBCSearch(CodingUnit& cu, Partitioner& partitioner, co
         mvPredQuadPel >>= 4;
         //mvPredQuadPel.set((cMvPred[bvpIdxTemp].hor >> 2) << 2, (cMvPred[bvpIdxTemp].ver >> 2) << 2);
         m_pcRdCost->setPredictor(mvPredQuadPel);
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
         bitsBVPQP = m_pcRdCost->getBitsOfVectorWithPredictor(cMv.getHor() >> 2, cMv.getVer() >> 2, 0);
 #else
         costQuadPel = m_pcRdCost->getBitsOfVectorWithPredictor(candMv.getHor(), candMv.getVer());
@@ -1569,7 +1569,7 @@ void InterSearch::xxIntraBlockCopyHashSearch(PredictionUnit& pu, Mv* mvPred, int
         for (int n = 0; n < numMvPred; n++)
         {
           m_pcRdCost->setPredictor(mvPred[n]);
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
           unsigned int cost = m_pcRdCost->getBitsOfVectorWithPredictor(candMv.getHor(), candMv.getVer(), 0);
 #else
           UInt cost = m_pcRdCost->getBitsOfVectorWithPredictor(candMv.getHor(), candMv.getVer());
@@ -1591,7 +1591,7 @@ void InterSearch::xxIntraBlockCopyHashSearch(PredictionUnit& pu, Mv* mvPred, int
             mvPredQuadPel.set(((mvPred[n].hor + offset) >> 2), ((mvPred[n].ver + offset) >> 2));
 
             m_pcRdCost->setPredictor(mvPredQuadPel);
-#if JEM_TOOLS
+#if JVET_K0357_AMVR
             costQuadPel = m_pcRdCost->getBitsOfVectorWithPredictor(candMv.getHor() >> 2, candMv.getVer() >> 2, 0);
 #else
             costQuadPel = m_pcRdCost->getBitsOfVectorWithPredictor(candMv.getHor(), candMv.getVer());

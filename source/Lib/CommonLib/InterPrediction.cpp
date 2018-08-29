@@ -682,8 +682,16 @@ void InterPrediction::xChromaMC(PredictionUnit &pu, PelUnitBuf& pcYuvPred)
       subPu.UnitArea::operator=(UnitArea(pu.chromaFormat, Area(x, y, MIN_PU_SIZE, MIN_PU_SIZE)));
       PelUnitBuf subPredBuf = pcYuvPred.subBuf(UnitAreaRelative(pu, subPu));
       
-      xPredInterBlk(COMPONENT_Cb, subPu, refPic, curMi.mv[0], subPredBuf, false, pu.cu->slice->clpRng(COMPONENT_Cb), false, false, FRUC_MERGE_OFF, false);
-      xPredInterBlk(COMPONENT_Cr, subPu, refPic, curMi.mv[0], subPredBuf, false, pu.cu->slice->clpRng(COMPONENT_Cr), false, false, FRUC_MERGE_OFF, false);
+      xPredInterBlk(COMPONENT_Cb, subPu, refPic, curMi.mv[0], subPredBuf, false, pu.cu->slice->clpRng(COMPONENT_Cb)
+#if JEM_TOOLS
+        , false, false, FRUC_MERGE_OFF, false
+#endif
+      );
+      xPredInterBlk(COMPONENT_Cr, subPu, refPic, curMi.mv[0], subPredBuf, false, pu.cu->slice->clpRng(COMPONENT_Cr)
+#if JEM_TOOLS
+        , false, false, FRUC_MERGE_OFF, false
+#endif
+      );
     }
   }
 }
@@ -696,7 +704,11 @@ void InterPrediction::xPredInterUni(const PredictionUnit& pu, const RefPicList& 
 #endif
 )
 #else
-void InterPrediction::xPredInterUni(const PredictionUnit& pu, const RefPicList& eRefPicList, PelUnitBuf& pcYuvPred, const bool& bi )
+void InterPrediction::xPredInterUni(const PredictionUnit& pu, const RefPicList& eRefPicList, PelUnitBuf& pcYuvPred, const bool& bi 
+#if JVET_K0076_CPR_DT
+  , const bool luma, const bool chroma
+#endif
+)
 #endif
 {
   const SPS &sps = *pu.cs->sps;
@@ -1863,7 +1875,11 @@ void InterPrediction::motionCompensation( PredictionUnit &pu, PelUnitBuf &predBu
     }
     else // (luma && !chroma)
     {
-      xPredInterUni(pu, eRefPicList, predBuf, false, false, false, luma, chroma);
+      xPredInterUni(pu, eRefPicList, predBuf, false, 
+#if JEM_TOOLS
+        false, false, 
+#endif
+        luma, chroma);
       return;
     }
  }
