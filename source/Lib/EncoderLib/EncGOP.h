@@ -181,7 +181,7 @@ public:
 
   PicList*   getListPic()      { return m_pcListPic; }
 
-  void  printOutSummary(uint32_t uiNumAllPicCoded, bool isField, const bool printMSEBasedSNR, const bool printSequenceMSE, const BitDepths &bitDepths);
+  void  printOutSummary      ( uint32_t uiNumAllPicCoded, bool isField, const bool printMSEBasedSNR, const bool printSequenceMSE, const BitDepths &bitDepths );
 #if W0038_DB_OPT
   uint64_t  preLoopFilterPicAndCalcDist( Picture* pcPic );
 #endif

@@ -1867,7 +1867,7 @@ SPSNext::SPSNext( SPS& sps )
   , m_CIPFMode                  ( 0 )
 #endif
 #if JVET_K0076_CPR
-    , m_IBCMode(0)
+    , m_IBCMode                 ( 0 )
 #endif
   // ADD_NEW_TOOL : (sps extension) add tool enabling flags here (with "false" as default values)
 {

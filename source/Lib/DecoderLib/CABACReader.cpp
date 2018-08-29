@@ -226,15 +226,14 @@ bool CABACReader::coding_tree_unit( CodingStructure& cs, const UnitArea& area, i
   {
     isLast = coding_tree(cs, *partitioner, cuCtx);
 #else
-  bool isLast = coding_tree(cs, *partitioner, cuCtx);
-#endif
+  bool isLast = coding_tree( cs, *partitioner, cuCtx );
 #endif
   qps[CH_L] = cuCtx.qp;
-  if (!isLast && CS::isDualITree(cs) && cs.pcv->chrFormat != CHROMA_400)
+  if( !isLast && CS::isDualITree( cs ) && cs.pcv->chrFormat != CHROMA_400 )
   {
-    CUCtx cuCtxChroma(qps[CH_C]);
-    partitioner->initCtu(area, CH_C, *cs.slice);
-    isLast = coding_tree(cs, *partitioner, cuCtxChroma);
+    CUCtx cuCtxChroma( qps[CH_C] );
+    partitioner->initCtu( area, CH_C, *cs.slice );
+    isLast = coding_tree( cs, *partitioner, cuCtxChroma );
     qps[CH_C] = cuCtxChroma.qp;
   }
 #if JVET_K0230_DUAL_CODING_TREE_UNDER_64x64_BLOCK
@@ -1383,6 +1382,7 @@ void CABACReader::imv_mode( CodingUnit& cu, MergeCtx& mrgCtx )
 void CABACReader::pred_mode( CodingUnit& cu )
 {
   RExt__DECODER_DEBUG_BIT_STATISTICS_CREATE_SET( STATS__CABAC_BITS__PRED_MODE );
+
   if( cu.cs->slice->isIntra() || m_BinDecoder.decodeBin( Ctx::PredMode() ) )
   {
     cu.predMode = MODE_INTRA;

@@ -1163,7 +1163,7 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx, co
   // compute the location of the current PU
 
   int cnt = 0;
-#if JVET_K0076_CPR && JEM_TOOLS
+#if JVET_K0076_CPR 
   int cntIBC = 0;
 #endif
   const Position posLT = pu.Y().topLeft();
