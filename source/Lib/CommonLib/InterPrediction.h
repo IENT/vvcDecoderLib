@@ -145,7 +145,11 @@ protected:
   );
   void xPredInterBi             ( PredictionUnit& pu, PelUnitBuf &pcYuvPred, bool obmc = false );
 #else
-  void xPredInterUni            ( const PredictionUnit& pu, const RefPicList& eRefPicList, PelUnitBuf& pcYuvPred, const bool& bi );
+  void xPredInterUni            ( const PredictionUnit& pu, const RefPicList& eRefPicList, PelUnitBuf& pcYuvPred, const bool& bi 
+#if JVET_K0076_CPR_DT
+    , const bool luma = true, const bool chroma = true
+#endif
+  );
   void xPredInterBi             ( PredictionUnit& pu, PelUnitBuf &pcYuvPred );
 #endif
   void xPredInterBlk            ( const ComponentID& compID, const PredictionUnit& pu, const Picture* refPic, const Mv& _mv, PelUnitBuf& dstPic, const bool& bi, const ClpRng& clpRng

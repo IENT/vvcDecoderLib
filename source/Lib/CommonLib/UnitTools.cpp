@@ -4206,7 +4206,11 @@ void clipColBlkMv(int& mvX, int& mvY, const PredictionUnit& pu)
 }
 #endif
 
-bool PU::getInterMergeSubPuMvpCand(const PredictionUnit &pu, MergeCtx& mrgCtx, bool& LICFlag, const int count)
+bool PU::getInterMergeSubPuMvpCand(const PredictionUnit &pu, MergeCtx& mrgCtx, bool& LICFlag, const int count
+#if JVET_K0076_CPR
+  , const int countIBC
+#endif
+)
 {
   const Slice   &slice = *pu.cs->slice;
 #if JVET_K0346
