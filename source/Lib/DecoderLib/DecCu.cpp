@@ -102,7 +102,7 @@ void DecCu::decompressCtu( CodingStructure& cs, const UnitArea& ctuArea )
       switch( currCU.predMode )
       {
       case MODE_INTER:
-#if !JVET_K0076_CPR
+#if !JVET_K0076_CPR_DT
         xDeriveCUMV( currCU );
 #endif
         xReconInter( currCU );
