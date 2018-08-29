@@ -2319,199 +2319,198 @@ void EncCu::xCheckRDCostIntraBCMerge2Nx2N(CodingStructure *&tempCS, CodingStruct
 
 }
 
+void EncCu::xCheckRDCostIntraBC(CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode)
+{
+  tempCS->initStructData(encTestMode.qp, encTestMode.lossless);
 
-  void EncCu::xCheckRDCostIntraBC(CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode)
-  {
-    tempCS->initStructData(encTestMode.qp, encTestMode.lossless);
+  CodingUnit &cu = tempCS->addCU(CS::getArea(*tempCS, tempCS->area, partitioner.chType), partitioner.chType);
 
-    CodingUnit &cu = tempCS->addCU(CS::getArea(*tempCS, tempCS->area, partitioner.chType), partitioner.chType);
-
-    partitioner.setCUData(cu);
-    cu.slice = tempCS->slice;
+  partitioner.setCUData(cu);
+  cu.slice = tempCS->slice;
 #if HEVC_TILES_WPP
-    cu.tileIdx = tempCS->picture->tileMap->getTileIdxMap(tempCS->area.lumaPos());
+  cu.tileIdx = tempCS->picture->tileMap->getTileIdxMap(tempCS->area.lumaPos());
 #endif
-    cu.skip = false;
-    cu.partSize = encTestMode.partSize;
-    cu.predMode = MODE_INTER;
-    cu.transQuantBypass = encTestMode.lossless;
-    cu.chromaQpAdj = cu.transQuantBypass ? 0 : m_cuChromaQpOffsetIdxPlus1;
-    cu.qp = encTestMode.qp;
-    cu.ibc = true;
+  cu.skip = false;
+  cu.partSize = encTestMode.partSize;
+  cu.predMode = MODE_INTER;
+  cu.transQuantBypass = encTestMode.lossless;
+  cu.chromaQpAdj = cu.transQuantBypass ? 0 : m_cuChromaQpOffsetIdxPlus1;
+  cu.qp = encTestMode.qp;
+  cu.ibc = true;
 #if JEM_TOOLS
-    cu.imv = 0;
+  cu.imv = 0;
 #endif
-    CU::addPUs(cu);
+  CU::addPUs(cu);
 
-    PredictionUnit& pu = *cu.firstPU;
-    pu.intraDir[0] = DC_IDX; // set intra pred for ibc block
-    pu.intraDir[1] = PLANAR_IDX; // set intra pred for ibc block
+  PredictionUnit& pu = *cu.firstPU;
+  pu.intraDir[0] = DC_IDX; // set intra pred for ibc block
+  pu.intraDir[1] = PLANAR_IDX; // set intra pred for ibc block
 
-    pu.interDir = 1; // use list 0 for IBC mode
-    pu.refIdx[REF_PIC_LIST_0] = pu.cs->slice->getNumRefIdx(REF_PIC_LIST_0) - 1; // last idx in the list
+  pu.interDir = 1; // use list 0 for IBC mode
+  pu.refIdx[REF_PIC_LIST_0] = pu.cs->slice->getNumRefIdx(REF_PIC_LIST_0) - 1; // last idx in the list
 
 #if JVET_K0076_CPR_DT
-    if (partitioner.chType == CHANNEL_TYPE_LUMA)
+  if (partitioner.chType == CHANNEL_TYPE_LUMA)
 #endif
+  {
+    bool bValid = m_pcInterSearch->predIntraBCSearch(cu, partitioner, m_ctuIbcSearchRangeX, m_ctuIbcSearchRangeY, m_ibcHashMap);
+
+    if (bValid)
     {
-      bool bValid = m_pcInterSearch->predIntraBCSearch(cu, partitioner, m_ctuIbcSearchRangeX, m_ctuIbcSearchRangeY, m_ibcHashMap);
-
-      if (bValid)
-      {
-        PU::spanMotionInfo(pu);
+      PU::spanMotionInfo(pu);
 #if JVET_K0076_CPR_DT
-        const bool chroma = !(CS::isDualITree(*tempCS));
+      const bool chroma = !(CS::isDualITree(*tempCS));
 #endif
-        //  MC
-        m_pcInterSearch->motionCompensation(pu
+      //  MC
+      m_pcInterSearch->motionCompensation(pu
 #if JVET_K0076_CPR_DT
-          , REF_PIC_LIST_0
+        , REF_PIC_LIST_0
+        , true, chroma
+#endif
+      );
+
+#if JEM_TOOLS
+      double    bestCost = bestCS->cost;
+      unsigned char    considerEmtSecondPass = 0;
+      bool      skipSecondEmtPass = true;
+      double    emtFirstPassCost = MAX_DOUBLE;
+
+      // CU-level optimization
+
+      for (unsigned char emtCuFlag = 0; emtCuFlag <= considerEmtSecondPass; emtCuFlag++)
+      {
+        if (m_pcEncCfg->getFastInterEMT() && emtCuFlag && skipSecondEmtPass)
+        {
+          continue;
+        }
+
+        tempCS->getCU(tempCS->chType)->emtFlag = emtCuFlag;
+#endif
+        m_pcInterSearch->encodeResAndCalcRdInterCU(*tempCS, partitioner, false
+#if JVET_K0076_CPR_DT
           , true, chroma
 #endif
         );
-
 #if JEM_TOOLS
-        double    bestCost = bestCS->cost;
-        unsigned char    considerEmtSecondPass = 0;
-        bool      skipSecondEmtPass = true;
-        double    emtFirstPassCost = MAX_DOUBLE;
-
-        // CU-level optimization
-
-        for (unsigned char emtCuFlag = 0; emtCuFlag <= considerEmtSecondPass; emtCuFlag++)
+        if (m_pcEncCfg->getFastInterEMT())
         {
-          if (m_pcEncCfg->getFastInterEMT() && emtCuFlag && skipSecondEmtPass)
-          {
-            continue;
-          }
-
-          tempCS->getCU(tempCS->chType)->emtFlag = emtCuFlag;
-#endif
-          m_pcInterSearch->encodeResAndCalcRdInterCU(*tempCS, partitioner, false
-#if JVET_K0076_CPR_DT
-            , true, chroma
-#endif
-          );
-#if JEM_TOOLS
-          if (m_pcEncCfg->getFastInterEMT())
-          {
-            emtFirstPassCost = (!emtCuFlag) ? tempCS->cost : emtFirstPassCost;
-          }
-#endif
-          xEncodeDontSplit(*tempCS, partitioner);
-
-          if (tempCS->pps->getUseDQP() && (partitioner.currDepth) <= tempCS->pps->getMaxCuDQPDepth())
-          {
-            xCheckDQP(*tempCS, partitioner);
-          }
-
-          DTRACE_MODE_COST(*tempCS, m_pcRdCost->getLambda());
-          xCheckBestMode(tempCS, bestCS, partitioner, encTestMode);
-#if JEM_TOOLS
-          //now we check whether the second pass should be skipped or not
-          if (!emtCuFlag && considerEmtSecondPass)
-          {
-            static const double thresholdToSkipEmtSecondPass = 1.1; // Skip checking EMT transforms
-            if (m_pcEncCfg->getFastInterEMT() && (!cu.firstTU->cbf[COMPONENT_Y] || emtFirstPassCost > bestCost * thresholdToSkipEmtSecondPass))
-            {
-              skipSecondEmtPass = true;
-            }
-            else //EMT will be checked
-            {
-              if (bestCost == bestCS->cost) //The first EMT pass didn't become the bestCS, so we clear the TUs generated
-              {
-                tempCS->clearTUs();
-              }
-              else
-              {
-                tempCS->initStructData(bestCS->currQP[bestCS->chType], bestCS->isLossless);
-
-                tempCS->copyStructure(*bestCS, partitioner.chType);
-                tempCS->getPredBuf().copyFrom(bestCS->getPredBuf());
-              }
-
-              //we need to restart the distortion for the new tempCS, the bit count and the cost
-              tempCS->dist = 0;
-              tempCS->fracBits = 0;
-              tempCS->cost = MAX_DOUBLE;
-            }
-          }
+          emtFirstPassCost = (!emtCuFlag) ? tempCS->cost : emtFirstPassCost;
         }
 #endif
-      } // bValid
-      else
-      {
-        tempCS->dist = 0;
-        tempCS->fracBits = 0;
-        tempCS->cost = MAX_DOUBLE;
-      }
-    }
-#if JVET_K0076_CPR_DT // chroma CU ibc comp
-    else
-    {
-      bool success = true;
-      // chroma tree, reuse luma bv at minimal block level
-      // enabled search only when each chroma sub-block has a BV from its luma sub-block
-      assert(tempCS->getIbcLumaCoverage(pu.Cb()) == IBC_LUMA_COVERAGE_FULL);
-      // check if each BV for the chroma sub-block is valid
-      //static const UInt unitArea = MIN_PU_SIZE * MIN_PU_SIZE;
-      const CompArea lumaArea = CompArea(COMPONENT_Y, pu.chromaFormat, pu.Cb().lumaPos(), recalcSize(pu.chromaFormat, CHANNEL_TYPE_CHROMA, CHANNEL_TYPE_LUMA, pu.Cb().size()));
-      PredictionUnit subPu;
-      subPu.cs = pu.cs;
-      subPu.cu = pu.cu;
-      const ComponentID compID = COMPONENT_Cb; // use Cb to represent both Cb and CR, as their structures are the same
-      int shiftHor = ::getComponentScaleX(compID, pu.chromaFormat);
-      int shiftVer = ::getComponentScaleY(compID, pu.chromaFormat);
-      //const ChromaFormat  chFmt = pu.chromaFormat;
-
-      for (int y = lumaArea.y; y < lumaArea.y + lumaArea.height; y += MIN_PU_SIZE)
-      {
-        for (int x = lumaArea.x; x < lumaArea.x + lumaArea.width; x += MIN_PU_SIZE)
-        {
-          const MotionInfo &curMi = pu.cs->picture->cs->getMotionInfo(Position{ x, y });
-          int interpolationSamplesX = (pu.chromaFormat == CHROMA_422 || pu.chromaFormat == CHROMA_420) ? ((curMi.bv.getHor() & 0x1) << 1) : 0;
-          int interpolationSamplesY = (pu.chromaFormat == CHROMA_420) ? ((curMi.bv.getVer() & 0x1) << 1) : 0;
-
-          subPu.UnitArea::operator=(UnitArea(pu.chromaFormat, Area(x, y, MIN_PU_SIZE, MIN_PU_SIZE)));
-          Position offset = subPu.blocks[compID].pos().offset(((curMi.bv.getHor() - interpolationSamplesX) >> shiftHor), ((curMi.bv.getVer() - interpolationSamplesY) >> shiftVer));
-          Position refEndPos(offset.x + subPu.blocks[compID].size().width - 1 + (interpolationSamplesX > 0 ? 3 : 0), offset.y + subPu.blocks[compID].size().height - 1 + (interpolationSamplesY > 0 ? 3 : 0));
-
-          if (!subPu.cs->isDecomp(refEndPos, toChannelType(compID)) || !subPu.cs->isDecomp(offset, toChannelType(compID))) // ref block is not yet available for this chroma sub-block
-          {
-            success = false;
-            break;
-          }
-        }
-        if (!success)
-          break;
-      }
-      ////////////////////////////////////////////////////////////////////////////
-
-      if (success)
-      {
-        //pu.mergeType = MRG_TYPE_IBC;
-        m_pcInterSearch->motionCompensation(pu, REF_PIC_LIST_0, false, true); // luma=0, chroma=1
-        m_pcInterSearch->encodeResAndCalcRdInterCU(*tempCS, partitioner, false, false, true);
-
         xEncodeDontSplit(*tempCS, partitioner);
 
-        xCheckDQP(*tempCS, partitioner);
+        if (tempCS->pps->getUseDQP() && (partitioner.currDepth) <= tempCS->pps->getMaxCuDQPDepth())
+        {
+          xCheckDQP(*tempCS, partitioner);
+        }
 
         DTRACE_MODE_COST(*tempCS, m_pcRdCost->getLambda());
-
         xCheckBestMode(tempCS, bestCS, partitioner, encTestMode);
+#if JEM_TOOLS
+        //now we check whether the second pass should be skipped or not
+        if (!emtCuFlag && considerEmtSecondPass)
+        {
+          static const double thresholdToSkipEmtSecondPass = 1.1; // Skip checking EMT transforms
+          if (m_pcEncCfg->getFastInterEMT() && (!cu.firstTU->cbf[COMPONENT_Y] || emtFirstPassCost > bestCost * thresholdToSkipEmtSecondPass))
+          {
+            skipSecondEmtPass = true;
+          }
+          else //EMT will be checked
+          {
+            if (bestCost == bestCS->cost) //The first EMT pass didn't become the bestCS, so we clear the TUs generated
+            {
+              tempCS->clearTUs();
+            }
+            else
+            {
+              tempCS->initStructData(bestCS->currQP[bestCS->chType], bestCS->isLossless);
+
+              tempCS->copyStructure(*bestCS, partitioner.chType);
+              tempCS->getPredBuf().copyFrom(bestCS->getPredBuf());
+            }
+
+            //we need to restart the distortion for the new tempCS, the bit count and the cost
+            tempCS->dist = 0;
+            tempCS->fracBits = 0;
+            tempCS->cost = MAX_DOUBLE;
+          }
+        }
       }
-      else
-      {
-        tempCS->dist = 0;
-        tempCS->fracBits = 0;
-        tempCS->cost = MAX_DOUBLE;
-      }
+#endif
+    } // bValid
+    else
+    {
+      tempCS->dist = 0;
+      tempCS->fracBits = 0;
+      tempCS->cost = MAX_DOUBLE;
     }
+  }
+#if JVET_K0076_CPR_DT // chroma CU ibc comp
+  else
+  {
+    bool success = true;
+    // chroma tree, reuse luma bv at minimal block level
+    // enabled search only when each chroma sub-block has a BV from its luma sub-block
+    assert(tempCS->getIbcLumaCoverage(pu.Cb()) == IBC_LUMA_COVERAGE_FULL);
+    // check if each BV for the chroma sub-block is valid
+    //static const UInt unitArea = MIN_PU_SIZE * MIN_PU_SIZE;
+    const CompArea lumaArea = CompArea(COMPONENT_Y, pu.chromaFormat, pu.Cb().lumaPos(), recalcSize(pu.chromaFormat, CHANNEL_TYPE_CHROMA, CHANNEL_TYPE_LUMA, pu.Cb().size()));
+    PredictionUnit subPu;
+    subPu.cs = pu.cs;
+    subPu.cu = pu.cu;
+    const ComponentID compID = COMPONENT_Cb; // use Cb to represent both Cb and CR, as their structures are the same
+    int shiftHor = ::getComponentScaleX(compID, pu.chromaFormat);
+    int shiftVer = ::getComponentScaleY(compID, pu.chromaFormat);
+    //const ChromaFormat  chFmt = pu.chromaFormat;
+
+    for (int y = lumaArea.y; y < lumaArea.y + lumaArea.height; y += MIN_PU_SIZE)
+    {
+      for (int x = lumaArea.x; x < lumaArea.x + lumaArea.width; x += MIN_PU_SIZE)
+      {
+        const MotionInfo &curMi = pu.cs->picture->cs->getMotionInfo(Position{ x, y });
+        int interpolationSamplesX = (pu.chromaFormat == CHROMA_422 || pu.chromaFormat == CHROMA_420) ? ((curMi.bv.getHor() & 0x1) << 1) : 0;
+        int interpolationSamplesY = (pu.chromaFormat == CHROMA_420) ? ((curMi.bv.getVer() & 0x1) << 1) : 0;
+
+        subPu.UnitArea::operator=(UnitArea(pu.chromaFormat, Area(x, y, MIN_PU_SIZE, MIN_PU_SIZE)));
+        Position offset = subPu.blocks[compID].pos().offset(((curMi.bv.getHor() - interpolationSamplesX) >> shiftHor), ((curMi.bv.getVer() - interpolationSamplesY) >> shiftVer));
+        Position refEndPos(offset.x + subPu.blocks[compID].size().width - 1 + (interpolationSamplesX > 0 ? 3 : 0), offset.y + subPu.blocks[compID].size().height - 1 + (interpolationSamplesY > 0 ? 3 : 0));
+
+        if (!subPu.cs->isDecomp(refEndPos, toChannelType(compID)) || !subPu.cs->isDecomp(offset, toChannelType(compID))) // ref block is not yet available for this chroma sub-block
+        {
+          success = false;
+          break;
+        }
+      }
+      if (!success)
+        break;
+    }
+    ////////////////////////////////////////////////////////////////////////////
+
+    if (success)
+    {
+      //pu.mergeType = MRG_TYPE_IBC;
+      m_pcInterSearch->motionCompensation(pu, REF_PIC_LIST_0, false, true); // luma=0, chroma=1
+      m_pcInterSearch->encodeResAndCalcRdInterCU(*tempCS, partitioner, false, false, true);
+
+      xEncodeDontSplit(*tempCS, partitioner);
+
+      xCheckDQP(*tempCS, partitioner);
+
+      DTRACE_MODE_COST(*tempCS, m_pcRdCost->getLambda());
+
+      xCheckBestMode(tempCS, bestCS, partitioner, encTestMode);
+    }
+    else
+    {
+      tempCS->dist = 0;
+      tempCS->fracBits = 0;
+      tempCS->cost = MAX_DOUBLE;
+    }
+  }
 #endif
 }
-  // check ibc mode in encoder RD
-  //////////////////////////////////////////////////////////////////////////////////////////////
+// check ibc mode in encoder RD
+//////////////////////////////////////////////////////////////////////////////////////////////
 #endif // CPR
 void EncCu::xCheckRDCostInter( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode )
 {

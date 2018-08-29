@@ -45,7 +45,6 @@
 #include <stdio.h>
 #include <memory.h>
 #include <assert.h>
-#include <cinttypes>
 #include "CommonLib/CommonDef.h"
 #include "CommonLib/ChromaFormat.h"
 #include "math.h"
@@ -174,10 +173,11 @@ public:
     PSNRyuv = (MSEyuv == 0) ? 999.99 : 10.0 * log10((maxval * maxval) / MSEyuv);
   }
 
+
 #if ENABLE_QPA || WCG_WPSNR
-  void    printOut(char cDelim, const ChromaFormat chFmt, const bool printMSEBasedSNR, const bool printSequenceMSE, const BitDepths &bitDepths, const bool useWPSNR = false)
+  void    printOut ( char cDelim, const ChromaFormat chFmt, const bool printMSEBasedSNR, const bool printSequenceMSE, const BitDepths &bitDepths, const bool useWPSNR = false )
 #else
-  void    printOut(char cDelim, const ChromaFormat chFmt, const bool printMSEBasedSNR, const bool printSequenceMSE, const BitDepths &bitDepths)
+  void    printOut ( char cDelim, const ChromaFormat chFmt, const bool printMSEBasedSNR, const bool printSequenceMSE, const BitDepths &bitDepths )
 #endif
   {
 #if !WCG_WPSNR
@@ -226,7 +226,6 @@ public:
 #endif
           msg( e_msg_level, "         \tTotal Frames |   "   "Bitrate     "  "Y-PSNR" );
 
-
           if (printSequenceMSE)
           {
             msg( e_msg_level, "    Y-MSE\n" );
@@ -244,7 +243,6 @@ public:
                  useWPSNR ? getWPSNR(COMPONENT_Y) :
 #endif
                  getPsnr(COMPONENT_Y) / (double)getNumPic() );
-
 
           if (printSequenceMSE)
           {
@@ -269,7 +267,6 @@ public:
 #endif
           msg( e_msg_level, "\tTotal Frames |   "   "Bitrate     "  "Y-PSNR" );
 
-
           if (printSequenceMSE)
           {
             msg( e_msg_level, "    Y-MSE\n" );
@@ -287,7 +284,6 @@ public:
                  useWPSNR ? getWPSNR(COMPONENT_Y) :
 #endif
                  getPsnr(COMPONENT_Y) / (double)getNumPic() );
-
 
           if (printSequenceMSE)
           {
@@ -317,7 +313,6 @@ public:
 #endif
             msg( e_msg_level, "         \tTotal Frames |   "   "Bitrate     "  "Y-PSNR    "  "U-PSNR    "  "V-PSNR    "  "YUV-PSNR " );
 
-
             if (printSequenceMSE)
             {
               msg( e_msg_level, " Y-MSE     "  "U-MSE     "  "V-MSE    "  "YUV-MSE \n" );
@@ -344,7 +339,6 @@ public:
 #endif
                    getPsnr(COMPONENT_Cr) / (double)getNumPic(),
                    PSNRyuv );
-
 
             if (printSequenceMSE)
             {
@@ -379,7 +373,6 @@ public:
             m_ext360.printHeader(e_msg_level);
 #endif
 
-
             if (printSequenceMSE)
             {
               msg( e_msg_level, " Y-MSE     "  "U-MSE     "  "V-MSE    "  "YUV-MSE \n" );
@@ -406,7 +399,6 @@ public:
 #endif
                    getPsnr(COMPONENT_Cr) / (double)getNumPic(),
                    PSNRyuv );
-
 
 #if EXTENSION_360_VIDEO
             m_ext360.printPSNRs(getNumPic(), e_msg_level);
