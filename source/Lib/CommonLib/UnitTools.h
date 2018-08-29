@@ -188,7 +188,11 @@ namespace PU
   void setAllAffineMv                 (      PredictionUnit &pu, Mv affLT, Mv affRT, Mv affLB, RefPicList eRefList );
 #endif
 #if !JEM_TOOLS && JVET_K0346
-  bool getInterMergeSubPuMvpCand(const PredictionUnit &pu, MergeCtx &mrgCtx, bool& LICFlag, const int count);
+  bool getInterMergeSubPuMvpCand(const PredictionUnit &pu, MergeCtx &mrgCtx, bool& LICFlag, const int count
+#if JVET_K0076_CPR
+    , const int countIBC
+#endif
+  );
   bool getInterMergeSubPuRecurCand(const PredictionUnit &pu, MergeCtx &mrgCtx, const int count);
 #endif
   bool isBiPredFromDifferentDir       (const PredictionUnit &pu);
