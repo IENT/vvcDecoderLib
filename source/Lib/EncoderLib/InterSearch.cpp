@@ -1291,10 +1291,6 @@ void InterSearch::xIntraBlockCopyEstimation(PredictionUnit& pu, PelUnitBuf& orig
   Distortion &ruiCost, const int localSearchRangeX, const int localSearchRangeY
 )
 {
-#if ENABLE_ENCODING_STAT
-  g_encoderStat->startTimer(EncodingTimeStat_IbcMe);
-#endif
-
   bool buffered = false;
   if (m_pcEncCfg->getIBCFastMethod() & IBC_FAST_METHOD_BUFFERBV)
   {
@@ -1372,9 +1368,6 @@ void InterSearch::xIntraBlockCopyEstimation(PredictionUnit& pu, PelUnitBuf& orig
 
     xIntraPatternSearch(pu, cStruct, rcMv, ruiCost, &cMvSrchRngLT, &cMvSrchRngRB, pcMvPred);
   }
-#if ENABLE_ENCODING_STAT
-  g_encoderStat->stopTimer(EncodingTimeStat_IbcMe);
-#endif
 }
 
 // based on xSetSearchRange
@@ -1442,7 +1435,6 @@ bool InterSearch::predIntraBCSearch(CodingUnit& cu, Partitioner& partitioner, co
 
     if (m_pcEncCfg->getIBCHashSearch())
     {
-      // TODO: when hash search finds BV the cost is actually set to zero, which may not be good
       xxIntraBlockCopyHashSearch(pu, cMvPred, iBvpNum, cMv, bvpIdxBest, ibcHashMap);
     }
 
@@ -1544,9 +1536,6 @@ bool InterSearch::predIntraBCSearch(CodingUnit& cu, Partitioner& partitioner, co
 
 void InterSearch::xxIntraBlockCopyHashSearch(PredictionUnit& pu, Mv* mvPred, int numMvPred, Mv &mv, int& idxMvPred, IbcHashMap& ibcHashMap)
 {
-#if ENABLE_ENCODING_STAT
-  g_encoderStat->startTimer(EncodingTimeStat_IbcHashSearch);
-#endif
   mv.setZero();
   m_pcRdCost->setCostScale(0);
 
