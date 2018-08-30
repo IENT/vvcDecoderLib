@@ -913,6 +913,9 @@ bool EncAppCfg::parseCfg( int argc, char* argv[] )
   ("DMVR",                                            m_DMVR,                                           false, "Enable decoder-side motion vector refinement")
   ("MDMS",                                            m_MDMS,                                           false, "multiple direct mode signaling")
 #endif
+#if JVET_K0157
+  ("CompositeLTReference",                            m_CompositeRefEnabled,                            false, "Enable Composite Long Term Reference Frame")
+#endif
   // ADD_NEW_TOOL : (encoder app) add parsing parameters here
 
   ("LCTUFast",                                        m_useFastLCTU,                                    false, "Fast methods for large CTU")
@@ -1353,6 +1356,18 @@ bool EncAppCfg::parseCfg( int argc, char* argv[] )
   po::setDefaults(opts);
   po::ErrorReporter err;
   const list<const char*>& argv_unhandled = po::scanArgv(opts, argc, (const char**) argv, err);
+
+#if JVET_K0157
+  if (m_CompositeRefEnabled) {
+    for (int i = 0; i < m_iGOPSize; i++) {
+      m_GOPList[i].m_POC *= 2;
+      m_GOPList[i].m_deltaRPS *= 2;
+      for (int j = 0; j < m_GOPList[i].m_numRefPics; j++) {
+        m_GOPList[i].m_referencePics[j] *= 2;
+      }
+    }
+  }
+#endif
 
   for (list<const char*>::const_iterator it = argv_unhandled.begin(); it != argv_unhandled.end(); it++)
   {
@@ -2039,6 +2054,9 @@ bool EncAppCfg::xCheckParameter()
 #if JEM_TOOLS
     xConfirmPara( m_IntraPDPC, "PDPC is only allowed with NEXT profile" );
 #endif
+#if JVET_K0157
+    xConfirmPara(m_CompositeRefEnabled, "Composite Reference Frame is only allowed with NEXT profile");
+#endif
     // ADD_NEW_TOOL : (parameter check) add a check for next tools here
   }
   else
@@ -2553,6 +2571,9 @@ bool EncAppCfg::xCheckParameter()
     xConfirmPara( m_intraConstraintFlag, "IntraConstraintFlag cannot be 1 for inter sequences");
   }
 
+#if JVET_K0157
+  int multiple_factor = m_CompositeRefEnabled ? 2 : 1;
+#endif
   bool verifiedGOP=false;
   bool errorGOP=false;
   int checkGOP=1;
@@ -2573,7 +2594,11 @@ bool EncAppCfg::xCheckParameter()
 
   for(int i=0; i<m_iGOPSize; i++)
   {
+#if JVET_K0157
+    if (m_GOPList[i].m_POC == m_iGOPSize * multiple_factor)
+#else
     if(m_GOPList[i].m_POC==m_iGOPSize)
+#endif
     {
       xConfirmPara( m_GOPList[i].m_temporalId!=0 , "The last frame in each GOP must have temporal ID = 0 " );
     }
@@ -2607,7 +2632,11 @@ bool EncAppCfg::xCheckParameter()
   while(!verifiedGOP&&!errorGOP)
   {
     int curGOP = (checkGOP-1)%m_iGOPSize;
+#if JVET_K0157
+    int curPOC = ((checkGOP - 1) / m_iGOPSize)*m_iGOPSize * multiple_factor + m_GOPList[curGOP].m_POC;
+#else
     int curPOC = ((checkGOP-1)/m_iGOPSize)*m_iGOPSize + m_GOPList[curGOP].m_POC;
+#endif
     if(m_GOPList[curGOP].m_POC<0)
     {
       msg( WARNING, "\nError: found fewer Reference Picture Sets than GOPSize\n");
@@ -2634,7 +2663,11 @@ bool EncAppCfg::xCheckParameter()
               found=true;
               for(int k=0; k<m_iGOPSize; k++)
               {
+#if JVET_K0157
+                if (absPOC % (m_iGOPSize * multiple_factor) == m_GOPList[k].m_POC % (m_iGOPSize * multiple_factor))
+#else
                 if(absPOC%m_iGOPSize == m_GOPList[k].m_POC%m_iGOPSize)
+#endif
                 {
                   if(m_GOPList[k].m_temporalId==m_GOPList[curGOP].m_temporalId)
                   {
@@ -2686,7 +2719,11 @@ bool EncAppCfg::xCheckParameter()
         {
           //step backwards in coding order and include any extra available pictures we might find useful to replace the ones with POC < 0.
           int offGOP = (checkGOP-1+offset)%m_iGOPSize;
+#if JVET_K0157
+          int offPOC = ((checkGOP - 1 + offset) / m_iGOPSize)*(m_iGOPSize * multiple_factor) + m_GOPList[offGOP].m_POC;
+#else
           int offPOC = ((checkGOP-1+offset)/m_iGOPSize)*m_iGOPSize + m_GOPList[offGOP].m_POC;
+#endif
           if(offPOC>=0&&m_GOPList[offGOP].m_temporalId<=m_GOPList[curGOP].m_temporalId)
           {
             bool newRef=false;
@@ -3390,6 +3427,9 @@ void EncAppCfg::xPrintParameter()
 #if JEM_TOOLS
     msg( VERBOSE, "DMVR:%d ", m_DMVR );
     msg( VERBOSE, "MDMS:%d ", m_MDMS );
+#endif
+#if JVET_K0157
+    msg(VERBOSE, "CompositeLTReference:%d ", m_CompositeRefEnabled);
 #endif
   }
   // ADD_NEW_TOOL (add some output indicating the usage of tools)

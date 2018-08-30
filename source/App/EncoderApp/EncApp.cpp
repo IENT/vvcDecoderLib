@@ -301,6 +301,9 @@ void EncApp::xInitLibCfg()
   m_cEncLib.setUseDMVR                                           ( m_DMVR );
   m_cEncLib.setMDMS                                              ( m_MDMS );
 #endif
+#if JVET_K0157
+  m_cEncLib.setUseCompositeRef                                   ( m_CompositeRefEnabled );
+#endif
   // ADD_NEW_TOOL : (encoder app) add setting of tool enabling flags and associated parameters here
 
   m_cEncLib.setMaxCUWidth                                        ( m_QTBT ? m_uiCTUSize : m_uiMaxCUWidth );

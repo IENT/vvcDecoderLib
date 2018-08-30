@@ -3132,7 +3132,14 @@ void InterPrediction::xFrucCollectSubBlkStartMv( PredictionUnit& pu, const Merge
           }
 
           mvCand.refIdx = rMvStart.refIdx;
+#if JVET_K0157
+          if (pColPic->cs->slice->getRefPic((RefPicList)nRefListColPic, colMi.refIdx[nRefListColPic])->longTerm)
+            mvCand.mv = rColMv;
+          else
+            mvCand.mv = PU::scaleMv(rColMv, nCurPOC, nCurRefPOC, pColPic->getPOC(), pColPic->cs->slice->getRefPOC((RefPicList)nRefListColPic, colMi.refIdx[nRefListColPic]), pu.cs->slice);
+#else
           mvCand.mv     = PU::scaleMv( rColMv , nCurPOC , nCurRefPOC , pColPic->getPOC(), pColPic->cs->slice->getRefPOC( ( RefPicList )nRefListColPic , colMi.refIdx[nRefListColPic] ), pu.cs->slice );
+#endif
           if( mvCand.refIdx < 0 )
           {
             printf( "base" );

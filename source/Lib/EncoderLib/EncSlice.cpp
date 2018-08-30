@@ -278,8 +278,11 @@ static int applyQPAdaptationChroma (Picture* const pcPic, Slice* const pcSlice, 
  \param rpcSlice      slice header class
  \param isField       true for field coding
  */
-
-void EncSlice::initEncSlice( Picture* pcPic, const int pocLast, const int pocCurr, const int iGOPid, Slice*& rpcSlice, const bool isField )
+void EncSlice::initEncSlice(Picture* pcPic, const int pocLast, const int pocCurr, const int iGOPid, Slice*& rpcSlice, const bool isField
+#if JVET_K0157
+  , bool isEncodeLtRef
+#endif
+)
 {
   double dQP;
   double dLambda;
@@ -288,7 +291,19 @@ void EncSlice::initEncSlice( Picture* pcPic, const int pocLast, const int pocCur
   rpcSlice->setSliceBits(0);
   rpcSlice->setPic( pcPic );
   rpcSlice->initSlice();
+#if JVET_K0157
+  int multiple_factor = pcPic->cs->sps->getSpsNext().getUseCompositeRef() ? 2 : 1;
+  if (pcPic->cs->sps->getSpsNext().getUseCompositeRef() && isEncodeLtRef)
+  {
+    rpcSlice->setPicOutputFlag(false);
+  }
+  else
+  {
+    rpcSlice->setPicOutputFlag(true);
+  }
+#else
   rpcSlice->setPicOutputFlag( true );
+#endif
   rpcSlice->setPOC( pocCurr );
 #if JEM_TOOLS
   rpcSlice->setUseLIC( false );
@@ -315,7 +330,11 @@ void EncSlice::initEncSlice( Picture* pcPic, const int pocLast, const int pocCur
     }
     else
     {
+#if JVET_K0157
+      poc = poc % (m_pcCfg->getGOPSize() * multiple_factor);
+#else
       poc = poc % m_pcCfg->getGOPSize();
+#endif
     }
 
     if ( poc == 0 )
@@ -324,11 +343,19 @@ void EncSlice::initEncSlice( Picture* pcPic, const int pocLast, const int pocCur
     }
     else
     {
+#if JVET_K0157
+      int step = m_pcCfg->getGOPSize() * multiple_factor;
+#else
       int step = m_pcCfg->getGOPSize();
+#endif
       depth    = 0;
       for( int i=step>>1; i>=1; i>>=1 )
       {
+#if JVET_K0157
+        for (int j = i; j<(m_pcCfg->getGOPSize() * multiple_factor); j += step)
+#else
         for ( int j=i; j<m_pcCfg->getGOPSize(); j+=step )
+#endif
         {
           if ( j == poc )
           {
@@ -358,11 +385,19 @@ void EncSlice::initEncSlice( Picture* pcPic, const int pocLast, const int pocCur
   {
     if(m_pcCfg->getDecodingRefreshType() == 3)
     {
+#if JVET_K0157
+      eSliceType = (pocLast == 0 || pocCurr % (m_pcCfg->getIntraPeriod() * multiple_factor) == 0 || m_pcGOPEncoder->getGOPSize() == 0) ? I_SLICE : eSliceType;
+#else
       eSliceType = (pocLast == 0 || pocCurr % m_pcCfg->getIntraPeriod() == 0             || m_pcGOPEncoder->getGOPSize() == 0) ? I_SLICE : eSliceType;
+#endif
     }
     else
     {
+#if JVET_K0157
+      eSliceType = (pocLast == 0 || (pocCurr - (isField ? 1 : 0)) % (m_pcCfg->getIntraPeriod() * multiple_factor) == 0 || m_pcGOPEncoder->getGOPSize() == 0) ? I_SLICE : eSliceType;
+#else
       eSliceType = (pocLast == 0 || (pocCurr - (isField ? 1 : 0)) % m_pcCfg->getIntraPeriod() == 0 || m_pcGOPEncoder->getGOPSize() == 0) ? I_SLICE : eSliceType;
+#endif
     }
   }
 
@@ -605,11 +640,19 @@ void EncSlice::initEncSlice( Picture* pcPic, const int pocLast, const int pocCur
     {
       if(m_pcCfg->getDecodingRefreshType() == 3)
       {
+#if JVET_K0157
+        eSliceType = (pocLast == 0 || (pocCurr) % (m_pcCfg->getIntraPeriod() * multiple_factor) == 0 || m_pcGOPEncoder->getGOPSize() == 0) ? I_SLICE : eSliceType;
+#else
         eSliceType = (pocLast == 0 || (pocCurr)                     % m_pcCfg->getIntraPeriod() == 0 || m_pcGOPEncoder->getGOPSize() == 0) ? I_SLICE : eSliceType;
+#endif
       }
       else
       {
+#if JVET_K0157
+        eSliceType = (pocLast == 0 || (pocCurr - (isField ? 1 : 0)) % (m_pcCfg->getIntraPeriod() * multiple_factor) == 0 || m_pcGOPEncoder->getGOPSize() == 0) ? I_SLICE : eSliceType;
+#else
         eSliceType = (pocLast == 0 || (pocCurr - (isField ? 1 : 0)) % m_pcCfg->getIntraPeriod() == 0 || m_pcGOPEncoder->getGOPSize() == 0) ? I_SLICE : eSliceType;
+#endif
       }
     }
 
