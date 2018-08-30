@@ -67,6 +67,14 @@ typedef Distortion (*FpDistFunc) (const DistParam&);
 class DistParam
 {
 public:
+#if DMVR_JVET_K0217
+  int32_t meanL0;
+  int32_t meanL1;
+  Mv MVDL0;
+  Mv MVDL1;
+  int32_t partOfMeanL0;
+  int32_t partOfMeanL1;
+#endif
   CPelBuf               org;
   CPelBuf               cur;
 #if WCG_EXT
@@ -89,7 +97,18 @@ public:
   // - 0 = no subsampling, 1 = even rows, 2 = every 4th, etc.
   int                   subShift;
 
-  DistParam() : org(), cur(), step( 1 ), bitDepth( 0 ), useMR( false ), applyWeight( false ), isBiPred( false ), wpCur( nullptr ), compID( MAX_NUM_COMPONENT ), maximumDistortionForEarlyExit( std::numeric_limits<Distortion>::max() ), subShift( 0 ) { }
+  DistParam() :
+#if DMVR_JVET_K0217
+  meanL0(0),
+  meanL1(0),
+  MVDL0({}),
+  MVDL1({}),
+  partOfMeanL0(0), 
+  partOfMeanL1(0),
+#endif
+  org(), cur(), step( 1 ), bitDepth( 0 ), useMR( false ), applyWeight( false ), isBiPred( false ), wpCur( nullptr ), compID( MAX_NUM_COMPONENT ), maximumDistortionForEarlyExit( std::numeric_limits<Distortion>::max() ), subShift( 0 )
+
+  { }
 };
 
 /// RD cost computation class

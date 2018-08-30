@@ -52,6 +52,9 @@ namespace CS
 #endif
   UnitArea getArea                    ( const CodingStructure &cs, const UnitArea &area, const ChannelType chType );
   bool   isDualITree                  ( const CodingStructure &cs );
+#if DMVR_JVET_LOW_LATENCY_K0217
+  void   setRefinedMotionField        ( CodingStructure &cs );
+#endif
 }
 
 #if JEM_TOOLS
