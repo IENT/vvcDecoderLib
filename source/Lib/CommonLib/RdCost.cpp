@@ -326,7 +326,11 @@ void RdCost::setDistParam( DistParam &rcDP, const CPelBuf &org, const CPelBuf &c
   rcDP.maximumDistortionForEarlyExit = std::numeric_limits<Distortion>::max();
 }
 
+#if JVET_K0485_BIO
+void RdCost::setDistParam( DistParam &rcDP, const Pel* pOrg, const Pel* piRefY, int iOrgStride, int iRefStride, int bitDepth, ComponentID compID, int width, int height, int subShiftMode, int step, bool useHadamard, bool bio )
+#else
 void RdCost::setDistParam( DistParam &rcDP, const Pel* pOrg, const Pel* piRefY, int iOrgStride, int iRefStride, int bitDepth, ComponentID compID, int width, int height, int subShiftMode, int step, bool useHadamard )
+#endif
 {
   rcDP.bitDepth   = bitDepth;
   rcDP.compID     = compID;
@@ -347,6 +351,13 @@ void RdCost::setDistParam( DistParam &rcDP, const Pel* pOrg, const Pel* piRefY, 
 
   CHECK( useHadamard || rcDP.useMR || subShiftMode > 0, "only used in xDirectMCCost with these default parameters (so far...)" );
 
+#if JVET_K0485_BIO
+  if (bio)
+  {
+    rcDP.distFunc = xGetSAD;
+    return;
+  }
+#endif
   if( width == 12 )
   {
     rcDP.distFunc = m_afpDistortFunc[ DF_SAD12 ];

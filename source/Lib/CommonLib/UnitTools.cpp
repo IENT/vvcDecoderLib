@@ -700,8 +700,8 @@ int PU::getIntraMPMs( const PredictionUnit &pu, unsigned* mpm, const ChannelType
 
     CHECK(2 >= numMPMs, "Invalid number of most probable modes");
 
-    const int offset = (int) NUM_LUMA_MODE - 5;
-    const int mod    = offset + 3;
+    const int offset = 61;
+    const int mod    = 64;
 
     if (leftIntraDir == aboveIntraDir)
     {

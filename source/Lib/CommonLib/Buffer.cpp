@@ -62,6 +62,36 @@ void addAvgCore( const T* src1, int src1Stride, const T* src2, int src2Stride, T
 #undef ADD_AVG_CORE_INC
 }
 
+#if JVET_K0485_BIO
+void addBIOAvgCore(const Pel* src0, int src0Stride, const Pel* src1, int src1Stride, Pel *dst, int dstStride, const Pel *pGradX0, const Pel *pGradX1, const Pel *pGradY0, const Pel*pGradY1, int gradStride, int width, int height, int tmpx, int tmpy, int shift, int offset, const ClpRng& clpRng)
+{
+  int b = 0;
+
+  for (int y = 0; y < height; y++)
+  {
+    for (int x = 0; x < width; x += 4)
+    {
+      b = tmpx * (pGradX0[x] - pGradX1[x]) + tmpy * (pGradY0[x] - pGradY1[x]);
+      b = ((b + 32) >> 6);
+      dst[x] = ClipPel((int16_t)rightShift((src0[x] + src1[x] + b + offset), shift), clpRng);
+
+      b = tmpx * (pGradX0[x + 1] - pGradX1[x + 1]) + tmpy * (pGradY0[x + 1] - pGradY1[x + 1]);
+      b = ((b + 32) >> 6);
+      dst[x + 1] = ClipPel((int16_t)rightShift((src0[x + 1] + src1[x + 1] + b + offset), shift), clpRng);
+
+      b = tmpx * (pGradX0[x + 2] - pGradX1[x + 2]) + tmpy * (pGradY0[x + 2] - pGradY1[x + 2]);
+      b = ((b + 32) >> 6);
+      dst[x + 2] = ClipPel((int16_t)rightShift((src0[x + 2] + src1[x + 2] + b + offset), shift), clpRng);
+
+      b = tmpx * (pGradX0[x + 3] - pGradX1[x + 3]) + tmpy * (pGradY0[x + 3] - pGradY1[x + 3]);
+      b = ((b + 32) >> 6);
+      dst[x + 3] = ClipPel((int16_t)rightShift((src0[x + 3] + src1[x + 3] + b + offset), shift), clpRng);
+    }
+    dst += dstStride;       src0 += src0Stride;     src1 += src1Stride;
+    pGradX0 += gradStride; pGradX1 += gradStride; pGradY0 += gradStride; pGradY1 += gradStride;
+  }
+}
+#endif
 
 template<typename T>
 void reconstructCore( const T* src1, int src1Stride, const T* src2, int src2Stride, T* dest, int dstStride, int width, int height, const ClpRng& clpRng )
@@ -97,6 +127,9 @@ PelBufferOps::PelBufferOps()
 {
   addAvg4 = addAvgCore<Pel>;
   addAvg8 = addAvgCore<Pel>;
+#if JVET_K0485_BIO
+  addBIOAvg4    = addBIOAvgCore;
+#endif
 
   reco4 = reconstructCore<Pel>;
   reco8 = reconstructCore<Pel>;
