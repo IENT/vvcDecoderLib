@@ -937,6 +937,9 @@ private:
 #if JEM_TOOLS
   unsigned    m_CIPFMode;
 #endif
+#if JVET_K0157
+  bool              m_CompositeRefEnabled;        //composite longterm reference
+#endif
   // ADD_NEW_TOOL : (sps extension) add tool enabling flags and associated parameters here
 
 public:
@@ -1157,6 +1160,10 @@ public:
   int       getIntraPDPCMode      ()                                      const     { return m_IntraPDPCMode; }
   bool      isIntraPDPC           ()                                      const     { return 0 != (m_IntraPDPCMode&1); }
   bool      isPlanarPDPC          ()                                      const     { return 0 != (m_IntraPDPCMode&2); }
+#endif
+#if JVET_K0157
+  void      setUseCompositeRef(bool b) { m_CompositeRefEnabled = b; }
+  bool      getUseCompositeRef()                                      const { return m_CompositeRefEnabled; }
 #endif
   // ADD_NEW_TOOL : (sps extension) add access functions for tool enabling flags and associated parameters here
 
@@ -1985,9 +1992,13 @@ public:
   bool                        isTemporalLayerSwitchingPoint( PicList& rcListPic )                                           const;
   bool                        isStepwiseTemporalLayerSwitchingPointCandidate( PicList& rcListPic )                          const;
   int                         checkThatAllRefPicsAreAvailable( PicList& rcListPic, const ReferencePictureSet *pReferencePictureSet, bool printErrors, int pocRandomAccess = 0, bool bUseRecoveryPoint = false) const;
-  void                        createExplicitReferencePictureSetFromReference( PicList& rcListPic, const ReferencePictureSet *pReferencePictureSet, bool isRAP, int pocRandomAccess, bool bUseRecoveryPoint, const bool bEfficientFieldIRAPEnabled);
+  void                        createExplicitReferencePictureSetFromReference(PicList& rcListPic, const ReferencePictureSet *pReferencePictureSet, bool isRAP, int pocRandomAccess, bool bUseRecoveryPoint, const bool bEfficientFieldIRAPEnabled
+#if JVET_K0157
+                              , bool isEncodeLtRef, bool CompositeRefEanble
+#endif
+  );
   void                        setMaxNumMergeCand(uint32_t val )                          { m_maxNumMergeCand = val;                                      }
-  uint32_t                        getMaxNumMergeCand() const                             { return m_maxNumMergeCand;                                     }
+  uint32_t                    getMaxNumMergeCand() const                             { return m_maxNumMergeCand;                                     }
 
   void                        setNoOutputPriorPicsFlag( bool val )                   { m_noOutputPriorPicsFlag = val;                                }
   bool                        getNoOutputPriorPicsFlag() const                       { return m_noOutputPriorPicsFlag;                               }

@@ -162,6 +162,9 @@ protected:
 #if HEVC_USE_SCALING_LISTS
   void  xInitScalingLists (SPS &sps, PPS &pps);   ///< initialize scaling lists
 #endif
+#if JVET_K0157
+  void  xInitPPSforLT(PPS& pps);
+#endif
   void  xInitHrdParameters(SPS &sps);                 ///< initialize HRD parameters
 
 #if HEVC_TILES_WPP
@@ -230,7 +233,12 @@ public:
 #endif
   RateCtrl*               getRateCtrl           ()              { return  &m_cRateCtrl;            }
 
-  void selectReferencePictureSet(Slice* slice, int POCCurr, int GOPid );
+
+  void selectReferencePictureSet(Slice* slice, int POCCurr, int GOPid
+#if JVET_K0157
+    , int LtPoc, PicList& rcListPic
+#endif
+  );
   int getReferencePictureSetIdxForSOP(int POCCurr, int GOPid );
 
   bool                   PPSNeedsWriting(int ppsId);

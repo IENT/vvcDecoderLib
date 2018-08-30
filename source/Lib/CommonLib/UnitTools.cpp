@@ -97,7 +97,15 @@ static void xInitFrucMvpEl( CodingStructure& cs, int x, int y, int nCurPOC, int 
       mvColPic.setHighPrec();
     }
 
+#if JVET_K0157
+    Mv mv2CurRefPic;
+    if (cs.slice->getRefPic(eRefPicList, frucMi.refIdx[eRefPicList])->longTerm)
+      mv2CurRefPic = mvColPic;
+    else
+      mv2CurRefPic = PU::scaleMv(mvColPic, nCurPOC, nCurRefPOC, nColPOC, nColRefPOC, cs.slice);
+#else
     Mv mv2CurRefPic = PU::scaleMv( mvColPic, nCurPOC, nCurRefPOC, nColPOC, nColRefPOC, cs.slice );
+#endif
 
     int xCurPic = 0;
     int yCurPic = 0;
@@ -2825,7 +2833,14 @@ static bool deriveScaledMotionTemporal( const Slice&      slice,
     cColMv      = mi.mv[eColRefPicList];
     //pcMvFieldSP[2*iPartition + eCurrRefPicList].getMv();
     // Assume always short-term for now
+#if JVET_K0157
+    if (slice.getRefPic(eColRefPicList, 0)->longTerm)
+      iScale = 4096;
+    else
+      iScale = xGetDistScaleFactor(iCurrPOC, iCurrRefPOC, iColPOC, iColRefPOC);
+#else
     iScale      = xGetDistScaleFactor( iCurrPOC, iCurrRefPOC, iColPOC, iColRefPOC );
+#endif
 
     if( iScale != 4096 )
     {
@@ -3029,7 +3044,15 @@ bool PU::getInterMergeSubPuMvpCand( const PredictionUnit &pu, MergeCtx& mrgCtx, 
       if( iNewColPicPOC != iPocColPic )
       {
         //////////////// POC based scaling of the temporal vector /////////////
+#if JVET_K0157
+        int iScale;
+        if (pColPic->longTerm)
+          iScale = 4096;
+        else
+          iScale = xGetDistScaleFactor(slice.getPOC(), iNewColPicPOC, slice.getPOC(), iPocColPic);
+#else
         int iScale = xGetDistScaleFactor( slice.getPOC(), iNewColPicPOC, slice.getPOC(), iPocColPic );
+#endif
         if( iScale != 4096 )
         {
           cTempVector = cTMv.scaleMv( iScale );
@@ -3222,7 +3245,15 @@ bool PU::getMvPair( const PredictionUnit &pu, RefPicList eCurRefPicList, const M
   int nCurPOC               = slice.getPOC();
   int nRefPOC               = slice.getRefPOC( eCurRefPicList , rCurMvField.refIdx );
   int nTargetPOC            = slice.getRefPOC( eTarRefPicList , nTargetRefIdx );
+#if JVET_K0157
+  int nScale = 4096;
+  if (slice.getRefPic(eTarRefPicList, rCurMvField.refIdx)->longTerm || slice.getRefPic(eTarRefPicList, nTargetRefIdx)->longTerm)
+    nScale = 4096;
+  else
+    nScale = xGetDistScaleFactorFRUC(nCurPOC, nTargetPOC, nCurPOC, nRefPOC, pu.cs->slice);
+#else
   int nScale                = xGetDistScaleFactorFRUC( nCurPOC , nTargetPOC , nCurPOC , nRefPOC, pu.cs->slice );
+#endif
   rMvPair.mv                = rCurMvField.mv.scaleMv( nScale );
   rMvPair.refIdx            = nTargetRefIdx;
 
@@ -3273,7 +3304,15 @@ static void getNeighboringMvField( const Slice& slice, const MotionInfo &miNB, M
         iRefPOCSrc    = slice.getRefPOC( eRefPicListSrc, miNB.refIdx[eRefPicListSrc] );
         iRefPOCMirror = slice.getRefPOC( eRefPicListSrc, 0 );
 
+#if JVET_K0157
+        int iScale;
+        if (slice.getRefPic(eRefPicListSrc, miNB.refIdx[eRefPicListSrc])->longTerm)
+          iScale = 4096;
+        else
+          iScale = xGetDistScaleFactor(slice.getPOC(), iRefPOCMirror, slice.getPOC(), iRefPOCSrc);
+#else
         int iScale = xGetDistScaleFactor( slice.getPOC(), iRefPOCMirror, slice.getPOC(), iRefPOCSrc );
+#endif
         if( iScale == 4096 )
         {
           cMvField[uiMvIdxSrc].setMvField( miNB.mv[eRefPicListSrc], 0 );
@@ -3319,7 +3358,15 @@ static void getNeighboringMvField( const Slice& slice, const MotionInfo &miNB, M
     else
     {
       iRefPOCMirror = slice.getRefPOC( eRefPicListSrc, 0 );
+#if JVET_K0157
+      int iScale;
+      if (slice.getRefPic(eRefPicListSrc, miNB.refIdx[eRefPicListSrc])->longTerm)
+        iScale = 4096;
+      else
+        iScale = xGetDistScaleFactor(slice.getPOC(), iRefPOCMirror, slice.getPOC(), iRefPOCSrc);
+#else
       int iScale = xGetDistScaleFactor( slice.getPOC(), iRefPOCMirror, slice.getPOC(), iRefPOCSrc );
+#endif
       if( iScale == 4096 )
       {
         cMvField[uiMvIdxSrc].setMvField( miNB.mv[eRefPicListSrc], 0 );
