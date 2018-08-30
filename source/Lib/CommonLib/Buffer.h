@@ -68,6 +68,9 @@ struct PelBufferOps
   void ( *reco8 )         ( const Pel* src0, int src0Stride, const Pel* src1, int src1Stride, Pel *dst, int dstStride, int width, int height,                                   const ClpRng& clpRng );
   void ( *linTf4 )        ( const Pel* src0, int src0Stride,                                  Pel *dst, int dstStride, int width, int height, int scale, int shift, int offset, const ClpRng& clpRng, bool bClip );
   void ( *linTf8 )        ( const Pel* src0, int src0Stride,                                  Pel *dst, int dstStride, int width, int height, int scale, int shift, int offset, const ClpRng& clpRng, bool bClip );
+#if JVET_K0485_BIO
+  void(*addBIOAvg4)          (const Pel* src0, int src0Stride, const Pel* src1, int src1Stride, Pel *dst, int dstStride, const Pel *pGradX0, const Pel *pGradX1, const Pel *pGradY0, const Pel*pGradY1, int gradStride, int width, int height, int tmpx, int tmpy, int shift, int offset, const ClpRng& clpRng);
+#endif
 };
 
 extern PelBufferOps g_pelBufOP;
@@ -371,7 +374,6 @@ void AreaBuf<T>::addAvg( const AreaBuf<const T> &other1, const AreaBuf<const T> 
 
 template<>
 void AreaBuf<Pel>::addAvg( const AreaBuf<const Pel> &other1, const AreaBuf<const Pel> &other2, const ClpRng& clpRng );
-
 
 template<typename T>
 void AreaBuf<T>::linearTransform( const int scale, const int shift, const int offset, bool bClip, const ClpRng& clpRng )
