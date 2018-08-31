@@ -680,7 +680,7 @@ void InterPrediction::xPredInterBi(PredictionUnit& pu, PelUnitBuf &pcYuvPred)
 #endif
 }
 
-#if JVET_K0485_BIO
+#if JVET_K0485_BIO && JEM_TOOLS
 void InterPrediction::xPadRefFromFMC(const Pel* refBufPtr, int refBufStride, int width, int height, Pel* padRefPelPtr, int &padRefStride, bool isFracMC)
 {
   int  widthFMC = 3 + width + 4;
