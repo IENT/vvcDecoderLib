@@ -283,7 +283,7 @@ protected:
   bool      m_MDMS;
 #endif
 #if JVET_K0157
-  bool      m_CompositeRefEnabled;
+  bool      m_compositeRefEnabled;
 #endif
   // ADD_NEW_TOOL : (encoder app) add tool enabling flags and associated parameters here
 

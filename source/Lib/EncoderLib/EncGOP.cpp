@@ -299,13 +299,13 @@ EncGOP::EncGOP()
 
   m_bInitAMaxBT         = true;
 #if JVET_K0157
-  m_BgPOC = -1;
-  m_rpcPicBg = NULL;
-  m_rpcPicOrig = NULL;
-  m_EncodedLTRef = false;
-  m_UseLTRef = false;
-  m_PrepareLTRef = true;
-  m_LastLTRefPoc = 0;
+  m_iBgPOC = -1;
+  m_pcPicBg = NULL;
+  m_pcPicOrig = NULL;
+  m_isEncodedLTRef = false;
+  m_isUseLTRef = false;
+  m_isPrepareLTRef = true;
+  m_iLastLTRefPoc = 0;
 #endif
 }
 
@@ -337,17 +337,17 @@ void  EncGOP::destroy()
   }
 #endif
 #if JVET_K0157
-  if (m_rpcPicBg)
+  if (m_pcPicBg)
   {
-    m_rpcPicBg->destroy();
-    delete m_rpcPicBg;
-    m_rpcPicBg = NULL;
+    m_pcPicBg->destroy();
+    delete m_pcPicBg;
+    m_pcPicBg = NULL;
   }
-  if (m_rpcPicOrig)
+  if (m_pcPicOrig)
   {
-    m_rpcPicOrig->destroy();
-    delete m_rpcPicOrig;
-    m_rpcPicOrig = NULL;
+    m_pcPicOrig->destroy();
+    delete m_pcPicOrig;
+    m_pcPicOrig = NULL;
   }
 #endif
 }
@@ -1567,14 +1567,14 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
     int iTimeOffset;
     int pocCurr;
 #if JVET_K0157
-    int multiple_factor = m_pcCfg->getUseCompositeRef() ? 2 : 1;
+    int iMultipleFactor = m_pcCfg->getUseCompositeRef() ? 2 : 1;
 #endif
 
     if(iPOCLast == 0) //case first frame or first top field
     {
       pocCurr=0;
 #if JVET_K0157
-      iTimeOffset = multiple_factor;
+      iTimeOffset = iMultipleFactor;
 #else
       iTimeOffset = 1;
 #endif
@@ -1587,7 +1587,7 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
     else
     {
 #if JVET_K0157
-      pocCurr = iPOCLast - iNumPicRcvd * multiple_factor + m_pcCfg->getGOPEntry(iGOPid).m_POC - ((isField && m_iGopSize>1) ? 1 : 0);
+      pocCurr = iPOCLast - iNumPicRcvd * iMultipleFactor + m_pcCfg->getGOPEntry(iGOPid).m_POC - ((isField && m_iGopSize>1) ? 1 : 0);
 #else
       pocCurr = iPOCLast - iNumPicRcvd + m_pcCfg->getGOPEntry(iGOPid).m_POC - ((isField && m_iGopSize>1) ? 1:0);
 #endif
@@ -1600,7 +1600,7 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
       pocCurr++;
       iTimeOffset--;
     }
-    if (pocCurr / multiple_factor >= m_pcCfg->getFramesToBeEncoded())
+    if (pocCurr / iMultipleFactor >= m_pcCfg->getFramesToBeEncoded())
 #else
     if(pocCurr>=m_pcCfg->getFramesToBeEncoded())
 #endif
@@ -1734,9 +1734,9 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
       setLastLTRefPoc(-1);
     }
 
-    if (pcPic->cs->sps->getSpsNext().getUseCompositeRef() && m_rpcPicBg->getSpliceFull() && getUseLTRef())
+    if (pcPic->cs->sps->getSpsNext().getUseCompositeRef() && m_pcPicBg->getSpliceFull() && getUseLTRef())
     {
-      m_pcEncLib->selectReferencePictureSet(pcSlice, pocCurr, iGOPid, m_BgPOC, rcListPic);
+      m_pcEncLib->selectReferencePictureSet(pcSlice, pocCurr, iGOPid, m_iBgPOC, rcListPic);
     }
     else
     {
@@ -1837,7 +1837,10 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
         }
       }
     }
-#if !JVET_K0157
+#if JVET_K0157
+    if (pcSlice->getRPSidx() == -1)
+      arrangeLongtermPicturesInRPS(pcSlice, rcListPic);
+#else
     arrangeLongtermPicturesInRPS(pcSlice, rcListPic);
 #endif
     RefPicListModification* refPicListModification = pcSlice->getRefPicListModification();
@@ -1855,7 +1858,7 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
       pcSlice->setNumRefIdx(REF_PIC_LIST_1, min(m_pcCfg->getGOPEntry(iGOPid).m_numRefPicsActive, pcSlice->getRPS()->getNumberOfPictures()));
     }
     if (pcPic->cs->sps->getSpsNext().getUseCompositeRef() && getPrepareLTRef()) {
-      ArrangeBackgroundReference(pcSlice, rcListPic, pocCurr);
+      arrangeCompositeReference(pcSlice, rcListPic, pocCurr);
     }
 #else
     pcSlice->setNumRefIdx(REF_PIC_LIST_0,min(m_pcCfg->getGOPEntry(iGOPid).m_numRefPicsActive,pcSlice->getRPS()->getNumberOfPictures()));
@@ -2426,7 +2429,7 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
 #if JVET_K0157
       if (pcPic->cs->sps->getSpsNext().getUseCompositeRef() && getPrepareLTRef()) 
       {
-        UpdateBackgroundReference(pcSlice, rcListPic, pocCurr);
+        updateCompositeReference(pcSlice, rcListPic, pocCurr);
       }
 #endif
     }
@@ -2919,8 +2922,8 @@ void EncGOP::xGetBuffer( PicList&                  rcListPic,
   }
 
 #if JVET_K0157
-  int multiple_factor = m_pcCfg->getUseCompositeRef() ? 2 : 1;
-  for (i = 0; i < (iNumPicRcvd * multiple_factor - iTimeOffset + 1); i += multiple_factor)
+  int iMultipleFactor = m_pcCfg->getUseCompositeRef() ? 2 : 1;
+  for (i = 0; i < (iNumPicRcvd * iMultipleFactor - iTimeOffset + 1); i += iMultipleFactor)
 #else
   for ( i = 0; i < (iNumPicRcvd - iTimeOffset + 1); i++ )
 #endif
@@ -3846,18 +3849,18 @@ void EncGOP::arrangeLongtermPicturesInRPS(Slice *pcSlice, PicList& rcListPic)
 }
 
 #if JVET_K0157
-void EncGOP::ArrangeBackgroundReference(Slice* pcSlice, PicList& rcListPic, int pocCurr)
+void EncGOP::arrangeCompositeReference(Slice* pcSlice, PicList& rcListPic, int pocCurr)
 {
-  Picture* rpcCurPic = NULL;
+  Picture* pcCurPic = NULL;
   PicList::iterator  iterPic = rcListPic.begin();
   const PreCalcValues *pcv = pcSlice->getPPS()->pcv;
-  m_BgPOC = pocCurr + 1;
-  if (m_rpcPicBg->getSpliceFull())
+  m_iBgPOC = pocCurr + 1;
+  if (m_pcPicBg->getSpliceFull())
     return;
   while (iterPic != rcListPic.end())
   {
-    rpcCurPic = *(iterPic++);
-    if (rpcCurPic->getPOC() == pocCurr)
+    pcCurPic = *(iterPic++);
+    if (pcCurPic->getPOC() == pocCurr)
     {
       break;
     }
@@ -3867,14 +3870,14 @@ void EncGOP::ArrangeBackgroundReference(Slice* pcSlice, PicList& rcListPic, int 
 
   int iWidth = pcv->lumaWidth;
   int iHeight = pcv->lumaHeight;
-  int iStride = rpcCurPic->getOrigBuf().get(COMPONENT_Y).stride;
-  int iCStride = rpcCurPic->getOrigBuf().get(COMPONENT_Cb).stride;
-  Pel* pCurLumaAddr = rpcCurPic->getOrigBuf().get(COMPONENT_Y).buf;
-  Pel* pCurCbAddr = rpcCurPic->getOrigBuf().get(COMPONENT_Cb).buf;
-  Pel* pCurCrAddr = rpcCurPic->getOrigBuf().get(COMPONENT_Cr).buf;
-  Pel* pBgOrgLumaAddr = m_rpcPicOrig->getOrigBuf().get(COMPONENT_Y).buf;
-  Pel* pBgOrgCbAddr = m_rpcPicOrig->getOrigBuf().get(COMPONENT_Cb).buf;
-  Pel* pBgOrgCrAddr = m_rpcPicOrig->getOrigBuf().get(COMPONENT_Cr).buf;
+  int iStride = pcCurPic->getOrigBuf().get(COMPONENT_Y).stride;
+  int iCStride = pcCurPic->getOrigBuf().get(COMPONENT_Cb).stride;
+  Pel* pCurLumaAddr = pcCurPic->getOrigBuf().get(COMPONENT_Y).buf;
+  Pel* pCurCbAddr = pcCurPic->getOrigBuf().get(COMPONENT_Cb).buf;
+  Pel* pCurCrAddr = pcCurPic->getOrigBuf().get(COMPONENT_Cr).buf;
+  Pel* pBgOrgLumaAddr = m_pcPicOrig->getOrigBuf().get(COMPONENT_Y).buf;
+  Pel* pBgOrgCbAddr = m_pcPicOrig->getOrigBuf().get(COMPONENT_Cb).buf;
+  Pel* pBgOrgCrAddr = m_pcPicOrig->getOrigBuf().get(COMPONENT_Cr).buf;
   int iCUMaxWidth = pcv->maxCUWidth;
   int iCUMaxHeight = pcv->maxCUHeight;
   int iMaxReplace = (pcv->sizeInCtus) / 2;
@@ -3931,7 +3934,7 @@ void EncGOP::ArrangeBackgroundReference(Slice* pcSlice, PicList& rcListPic, int 
       int iYinLCU = y / iCUMaxHeight;
       int iXinLCU = x / iCUMaxWidth;
       int iLCUIdx = iYinLCU * pcv->widthInCtus + iXinLCU;
-      if ((iLargeDist / (double)iRealPixelCnt < 0.01 &&dLCUdist / iRealPixelCnt < (3.5 * (1 << uiBitIncrementY)) && dLCUdistcb / iRealPixelCnt < (0.5 * (1 << uiBitIncrementUV)) && dLCUdistcr / iRealPixelCnt < (0.5 * (1 << uiBitIncrementUV)) && m_rpcPicBg->getSpliceIdx(iLCUIdx) == 0))
+      if ((iLargeDist / (double)iRealPixelCnt < 0.01 &&dLCUdist / iRealPixelCnt < (3.5 * (1 << uiBitIncrementY)) && dLCUdistcb / iRealPixelCnt < (0.5 * (1 << uiBitIncrementUV)) && dLCUdistcr / iRealPixelCnt < (0.5 * (1 << uiBitIncrementUV)) && m_pcPicBg->getSpliceIdx(iLCUIdx) == 0))
       {
         dLCUCost = dLCUdist / iRealPixelCnt + dLCUdistcb / iRealPixelCnt + dLCUdistcr / iRealPixelCnt;
         //obtain the iMaxReplace smallest cost
@@ -3960,40 +3963,40 @@ void EncGOP::ArrangeBackgroundReference(Slice* pcSlice, PicList& rcListPic, int 
     {
       if (pcMinCtuCost[i].iCtuIdx != -1)
       {
-        m_rpcPicBg->setSpliceIdx(pcMinCtuCost[i].iCtuIdx, pocCurr);
+        m_pcPicBg->setSpliceIdx(pcMinCtuCost[i].iCtuIdx, pocCurr);
       }
     }
   }
   delete[]pcMinCtuCost;
 }
 
-void EncGOP::UpdateBackgroundReference(Slice* pcSlice, PicList& rcListPic, int pocCurr)
+void EncGOP::updateCompositeReference(Slice* pcSlice, PicList& rcListPic, int pocCurr)
 {
-  Picture* rpcCurPic = NULL;
+  Picture* pcCurPic = NULL;
   const PreCalcValues *pcv = pcSlice->getPPS()->pcv;
   PicList::iterator  iterPic = rcListPic.begin();
   iterPic = rcListPic.begin();
   while (iterPic != rcListPic.end())
   {
-    rpcCurPic = *(iterPic++);
-    if (rpcCurPic->getPOC() == pocCurr)
+    pcCurPic = *(iterPic++);
+    if (pcCurPic->getPOC() == pocCurr)
     {
       break;
     }
   }
-  assert(rpcCurPic->getPOC() == pocCurr);
+  assert(pcCurPic->getPOC() == pocCurr);
 
   int iWidth = pcv->lumaWidth;
   int iHeight = pcv->lumaHeight;
-  int iStride = rpcCurPic->getRecoBuf().get(COMPONENT_Y).stride;
-  int iCStride = rpcCurPic->getRecoBuf().get(COMPONENT_Cb).stride;
+  int iStride = pcCurPic->getRecoBuf().get(COMPONENT_Y).stride;
+  int iCStride = pcCurPic->getRecoBuf().get(COMPONENT_Cb).stride;
 
-  Pel* pBgLumaAddr = m_rpcPicBg->getRecoBuf().get(COMPONENT_Y).buf;
-  Pel* pBgCbAddr = m_rpcPicBg->getRecoBuf().get(COMPONENT_Cb).buf;
-  Pel* pBgCrAddr = m_rpcPicBg->getRecoBuf().get(COMPONENT_Cr).buf;
-  Pel* pCurLumaAddr = rpcCurPic->getRecoBuf().get(COMPONENT_Y).buf;
-  Pel* pCurCbAddr = rpcCurPic->getRecoBuf().get(COMPONENT_Cb).buf;
-  Pel* pCurCrAddr = rpcCurPic->getRecoBuf().get(COMPONENT_Cr).buf;
+  Pel* pBgLumaAddr = m_pcPicBg->getRecoBuf().get(COMPONENT_Y).buf;
+  Pel* pBgCbAddr = m_pcPicBg->getRecoBuf().get(COMPONENT_Cb).buf;
+  Pel* pBgCrAddr = m_pcPicBg->getRecoBuf().get(COMPONENT_Cr).buf;
+  Pel* pCurLumaAddr = pcCurPic->getRecoBuf().get(COMPONENT_Y).buf;
+  Pel* pCurCbAddr = pcCurPic->getRecoBuf().get(COMPONENT_Cb).buf;
+  Pel* pCurCrAddr = pcCurPic->getRecoBuf().get(COMPONENT_Cr).buf;
 
   int iMaxCUWidth = pcv->maxCUWidth;
   int iMaxCUHeight = pcv->maxCUHeight;
@@ -4001,11 +4004,11 @@ void EncGOP::UpdateBackgroundReference(Slice* pcSlice, PicList& rcListPic, int p
   // Update background reference
   if (pcSlice->getSliceType() == I_SLICE)//(pocCurr == 0)
   {
-    rpcCurPic->extendPicBorder();
-    rpcCurPic->setBorderExtension(true);
+    pcCurPic->extendPicBorder();
+    pcCurPic->setBorderExtension(true);
 
-    m_rpcPicBg->getRecoBuf().copyFrom(rpcCurPic->getRecoBuf());
-    m_rpcPicOrig->getOrigBuf().copyFrom(rpcCurPic->getOrigBuf());
+    m_pcPicBg->getRecoBuf().copyFrom(pcCurPic->getRecoBuf());
+    m_pcPicOrig->getOrigBuf().copyFrom(pcCurPic->getOrigBuf());
   }
   else
   {
@@ -4014,7 +4017,7 @@ void EncGOP::UpdateBackgroundReference(Slice* pcSlice, PicList& rcListPic, int p
     {
       for (int x = 0; x < iWidth; x += iMaxCUWidth)
       {
-        if (m_rpcPicBg->getSpliceIdx((y / iMaxCUHeight)*pcv->widthInCtus + x / iMaxCUWidth) == pocCurr)
+        if (m_pcPicBg->getSpliceIdx((y / iMaxCUHeight)*pcv->widthInCtus + x / iMaxCUWidth) == pocCurr)
         {
           for (int tmpy = 0; tmpy < iMaxCUHeight; tmpy++)
           {
@@ -4039,17 +4042,17 @@ void EncGOP::UpdateBackgroundReference(Slice* pcSlice, PicList& rcListPic, int p
         }
       }
     }
-    m_rpcPicBg->setBorderExtension(false);
-    m_rpcPicBg->extendPicBorder();
-    m_rpcPicBg->setBorderExtension(true);
+    m_pcPicBg->setBorderExtension(false);
+    m_pcPicBg->extendPicBorder();
+    m_pcPicBg->setBorderExtension(true);
 
-    rpcCurPic->extendPicBorder();
-    rpcCurPic->setBorderExtension(true);
-    m_rpcPicOrig->getOrigBuf().copyFrom(rpcCurPic->getOrigBuf());
+    pcCurPic->extendPicBorder();
+    pcCurPic->setBorderExtension(true);
+    m_pcPicOrig->getOrigBuf().copyFrom(pcCurPic->getOrigBuf());
 
-    m_rpcPicBg->setBorderExtension(false);
-    m_rpcPicBg->extendPicBorder();
-    m_rpcPicBg->setBorderExtension(true);
+    m_pcPicBg->setBorderExtension(false);
+    m_pcPicBg->extendPicBorder();
+    m_pcPicBg->setBorderExtension(true);
   }
 }
 #endif

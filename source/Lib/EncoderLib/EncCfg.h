@@ -271,7 +271,7 @@ protected:
   bool      m_DMVR;
 #endif
 #if JVET_K0157
-  bool      m_CompositeRefEnabled;        //composite reference
+  bool      m_compositeRefEnabled;        //composite reference
 #endif
   // ADD_NEW_TOOL : (encoder lib) add tool enabling flags and associated parameters here
 
@@ -826,8 +826,8 @@ public:
   bool      getMDMS                         ()         const { return m_MDMS; }
 #endif
 #if JVET_K0157
-  void      setUseCompositeRef              (bool b)         { m_CompositeRefEnabled = b; }
-  bool      getUseCompositeRef              ()         const { return m_CompositeRefEnabled; }
+  void      setUseCompositeRef              (bool b)         { m_compositeRefEnabled = b; }
+  bool      getUseCompositeRef              ()         const { return m_compositeRefEnabled; }
 #endif
 
   // ADD_NEW_TOOL : (encoder lib) add access functions here

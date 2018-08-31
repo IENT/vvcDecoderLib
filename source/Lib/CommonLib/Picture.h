@@ -227,8 +227,8 @@ struct Picture : public UnitArea
   Pel* getOrigin( const PictureType &type, const ComponentID compID ) const;
 
 #if JVET_K0157
-  int           getSpliceIdx(uint32_t idx) const { return m_SpliceIdx[idx]; }
-  void          setSpliceIdx(uint32_t idx, int poc) { m_SpliceIdx[idx] = poc; }
+  int           getSpliceIdx(uint32_t idx) const { return m_iSpliceIdx[idx]; }
+  void          setSpliceIdx(uint32_t idx, int poc) { m_iSpliceIdx[idx] = poc; }
   void          createSpliceIdx(int nums);
   bool          getSpliceFull();
 #endif
@@ -249,8 +249,8 @@ public:
   uint32_t depth;
 
 #if JVET_K0157
-  int* m_SpliceIdx;
-  int ctuNums;
+  int* m_iSpliceIdx;
+  int  m_iCtuNums;
 #endif
 
 #if ENABLE_SPLIT_PARALLELISM

@@ -88,7 +88,7 @@ void EncLib::create ()
 
 
 #if JVET_K0157
-  m_iPOCLast = m_CompositeRefEnabled ? -2 : -1;
+  m_iPOCLast = m_compositeRefEnabled ? -2 : -1;
 #endif
   // create processing unit classes
   m_cGOPEncoder.        create( );
@@ -257,7 +257,8 @@ void EncLib::init( bool isFieldCoding, AUWriterIf* auWriterIf )
   m_HLSWriter.init( m_CABACDataStore );
 #endif
 #if JVET_K0157
-  if (sps0.getSpsNext().getUseCompositeRef()) {
+  if (sps0.getSpsNext().getUseCompositeRef()) 
+  {
     sps0.setLongTermRefsPresent(true);
   }
 #endif
@@ -291,7 +292,8 @@ void EncLib::init( bool isFieldCoding, AUWriterIf* auWriterIf )
   }
 #endif
 #if JVET_K0157
-  if (sps0.getSpsNext().getUseCompositeRef()){
+  if (sps0.getSpsNext().getUseCompositeRef())
+  {
     PPS &pps2 = *(m_ppsMap.allocatePS(2));
     xInitPPS(pps2, sps0);
     xInitPPSforLT(pps2);
@@ -430,18 +432,19 @@ void EncLib::init( bool isFieldCoding, AUWriterIf* auWriterIf )
   m_entropyCodingSyncContextStateVec.resize( pps0.pcv->heightInCtus );
 #endif
 #if JVET_K0157
-  if (sps0.getSpsNext().getUseCompositeRef()) {
-    Picture *rpcPicBg = new Picture;
-    rpcPicBg->create(sps0.getChromaFormatIdc(), Size(sps0.getPicWidthInLumaSamples(), sps0.getPicHeightInLumaSamples()), sps0.getMaxCUWidth(), sps0.getMaxCUWidth() + 16, false);
-    rpcPicBg->getRecoBuf().fill(0);
-    rpcPicBg->finalInit(sps0, pps0);
-    rpcPicBg->allocateNewSlice();
-    rpcPicBg->createSpliceIdx(pps0.pcv->sizeInCtus);
-    m_cGOPEncoder.setPicBg(rpcPicBg);
-    Picture *rpcPicOrig = new Picture;
-    rpcPicOrig->create(sps0.getChromaFormatIdc(), Size(sps0.getPicWidthInLumaSamples(), sps0.getPicHeightInLumaSamples()), sps0.getMaxCUWidth(), sps0.getMaxCUWidth() + 16, false);
-    rpcPicOrig->getOrigBuf().fill(0);
-    m_cGOPEncoder.setPicOrig(rpcPicOrig);
+  if (sps0.getSpsNext().getUseCompositeRef()) 
+  {
+    Picture *pcPicBg = new Picture;
+    pcPicBg->create(sps0.getChromaFormatIdc(), Size(sps0.getPicWidthInLumaSamples(), sps0.getPicHeightInLumaSamples()), sps0.getMaxCUWidth(), sps0.getMaxCUWidth() + 16, false);
+    pcPicBg->getRecoBuf().fill(0);
+    pcPicBg->finalInit(sps0, pps0);
+    pcPicBg->allocateNewSlice();
+    pcPicBg->createSpliceIdx(pps0.pcv->sizeInCtus);
+    m_cGOPEncoder.setPicBg(pcPicBg);
+    Picture *pcPicOrig = new Picture;
+    pcPicOrig->create(sps0.getChromaFormatIdc(), Size(sps0.getPicWidthInLumaSamples(), sps0.getPicHeightInLumaSamples()), sps0.getMaxCUWidth(), sps0.getMaxCUWidth() + 16, false);
+    pcPicOrig->getOrigBuf().fill(0);
+    m_cGOPEncoder.setPicOrig(pcPicOrig);
   }
 #endif
 }
@@ -581,7 +584,7 @@ void EncLib::encode( bool flush, PelStorage* pcPicYuvOrg, PelStorage* cPicYuvTru
                      int& iNumEncoded )
 {
 #if JVET_K0157
-  if (m_CompositeRefEnabled && m_cGOPEncoder.getPicBg()->getSpliceFull() && m_iPOCLast >= 10 && m_iNumPicRcvd == 0 && m_cGOPEncoder.getEncodedLTRef() == false)
+  if (m_compositeRefEnabled && m_cGOPEncoder.getPicBg()->getSpliceFull() && m_iPOCLast >= 10 && m_iNumPicRcvd == 0 && m_cGOPEncoder.getEncodedLTRef() == false)
   {
     Picture* pcPicCurr = NULL;
     xGetNewPicBuffer(rcListPicYuvRecOut, pcPicCurr, 2);
@@ -623,7 +626,7 @@ void EncLib::encode( bool flush, PelStorage* pcPicYuvOrg, PelStorage* cPicYuvTru
     if (getWCGChromaQPControl().isEnabled())
     {
 #if JVET_K0157
-      ppsID = getdQPs()[m_iPOCLast / (m_CompositeRefEnabled ? 2 : 1) + 1];
+      ppsID = getdQPs()[m_iPOCLast / (m_compositeRefEnabled ? 2 : 1) + 1];
 #else
       ppsID=getdQPs()[ m_iPOCLast+1 ];
 #endif
@@ -852,7 +855,7 @@ void EncLib::xGetNewPicBuffer ( std::list<PelUnitBuf*>& rcListPicYuvRecOut, Pict
   rpcPic->referenced = true;
 
 #if JVET_K0157
-  m_iPOCLast += (m_CompositeRefEnabled ? 2 : 1);
+  m_iPOCLast += (m_compositeRefEnabled ? 2 : 1);
 #else
   m_iPOCLast++;
 #endif
@@ -1015,7 +1018,7 @@ void EncLib::xInitSPS(SPS &sps)
   sps.getSpsNext().setIntraPDPCMode         ( m_IntraPDPC );
 #endif
 #if JVET_K0157
-  sps.getSpsNext().setUseCompositeRef       ( m_CompositeRefEnabled );
+  sps.getSpsNext().setUseCompositeRef       ( m_compositeRefEnabled );
 #endif
 
   // ADD_NEW_TOOL : (encoder lib) set tool enabling flags and associated parameters here
@@ -1699,7 +1702,7 @@ void EncLib::selectReferencePictureSet(Slice* slice, int POCCurr, int GOPid
 {
 #if JVET_K0157
   bool isEncodeLtRef = (POCCurr == LtPoc);
-  if (m_CompositeRefEnabled && isEncodeLtRef)
+  if (m_compositeRefEnabled && isEncodeLtRef)
   {
     POCCurr++;
   }
@@ -1746,7 +1749,7 @@ void EncLib::selectReferencePictureSet(Slice* slice, int POCCurr, int GOPid
 
 #if JVET_K0157
   ReferencePictureSet *rps = const_cast<ReferencePictureSet *>(slice->getSPS()->getRPSList()->getReferencePictureSet(slice->getRPSidx()));
-  if (m_CompositeRefEnabled && LtPoc != -1 && !isEncodeLtRef)
+  if (m_compositeRefEnabled && LtPoc != -1 && !isEncodeLtRef)
   {
     if (LtPoc != -1 && rps->getNumberOfLongtermPictures() != 1 && !isEncodeLtRef)
     {
@@ -1762,7 +1765,7 @@ void EncLib::selectReferencePictureSet(Slice* slice, int POCCurr, int GOPid
       rps->setUsed(idx, true);
     }
   }
-  else if (m_CompositeRefEnabled && isEncodeLtRef)
+  else if (m_compositeRefEnabled && isEncodeLtRef)
   {
     ReferencePictureSet* pLocalRPS = slice->getLocalRPS();
     (*pLocalRPS) = ReferencePictureSet();
@@ -1961,7 +1964,7 @@ int EncCfg::getQPForPicture(const uint32_t gopIndex, const Slice *pSlice) const
     if ( pdQPs )
     {
 #if JVET_K0157
-      qp += pdQPs[pSlice->getPOC() / (m_CompositeRefEnabled ? 2 : 1)];
+      qp += pdQPs[pSlice->getPOC() / (m_compositeRefEnabled ? 2 : 1)];
 #else
       qp += pdQPs[ pSlice->getPOC() ];
 #endif

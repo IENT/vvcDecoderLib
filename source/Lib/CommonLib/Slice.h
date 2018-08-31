@@ -938,7 +938,7 @@ private:
   unsigned    m_CIPFMode;
 #endif
 #if JVET_K0157
-  bool              m_CompositeRefEnabled;        //composite longterm reference
+  bool              m_compositeRefEnabled;        //composite longterm reference
 #endif
   // ADD_NEW_TOOL : (sps extension) add tool enabling flags and associated parameters here
 
@@ -1162,8 +1162,8 @@ public:
   bool      isPlanarPDPC          ()                                      const     { return 0 != (m_IntraPDPCMode&2); }
 #endif
 #if JVET_K0157
-  void      setUseCompositeRef(bool b) { m_CompositeRefEnabled = b; }
-  bool      getUseCompositeRef()                                      const { return m_CompositeRefEnabled; }
+  void      setUseCompositeRef(bool b) { m_compositeRefEnabled = b; }
+  bool      getUseCompositeRef()                                      const { return m_compositeRefEnabled; }
 #endif
   // ADD_NEW_TOOL : (sps extension) add access functions for tool enabling flags and associated parameters here
 
@@ -1994,7 +1994,7 @@ public:
   int                         checkThatAllRefPicsAreAvailable( PicList& rcListPic, const ReferencePictureSet *pReferencePictureSet, bool printErrors, int pocRandomAccess = 0, bool bUseRecoveryPoint = false) const;
   void                        createExplicitReferencePictureSetFromReference(PicList& rcListPic, const ReferencePictureSet *pReferencePictureSet, bool isRAP, int pocRandomAccess, bool bUseRecoveryPoint, const bool bEfficientFieldIRAPEnabled
 #if JVET_K0157
-                              , bool isEncodeLtRef, bool CompositeRefEanble
+                              , bool isEncodeLtRef, bool isCompositeRefEnable
 #endif
   );
   void                        setMaxNumMergeCand(uint32_t val )                          { m_maxNumMergeCand = val;                                      }

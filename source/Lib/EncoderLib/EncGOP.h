@@ -132,13 +132,13 @@ private:
   SEIWriter               m_seiWriter;
 
 #if JVET_K0157
-  Picture *               m_rpcPicBg;
-  Picture *               m_rpcPicOrig;
-  int                     m_BgPOC;
-  bool					          m_EncodedLTRef;
-  bool					          m_PrepareLTRef;
-  bool					          m_UseLTRef;
-  int					            m_LastLTRefPoc;
+  Picture *               m_pcPicBg;
+  Picture *               m_pcPicOrig;
+  int                     m_iBgPOC;
+  bool					          m_isEncodedLTRef;
+  bool					          m_isPrepareLTRef;
+  bool					          m_isUseLTRef;
+  int					            m_iLastLTRefPoc;
 #endif
   //--Adaptive Loop filter
   EncSampleAdaptiveOffset*  m_pcSAO;
@@ -194,20 +194,20 @@ public:
 
   PicList*   getListPic()      { return m_pcListPic; }
 #if JVET_K0157
-  void      setPicBg(Picture* rpcTmpPicBg) { m_rpcPicBg = rpcTmpPicBg; }
-  Picture*  getPicBg() const { return m_rpcPicBg; }
-  void      setPicOrig(Picture* rpcTmpPicBg) { m_rpcPicOrig = rpcTmpPicBg; }
-  Picture*  getPicOrig() { return m_rpcPicOrig; }
-  void      setNewestBgPOC(int poc) { m_BgPOC = poc; }
-  int       getNewestBgPOC() const { return m_BgPOC; }
-  void      setEncodedLTRef(bool EncodedLTRef) { m_EncodedLTRef = EncodedLTRef; }
-  bool      getEncodedLTRef() { return m_EncodedLTRef; }
-  void      setUseLTRef(bool UseLTRef) { m_UseLTRef = UseLTRef; }
-  bool      getUseLTRef() { return m_UseLTRef; }
-  void      setPrepareLTRef(bool PrepareLTRef) { m_PrepareLTRef = PrepareLTRef; }
-  bool      getPrepareLTRef() { return m_PrepareLTRef; }
-  void      setLastLTRefPoc(int LastLTRefPoc) { m_LastLTRefPoc = LastLTRefPoc; }
-  int       getLastLTRefPoc() const { return m_LastLTRefPoc; }
+  void      setPicBg(Picture* rpcTmpPicBg) { m_pcPicBg = rpcTmpPicBg; }
+  Picture*  getPicBg() const { return m_pcPicBg; }
+  void      setPicOrig(Picture* rpcTmpPicBg) { m_pcPicOrig = rpcTmpPicBg; }
+  Picture*  getPicOrig() { return m_pcPicOrig; }
+  void      setNewestBgPOC(int poc) { m_iBgPOC = poc; }
+  int       getNewestBgPOC() const { return m_iBgPOC; }
+  void      setEncodedLTRef(bool EncodedLTRef) { m_isEncodedLTRef = EncodedLTRef; }
+  bool      getEncodedLTRef() { return m_isEncodedLTRef; }
+  void      setUseLTRef(bool UseLTRef) { m_isUseLTRef = UseLTRef; }
+  bool      getUseLTRef() { return m_isUseLTRef; }
+  void      setPrepareLTRef(bool PrepareLTRef) { m_isPrepareLTRef = PrepareLTRef; }
+  bool      getPrepareLTRef() { return m_isPrepareLTRef; }
+  void      setLastLTRefPoc(int LastLTRefPoc) { m_iLastLTRefPoc = LastLTRefPoc; }
+  int       getLastLTRefPoc() const { return m_iLastLTRefPoc; }
 
 #endif
   void  printOutSummary      ( uint32_t uiNumAllPicCoded, bool isField, const bool printMSEBasedSNR, const bool printSequenceMSE, const BitDepths &bitDepths );
@@ -218,8 +218,8 @@ public:
   NalUnitType getNalUnitType( int pocCurr, int lastIdr, bool isField );
   void arrangeLongtermPicturesInRPS(Slice *, PicList& );
 #if JVET_K0157
-  void ArrangeBackgroundReference(Slice* pcSlice, PicList& rcListPic, int pocCurr);
-  void UpdateBackgroundReference(Slice* pcSlice, PicList& rcListPic, int pocCurr);
+  void arrangeCompositeReference(Slice* pcSlice, PicList& rcListPic, int pocCurr);
+  void updateCompositeReference(Slice* pcSlice, PicList& rcListPic, int pocCurr);
 #endif
 
 #if EXTENSION_360_VIDEO

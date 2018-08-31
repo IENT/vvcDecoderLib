@@ -912,7 +912,7 @@ bool EncAppCfg::parseCfg( int argc, char* argv[] )
   ("MDMS",                                            m_MDMS,                                           false, "multiple direct mode signaling")
 #endif
 #if JVET_K0157
-  ("CompositeLTReference",                            m_CompositeRefEnabled,                            false, "Enable Composite Long Term Reference Frame")
+  ("CompositeLTReference",                            m_compositeRefEnabled,                            false, "Enable Composite Long Term Reference Frame")
 #endif
   // ADD_NEW_TOOL : (encoder app) add parsing parameters here
 
@@ -1356,7 +1356,7 @@ bool EncAppCfg::parseCfg( int argc, char* argv[] )
   const list<const char*>& argv_unhandled = po::scanArgv(opts, argc, (const char**) argv, err);
 
 #if JVET_K0157
-  if (m_CompositeRefEnabled) {
+  if (m_compositeRefEnabled) {
     for (int i = 0; i < m_iGOPSize; i++) {
       m_GOPList[i].m_POC *= 2;
       m_GOPList[i].m_deltaRPS *= 2;
@@ -2042,7 +2042,7 @@ bool EncAppCfg::xCheckParameter()
     xConfirmPara( m_IntraPDPC, "PDPC is only allowed with NEXT profile" );
 #endif
 #if JVET_K0157
-    xConfirmPara(m_CompositeRefEnabled, "Composite Reference Frame is only allowed with NEXT profile");
+    xConfirmPara(m_compositeRefEnabled, "Composite Reference Frame is only allowed with NEXT profile");
 #endif
     // ADD_NEW_TOOL : (parameter check) add a check for next tools here
   }
@@ -2556,7 +2556,7 @@ bool EncAppCfg::xCheckParameter()
   }
 
 #if JVET_K0157
-  int multiple_factor = m_CompositeRefEnabled ? 2 : 1;
+  int iMultipleFactor = m_compositeRefEnabled ? 2 : 1;
 #endif
   bool verifiedGOP=false;
   bool errorGOP=false;
@@ -2579,7 +2579,7 @@ bool EncAppCfg::xCheckParameter()
   for(int i=0; i<m_iGOPSize; i++)
   {
 #if JVET_K0157
-    if (m_GOPList[i].m_POC == m_iGOPSize * multiple_factor)
+    if (m_GOPList[i].m_POC == m_iGOPSize * iMultipleFactor)
 #else
     if(m_GOPList[i].m_POC==m_iGOPSize)
 #endif
@@ -2617,7 +2617,7 @@ bool EncAppCfg::xCheckParameter()
   {
     int curGOP = (checkGOP-1)%m_iGOPSize;
 #if JVET_K0157
-    int curPOC = ((checkGOP - 1) / m_iGOPSize)*m_iGOPSize * multiple_factor + m_GOPList[curGOP].m_POC;
+    int curPOC = ((checkGOP - 1) / m_iGOPSize)*m_iGOPSize * iMultipleFactor + m_GOPList[curGOP].m_POC;
 #else
     int curPOC = ((checkGOP-1)/m_iGOPSize)*m_iGOPSize + m_GOPList[curGOP].m_POC;
 #endif
@@ -2648,7 +2648,7 @@ bool EncAppCfg::xCheckParameter()
               for(int k=0; k<m_iGOPSize; k++)
               {
 #if JVET_K0157
-                if (absPOC % (m_iGOPSize * multiple_factor) == m_GOPList[k].m_POC % (m_iGOPSize * multiple_factor))
+                if (absPOC % (m_iGOPSize * iMultipleFactor) == m_GOPList[k].m_POC % (m_iGOPSize * iMultipleFactor))
 #else
                 if(absPOC%m_iGOPSize == m_GOPList[k].m_POC%m_iGOPSize)
 #endif
@@ -2704,7 +2704,7 @@ bool EncAppCfg::xCheckParameter()
           //step backwards in coding order and include any extra available pictures we might find useful to replace the ones with POC < 0.
           int offGOP = (checkGOP-1+offset)%m_iGOPSize;
 #if JVET_K0157
-          int offPOC = ((checkGOP - 1 + offset) / m_iGOPSize)*(m_iGOPSize * multiple_factor) + m_GOPList[offGOP].m_POC;
+          int offPOC = ((checkGOP - 1 + offset) / m_iGOPSize)*(m_iGOPSize * iMultipleFactor) + m_GOPList[offGOP].m_POC;
 #else
           int offPOC = ((checkGOP-1+offset)/m_iGOPSize)*m_iGOPSize + m_GOPList[offGOP].m_POC;
 #endif
@@ -3413,7 +3413,7 @@ void EncAppCfg::xPrintParameter()
     msg( VERBOSE, "MDMS:%d ", m_MDMS );
 #endif
 #if JVET_K0157
-    msg(VERBOSE, "CompositeLTReference:%d ", m_CompositeRefEnabled);
+    msg(VERBOSE, "CompositeLTReference:%d ", m_compositeRefEnabled);
 #endif
   }
   // ADD_NEW_TOOL (add some output indicating the usage of tools)

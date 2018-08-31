@@ -1345,7 +1345,7 @@ int Slice::checkThatAllRefPicsAreAvailable( PicList& rcListPic, const ReferenceP
 */
 void Slice::createExplicitReferencePictureSetFromReference(PicList& rcListPic, const ReferencePictureSet *pReferencePictureSet, bool isRAP, int pocRandomAccess, bool bUseRecoveryPoint, const bool bEfficientFieldIRAPEnabled
 #if JVET_K0157
-                                                         , bool isEncodeLtRef, bool CompositeRefEnable
+                                                         , bool isEncodeLtRef, bool isCompositeRefEnable
 #endif
 )
 {
@@ -1388,7 +1388,7 @@ void Slice::createExplicitReferencePictureSetFromReference(PicList& rcListPic, c
         else
         {
 #if JVET_K0157
-          if (bEfficientFieldIRAPEnabled && rpcPic->getPOC() == this->getAssociatedIRAPPOC() && this->getAssociatedIRAPPOC() == this->getPOC() + (CompositeRefEnable ? 2 : 1))
+          if (bEfficientFieldIRAPEnabled && rpcPic->getPOC() == this->getAssociatedIRAPPOC() && this->getAssociatedIRAPPOC() == this->getPOC() + (isCompositeRefEnable ? 2 : 1))
 #else
           if(bEfficientFieldIRAPEnabled && rpcPic->getPOC() == this->getAssociatedIRAPPOC() && this->getAssociatedIRAPPOC() == this->getPOC()+1)
 #endif
@@ -1411,7 +1411,7 @@ void Slice::createExplicitReferencePictureSetFromReference(PicList& rcListPic, c
     {
       rpcPic = *(iterPic++);
 #if JVET_K0157
-      if (rpcPic->getPOC() == this->getAssociatedIRAPPOC() && this->getAssociatedIRAPPOC() == this->getPOC() + (CompositeRefEnable ? 2 : 1))
+      if (rpcPic->getPOC() == this->getAssociatedIRAPPOC() && this->getAssociatedIRAPPOC() == this->getPOC() + (isCompositeRefEnable ? 2 : 1))
 #else
       if(rpcPic->getPOC() == this->getAssociatedIRAPPOC() && this->getAssociatedIRAPPOC() == this->getPOC()+1)
 #endif
@@ -1425,7 +1425,7 @@ void Slice::createExplicitReferencePictureSetFromReference(PicList& rcListPic, c
     }
   }
 #if JVET_K0157
-  if (CompositeRefEnable && isEncodeLtRef)
+  if (isCompositeRefEnable && isEncodeLtRef)
   {
     useNewRPS = true;
     nrOfNegativePictures = 0;
@@ -1898,7 +1898,7 @@ SPSNext::SPSNext( SPS& sps )
   , m_CIPFMode                  ( 0 )
 #endif
 #if JVET_K0157
-    , m_CompositeRefEnabled     ( false )
+    , m_compositeRefEnabled     ( false )
 #endif
   // ADD_NEW_TOOL : (sps extension) add tool enabling flags here (with "false" as default values)
 {
