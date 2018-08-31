@@ -746,7 +746,7 @@ unsigned DeriveCtx::CtxFrucMode( const PredictionUnit& pu )
 }
 #endif
 
-Void MergeCtx::setMergeInfo( PredictionUnit& pu, int candIdx )
+void MergeCtx::setMergeInfo( PredictionUnit& pu, int candIdx )
 {
   CHECK( candIdx >= numValidMergeCand, "Merge candidate does not exist" );
 

@@ -49,40 +49,40 @@ public:
   SEIWriter() {};
   virtual ~SEIWriter() {};
 
-  Void writeSEImessages(OutputBitstream& bs, const SEIMessages &seiList, const SPS *sps, Bool isNested);
+  void writeSEImessages(OutputBitstream& bs, const SEIMessages &seiList, const SPS *sps, bool isNested);
 
 protected:
-  Void xWriteSEIuserDataUnregistered(const SEIuserDataUnregistered &sei);
-  Void xWriteSEIActiveParameterSets(const SEIActiveParameterSets& sei);
-  Void xWriteSEIDecodingUnitInfo(const SEIDecodingUnitInfo& sei, const SPS *sps);
-  Void xWriteSEIDecodedPictureHash(const SEIDecodedPictureHash& sei);
-  Void xWriteSEIBufferingPeriod(const SEIBufferingPeriod& sei, const SPS *sps);
-  Void xWriteSEIPictureTiming(const SEIPictureTiming& sei, const SPS *sps);
-  Void xWriteSEIRecoveryPoint(const SEIRecoveryPoint& sei);
-  Void xWriteSEIFramePacking(const SEIFramePacking& sei);
-  Void xWriteSEISegmentedRectFramePacking(const SEISegmentedRectFramePacking& sei);
-  Void xWriteSEIDisplayOrientation(const SEIDisplayOrientation &sei);
-  Void xWriteSEITemporalLevel0Index(const SEITemporalLevel0Index &sei);
-  Void xWriteSEIGradualDecodingRefreshInfo(const SEIGradualDecodingRefreshInfo &sei);
-  Void xWriteSEINoDisplay(const SEINoDisplay &sei);
-  Void xWriteSEIToneMappingInfo(const SEIToneMappingInfo& sei);
-  Void xWriteSEISOPDescription(const SEISOPDescription& sei);
-  Void xWriteSEIScalableNesting(OutputBitstream& bs, const SEIScalableNesting& sei, const SPS *sps);
+  void xWriteSEIuserDataUnregistered(const SEIuserDataUnregistered &sei);
+  void xWriteSEIActiveParameterSets(const SEIActiveParameterSets& sei);
+  void xWriteSEIDecodingUnitInfo(const SEIDecodingUnitInfo& sei, const SPS *sps);
+  void xWriteSEIDecodedPictureHash(const SEIDecodedPictureHash& sei);
+  void xWriteSEIBufferingPeriod(const SEIBufferingPeriod& sei, const SPS *sps);
+  void xWriteSEIPictureTiming(const SEIPictureTiming& sei, const SPS *sps);
+  void xWriteSEIRecoveryPoint(const SEIRecoveryPoint& sei);
+  void xWriteSEIFramePacking(const SEIFramePacking& sei);
+  void xWriteSEISegmentedRectFramePacking(const SEISegmentedRectFramePacking& sei);
+  void xWriteSEIDisplayOrientation(const SEIDisplayOrientation &sei);
+  void xWriteSEITemporalLevel0Index(const SEITemporalLevel0Index &sei);
+  void xWriteSEIGradualDecodingRefreshInfo(const SEIGradualDecodingRefreshInfo &sei);
+  void xWriteSEINoDisplay(const SEINoDisplay &sei);
+  void xWriteSEIToneMappingInfo(const SEIToneMappingInfo& sei);
+  void xWriteSEISOPDescription(const SEISOPDescription& sei);
+  void xWriteSEIScalableNesting(OutputBitstream& bs, const SEIScalableNesting& sei, const SPS *sps);
 #if HEVC_TILES_WPP
-  Void xWriteSEITempMotionConstrainedTileSets(const SEITempMotionConstrainedTileSets& sei);
+  void xWriteSEITempMotionConstrainedTileSets(const SEITempMotionConstrainedTileSets& sei);
 #endif
-  Void xWriteSEITimeCode(const SEITimeCode& sei);
-  Void xWriteSEIChromaResamplingFilterHint(const SEIChromaResamplingFilterHint& sei);
-  Void xWriteSEIKneeFunctionInfo(const SEIKneeFunctionInfo &sei);
-  Void xWriteSEIColourRemappingInfo(const SEIColourRemappingInfo& sei);
-  Void xWriteSEIMasteringDisplayColourVolume( const SEIMasteringDisplayColourVolume& sei);
+  void xWriteSEITimeCode(const SEITimeCode& sei);
+  void xWriteSEIChromaResamplingFilterHint(const SEIChromaResamplingFilterHint& sei);
+  void xWriteSEIKneeFunctionInfo(const SEIKneeFunctionInfo &sei);
+  void xWriteSEIColourRemappingInfo(const SEIColourRemappingInfo& sei);
+  void xWriteSEIMasteringDisplayColourVolume( const SEIMasteringDisplayColourVolume& sei);
 #if U0033_ALTERNATIVE_TRANSFER_CHARACTERISTICS_SEI
-  Void xWriteSEIAlternativeTransferCharacteristics(const SEIAlternativeTransferCharacteristics& sei);
+  void xWriteSEIAlternativeTransferCharacteristics(const SEIAlternativeTransferCharacteristics& sei);
 #endif
-  Void xWriteSEIGreenMetadataInfo(const SEIGreenMetadataInfo &sei);
+  void xWriteSEIGreenMetadataInfo(const SEIGreenMetadataInfo &sei);
 
-  Void xWriteSEIpayloadData(OutputBitstream& bs, const SEI& sei, const SPS *sps);
-  Void xWriteByteAlign();
+  void xWriteSEIpayloadData(OutputBitstream& bs, const SEI& sei, const SPS *sps);
+  void xWriteByteAlign();
 };
 
 //! \}

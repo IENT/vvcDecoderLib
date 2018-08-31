@@ -120,9 +120,9 @@ inline Size recalcSize( const ChromaFormat _cf, const ChannelType srcCHt, const 
 struct CompArea : public Area
 {
   CompArea() : Area(), chromaFormat(NUM_CHROMA_FORMAT), compID(MAX_NUM_TBLOCKS)                                                                                                                                 { }
-  CompArea(const ComponentID _compID, const ChromaFormat _cf, const Area &_area, const Bool isLuma = false)                                          : Area(_area),          chromaFormat(_cf), compID(_compID) { if (isLuma) xRecalcLumaToChroma(); }
-  CompArea(const ComponentID _compID, const ChromaFormat _cf, const Position& _pos, const Size& _size, const Bool isLuma = false)                    : Area(_pos, _size),    chromaFormat(_cf), compID(_compID) { if (isLuma) xRecalcLumaToChroma(); }
-  CompArea(const ComponentID _compID, const ChromaFormat _cf, const UInt _x, const UInt _y, const UInt _w, const UInt _h, const Bool isLuma = false) : Area(_x, _y, _w, _h), chromaFormat(_cf), compID(_compID) { if (isLuma) xRecalcLumaToChroma(); }
+  CompArea(const ComponentID _compID, const ChromaFormat _cf, const Area &_area, const bool isLuma = false)                                          : Area(_area),          chromaFormat(_cf), compID(_compID) { if (isLuma) xRecalcLumaToChroma(); }
+  CompArea(const ComponentID _compID, const ChromaFormat _cf, const Position& _pos, const Size& _size, const bool isLuma = false)                    : Area(_pos, _size),    chromaFormat(_cf), compID(_compID) { if (isLuma) xRecalcLumaToChroma(); }
+  CompArea(const ComponentID _compID, const ChromaFormat _cf, const uint32_t _x, const uint32_t _y, const uint32_t _w, const uint32_t _h, const bool isLuma = false) : Area(_x, _y, _w, _h), chromaFormat(_cf), compID(_compID) { if (isLuma) xRecalcLumaToChroma(); }
 
   ChromaFormat chromaFormat;
   ComponentID compID;
@@ -141,9 +141,9 @@ struct CompArea : public Area
   Position bottomLeftComp (const ComponentID _compID) const { return recalcPosition(chromaFormat, compID, _compID, { x                        , (PosType) (y + height - 1 )}); }
   Position bottomRightComp(const ComponentID _compID) const { return recalcPosition(chromaFormat, compID, _compID, { (PosType) (x + width - 1), (PosType) (y + height - 1 )}); }
 
-  Bool valid() const { return chromaFormat < NUM_CHROMA_FORMAT && compID < MAX_NUM_TBLOCKS && width != 0 && height != 0; }
+  bool valid() const { return chromaFormat < NUM_CHROMA_FORMAT && compID < MAX_NUM_TBLOCKS && width != 0 && height != 0; }
 
-  const Bool operator==(const CompArea &other) const
+  const bool operator==(const CompArea &other) const
   {
     if (chromaFormat != other.chromaFormat) return false;
     if (compID       != other.compID)       return false;
@@ -151,14 +151,14 @@ struct CompArea : public Area
     return Position::operator==(other) && Size::operator==(other);
   }
 
-  const Bool operator!=(const CompArea &other) const { return !(operator==(other)); }
+  const bool operator!=(const CompArea &other) const { return !(operator==(other)); }
 
   void     repositionTo      (const Position& newPos)       { Position::repositionTo(newPos); }
   void     positionRelativeTo(const CompArea& origCompArea) { Position::relativeTo(origCompArea); }
 
 private:
 
-  Void xRecalcLumaToChroma();
+  void xRecalcLumaToChroma();
 };
 
 inline CompArea clipArea(const CompArea &compArea, const Area &boundingBox)
@@ -195,18 +195,18 @@ struct UnitArea
         CompArea& block(const ComponentID comp)       { return blocks[comp]; }
   const CompArea& block(const ComponentID comp) const { return blocks[comp]; }
 
-  Bool contains(const UnitArea& other) const;
-  Bool contains(const UnitArea& other, const ChannelType chType) const;
+  bool contains(const UnitArea& other) const;
+  bool contains(const UnitArea& other, const ChannelType chType) const;
 
         CompArea& operator[]( const int n )       { return blocks[n]; }
   const CompArea& operator[]( const int n ) const { return blocks[n]; }
 
-  const Bool operator==(const UnitArea &other) const
+  const bool operator==(const UnitArea &other) const
   {
     if (chromaFormat != other.chromaFormat)   return false;
     if (blocks.size() != other.blocks.size()) return false;
 
-    for (UInt i = 0; i < blocks.size(); i++)
+    for (uint32_t i = 0; i < blocks.size(); i++)
     {
       if (blocks[i] != other.blocks[i]) return false;
     }
@@ -214,9 +214,9 @@ struct UnitArea
     return true;
   }
 
-  Void repositionTo(const UnitArea& unit);
+  void repositionTo(const UnitArea& unit);
 
-  const Bool operator!=(const UnitArea &other) const { return !(*this == other); }
+  const bool operator!=(const UnitArea &other) const { return !(*this == other); }
 
   const Position& lumaPos () const { return Y(); }
   const Size&     lumaSize() const { return Y(); }
@@ -233,14 +233,14 @@ struct UnitArea
   const PosType   lx() const { return Y().x; }           /*! luma x-pos */
   const PosType   ly() const { return Y().y; }           /*! luma y-pos */
 
-  Bool valid() const { return chromaFormat != NUM_CHROMA_FORMAT && blocks.size() > 0; }
+  bool valid() const { return chromaFormat != NUM_CHROMA_FORMAT && blocks.size() > 0; }
 };
 
 inline UnitArea clipArea(const UnitArea &area, const UnitArea &boundingBox)
 {
   UnitArea ret(area.chromaFormat);
 
-  for (UInt i = 0; i < area.blocks.size(); i++)
+  for (uint32_t i = 0; i < area.blocks.size(); i++)
   {
     ret.blocks.push_back(clipArea(area.blocks[i], boundingBox.blocks[i]));
   }
@@ -253,7 +253,7 @@ struct UnitAreaRelative : public UnitArea
   UnitAreaRelative(const UnitArea& origUnit, const UnitArea& unit)
   {
     *((UnitArea*)this) = unit;
-    for(UInt i = 0; i < blocks.size(); i++)
+    for(uint32_t i = 0; i < blocks.size(); i++)
     {
       blocks[i].positionRelativeTo(origUnit.blocks[i]);
     }
@@ -286,46 +286,46 @@ struct CodingUnit : public UnitArea
   PredMode       predMode;
   PartSize       partSize;
 
-  UChar          depth;   // number of all splits, applied with generalized splits
-  UChar          qtDepth; // number of applied quad-splits, before switching to the multi-type-tree (mtt)
+  uint8_t          depth;   // number of all splits, applied with generalized splits
+  uint8_t          qtDepth; // number of applied quad-splits, before switching to the multi-type-tree (mtt)
   // a triple split would increase the mtDepth by 1, but the qtDepth by 2 in the first and last part and by 1 in the middle part (because of the 1-2-1 split proportions)
-  UChar          btDepth; // number of applied binary splits, after switching to the mtt (or it's equivalent)
-  UChar          mtDepth; // the actual number of splits after switching to mtt (equals btDepth if only binary splits are allowed)
-  SChar          chromaQpAdj;
-  SChar          qp;
+  uint8_t          btDepth; // number of applied binary splits, after switching to the mtt (or it's equivalent)
+  uint8_t          mtDepth; // the actual number of splits after switching to mtt (equals btDepth if only binary splits are allowed)
+  int8_t          chromaQpAdj;
+  int8_t          qp;
   SplitSeries    splitSeries;
-  Bool           skip;
+  bool           skip;
 #if JEM_TOOLS || JVET_K_AFFINE
-  Bool           affine;
+  bool           affine;
 #if JVET_K0337_AFFINE_6PARA
   int            affineType;
 #endif
 #endif
-  Bool           transQuantBypass;
+  bool           transQuantBypass;
 #if JEM_TOOLS
-  Bool           pdpc;
+  bool           pdpc;
 #endif
-  Bool           ipcm;
+  bool           ipcm;
 #if JVET_K0357_AMVR
-  UChar          imv;
+  uint8_t          imv;
 #endif
-  Bool           rootCbf;
+  bool           rootCbf;
 #if HEVC_TILES_WPP
-  UInt           tileIdx;
+  uint32_t           tileIdx;
 #endif
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
-  UChar          emtFlag;
+  uint8_t          emtFlag;
 #endif
 #if JEM_TOOLS
-  UInt           nsstIdx;
+  uint32_t           nsstIdx;
 #endif
 #if JEM_TOOLS
-  Bool           LICFlag;
-  Bool           obmcFlag;
+  bool           LICFlag;
+  bool           obmcFlag;
 #endif
 
   // needed for fast imv mode decisions
-  SChar          imvNumCand;
+  int8_t          imvNumCand;
 
 
   CodingUnit() : chType( CH_L ) { }
@@ -334,7 +334,7 @@ struct CodingUnit : public UnitArea
 
   CodingUnit& operator=( const CodingUnit& other );
 
-  Void initData();
+  void initData();
 
   unsigned    idx;
   CodingUnit *next;
@@ -357,23 +357,23 @@ struct CodingUnit : public UnitArea
 
 struct IntraPredictionData
 {
-  UInt  intraDir[MAX_NUM_CHANNEL_TYPE];
+  uint32_t  intraDir[MAX_NUM_CHANNEL_TYPE];
 };
 
 struct InterPredictionData
 {
-  Bool      mergeFlag;
-  UChar     mergeIdx;
-  UChar     interDir;
-  UChar     mvpIdx  [NUM_REF_PIC_LIST_01];
-  UChar     mvpNum  [NUM_REF_PIC_LIST_01];
+  bool      mergeFlag;
+  uint8_t     mergeIdx;
+  uint8_t     interDir;
+  uint8_t     mvpIdx  [NUM_REF_PIC_LIST_01];
+  uint8_t     mvpNum  [NUM_REF_PIC_LIST_01];
   Mv        mvd     [NUM_REF_PIC_LIST_01];
   Mv        mv      [NUM_REF_PIC_LIST_01];
-  Short     refIdx  [NUM_REF_PIC_LIST_01];
+  int16_t     refIdx  [NUM_REF_PIC_LIST_01];
   MergeType mergeType;
 #if JEM_TOOLS
-  UChar     frucMrgMode;
-  Bool      mvRefine;
+  uint8_t     frucMrgMode;
+  bool      mvRefine;
 #endif
 #if JEM_TOOLS || JVET_K_AFFINE
   Mv        mvdAffi [NUM_REF_PIC_LIST_01][3];
@@ -391,7 +391,7 @@ struct PredictionUnit : public UnitArea, public IntraPredictionData, public Inte
   PredictionUnit(const UnitArea &unit);
   PredictionUnit(const ChromaFormat _chromaFormat, const Area &area);
 
-  Void initData();
+  void initData();
 
   PredictionUnit& operator=(const IntraPredictionData& predData);
   PredictionUnit& operator=(const InterPredictionData& predData);
@@ -430,29 +430,29 @@ struct TransformUnit : public UnitArea
   ChannelType      chType;
 
 #if ENABLE_BMS
-  UChar        depth;
+  uint8_t        depth;
 #endif
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
-  UChar        emtIdx;
+  uint8_t        emtIdx;
 #endif
-  UChar        cbf          [ MAX_NUM_TBLOCKS ];
+  uint8_t        cbf          [ MAX_NUM_TBLOCKS ];
   RDPCMMode    rdpcm        [ MAX_NUM_TBLOCKS ];
-  Bool         transformSkip[ MAX_NUM_TBLOCKS ];
-  SChar        compAlpha    [ MAX_NUM_TBLOCKS ];
+  bool         transformSkip[ MAX_NUM_TBLOCKS ];
+  int8_t        compAlpha    [ MAX_NUM_TBLOCKS ];
 
   TransformUnit() : chType( CH_L ) { }
   TransformUnit(const UnitArea& unit);
   TransformUnit(const ChromaFormat _chromaFormat, const Area &area);
 
-  Void initData();
+  void initData();
 
   unsigned       idx;
   TransformUnit *next;
 
-  Void init(TCoeff **coeffs, Pel **pcmbuf);
+  void init(TCoeff **coeffs, Pel **pcmbuf);
 
   TransformUnit& operator=(const TransformUnit& other);
-  Void copyComponentFrom  (const TransformUnit& other, const ComponentID compID);
+  void copyComponentFrom  (const TransformUnit& other, const ComponentID compID);
 
          CoeffBuf getCoeffs(const ComponentID id);
   const CCoeffBuf getCoeffs(const ComponentID id) const;

@@ -31,6 +31,7 @@ set( EXTENSION_360_VIDEO OFF CACHE BOOL "If EXTENSION_360_VIDEO is on, 360Lib wi
 set( SKIP_SVN_REVISION OFF CACHE BOOL "Don't add SVN path and revision info to the encoder and decoder output" )
 set( SET_ENABLE_TRACING OFF CACHE BOOL "Set ENABLE_TRACING as a compiler flag" )
 set( ENABLE_TRACING OFF CACHE BOOL "If SET_ENABLE_TRACING is on, it will be set to this value" )
+set( ENABLE_VTM OFF CACHE BOOL "If ENABLE_VTM is on, the software will be compiled as VTM" )
 
 if( CMAKE_COMPILER_IS_GNUCC )
   set( BUILD_STATIC OFF CACHE BOOL "Build static executables" )
@@ -130,6 +131,7 @@ endif()
 
 # add needed subdirectories
 add_subdirectory( "source/Lib/CommonLib" )
+add_subdirectory( "source/Lib/CommonAnalyserLib" )
 if( EXTENSION_360_VIDEO )
   add_subdirectory( "source/Lib/Lib360" )
   add_subdirectory( "source/Lib/AppEncHelper360" )

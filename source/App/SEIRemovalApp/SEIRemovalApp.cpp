@@ -68,20 +68,20 @@ SEIRemovalApp::SEIRemovalApp()
  - returns the number of mismatching pictures
  */
 
-Void read2(InputNALUnit& nalu)
+void read2(InputNALUnit& nalu)
 {
   InputBitstream& bs = nalu.getBitstream();
 
-  Bool forbidden_zero_bit = bs.read(1);           // forbidden_zero_bit
+  bool forbidden_zero_bit = bs.read(1);           // forbidden_zero_bit
   if(forbidden_zero_bit != 0) { THROW( "Forbidden zero-bit not '0'" );}
   nalu.m_nalUnitType = (NalUnitType) bs.read(6);  // nal_unit_type
   nalu.m_nuhLayerId = bs.read(6);                 // nuh_layer_id
   nalu.m_temporalId = bs.read(3) - 1;             // nuh_temporal_id_plus1
 }
 
-UInt SEIRemovalApp::decode()
+uint32_t SEIRemovalApp::decode()
 {
-//  Int                 poc;
+//  int                 poc;
 //  PicList* pcListPic = NULL;
 
   ifstream bitstreamFileIn(m_bitstreamFileNameIn.c_str(), ifstream::in | ifstream::binary);

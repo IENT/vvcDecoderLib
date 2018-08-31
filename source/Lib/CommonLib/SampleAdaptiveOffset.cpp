@@ -61,12 +61,12 @@ SAOOffset::~SAOOffset()
 
 }
 
-Void SAOOffset::reset()
+void SAOOffset::reset()
 {
   modeIdc = SAO_MODE_OFF;
   typeIdc = -1;
   typeAuxInfo = -1;
-  ::memset(offset, 0, sizeof(Int)* MAX_NUM_SAO_CLASSES);
+  ::memset(offset, 0, sizeof(int)* MAX_NUM_SAO_CLASSES);
 }
 
 const SAOOffset& SAOOffset::operator= (const SAOOffset& src)
@@ -74,7 +74,7 @@ const SAOOffset& SAOOffset::operator= (const SAOOffset& src)
   modeIdc = src.modeIdc;
   typeIdc = src.typeIdc;
   typeAuxInfo = src.typeAuxInfo;
-  ::memcpy(offset, src.offset, sizeof(Int)* MAX_NUM_SAO_CLASSES);
+  ::memcpy(offset, src.offset, sizeof(int)* MAX_NUM_SAO_CLASSES);
 
   return *this;
 }
@@ -90,9 +90,9 @@ SAOBlkParam::~SAOBlkParam()
 
 }
 
-Void SAOBlkParam::reset()
+void SAOBlkParam::reset()
 {
-  for(Int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++)
+  for(int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++)
   {
     offsetParam[compIdx].reset();
   }
@@ -100,7 +100,7 @@ Void SAOBlkParam::reset()
 
 const SAOBlkParam& SAOBlkParam::operator= (const SAOBlkParam& src)
 {
-  for(Int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++)
+  for(int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++)
   {
     offsetParam[compIdx] = src.offsetParam[compIdx];
   }
@@ -123,7 +123,7 @@ SampleAdaptiveOffset::~SampleAdaptiveOffset()
   m_signLineBuf2.clear();
 }
 
-Void SampleAdaptiveOffset::create( Int picWidth, Int picHeight, ChromaFormat format, UInt maxCUWidth, UInt maxCUHeight, UInt maxCUDepth, UInt lumaBitShift, UInt chromaBitShift )
+void SampleAdaptiveOffset::create( int picWidth, int picHeight, ChromaFormat format, uint32_t maxCUWidth, uint32_t maxCUHeight, uint32_t maxCUDepth, uint32_t lumaBitShift, uint32_t chromaBitShift )
 {
   //temporary picture buffer
   UnitArea picArea(format, Area(0, 0, picWidth, picHeight));
@@ -132,35 +132,35 @@ Void SampleAdaptiveOffset::create( Int picWidth, Int picHeight, ChromaFormat for
   m_tempBuf.create( picArea );
 
   //bit-depth related
-  for(Int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++)
+  for(int compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++)
   {
     m_offsetStepLog2  [compIdx] = isLuma(ComponentID(compIdx))? lumaBitShift : chromaBitShift;
   }
   m_numberOfComponents = getNumberValidComponents(format);
 }
 
-Void SampleAdaptiveOffset::destroy()
+void SampleAdaptiveOffset::destroy()
 {
   m_tempBuf.destroy();
 }
 
-Void SampleAdaptiveOffset::invertQuantOffsets(ComponentID compIdx, Int typeIdc, Int typeAuxInfo, Int* dstOffsets, Int* srcOffsets)
+void SampleAdaptiveOffset::invertQuantOffsets(ComponentID compIdx, int typeIdc, int typeAuxInfo, int* dstOffsets, int* srcOffsets)
 {
-  Int codedOffset[MAX_NUM_SAO_CLASSES];
+  int codedOffset[MAX_NUM_SAO_CLASSES];
 
-  ::memcpy(codedOffset, srcOffsets, sizeof(Int)*MAX_NUM_SAO_CLASSES);
-  ::memset(dstOffsets, 0, sizeof(Int)*MAX_NUM_SAO_CLASSES);
+  ::memcpy(codedOffset, srcOffsets, sizeof(int)*MAX_NUM_SAO_CLASSES);
+  ::memset(dstOffsets, 0, sizeof(int)*MAX_NUM_SAO_CLASSES);
 
   if(typeIdc == SAO_TYPE_START_BO)
   {
-    for(Int i=0; i< 4; i++)
+    for(int i=0; i< 4; i++)
     {
       dstOffsets[(typeAuxInfo+ i)%NUM_SAO_BO_CLASSES] = codedOffset[(typeAuxInfo+ i)%NUM_SAO_BO_CLASSES]*(1<<m_offsetStepLog2[compIdx]);
     }
   }
   else //EO
   {
-    for(Int i=0; i< NUM_SAO_EO_CLASSES; i++)
+    for(int i=0; i< NUM_SAO_EO_CLASSES; i++)
     {
       dstOffsets[i] = codedOffset[i] *(1<<m_offsetStepLog2[compIdx]);
     }
@@ -169,17 +169,17 @@ Void SampleAdaptiveOffset::invertQuantOffsets(ComponentID compIdx, Int typeIdc, 
 
 }
 
-Int SampleAdaptiveOffset::getMergeList(CodingStructure& cs, Int ctuRsAddr, SAOBlkParam* blkParams, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES])
+int SampleAdaptiveOffset::getMergeList(CodingStructure& cs, int ctuRsAddr, SAOBlkParam* blkParams, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES])
 {
   const PreCalcValues& pcv = *cs.pcv;
 
-  Int ctuX = ctuRsAddr % pcv.widthInCtus;
-  Int ctuY = ctuRsAddr / pcv.widthInCtus;
+  int ctuX = ctuRsAddr % pcv.widthInCtus;
+  int ctuY = ctuRsAddr / pcv.widthInCtus;
   const CodingUnit& cu = *cs.getCU(Position(ctuX*pcv.maxCUWidth, ctuY*pcv.maxCUHeight), CH_L);
-  Int mergedCTUPos;
-  Int numValidMergeCandidates = 0;
+  int mergedCTUPos;
+  int numValidMergeCandidates = 0;
 
-  for(Int mergeType=0; mergeType< NUM_SAO_MERGE_TYPES; mergeType++)
+  for(int mergeType=0; mergeType< NUM_SAO_MERGE_TYPES; mergeType++)
   {
     SAOBlkParam* mergeCandidate = NULL;
 
@@ -226,10 +226,10 @@ Int SampleAdaptiveOffset::getMergeList(CodingStructure& cs, Int ctuRsAddr, SAOBl
 }
 
 
-Void SampleAdaptiveOffset::reconstructBlkSAOParam(SAOBlkParam& recParam, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES])
+void SampleAdaptiveOffset::reconstructBlkSAOParam(SAOBlkParam& recParam, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES])
 {
-  const Int numberOfComponents = m_numberOfComponents;
-  for(Int compIdx = 0; compIdx < numberOfComponents; compIdx++)
+  const int numberOfComponents = m_numberOfComponents;
+  for(int compIdx = 0; compIdx < numberOfComponents; compIdx++)
   {
     const ComponentID component = ComponentID(compIdx);
     SAOOffset& offsetParam = recParam[component];
@@ -262,23 +262,23 @@ Void SampleAdaptiveOffset::reconstructBlkSAOParam(SAOBlkParam& recParam, SAOBlkP
   }
 }
 
-Void SampleAdaptiveOffset::xReconstructBlkSAOParams(CodingStructure& cs, SAOBlkParam* saoBlkParams)
+void SampleAdaptiveOffset::xReconstructBlkSAOParams(CodingStructure& cs, SAOBlkParam* saoBlkParams)
 {
-  for(UInt compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++)
+  for(uint32_t compIdx = 0; compIdx < MAX_NUM_COMPONENT; compIdx++)
   {
     m_picSAOEnabled[compIdx] = false;
   }
 
-  const UInt numberOfComponents = getNumberValidComponents(cs.pcv->chrFormat);
+  const uint32_t numberOfComponents = getNumberValidComponents(cs.pcv->chrFormat);
 
-  for(Int ctuRsAddr=0; ctuRsAddr< cs.pcv->sizeInCtus; ctuRsAddr++)
+  for(int ctuRsAddr=0; ctuRsAddr< cs.pcv->sizeInCtus; ctuRsAddr++)
   {
     SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES] = { NULL };
     getMergeList(cs, ctuRsAddr, saoBlkParams, mergeList);
 
     reconstructBlkSAOParam(saoBlkParams[ctuRsAddr], mergeList);
 
-    for(UInt compIdx = 0; compIdx < numberOfComponents; compIdx++)
+    for(uint32_t compIdx = 0; compIdx < numberOfComponents; compIdx++)
     {
       if(saoBlkParams[ctuRsAddr][compIdx].modeIdc != SAO_MODE_OFF)
       {
@@ -289,13 +289,13 @@ Void SampleAdaptiveOffset::xReconstructBlkSAOParams(CodingStructure& cs, SAOBlkP
 }
 
 
-Void SampleAdaptiveOffset::offsetBlock(const Int channelBitDepth, const ClpRng& clpRng, Int typeIdx, Int* offset
-                                          , const Pel* srcBlk, Pel* resBlk, Int srcStride, Int resStride,  Int width, Int height
-                                          , Bool isLeftAvail,  Bool isRightAvail, Bool isAboveAvail, Bool isBelowAvail, Bool isAboveLeftAvail, Bool isAboveRightAvail, Bool isBelowLeftAvail, Bool isBelowRightAvail)
+void SampleAdaptiveOffset::offsetBlock(const int channelBitDepth, const ClpRng& clpRng, int typeIdx, int* offset
+                                          , const Pel* srcBlk, Pel* resBlk, int srcStride, int resStride,  int width, int height
+                                          , bool isLeftAvail,  bool isRightAvail, bool isAboveAvail, bool isBelowAvail, bool isAboveLeftAvail, bool isAboveRightAvail, bool isBelowLeftAvail, bool isBelowRightAvail)
 {
-  Int x,y, startX, startY, endX, endY, edgeType;
-  Int firstLineStartX, firstLineEndX, lastLineStartX, lastLineEndX;
-  SChar signLeft, signRight, signDown;
+  int x,y, startX, startY, endX, endY, edgeType;
+  int firstLineStartX, firstLineEndX, lastLineStartX, lastLineEndX;
+  int8_t signLeft, signRight, signDown;
 
   const Pel* srcLine = srcBlk;
         Pel* resLine = resBlk;
@@ -309,10 +309,10 @@ Void SampleAdaptiveOffset::offsetBlock(const Int channelBitDepth, const ClpRng& 
       endX   = isRightAvail ? width : (width -1);
       for (y=0; y< height; y++)
       {
-        signLeft = (SChar)sgn(srcLine[startX] - srcLine[startX-1]);
+        signLeft = (int8_t)sgn(srcLine[startX] - srcLine[startX-1]);
         for (x=startX; x< endX; x++)
         {
-          signRight = (SChar)sgn(srcLine[x] - srcLine[x+1]);
+          signRight = (int8_t)sgn(srcLine[x] - srcLine[x+1]);
           edgeType =  signRight + signLeft;
           signLeft  = -signRight;
 
@@ -327,7 +327,7 @@ Void SampleAdaptiveOffset::offsetBlock(const Int channelBitDepth, const ClpRng& 
   case SAO_TYPE_EO_90:
     {
       offset += 2;
-      SChar *signUpLine = &m_signLineBuf1[0];
+      int8_t *signUpLine = &m_signLineBuf1[0];
 
       startY = isAboveAvail ? 0 : 1;
       endY   = isBelowAvail ? height : height-1;
@@ -340,7 +340,7 @@ Void SampleAdaptiveOffset::offsetBlock(const Int channelBitDepth, const ClpRng& 
       const Pel* srcLineAbove= srcLine- srcStride;
       for (x=0; x< width; x++)
       {
-        signUpLine[x] = (SChar)sgn(srcLine[x] - srcLineAbove[x]);
+        signUpLine[x] = (int8_t)sgn(srcLine[x] - srcLineAbove[x]);
       }
 
       const Pel* srcLineBelow;
@@ -350,7 +350,7 @@ Void SampleAdaptiveOffset::offsetBlock(const Int channelBitDepth, const ClpRng& 
 
         for (x=0; x< width; x++)
         {
-          signDown  = (SChar)sgn(srcLine[x] - srcLineBelow[x]);
+          signDown  = (int8_t)sgn(srcLine[x] - srcLineBelow[x]);
           edgeType = signDown + signUpLine[x];
           signUpLine[x]= -signDown;
 
@@ -365,7 +365,7 @@ Void SampleAdaptiveOffset::offsetBlock(const Int channelBitDepth, const ClpRng& 
   case SAO_TYPE_EO_135:
     {
       offset += 2;
-      SChar *signUpLine, *signDownLine, *signTmpLine;
+      int8_t *signUpLine, *signDownLine, *signTmpLine;
 
       signUpLine  = &m_signLineBuf1[0];
       signDownLine= &m_signLineBuf2[0];
@@ -377,7 +377,7 @@ Void SampleAdaptiveOffset::offsetBlock(const Int channelBitDepth, const ClpRng& 
       const Pel* srcLineBelow= srcLine+ srcStride;
       for (x=startX; x< endX+1; x++)
       {
-        signUpLine[x] = (SChar)sgn(srcLineBelow[x] - srcLine[x- 1]);
+        signUpLine[x] = (int8_t)sgn(srcLineBelow[x] - srcLine[x- 1]);
       }
 
       //1st line
@@ -401,13 +401,13 @@ Void SampleAdaptiveOffset::offsetBlock(const Int channelBitDepth, const ClpRng& 
 
         for (x=startX; x<endX; x++)
         {
-          signDown =  (SChar)sgn(srcLine[x] - srcLineBelow[x+ 1]);
+          signDown =  (int8_t)sgn(srcLine[x] - srcLineBelow[x+ 1]);
           edgeType =  signDown + signUpLine[x];
           resLine[x] = ClipPel<int>( srcLine[x] + offset[edgeType], clpRng);
 
           signDownLine[x+1] = -signDown;
         }
-        signDownLine[startX] = (SChar)sgn(srcLineBelow[startX] - srcLine[startX-1]);
+        signDownLine[startX] = (int8_t)sgn(srcLineBelow[startX] - srcLine[startX-1]);
 
         signTmpLine  = signUpLine;
         signUpLine   = signDownLine;
@@ -432,7 +432,7 @@ Void SampleAdaptiveOffset::offsetBlock(const Int channelBitDepth, const ClpRng& 
   case SAO_TYPE_EO_45:
     {
       offset += 2;
-      SChar *signUpLine = &m_signLineBuf1[1];
+      int8_t *signUpLine = &m_signLineBuf1[1];
 
       startX = isLeftAvail ? 0 : 1;
       endX   = isRightAvail ? width : (width -1);
@@ -441,7 +441,7 @@ Void SampleAdaptiveOffset::offsetBlock(const Int channelBitDepth, const ClpRng& 
       const Pel* srcLineBelow= srcLine+ srcStride;
       for (x=startX-1; x< endX; x++)
       {
-        signUpLine[x] = (SChar)sgn(srcLineBelow[x] - srcLine[x+1]);
+        signUpLine[x] = (int8_t)sgn(srcLineBelow[x] - srcLine[x+1]);
       }
 
 
@@ -464,12 +464,12 @@ Void SampleAdaptiveOffset::offsetBlock(const Int channelBitDepth, const ClpRng& 
 
         for(x= startX; x< endX; x++)
         {
-          signDown =  (SChar)sgn(srcLine[x] - srcLineBelow[x-1]);
+          signDown =  (int8_t)sgn(srcLine[x] - srcLineBelow[x-1]);
           edgeType =  signDown + signUpLine[x];
           resLine[x] = ClipPel<int>(srcLine[x] + offset[edgeType], clpRng);
           signUpLine[x-1] = -signDown;
         }
-        signUpLine[endX-1] = (SChar)sgn(srcLineBelow[endX-1] - srcLine[endX]);
+        signUpLine[endX-1] = (int8_t)sgn(srcLineBelow[endX-1] - srcLine[endX]);
         srcLine  += srcStride;
         resLine += resStride;
       }
@@ -488,7 +488,7 @@ Void SampleAdaptiveOffset::offsetBlock(const Int channelBitDepth, const ClpRng& 
     break;
   case SAO_TYPE_BO:
     {
-      const Int shiftBits = channelBitDepth - NUM_SAO_BO_CLASSES_LOG2;
+      const int shiftBits = channelBitDepth - NUM_SAO_BO_CLASSES_LOG2;
       for (y=0; y< height; y++)
       {
         for (x=0; x< width; x++)
@@ -507,11 +507,11 @@ Void SampleAdaptiveOffset::offsetBlock(const Int channelBitDepth, const ClpRng& 
   }
 }
 
-Void SampleAdaptiveOffset::offsetCTU( const UnitArea& area, const CPelUnitBuf& src, PelUnitBuf& res, SAOBlkParam& saoblkParam, CodingStructure& cs)
+void SampleAdaptiveOffset::offsetCTU( const UnitArea& area, const CPelUnitBuf& src, PelUnitBuf& res, SAOBlkParam& saoblkParam, CodingStructure& cs)
 {
-  const UInt numberOfComponents = getNumberValidComponents( area.chromaFormat );
-  Bool bAllOff=true;
-  for( UInt compIdx = 0; compIdx < numberOfComponents; compIdx++)
+  const uint32_t numberOfComponents = getNumberValidComponents( area.chromaFormat );
+  bool bAllOff=true;
+  for( uint32_t compIdx = 0; compIdx < numberOfComponents; compIdx++)
   {
     if (saoblkParam[compIdx].modeIdc != SAO_MODE_OFF)
     {
@@ -523,7 +523,7 @@ Void SampleAdaptiveOffset::offsetCTU( const UnitArea& area, const CPelUnitBuf& s
     return;
   }
 
-  Bool isLeftAvail, isRightAvail, isAboveAvail, isBelowAvail, isAboveLeftAvail, isAboveRightAvail, isBelowLeftAvail, isBelowRightAvail;
+  bool isLeftAvail, isRightAvail, isAboveAvail, isBelowAvail, isAboveLeftAvail, isAboveRightAvail, isBelowLeftAvail, isBelowRightAvail;
 
   //block boundary availability
   deriveLoopFilterBoundaryAvailibility(cs, area.Y(), isLeftAvail,isRightAvail,isAboveAvail,isBelowAvail,isAboveLeftAvail,isAboveRightAvail,isBelowLeftAvail,isBelowRightAvail);
@@ -535,7 +535,7 @@ Void SampleAdaptiveOffset::offsetCTU( const UnitArea& area, const CPelUnitBuf& s
     m_signLineBuf2.resize(lineBufferSize);
   }
 
-  for(Int compIdx = 0; compIdx < numberOfComponents; compIdx++)
+  for(int compIdx = 0; compIdx < numberOfComponents; compIdx++)
   {
     const ComponentID compID = ComponentID(compIdx);
     const CompArea& compArea = area.block(compID);
@@ -543,9 +543,9 @@ Void SampleAdaptiveOffset::offsetCTU( const UnitArea& area, const CPelUnitBuf& s
 
     if(ctbOffset.modeIdc != SAO_MODE_OFF)
     {
-      Int  srcStride    = src.get(compID).stride;
+      int  srcStride    = src.get(compID).stride;
       const Pel* srcBlk = src.get(compID).bufAt(compArea);
-      Int  resStride    = res.get(compID).stride;
+      int  resStride    = res.get(compID).stride;
       Pel* resBlk       = res.get(compID).bufAt(compArea);
 
       offsetBlock( cs.sps->getBitDepth(toChannelType(compID)),
@@ -561,16 +561,16 @@ Void SampleAdaptiveOffset::offsetCTU( const UnitArea& area, const CPelUnitBuf& s
   } //compIdx
 }
 
-Void SampleAdaptiveOffset::SAOProcess( CodingStructure& cs, SAOBlkParam* saoBlkParams
+void SampleAdaptiveOffset::SAOProcess( CodingStructure& cs, SAOBlkParam* saoBlkParams
                                       )
 {
   CHECK(!saoBlkParams, "No parameters present");
 
   xReconstructBlkSAOParams(cs, saoBlkParams);
 
-  const UInt numberOfComponents = getNumberValidComponents(cs.area.chromaFormat);
-  Bool bAllDisabled = true;
-  for (UInt compIdx = 0; compIdx < numberOfComponents; compIdx++)
+  const uint32_t numberOfComponents = getNumberValidComponents(cs.area.chromaFormat);
+  bool bAllDisabled = true;
+  for (uint32_t compIdx = 0; compIdx < numberOfComponents; compIdx++)
   {
     if (m_picSAOEnabled[compIdx])
     {
@@ -587,12 +587,12 @@ Void SampleAdaptiveOffset::SAOProcess( CodingStructure& cs, SAOBlkParam* saoBlkP
   m_tempBuf.copyFrom( rec );
 
   int ctuRsAddr = 0;
-  for( UInt yPos = 0; yPos < pcv.lumaHeight; yPos += pcv.maxCUHeight )
+  for( uint32_t yPos = 0; yPos < pcv.lumaHeight; yPos += pcv.maxCUHeight )
   {
-    for( UInt xPos = 0; xPos < pcv.lumaWidth; xPos += pcv.maxCUWidth )
+    for( uint32_t xPos = 0; xPos < pcv.lumaWidth; xPos += pcv.maxCUWidth )
     {
-      const UInt width  = (xPos + pcv.maxCUWidth  > pcv.lumaWidth)  ? (pcv.lumaWidth - xPos)  : pcv.maxCUWidth;
-      const UInt height = (yPos + pcv.maxCUHeight > pcv.lumaHeight) ? (pcv.lumaHeight - yPos) : pcv.maxCUHeight;
+      const uint32_t width  = (xPos + pcv.maxCUWidth  > pcv.lumaWidth)  ? (pcv.lumaWidth - xPos)  : pcv.maxCUWidth;
+      const uint32_t height = (yPos + pcv.maxCUHeight > pcv.lumaHeight) ? (pcv.lumaHeight - yPos) : pcv.maxCUHeight;
       const UnitArea area( cs.area.chromaFormat, Area(xPos , yPos, width, height) );
 
       offsetCTU( area, m_tempBuf, rec, cs.picture->getSAO()[ctuRsAddr], cs);
@@ -611,16 +611,16 @@ Void SampleAdaptiveOffset::SAOProcess( CodingStructure& cs, SAOBlkParam* saoBlkP
   xPCMLFDisableProcess(cs);
 }
 
-Void SampleAdaptiveOffset::xPCMLFDisableProcess(CodingStructure& cs)
+void SampleAdaptiveOffset::xPCMLFDisableProcess(CodingStructure& cs)
 {
   const PreCalcValues& pcv = *cs.pcv;
-  const Bool bPCMFilter = (cs.sps->getUsePCM() && cs.sps->getPCMFilterDisableFlag()) ? true : false;
+  const bool bPCMFilter = (cs.sps->getUsePCM() && cs.sps->getPCMFilterDisableFlag()) ? true : false;
 
   if( bPCMFilter || cs.pps->getTransquantBypassEnabledFlag() )
   {
-    for( UInt yPos = 0; yPos < pcv.lumaHeight; yPos += pcv.maxCUHeight )
+    for( uint32_t yPos = 0; yPos < pcv.lumaHeight; yPos += pcv.maxCUHeight )
     {
-      for( UInt xPos = 0; xPos < pcv.lumaWidth; xPos += pcv.maxCUWidth )
+      for( uint32_t xPos = 0; xPos < pcv.lumaWidth; xPos += pcv.maxCUWidth )
       {
         UnitArea ctuArea( cs.area.chromaFormat, Area( xPos, yPos, pcv.maxCUWidth, pcv.maxCUHeight ) );
 
@@ -631,7 +631,7 @@ Void SampleAdaptiveOffset::xPCMLFDisableProcess(CodingStructure& cs)
   }
 }
 
-Void SampleAdaptiveOffset::xPCMCURestoration(CodingStructure& cs, const UnitArea &ctuArea)
+void SampleAdaptiveOffset::xPCMCURestoration(CodingStructure& cs, const UnitArea &ctuArea)
 {
   const SPS& sps = *cs.sps;
 
@@ -640,9 +640,9 @@ Void SampleAdaptiveOffset::xPCMCURestoration(CodingStructure& cs, const UnitArea
     // restore PCM samples
     if( ( cu.ipcm && sps.getPCMFilterDisableFlag() ) || CU::isLosslessCoded( cu ) )
     {
-      const UInt numComponents = m_numberOfComponents;
+      const uint32_t numComponents = m_numberOfComponents;
 
-      for( UInt comp = 0; comp < numComponents; comp++ )
+      for( uint32_t comp = 0; comp < numComponents; comp++ )
       {
         xPCMSampleRestoration( cu, ComponentID( comp ) );
       }
@@ -650,7 +650,7 @@ Void SampleAdaptiveOffset::xPCMCURestoration(CodingStructure& cs, const UnitArea
   }
 }
 
-Void SampleAdaptiveOffset::xPCMSampleRestoration(CodingUnit& cu, const ComponentID compID)
+void SampleAdaptiveOffset::xPCMSampleRestoration(CodingUnit& cu, const ComponentID compID)
 {
   const CompArea& ca = cu.block(compID);
 
@@ -671,26 +671,26 @@ Void SampleAdaptiveOffset::xPCMSampleRestoration(CodingUnit& cu, const Component
   const CPelBuf& pcmBuf   = tu.getPcmbuf( compID );
          PelBuf dstBuf    = cu.cs->getRecoBuf( ca );
   const SPS &sps = *cu.cs->sps;
-  const UInt uiPcmLeftShiftBit = sps.getBitDepth(toChannelType(compID)) - sps.getPCMBitDepth(toChannelType(compID));
+  const uint32_t uiPcmLeftShiftBit = sps.getBitDepth(toChannelType(compID)) - sps.getPCMBitDepth(toChannelType(compID));
 
-  for (UInt y = 0; y < ca.height; y++)
+  for (uint32_t y = 0; y < ca.height; y++)
   {
-    for (UInt x = 0; x < ca.width; x++)
+    for (uint32_t x = 0; x < ca.width; x++)
     {
       dstBuf.at(x,y) = (pcmBuf.at(x,y) << uiPcmLeftShiftBit);
     }
   }
 }
 
-Void SampleAdaptiveOffset::deriveLoopFilterBoundaryAvailibility(CodingStructure& cs, const Position &pos,
-  Bool& isLeftAvail,
-  Bool& isRightAvail,
-  Bool& isAboveAvail,
-  Bool& isBelowAvail,
-  Bool& isAboveLeftAvail,
-  Bool& isAboveRightAvail,
-  Bool& isBelowLeftAvail,
-  Bool& isBelowRightAvail
+void SampleAdaptiveOffset::deriveLoopFilterBoundaryAvailibility(CodingStructure& cs, const Position &pos,
+  bool& isLeftAvail,
+  bool& isRightAvail,
+  bool& isAboveAvail,
+  bool& isBelowAvail,
+  bool& isAboveLeftAvail,
+  bool& isAboveRightAvail,
+  bool& isBelowLeftAvail,
+  bool& isBelowRightAvail
   ) const
 {
   const int width = cs.pcv->maxCUWidth;

@@ -50,10 +50,10 @@
  // block method definitions
  // ---------------------------------------------------------------------------
 
-Void CompArea::xRecalcLumaToChroma()
+void CompArea::xRecalcLumaToChroma()
 {
-  const UInt csx = getComponentScaleX(compID, chromaFormat);
-  const UInt csy = getComponentScaleY(compID, chromaFormat);
+  const uint32_t csx = getComponentScaleX(compID, chromaFormat);
+  const uint32_t csy = getComponentScaleY(compID, chromaFormat);
 
   x      >>= csx;
   y      >>= csy;
@@ -65,8 +65,8 @@ Position CompArea::chromaPos() const
 {
   if (isLuma(compID))
   {
-    UInt scaleX = getComponentScaleX(compID, chromaFormat);
-    UInt scaleY = getComponentScaleY(compID, chromaFormat);
+    uint32_t scaleX = getComponentScaleX(compID, chromaFormat);
+    uint32_t scaleY = getComponentScaleY(compID, chromaFormat);
 
     return Position(x >> scaleX, y >> scaleY);
   }
@@ -80,8 +80,8 @@ Size CompArea::lumaSize() const
 {
   if( isChroma( compID ) )
   {
-    UInt scaleX = getComponentScaleX( compID, chromaFormat );
-    UInt scaleY = getComponentScaleY( compID, chromaFormat );
+    uint32_t scaleX = getComponentScaleX( compID, chromaFormat );
+    uint32_t scaleY = getComponentScaleY( compID, chromaFormat );
 
     return Size( width << scaleX, height << scaleY );
   }
@@ -95,8 +95,8 @@ Size CompArea::chromaSize() const
 {
   if( isLuma( compID ) )
   {
-    UInt scaleX = getComponentScaleX( compID, chromaFormat );
-    UInt scaleY = getComponentScaleY( compID, chromaFormat );
+    uint32_t scaleX = getComponentScaleX( compID, chromaFormat );
+    uint32_t scaleY = getComponentScaleY( compID, chromaFormat );
 
     return Size( width >> scaleX, height >> scaleY );
   }
@@ -110,8 +110,8 @@ Position CompArea::lumaPos() const
 {
   if( isChroma( compID ) )
   {
-    UInt scaleX = getComponentScaleX( compID, chromaFormat );
-    UInt scaleY = getComponentScaleY( compID, chromaFormat );
+    uint32_t scaleX = getComponentScaleX( compID, chromaFormat );
+    uint32_t scaleY = getComponentScaleY( compID, chromaFormat );
 
     return Position( x << scaleX, y << scaleY );
   }
@@ -139,9 +139,9 @@ UnitArea::UnitArea(const ChromaFormat _chromaFormat) : chromaFormat(_chromaForma
 
 UnitArea::UnitArea(const ChromaFormat _chromaFormat, const Area &_area) : chromaFormat(_chromaFormat), blocks(getNumberValidComponents(_chromaFormat))
 {
-  const UInt numCh = getNumberValidComponents(chromaFormat);
+  const uint32_t numCh = getNumberValidComponents(chromaFormat);
 
-  for (UInt i = 0; i < numCh; i++)
+  for (uint32_t i = 0; i < numCh; i++)
   {
     blocks[i] = CompArea(ComponentID(i), chromaFormat, _area, true);
   }
@@ -155,10 +155,10 @@ UnitArea::UnitArea(const ChromaFormat _chromaFormat, const CompArea &blkY, const
 
 UnitArea::UnitArea(const ChromaFormat _chromaFormat,       CompArea &&blkY,      CompArea &&blkCb,      CompArea &&blkCr) : chromaFormat(_chromaFormat), blocks { std::forward<CompArea>(blkY), std::forward<CompArea>(blkCb), std::forward<CompArea>(blkCr) } {}
 
-Bool UnitArea::contains(const UnitArea& other) const
+bool UnitArea::contains(const UnitArea& other) const
 {
-  Bool ret = true;
-  Bool any = false;
+  bool ret = true;
+  bool any = false;
 
   for( const auto &blk : other.blocks )
   {
@@ -172,10 +172,10 @@ Bool UnitArea::contains(const UnitArea& other) const
   return any && ret;
 }
 
-Bool UnitArea::contains( const UnitArea& other, const ChannelType chType ) const
+bool UnitArea::contains( const UnitArea& other, const ChannelType chType ) const
 {
-  Bool ret = true;
-  Bool any = false;
+  bool ret = true;
+  bool any = false;
 
   for( const auto &blk : other.blocks )
   {
@@ -189,9 +189,9 @@ Bool UnitArea::contains( const UnitArea& other, const ChannelType chType ) const
   return any && ret;
 }
 
-Void UnitArea::repositionTo(const UnitArea& unitArea)
+void UnitArea::repositionTo(const UnitArea& unitArea)
 {
-  for(UInt i = 0; i < blocks.size(); i++)
+  for(uint32_t i = 0; i < blocks.size(); i++)
   {
     blocks[i].repositionTo(unitArea.blocks[i]);
   }
@@ -288,7 +288,7 @@ CodingUnit& CodingUnit::operator=( const CodingUnit& other )
   return *this;
 }
 
-Void CodingUnit::initData()
+void CodingUnit::initData()
 {
   predMode          = NUMBER_OF_PREDICTION_MODES;
   partSize          = NUMBER_OF_PART_SIZES;
@@ -339,7 +339,7 @@ Void CodingUnit::initData()
 PredictionUnit::PredictionUnit(const UnitArea &unit)                                : UnitArea(unit)                , cu(nullptr), cs(nullptr), chType( CH_L ), next(nullptr) { initData(); }
 PredictionUnit::PredictionUnit(const ChromaFormat _chromaFormat, const Area &_area) : UnitArea(_chromaFormat, _area), cu(nullptr), cs(nullptr), chType( CH_L ), next(nullptr) { initData(); }
 
-Void PredictionUnit::initData()
+void PredictionUnit::initData()
 {
   // intra data - need this default initialization for PCM
   intraDir[0] = DC_IDX;
@@ -354,7 +354,7 @@ Void PredictionUnit::initData()
   frucMrgMode = 0;
   mvRefine    = false;
 #endif
-  for (UInt i = 0; i < NUM_REF_PIC_LIST_01; i++)
+  for (uint32_t i = 0; i < NUM_REF_PIC_LIST_01; i++)
   {
     mvpIdx[i] = MAX_UCHAR;
     mvpNum[i] = MAX_UCHAR;
@@ -362,7 +362,7 @@ Void PredictionUnit::initData()
     mv[i]     .setZero();
     mvd[i]    .setZero();
 #if JEM_TOOLS || JVET_K_AFFINE
-    for( UInt j = 0; j < 3; j++ )
+    for( uint32_t j = 0; j < 3; j++ )
     {
       mvdAffi[i][j].setZero();
     }
@@ -372,7 +372,7 @@ Void PredictionUnit::initData()
 
 PredictionUnit& PredictionUnit::operator=(const IntraPredictionData& predData)
 {
-  for (UInt i = 0; i < MAX_NUM_CHANNEL_TYPE; i++)
+  for (uint32_t i = 0; i < MAX_NUM_CHANNEL_TYPE; i++)
   {
     intraDir[i] = predData.intraDir[i];
   }
@@ -390,7 +390,7 @@ PredictionUnit& PredictionUnit::operator=(const InterPredictionData& predData)
   frucMrgMode = predData.frucMrgMode;
   mvRefine    = predData.mvRefine;
 #endif
-  for (UInt i = 0; i < NUM_REF_PIC_LIST_01; i++)
+  for (uint32_t i = 0; i < NUM_REF_PIC_LIST_01; i++)
   {
     mvpIdx[i]   = predData.mvpIdx[i];
     mvpNum[i]   = predData.mvpNum[i];
@@ -398,7 +398,7 @@ PredictionUnit& PredictionUnit::operator=(const InterPredictionData& predData)
     mvd[i]      = predData.mvd[i];
     refIdx[i]   = predData.refIdx[i];
 #if JEM_TOOLS || JVET_K_AFFINE
-    for( UInt j = 0; j < 3; j++ )
+    for( uint32_t j = 0; j < 3; j++ )
     {
       mvdAffi[i][j] = predData.mvdAffi[i][j];
     }
@@ -410,7 +410,7 @@ PredictionUnit& PredictionUnit::operator=(const InterPredictionData& predData)
 
 PredictionUnit& PredictionUnit::operator=( const PredictionUnit& other )
 {
-  for( UInt i = 0; i < MAX_NUM_CHANNEL_TYPE; i++ )
+  for( uint32_t i = 0; i < MAX_NUM_CHANNEL_TYPE; i++ )
   {
     intraDir[ i ] = other.intraDir[ i ];
   }
@@ -423,7 +423,7 @@ PredictionUnit& PredictionUnit::operator=( const PredictionUnit& other )
   frucMrgMode = other.frucMrgMode;
   mvRefine    = other.mvRefine;
 #endif
-  for (UInt i = 0; i < NUM_REF_PIC_LIST_01; i++)
+  for (uint32_t i = 0; i < NUM_REF_PIC_LIST_01; i++)
   {
     mvpIdx[i]   = other.mvpIdx[i];
     mvpNum[i]   = other.mvpNum[i];
@@ -431,7 +431,7 @@ PredictionUnit& PredictionUnit::operator=( const PredictionUnit& other )
     mvd[i]      = other.mvd[i];
     refIdx[i]   = other.refIdx[i];
 #if JEM_TOOLS || JVET_K_AFFINE
-    for( UInt j = 0; j < 3; j++ )
+    for( uint32_t j = 0; j < 3; j++ )
     {
       mvdAffi[i][j] = other.mvdAffi[i][j];
     }
@@ -445,7 +445,7 @@ PredictionUnit& PredictionUnit::operator=( const MotionInfo& mi )
 {
   interDir = mi.interDir;
 
-  for( UInt i = 0; i < NUM_REF_PIC_LIST_01; i++ )
+  for( uint32_t i = 0; i < NUM_REF_PIC_LIST_01; i++ )
   {
     refIdx[i] = mi.refIdx[i];
     mv    [i] = mi.mv[i];
@@ -519,7 +519,7 @@ TransformUnit::TransformUnit(const ChromaFormat _chromaFormat, const Area &_area
   initData();
 }
 
-Void TransformUnit::initData()
+void TransformUnit::initData()
 {
   for( unsigned i = 0; i < MAX_NUM_TBLOCKS; i++ )
   {
@@ -537,11 +537,11 @@ Void TransformUnit::initData()
 
 }
 
-Void TransformUnit::init(TCoeff **coeffs, Pel **pcmbuf)
+void TransformUnit::init(TCoeff **coeffs, Pel **pcmbuf)
 {
-  UInt numBlocks = getNumberValidTBlocks(*cs->pcv);
+  uint32_t numBlocks = getNumberValidTBlocks(*cs->pcv);
 
-  for (UInt i = 0; i < numBlocks; i++)
+  for (uint32_t i = 0; i < numBlocks; i++)
   {
     m_coeffs[i] = coeffs[i];
     m_pcmbuf[i] = pcmbuf[i];
@@ -557,7 +557,7 @@ TransformUnit& TransformUnit::operator=(const TransformUnit& other)
   {
     CHECKD( blocks[i].area() != other.blocks[i].area(), "Transformation units cover different areas" );
 
-    UInt area = blocks[i].area();
+    uint32_t area = blocks[i].area();
 
     if (m_coeffs[i] && other.m_coeffs[i] && m_coeffs[i] != other.m_coeffs[i]) memcpy(m_coeffs[i], other.m_coeffs[i], sizeof(TCoeff) * area);
     if (m_pcmbuf[i] && other.m_pcmbuf[i] && m_pcmbuf[i] != other.m_pcmbuf[i]) memcpy(m_pcmbuf[i], other.m_pcmbuf[i], sizeof(Pel   ) * area);
@@ -576,13 +576,13 @@ TransformUnit& TransformUnit::operator=(const TransformUnit& other)
   return *this;
 }
 
-Void TransformUnit::copyComponentFrom(const TransformUnit& other, const ComponentID i)
+void TransformUnit::copyComponentFrom(const TransformUnit& other, const ComponentID i)
 {
   CHECK( chromaFormat != other.chromaFormat, "Incompatible formats" );
 
   CHECKD( blocks[i].area() != other.blocks[i].area(), "Transformation units cover different areas" );
 
-  UInt area = blocks[i].area();
+  uint32_t area = blocks[i].area();
 
   if (m_coeffs[i] && other.m_coeffs[i] && m_coeffs[i] != other.m_coeffs[i]) memcpy(m_coeffs[i], other.m_coeffs[i], sizeof(TCoeff) * area);
   if (m_pcmbuf[i] && other.m_pcmbuf[i] && m_pcmbuf[i] != other.m_pcmbuf[i]) memcpy(m_pcmbuf[i], other.m_pcmbuf[i], sizeof(Pel   ) * area);

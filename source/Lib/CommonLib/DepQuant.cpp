@@ -97,37 +97,37 @@ namespace DQIntern
 
     SizeIndexInfoLog2 sizeInfo;
     sizeInfo.init ( MAX_CU_SIZE );
-    UInt raster2id[ MAX_CU_SIZE * MAX_CU_SIZE ];
+    uint32_t raster2id[ MAX_CU_SIZE * MAX_CU_SIZE ];
 
-    for( UInt blockHeightIdx = 0; blockHeightIdx < sizeInfo.numHeights(); blockHeightIdx++ )
+    for( uint32_t blockHeightIdx = 0; blockHeightIdx < sizeInfo.numHeights(); blockHeightIdx++ )
     {
-      for( UInt blockWidthIdx = 0; blockWidthIdx < sizeInfo.numWidths(); blockWidthIdx++ )
+      for( uint32_t blockWidthIdx = 0; blockWidthIdx < sizeInfo.numWidths(); blockWidthIdx++ )
       {
-        const UInt blockWidth   = sizeInfo.sizeFrom( blockWidthIdx  );
-        const UInt blockHeight  = sizeInfo.sizeFrom( blockHeightIdx );
-        const UInt totalValues  = blockWidth * blockHeight;
-        const UInt log2CGWidth  = (blockWidth & 3) + (blockHeight & 3) > 0 ? 1 : 2;
-        const UInt log2CGHeight = (blockWidth & 3) + (blockHeight & 3) > 0 ? 1 : 2;
-        const UInt groupWidth   = 1 << log2CGWidth;
-        const UInt groupHeight  = 1 << log2CGHeight;
-        const UInt groupSize    = groupWidth * groupHeight;
+        const uint32_t blockWidth   = sizeInfo.sizeFrom( blockWidthIdx  );
+        const uint32_t blockHeight  = sizeInfo.sizeFrom( blockHeightIdx );
+        const uint32_t totalValues  = blockWidth * blockHeight;
+        const uint32_t log2CGWidth  = (blockWidth & 3) + (blockHeight & 3) > 0 ? 1 : 2;
+        const uint32_t log2CGHeight = (blockWidth & 3) + (blockHeight & 3) > 0 ? 1 : 2;
+        const uint32_t groupWidth   = 1 << log2CGWidth;
+        const uint32_t groupHeight  = 1 << log2CGHeight;
+        const uint32_t groupSize    = groupWidth * groupHeight;
         if( ((blockWidth>>log2CGWidth)<<log2CGWidth)!=blockWidth || ((blockHeight>>log2CGHeight)<<log2CGHeight)!=blockHeight )
         {
           continue;
         }
-        for( UInt scanTypeIdx = 0; scanTypeIdx < SCAN_NUMBER_OF_TYPES; scanTypeIdx++ )
+        for( uint32_t scanTypeIdx = 0; scanTypeIdx < SCAN_NUMBER_OF_TYPES; scanTypeIdx++ )
         {
           const CoeffScanType scanType  = CoeffScanType(scanTypeIdx);
-          const UInt*         scanId2RP = g_scanOrder     [SCAN_GROUPED_4x4][scanType][blockWidthIdx][blockHeightIdx];
-          const UInt*         scanId2X  = g_scanOrderPosXY[SCAN_GROUPED_4x4][scanType][blockWidthIdx][blockHeightIdx][0];
-          const UInt*         scanId2Y  = g_scanOrderPosXY[SCAN_GROUPED_4x4][scanType][blockWidthIdx][blockHeightIdx][1];
+          const uint32_t*         scanId2RP = g_scanOrder     [SCAN_GROUPED_4x4][scanType][blockWidthIdx][blockHeightIdx];
+          const uint32_t*         scanId2X  = g_scanOrderPosXY[SCAN_GROUPED_4x4][scanType][blockWidthIdx][blockHeightIdx][0];
+          const uint32_t*         scanId2Y  = g_scanOrderPosXY[SCAN_GROUPED_4x4][scanType][blockWidthIdx][blockHeightIdx][1];
           NbInfoSbb*&         sId2NbSbb = m_scanId2NbInfoSbbArray           [scanType][blockWidthIdx][blockHeightIdx];
           NbInfoOut*&         sId2NbOut = m_scanId2NbInfoOutArray           [scanType][blockWidthIdx][blockHeightIdx];
 
           sId2NbSbb = new NbInfoSbb[ totalValues ];
           sId2NbOut = new NbInfoOut[ totalValues ];
 
-          for( UInt scanId = 0; scanId < totalValues; scanId++ )
+          for( uint32_t scanId = 0; scanId < totalValues; scanId++ )
           {
             raster2id[ scanId2RP[ scanId ] ] = scanId;
           }
@@ -234,11 +234,11 @@ namespace DQIntern
     {
       return;
     }
-    for( UInt blockHeightIdx = 0; blockHeightIdx <= MAX_CU_SIZE/2; blockHeightIdx++ )
+    for( uint32_t blockHeightIdx = 0; blockHeightIdx <= MAX_CU_SIZE/2; blockHeightIdx++ )
     {
-      for( UInt blockWidthIdx = 0; blockWidthIdx <= MAX_CU_SIZE/2; blockWidthIdx++ )
+      for( uint32_t blockWidthIdx = 0; blockWidthIdx <= MAX_CU_SIZE/2; blockWidthIdx++ )
       {
-        for( UInt scanTypeIdx = 0; scanTypeIdx < SCAN_NUMBER_OF_TYPES; scanTypeIdx++ )
+        for( uint32_t scanTypeIdx = 0; scanTypeIdx < SCAN_NUMBER_OF_TYPES; scanTypeIdx++ )
         {
           NbInfoSbb*& sId2NbSbb = m_scanId2NbInfoSbbArray[scanTypeIdx][blockWidthIdx][blockHeightIdx];
           NbInfoOut*& sId2NbOut = m_scanId2NbInfoOutArray[scanTypeIdx][blockWidthIdx][blockHeightIdx];

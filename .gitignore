@@ -1,12 +1,12 @@
 dec.yuv
 rec.yuv
 str.bin
-./build
-./bin
-./lib
+/build/
+/bin/
+/lib/
 core
 deploy
 *.sdf
 *.suo
-.vs
-.vscode
+.vs/
+.vscode/

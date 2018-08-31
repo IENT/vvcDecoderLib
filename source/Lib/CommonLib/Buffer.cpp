@@ -62,6 +62,36 @@ void addAvgCore( const T* src1, int src1Stride, const T* src2, int src2Stride, T
 #undef ADD_AVG_CORE_INC
 }
 
+#if JVET_K0485_BIO
+void addBIOAvgCore(const Pel* src0, int src0Stride, const Pel* src1, int src1Stride, Pel *dst, int dstStride, const Pel *pGradX0, const Pel *pGradX1, const Pel *pGradY0, const Pel*pGradY1, int gradStride, int width, int height, int tmpx, int tmpy, int shift, int offset, const ClpRng& clpRng)
+{
+  int b = 0;
+
+  for (int y = 0; y < height; y++)
+  {
+    for (int x = 0; x < width; x += 4)
+    {
+      b = tmpx * (pGradX0[x] - pGradX1[x]) + tmpy * (pGradY0[x] - pGradY1[x]);
+      b = ((b + 32) >> 6);
+      dst[x] = ClipPel((int16_t)rightShift((src0[x] + src1[x] + b + offset), shift), clpRng);
+
+      b = tmpx * (pGradX0[x + 1] - pGradX1[x + 1]) + tmpy * (pGradY0[x + 1] - pGradY1[x + 1]);
+      b = ((b + 32) >> 6);
+      dst[x + 1] = ClipPel((int16_t)rightShift((src0[x + 1] + src1[x + 1] + b + offset), shift), clpRng);
+
+      b = tmpx * (pGradX0[x + 2] - pGradX1[x + 2]) + tmpy * (pGradY0[x + 2] - pGradY1[x + 2]);
+      b = ((b + 32) >> 6);
+      dst[x + 2] = ClipPel((int16_t)rightShift((src0[x + 2] + src1[x + 2] + b + offset), shift), clpRng);
+
+      b = tmpx * (pGradX0[x + 3] - pGradX1[x + 3]) + tmpy * (pGradY0[x + 3] - pGradY1[x + 3]);
+      b = ((b + 32) >> 6);
+      dst[x + 3] = ClipPel((int16_t)rightShift((src0[x + 3] + src1[x + 3] + b + offset), shift), clpRng);
+    }
+    dst += dstStride;       src0 += src0Stride;     src1 += src1Stride;
+    pGradX0 += gradStride; pGradX1 += gradStride; pGradY0 += gradStride; pGradY1 += gradStride;
+  }
+}
+#endif
 
 template<typename T>
 void reconstructCore( const T* src1, int src1Stride, const T* src2, int src2Stride, T* dest, int dstStride, int width, int height, const ClpRng& clpRng )
@@ -97,6 +127,9 @@ PelBufferOps::PelBufferOps()
 {
   addAvg4 = addAvgCore<Pel>;
   addAvg8 = addAvgCore<Pel>;
+#if JVET_K0485_BIO
+  addBIOAvg4    = addBIOAvgCore;
+#endif
 
   reco4 = reconstructCore<Pel>;
   reco8 = reconstructCore<Pel>;
@@ -112,7 +145,7 @@ PelBufferOps g_pelBufOP = PelBufferOps();
 
 
 template<>
-Void AreaBuf<Pel>::addAvg( const AreaBuf<const Pel> &other1, const AreaBuf<const Pel> &other2, const ClpRng& clpRng)
+void AreaBuf<Pel>::addAvg( const AreaBuf<const Pel> &other1, const AreaBuf<const Pel> &other2, const ClpRng& clpRng)
 {
   const Pel* src0 = other1.buf;
   const Pel* src2 = other2.buf;
@@ -122,7 +155,7 @@ Void AreaBuf<Pel>::addAvg( const AreaBuf<const Pel> &other1, const AreaBuf<const
   const unsigned src2Stride = other2.stride;
   const unsigned destStride =        stride;
   const int     clipbd      = clpRng.bd;
-  const int     shiftNum    = std::max<Int>(2, (IF_INTERNAL_PREC - clipbd)) + 1;
+  const int     shiftNum    = std::max<int>(2, (IF_INTERNAL_PREC - clipbd)) + 1;
   const int     offset      = (1 << (shiftNum - 1)) + 2 * IF_INTERNAL_OFFS;
 
 #if ENABLE_SIMD_OPT_BUFFER && defined(TARGET_SIMD_X86)
@@ -151,14 +184,14 @@ Void AreaBuf<Pel>::addAvg( const AreaBuf<const Pel> &other1, const AreaBuf<const
 }
 
 template<>
-Void AreaBuf<Pel>::toLast( const ClpRng& clpRng )
+void AreaBuf<Pel>::toLast( const ClpRng& clpRng )
 {
         Pel* src       = buf;
-  const UInt srcStride = stride;
+  const uint32_t srcStride = stride;
 
-  const Int  clipbd    = clpRng.bd;
-  const Int  shiftNum  = std::max<Int>(2, (IF_INTERNAL_PREC - clipbd));
-  const Int  offset    = ( 1 << ( shiftNum - 1 ) ) + IF_INTERNAL_OFFS;
+  const int  clipbd    = clpRng.bd;
+  const int  shiftNum  = std::max<int>(2, (IF_INTERNAL_PREC - clipbd));
+  const int  offset    = ( 1 << ( shiftNum - 1 ) ) + IF_INTERNAL_OFFS;
 
   if (width == 1)
   {
@@ -166,9 +199,9 @@ Void AreaBuf<Pel>::toLast( const ClpRng& clpRng )
   }
   else if (width&2)
   {
-    for ( Int y = 0; y < height; y++ )
+    for ( int y = 0; y < height; y++ )
     {
-      for (Int x=0 ; x < width; x+=2 )
+      for (int x=0 ; x < width; x+=2 )
       {
         src[x + 0] = ClipPel( rightShift( ( src[x + 0] + offset ), shiftNum ), clpRng );
         src[x + 1] = ClipPel( rightShift( ( src[x + 1] + offset ), shiftNum ), clpRng );
@@ -178,9 +211,9 @@ Void AreaBuf<Pel>::toLast( const ClpRng& clpRng )
   }
   else
   {
-    for ( Int y = 0; y < height; y++ )
+    for ( int y = 0; y < height; y++ )
     {
-      for (Int x=0 ; x < width; x+=4 )
+      for (int x=0 ; x < width; x+=4 )
       {
         src[x + 0] = ClipPel( rightShift( ( src[x + 0] + offset ), shiftNum ), clpRng );
         src[x + 1] = ClipPel( rightShift( ( src[x + 1] + offset ), shiftNum ), clpRng );
@@ -304,7 +337,7 @@ void AreaBuf<Pel>::subtract( const Pel val )
 
 PelStorage::PelStorage()
 {
-  for( UInt i = 0; i < MAX_NUM_COMPONENT; i++ )
+  for( uint32_t i = 0; i < MAX_NUM_COMPONENT; i++ )
   {
     m_origin[i] = nullptr;
   }
@@ -326,7 +359,7 @@ void PelStorage::create( const ChromaFormat &_chromaFormat, const Area& _area, c
 
   chromaFormat = _chromaFormat;
 
-  const UInt numCh = getNumberValidComponents( _chromaFormat );
+  const uint32_t numCh = getNumberValidComponents( _chromaFormat );
 
   unsigned extHeight = _area.height;
   unsigned extWidth  = _area.width;
@@ -337,7 +370,7 @@ void PelStorage::create( const ChromaFormat &_chromaFormat, const Area& _area, c
     extWidth  = ( ( _area.width  + _maxCUSize - 1 ) / _maxCUSize ) * _maxCUSize;
   }
 
-  for( UInt i = 0; i < numCh; i++ )
+  for( uint32_t i = 0; i < numCh; i++ )
   {
     const ComponentID compID = ComponentID( i );
     const unsigned scaleX = ::getComponentScaleX( compID, _chromaFormat );
@@ -356,7 +389,7 @@ void PelStorage::create( const ChromaFormat &_chromaFormat, const Area& _area, c
       CHECK( _alignment != MEMORY_ALIGN_DEF_SIZE, "Unsupported alignment" );
       totalWidth = ( ( totalWidth + _alignment - 1 ) / _alignment ) * _alignment;
     }
-    UInt area = totalWidth * totalHeight;
+    uint32_t area = totalWidth * totalHeight;
     CHECK( !area, "Trying to create a buffer with zero area" );
 
     m_origin[i] = ( Pel* ) xMalloc( Pel, area );
@@ -369,11 +402,11 @@ void PelStorage::createFromBuf( PelUnitBuf buf )
 {
   chromaFormat = buf.chromaFormat;
 
-  const UInt numCh = ::getNumberValidComponents( chromaFormat );
+  const uint32_t numCh = ::getNumberValidComponents( chromaFormat );
 
   bufs.resize(numCh);
 
-  for( UInt i = 0; i < numCh; i++ )
+  for( uint32_t i = 0; i < numCh; i++ )
   {
     PelBuf cPelBuf = buf.get( ComponentID( i ) );
     bufs[i] = PelBuf( cPelBuf.bufAt( 0, 0 ), cPelBuf.stride, cPelBuf.width, cPelBuf.height );
@@ -382,9 +415,9 @@ void PelStorage::createFromBuf( PelUnitBuf buf )
 
 void PelStorage::swap( PelStorage& other )
 {
-  const UInt numCh = ::getNumberValidComponents( chromaFormat );
+  const uint32_t numCh = ::getNumberValidComponents( chromaFormat );
 
-  for( UInt i = 0; i < numCh; i++ )
+  for( uint32_t i = 0; i < numCh; i++ )
   {
     // check this otherwise it would turn out to get very weird
     CHECK( chromaFormat                   != other.chromaFormat                  , "Incompatible formats" );
@@ -400,7 +433,7 @@ void PelStorage::swap( PelStorage& other )
 void PelStorage::destroy()
 {
   chromaFormat = NUM_CHROMA_FORMAT;
-  for( UInt i = 0; i < MAX_NUM_COMPONENT; i++ )
+  for( uint32_t i = 0; i < MAX_NUM_COMPONENT; i++ )
   {
     if( m_origin[i] )
     {

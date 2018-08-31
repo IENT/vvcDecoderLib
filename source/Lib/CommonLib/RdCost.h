@@ -67,6 +67,14 @@ typedef Distortion (*FpDistFunc) (const DistParam&);
 class DistParam
 {
 public:
+#if DMVR_JVET_K0217
+  int32_t meanL0;
+  int32_t meanL1;
+  Mv MVDL0;
+  Mv MVDL1;
+  int32_t partOfMeanL0;
+  int32_t partOfMeanL1;
+#endif
   CPelBuf               org;
   CPelBuf               cur;
 #if WCG_EXT
@@ -87,9 +95,20 @@ public:
 
   // (vertical) subsampling shift (for reducing complexity)
   // - 0 = no subsampling, 1 = even rows, 2 = every 4th, etc.
-  Int                   subShift;
+  int                   subShift;
 
-  DistParam() : org(), cur(), step( 1 ), bitDepth( 0 ), useMR( false ), applyWeight( false ), isBiPred( false ), wpCur( nullptr ), compID( MAX_NUM_COMPONENT ), maximumDistortionForEarlyExit( std::numeric_limits<Distortion>::max() ), subShift( 0 ) { }
+  DistParam() :
+#if DMVR_JVET_K0217
+  meanL0(0),
+  meanL1(0),
+  MVDL0({}),
+  MVDL1({}),
+  partOfMeanL0(0), 
+  partOfMeanL1(0),
+#endif
+  org(), cur(), step( 1 ), bitDepth( 0 ), useMR( false ), applyWeight( false ), isBiPred( false ), wpCur( nullptr ), compID( MAX_NUM_COMPONENT ), maximumDistortionForEarlyExit( std::numeric_limits<Distortion>::max() ), subShift( 0 )
+
+  { }
 };
 
 /// RD cost computation class
@@ -122,41 +141,45 @@ public:
   virtual ~RdCost();
 
 #if WCG_EXT
-  Double        calcRdCost            ( uint64_t fracBits, Distortion distortion, bool useUnadjustedLambda = true );
+  double        calcRdCost            ( uint64_t fracBits, Distortion distortion, bool useUnadjustedLambda = true );
 #else
-  Double        calcRdCost            ( uint64_t fracBits, Distortion distortion );
+  double        calcRdCost            ( uint64_t fracBits, Distortion distortion );
 #endif
 
-  Void          setDistortionWeight   ( const ComponentID compID, const Double distortionWeight ) { m_distortionWeight[compID] = distortionWeight; }
-  Void          setLambda             ( Double dLambda, const BitDepths &bitDepths );
+  void          setDistortionWeight   ( const ComponentID compID, const double distortionWeight ) { m_distortionWeight[compID] = distortionWeight; }
+  void          setLambda             ( double dLambda, const BitDepths &bitDepths );
 
 #if WCG_EXT
-  Double        getLambda( bool unadj = false )
+  double        getLambda( bool unadj = false )
                                       { return unadj ? m_dLambda_unadjusted : m_dLambda; }
 #else
-  Double        getLambda()           { return m_dLambda; }
+  double        getLambda()           { return m_dLambda; }
 #endif
-  Double        getChromaWeight()     { return ((m_distortionWeight[COMPONENT_Cb] + m_distortionWeight[COMPONENT_Cr]) / 2.0); }
+  double        getChromaWeight()     { return ((m_distortionWeight[COMPONENT_Cb] + m_distortionWeight[COMPONENT_Cr]) / 2.0); }
 
-  Void          setCostMode(CostMode m) { m_costMode = m; }
+  void          setCostMode(CostMode m) { m_costMode = m; }
 
-  Void          setUseQtbt(bool b)    { m_useQtbt = b; }
+  void          setUseQtbt(bool b)    { m_useQtbt = b; }
 
   // Distortion Functions
-  Void          init();
+  void          init();
 #ifdef TARGET_SIMD_X86
-  Void          initRdCostX86();
+  void          initRdCostX86();
   template <X86_VEXT vext>
-  Void          _initRdCostX86();
+  void          _initRdCostX86();
 #endif
 
-  Void           setDistParam( DistParam &rcDP, const CPelBuf &org, const Pel* piRefY , Int iRefStride, Int bitDepth, ComponentID compID, Int subShiftMode = 0, Int step = 1, Bool useHadamard = false );
-  Void           setDistParam( DistParam &rcDP, const CPelBuf &org, const CPelBuf &cur, Int bitDepth, ComponentID compID, Bool useHadamard = false );
-  Void           setDistParam( DistParam &rcDP, const Pel* pOrg, const Pel* piRefY, Int iOrgStride, Int iRefStride, Int bitDepth, ComponentID compID, Int width, Int height, Int subShiftMode = 0, Int step = 1, Bool useHadamard = false );
+  void           setDistParam( DistParam &rcDP, const CPelBuf &org, const Pel* piRefY , int iRefStride, int bitDepth, ComponentID compID, int subShiftMode = 0, int step = 1, bool useHadamard = false );
+  void           setDistParam( DistParam &rcDP, const CPelBuf &org, const CPelBuf &cur, int bitDepth, ComponentID compID, bool useHadamard = false );
+#if JVET_K0485_BIO
+  void           setDistParam( DistParam &rcDP, const Pel* pOrg, const Pel* piRefY, int iOrgStride, int iRefStride, int bitDepth, ComponentID compID, int width, int height, int subShiftMode = 0, int step = 1, bool useHadamard = false, bool bio = false );
+#else
+  void           setDistParam( DistParam &rcDP, const Pel* pOrg, const Pel* piRefY, int iOrgStride, int iRefStride, int bitDepth, ComponentID compID, int width, int height, int subShiftMode = 0, int step = 1, bool useHadamard = false );
+#endif
 
   double         getMotionLambda          ( bool bIsTransquantBypass ) { return m_dLambdaMotionSAD[(bIsTransquantBypass && m_costMode==COST_MIXED_LOSSLESS_LOSSY_CODING)?1:0]; }
-  Void           selectMotionLambda       ( bool bIsTransquantBypass ) { m_motionLambda = getMotionLambda( bIsTransquantBypass ); }
-  Void           setPredictor             ( const Mv& rcMv )
+  void           selectMotionLambda       ( bool bIsTransquantBypass ) { m_motionLambda = getMotionLambda( bIsTransquantBypass ); }
+  void           setPredictor             ( const Mv& rcMv )
   {
     m_mvPredictor = rcMv;
 #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
@@ -166,15 +189,15 @@ public:
     }
 #endif
   }
-  Void           setCostScale             ( Int iCostScale )           { m_iCostScale = iCostScale; }
-  Distortion     getCost                  ( UInt b )                   { return Distortion( m_motionLambda * b ); }
+  void           setCostScale             ( int iCostScale )           { m_iCostScale = iCostScale; }
+  Distortion     getCost                  ( uint32_t b )                   { return Distortion( m_motionLambda * b ); }
 
 #if ENABLE_SPLIT_PARALLELISM
   void copyState( const RdCost& other );
 #endif
 
   // for motion cost
-  static UInt    xGetExpGolombNumberOfBits( Int iVal )
+  static uint32_t    xGetExpGolombNumberOfBits( int iVal )
   {
     CHECKD( iVal == std::numeric_limits<int>::min(), "Wrong value" );
     unsigned uiLength2 = 1, uiTemp2 = ( iVal <= 0 ) ? ( unsigned( -iVal ) << 1 ) + 1 : unsigned( iVal << 1 );
@@ -188,16 +211,16 @@ public:
     return uiLength2 + ( g_aucPrevLog2[uiTemp2] << 1 );
   }
 #if JVET_K0357_AMVR
-  Distortion     getCostOfVectorWithPredictor( const Int x, const Int y, const unsigned imvShift )  { return Distortion( m_motionLambda * getBitsOfVectorWithPredictor(x, y, imvShift )); }
-  UInt           getBitsOfVectorWithPredictor( const Int x, const Int y, const unsigned imvShift )  { return xGetExpGolombNumberOfBits(((x << m_iCostScale) - m_mvPredictor.getHor())>>imvShift) + xGetExpGolombNumberOfBits(((y << m_iCostScale) - m_mvPredictor.getVer())>>imvShift); }
+  Distortion     getCostOfVectorWithPredictor( const int x, const int y, const unsigned imvShift )  { return Distortion( m_motionLambda * getBitsOfVectorWithPredictor(x, y, imvShift )); }
+  uint32_t           getBitsOfVectorWithPredictor( const int x, const int y, const unsigned imvShift )  { return xGetExpGolombNumberOfBits(((x << m_iCostScale) - m_mvPredictor.getHor())>>imvShift) + xGetExpGolombNumberOfBits(((y << m_iCostScale) - m_mvPredictor.getVer())>>imvShift); }
 #else
-  Distortion     getCostOfVectorWithPredictor( const Int x, const Int y )  { return Distortion( m_motionLambda * getBitsOfVectorWithPredictor(x, y )); }
-  UInt           getBitsOfVectorWithPredictor( const Int x, const Int y )  { return xGetExpGolombNumberOfBits(((x << m_iCostScale) - m_mvPredictor.getHor())) + xGetExpGolombNumberOfBits(((y << m_iCostScale) - m_mvPredictor.getVer())); }
+  Distortion     getCostOfVectorWithPredictor( const int x, const int y )  { return Distortion( m_motionLambda * getBitsOfVectorWithPredictor(x, y )); }
+  uint32_t           getBitsOfVectorWithPredictor( const int x, const int y )  { return xGetExpGolombNumberOfBits(((x << m_iCostScale) - m_mvPredictor.getHor())) + xGetExpGolombNumberOfBits(((y << m_iCostScale) - m_mvPredictor.getVer())); }
 #endif
 #if WCG_EXT
-         Void    saveUnadjustedLambda       ();
-         Void    initLumaLevelToWeightTable ();
-  inline Double  getWPSNRLumaLevelWeight    (Int val) { return m_lumaLevelToWeightPLUT[val]; }
+         void    saveUnadjustedLambda       ();
+         void    initLumaLevelToWeightTable ();
+  inline double  getWPSNRLumaLevelWeight    (int val) { return m_lumaLevelToWeightPLUT[val]; }
 #endif
 
 private:
@@ -211,7 +234,7 @@ private:
   static Distortion xGetSSE16N        ( const DistParam& pcDtParam );
 
 #if WCG_EXT
-  static Distortion getWeightedMSE    (Int compIdx, const Pel org, const Pel cur, const UInt uiShift, const Pel orgLuma);
+  static Distortion getWeightedMSE    (int compIdx, const Pel org, const Pel cur, const uint32_t uiShift, const Pel orgLuma);
   static Distortion xGetSSE_WTD       ( const DistParam& pcDtParam );
   static Distortion xGetSSE2_WTD      ( const DistParam& pcDtParam );
   static Distortion xGetSSE4_WTD      ( const DistParam& pcDtParam );
@@ -249,24 +272,24 @@ private:
   static Distortion xGetMRHADs        ( const DistParam& pcDtParam );
 
   static Distortion xGetHADs          ( const DistParam& pcDtParam );
-  static Distortion xCalcHADs2x2      ( const Pel *piOrg, const Pel *piCurr, Int iStrideOrg, Int iStrideCur, Int iStep );
-  static Distortion xCalcHADs4x4      ( const Pel *piOrg, const Pel *piCurr, Int iStrideOrg, Int iStrideCur, Int iStep );
-  static Distortion xCalcHADs8x8      ( const Pel *piOrg, const Pel *piCurr, Int iStrideOrg, Int iStrideCur, Int iStep );
+  static Distortion xCalcHADs2x2      ( const Pel *piOrg, const Pel *piCurr, int iStrideOrg, int iStrideCur, int iStep );
+  static Distortion xCalcHADs4x4      ( const Pel *piOrg, const Pel *piCurr, int iStrideOrg, int iStrideCur, int iStep );
+  static Distortion xCalcHADs8x8      ( const Pel *piOrg, const Pel *piCurr, int iStrideOrg, int iStrideCur, int iStep );
 
-  static Distortion xCalcHADs16x8     ( const Pel *piOrg, const Pel *piCur, Int iStrideOrg, Int iStrideCur );
-  static Distortion xCalcHADs8x16     ( const Pel *piOrg, const Pel *piCur, Int iStrideOrg, Int iStrideCur );
-  static Distortion xCalcHADs4x8      ( const Pel *piOrg, const Pel *piCur, Int iStrideOrg, Int iStrideCur );
-  static Distortion xCalcHADs8x4      ( const Pel *piOrg, const Pel *piCur, Int iStrideOrg, Int iStrideCur );
+  static Distortion xCalcHADs16x8     ( const Pel *piOrg, const Pel *piCur, int iStrideOrg, int iStrideCur );
+  static Distortion xCalcHADs8x16     ( const Pel *piOrg, const Pel *piCur, int iStrideOrg, int iStrideCur );
+  static Distortion xCalcHADs4x8      ( const Pel *piOrg, const Pel *piCur, int iStrideOrg, int iStrideCur );
+  static Distortion xCalcHADs8x4      ( const Pel *piOrg, const Pel *piCur, int iStrideOrg, int iStrideCur );
 
 #ifdef TARGET_SIMD_X86
   template< typename Torg, typename Tcur, X86_VEXT vext >
   static Distortion xGetSSE_SIMD    ( const DistParam& pcDtParam );
-  template< typename Torg, typename Tcur, Int iWidth, X86_VEXT vext >
+  template< typename Torg, typename Tcur, int iWidth, X86_VEXT vext >
   static Distortion xGetSSE_NxN_SIMD( const DistParam& pcDtParam );
 
   template< X86_VEXT vext >
   static Distortion xGetSAD_SIMD    ( const DistParam& pcDtParam );
-  template< Int iWidth, X86_VEXT vext >
+  template< int iWidth, X86_VEXT vext >
   static Distortion xGetSAD_NxN_SIMD( const DistParam& pcDtParam );
 
   template< typename Torg, typename Tcur, X86_VEXT vext >
@@ -276,9 +299,9 @@ private:
 public:
 
 #if WCG_EXT
-  Distortion   getDistPart( const CPelBuf &org, const CPelBuf &cur, Int bitDepth, const ComponentID compID, DFunc eDFunc, const CPelBuf *orgLuma = NULL );
+  Distortion   getDistPart( const CPelBuf &org, const CPelBuf &cur, int bitDepth, const ComponentID compID, DFunc eDFunc, const CPelBuf *orgLuma = NULL );
 #else
-  Distortion   getDistPart( const CPelBuf &org, const CPelBuf &cur, Int bitDepth, const ComponentID compID, DFunc eDFunc );
+  Distortion   getDistPart( const CPelBuf &org, const CPelBuf &cur, int bitDepth, const ComponentID compID, DFunc eDFunc );
 #endif
 
 };// END CLASS DEFINITION RdCost

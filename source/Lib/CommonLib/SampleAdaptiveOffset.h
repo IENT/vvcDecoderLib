@@ -55,7 +55,7 @@
 // Class definition
 // ====================================================================================================================
 
-template <typename T> Int sgn(T val)
+template <typename T> int sgn(T val)
 {
   return (T(0) < val) - (val < T(0));
 }
@@ -65,44 +65,44 @@ class SampleAdaptiveOffset
 public:
   SampleAdaptiveOffset();
   virtual ~SampleAdaptiveOffset();
-  Void SAOProcess( CodingStructure& cs, SAOBlkParam* saoBlkParams
+  void SAOProcess( CodingStructure& cs, SAOBlkParam* saoBlkParams
                    );
-  Void create( Int picWidth, Int picHeight, ChromaFormat format, UInt maxCUWidth, UInt maxCUHeight, UInt maxCUDepth, UInt lumaBitShift, UInt chromaBitShift );
-  Void destroy();
-  static Int getMaxOffsetQVal(const Int channelBitDepth) { return (1<<(std::min<Int>(channelBitDepth,MAX_SAO_TRUNCATED_BITDEPTH)-5))-1; } //Table 9-32, inclusive
+  void create( int picWidth, int picHeight, ChromaFormat format, uint32_t maxCUWidth, uint32_t maxCUHeight, uint32_t maxCUDepth, uint32_t lumaBitShift, uint32_t chromaBitShift );
+  void destroy();
+  static int getMaxOffsetQVal(const int channelBitDepth) { return (1<<(std::min<int>(channelBitDepth,MAX_SAO_TRUNCATED_BITDEPTH)-5))-1; } //Table 9-32, inclusive
 
 protected:
-  Void deriveLoopFilterBoundaryAvailibility(CodingStructure& cs, const Position &pos,
-    Bool& isLeftAvail,
-    Bool& isRightAvail,
-    Bool& isAboveAvail,
-    Bool& isBelowAvail,
-    Bool& isAboveLeftAvail,
-    Bool& isAboveRightAvail,
-    Bool& isBelowLeftAvail,
-    Bool& isBelowRightAvail
+  void deriveLoopFilterBoundaryAvailibility(CodingStructure& cs, const Position &pos,
+    bool& isLeftAvail,
+    bool& isRightAvail,
+    bool& isAboveAvail,
+    bool& isBelowAvail,
+    bool& isAboveLeftAvail,
+    bool& isAboveRightAvail,
+    bool& isBelowLeftAvail,
+    bool& isBelowRightAvail
     ) const;
 
-  Void offsetBlock(const Int channelBitDepth, const ClpRng& clpRng, Int typeIdx, Int* offset, const Pel* srcBlk, Pel* resBlk, Int srcStride, Int resStride,  Int width, Int height
-                  , Bool isLeftAvail, Bool isRightAvail, Bool isAboveAvail, Bool isBelowAvail, Bool isAboveLeftAvail, Bool isAboveRightAvail, Bool isBelowLeftAvail, Bool isBelowRightAvail);
-  Void invertQuantOffsets(ComponentID compIdx, Int typeIdc, Int typeAuxInfo, Int* dstOffsets, Int* srcOffsets);
-  Void reconstructBlkSAOParam(SAOBlkParam& recParam, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES]);
-  Int  getMergeList(CodingStructure& cs, Int ctuRsAddr, SAOBlkParam* blkParams, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES]);
-  Void offsetCTU(const UnitArea& area, const CPelUnitBuf& src, PelUnitBuf& res, SAOBlkParam& saoblkParam, CodingStructure& cs);
-  Void xPCMLFDisableProcess(CodingStructure& cs);
-  Void xPCMCURestoration(CodingStructure& cs, const UnitArea &ctuArea);
-  Void xPCMSampleRestoration(CodingUnit& cu, const ComponentID compID);
-  Void xReconstructBlkSAOParams(CodingStructure& cs, SAOBlkParam* saoBlkParams);
+  void offsetBlock(const int channelBitDepth, const ClpRng& clpRng, int typeIdx, int* offset, const Pel* srcBlk, Pel* resBlk, int srcStride, int resStride,  int width, int height
+                  , bool isLeftAvail, bool isRightAvail, bool isAboveAvail, bool isBelowAvail, bool isAboveLeftAvail, bool isAboveRightAvail, bool isBelowLeftAvail, bool isBelowRightAvail);
+  void invertQuantOffsets(ComponentID compIdx, int typeIdc, int typeAuxInfo, int* dstOffsets, int* srcOffsets);
+  void reconstructBlkSAOParam(SAOBlkParam& recParam, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES]);
+  int  getMergeList(CodingStructure& cs, int ctuRsAddr, SAOBlkParam* blkParams, SAOBlkParam* mergeList[NUM_SAO_MERGE_TYPES]);
+  void offsetCTU(const UnitArea& area, const CPelUnitBuf& src, PelUnitBuf& res, SAOBlkParam& saoblkParam, CodingStructure& cs);
+  void xPCMLFDisableProcess(CodingStructure& cs);
+  void xPCMCURestoration(CodingStructure& cs, const UnitArea &ctuArea);
+  void xPCMSampleRestoration(CodingUnit& cu, const ComponentID compID);
+  void xReconstructBlkSAOParams(CodingStructure& cs, SAOBlkParam* saoBlkParams);
 
 protected:
-  UInt m_offsetStepLog2[MAX_NUM_COMPONENT]; //offset step
+  uint32_t m_offsetStepLog2[MAX_NUM_COMPONENT]; //offset step
   PelStorage m_tempBuf;
-  UInt m_numberOfComponents;
+  uint32_t m_numberOfComponents;
 
-  std::vector<SChar> m_signLineBuf1;
-  std::vector<SChar> m_signLineBuf2;
+  std::vector<int8_t> m_signLineBuf1;
+  std::vector<int8_t> m_signLineBuf2;
 private:
-  Bool m_picSAOEnabled[MAX_NUM_COMPONENT];
+  bool m_picSAOEnabled[MAX_NUM_COMPONENT];
 };
 
 //! \}

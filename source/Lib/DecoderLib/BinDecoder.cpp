@@ -125,7 +125,7 @@ unsigned BinDecoderBase::decodeBinEP()
 unsigned BinDecoderBase::decodeBinsEP( unsigned numBins )
 {
 #if ENABLE_TRACING
-  Int numBinsOrig = numBins;
+  int numBinsOrig = numBins;
 #endif
 
   if( m_Range == 256 )
@@ -138,7 +138,7 @@ unsigned BinDecoderBase::decodeBinsEP( unsigned numBins )
   {
     m_Value     = ( m_Value << 8 ) + ( m_Bitstream->readByte() << ( 8 + m_bitsNeeded ) );
     unsigned SR =   m_Range << 15;
-    for( Int i = 0; i < 8; i++ )
+    for( int i = 0; i < 8; i++ )
     {
       bins += bins;
       SR  >>= 1;
@@ -158,7 +158,7 @@ unsigned BinDecoderBase::decodeBinsEP( unsigned numBins )
     m_bitsNeeded -= 8;
   }
   unsigned SR = m_Range << ( remBins + 7 );
-  for ( Int i = 0; i < remBins; i++ )
+  for ( int i = 0; i < remBins; i++ )
   {
     bins += bins;
     SR  >>= 1;
@@ -172,7 +172,7 @@ unsigned BinDecoderBase::decodeBinsEP( unsigned numBins )
   CodingStatistics::IncrementStatisticEP( *ptype, numBins, int(bins) );
 #endif
 #if ENABLE_TRACING
-  for( Int i = 0; i < numBinsOrig; i++ )
+  for( int i = 0; i < numBinsOrig; i++ )
   {
     DTRACE( g_trace_ctx, D_CABAC, "%d" "  " "%d" "  EP=%d \n", DTRACE_GET_COUNTER( g_trace_ctx, D_CABAC ), m_Range, ( bins >> ( numBinsOrig - 1 - i ) ) & 1 );
   }
@@ -287,7 +287,7 @@ void BinDecoderBase::align()
 unsigned BinDecoderBase::decodeAlignedBinsEP( unsigned numBins )
 {
 #if ENABLE_TRACING
-  Int numBinsOrig = numBins;
+  int numBinsOrig = numBins;
 #endif
   unsigned remBins = numBins;
   unsigned bins    = 0;
@@ -318,7 +318,7 @@ unsigned BinDecoderBase::decodeAlignedBinsEP( unsigned numBins )
   CodingStatistics::IncrementStatisticEP( *ptype, numBins, int(bins) );
 #endif
 #if ENABLE_TRACING
-  for( Int i = 0; i < numBinsOrig; i++ )
+  for( int i = 0; i < numBinsOrig; i++ )
   {
     DTRACE( g_trace_ctx, D_CABAC, "%d" "  " "%d" "  " "EP=%d \n", DTRACE_GET_COUNTER( g_trace_ctx, D_CABAC ), m_Range, ( bins >> ( numBinsOrig - 1 - i ) ) & 1 );
   }

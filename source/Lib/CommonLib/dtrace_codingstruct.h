@@ -57,11 +57,11 @@ inline void dtracePicComp( DTRACE_CHANNEL channel, CodingStructure& cs, const CP
   if( !g_trace_ctx ) return;
   if( pelUnitBuf.chromaFormat == CHROMA_400 && compId != COMPONENT_Y )  return;
   const Pel* piSrc    = pelUnitBuf.bufs[compId].buf;
-  UInt       uiStride = pelUnitBuf.bufs[compId].stride;
-  UInt       uiWidth  = pelUnitBuf.bufs[compId].width;
-  UInt       uiHeight = pelUnitBuf.bufs[compId].height;
-  UInt       uiChromaScaleX = getComponentScaleX( compId, pelUnitBuf.chromaFormat );
-  UInt       uiChromaScaleY = getComponentScaleY( compId, pelUnitBuf.chromaFormat );
+  uint32_t       uiStride = pelUnitBuf.bufs[compId].stride;
+  uint32_t       uiWidth  = pelUnitBuf.bufs[compId].width;
+  uint32_t       uiHeight = pelUnitBuf.bufs[compId].height;
+  uint32_t       uiChromaScaleX = getComponentScaleX( compId, pelUnitBuf.chromaFormat );
+  uint32_t       uiChromaScaleY = getComponentScaleY( compId, pelUnitBuf.chromaFormat );
 
   DTRACE                ( g_trace_ctx, channel, "\n%s: poc = %d, size=%dx%d\n\n", g_trace_ctx->getChannelName(channel), cs.slice->getPOC(), uiWidth, uiHeight );
   DTRACE_FRAME_BLOCKWISE( g_trace_ctx, channel, piSrc, uiStride, uiWidth, uiHeight, cs.sps->getMaxCUWidth() >> uiChromaScaleX, cs.sps->getMaxCUHeight() >> uiChromaScaleY);
@@ -76,11 +76,11 @@ inline void dtraceModeCost(CodingStructure &cs, double lambda)
   Distortion tempDist = cs.dist;
 
 #if OLD_RDCOST
-  UInt64 tempBits = cs.fracBits >> SCALE_BITS;
-  UInt64 tempCost = (UInt64)(cs.dist + (double)tempBits * lambda);
+  uint64_t tempBits = cs.fracBits >> SCALE_BITS;
+  uint64_t tempCost = (uint64_t)(cs.dist + (double)tempBits * lambda);
 #else
-  UInt64 tempBits = cs.fracBits;
-  UInt64 tempCost = (UInt64)cs.cost;
+  uint64_t tempBits = cs.fracBits;
+  uint64_t tempCost = (uint64_t)cs.cost;
 #endif
 
   if( cs.cost == MAX_DOUBLE )
@@ -108,6 +108,10 @@ inline void dtraceModeCost(CodingStructure &cs, double lambda)
   else if( isIntra ) intraModeC = g_intraMode65to33AngMapping[intraModeC];
 #endif
 #endif
+  int imvVal = 0;
+#if JVET_K0357_AMVR
+  imvVal = cs.cus[0]->imv;
+#endif
 #if JEM_TOOLS
   DTRACE( g_trace_ctx, D_MODE_COST, "ModeCost: %6lld %3d @(%4d,%4d) [%2dx%2d] %d (qp%d,pm%d,ptSize%d,skip%d,mrg%d,fruc%d,obmc%d,ic%d,imv%d,affn%d,%d,%d) tempCS = %lld (%d,%d)\n",
     DTRACE_GET_COUNTER( g_trace_ctx, D_MODE_COST ),
@@ -123,11 +127,7 @@ inline void dtraceModeCost(CodingStructure &cs, double lambda)
     cs.pus[0]->frucMrgMode,
     cs.cus[0]->obmcFlag,
     cs.cus[0]->LICFlag,
-#if JVET_K0357_AMVR
-    cs.cus[0]->imv,
-#else
-    0,
-#endif
+    imvVal,
     cs.cus[0]->affine,
     intraModeL, intraModeC,
     tempCost, tempBits, tempDist );
@@ -144,11 +144,7 @@ inline void dtraceModeCost(CodingStructure &cs, double lambda)
     cs.cus[0]->skip,
     cs.pus[0]->mergeFlag,
     0, 0, 
-#if JVET_K0357_AMVR
-    cs.cus[0]->imv,
-#else
-    0,
-#endif
+    imvVal,
     0, 0,
           intraModeL, intraModeC,
           tempCost, tempBits, tempDist );
@@ -157,7 +153,7 @@ inline void dtraceModeCost(CodingStructure &cs, double lambda)
 
 inline void dtraceBestMode(CodingStructure *&tempCS, CodingStructure *&bestCS, double lambda)
 {
-  Bool bSplitCS = tempCS->cus.size() > 1 || bestCS->cus.size() > 1;
+  bool bSplitCS = tempCS->cus.size() > 1 || bestCS->cus.size() > 1;
   ChannelType chType = tempCS->cus.back()->chType;
 
   // if the last CU does not align with the CS, we probably are at the edge
@@ -166,15 +162,15 @@ inline void dtraceBestMode(CodingStructure *&tempCS, CodingStructure *&bestCS, d
   Distortion tempDist = tempCS->dist;
 
 #if OLD_RDCOST
-  UInt64 tempBits = tempCS->fracBits >> SCALE_BITS;
-  UInt64 bestBits = bestCS->fracBits >> SCALE_BITS;
-  UInt64 tempCost = (UInt64)(tempCS->dist + (double)tempBits * lambda);
-  UInt64 bestCost = (UInt64)(bestCS->dist + (double)bestBits * lambda);
+  uint64_t tempBits = tempCS->fracBits >> SCALE_BITS;
+  uint64_t bestBits = bestCS->fracBits >> SCALE_BITS;
+  uint64_t tempCost = (uint64_t)(tempCS->dist + (double)tempBits * lambda);
+  uint64_t bestCost = (uint64_t)(bestCS->dist + (double)bestBits * lambda);
 #else
-  UInt64 tempBits = tempCS->fracBits;
-  UInt64 bestBits = bestCS->fracBits;
-  UInt64 tempCost = (UInt64)tempCS->cost;
-  UInt64 bestCost = (UInt64)bestCS->cost;
+  uint64_t tempBits = tempCS->fracBits;
+  uint64_t bestBits = bestCS->fracBits;
+  uint64_t tempCost = (uint64_t)tempCS->cost;
+  uint64_t bestCost = (uint64_t)bestCS->cost;
 #endif
 
   if( tempCS->cost == MAX_DOUBLE )

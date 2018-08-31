@@ -63,8 +63,8 @@ public:
   ColourRemapping();
   virtual ~ColourRemapping();
 
-  Void outputColourRemapPic(Picture* pcPic, std::ofstream& outstream );
-  Void reset();
+  void outputColourRemapPic(Picture* pcPic, std::ofstream& outstream );
+  void reset();
 };
 
 //! \}

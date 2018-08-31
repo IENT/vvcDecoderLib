@@ -63,7 +63,7 @@ public:
   SEIRemovalApp();
   virtual ~SEIRemovalApp         ()  {}
 
-  UInt  decode            (); ///< main decoding function
+  uint32_t  decode            (); ///< main decoding function
 };
 
 #endif // __SEIREMOVALAPP__

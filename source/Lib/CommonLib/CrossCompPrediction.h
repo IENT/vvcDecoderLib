@@ -54,16 +54,16 @@ class CrossComponentPrediction
 {
 protected:
 
-  SChar xCalcCrossComponentPredictionAlpha( TransformUnit &tu, const ComponentID &compID, Bool useRecoResidual );
+  int8_t xCalcCrossComponentPredictionAlpha( TransformUnit &tu, const ComponentID &compID, bool useRecoResidual );
 
 public:
 
-  static Void crossComponentPrediction(       TransformUnit &tu,
+  static void crossComponentPrediction(       TransformUnit &tu,
                                         const ComponentID   &compID,
                                         const CPelBuf       &piResiL,
                                         const CPelBuf       &piResiC,
                                               PelBuf        &piResiT,
-                                        const Bool          &reverse );
+                                        const bool          &reverse );
 };
 
 //! \}

@@ -61,7 +61,7 @@ void roundAffineMv( int& mvx, int& mvy, int nShift )
 }
 #endif
 
-Void clipMv( Mv& rcMv, const Position& pos, const SPS& sps )
+void clipMv( Mv& rcMv, const Position& pos, const SPS& sps )
 {
 #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
   int iMvShift = 2 + ( rcMv.highPrec ? VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : 0 );

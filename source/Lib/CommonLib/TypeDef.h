@@ -104,6 +104,11 @@
 
 #define JVET_K0357_AMVR                                   1 // Adaptive motion vector resolution separated from JEM_TOOLS macro
 
+#define JVET_K0485_BIO                                    1 // BIO simplifications
+#if JVET_K0485_BIO
+#define JVET_K0485_BIO_EXTEND_SIZE                        1
+#endif
+
 #ifndef JEM_TOOLS
 #define JEM_TOOLS                                         1 // Defines the inclusion of JEM tools into compiled executable
 
@@ -245,6 +250,14 @@
 #define RExt__DECODER_DEBUG_BIT_STATISTICS                0 ///< 0 (default) = decoder reports as normal, 1 = decoder produces bit usage statistics (will impact decoder run time by up to ~10%)
 #endif
 
+#ifndef RExt__DECODER_DEBUG_TOOL_STATISTICS
+#define RExt__DECODER_DEBUG_TOOL_STATISTICS               0 ///< 0 (default) = decoder reports as normal, 1 = decoder produces tool usage statistics
+#endif
+
+#if RExt__DECODER_DEBUG_BIT_STATISTICS || RExt__DECODER_DEBUG_TOOL_STATISTICS
+#define RExt__DECODER_DEBUG_STATISTICS                    1
+#endif
+
 // ====================================================================================================================
 // Tool Switches - transitory (these macros are likely to be removed in future revisions)
 // ====================================================================================================================
@@ -313,6 +326,14 @@
 #endif
 #endif
 
+#if JEM_TOOLS
+#define DMVR_JVET_K0217                                   1  // DMVR CE9.2.9l (JVET K0217)
+#if DMVR_JVET_K0217
+#define DMVR_JVET_SEARCH_RANGE_K0217                      2  // refinement iteration count ([1; 8])
+#define DMVR_JVET_LOW_LATENCY_K0217                       1  // refined MVs for used for TMVP but not for deblocking
+#endif
+#endif
+
 #define RDOQ_CHROMA                                       1 ///< use of RDOQ in chroma
 
 #define QP_SWITCHING_FOR_PARALLEL                         1 ///< Replace floating point QP with a source-file frame number. After switching POC, increase base QP instead of frame level QP.
@@ -353,72 +374,34 @@
 #endif
 
 // ====================================================================================================================
-// Basic type redefinition
-// ====================================================================================================================
-
-typedef       void                Void;
-typedef       bool                Bool;
-
-typedef       char                TChar; // Used for text/characters
-typedef       signed char         SChar; // Signed 8-bit values
-typedef       unsigned char       UChar; // Unsigned 8-bit values
-typedef       short               Short;
-typedef       unsigned short      UShort;
-typedef       int                 Int;
-typedef       unsigned int        UInt;
-typedef       double              Double;
-typedef       float               Float;
-
-
-// ====================================================================================================================
-// 64-bit integer type
-// ====================================================================================================================
-
-#ifdef _MSC_VER
-typedef       __int64             Int64;
-
-#if _MSC_VER <= 1200 // MS VC6
-typedef       __int64             UInt64;   // MS VC6 does not support unsigned __int64 to double conversion
-#else
-typedef       unsigned __int64    UInt64;
-#endif
-
-#else
-
-typedef       long long           Int64;
-typedef       unsigned long long  UInt64;
-
-#endif
-
-// ====================================================================================================================
 // Named numerical types
 // ====================================================================================================================
 
 #if RExt__HIGH_BIT_DEPTH_SUPPORT
-typedef       Int             Pel;               ///< pixel type
-typedef       Int64           TCoeff;            ///< transform coefficient
-typedef       Int             TMatrixCoeff;      ///< transform matrix coefficient
-typedef       Short           TFilterCoeff;      ///< filter coefficient
-typedef       Int64           Intermediate_Int;  ///< used as intermediate value in calculations
-typedef       UInt64          Intermediate_UInt; ///< used as intermediate value in calculations
+typedef       int             Pel;               ///< pixel type
+typedef       int64_t           TCoeff;            ///< transform coefficient
+typedef       int             TMatrixCoeff;      ///< transform matrix coefficient
+typedef       int16_t           TFilterCoeff;      ///< filter coefficient
+typedef       int64_t           Intermediate_Int;  ///< used as intermediate value in calculations
+typedef       uint64_t          Intermediate_UInt; ///< used as intermediate value in calculations
 #else
-typedef       Short           Pel;               ///< pixel type
-typedef       Int             TCoeff;            ///< transform coefficient
-typedef       Short           TMatrixCoeff;      ///< transform matrix coefficient
-typedef       Short           TFilterCoeff;      ///< filter coefficient
-typedef       Int             Intermediate_Int;  ///< used as intermediate value in calculations
-typedef       UInt            Intermediate_UInt; ///< used as intermediate value in calculations
+typedef       int16_t           Pel;               ///< pixel type
+typedef       int             TCoeff;            ///< transform coefficient
+typedef       int16_t           TMatrixCoeff;      ///< transform matrix coefficient
+typedef       int16_t           TFilterCoeff;      ///< filter coefficient
+typedef       int             Intermediate_Int;  ///< used as intermediate value in calculations
+typedef       uint32_t            Intermediate_UInt; ///< used as intermediate value in calculations
 #endif
 
-typedef       UInt64          SplitSeries;       ///< used to encoded the splits that caused a particular CU size
+typedef       uint64_t          SplitSeries;       ///< used to encoded the splits that caused a particular CU size
 
 #if DISTORTION_TYPE_BUGFIX
 typedef       uint64_t        Distortion;        ///< distortion measurement
 #else
 #if FULL_NBIT
-typedef       UInt64          Distortion;        ///< distortion measurement
+typedef       uint64_t          Distortion;        ///< distortion measurement
 #else
-typedef       UInt            Distortion;        ///< distortion measurement
+typedef       uint32_t            Distortion;        ///< distortion measurement
 #endif
 #endif
 
@@ -1041,13 +1024,13 @@ class PicSym;
 struct SAOOffset
 {
   SAOMode modeIdc; // NEW, MERGE, OFF
-  Int typeIdc;     // union of SAOModeMergeTypes and SAOModeNewTypes, depending on modeIdc.
-  Int typeAuxInfo; // BO: starting band index
-  Int offset[MAX_NUM_SAO_CLASSES];
+  int typeIdc;     // union of SAOModeMergeTypes and SAOModeNewTypes, depending on modeIdc.
+  int typeAuxInfo; // BO: starting band index
+  int offset[MAX_NUM_SAO_CLASSES];
 
   SAOOffset();
   ~SAOOffset();
-  Void reset();
+  void reset();
 
   const SAOOffset& operator= (const SAOOffset& src);
 };
@@ -1057,10 +1040,10 @@ struct SAOBlkParam
 
   SAOBlkParam();
   ~SAOBlkParam();
-  Void reset();
+  void reset();
   const SAOBlkParam& operator= (const SAOBlkParam& src);
-  SAOOffset& operator[](Int compIdx){ return offsetParam[compIdx];}
-  const SAOOffset& operator[](Int compIdx) const { return offsetParam[compIdx];}
+  SAOOffset& operator[](int compIdx){ return offsetParam[compIdx];}
+  const SAOOffset& operator[](int compIdx) const { return offsetParam[compIdx];}
 private:
   SAOOffset offsetParam[MAX_NUM_COMPONENT];
 
@@ -1097,88 +1080,88 @@ struct ALFParam
 
   void destroy();
   void reset();
-  void copyFrom(const ALFParam& src, const Bool isGALF, Bool max_depth_copy = true);
+  void copyFrom(const ALFParam& src, const bool isGALF, bool max_depth_copy = true);
 
-  Int alf_flag;                           ///< indicates use of ALF
-  Int cu_control_flag;                    ///< coding unit based control flag
-  Int chroma_idc;                         ///< indicates use of ALF for chroma
+  int alf_flag;                           ///< indicates use of ALF
+  int cu_control_flag;                    ///< coding unit based control flag
+  int chroma_idc;                         ///< indicates use of ALF for chroma
 #if JVET_C0038_NO_PREV_FILTERS
-  Int iAvailableFilters;
-  Int iPredPattern;
-  Int PrevFiltIdx[NUM_OF_ALF_CLASSES];
+  int iAvailableFilters;
+  int iPredPattern;
+  int PrevFiltIdx[NUM_OF_ALF_CLASSES];
 #endif
   //Filter Adaptation (Classification)
   AlfFilterMode filterMode;
-  Int mapClassToFilter [NUM_OF_ALF_CLASSES];
-  Int filterPattern    [NUM_OF_ALF_CLASSES];
-  Int startSecondFilter;
-  Int **alfCoeffLuma;
-  Int  *alfCoeffChroma;
+  int mapClassToFilter [NUM_OF_ALF_CLASSES];
+  int filterPattern    [NUM_OF_ALF_CLASSES];
+  int startSecondFilter;
+  int **alfCoeffLuma;
+  int  *alfCoeffChroma;
 
   AlfFilterType filterType;
-  Int tapH;                               ///< number of filter taps - horizontal
-  Int tapV;                               ///< number of filter taps - vertical
-  Int num_coeff;                          ///< number of filter coefficients
-  Int **coeffmulti;
+  int tapH;                               ///< number of filter taps - horizontal
+  int tapV;                               ///< number of filter taps - vertical
+  int num_coeff;                          ///< number of filter coefficients
+  int **coeffmulti;
 
-  Int tap_chroma;                         ///< number of filter taps (chroma)
-  Int num_coeff_chroma;                   ///< number of filter coefficients (chroma)
-  Int *coeff_chroma;                      ///< filter coefficient array (chroma)
+  int tap_chroma;                         ///< number of filter taps (chroma)
+  int num_coeff_chroma;                   ///< number of filter coefficients (chroma)
+  int *coeff_chroma;                      ///< filter coefficient array (chroma)
 
   //CU Adaptation
-  UInt num_alf_cu_flag;
-  UInt alf_max_depth;
-  Bool *alf_cu_flag;
+  uint32_t num_alf_cu_flag;
+  uint32_t alf_max_depth;
+  bool *alf_cu_flag;
 
   //Coeff send related
-  UInt num_ctus_in_frame;
-  UInt maxCodingDepth;
+  uint32_t num_ctus_in_frame;
+  uint32_t maxCodingDepth;
 
-  Int codedVarBins[NUM_OF_ALF_CLASSES];
-  Int filters_per_group_diff; //this can be updated using codedVarBins
-  Int filters_per_group;
+  int codedVarBins[NUM_OF_ALF_CLASSES];
+  int filters_per_group_diff; //this can be updated using codedVarBins
+  int filters_per_group;
 
 
-  Int forceCoeff0;
-  Int predMethod;
+  int forceCoeff0;
+  int predMethod;
 
-  Int minKStart;
-  Int maxScanVal;
-  Int kMinTab[42];
+  int minKStart;
+  int maxScanVal;
+  int kMinTab[42];
 
   //Use stored parameter
-  Bool temporalPredFlag;        //indicate whether reuse previous ALF coefficients
-  Int  prevIdx;                 //index of the reused ALF coefficients
+  bool temporalPredFlag;        //indicate whether reuse previous ALF coefficients
+  int  prevIdx;                 //index of the reused ALF coefficients
 };
 #endif
 
 
 struct BitDepths
 {
-  Int recon[MAX_NUM_CHANNEL_TYPE]; ///< the bit depth as indicated in the SPS
+  int recon[MAX_NUM_CHANNEL_TYPE]; ///< the bit depth as indicated in the SPS
 };
 
 /// parameters for deblocking filter
 struct LFCUParam
 {
-  Bool internalEdge;                     ///< indicates internal edge
-  Bool leftEdge;                         ///< indicates left edge
-  Bool topEdge;                          ///< indicates top edge
+  bool internalEdge;                     ///< indicates internal edge
+  bool leftEdge;                         ///< indicates left edge
+  bool topEdge;                          ///< indicates top edge
 };
 
 
 
 struct PictureHash
 {
-  std::vector<UChar> hash;
+  std::vector<uint8_t> hash;
 
-  Bool operator==(const PictureHash &other) const
+  bool operator==(const PictureHash &other) const
   {
     if (other.hash.size() != hash.size())
     {
       return false;
     }
-    for(UInt i=0; i<UInt(hash.size()); i++)
+    for(uint32_t i=0; i<uint32_t(hash.size()); i++)
     {
       if (other.hash[i] != hash[i])
       {
@@ -1188,7 +1171,7 @@ struct PictureHash
     return true;
   }
 
-  Bool operator!=(const PictureHash &other) const
+  bool operator!=(const PictureHash &other) const
   {
     return !(*this == other);
   }
@@ -1212,42 +1195,42 @@ struct SEITimeSet
                      timeOffsetLength(0),
                      timeOffsetValue(0)
   { }
-  Bool clockTimeStampFlag;
-  Bool numUnitFieldBasedFlag;
-  Int  countingType;
-  Bool fullTimeStampFlag;
-  Bool discontinuityFlag;
-  Bool cntDroppedFlag;
-  Int  numberOfFrames;
-  Int  secondsValue;
-  Int  minutesValue;
-  Int  hoursValue;
-  Bool secondsFlag;
-  Bool minutesFlag;
-  Bool hoursFlag;
-  Int  timeOffsetLength;
-  Int  timeOffsetValue;
+  bool clockTimeStampFlag;
+  bool numUnitFieldBasedFlag;
+  int  countingType;
+  bool fullTimeStampFlag;
+  bool discontinuityFlag;
+  bool cntDroppedFlag;
+  int  numberOfFrames;
+  int  secondsValue;
+  int  minutesValue;
+  int  hoursValue;
+  bool secondsFlag;
+  bool minutesFlag;
+  bool hoursFlag;
+  int  timeOffsetLength;
+  int  timeOffsetValue;
 };
 
 struct SEIMasteringDisplay
 {
-  Bool      colourVolumeSEIEnabled;
-  UInt      maxLuminance;
-  UInt      minLuminance;
-  UShort    primaries[3][2];
-  UShort    whitePoint[2];
+  bool      colourVolumeSEIEnabled;
+  uint32_t      maxLuminance;
+  uint32_t      minLuminance;
+  uint16_t    primaries[3][2];
+  uint16_t    whitePoint[2];
 };
 
 #if SHARP_LUMA_DELTA_QP
 struct LumaLevelToDeltaQPMapping
 {
   LumaLevelToDQPMode                 mode;             ///< use deltaQP determined by block luma level
-  Double                             maxMethodWeight;  ///< weight of max luma value when mode = 2
-  std::vector< std::pair<Int, Int> > mapping;          ///< first=luma level, second=delta QP.
+  double                             maxMethodWeight;  ///< weight of max luma value when mode = 2
+  std::vector< std::pair<int, int> > mapping;          ///< first=luma level, second=delta QP.
 #if ENABLE_QPA
   bool isEnabled() const { return (mode != LUMALVL_TO_DQP_DISABLED && mode != LUMALVL_TO_DQP_NUM_MODES); }
 #else
-  Bool isEnabled() const { return mode!=LUMALVL_TO_DQP_DISABLED; }
+  bool isEnabled() const { return mode!=LUMALVL_TO_DQP_DISABLED; }
 #endif
 };
 #endif
@@ -1255,12 +1238,12 @@ struct LumaLevelToDeltaQPMapping
 #if ER_CHROMA_QP_WCG_PPS
 struct WCGChromaQPControl
 {
-  Bool isEnabled() const { return enabled; }
-  Bool   enabled;         ///< Enabled flag (0:default)
-  Double chromaCbQpScale; ///< Chroma Cb QP Scale (1.0:default)
-  Double chromaCrQpScale; ///< Chroma Cr QP Scale (1.0:default)
-  Double chromaQpScale;   ///< Chroma QP Scale (0.0:default)
-  Double chromaQpOffset;  ///< Chroma QP Offset (0.0:default)
+  bool isEnabled() const { return enabled; }
+  bool   enabled;         ///< Enabled flag (0:default)
+  double chromaCbQpScale; ///< Chroma Cb QP Scale (1.0:default)
+  double chromaCrQpScale; ///< Chroma Cr QP Scale (1.0:default)
+  double chromaQpScale;   ///< Chroma QP Scale (0.0:default)
+  double chromaQpOffset;  ///< Chroma QP Offset (0.0:default)
 };
 #endif
 

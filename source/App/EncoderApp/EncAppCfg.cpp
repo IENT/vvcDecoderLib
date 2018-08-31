@@ -144,11 +144,11 @@ EncAppCfg::~EncAppCfg()
 #endif
 }
 
-Void EncAppCfg::create()
+void EncAppCfg::create()
 {
 }
 
-Void EncAppCfg::destroy()
+void EncAppCfg::destroy()
 {
 }
 
@@ -171,7 +171,7 @@ std::istringstream &operator>>(std::istringstream &in, GOPEntry &entry)     //in
   in>>entry.m_temporalId;
   in>>entry.m_numRefPicsActive;
   in>>entry.m_numRefPics;
-  for ( Int i = 0; i < entry.m_numRefPics; i++ )
+  for ( int i = 0; i < entry.m_numRefPics; i++ )
   {
     in>>entry.m_referencePics[i];
   }
@@ -180,7 +180,7 @@ std::istringstream &operator>>(std::istringstream &in, GOPEntry &entry)     //in
   {
     in>>entry.m_deltaRPS;
     in>>entry.m_numRefIdc;
-    for ( Int i = 0; i < entry.m_numRefIdc; i++ )
+    for ( int i = 0; i < entry.m_numRefIdc; i++ )
     {
       in>>entry.m_refIdc[i];
     }
@@ -192,9 +192,9 @@ std::istringstream &operator>>(std::istringstream &in, GOPEntry &entry)     //in
   return in;
 }
 
-Bool confirmPara(Bool bflag, const TChar* message);
+bool confirmPara(bool bflag, const char* message);
 
-static inline ChromaFormat numberToChromaFormat(const Int val)
+static inline ChromaFormat numberToChromaFormat(const int val)
 {
   switch (val)
   {
@@ -208,7 +208,7 @@ static inline ChromaFormat numberToChromaFormat(const Int val)
 
 static const struct MapStrToProfile
 {
-  const TChar* str;
+  const char* str;
   Profile::Name value;
 }
 strToProfile[] =
@@ -224,7 +224,7 @@ strToProfile[] =
 
 static const struct MapStrToExtendedProfile
 {
-  const TChar* str;
+  const char* str;
   ExtendedProfileName value;
 }
 strToExtendedProfile[] =
@@ -284,7 +284,7 @@ static const ExtendedProfileName validRExtProfileNames[2/* intraConstraintFlag*/
 
 static const struct MapStrToTier
 {
-  const TChar* str;
+  const char* str;
   Level::Tier value;
 }
 strToTier[] =
@@ -295,7 +295,7 @@ strToTier[] =
 
 static const struct MapStrToLevel
 {
-  const TChar* str;
+  const char* str;
   Level::Name value;
 }
 strToLevel[] =
@@ -318,7 +318,7 @@ strToLevel[] =
 };
 
 #if U0132_TARGET_BITS_SATURATION
-UInt g_uiMaxCpbSize[2][21] =
+uint32_t g_uiMaxCpbSize[2][21] =
 {
   //         LEVEL1,        LEVEL2,LEVEL2_1,     LEVEL3, LEVEL3_1,      LEVEL4, LEVEL4_1,       LEVEL5,  LEVEL5_1,  LEVEL5_2,    LEVEL6,  LEVEL6_1,  LEVEL6_2
   { 0, 0, 0, 350000, 0, 0, 1500000, 3000000, 0, 6000000, 10000000, 0, 12000000, 20000000, 0,  25000000,  40000000,  60000000,  60000000, 120000000, 240000000 },
@@ -328,7 +328,7 @@ UInt g_uiMaxCpbSize[2][21] =
 
 static const struct MapStrToCostMode
 {
-  const TChar* str;
+  const char* str;
   CostMode    value;
 }
 strToCostMode[] =
@@ -342,7 +342,7 @@ strToCostMode[] =
 #if HEVC_USE_SCALING_LISTS
 static const struct MapStrToScalingListMode
 {
-  const TChar* str;
+  const char* str;
   ScalingListMode value;
 }
 strToScalingListMode[] =
@@ -357,9 +357,9 @@ strToScalingListMode[] =
 #endif
 
 template<typename T, typename P>
-static std::string enumToString(P map[], UInt mapLen, const T val)
+static std::string enumToString(P map[], uint32_t mapLen, const T val)
 {
-  for (UInt i = 0; i < mapLen; i++)
+  for (uint32_t i = 0; i < mapLen; i++)
   {
     if (val == map[i].value)
     {
@@ -370,12 +370,12 @@ static std::string enumToString(P map[], UInt mapLen, const T val)
 }
 
 template<typename T, typename P>
-static istream& readStrToEnum(P map[], UInt mapLen, istream &in, T &val)
+static istream& readStrToEnum(P map[], uint32_t mapLen, istream &in, T &val)
 {
   string str;
   in >> str;
 
-  for (UInt i = 0; i < mapLen; i++)
+  for (uint32_t i = 0; i < mapLen; i++)
   {
     if (str == map[i].str)
     {
@@ -433,12 +433,12 @@ struct SMultiValueInput
   SMultiValueInput(std::vector<T> &defaults) : minValIncl(0), maxValIncl(0), minNumValuesIncl(0), maxNumValuesIncl(0), values(defaults) { }
   SMultiValueInput(const T &minValue, const T &maxValue, std::size_t minNumberValues=0, std::size_t maxNumberValues=0)
     : minValIncl(minValue), maxValIncl(maxValue), minNumValuesIncl(minNumberValues), maxNumValuesIncl(maxNumberValues), values()  { }
-  SMultiValueInput(const T &minValue, const T &maxValue, std::size_t minNumberValues, std::size_t maxNumberValues, const T* defValues, const UInt numDefValues)
+  SMultiValueInput(const T &minValue, const T &maxValue, std::size_t minNumberValues, std::size_t maxNumberValues, const T* defValues, const uint32_t numDefValues)
     : minValIncl(minValue), maxValIncl(maxValue), minNumValuesIncl(minNumberValues), maxNumValuesIncl(maxNumberValues), values(defValues, defValues+numDefValues)  { }
   SMultiValueInput<T> &operator=(const std::vector<T> &userValues) { values=userValues; return *this; }
   SMultiValueInput<T> &operator=(const SMultiValueInput<T> &userValues) { values=userValues.values; return *this; }
 
-  T readValue(const TChar *&pStr, Bool &bSuccess);
+  T readValue(const char *&pStr, bool &bSuccess);
 
   istream& readValues(std::istream &in);
 };
@@ -450,42 +450,42 @@ static inline istream& operator >> (std::istream &in, SMultiValueInput<T> &value
 }
 
 template<>
-UInt SMultiValueInput<UInt>::readValue(const TChar *&pStr, Bool &bSuccess)
+uint32_t SMultiValueInput<uint32_t>::readValue(const char *&pStr, bool &bSuccess)
 {
-  TChar *eptr;
-  UInt val=strtoul(pStr, &eptr, 0);
+  char *eptr;
+  uint32_t val=strtoul(pStr, &eptr, 0);
   pStr=eptr;
   bSuccess=!(*eptr!=0 && !isspace(*eptr) && *eptr!=',') && !(val<minValIncl || val>maxValIncl);
   return val;
 }
 
 template<>
-Int SMultiValueInput<Int>::readValue(const TChar *&pStr, Bool &bSuccess)
+int SMultiValueInput<int>::readValue(const char *&pStr, bool &bSuccess)
 {
-  TChar *eptr;
-  Int val=strtol(pStr, &eptr, 0);
+  char *eptr;
+  int val=strtol(pStr, &eptr, 0);
   pStr=eptr;
   bSuccess=!(*eptr!=0 && !isspace(*eptr) && *eptr!=',') && !(val<minValIncl || val>maxValIncl);
   return val;
 }
 
 template<>
-Double SMultiValueInput<Double>::readValue(const TChar *&pStr, Bool &bSuccess)
+double SMultiValueInput<double>::readValue(const char *&pStr, bool &bSuccess)
 {
-  TChar *eptr;
-  Double val=strtod(pStr, &eptr);
+  char *eptr;
+  double val=strtod(pStr, &eptr);
   pStr=eptr;
   bSuccess=!(*eptr!=0 && !isspace(*eptr) && *eptr!=',') && !(val<minValIncl || val>maxValIncl);
   return val;
 }
 
 template<>
-Bool SMultiValueInput<Bool>::readValue(const TChar *&pStr, Bool &bSuccess)
+bool SMultiValueInput<bool>::readValue(const char *&pStr, bool &bSuccess)
 {
-  TChar *eptr;
-  Int val=strtol(pStr, &eptr, 0);
+  char *eptr;
+  int val=strtol(pStr, &eptr, 0);
   pStr=eptr;
-  bSuccess=!(*eptr!=0 && !isspace(*eptr) && *eptr!=',') && !(val<Int(minValIncl) || val>Int(maxValIncl));
+  bSuccess=!(*eptr!=0 && !isspace(*eptr) && *eptr!=',') && !(val<int(minValIncl) || val>int(maxValIncl));
   return val!=0;
 }
 
@@ -500,13 +500,13 @@ istream& SMultiValueInput<T>::readValues(std::istream &in)
   }
   if (!str.empty())
   {
-    const TChar *pStr=str.c_str();
+    const char *pStr=str.c_str();
     // soak up any whitespace
     for(;isspace(*pStr);pStr++);
 
     while (*pStr != 0)
     {
-      Bool bSuccess=true;
+      bool bSuccess=true;
       T val=readValue(pStr, bSuccess);
       if (!bSuccess)
       {
@@ -554,18 +554,18 @@ static inline istream& operator >> (std::istream &in, EncAppCfg::OptionalValue<T
 }
 #endif
 
-static Void
-automaticallySelectRExtProfile(const Bool bUsingGeneralRExtTools,
-                               const Bool bUsingChromaQPAdjustment,
-                               const Bool bUsingExtendedPrecision,
-                               const Bool bIntraConstraintFlag,
-                               UInt &bitDepthConstraint,
+static void
+automaticallySelectRExtProfile(const bool bUsingGeneralRExtTools,
+                               const bool bUsingChromaQPAdjustment,
+                               const bool bUsingExtendedPrecision,
+                               const bool bIntraConstraintFlag,
+                               uint32_t &bitDepthConstraint,
                                ChromaFormat &chromaFormatConstraint,
-                               const Int  maxBitDepth,
+                               const int  maxBitDepth,
                                const ChromaFormat chromaFormat)
 {
   // Try to choose profile, according to table in Q1013.
-  UInt trialBitDepthConstraint=maxBitDepth;
+  uint32_t trialBitDepthConstraint=maxBitDepth;
   if (trialBitDepthConstraint<8)
   {
     trialBitDepthConstraint=8;
@@ -637,68 +637,68 @@ automaticallySelectRExtProfile(const Bool bUsingGeneralRExtTools,
     \param  argv        array of arguments
     \retval             true when success
  */
-Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
+bool EncAppCfg::parseCfg( int argc, char* argv[] )
 {
-  Bool do_help = false;
+  bool do_help = false;
 
-  Int tmpChromaFormat;
-  Int tmpInputChromaFormat;
-  Int tmpConstraintChromaFormat;
-  Int tmpWeightedPredictionMethod;
-  Int tmpFastInterSearchMode;
-  Int tmpMotionEstimationSearchMethod;
-  Int tmpSliceMode;
+  int tmpChromaFormat;
+  int tmpInputChromaFormat;
+  int tmpConstraintChromaFormat;
+  int tmpWeightedPredictionMethod;
+  int tmpFastInterSearchMode;
+  int tmpMotionEstimationSearchMethod;
+  int tmpSliceMode;
 #if HEVC_DEPENDENT_SLICES
-  Int tmpSliceSegmentMode;
+  int tmpSliceSegmentMode;
 #endif
-  Int tmpDecodedPictureHashSEIMappedType;
+  int tmpDecodedPictureHashSEIMappedType;
   string inputColourSpaceConvert;
   string inputPathPrefix;
   ExtendedProfileName extendedProfile;
-  Int saoOffsetBitShift[MAX_NUM_CHANNEL_TYPE];
+  int saoOffsetBitShift[MAX_NUM_CHANNEL_TYPE];
 
   // Multi-value input fields:                                // minval, maxval (incl), min_entries, max_entries (incl) [, default values, number of default values]
-  SMultiValueInput<UInt> cfg_ColumnWidth                     (0, std::numeric_limits<UInt>::max(), 0, std::numeric_limits<UInt>::max());
-  SMultiValueInput<UInt> cfg_RowHeight                       (0, std::numeric_limits<UInt>::max(), 0, std::numeric_limits<UInt>::max());
-  SMultiValueInput<Int>  cfg_startOfCodedInterval            (std::numeric_limits<Int>::min(), std::numeric_limits<Int>::max(), 0, 1<<16);
-  SMultiValueInput<Int>  cfg_codedPivotValue                 (std::numeric_limits<Int>::min(), std::numeric_limits<Int>::max(), 0, 1<<16);
-  SMultiValueInput<Int>  cfg_targetPivotValue                (std::numeric_limits<Int>::min(), std::numeric_limits<Int>::max(), 0, 1<<16);
+  SMultiValueInput<uint32_t> cfg_ColumnWidth                     (0, std::numeric_limits<uint32_t>::max(), 0, std::numeric_limits<uint32_t>::max());
+  SMultiValueInput<uint32_t> cfg_RowHeight                       (0, std::numeric_limits<uint32_t>::max(), 0, std::numeric_limits<uint32_t>::max());
+  SMultiValueInput<int>  cfg_startOfCodedInterval            (std::numeric_limits<int>::min(), std::numeric_limits<int>::max(), 0, 1<<16);
+  SMultiValueInput<int>  cfg_codedPivotValue                 (std::numeric_limits<int>::min(), std::numeric_limits<int>::max(), 0, 1<<16);
+  SMultiValueInput<int>  cfg_targetPivotValue                (std::numeric_limits<int>::min(), std::numeric_limits<int>::max(), 0, 1<<16);
 
-  SMultiValueInput<Double> cfg_adIntraLambdaModifier         (0, std::numeric_limits<Double>::max(), 0, MAX_TLAYER); ///< Lambda modifier for Intra pictures, one for each temporal layer. If size>temporalLayer, then use [temporalLayer], else if size>0, use [size()-1], else use m_adLambdaModifier.
+  SMultiValueInput<double> cfg_adIntraLambdaModifier         (0, std::numeric_limits<double>::max(), 0, MAX_TLAYER); ///< Lambda modifier for Intra pictures, one for each temporal layer. If size>temporalLayer, then use [temporalLayer], else if size>0, use [size()-1], else use m_adLambdaModifier.
 
 #if SHARP_LUMA_DELTA_QP
-  const Int defaultLumaLevelTodQp_QpChangePoints[]   =  {-3,  -2,  -1,   0,   1,   2,   3,   4,   5,   6};
-  const Int defaultLumaLevelTodQp_LumaChangePoints[] =  { 0, 301, 367, 434, 501, 567, 634, 701, 767, 834};
-  SMultiValueInput<Int>  cfg_lumaLeveltoDQPMappingQP         (-MAX_QP, MAX_QP,                    0, LUMA_LEVEL_TO_DQP_LUT_MAXSIZE, defaultLumaLevelTodQp_QpChangePoints,   sizeof(defaultLumaLevelTodQp_QpChangePoints  )/sizeof(Int));
-  SMultiValueInput<Int>  cfg_lumaLeveltoDQPMappingLuma       (0, std::numeric_limits<Int>::max(), 0, LUMA_LEVEL_TO_DQP_LUT_MAXSIZE, defaultLumaLevelTodQp_LumaChangePoints, sizeof(defaultLumaLevelTodQp_LumaChangePoints)/sizeof(Int));
-  UInt lumaLevelToDeltaQPMode;
+  const int defaultLumaLevelTodQp_QpChangePoints[]   =  {-3,  -2,  -1,   0,   1,   2,   3,   4,   5,   6};
+  const int defaultLumaLevelTodQp_LumaChangePoints[] =  { 0, 301, 367, 434, 501, 567, 634, 701, 767, 834};
+  SMultiValueInput<int>  cfg_lumaLeveltoDQPMappingQP         (-MAX_QP, MAX_QP,                    0, LUMA_LEVEL_TO_DQP_LUT_MAXSIZE, defaultLumaLevelTodQp_QpChangePoints,   sizeof(defaultLumaLevelTodQp_QpChangePoints  )/sizeof(int));
+  SMultiValueInput<int>  cfg_lumaLeveltoDQPMappingLuma       (0, std::numeric_limits<int>::max(), 0, LUMA_LEVEL_TO_DQP_LUT_MAXSIZE, defaultLumaLevelTodQp_LumaChangePoints, sizeof(defaultLumaLevelTodQp_LumaChangePoints)/sizeof(int));
+  uint32_t lumaLevelToDeltaQPMode;
 #endif
 
-  const UInt defaultInputKneeCodes[3]  = { 600, 800, 900 };
-  const UInt defaultOutputKneeCodes[3] = { 100, 250, 450 };
-  SMultiValueInput<UInt> cfg_kneeSEIInputKneePointValue      (1,  999, 0, 999, defaultInputKneeCodes,  sizeof(defaultInputKneeCodes )/sizeof(UInt));
-  SMultiValueInput<UInt> cfg_kneeSEIOutputKneePointValue     (0, 1000, 0, 999, defaultOutputKneeCodes, sizeof(defaultOutputKneeCodes)/sizeof(UInt));
-  const Int defaultPrimaryCodes[6]     = { 0,50000, 0,0, 50000,0 };
-  const Int defaultWhitePointCode[2]   = { 16667, 16667 };
-  SMultiValueInput<Int>  cfg_DisplayPrimariesCode            (0, 50000, 6, 6, defaultPrimaryCodes,   sizeof(defaultPrimaryCodes  )/sizeof(Int));
-  SMultiValueInput<Int>  cfg_DisplayWhitePointCode           (0, 50000, 2, 2, defaultWhitePointCode, sizeof(defaultWhitePointCode)/sizeof(Int));
+  const uint32_t defaultInputKneeCodes[3]  = { 600, 800, 900 };
+  const uint32_t defaultOutputKneeCodes[3] = { 100, 250, 450 };
+  SMultiValueInput<uint32_t> cfg_kneeSEIInputKneePointValue      (1,  999, 0, 999, defaultInputKneeCodes,  sizeof(defaultInputKneeCodes )/sizeof(uint32_t));
+  SMultiValueInput<uint32_t> cfg_kneeSEIOutputKneePointValue     (0, 1000, 0, 999, defaultOutputKneeCodes, sizeof(defaultOutputKneeCodes)/sizeof(uint32_t));
+  const int defaultPrimaryCodes[6]     = { 0,50000, 0,0, 50000,0 };
+  const int defaultWhitePointCode[2]   = { 16667, 16667 };
+  SMultiValueInput<int>  cfg_DisplayPrimariesCode            (0, 50000, 6, 6, defaultPrimaryCodes,   sizeof(defaultPrimaryCodes  )/sizeof(int));
+  SMultiValueInput<int>  cfg_DisplayWhitePointCode           (0, 50000, 2, 2, defaultWhitePointCode, sizeof(defaultWhitePointCode)/sizeof(int));
 
-  SMultiValueInput<Bool> cfg_timeCodeSeiTimeStampFlag        (0,  1, 0, MAX_TIMECODE_SEI_SETS);
-  SMultiValueInput<Bool> cfg_timeCodeSeiNumUnitFieldBasedFlag(0,  1, 0, MAX_TIMECODE_SEI_SETS);
-  SMultiValueInput<Int>  cfg_timeCodeSeiCountingType         (0,  6, 0, MAX_TIMECODE_SEI_SETS);
-  SMultiValueInput<Bool> cfg_timeCodeSeiFullTimeStampFlag    (0,  1, 0, MAX_TIMECODE_SEI_SETS);
-  SMultiValueInput<Bool> cfg_timeCodeSeiDiscontinuityFlag    (0,  1, 0, MAX_TIMECODE_SEI_SETS);
-  SMultiValueInput<Bool> cfg_timeCodeSeiCntDroppedFlag       (0,  1, 0, MAX_TIMECODE_SEI_SETS);
-  SMultiValueInput<Int>  cfg_timeCodeSeiNumberOfFrames       (0,511, 0, MAX_TIMECODE_SEI_SETS);
-  SMultiValueInput<Int>  cfg_timeCodeSeiSecondsValue         (0, 59, 0, MAX_TIMECODE_SEI_SETS);
-  SMultiValueInput<Int>  cfg_timeCodeSeiMinutesValue         (0, 59, 0, MAX_TIMECODE_SEI_SETS);
-  SMultiValueInput<Int>  cfg_timeCodeSeiHoursValue           (0, 23, 0, MAX_TIMECODE_SEI_SETS);
-  SMultiValueInput<Bool> cfg_timeCodeSeiSecondsFlag          (0,  1, 0, MAX_TIMECODE_SEI_SETS);
-  SMultiValueInput<Bool> cfg_timeCodeSeiMinutesFlag          (0,  1, 0, MAX_TIMECODE_SEI_SETS);
-  SMultiValueInput<Bool> cfg_timeCodeSeiHoursFlag            (0,  1, 0, MAX_TIMECODE_SEI_SETS);
-  SMultiValueInput<Int>  cfg_timeCodeSeiTimeOffsetLength     (0, 31, 0, MAX_TIMECODE_SEI_SETS);
-  SMultiValueInput<Int>  cfg_timeCodeSeiTimeOffsetValue      (std::numeric_limits<Int>::min(), std::numeric_limits<Int>::max(), 0, MAX_TIMECODE_SEI_SETS);
-  Int warnUnknowParameter = 0;
+  SMultiValueInput<bool> cfg_timeCodeSeiTimeStampFlag        (0,  1, 0, MAX_TIMECODE_SEI_SETS);
+  SMultiValueInput<bool> cfg_timeCodeSeiNumUnitFieldBasedFlag(0,  1, 0, MAX_TIMECODE_SEI_SETS);
+  SMultiValueInput<int>  cfg_timeCodeSeiCountingType         (0,  6, 0, MAX_TIMECODE_SEI_SETS);
+  SMultiValueInput<bool> cfg_timeCodeSeiFullTimeStampFlag    (0,  1, 0, MAX_TIMECODE_SEI_SETS);
+  SMultiValueInput<bool> cfg_timeCodeSeiDiscontinuityFlag    (0,  1, 0, MAX_TIMECODE_SEI_SETS);
+  SMultiValueInput<bool> cfg_timeCodeSeiCntDroppedFlag       (0,  1, 0, MAX_TIMECODE_SEI_SETS);
+  SMultiValueInput<int>  cfg_timeCodeSeiNumberOfFrames       (0,511, 0, MAX_TIMECODE_SEI_SETS);
+  SMultiValueInput<int>  cfg_timeCodeSeiSecondsValue         (0, 59, 0, MAX_TIMECODE_SEI_SETS);
+  SMultiValueInput<int>  cfg_timeCodeSeiMinutesValue         (0, 59, 0, MAX_TIMECODE_SEI_SETS);
+  SMultiValueInput<int>  cfg_timeCodeSeiHoursValue           (0, 23, 0, MAX_TIMECODE_SEI_SETS);
+  SMultiValueInput<bool> cfg_timeCodeSeiSecondsFlag          (0,  1, 0, MAX_TIMECODE_SEI_SETS);
+  SMultiValueInput<bool> cfg_timeCodeSeiMinutesFlag          (0,  1, 0, MAX_TIMECODE_SEI_SETS);
+  SMultiValueInput<bool> cfg_timeCodeSeiHoursFlag            (0,  1, 0, MAX_TIMECODE_SEI_SETS);
+  SMultiValueInput<int>  cfg_timeCodeSeiTimeOffsetLength     (0, 31, 0, MAX_TIMECODE_SEI_SETS);
+  SMultiValueInput<int>  cfg_timeCodeSeiTimeOffsetValue      (std::numeric_limits<int>::min(), std::numeric_limits<int>::max(), 0, MAX_TIMECODE_SEI_SETS);
+  int warnUnknowParameter = 0;
 
 #if ENABLE_TRACING
   string sTracingRule;
@@ -769,7 +769,7 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
   ("SummaryOutFilename",                              m_summaryOutFilename,                          string(), "Filename to use for producing summary output file. If empty, do not produce a file.")
   ("SummaryPicFilenameBase",                          m_summaryPicFilenameBase,                      string(), "Base filename to use for producing summary picture output files. The actual filenames used will have I.txt, P.txt and B.txt appended. If empty, do not produce a file.")
   ("SummaryVerboseness",                              m_summaryVerboseness,                                0u, "Specifies the level of the verboseness of the text output")
-  ("Verbosity,v",                                     m_verbosity,                               (Int)VERBOSE, "Specifies the level of the verboseness")
+  ("Verbosity,v",                                     m_verbosity,                               (int)VERBOSE, "Specifies the level of the verboseness")
 
   //Field coding parameters
   ("FieldCoding",                                     m_isField,                                        false, "Signals if it's a field based coding")
@@ -947,7 +947,7 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
 
   // motion search options
   ("DisableIntraInInter",                             m_bDisableIntraPUsInInterSlices,                  false, "Flag to disable intra PUs in inter slices")
-  ("FastSearch",                                      tmpMotionEstimationSearchMethod,  Int(MESEARCH_DIAMOND), "0:Full search 1:Diamond 2:Selective 3:Enhanced Diamond")
+  ("FastSearch",                                      tmpMotionEstimationSearchMethod,  int(MESEARCH_DIAMOND), "0:Full search 1:Diamond 2:Selective 3:Enhanced Diamond")
   ("SearchRange,-sr",                                 m_iSearchRange,                                      96, "Motion search range")
   ("BipredSearchRange",                               m_bipredSearchRange,                                  4, "Motion search range for bipred refinement")
   ("MinSearchWindow",                                 m_minSearchWindow,                                    8, "Minimum motion search window size for the adaptive window ME")
@@ -960,20 +960,20 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
   opts.addOptions()
 
   // Mode decision parameters
-  ("LambdaModifier0,-LM0",                            m_adLambdaModifier[ 0 ],                  ( Double )1.0, "Lambda modifier for temporal layer 0. If LambdaModifierI is used, this will not affect intra pictures")
-  ("LambdaModifier1,-LM1",                            m_adLambdaModifier[ 1 ],                  ( Double )1.0, "Lambda modifier for temporal layer 1. If LambdaModifierI is used, this will not affect intra pictures")
-  ("LambdaModifier2,-LM2",                            m_adLambdaModifier[ 2 ],                  ( Double )1.0, "Lambda modifier for temporal layer 2. If LambdaModifierI is used, this will not affect intra pictures")
-  ("LambdaModifier3,-LM3",                            m_adLambdaModifier[ 3 ],                  ( Double )1.0, "Lambda modifier for temporal layer 3. If LambdaModifierI is used, this will not affect intra pictures")
-  ("LambdaModifier4,-LM4",                            m_adLambdaModifier[ 4 ],                  ( Double )1.0, "Lambda modifier for temporal layer 4. If LambdaModifierI is used, this will not affect intra pictures")
-  ("LambdaModifier5,-LM5",                            m_adLambdaModifier[ 5 ],                  ( Double )1.0, "Lambda modifier for temporal layer 5. If LambdaModifierI is used, this will not affect intra pictures")
-  ("LambdaModifier6,-LM6",                            m_adLambdaModifier[ 6 ],                  ( Double )1.0, "Lambda modifier for temporal layer 6. If LambdaModifierI is used, this will not affect intra pictures")
+  ("LambdaModifier0,-LM0",                            m_adLambdaModifier[ 0 ],                  ( double )1.0, "Lambda modifier for temporal layer 0. If LambdaModifierI is used, this will not affect intra pictures")
+  ("LambdaModifier1,-LM1",                            m_adLambdaModifier[ 1 ],                  ( double )1.0, "Lambda modifier for temporal layer 1. If LambdaModifierI is used, this will not affect intra pictures")
+  ("LambdaModifier2,-LM2",                            m_adLambdaModifier[ 2 ],                  ( double )1.0, "Lambda modifier for temporal layer 2. If LambdaModifierI is used, this will not affect intra pictures")
+  ("LambdaModifier3,-LM3",                            m_adLambdaModifier[ 3 ],                  ( double )1.0, "Lambda modifier for temporal layer 3. If LambdaModifierI is used, this will not affect intra pictures")
+  ("LambdaModifier4,-LM4",                            m_adLambdaModifier[ 4 ],                  ( double )1.0, "Lambda modifier for temporal layer 4. If LambdaModifierI is used, this will not affect intra pictures")
+  ("LambdaModifier5,-LM5",                            m_adLambdaModifier[ 5 ],                  ( double )1.0, "Lambda modifier for temporal layer 5. If LambdaModifierI is used, this will not affect intra pictures")
+  ("LambdaModifier6,-LM6",                            m_adLambdaModifier[ 6 ],                  ( double )1.0, "Lambda modifier for temporal layer 6. If LambdaModifierI is used, this will not affect intra pictures")
   ("LambdaModifierI,-LMI",                            cfg_adIntraLambdaModifier,    cfg_adIntraLambdaModifier, "Lambda modifiers for Intra pictures, comma separated, up to one the number of temporal layer. If entry for temporalLayer exists, then use it, else if some are specified, use the last, else use the standard LambdaModifiers.")
   ("IQPFactor,-IQF",                                  m_dIntraQpFactor,                                  -1.0, "Intra QP Factor for Lambda Computation. If negative, the default will scale lambda based on GOP size (unless LambdaFromQpEnable then IntraQPOffset is used instead)")
 
   /* Quantization parameters */
 #if QP_SWITCHING_FOR_PARALLEL
   ("QP,q",                                            m_iQP,                                               30, "Qp value")
-  ("QPIncrementFrame,-qpif",                          m_qpIncrementAtSourceFrame,       OptionalValue<UInt>(), "If a source file frame number is specified, the internal QP will be incremented for all POCs associated with source frames >= frame number. If empty, do not increment.")
+  ("QPIncrementFrame,-qpif",                          m_qpIncrementAtSourceFrame,       OptionalValue<uint32_t>(), "If a source file frame number is specified, the internal QP will be incremented for all POCs associated with source frames >= frame number. If empty, do not increment.")
 #else
   ("QP,q",                                            m_fQP,                                             30.0, "Qp value, if value is float, QP is switched once during encoding")
 #endif
@@ -1061,19 +1061,19 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
   ("SAOGreedyEnc",                                    m_saoGreedyMergeEnc,                              false, "SAO greedy merge encoding algorithm")
 #endif
 #if HEVC_TILES_WPP
-  ("SliceMode",                                       tmpSliceMode,                            Int(NO_SLICES), "0: Disable all Recon slice limits, 1: Enforce max # of CTUs, 2: Enforce max # of bytes, 3:specify tiles per dependent slice")
+  ("SliceMode",                                       tmpSliceMode,                            int(NO_SLICES), "0: Disable all Recon slice limits, 1: Enforce max # of CTUs, 2: Enforce max # of bytes, 3:specify tiles per dependent slice")
   ("SliceArgument",                                   m_sliceArgument,                                      0, "Depending on SliceMode being:"
                                                                                                                "\t1: max number of CTUs per slice"
                                                                                                                "\t2: max number of bytes per slice"
                                                                                                                "\t3: max number of tiles per slice")
 #else
-  ("SliceMode",                                       tmpSliceMode,                            Int(NO_SLICES), "0: Disable all Recon slice limits, 1: Enforce max # of CTUs, 2: Enforce max # of bytes)")
+  ("SliceMode",                                       tmpSliceMode,                            int(NO_SLICES), "0: Disable all Recon slice limits, 1: Enforce max # of CTUs, 2: Enforce max # of bytes)")
   ("SliceArgument",                                   m_sliceArgument,                                      0, "Depending on SliceMode being:"
                                                                                                                "\t1: max number of CTUs per slice"
                                                                                                                "\t2: max number of bytes per slice")
 #endif
 #if HEVC_DEPENDENT_SLICES
-  ("SliceSegmentMode",                                tmpSliceSegmentMode,                     Int(NO_SLICES), "0: Disable all slice segment limits, 1: Enforce max # of CTUs, 2: Enforce max # of bytes, 3:specify tiles per dependent slice")
+  ("SliceSegmentMode",                                tmpSliceSegmentMode,                     int(NO_SLICES), "0: Disable all slice segment limits, 1: Enforce max # of CTUs, 2: Enforce max # of bytes, 3:specify tiles per dependent slice")
   ("SliceSegmentArgument",                            m_sliceSegmentArgument,                               0, "Depending on SliceSegmentMode being:"
                                                                                                                "\t1: max number of CTUs per slice segment"
                                                                                                                "\t2: max number of bytes per slice segment"
@@ -1094,7 +1094,7 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
   ("IntraReferenceSmoothing",                         m_enableIntraReferenceSmoothing,                   true, "0: Disable use of intra reference smoothing (not valid in V1 profiles). 1: Enable use of intra reference smoothing (same as V1)")
   ("WeightedPredP,-wpP",                              m_useWeightedPred,                                false, "Use weighted prediction in P slices")
   ("WeightedPredB,-wpB",                              m_useWeightedBiPred,                              false, "Use weighted (bidirectional) prediction in B slices")
-  ("WeightedPredMethod,-wpM",                         tmpWeightedPredictionMethod, Int(WP_PER_PICTURE_WITH_SIMPLE_DC_COMBINED_COMPONENT), "Weighted prediction method")
+  ("WeightedPredMethod,-wpM",                         tmpWeightedPredictionMethod, int(WP_PER_PICTURE_WITH_SIMPLE_DC_COMBINED_COMPONENT), "Weighted prediction method")
   ("Log2ParallelMergeLevel",                          m_log2ParallelMergeLevel,                            2u, "Parallel merge estimation region")
 #if HEVC_TILES_WPP
     //deprecated copies of renamed tile parameters
@@ -1132,7 +1132,7 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
                                                                                                                "\t1: use MD5\n"
                                                                                                                "\t0: disable")
   ("TMVPMode",                                        m_TMVPModeId,                                         1, "TMVP mode 0: TMVP disable for all slices. 1: TMVP enable for all slices (default) 2: TMVP enable for certain slices only")
-  ("FEN",                                             tmpFastInterSearchMode,   Int(FASTINTERSEARCH_DISABLED), "fast encoder setting")
+  ("FEN",                                             tmpFastInterSearchMode,   int(FASTINTERSEARCH_DISABLED), "fast encoder setting")
   ("ECU",                                             m_bUseEarlyCU,                                    false, "Early CU setting")
   ("FDM",                                             m_useFastDecisionForMerge,                         true, "Fast decision for Merge RD Cost")
   ("CFM",                                             m_bUseCbfFastMode,                                false, "Cbf fast mode setting")
@@ -1342,7 +1342,7 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
   m_ext360.addOptions(opts, ext360CfgContext);
 #endif
 
-  for(Int i=1; i<MAX_GOP+1; i++)
+  for(int i=1; i<MAX_GOP+1; i++)
   {
     std::ostringstream cOSS;
     cOSS<<"Frame"<<i;
@@ -1350,9 +1350,9 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
   }
   po::setDefaults(opts);
   po::ErrorReporter err;
-  const list<const TChar*>& argv_unhandled = po::scanArgv(opts, argc, (const TChar**) argv, err);
+  const list<const char*>& argv_unhandled = po::scanArgv(opts, argc, (const char**) argv, err);
 
-  for (list<const TChar*>::const_iterator it = argv_unhandled.begin(); it != argv_unhandled.end(); it++)
+  for (list<const char*>::const_iterator it = argv_unhandled.begin(); it != argv_unhandled.end(); it++)
   {
     msg( ERROR, "Unhandled argument ignored: `%s'\n", *it);
   }
@@ -1385,7 +1385,11 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
   m_ext360.setMaxCUInfo(m_uiCTUSize, 1 << MIN_CU_LOG2);
 #endif
 
-  m_inputFileName   = inputPathPrefix + "/" + m_inputFileName;
+  if (!inputPathPrefix.empty() && inputPathPrefix.back() != '/' && inputPathPrefix.back() != '\\' )
+  {
+    inputPathPrefix += "/";
+  }
+  m_inputFileName   = inputPathPrefix + m_inputFileName;
   m_framesToBeEncoded = ( m_framesToBeEncoded + m_temporalSubsampleRatio - 1 ) / m_temporalSubsampleRatio;
   m_adIntraLambdaModifier = cfg_adIntraLambdaModifier.values;
   if(m_isField)
@@ -1412,7 +1416,7 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
     else
     {
       m_tileColumnWidth.resize(m_numTileColumnsMinus1);
-      for(UInt i=0; i<cfg_ColumnWidth.values.size(); i++)
+      for(uint32_t i=0; i<cfg_ColumnWidth.values.size(); i++)
       {
         m_tileColumnWidth[i]=cfg_ColumnWidth.values[i];
       }
@@ -1436,7 +1440,7 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
     else
     {
       m_tileRowHeight.resize(m_numTileRowsMinus1);
-      for(UInt i=0; i<cfg_RowHeight.values.size(); i++)
+      for(uint32_t i=0; i<cfg_RowHeight.values.size(); i++)
       {
         m_tileRowHeight[i]=cfg_RowHeight.values[i];
       }
@@ -1529,15 +1533,15 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
     if (m_bitDepthConstraint == 0 && tmpConstraintChromaFormat == 0)
     {
       // produce a valid combination, if possible.
-      const Bool bUsingGeneralRExtTools  = m_transformSkipRotationEnabledFlag        ||
+      const bool bUsingGeneralRExtTools  = m_transformSkipRotationEnabledFlag        ||
                                            m_transformSkipContextEnabledFlag         ||
                                            m_rdpcmEnabledFlag[RDPCM_SIGNAL_IMPLICIT] ||
                                            m_rdpcmEnabledFlag[RDPCM_SIGNAL_EXPLICIT] ||
                                            !m_enableIntraReferenceSmoothing          ||
                                            m_persistentRiceAdaptationEnabledFlag     ||
                                            m_log2MaxTransformSkipBlockSize!=2;
-      const Bool bUsingChromaQPAdjustment= m_diffCuChromaQpOffsetDepth >= 0;
-      const Bool bUsingExtendedPrecision = m_extendedPrecisionProcessingFlag;
+      const bool bUsingChromaQPAdjustment= m_diffCuChromaQpOffsetDepth >= 0;
+      const bool bUsingExtendedPrecision = m_extendedPrecisionProcessingFlag;
       if (m_onePictureOnlyConstraintFlag)
       {
         m_chromaFormatConstraint = CHROMA_444;
@@ -1545,7 +1549,7 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
         {
           EXIT( "Error: Intra constraint flag must be true when one_picture_only_constraint_flag is true");
         }
-        const Int maxBitDepth = m_chromaFormatIDC==CHROMA_400 ? m_internalBitDepth[CHANNEL_TYPE_LUMA] : std::max(m_internalBitDepth[CHANNEL_TYPE_LUMA], m_internalBitDepth[CHANNEL_TYPE_CHROMA]);
+        const int maxBitDepth = m_chromaFormatIDC==CHROMA_400 ? m_internalBitDepth[CHANNEL_TYPE_LUMA] : std::max(m_internalBitDepth[CHANNEL_TYPE_LUMA], m_internalBitDepth[CHANNEL_TYPE_CHROMA]);
         m_bitDepthConstraint = maxBitDepth>8 ? 16:8;
       }
       else
@@ -1591,7 +1595,7 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
   case 1:
     {
       // automatic padding to minimum CU size
-      Int minCuSize = m_uiMaxCUHeight >> (m_uiMaxCUDepth - 1);
+      int minCuSize = m_uiMaxCUHeight >> (m_uiMaxCUDepth - 1);
       if (m_iSourceWidth % minCuSize)
       {
         m_aiPad[0] = m_confWinRight  = ((m_iSourceWidth / minCuSize) + 1) * minCuSize - m_iSourceWidth;
@@ -1642,21 +1646,21 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
     }
   }
 
-  if (tmpSliceMode<0 || tmpSliceMode>=Int(NUMBER_OF_SLICE_CONSTRAINT_MODES))
+  if (tmpSliceMode<0 || tmpSliceMode>=int(NUMBER_OF_SLICE_CONSTRAINT_MODES))
   {
     EXIT( "Error: bad slice mode");
   }
   m_sliceMode = SliceConstraint(tmpSliceMode);
 
 #if HEVC_DEPENDENT_SLICES
-  if (tmpSliceSegmentMode<0 || tmpSliceSegmentMode>=Int(NUMBER_OF_SLICE_CONSTRAINT_MODES))
+  if (tmpSliceSegmentMode<0 || tmpSliceSegmentMode>=int(NUMBER_OF_SLICE_CONSTRAINT_MODES))
   {
     EXIT( "Error: bad slice segment mode");
   }
   m_sliceSegmentMode = SliceConstraint(tmpSliceSegmentMode);
 #endif
 
-  if (tmpDecodedPictureHashSEIMappedType<0 || tmpDecodedPictureHashSEIMappedType>=Int(NUMBER_OF_HASHTYPES))
+  if (tmpDecodedPictureHashSEIMappedType<0 || tmpDecodedPictureHashSEIMappedType>=int(NUMBER_OF_HASHTYPES))
   {
     EXIT( "Error: bad checksum mode");
   }
@@ -1671,13 +1675,13 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
   }
 
   // allocate slice-based dQP values
-  m_aidQP = new Int[ m_framesToBeEncoded + m_iGOPSize + 1 ];
-  ::memset( m_aidQP, 0, sizeof(Int)*( m_framesToBeEncoded + m_iGOPSize + 1 ) );
+  m_aidQP = new int[ m_framesToBeEncoded + m_iGOPSize + 1 ];
+  ::memset( m_aidQP, 0, sizeof(int)*( m_framesToBeEncoded + m_iGOPSize + 1 ) );
 
 #if QP_SWITCHING_FOR_PARALLEL
   if (m_qpIncrementAtSourceFrame.bPresent)
   {
-    UInt switchingPOC = 0;
+    uint32_t switchingPOC = 0;
     if (m_qpIncrementAtSourceFrame.value > m_FrameSkip)
     {
       // if switch source frame (ssf) = 10, and frame skip (fs)=2 and temporal subsample ratio (tsr) =1, then
@@ -1685,7 +1689,7 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
       // if ssf=10, fs=2, tsr=2, then for this simulation, switch at POC 4 (=(10-2)/2): POC0=Src2, POC1=Src4, POC2=Src6, POC3=Src8, POC4=Src10
       switchingPOC = (m_qpIncrementAtSourceFrame.value - m_FrameSkip) / m_temporalSubsampleRatio;
     }
-    for (UInt i = switchingPOC; i<(m_framesToBeEncoded + m_iGOPSize + 1); i++)
+    for (uint32_t i = switchingPOC; i<(m_framesToBeEncoded + m_iGOPSize + 1); i++)
     {
       m_aidQP[i] = 1;
     }
@@ -1693,26 +1697,26 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
 #else
   // handling of floating-point QP values
   // if QP is not integer, sequence is split into two sections having QP and QP+1
-  m_iQP = (Int)( m_fQP );
+  m_iQP = (int)( m_fQP );
   if ( m_iQP < m_fQP )
   {
-    Int iSwitchPOC = (Int)( m_framesToBeEncoded - (m_fQP - m_iQP)*m_framesToBeEncoded + 0.5 );
+    int iSwitchPOC = (int)( m_framesToBeEncoded - (m_fQP - m_iQP)*m_framesToBeEncoded + 0.5 );
 
-    iSwitchPOC = (Int)( (Double)iSwitchPOC / m_iGOPSize + 0.5 )*m_iGOPSize;
-    for ( Int i=iSwitchPOC; i<m_framesToBeEncoded + m_iGOPSize + 1; i++ )
+    iSwitchPOC = (int)( (double)iSwitchPOC / m_iGOPSize + 0.5 )*m_iGOPSize;
+    for ( int i=iSwitchPOC; i<m_framesToBeEncoded + m_iGOPSize + 1; i++ )
     {
       m_aidQP[i] = 1;
     }
   }
 #endif
 
-  for(UInt ch=0; ch<MAX_NUM_CHANNEL_TYPE; ch++)
+  for(uint32_t ch=0; ch<MAX_NUM_CHANNEL_TYPE; ch++)
   {
     if (saoOffsetBitShift[ch]<0)
     {
       if (m_internalBitDepth[ch]>10)
       {
-        m_log2SaoOffsetScale[ch]=UInt(Clip3<Int>(0, m_internalBitDepth[ch]-10, Int(m_internalBitDepth[ch]-10 + 0.165*m_iQP - 3.22 + 0.5) ) );
+        m_log2SaoOffsetScale[ch]=uint32_t(Clip3<int>(0, m_internalBitDepth[ch]-10, int(m_internalBitDepth[ch]-10 + 0.165*m_iQP - 3.22 + 0.5) ) );
       }
       else
       {
@@ -1721,7 +1725,7 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
     }
     else
     {
-      m_log2SaoOffsetScale[ch]=UInt(saoOffsetBitShift[ch]);
+      m_log2SaoOffsetScale[ch]=uint32_t(saoOffsetBitShift[ch]);
     }
   }
 
@@ -1734,9 +1738,9 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
   {
     CHECK(  cfg_lumaLeveltoDQPMappingLuma.values.size() != cfg_lumaLeveltoDQPMappingQP.values.size(), "Error in cfg" );
     m_lumaLevelToDeltaQPMapping.mapping.resize(cfg_lumaLeveltoDQPMappingLuma.values.size());
-    for(UInt i=0; i<cfg_lumaLeveltoDQPMappingLuma.values.size(); i++)
+    for(uint32_t i=0; i<cfg_lumaLeveltoDQPMappingLuma.values.size(); i++)
     {
-      m_lumaLevelToDeltaQPMapping.mapping[i]=std::pair<Int,Int>(cfg_lumaLeveltoDQPMappingLuma.values[i], cfg_lumaLeveltoDQPMappingQP.values[i]);
+      m_lumaLevelToDeltaQPMapping.mapping[i]=std::pair<int,int>(cfg_lumaLeveltoDQPMappingLuma.values[i], cfg_lumaLeveltoDQPMappingQP.values[i]);
     }
   }
 #endif
@@ -1747,8 +1751,8 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
     FILE* fpt=fopen( m_dQPFileName.c_str(), "r" );
     if ( fpt )
     {
-      Int iValue;
-      Int iPOC = 0;
+      int iValue;
+      int iPOC = 0;
       while ( iPOC < m_framesToBeEncoded )
       {
         if ( fscanf(fpt, "%d", &iValue ) == EOF )
@@ -1764,13 +1768,13 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
 
   if( m_masteringDisplay.colourVolumeSEIEnabled )
   {
-    for(UInt idx=0; idx<6; idx++)
+    for(uint32_t idx=0; idx<6; idx++)
     {
-      m_masteringDisplay.primaries[idx/2][idx%2] = UShort((cfg_DisplayPrimariesCode.values.size() > idx) ? cfg_DisplayPrimariesCode.values[idx] : 0);
+      m_masteringDisplay.primaries[idx/2][idx%2] = uint16_t((cfg_DisplayPrimariesCode.values.size() > idx) ? cfg_DisplayPrimariesCode.values[idx] : 0);
     }
-    for(UInt idx=0; idx<2; idx++)
+    for(uint32_t idx=0; idx<2; idx++)
     {
-      m_masteringDisplay.whitePoint[idx] = UShort((cfg_DisplayWhitePointCode.values.size() > idx) ? cfg_DisplayWhitePointCode.values[idx] : 0);
+      m_masteringDisplay.whitePoint[idx] = uint16_t((cfg_DisplayWhitePointCode.values.size() > idx) ? cfg_DisplayWhitePointCode.values[idx] : 0);
     }
   }
 
@@ -1778,9 +1782,9 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
   {
     if( m_toneMapModelId == 2 && !cfg_startOfCodedInterval.values.empty() )
     {
-      const UInt num = 1u<< m_toneMapTargetBitDepth;
-      m_startOfCodedInterval = new Int[num];
-      for(UInt i=0; i<num; i++)
+      const uint32_t num = 1u<< m_toneMapTargetBitDepth;
+      m_startOfCodedInterval = new int[num];
+      for(uint32_t i=0; i<num; i++)
       {
         m_startOfCodedInterval[i] = cfg_startOfCodedInterval.values.size() > i ? cfg_startOfCodedInterval.values[i] : 0;
       }
@@ -1793,9 +1797,9 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
     {
       if( !cfg_codedPivotValue.values.empty() && !cfg_targetPivotValue.values.empty() )
       {
-        m_codedPivotValue  = new Int[m_numPivots];
-        m_targetPivotValue = new Int[m_numPivots];
-        for(UInt i=0; i<m_numPivots; i++)
+        m_codedPivotValue  = new int[m_numPivots];
+        m_targetPivotValue = new int[m_numPivots];
+        for(uint32_t i=0; i<m_numPivots; i++)
         {
           m_codedPivotValue[i]  = cfg_codedPivotValue.values.size()  > i ? cfg_codedPivotValue.values [i] : 0;
           m_targetPivotValue[i] = cfg_targetPivotValue.values.size() > i ? cfg_targetPivotValue.values[i] : 0;
@@ -1812,9 +1816,9 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
   if( m_kneeSEIEnabled && !m_kneeSEICancelFlag )
   {
     CHECK(!( m_kneeSEINumKneePointsMinus1 >= 0 && m_kneeSEINumKneePointsMinus1 < 999 ), "Inconsistent config");
-    m_kneeSEIInputKneePoint  = new Int[m_kneeSEINumKneePointsMinus1+1];
-    m_kneeSEIOutputKneePoint = new Int[m_kneeSEINumKneePointsMinus1+1];
-    for(Int i=0; i<(m_kneeSEINumKneePointsMinus1+1); i++)
+    m_kneeSEIInputKneePoint  = new int[m_kneeSEINumKneePointsMinus1+1];
+    m_kneeSEIOutputKneePoint = new int[m_kneeSEINumKneePointsMinus1+1];
+    for(int i=0; i<(m_kneeSEINumKneePointsMinus1+1); i++)
     {
       m_kneeSEIInputKneePoint[i]  = cfg_kneeSEIInputKneePointValue.values.size()  > i ? cfg_kneeSEIInputKneePointValue.values[i]  : 1;
       m_kneeSEIOutputKneePoint[i] = cfg_kneeSEIOutputKneePointValue.values.size() > i ? cfg_kneeSEIOutputKneePointValue.values[i] : 0;
@@ -1823,7 +1827,7 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
 
   if(m_timeCodeSEIEnabled)
   {
-    for(Int i = 0; i < m_timeCodeSEINumTs && i < MAX_TIMECODE_SEI_SETS; i++)
+    for(int i = 0; i < m_timeCodeSEINumTs && i < MAX_TIMECODE_SEI_SETS; i++)
     {
       m_timeSetArray[i].clockTimeStampFlag    = cfg_timeCodeSeiTimeStampFlag        .values.size()>i ? cfg_timeCodeSeiTimeStampFlag        .values [i] : false;
       m_timeSetArray[i].numUnitFieldBasedFlag = cfg_timeCodeSeiNumUnitFieldBasedFlag.values.size()>i ? cfg_timeCodeSeiNumUnitFieldBasedFlag.values [i] : 0;
@@ -1870,7 +1874,7 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
 
   if( m_QTBT )
   {
-    Int minCuSize = 1 << MIN_CU_LOG2;
+    int minCuSize = 1 << MIN_CU_LOG2;
     m_uiMaxCodingDepth = 0;
     while( ( m_uiCTUSize >> m_uiMaxCodingDepth ) > minCuSize )
     {
@@ -1892,7 +1896,7 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
   if( !m_QTBT )
   {
     // compute actual CU depth with respect to config depth and max transform size
-    UInt uiAddCUDepth = 0;
+    uint32_t uiAddCUDepth = 0;
     while( ( m_uiMaxCUWidth >> m_uiMaxCUDepth ) > ( 1 << ( m_quadtreeTULog2MinSize + uiAddCUDepth ) ) )
     {
       uiAddCUDepth++;
@@ -1919,7 +1923,7 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
 // Private member functions
 // ====================================================================================================================
 
-Bool EncAppCfg::xCheckParameter()
+bool EncAppCfg::xCheckParameter()
 {
   msg( NOTICE, "\n" );
   if (m_decodedPictureHashSEIType==HASHTYPE_NONE)
@@ -1943,7 +1947,7 @@ Bool EncAppCfg::xCheckParameter()
     msg( DETAILS, "***************************************************************************\n");
   }
 
-  Bool check_failed = false; /* abort if there is a fatal configuration problem */
+  bool check_failed = false; /* abort if there is a fatal configuration problem */
 #define xConfirmPara(a,b) check_failed |= confirmPara(a,b)
 
 
@@ -2154,7 +2158,7 @@ Bool EncAppCfg::xCheckParameter()
 
 
   xConfirmPara(m_bitstreamFileName.empty(), "A bitstream file name must be specified (BitstreamFile)");
-  const UInt maxBitDepth=(m_chromaFormatIDC==CHROMA_400) ? m_internalBitDepth[CHANNEL_TYPE_LUMA] : std::max(m_internalBitDepth[CHANNEL_TYPE_LUMA], m_internalBitDepth[CHANNEL_TYPE_CHROMA]);
+  const uint32_t maxBitDepth=(m_chromaFormatIDC==CHROMA_400) ? m_internalBitDepth[CHANNEL_TYPE_LUMA] : std::max(m_internalBitDepth[CHANNEL_TYPE_LUMA], m_internalBitDepth[CHANNEL_TYPE_CHROMA]);
   xConfirmPara(m_bitDepthConstraint<maxBitDepth, "The internalBitDepth must not be greater than the bitDepthConstraint value");
   xConfirmPara(m_chromaFormatConstraint<m_chromaFormatIDC, "The chroma format used must not be greater than the chromaFormatConstraint value");
 
@@ -2164,20 +2168,20 @@ Bool EncAppCfg::xCheckParameter()
     xConfirmPara(m_cabacBypassAlignmentEnabledFlag && m_profile!=Profile::HIGHTHROUGHPUTREXT, "AlignCABACBeforeBypass must not be enabled unless the high throughput profile is being used.");
     if (m_profile == Profile::MAINREXT)
     {
-      const UInt intraIdx = m_intraConstraintFlag ? 1:0;
-      const UInt bitDepthIdx = (m_bitDepthConstraint == 8 ? 0 : (m_bitDepthConstraint ==10 ? 1 : (m_bitDepthConstraint == 12 ? 2 : (m_bitDepthConstraint == 16 ? 3 : 4 ))));
-      const UInt chromaFormatIdx = UInt(m_chromaFormatConstraint);
-      const Bool bValidProfile = (bitDepthIdx > 3 || chromaFormatIdx>3) ? false : (validRExtProfileNames[intraIdx][bitDepthIdx][chromaFormatIdx] != NONE);
+      const uint32_t intraIdx = m_intraConstraintFlag ? 1:0;
+      const uint32_t bitDepthIdx = (m_bitDepthConstraint == 8 ? 0 : (m_bitDepthConstraint ==10 ? 1 : (m_bitDepthConstraint == 12 ? 2 : (m_bitDepthConstraint == 16 ? 3 : 4 ))));
+      const uint32_t chromaFormatIdx = uint32_t(m_chromaFormatConstraint);
+      const bool bValidProfile = (bitDepthIdx > 3 || chromaFormatIdx>3) ? false : (validRExtProfileNames[intraIdx][bitDepthIdx][chromaFormatIdx] != NONE);
       xConfirmPara(!bValidProfile, "Invalid intra constraint flag, bit depth constraint flag and chroma format constraint flag combination for a RExt profile");
-      const Bool bUsingGeneralRExtTools  = m_transformSkipRotationEnabledFlag        ||
+      const bool bUsingGeneralRExtTools  = m_transformSkipRotationEnabledFlag        ||
                                            m_transformSkipContextEnabledFlag         ||
                                            m_rdpcmEnabledFlag[RDPCM_SIGNAL_IMPLICIT] ||
                                            m_rdpcmEnabledFlag[RDPCM_SIGNAL_EXPLICIT] ||
                                            !m_enableIntraReferenceSmoothing          ||
                                            m_persistentRiceAdaptationEnabledFlag     ||
                                            m_log2MaxTransformSkipBlockSize!=2;
-      const Bool bUsingChromaQPTool      = m_diffCuChromaQpOffsetDepth >= 0;
-      const Bool bUsingExtendedPrecision = m_extendedPrecisionProcessingFlag;
+      const bool bUsingChromaQPTool      = m_diffCuChromaQpOffsetDepth >= 0;
+      const bool bUsingExtendedPrecision = m_extendedPrecisionProcessingFlag;
 
       xConfirmPara((m_chromaFormatConstraint==CHROMA_420 || m_chromaFormatConstraint==CHROMA_400) && bUsingChromaQPTool, "CU Chroma QP adjustment cannot be used for 4:0:0 or 4:2:0 RExt profiles");
       xConfirmPara(m_bitDepthConstraint != 16 && bUsingExtendedPrecision, "Extended precision can only be used in 16-bit RExt profiles");
@@ -2232,14 +2236,14 @@ Bool EncAppCfg::xCheckParameter()
 #if !RExt__HIGH_BIT_DEPTH_SUPPORT
   if (m_extendedPrecisionProcessingFlag)
   {
-    for (UInt channelType = 0; channelType < MAX_NUM_CHANNEL_TYPE; channelType++)
+    for (uint32_t channelType = 0; channelType < MAX_NUM_CHANNEL_TYPE; channelType++)
     {
       xConfirmPara((m_internalBitDepth[channelType] > 8) , "Model is not configured to support high enough internal accuracies - enable RExt__HIGH_BIT_DEPTH_SUPPORT to use increased precision internal data types etc...");
     }
   }
   else
   {
-    for (UInt channelType = 0; channelType < MAX_NUM_CHANNEL_TYPE; channelType++)
+    for (uint32_t channelType = 0; channelType < MAX_NUM_CHANNEL_TYPE; channelType++)
     {
       xConfirmPara((m_internalBitDepth[channelType] > 12) , "Model is not configured to support high enough internal accuracies - enable RExt__HIGH_BIT_DEPTH_SUPPORT to use increased precision internal data types etc...");
     }
@@ -2446,7 +2450,7 @@ Bool EncAppCfg::xCheckParameter()
 #endif
   if( m_usePCM)
   {
-    for (UInt channelType = 0; channelType < MAX_NUM_CHANNEL_TYPE; channelType++)
+    for (uint32_t channelType = 0; channelType < MAX_NUM_CHANNEL_TYPE; channelType++)
     {
       xConfirmPara(((m_MSBExtendedBitDepth[channelType] > m_internalBitDepth[channelType]) && m_bPCMInputBitDepthFlag), "PCM bit depth cannot be greater than internal bit depth (PCMInputBitDepthFlag cannot be used when InputBitDepth or MSBExtendedBitDepth > InternalBitDepth)");
     }
@@ -2469,7 +2473,7 @@ Bool EncAppCfg::xCheckParameter()
 #endif
 
 #if HEVC_TILES_WPP
-  Bool tileFlag = (m_numTileColumnsMinus1 > 0 || m_numTileRowsMinus1 > 0 );
+  bool tileFlag = (m_numTileColumnsMinus1 > 0 || m_numTileRowsMinus1 > 0 );
   if (m_profile!=Profile::HIGHTHROUGHPUTREXT)
   {
     xConfirmPara( tileFlag && m_entropyCodingSyncEnabledFlag, "Tiles and entropy-coding-sync (Wavefronts) can not be applied together, except in the High Throughput Intra 4:4:4 16 profile");
@@ -2498,7 +2502,7 @@ Bool EncAppCfg::xCheckParameter()
   }
 
   // max CU width and height should be power of 2
-  UInt ui = m_uiMaxCUWidth;
+  uint32_t ui = m_uiMaxCUWidth;
   while(ui)
   {
     ui >>= 1;
@@ -2533,25 +2537,25 @@ Bool EncAppCfg::xCheckParameter()
     xConfirmPara( m_intraConstraintFlag, "IntraConstraintFlag cannot be 1 for inter sequences");
   }
 
-  Bool verifiedGOP=false;
-  Bool errorGOP=false;
-  Int checkGOP=1;
-  Int numRefs = m_isField ? 2 : 1;
-  Int refList[MAX_NUM_REF_PICS+1];
+  bool verifiedGOP=false;
+  bool errorGOP=false;
+  int checkGOP=1;
+  int numRefs = m_isField ? 2 : 1;
+  int refList[MAX_NUM_REF_PICS+1];
   refList[0]=0;
   if(m_isField)
   {
     refList[1] = 1;
   }
-  Bool isOK[MAX_GOP];
-  for(Int i=0; i<MAX_GOP; i++)
+  bool isOK[MAX_GOP];
+  for(int i=0; i<MAX_GOP; i++)
   {
     isOK[i]=false;
   }
-  Int numOK=0;
+  int numOK=0;
   xConfirmPara( m_iIntraPeriod >=0&&(m_iIntraPeriod%m_iGOPSize!=0), "Intra period must be a multiple of GOPSize, or -1" );
 
-  for(Int i=0; i<m_iGOPSize; i++)
+  for(int i=0; i<m_iGOPSize; i++)
   {
     if(m_GOPList[i].m_POC==m_iGOPSize)
     {
@@ -2561,7 +2565,7 @@ Bool EncAppCfg::xCheckParameter()
 
   if ( (m_iIntraPeriod != 1) && !m_loopFilterOffsetInPPS && (!m_bLoopFilterDisable) )
   {
-    for(Int i=0; i<m_iGOPSize; i++)
+    for(int i=0; i<m_iGOPSize; i++)
     {
       xConfirmPara( (m_GOPList[i].m_betaOffsetDiv2 + m_loopFilterBetaOffsetDiv2) < -6 || (m_GOPList[i].m_betaOffsetDiv2 + m_loopFilterBetaOffsetDiv2) > 6, "Loop Filter Beta Offset div. 2 for one of the GOP entries exceeds supported range (-6 to 6)" );
       xConfirmPara( (m_GOPList[i].m_tcOffsetDiv2 + m_loopFilterTcOffsetDiv2) < -6 || (m_GOPList[i].m_tcOffsetDiv2 + m_loopFilterTcOffsetDiv2) > 6, "Loop Filter Tc Offset div. 2 for one of the GOP entries exceeds supported range (-6 to 6)" );
@@ -2569,7 +2573,7 @@ Bool EncAppCfg::xCheckParameter()
   }
 
 #if W0038_CQP_ADJ
-  for(Int i=0; i<m_iGOPSize; i++)
+  for(int i=0; i<m_iGOPSize; i++)
   {
     xConfirmPara( abs(m_GOPList[i].m_CbQPoffset               ) > 12, "Cb QP Offset for one of the GOP entries exceeds supported range (-12 to 12)" );
     xConfirmPara( abs(m_GOPList[i].m_CbQPoffset + m_cbQpOffset) > 12, "Cb QP Offset for one of the GOP entries, when combined with the PPS Cb offset, exceeds supported range (-12 to 12)" );
@@ -2586,8 +2590,8 @@ Bool EncAppCfg::xCheckParameter()
   //start looping through frames in coding order until we can verify that the GOP structure is correct.
   while(!verifiedGOP&&!errorGOP)
   {
-    Int curGOP = (checkGOP-1)%m_iGOPSize;
-    Int curPOC = ((checkGOP-1)/m_iGOPSize)*m_iGOPSize + m_GOPList[curGOP].m_POC;
+    int curGOP = (checkGOP-1)%m_iGOPSize;
+    int curPOC = ((checkGOP-1)/m_iGOPSize)*m_iGOPSize + m_GOPList[curGOP].m_POC;
     if(m_GOPList[curGOP].m_POC<0)
     {
       msg( WARNING, "\nError: found fewer Reference Picture Sets than GOPSize\n");
@@ -2596,23 +2600,23 @@ Bool EncAppCfg::xCheckParameter()
     else
     {
       //check that all reference pictures are available, or have a POC < 0 meaning they might be available in the next GOP.
-      Bool beforeI = false;
-      for(Int i = 0; i< m_GOPList[curGOP].m_numRefPics; i++)
+      bool beforeI = false;
+      for(int i = 0; i< m_GOPList[curGOP].m_numRefPics; i++)
       {
-        Int absPOC = curPOC+m_GOPList[curGOP].m_referencePics[i];
+        int absPOC = curPOC+m_GOPList[curGOP].m_referencePics[i];
         if(absPOC < 0)
         {
           beforeI=true;
         }
         else
         {
-          Bool found=false;
-          for(Int j=0; j<numRefs; j++)
+          bool found=false;
+          for(int j=0; j<numRefs; j++)
           {
             if(refList[j]==absPOC)
             {
               found=true;
-              for(Int k=0; k<m_iGOPSize; k++)
+              for(int k=0; k<m_iGOPSize; k++)
               {
                 if(absPOC%m_iGOPSize == m_GOPList[k].m_POC%m_iGOPSize)
                 {
@@ -2649,10 +2653,10 @@ Bool EncAppCfg::xCheckParameter()
       {
         //create a new GOPEntry for this frame containing all the reference pictures that were available (POC > 0)
         m_GOPList[m_iGOPSize+m_extraRPSs]=m_GOPList[curGOP];
-        Int newRefs=0;
-        for(Int i = 0; i< m_GOPList[curGOP].m_numRefPics; i++)
+        int newRefs=0;
+        for(int i = 0; i< m_GOPList[curGOP].m_numRefPics; i++)
         {
-          Int absPOC = curPOC+m_GOPList[curGOP].m_referencePics[i];
+          int absPOC = curPOC+m_GOPList[curGOP].m_referencePics[i];
           if(absPOC>=0)
           {
             m_GOPList[m_iGOPSize+m_extraRPSs].m_referencePics[newRefs]=m_GOPList[curGOP].m_referencePics[i];
@@ -2660,24 +2664,24 @@ Bool EncAppCfg::xCheckParameter()
             newRefs++;
           }
         }
-        Int numPrefRefs = m_GOPList[curGOP].m_numRefPicsActive;
+        int numPrefRefs = m_GOPList[curGOP].m_numRefPicsActive;
 
-        for(Int offset = -1; offset>-checkGOP; offset--)
+        for(int offset = -1; offset>-checkGOP; offset--)
         {
           //step backwards in coding order and include any extra available pictures we might find useful to replace the ones with POC < 0.
-          Int offGOP = (checkGOP-1+offset)%m_iGOPSize;
-          Int offPOC = ((checkGOP-1+offset)/m_iGOPSize)*m_iGOPSize + m_GOPList[offGOP].m_POC;
+          int offGOP = (checkGOP-1+offset)%m_iGOPSize;
+          int offPOC = ((checkGOP-1+offset)/m_iGOPSize)*m_iGOPSize + m_GOPList[offGOP].m_POC;
           if(offPOC>=0&&m_GOPList[offGOP].m_temporalId<=m_GOPList[curGOP].m_temporalId)
           {
-            Bool newRef=false;
-            for(Int i=0; i<numRefs; i++)
+            bool newRef=false;
+            for(int i=0; i<numRefs; i++)
             {
               if(refList[i]==offPOC)
               {
                 newRef=true;
               }
             }
-            for(Int i=0; i<newRefs; i++)
+            for(int i=0; i<newRefs; i++)
             {
               if(m_GOPList[m_iGOPSize+m_extraRPSs].m_referencePics[i]==offPOC-curPOC)
               {
@@ -2686,13 +2690,13 @@ Bool EncAppCfg::xCheckParameter()
             }
             if(newRef)
             {
-              Int insertPoint=newRefs;
+              int insertPoint=newRefs;
               //this picture can be added, find appropriate place in list and insert it.
               if(m_GOPList[offGOP].m_temporalId==m_GOPList[curGOP].m_temporalId)
               {
                 m_GOPList[offGOP].m_refPic = true;
               }
-              for(Int j=0; j<newRefs; j++)
+              for(int j=0; j<newRefs; j++)
               {
                 if(m_GOPList[m_iGOPSize+m_extraRPSs].m_referencePics[j]<offPOC-curPOC||m_GOPList[m_iGOPSize+m_extraRPSs].m_referencePics[j]>0)
                 {
@@ -2700,12 +2704,12 @@ Bool EncAppCfg::xCheckParameter()
                   break;
                 }
               }
-              Int prev = offPOC-curPOC;
-              Int prevUsed = m_GOPList[offGOP].m_temporalId<=m_GOPList[curGOP].m_temporalId;
-              for(Int j=insertPoint; j<newRefs+1; j++)
+              int prev = offPOC-curPOC;
+              int prevUsed = m_GOPList[offGOP].m_temporalId<=m_GOPList[curGOP].m_temporalId;
+              for(int j=insertPoint; j<newRefs+1; j++)
               {
-                Int newPrev = m_GOPList[m_iGOPSize+m_extraRPSs].m_referencePics[j];
-                Int newUsed = m_GOPList[m_iGOPSize+m_extraRPSs].m_usedByCurrPic[j];
+                int newPrev = m_GOPList[m_iGOPSize+m_extraRPSs].m_referencePics[j];
+                int newUsed = m_GOPList[m_iGOPSize+m_extraRPSs].m_usedByCurrPic[j];
                 m_GOPList[m_iGOPSize+m_extraRPSs].m_referencePics[j]=prev;
                 m_GOPList[m_iGOPSize+m_extraRPSs].m_usedByCurrPic[j]=prevUsed;
                 prevUsed=newUsed;
@@ -2728,16 +2732,16 @@ Bool EncAppCfg::xCheckParameter()
         }
         else
         {
-          Int rIdx =  m_iGOPSize + m_extraRPSs - 1;
-          Int refPOC = m_GOPList[rIdx].m_POC;
-          Int refPics = m_GOPList[rIdx].m_numRefPics;
-          Int newIdc=0;
-          for(Int i = 0; i<= refPics; i++)
+          int rIdx =  m_iGOPSize + m_extraRPSs - 1;
+          int refPOC = m_GOPList[rIdx].m_POC;
+          int refPics = m_GOPList[rIdx].m_numRefPics;
+          int newIdc=0;
+          for(int i = 0; i<= refPics; i++)
           {
-            Int deltaPOC = ((i != refPics)? m_GOPList[rIdx].m_referencePics[i] : 0);  // check if the reference abs POC is >= 0
-            Int absPOCref = refPOC+deltaPOC;
-            Int refIdc = 0;
-            for (Int j = 0; j < m_GOPList[m_iGOPSize+m_extraRPSs].m_numRefPics; j++)
+            int deltaPOC = ((i != refPics)? m_GOPList[rIdx].m_referencePics[i] : 0);  // check if the reference abs POC is >= 0
+            int absPOCref = refPOC+deltaPOC;
+            int refIdc = 0;
+            for (int j = 0; j < m_GOPList[m_iGOPSize+m_extraRPSs].m_numRefPics; j++)
             {
               if ( (absPOCref - curPOC) == m_GOPList[m_iGOPSize+m_extraRPSs].m_referencePics[j])
               {
@@ -2762,9 +2766,9 @@ Bool EncAppCfg::xCheckParameter()
         m_extraRPSs++;
       }
       numRefs=0;
-      for(Int i = 0; i< m_GOPList[curGOP].m_numRefPics; i++)
+      for(int i = 0; i< m_GOPList[curGOP].m_numRefPics; i++)
       {
-        Int absPOC = curPOC+m_GOPList[curGOP].m_referencePics[i];
+        int absPOC = curPOC+m_GOPList[curGOP].m_referencePics[i];
         if(absPOC >= 0)
         {
           refList[numRefs]=absPOC;
@@ -2778,7 +2782,7 @@ Bool EncAppCfg::xCheckParameter()
   }
   xConfirmPara(errorGOP,"Invalid GOP structure given");
   m_maxTempLayer = 1;
-  for(Int i=0; i<m_iGOPSize; i++)
+  for(int i=0; i<m_iGOPSize; i++)
   {
     if(m_GOPList[i].m_temporalId >= m_maxTempLayer)
     {
@@ -2786,27 +2790,27 @@ Bool EncAppCfg::xCheckParameter()
     }
     xConfirmPara(m_GOPList[i].m_sliceType!='B' && m_GOPList[i].m_sliceType!='P' && m_GOPList[i].m_sliceType!='I', "Slice type must be equal to B or P or I");
   }
-  for(Int i=0; i<MAX_TLAYER; i++)
+  for(int i=0; i<MAX_TLAYER; i++)
   {
     m_numReorderPics[i] = 0;
     m_maxDecPicBuffering[i] = 1;
   }
-  for(Int i=0; i<m_iGOPSize; i++)
+  for(int i=0; i<m_iGOPSize; i++)
   {
     if(m_GOPList[i].m_numRefPics+1 > m_maxDecPicBuffering[m_GOPList[i].m_temporalId])
     {
       m_maxDecPicBuffering[m_GOPList[i].m_temporalId] = m_GOPList[i].m_numRefPics + 1;
     }
-    Int highestDecodingNumberWithLowerPOC = 0;
-    for(Int j=0; j<m_iGOPSize; j++)
+    int highestDecodingNumberWithLowerPOC = 0;
+    for(int j=0; j<m_iGOPSize; j++)
     {
       if(m_GOPList[j].m_POC <= m_GOPList[i].m_POC)
       {
         highestDecodingNumberWithLowerPOC = j;
       }
     }
-    Int numReorder = 0;
-    for(Int j=0; j<highestDecodingNumberWithLowerPOC; j++)
+    int numReorder = 0;
+    for(int j=0; j<highestDecodingNumberWithLowerPOC; j++)
     {
       if(m_GOPList[j].m_temporalId <= m_GOPList[i].m_temporalId &&
         m_GOPList[j].m_POC > m_GOPList[i].m_POC)
@@ -2819,7 +2823,7 @@ Bool EncAppCfg::xCheckParameter()
       m_numReorderPics[m_GOPList[i].m_temporalId] = numReorder;
     }
   }
-  for(Int i=0; i<MAX_TLAYER-1; i++)
+  for(int i=0; i<MAX_TLAYER-1; i++)
   {
     // a lower layer can not have higher value of m_numReorderPics than a higher layer
     if(m_numReorderPics[i+1] < m_numReorderPics[i])
@@ -2846,14 +2850,14 @@ Bool EncAppCfg::xCheckParameter()
 
   if(m_vuiParametersPresentFlag && m_bitstreamRestrictionFlag)
   {
-    Int PicSizeInSamplesY =  m_iSourceWidth * m_iSourceHeight;
+    int PicSizeInSamplesY =  m_iSourceWidth * m_iSourceHeight;
 #if HEVC_TILES_WPP
     if(tileFlag)
     {
-      Int maxTileWidth = 0;
-      Int maxTileHeight = 0;
-      Int widthInCU = (m_iSourceWidth % m_uiMaxCUWidth) ? m_iSourceWidth/m_uiMaxCUWidth + 1: m_iSourceWidth/m_uiMaxCUWidth;
-      Int heightInCU = (m_iSourceHeight % m_uiMaxCUHeight) ? m_iSourceHeight/m_uiMaxCUHeight + 1: m_iSourceHeight/m_uiMaxCUHeight;
+      int maxTileWidth = 0;
+      int maxTileHeight = 0;
+      int widthInCU = (m_iSourceWidth % m_uiMaxCUWidth) ? m_iSourceWidth/m_uiMaxCUWidth + 1: m_iSourceWidth/m_uiMaxCUWidth;
+      int heightInCU = (m_iSourceHeight % m_uiMaxCUHeight) ? m_iSourceHeight/m_uiMaxCUHeight + 1: m_iSourceHeight/m_uiMaxCUHeight;
       if(m_tileUniformSpacingFlag)
       {
         maxTileWidth = m_uiMaxCUWidth*((widthInCU+m_numTileColumnsMinus1)/(m_numTileColumnsMinus1+1));
@@ -2879,8 +2883,8 @@ Bool EncAppCfg::xCheckParameter()
         }
         else
         {
-          Int accColumnWidth = 0;
-          for(Int col=0; col<(m_numTileColumnsMinus1); col++)
+          int accColumnWidth = 0;
+          for(int col=0; col<(m_numTileColumnsMinus1); col++)
           {
             maxTileWidth = m_tileColumnWidth[col]>maxTileWidth ? m_tileColumnWidth[col]:maxTileWidth;
             accColumnWidth += m_tileColumnWidth[col];
@@ -2893,8 +2897,8 @@ Bool EncAppCfg::xCheckParameter()
         }
         else
         {
-          Int accRowHeight = 0;
-          for(Int row=0; row<(m_numTileRowsMinus1); row++)
+          int accRowHeight = 0;
+          for(int row=0; row<(m_numTileRowsMinus1); row++)
           {
             maxTileHeight = m_tileRowHeight[row]>maxTileHeight ? m_tileRowHeight[row]:maxTileHeight;
             accRowHeight += m_tileRowHeight[row];
@@ -2902,7 +2906,7 @@ Bool EncAppCfg::xCheckParameter()
           maxTileHeight = (heightInCU-accRowHeight)>maxTileHeight ? m_uiMaxCUHeight*(heightInCU-accRowHeight):m_uiMaxCUHeight*maxTileHeight;
         }
       }
-      Int maxSizeInSamplesY = maxTileWidth*maxTileHeight;
+      int maxSizeInSamplesY = maxTileWidth*maxTileHeight;
       m_minSpatialSegmentationIdc = 4*PicSizeInSamplesY/maxSizeInSamplesY-4;
     }
     else if(m_entropyCodingSyncEnabledFlag)
@@ -2941,7 +2945,7 @@ Bool EncAppCfg::xCheckParameter()
   if (m_kneeSEIEnabled && !m_kneeSEICancelFlag)
   {
     xConfirmPara( m_kneeSEINumKneePointsMinus1 < 0 || m_kneeSEINumKneePointsMinus1 > 998, "SEIKneeFunctionNumKneePointsMinus1 must be in the range of 0 to 998");
-    for ( UInt i=0; i<=m_kneeSEINumKneePointsMinus1; i++ )
+    for ( uint32_t i=0; i<=m_kneeSEINumKneePointsMinus1; i++ )
     {
       xConfirmPara( m_kneeSEIInputKneePoint[i] < 1 || m_kneeSEIInputKneePoint[i] > 999, "SEIKneeFunctionInputKneePointValue must be in the range of 1 to 999");
       xConfirmPara( m_kneeSEIOutputKneePoint[i] < 0 || m_kneeSEIOutputKneePoint[i] > 1000, "SEIKneeFunctionInputKneePointValue must be in the range of 0 to 1000");
@@ -2973,7 +2977,7 @@ Bool EncAppCfg::xCheckParameter()
 #if U0132_TARGET_BITS_SATURATION
     if ((m_RCCpbSaturationEnabled) && (m_level!=Level::NONE) && (m_profile!=Profile::NONE))
     {
-      UInt uiLevelIdx = (m_level / 10) + (UInt)((m_level % 10) / 3);    // (m_level / 30)*3 + ((m_level % 10) / 3);
+      uint32_t uiLevelIdx = (m_level / 10) + (uint32_t)((m_level % 10) / 3);    // (m_level / 30)*3 + ((m_level % 10) / 3);
       xConfirmPara(m_RCCpbSize > g_uiMaxCpbSize[m_levelTier][uiLevelIdx], "RCCpbSize should be smaller than or equal to Max CPB size according to tier and level");
       xConfirmPara(m_RCInitialCpbFullness > 1, "RCInitialCpbFullness should be smaller than or equal to 1");
     }
@@ -3045,11 +3049,11 @@ Bool EncAppCfg::xCheckParameter()
   return check_failed;
 }
 
-const TChar *profileToString(const Profile::Name profile)
+const char *profileToString(const Profile::Name profile)
 {
-  static const UInt numberOfProfiles = sizeof(strToProfile)/sizeof(*strToProfile);
+  static const uint32_t numberOfProfiles = sizeof(strToProfile)/sizeof(*strToProfile);
 
-  for (UInt profileIndex = 0; profileIndex < numberOfProfiles; profileIndex++)
+  for (uint32_t profileIndex = 0; profileIndex < numberOfProfiles; profileIndex++)
   {
     if (strToProfile[profileIndex].value == profile)
     {
@@ -3062,14 +3066,14 @@ const TChar *profileToString(const Profile::Name profile)
   return "";
 }
 
-Void EncAppCfg::xPrintParameter()
+void EncAppCfg::xPrintParameter()
 {
   //msg( DETAILS, "\n" );
   msg( DETAILS, "Input          File                    : %s\n", m_inputFileName.c_str() );
   msg( DETAILS, "Bitstream      File                    : %s\n", m_bitstreamFileName.c_str() );
   msg( DETAILS, "Reconstruction File                    : %s\n", m_reconFileName.c_str() );
-  msg( DETAILS, "Real     Format                        : %dx%d %gHz\n", m_iSourceWidth - m_confWinLeft - m_confWinRight, m_iSourceHeight - m_confWinTop - m_confWinBottom, (Double)m_iFrameRate / m_temporalSubsampleRatio );
-  msg( DETAILS, "Internal Format                        : %dx%d %gHz\n", m_iSourceWidth, m_iSourceHeight, (Double)m_iFrameRate / m_temporalSubsampleRatio );
+  msg( DETAILS, "Real     Format                        : %dx%d %gHz\n", m_iSourceWidth - m_confWinLeft - m_confWinRight, m_iSourceHeight - m_confWinTop - m_confWinBottom, (double)m_iFrameRate / m_temporalSubsampleRatio );
+  msg( DETAILS, "Internal Format                        : %dx%d %gHz\n", m_iSourceWidth, m_iSourceHeight, (double)m_iFrameRate / m_temporalSubsampleRatio );
   msg( DETAILS, "Sequence PSNR output                   : %s\n", ( m_printMSEBasedSequencePSNR ? "Linear average, MSE-based" : "Linear average only" ) );
   msg(DETAILS, "Hexadecimal PSNR output                : %s\n", ( m_printHexPsnr ? "Enabled" : "Disabled" ) );
   msg( DETAILS, "Sequence MSE output                    : %s\n", ( m_printSequenceMSE ? "Enabled" : "Disabled" ) );
@@ -3096,9 +3100,9 @@ Void EncAppCfg::xPrintParameter()
     }
     else
     {
-      const UInt intraIdx = m_intraConstraintFlag ? 1:0;
-      const UInt bitDepthIdx = (m_bitDepthConstraint == 8 ? 0 : (m_bitDepthConstraint ==10 ? 1 : (m_bitDepthConstraint == 12 ? 2 : (m_bitDepthConstraint == 16 ? 3 : 4 ))));
-      const UInt chromaFormatIdx = UInt(m_chromaFormatConstraint);
+      const uint32_t intraIdx = m_intraConstraintFlag ? 1:0;
+      const uint32_t bitDepthIdx = (m_bitDepthConstraint == 8 ? 0 : (m_bitDepthConstraint ==10 ? 1 : (m_bitDepthConstraint == 12 ? 2 : (m_bitDepthConstraint == 16 ? 3 : 4 ))));
+      const uint32_t chromaFormatIdx = uint32_t(m_chromaFormatConstraint);
       validProfileName = (bitDepthIdx > 3 || chromaFormatIdx>3) ? NONE : validRExtProfileNames[intraIdx][bitDepthIdx][chromaFormatIdx];
     }
     std::string rextSubProfile;
@@ -3174,7 +3178,7 @@ Void EncAppCfg::xPrintParameter()
   }
 
   msg( DETAILS, "RateControl                            : %d\n", m_RCEnableRateControl );
-  msg( DETAILS, "WPMethod                               : %d\n", Int(m_weightedPredictionMethod));
+  msg( DETAILS, "WPMethod                               : %d\n", int(m_weightedPredictionMethod));
 
   if(m_RCEnableRateControl)
   {
@@ -3210,7 +3214,7 @@ Void EncAppCfg::xPrintParameter()
   msg( VERBOSE, "ASR:%d ", m_bUseASR                            );
   msg( VERBOSE, "MinSearchWindow:%d ", m_minSearchWindow        );
   msg( VERBOSE, "RestrictMESampling:%d ", m_bRestrictMESampling );
-  msg( VERBOSE, "FEN:%d ", Int(m_fastInterSearchMode)           );
+  msg( VERBOSE, "FEN:%d ", int(m_fastInterSearchMode)           );
   msg( VERBOSE, "ECU:%d ", m_bUseEarlyCU                        );
   msg( VERBOSE, "FDM:%d ", m_useFastDecisionForMerge            );
   msg( VERBOSE, "CFM:%d ", m_bUseCbfFastMode                    );
@@ -3219,7 +3223,7 @@ Void EncAppCfg::xPrintParameter()
   msg( VERBOSE, "TransformSkip:%d ",     m_useTransformSkip     );
   msg( VERBOSE, "TransformSkipFast:%d ", m_useTransformSkipFast );
   msg( VERBOSE, "TransformSkipLog2MaxSize:%d ", m_log2MaxTransformSkipBlockSize);
-  msg( VERBOSE, "Slice: M=%d ", Int(m_sliceMode));
+  msg( VERBOSE, "Slice: M=%d ", int(m_sliceMode));
   if (m_sliceMode!=NO_SLICES)
   {
     msg( VERBOSE, "A=%d ", m_sliceArgument);
@@ -3247,11 +3251,11 @@ Void EncAppCfg::xPrintParameter()
     msg( VERBOSE, "TransQuantBypassEnabled:%d ", (m_TransquantBypassEnabledFlag)? 1:0 );
   }
 
-  msg( VERBOSE, "WPP:%d ", (Int)m_useWeightedPred);
-  msg( VERBOSE, "WPB:%d ", (Int)m_useWeightedBiPred);
+  msg( VERBOSE, "WPP:%d ", (int)m_useWeightedPred);
+  msg( VERBOSE, "WPB:%d ", (int)m_useWeightedBiPred);
   msg( VERBOSE, "PME:%d ", m_log2ParallelMergeLevel);
 #if HEVC_TILES_WPP
-  const Int iWaveFrontSubstreams = m_entropyCodingSyncEnabledFlag ? (m_iSourceHeight + m_uiMaxCUHeight - 1) / m_uiMaxCUHeight : 1;
+  const int iWaveFrontSubstreams = m_entropyCodingSyncEnabledFlag ? (m_iSourceHeight + m_uiMaxCUHeight - 1) / m_uiMaxCUHeight : 1;
   msg( VERBOSE, " WaveFrontSynchro:%d WaveFrontSubstreams:%d", m_entropyCodingSyncEnabledFlag?1:0, iWaveFrontSubstreams);
 #endif
 #if HEVC_USE_SCALING_LISTS
@@ -3420,7 +3424,7 @@ Void EncAppCfg::xPrintParameter()
   fflush( stdout );
 }
 
-Bool confirmPara(Bool bflag, const TChar* message)
+bool confirmPara(bool bflag, const char* message)
 {
   if (!bflag)
   {

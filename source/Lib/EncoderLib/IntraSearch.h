@@ -86,17 +86,17 @@ private:
 #endif
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   //cost variables for the EMT algorithm and new modes list
-  Double m_bestModeCostStore[4];                                    // RD cost of the best mode for each PU using DCT2
-  Double m_modeCostStore    [4][NUM_LUMA_MODE];                         // RD cost of each mode for each PU using DCT2
-  UInt   m_savedRdModeList  [4][NUM_LUMA_MODE], m_savedNumRdModes[4];
+  double m_bestModeCostStore[4];                                    // RD cost of the best mode for each PU using DCT2
+  double m_modeCostStore    [4][NUM_LUMA_MODE];                         // RD cost of each mode for each PU using DCT2
+  uint32_t   m_savedRdModeList  [4][NUM_LUMA_MODE], m_savedNumRdModes[4];
 
 #endif
 #if JEM_TOOLS
-  static_vector<UInt,   FAST_UDI_MAX_RDMODE_NUM> m_uiSavedRdModeListNSST;
-  UInt                                           m_uiSavedNumRdModesNSST;
-  static_vector<UInt,   FAST_UDI_MAX_RDMODE_NUM> m_uiSavedHadModeListNSST;
-  static_vector<Double, FAST_UDI_MAX_RDMODE_NUM> m_dSavedModeCostNSST;
-  static_vector<Double, FAST_UDI_MAX_RDMODE_NUM> m_dSavedHadListNSST;
+  static_vector<uint32_t,   FAST_UDI_MAX_RDMODE_NUM> m_uiSavedRdModeListNSST;
+  uint32_t                                           m_uiSavedNumRdModesNSST;
+  static_vector<uint32_t,   FAST_UDI_MAX_RDMODE_NUM> m_uiSavedHadModeListNSST;
+  static_vector<double, FAST_UDI_MAX_RDMODE_NUM> m_dSavedModeCostNSST;
+  static_vector<double, FAST_UDI_MAX_RDMODE_NUM> m_dSavedHadListNSST;
 
 #endif
 protected:
@@ -116,14 +116,14 @@ protected:
   CABACWriter*    m_CABACEstimator;
   CtxCache*       m_CtxCache;
 
-  Bool            m_isInitialized;
+  bool            m_isInitialized;
 
 public:
 
   IntraSearch();
   ~IntraSearch();
 
-  Void init                       ( EncCfg*        pcEncCfg,
+  void init                       ( EncCfg*        pcEncCfg,
                                     TrQuant*       pcTrQuant,
                                     RdCost*        pcRdCost,
 #if JEM_TOOLS
@@ -132,12 +132,12 @@ public:
 #endif
                                     CABACWriter*   CABACEstimator,
                                     CtxCache*      ctxCache,
-                                    const UInt     maxCUWidth,
-                                    const UInt     maxCUHeight,
-                                    const UInt     maxTotalCUDepth
+                                    const uint32_t     maxCUWidth,
+                                    const uint32_t     maxCUHeight,
+                                    const uint32_t     maxTotalCUDepth
                                   );
 
-  Void destroy                    ();
+  void destroy                    ();
 
   CodingStructure****getSplitCSBuf() { return m_pSplitCS; }
   CodingStructure****getFullCSBuf () { return m_pFullCS; }
@@ -149,9 +149,9 @@ public:
 #endif
 public:
 
-  Void estIntraPredLumaQT         ( CodingUnit &cu, Partitioner& pm );
-  Void estIntraPredChromaQT       (CodingUnit &cu, Partitioner& pm);
-  Void IPCMSearch                 (CodingStructure &cs, Partitioner& partitioner);
+  void estIntraPredLumaQT         ( CodingUnit &cu, Partitioner& pm );
+  void estIntraPredChromaQT       (CodingUnit &cu, Partitioner& pm);
+  void IPCMSearch                 (CodingStructure &cs, Partitioner& partitioner);
 
 protected:
 
@@ -159,30 +159,30 @@ protected:
   // T & Q & Q-1 & T-1
   // -------------------------------------------------------------------------------------------------------------------
 
-  Void xEncPCM                    (CodingStructure &cs, Partitioner& partitioner, const ComponentID &compID);
+  void xEncPCM                    (CodingStructure &cs, Partitioner& partitioner, const ComponentID &compID);
 
   // -------------------------------------------------------------------------------------------------------------------
   // Intra search
   // -------------------------------------------------------------------------------------------------------------------
 
-  Void xEncIntraHeader            (CodingStructure &cs, Partitioner& pm, const Bool &bLuma, const Bool &bChroma);
-  Void xEncSubdivCbfQT            (CodingStructure &cs, Partitioner& pm, const Bool &bLuma, const Bool &bChroma);
-  UInt64 xGetIntraFracBitsQT      (CodingStructure &cs, Partitioner& pm, const Bool &bLuma, const Bool &bChroma);
+  void xEncIntraHeader            (CodingStructure &cs, Partitioner& pm, const bool &bLuma, const bool &bChroma);
+  void xEncSubdivCbfQT            (CodingStructure &cs, Partitioner& pm, const bool &bLuma, const bool &bChroma);
+  uint64_t xGetIntraFracBitsQT      (CodingStructure &cs, Partitioner& pm, const bool &bLuma, const bool &bChroma);
 
-  UInt64 xGetIntraFracBitsQTChroma(TransformUnit& tu, const ComponentID &compID);
-  Void xEncCoeffQT                (CodingStructure &cs, Partitioner& pm, const ComponentID &compID);
+  uint64_t xGetIntraFracBitsQTChroma(TransformUnit& tu, const ComponentID &compID);
+  void xEncCoeffQT                (CodingStructure &cs, Partitioner& pm, const ComponentID &compID);
 
-  UInt64 xFracModeBitsIntra       (PredictionUnit &pu, const UInt &uiMode, const ChannelType &compID);
+  uint64_t xFracModeBitsIntra       (PredictionUnit &pu, const uint32_t &uiMode, const ChannelType &compID);
 
-  Void xIntraCodingTUBlock        (TransformUnit &tu, const ComponentID &compID, const Bool &checkCrossCPrediction, Distortion& ruiDist, const Int &default0Save1Load2 = 0, UInt* numSig = nullptr );
+  void xIntraCodingTUBlock        (TransformUnit &tu, const ComponentID &compID, const bool &checkCrossCPrediction, Distortion& ruiDist, const int &default0Save1Load2 = 0, uint32_t* numSig = nullptr );
 
   ChromaCbfs xRecurIntraChromaCodingQT  (CodingStructure &cs, Partitioner& pm);
 
-  Void xRecurIntraCodingLumaQT    ( CodingStructure &cs, Partitioner& pm );
+  void xRecurIntraCodingLumaQT    ( CodingStructure &cs, Partitioner& pm );
 
 
-  void encPredIntraDPCM( const ComponentID &compID, PelBuf &pOrg, PelBuf &pDst, const UInt &uiDirMode );
-  static bool useDPCMForFirstPassIntraEstimation( const PredictionUnit &pu, const UInt &uiDirMode );
+  void encPredIntraDPCM( const ComponentID &compID, PelBuf &pOrg, PelBuf &pDst, const uint32_t &uiDirMode );
+  static bool useDPCMForFirstPassIntraEstimation( const PredictionUnit &pu, const uint32_t &uiDirMode );
 };// END CLASS DEFINITION EncSearch
 
 //! \}

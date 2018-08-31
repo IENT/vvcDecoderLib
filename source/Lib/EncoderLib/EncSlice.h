@@ -83,13 +83,13 @@ private:
   // RD optimization
   RdCost*                 m_pcRdCost;                           ///< RD cost computation
   CABACWriter*            m_CABACEstimator;
-  UInt64                  m_uiPicTotalBits;                     ///< total bits for the picture
-  UInt64                  m_uiPicDist;                          ///< total distortion for the picture
-  std::vector<Double>     m_vdRdPicLambda;                      ///< array of lambda candidates
-  std::vector<Double>     m_vdRdPicQp;                          ///< array of picture QP candidates (double-type for lambda)
-  std::vector<Int>        m_viRdPicQp;                          ///< array of picture QP candidates (Int-type)
+  uint64_t                  m_uiPicTotalBits;                     ///< total bits for the picture
+  uint64_t                  m_uiPicDist;                          ///< total distortion for the picture
+  std::vector<double>     m_vdRdPicLambda;                      ///< array of lambda candidates
+  std::vector<double>     m_vdRdPicQp;                          ///< array of picture QP candidates (double-type for lambda)
+  std::vector<int>        m_viRdPicQp;                          ///< array of picture QP candidates (int-type)
   RateCtrl*               m_pcRateCtrl;                         ///< Rate control manager
-  UInt                    m_uiSliceSegmentIdx;
+  uint32_t                    m_uiSliceSegmentIdx;
 #if HEVC_DEPENDENT_SLICES
   Ctx                     m_lastSliceSegmentEndContextState;    ///< context storage for state at the end of the previous slice-segment (used for dependent slices only).
 #endif
@@ -101,26 +101,21 @@ private:
 #endif
   SliceType               m_encCABACTableIdx;
 #if SHARP_LUMA_DELTA_QP
-  Int                     m_gopID;
+  int                     m_gopID;
 #endif
 
 #if SHARP_LUMA_DELTA_QP
 public:
-  Int getGopId()        const { return m_gopID; }
-  Double  calculateLambda( const Slice* slice, const Int GOPid, const Int depth, const Double refQP, const Double dQP, Int &iQP );
-#if WCG_EXT
-  Void    setUpLambda( Slice* slice, const Double dLambda, Int iQP );
-#endif
+  int getGopId()        const { return m_gopID; }
+  double  calculateLambda( const Slice* slice, const int GOPid, const int depth, const double refQP, const double dQP, int &iQP );
+  void    setUpLambda( Slice* slice, const double dLambda, int iQP );
   
 private:
 #endif
-#if !WCG_EXT
-  Void    setUpLambda( Slice* slice, const Double dLambda, Int iQP );
-#endif
 #if HEVC_TILES_WPP
-  Void    calculateBoundingCtuTsAddrForSlice( UInt &startCtuTSAddrSlice, UInt &boundingCtuTSAddrSlice, Bool &haveReachedTileBoundary, Picture* pcPic, const Int sliceMode, const Int sliceArgument );
+  void    calculateBoundingCtuTsAddrForSlice( uint32_t &startCtuTSAddrSlice, uint32_t &boundingCtuTSAddrSlice, bool &haveReachedTileBoundary, Picture* pcPic, const int sliceMode, const int sliceArgument );
 #else
-  Void    calculateBoundingCtuTsAddrForSlice( UInt &startCtuTSAddrSlice, UInt &boundingCtuTSAddrSlice, Picture* pcPic, const Int sliceMode, const Int sliceArgument );
+  void    calculateBoundingCtuTsAddrForSlice( uint32_t &startCtuTSAddrSlice, uint32_t &boundingCtuTSAddrSlice, Picture* pcPic, const int sliceMode, const int sliceArgument );
 #endif
 
 
@@ -128,39 +123,39 @@ public:
   EncSlice();
   virtual ~EncSlice();
 
-  Void    create              ( Int iWidth, Int iHeight, ChromaFormat chromaFormat, UInt iMaxCUWidth, UInt iMaxCUHeight, UChar uhTotalDepth );
-  Void    destroy             ();
-  Void    init                ( EncLib* pcEncLib, const SPS& sps );
+  void    create              ( int iWidth, int iHeight, ChromaFormat chromaFormat, uint32_t iMaxCUWidth, uint32_t iMaxCUHeight, uint8_t uhTotalDepth );
+  void    destroy             ();
+  void    init                ( EncLib* pcEncLib, const SPS& sps );
 
   /// preparation of slice encoding (reference marking, QP and lambda)
-  Void    initEncSlice        ( Picture*  pcPic, const Int pocLast, const Int pocCurr,
-                                const Int iGOPid,   Slice*& rpcSlice, const Bool isField );
-  Void    resetQP             ( Picture* pic, Int sliceQP, Double lambda );
+  void    initEncSlice        ( Picture*  pcPic, const int pocLast, const int pocCurr,
+                                const int iGOPid,   Slice*& rpcSlice, const bool isField );
+  void    resetQP             ( Picture* pic, int sliceQP, double lambda );
 
   // compress and encode slice
-  Void    precompressSlice    ( Picture* pcPic                                     );      ///< precompress slice for multi-loop slice-level QP opt.
-  Void    compressSlice       ( Picture* pcPic, const Bool bCompressEntireSlice, const Bool bFastDeltaQP );      ///< analysis stage of slice
-  Void    calCostSliceI       ( Picture* pcPic );
+  void    precompressSlice    ( Picture* pcPic                                     );      ///< precompress slice for multi-loop slice-level QP opt.
+  void    compressSlice       ( Picture* pcPic, const bool bCompressEntireSlice, const bool bFastDeltaQP );      ///< analysis stage of slice
+  void    calCostSliceI       ( Picture* pcPic );
 
-  Void    encodeSlice         ( Picture* pcPic, OutputBitstream* pcSubstreams, UInt &numBinsCoded );
+  void    encodeSlice         ( Picture* pcPic, OutputBitstream* pcSubstreams, uint32_t &numBinsCoded );
 #if ENABLE_WPP_PARALLELISM
   static
 #endif
-  Void    encodeCtus          ( Picture* pcPic, const Bool bCompressEntireSlice, const Bool bFastDeltaQP, UInt startCtuTsAddr, UInt boundingCtuTsAddr, EncLib* pcEncLib );
+  void    encodeCtus          ( Picture* pcPic, const bool bCompressEntireSlice, const bool bFastDeltaQP, uint32_t startCtuTsAddr, uint32_t boundingCtuTsAddr, EncLib* pcEncLib );
 
 
   // misc. functions
-  Void    setSearchRange      ( Slice* pcSlice  );                                  ///< set ME range adaptively
+  void    setSearchRange      ( Slice* pcSlice  );                                  ///< set ME range adaptively
 
   EncCu*  getCUEncoder        ()                    { return m_pcCuEncoder; }                        ///< CU encoder
-  Void    xDetermineStartAndBoundingCtuTsAddr  ( UInt& startCtuTsAddr, UInt& boundingCtuTsAddr, Picture* pcPic );
-  UInt    getSliceSegmentIdx  ()                    { return m_uiSliceSegmentIdx;       }
-  Void    setSliceSegmentIdx  (UInt i)              { m_uiSliceSegmentIdx = i;          }
+  void    xDetermineStartAndBoundingCtuTsAddr  ( uint32_t& startCtuTsAddr, uint32_t& boundingCtuTsAddr, Picture* pcPic );
+  uint32_t    getSliceSegmentIdx  ()                    { return m_uiSliceSegmentIdx;       }
+  void    setSliceSegmentIdx  (uint32_t i)              { m_uiSliceSegmentIdx = i;          }
 
   SliceType getEncCABACTableIdx() const             { return m_encCABACTableIdx;        }
 
 private:
-  Double  xGetQPValueAccordingToLambda ( Double lambda );
+  double  xGetQPValueAccordingToLambda ( double lambda );
 };
 
 //! \}

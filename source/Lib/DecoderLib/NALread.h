@@ -65,8 +65,8 @@ class InputNALUnit : public NALUnit
           InputBitstream &getBitstream()       { return m_Bitstream; }
 };
 
-Void read(InputNALUnit& nalu);
-Void readNalUnitHeader(InputNALUnit& nalu);
+void read(InputNALUnit& nalu);
+void readNalUnitHeader(InputNALUnit& nalu);
 
 //! \}
 

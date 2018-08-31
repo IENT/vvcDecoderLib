@@ -38,7 +38,7 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
-InputColourSpaceConversion stringToInputColourSpaceConvert(const std::string &value, const Bool bIsForward)
+InputColourSpaceConversion stringToInputColourSpaceConvert(const std::string &value, const bool bIsForward)
 {
   if (value.empty() || value=="UNCHANGED")
   {
@@ -73,7 +73,7 @@ InputColourSpaceConversion stringToInputColourSpaceConvert(const std::string &va
   return NUMBER_INPUT_COLOUR_SPACE_CONVERSIONS;
 }
 
-std::string getListOfColourSpaceConverts(const Bool bIsForward)
+std::string getListOfColourSpaceConverts(const bool bIsForward)
 {
   if (bIsForward)
   {

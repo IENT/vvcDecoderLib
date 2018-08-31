@@ -172,7 +172,7 @@ void BinEncoderBase::encodeBinEP( unsigned bin )
 
 void BinEncoderBase::encodeBinsEP( unsigned bins, unsigned numBins )
 {
-  for(Int i = 0; i < numBins; i++)
+  for(int i = 0; i < numBins; i++)
   {
     DTRACE( g_trace_ctx, D_CABAC, "%d" "  " "%d" "  EP=%d \n", DTRACE_GET_COUNTER( g_trace_ctx, D_CABAC ), m_Range, ( bins >> ( numBins - 1 - i ) ) & 1 );
   }
