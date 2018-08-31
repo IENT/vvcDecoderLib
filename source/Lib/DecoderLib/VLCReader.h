@@ -177,16 +177,6 @@ private:
   int  alfGolombDecode( const int k );
 #endif
 
-#if JVET_K0371_ALF
-  void alf( AlfSliceParam& alfSliceParam );
-  void alfFilter( AlfSliceParam& alfSliceParam, const bool isChroma );
-
-private:
-  int truncatedUnaryEqProb( const int maxSymbol );
-  void xReadTruncBinCode( UInt& ruiSymbol, const int uiMaxSymbol );
-  int  alfGolombDecode( const int k );
-#endif
-
 protected:
   bool  xMoreRbspData();
 #if JEM_TOOLS
