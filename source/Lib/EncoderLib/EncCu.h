@@ -218,8 +218,15 @@ protected:
   void xCheckRDCostMerge2Nx2NFRUC
                               ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode );
 #endif
-#if JEM_TOOLS || JVET_K0357_AMVR
-  void xEncodeInterResidual   ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode, int residualPass = 0, CodingStructure* imvCS = NULL, int emtMode = 1, bool* bestHasNonResi = NULL );
+#if JEM_TOOLS || JVET_K0357_AMVR || JVET_K1000_SIMPLIFIED_EMT
+  void xEncodeInterResidual   ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode, int residualPass = 0
+#if JVET_K0357_AMVR
+    , CodingStructure* imvCS = NULL
+#endif
+#if JVET_K1000_SIMPLIFIED_EMT
+    , int emtMode = 1
+#endif
+    , bool* bestHasNonResi = NULL );
 #else
   void xEncodeInterResidual   ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode, int residualPass, bool* bestHasNonResi );
 #endif
