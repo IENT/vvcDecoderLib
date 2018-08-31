@@ -194,19 +194,19 @@ public:
 
   PicList*   getListPic()      { return m_pcListPic; }
 #if JVET_K0157
-  void      setPicBg(Picture* rpcTmpPicBg) { m_pcPicBg = rpcTmpPicBg; }
+  void      setPicBg(Picture* pcTmpPicBg) { m_pcPicBg = pcTmpPicBg; }
   Picture*  getPicBg() const { return m_pcPicBg; }
-  void      setPicOrig(Picture* rpcTmpPicBg) { m_pcPicOrig = rpcTmpPicBg; }
+  void      setPicOrig(Picture* pcTmpPicBg) { m_pcPicOrig = pcTmpPicBg; }
   Picture*  getPicOrig() { return m_pcPicOrig; }
   void      setNewestBgPOC(int poc) { m_iBgPOC = poc; }
   int       getNewestBgPOC() const { return m_iBgPOC; }
-  void      setEncodedLTRef(bool EncodedLTRef) { m_isEncodedLTRef = EncodedLTRef; }
+  void      setEncodedLTRef(bool isEncodedLTRef) { m_isEncodedLTRef = isEncodedLTRef; }
   bool      getEncodedLTRef() { return m_isEncodedLTRef; }
-  void      setUseLTRef(bool UseLTRef) { m_isUseLTRef = UseLTRef; }
+  void      setUseLTRef(bool isUseLTRef) { m_isUseLTRef = isUseLTRef; }
   bool      getUseLTRef() { return m_isUseLTRef; }
-  void      setPrepareLTRef(bool PrepareLTRef) { m_isPrepareLTRef = PrepareLTRef; }
+  void      setPrepareLTRef(bool isPrepareLTRef) { m_isPrepareLTRef = isPrepareLTRef; }
   bool      getPrepareLTRef() { return m_isPrepareLTRef; }
-  void      setLastLTRefPoc(int LastLTRefPoc) { m_iLastLTRefPoc = LastLTRefPoc; }
+  void      setLastLTRefPoc(int iLastLTRefPoc) { m_iLastLTRefPoc = iLastLTRefPoc; }
   int       getLastLTRefPoc() const { return m_iLastLTRefPoc; }
 
 #endif

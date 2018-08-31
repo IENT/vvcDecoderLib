@@ -1358,11 +1358,14 @@ bool EncAppCfg::parseCfg( int argc, char* argv[] )
   const list<const char*>& argv_unhandled = po::scanArgv(opts, argc, (const char**) argv, err);
 
 #if JVET_K0157
-  if (m_compositeRefEnabled) {
-    for (int i = 0; i < m_iGOPSize; i++) {
+  if (m_compositeRefEnabled) 
+  {
+    for (int i = 0; i < m_iGOPSize; i++) 
+    {
       m_GOPList[i].m_POC *= 2;
       m_GOPList[i].m_deltaRPS *= 2;
-      for (int j = 0; j < m_GOPList[i].m_numRefPics; j++) {
+      for (int j = 0; j < m_GOPList[i].m_numRefPics; j++) 
+      {
         m_GOPList[i].m_referencePics[j] *= 2;
       }
     }
