@@ -302,7 +302,7 @@ void EncApp::xInitLibCfg()
   m_cEncLib.setMDMS                                              ( m_MDMS );
 #endif
 #if JVET_K0157
-  m_cEncLib.setUseCompositeRef                                   ( m_CompositeRefEnabled );
+  m_cEncLib.setUseCompositeRef                                   ( m_compositeRefEnabled );
 #endif
   // ADD_NEW_TOOL : (encoder app) add setting of tool enabling flags and associated parameters here
 

@@ -729,8 +729,8 @@ Picture::Picture()
     m_prevQP[i] = -1;
   }
 #if JVET_K0157
-  m_SpliceIdx = NULL;
-  ctuNums = 0;
+  m_iSpliceIdx = NULL;
+  m_iCtuNums = 0;
 #endif
 }
 
@@ -793,10 +793,10 @@ void Picture::destroy()
   }
 #endif
 #if JVET_K0157
-  if (m_SpliceIdx)
+  if (m_iSpliceIdx)
   {
-    delete[] m_SpliceIdx;
-    m_SpliceIdx = NULL;
+    delete[] m_iSpliceIdx;
+    m_iSpliceIdx = NULL;
   }
 #endif
 }
@@ -915,11 +915,11 @@ void Picture::finalInit( const SPS& sps, const PPS& pps )
   tileMap->create( sps, pps );
 #endif
 #if JVET_K0157
-  if (m_SpliceIdx == NULL)
+  if (m_iSpliceIdx == NULL)
   {
-    ctuNums = cs->pcv->sizeInCtus;
-    m_SpliceIdx = new int[ctuNums];
-    memset(m_SpliceIdx, 0, ctuNums * sizeof(int));
+    m_iCtuNums = cs->pcv->sizeInCtus;
+    m_iSpliceIdx = new int[m_iCtuNums];
+    memset(m_iSpliceIdx, 0, m_iCtuNums * sizeof(int));
   }
 #endif
 }
@@ -1136,20 +1136,20 @@ Pel* Picture::getOrigin( const PictureType &type, const ComponentID compID ) con
 #if JVET_K0157
 void Picture::createSpliceIdx(int nums)
 {
-  ctuNums = nums;
-  m_SpliceIdx = new int[ctuNums];
-  memset(m_SpliceIdx, 0, ctuNums * sizeof(int));
+  m_iCtuNums = nums;
+  m_iSpliceIdx = new int[m_iCtuNums];
+  memset(m_iSpliceIdx, 0, m_iCtuNums * sizeof(int));
 }
 
 bool Picture::getSpliceFull()
 {
   int count = 0;
-  for (int i = 0; i < ctuNums; i++)
+  for (int i = 0; i < m_iCtuNums; i++)
   {
-    if (m_SpliceIdx[i] != 0)
+    if (m_iSpliceIdx[i] != 0)
       count++;
   }
-  if (count < ctuNums * 0.25)
+  if (count < m_iCtuNums * 0.25)
     return false;
   return true;
 }
