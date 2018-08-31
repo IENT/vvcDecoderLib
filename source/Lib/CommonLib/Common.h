@@ -118,18 +118,18 @@ struct UnitScale
 namespace std
 {
   template <>
-  struct hash<Position> : public unary_function<Position, size_t>
+  struct hash<Position> : public unary_function<Position, uint64_t>
   {
-    size_t operator()(const Position& value) const
+    uint64_t operator()(const Position& value) const
     {
       return (((uint64_t)value.x << 32) + value.y);
     }
   };
 
   template <>
-  struct hash<Size> : public unary_function<Size, size_t>
+  struct hash<Size> : public unary_function<Size, uint64_t>
   {
-    size_t operator()(const Size& value) const
+    uint64_t operator()(const Size& value) const
     {
       return (((uint64_t)value.width << 32) + value.height);
     }
