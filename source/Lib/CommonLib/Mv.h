@@ -64,6 +64,22 @@ public:
 #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
   Mv(                                            ) : hor( 0    ), ver( 0    ), highPrec( false     ) {}
   Mv( int iHor, int iVer, bool _highPrec = false ) : hor( iHor ), ver( iVer ), highPrec( _highPrec ) {}
+#if DMVR_JVET_K0217
+  explicit Mv(const Mv &newMv, bool _highPrec) : hor(newMv.hor), ver(newMv.ver), highPrec(_highPrec) {}
+  explicit Mv(int iHorAndiVer, bool _highPrec) : hor(iHorAndiVer), ver(iHorAndiVer), highPrec(_highPrec) {}
+  Mv operator << (int i)
+  {
+      return Mv(hor << i, ver << i, highPrec);
+  }
+  Mv operator - (void)
+  {
+      return Mv(-hor, -ver, highPrec);
+  }
+  bool IsZero(void)
+  {
+    return (hor == 0 && ver == 0);
+  }
+#endif
 #else
   Mv(                    ) : hor( 0    ), ver( 0    ) {}
   Mv( int iHor, int iVer ) : hor( iHor ), ver( iVer ) {}

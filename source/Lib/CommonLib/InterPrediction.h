@@ -49,7 +49,9 @@
 
 #include "RdCost.h"
 #include "ContextModelling.h"
-
+#if DMVR_JVET_K0217
+#include <array>
+#endif
 // forward declaration
 class Mv;
 
@@ -68,7 +70,40 @@ class Mv;
 #define BIO_TEMP_BUFFER_SIZE ( MAX_CU_SIZE ) * ( MAX_CU_SIZE )
 #endif
 #endif
-
+#if DMVR_JVET_K0217
+#if DISTORTION_TYPE_BUGFIX
+typedef Distortion  MRSADtype;
+#else
+typedef uint32_t    MRSADtype;
+#endif
+namespace ns_SAD_POINTS_INDEXES
+{
+  const MRSADtype NotDefinedSAD = std::numeric_limits<MRSADtype>::max();
+  enum SAD_POINT_INDEX
+  {
+    NOT_AVAILABLE = -1,
+    BOTTOM = 0,
+    TOP,
+    RIGHT,
+    LEFT,
+    TOP_LEFT,
+    TOP_RIGHT,
+    BOTTOM_LEFT,
+    BOTTOM_RIGHT,
+    CENTER,
+    COUNT
+  };
+  inline SAD_POINT_INDEX& operator += (SAD_POINT_INDEX& lastValue, int value)
+  {
+    lastValue = static_cast<SAD_POINT_INDEX>(static_cast<int>(lastValue) + value);
+    return lastValue;
+  }
+  inline void operator ++ (SAD_POINT_INDEX& lastValue)
+  {
+    lastValue = static_cast<SAD_POINT_INDEX>(static_cast<int>(lastValue)+1);
+  }
+}
+#endif
 class InterPrediction : public WeightPrediction
 {
 private:
@@ -119,8 +154,26 @@ protected:
 
   PelStorage           m_tmpObmcBuf;
 
+#if !DMVR_JVET_K0217
   Pel*                 m_cYuvPredTempDMVR[MAX_NUM_COMPONENT];
-
+#else
+  PelUnitBuf           m_cYuvPredTempL0;
+  PelUnitBuf           m_cYuvPredTempL1;
+  Pel*                 m_cYuvPredTempDMVRL0;
+  Pel*                 m_cYuvPredTempDMVRL1;
+  PelUnitBuf           m_HalfPelFilteredBuffL0[2][2];
+  Pel*                 m_filteredBlockL1[2][2];
+  PelUnitBuf           m_HalfPelFilteredBuffL1[2][2];
+  std::array<MRSADtype, ns_SAD_POINTS_INDEXES::SAD_POINT_INDEX::COUNT> m_currentSADsArray;
+  std::array<MRSADtype, ns_SAD_POINTS_INDEXES::SAD_POINT_INDEX::COUNT> m_previousSADsArray;
+  ns_SAD_POINTS_INDEXES::SAD_POINT_INDEX m_lastDirection;
+#if DMVR_JVET_SEARCH_RANGE_K0217 > 2
+  std::vector<Mv>      m_checkedMVsList;
+#endif
+  std::array<Mv, 5>    m_pSearchOffset = { { Mv(0, 1), Mv(0, -1), Mv(1, 0), Mv(-1, 0), Mv(0, 0) } };
+  static const uint32_t m_searchRange = DMVR_JVET_SEARCH_RANGE_K0217;
+  static const uint32_t m_bufferWidthExtSize = m_searchRange << 1;
+#endif
 #if !JVET_K0485_BIO
   uint32_t                 m_uiaBIOShift[64];
 #endif
@@ -174,6 +227,11 @@ protected:
 #if JEM_TOOLS
                                   , const bool& bBIOApplied = false, const bool& bDMVRApplied = false, const int& nFRUCMode = FRUC_MERGE_OFF, const bool& doLic = true
 #endif
+#if DMVR_JVET_K0217
+  , bool doPred = true
+  , SizeType DMVRwidth = 0
+  , SizeType DMVRheight = 0
+#endif 
                                  );
   
 #if JEM_TOOLS
@@ -264,7 +322,7 @@ protected:
   bool xFrucIsTopTempAvailable  (PredictionUnit& pu);
   bool xFrucIsLeftTempAvailable (PredictionUnit& pu);
   int  xFrucGetSubBlkSize       (PredictionUnit& pu, int nBlkWidth, int nBlkHeight);
-
+#if !DMVR_JVET_K0217
 #if DISTORTION_TYPE_BUGFIX
   void xBIPMVRefine(PredictionUnit &pu, RefPicList eRefPicList, int iWidth, int iHeight, const CPelUnitBuf &pcYuvOrg,
                     uint32_t uiMaxSearchRounds, uint32_t nSearchStepShift, Distortion &uiMinCost, bool fullPel = true);
@@ -277,6 +335,12 @@ protected:
 #endif
   void xPredInterLines          (const PredictionUnit& pu, const Picture* refPic, Mv &mv, PelUnitBuf &dstPic, const bool &bi, const ClpRng& clpRng );
   void xFillPredBlckAndBorder   (const PredictionUnit& pu, RefPicList eRefPicList, int iWidth, int iHeight, PelBuf &cTmpY );
+#else
+  void xBIPMVRefine(PredictionUnit& pu, uint32_t nSearchStepShift, MRSADtype& minCost, DistParam &cDistParam, Mv *refineMv = nullptr);
+  MRSADtype xDirectMCCostDMVR(const Pel* pSrcL0, const Pel* pSrcL1, uint32_t stride, SizeType width, SizeType height, const DistParam &cDistParam);
+  void sumUpSamples(const Pel *pRef, uint32_t  refStride, SizeType cuWidth, SizeType cuHeight, int32_t& Avg);
+  void xGenerateFracPixel(PredictionUnit& pu, uint32_t nSearchStepShift, const ClpRngs &clpRngs);
+#endif  
   void xProcessDMVR             (      PredictionUnit& pu, PelUnitBuf &pcYuvDst, const ClpRngs &clpRngs, const bool bBIOApplied);
 #endif
 

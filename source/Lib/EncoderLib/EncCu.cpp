@@ -1645,6 +1645,10 @@ void EncCu::xCheckRDCostMerge2Nx2N( CodingStructure *&tempCS, CodingStructure *&
   static_vector<unsigned, MRG_MAX_NUM_CANDS>  RdModeList;
   bool                                        mrgTempBufSet    = false;
 
+#if DMVR_JVET_LOW_LATENCY_K0217
+  Mv                                          refinedMvdL0[MRG_MAX_NUM_CANDS];
+#endif
+
   for( unsigned i = 0; i < MRG_MAX_NUM_CANDS; i++ )
   {
     RdModeList.push_back( i );
@@ -1721,6 +1725,9 @@ void EncCu::xCheckRDCostMerge2Nx2N( CodingStructure *&tempCS, CodingStructure *&
         {
           mergeCtx.mvFieldNeighbours[2*uiMergeCand].mv   = pu.mv[0];
           mergeCtx.mvFieldNeighbours[2*uiMergeCand+1].mv = pu.mv[1];
+#if DMVR_JVET_LOW_LATENCY_K0217
+          refinedMvdL0[uiMergeCand] = pu.mvd[0];
+#endif
         }
 
 #if DISTORTION_TYPE_BUGFIX
@@ -1801,6 +1808,9 @@ void EncCu::xCheckRDCostMerge2Nx2N( CodingStructure *&tempCS, CodingStructure *&
 
       if( mrgTempBufSet )
       {
+#if DMVR_JVET_LOW_LATENCY_K0217
+        pu.mvd[0] = refinedMvdL0[uiMergeCand];
+#endif
         tempCS->getPredBuf().copyFrom( acMergeBuffer[ uiMergeCand ]);
       }
       else

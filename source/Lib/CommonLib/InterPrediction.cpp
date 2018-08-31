@@ -45,6 +45,152 @@
 
 //! \ingroup CommonLib
 //! \{
+#if DMVR_JVET_K0217
+namespace ns_SAD_POINTS_INDEXES
+{
+  static const std::array<SAD_POINT_INDEX, SAD_POINT_INDEX::COUNT> SADindexesArrayForBottom =
+  {
+    {
+      NOT_AVAILABLE,                  // BOTTOM       -> NOT_AVAILABLE
+      CENTER,                         // TOP          -> CENTER
+      BOTTOM_RIGHT,                   // RIGHT        -> BOTTOM_RIGHT
+      BOTTOM_LEFT,                    // LEFT         -> BOTTOM_LEFT
+      LEFT,                           // TOP_LEFT     -> LEFT
+      RIGHT,                          // TOP_RIGHT    -> RIGHT
+      NOT_AVAILABLE,                  // BOTTOM_LEFT  -> NOT_AVAILABLE
+      NOT_AVAILABLE,                  // BOTTOM_RIGHT -> NOT_AVAILABLE
+      TOP                             // CENTER       -> TOP
+    }
+  };
+  static const std::array<SAD_POINT_INDEX, SAD_POINT_INDEX::COUNT> SADindexesArrayForTop =
+  {
+    {
+      CENTER,                         // BOTTOM       -> CENTER
+      NOT_AVAILABLE,                  // TOP          -> NOT_AVAILABLE
+      TOP_RIGHT,                      // RIGHT        -> TOP_RIGHT
+      TOP_LEFT,                       // LEFT         -> TOP_LEFT
+      NOT_AVAILABLE,                  // TOP_LEFT     -> NOT_AVAILABLE
+      NOT_AVAILABLE,                  // TOP_RIGHT    -> NOT_AVAILABLE
+      LEFT,                           // BOTTOM_LEFT  -> LEFT
+      RIGHT,                          // BOTTOM_RIGHT -> RIGHT
+      TOP                             // CENTER       -> TOP
+    }
+  };
+  static const std::array<SAD_POINT_INDEX, SAD_POINT_INDEX::COUNT> SADindexesArrayForLeft =
+  {
+    {
+      BOTTOM_LEFT,                    // BOTTOM       -> BOTTOM_LEFT
+      TOP_LEFT,                       // TOP          -> TOP_LEFT
+      CENTER,                         // RIGHT        -> CENTER
+      NOT_AVAILABLE,                  // LEFT         -> NOT_AVAILABLE
+      NOT_AVAILABLE,                  // TOP_LEFT     -> NOT_AVAILABLE
+      TOP,                            // TOP_RIGHT    -> TOP
+      NOT_AVAILABLE,                  // BOTTOM_LEFT  -> NOT_AVAILABLE
+      BOTTOM,                         // BOTTOM_RIGHT -> BOTTOM
+      LEFT                            // CENTER       -> LEFT
+    }
+  };
+  static const std::array<SAD_POINT_INDEX, SAD_POINT_INDEX::COUNT> SADindexesArrayForRight =
+  {
+    {
+      BOTTOM_RIGHT,                   // BOTTOM       -> BOTTOM_RIGHT
+      TOP_RIGHT,                      // TOP          -> TOP_RIGHT
+      NOT_AVAILABLE,                  // RIGHT        -> NOT_AVAILABLE
+      CENTER,                         // LEFT         -> CENTER
+      TOP,                            // TOP_LEFT     -> TOP
+      NOT_AVAILABLE,                  // TOP_RIGHT    -> NOT_AVAILABLE
+      BOTTOM,                         // BOTTOM_LEFT  -> BOTTOM
+      NOT_AVAILABLE,                  // BOTTOM_RIGHT -> NOT_AVAILABLE
+      RIGHT                           // CENTER       -> RIGHT
+    }
+  };
+  static const std::array<SAD_POINT_INDEX, SAD_POINT_INDEX::COUNT> SADindexesArrayForBottomLeft =
+  {
+    {
+      NOT_AVAILABLE,                  // BOTTOM       -> NOT_AVAILABLE
+      LEFT,                           // TOP          -> LEFT
+      BOTTOM,                         // RIGHT        -> BOTTOM
+      NOT_AVAILABLE,                  // LEFT         -> NOT_AVAILABLE
+      NOT_AVAILABLE,                  // TOP_LEFT     -> NOT_AVAILABLE
+      CENTER,                         // TOP_RIGHT    -> CENTER
+      NOT_AVAILABLE,                  // BOTTOM_LEFT  -> NOT_AVAILABLE
+      NOT_AVAILABLE,                  // BOTTOM_RIGHT -> NOT_AVAILABLE
+      BOTTOM_LEFT                     // CENTER       -> BOTTOM_LEFT
+    }
+  };
+  static const std::array<SAD_POINT_INDEX, SAD_POINT_INDEX::COUNT> SADindexesArrayForBottomRight =
+  {
+    {
+      NOT_AVAILABLE,                  // BOTTOM       -> NOT_AVAILABLE
+      RIGHT,                          // TOP          -> RIGHT
+      NOT_AVAILABLE,                  // RIGHT        -> NOT_AVAILABLE
+      BOTTOM,                         // LEFT         -> BOTTOM
+      CENTER,                         // TOP_LEFT     -> CENTER
+      NOT_AVAILABLE,                  // TOP_RIGHT    -> NOT_AVAILABLE
+      NOT_AVAILABLE,                  // BOTTOM_LEFT  -> NOT_AVAILABLE
+      NOT_AVAILABLE,                  // BOTTOM_RIGHT -> NOT_AVAILABLE
+      BOTTOM_RIGHT                    // CENTER       -> BOTTOM_RIGHT
+    }
+  };
+  static const std::array<SAD_POINT_INDEX, SAD_POINT_INDEX::COUNT> SADindexesArrayForTopLeft =
+  {
+    {
+      LEFT,                           // BOTTOM       -> LEFT
+      NOT_AVAILABLE,                  // TOP          -> NOT_AVAILABLE
+      TOP,                            // RIGHT        -> TOP
+      NOT_AVAILABLE,                  // LEFT         -> NOT_AVAILABLE
+      NOT_AVAILABLE,                  // TOP_LEFT     -> NOT_AVAILABLE
+      NOT_AVAILABLE,                  // TOP_RIGHT    -> NOT_AVAILABLE
+      NOT_AVAILABLE,                  // BOTTOM_LEFT  -> NOT_AVAILABLE
+      CENTER,                         // BOTTOM_RIGHT -> CENTER
+      TOP_LEFT                        // CENTER       -> TOP_LEFT
+    }
+  };
+  static const std::array<SAD_POINT_INDEX, SAD_POINT_INDEX::COUNT> SADindexesArrayForTopRight =
+  {
+    {
+      RIGHT,                          // BOTTOM       -> RIGHT
+      NOT_AVAILABLE,                  // TOP          -> NOT_AVAILABLE
+      NOT_AVAILABLE,                  // RIGHT        -> NOT_AVAILABLE
+      TOP,                            // LEFT         -> TOP
+      NOT_AVAILABLE,                  // TOP_LEFT     -> NOT_AVAILABLE
+      NOT_AVAILABLE,                  // TOP_RIGHT    -> NOT_AVAILABLE
+      CENTER,                         // BOTTOM_LEFT  -> CENTER
+      NOT_AVAILABLE,                  // BOTTOM_RIGHT -> NOT_AVAILABLE
+      TOP_RIGHT                       // CENTER       -> TOP_RIGHT
+    }
+  };
+  static const std::array<SAD_POINT_INDEX, SAD_POINT_INDEX::COUNT> SADindexesArrayForCenter =
+  {
+    {
+      NOT_AVAILABLE,                  // BOTTOM
+      NOT_AVAILABLE,                  // TOP
+      NOT_AVAILABLE,                  // RIGHT
+      NOT_AVAILABLE,                  // LEFT
+      NOT_AVAILABLE,                  // TOP_LEFT
+      NOT_AVAILABLE,                  // TOP_RIGHT
+      NOT_AVAILABLE,                  // BOTTOM_LEFT
+      NOT_AVAILABLE,                  // BOTTOM_RIGHT
+      NOT_AVAILABLE                   // CENTER
+    }
+  };
+  static const std::array<std::array<SAD_POINT_INDEX, SAD_POINT_INDEX::COUNT>, SAD_POINT_INDEX::COUNT> currentSADIndexesSet =
+  {
+    {
+      SADindexesArrayForBottom,
+      SADindexesArrayForTop,
+      SADindexesArrayForRight,
+      SADindexesArrayForLeft,
+      SADindexesArrayForTopLeft,
+      SADindexesArrayForTopRight,
+      SADindexesArrayForBottomLeft,
+      SADindexesArrayForBottomRight,
+      SADindexesArrayForCenter
+    }
+  };
+}
+using namespace ns_SAD_POINTS_INDEXES;
+#endif
 
 // ====================================================================================================================
 // Constructor / destructor / initialize
@@ -86,6 +232,10 @@ InterPrediction::InterPrediction()
     }
   }
 
+#if DMVR_JVET_K0217
+  m_filteredBlockL1[0][1] = nullptr;
+  m_filteredBlockL1[1][0] = nullptr;
+#endif
 #if JEM_TOOLS
   m_LICMultApprox[0] = 0;
   for( int k = 1; k < 64; k++ )
@@ -99,8 +249,14 @@ InterPrediction::InterPrediction()
     {
       m_acYuvPredFrucTemplate[tmplt][ch] = nullptr;
     }
+#if !DMVR_JVET_K0217
     m_cYuvPredTempDMVR[ch] = nullptr;
+#endif
   }
+#if DMVR_JVET_K0217
+  m_cYuvPredTempDMVRL1 = nullptr;
+  m_cYuvPredTempDMVRL0 = nullptr;
+#endif
 #endif
 }
 
@@ -134,7 +290,12 @@ void InterPrediction::destroy()
       m_filteredBlockTmp[i][c] = nullptr;
     }
   }
-
+#if DMVR_JVET_K0217
+  xFree(m_filteredBlockL1[0][1]);
+  m_filteredBlockL1[0][1] = nullptr;
+  xFree(m_filteredBlockL1[1][0]);
+  m_filteredBlockL1[1][0] = nullptr;
+#endif
 #if JEM_TOOLS
   xFree( m_pGradX0 );   m_pGradX0 = nullptr;
   xFree( m_pGradY0 );   m_pGradY0 = nullptr;
@@ -152,9 +313,18 @@ void InterPrediction::destroy()
       xFree( m_acYuvPredFrucTemplate[tmplt][ch] );
       m_acYuvPredFrucTemplate[tmplt][ch] = nullptr;
     }
+#if !DMVR_JVET_K0217
     xFree( m_cYuvPredTempDMVR[ch] );
     m_cYuvPredTempDMVR[ch] = nullptr;
+#endif
   }
+#if DMVR_JVET_K0217
+  xFree(m_cYuvPredTempDMVRL1);
+  m_cYuvPredTempDMVRL1 = nullptr;
+
+  xFree(m_cYuvPredTempDMVRL0);
+  m_cYuvPredTempDMVRL0 = nullptr;
+#endif
 #endif
 }
 
@@ -170,18 +340,27 @@ void InterPrediction::init( RdCost* pcRdCost, ChromaFormat chromaFormatIDC )
   }
 
   m_currChromaFormat = chromaFormatIDC;
-
+#if DMVR_JVET_K0217
+  int extWidth = MAX_CU_SIZE + m_bufferWidthExtSize + 16;
+  int extHeight = MAX_CU_SIZE + m_bufferWidthExtSize + 1;
+#endif
+#if DMVR_JVET_K0217 & JVET_K0485_BIO 
+  extWidth = extWidth > (MAX_CU_SIZE + (2 * JVET_K0485_BIO_EXTEND_SIZE + 2) + 16) ? extWidth : MAX_CU_SIZE + (2 * JVET_K0485_BIO_EXTEND_SIZE + 2) + 16;
+  extHeight = extHeight > (MAX_CU_SIZE + (2 * JVET_K0485_BIO_EXTEND_SIZE + 2) + 1) ? extHeight : MAX_CU_SIZE + (2 * JVET_K0485_BIO_EXTEND_SIZE + 2) + 1;
+#endif
   if( m_acYuvPred[REF_PIC_LIST_0][COMPONENT_Y] == nullptr ) // check if first is null (in which case, nothing initialised yet)
   {
     for( uint32_t c = 0; c < MAX_NUM_COMPONENT; c++ )
     {
 #if JEM_TOOLS
+#if !DMVR_JVET_K0217
 #if JVET_K0485_BIO
       int extWidth  = MAX_CU_SIZE + (2 * JVET_K0485_BIO_EXTEND_SIZE + 2) + 16;
       int extHeight = MAX_CU_SIZE + (2 * JVET_K0485_BIO_EXTEND_SIZE + 2) + 1;
 #else
       int extWidth  = MAX_CU_SIZE + DMVR_INTME_RANGE*2 + 16;
       int extHeight = MAX_CU_SIZE + DMVR_INTME_RANGE*2 + 1;
+#endif
 #endif
 #else
       int extWidth  = MAX_CU_SIZE + 16;
@@ -204,6 +383,11 @@ void InterPrediction::init( RdCost* pcRdCost, ChromaFormat chromaFormatIDC )
       }
     }
 
+#if DMVR_JVET_K0217
+    m_filteredBlockL1[0][1] = (Pel*)xMalloc(Pel, extWidth * extHeight);
+    m_filteredBlockL1[1][0] = (Pel*)xMalloc(Pel, extWidth * extHeight);
+#endif
+
     m_iRefListIdx = -1;
     
 #if JEM_TOOLS
@@ -223,8 +407,14 @@ void InterPrediction::init( RdCost* pcRdCost, ChromaFormat chromaFormatIDC )
       {
         m_acYuvPredFrucTemplate[tmplt][ch] = ( Pel* ) xMalloc( Pel, MAX_CU_SIZE * MAX_CU_SIZE );
       }
+#if !DMVR_JVET_K0217
       m_cYuvPredTempDMVR[ch] = ( Pel* ) xMalloc( Pel, ( MAX_CU_SIZE + DMVR_INTME_RANGE*2 ) * ( MAX_CU_SIZE + DMVR_INTME_RANGE*2 ) );
+#endif
     }
+#if DMVR_JVET_K0217
+    m_cYuvPredTempDMVRL0 = (Pel*)xMalloc(Pel, (MAX_CU_SIZE + m_bufferWidthExtSize) * (MAX_CU_SIZE + m_bufferWidthExtSize));
+    m_cYuvPredTempDMVRL1 = (Pel*)xMalloc(Pel, (MAX_CU_SIZE + m_bufferWidthExtSize) * (MAX_CU_SIZE + m_bufferWidthExtSize));
+#endif
 #endif
   }
 
@@ -643,6 +833,20 @@ void InterPrediction::xPredInterBi(PredictionUnit& pu, PelUnitBuf &pcYuvPred)
   {
     xProcessDMVR( pu, pcYuvPred, slice.clpRngs(), bBIOApplied );
   }
+#if DMVR_JVET_LOW_LATENCY_K0217
+  else if (pu.cs->sps->getSpsNext().getUseDMVR()
+    && pu.mergeFlag
+    && pu.mergeType == MRG_TYPE_DEFAULT_N
+#if JEM_TOOLS
+    && !pu.frucMrgMode
+    && !pu.cu->LICFlag
+#endif
+    && !pu.cu->affine
+    && PU::isBiPredFromDifferentDir(pu))
+  {
+    pu.mvd[REF_PIC_LIST_0].setZero();
+  }
+#endif
 #endif
 
   CPelUnitBuf srcPred0 = ( pu.chromaFormat == CHROMA_400 ?
@@ -729,6 +933,11 @@ void InterPrediction::xPredInterBlk ( const ComponentID& compID, const Predictio
 #if JEM_TOOLS
                                       , const bool& bBIOApplied /*=false*/, const bool& bDMVRApplied /*= false*/, const int& nFRUCMode /*= FRUC_MERGE_OFF*/, const bool& doLic /*= true*/
 #endif
+#if DMVR_JVET_K0217
+  , bool doPred/* = true*/
+  , SizeType DMVRwidth/* = 0*/
+  , SizeType DMVRheight/* = 0*/
+#endif
                                     )
 {
   JVET_J0090_SET_REF_PICTURE( refPic, compID );
@@ -799,6 +1008,13 @@ void InterPrediction::xPredInterBlk ( const ComponentID& compID, const Predictio
   CPelBuf refBuf;
   {
     Position offset = pu.blocks[compID].pos().offset( _mv.getHor() >> shiftHor, _mv.getVer() >> shiftVer );
+#if DMVR_JVET_K0217
+    if (DMVRwidth)
+    {
+      refBuf = refPic->getRecoBuf(CompArea(compID, chFmt, offset, Size(DMVRwidth, DMVRheight)));
+    }
+    else
+#endif
     refBuf = refPic->getRecoBuf( CompArea( compID, chFmt, offset, pu.blocks[compID].size() ) );
   }
 
@@ -862,7 +1078,15 @@ void InterPrediction::xPredInterBlk ( const ComponentID& compID, const Predictio
 #endif
   }
 #endif
-
+#if DMVR_JVET_K0217
+  if (doPred)
+  {
+    if (DMVRwidth)
+    {
+      width = DMVRwidth;
+      height = DMVRheight;
+    }
+#endif
   if( yFrac == 0 )
   {
 #if JEM_TOOLS
@@ -881,9 +1105,17 @@ void InterPrediction::xPredInterBlk ( const ComponentID& compID, const Predictio
   }
   else
   {
-    PelBuf tmpBuf = PelBuf(m_filteredBlockTmp[0][compID], pu.blocks[compID]);
+#if DMVR_JVET_K0217
+      PelBuf tmpBuf = DMVRwidth ? PelBuf(m_filteredBlockTmp[0][compID], Size(DMVRwidth, DMVRheight)) : PelBuf(m_filteredBlockTmp[0][compID], pu.blocks[compID]);
 #if JVET_K0485_BIO
-    tmpBuf.stride = dstBuf.stride;
+      if (DMVRwidth == 0)
+        tmpBuf.stride = dstBuf.stride;
+#endif
+#else
+      PelBuf tmpBuf = PelBuf(m_filteredBlockTmp[0][compID], pu.blocks[compID]);
+#if JVET_K0485_BIO
+      tmpBuf.stride = dstBuf.stride;
+#endif
 #endif
 
     int vFilterSize = isLuma(compID) ? NTAPS_LUMA : NTAPS_CHROMA;
@@ -902,7 +1134,9 @@ void InterPrediction::xPredInterBlk ( const ComponentID& compID, const Predictio
 #endif
     JVET_J0090_SET_CACHE_ENABLE( true );
   }
-
+#if DMVR_JVET_K0217
+  }
+#endif
 #if JEM_TOOLS
 #if JVET_K0485_BIO
   if (bBIOApplied && compID == COMPONENT_Y && !bDMVRApplied)
@@ -3629,7 +3863,7 @@ void InterPrediction::xFrucUpdateTemplate( PredictionUnit& pu, int nWidth, int n
     pcBufPredCurLeft.removeHighFreq( pcBufPredRefLeft, false, pu.cs->slice->clpRngs() );
   }
 }
-
+#if !DMVR_JVET_K0217
 void InterPrediction::xPredInterLines( const PredictionUnit& pu, const Picture* refPic, Mv &_mv, PelUnitBuf &dstPic, const bool &bi, const ClpRng& clpRng )
 {
   clipMv( _mv, pu.lumaPos(), *pu.cs->sps );
@@ -3841,7 +4075,314 @@ void InterPrediction::xBIPMVRefine( PredictionUnit& pu, RefPicList eRefPicList, 
 
   pu.mv[eRefPicList] = cBestMv;
 }
+#else
+MRSADtype InterPrediction::xDirectMCCostDMVR(const Pel* pSrcL0, const Pel* pSrcL1, uint32_t stride, SizeType width, SizeType height, const DistParam &cDistParam)
+{
+  MRSADtype sum = 0;
+  const int16_t deltaC = (int16_t)round((double)(cDistParam.meanL0 - cDistParam.meanL1) / (width * height));
 
+  for (SizeType j = 0; j < height; j++)
+  {
+    for (SizeType i = 0; i < width; i++)
+    {
+      sum += abs(pSrcL0[i] - pSrcL1[i] - deltaC);
+    }
+    pSrcL0 += stride;
+    pSrcL1 += stride;
+  }
+  return sum;
+}
+
+void InterPrediction::sumUpSamples(const Pel * pDst, uint32_t  refStride, SizeType cuWidth, SizeType cuHeight, int32_t& Avg)
+{
+  Avg = 0;
+  if (cuWidth == 1)
+  {
+    for (int j = 0; j < cuHeight; j++)
+    {
+      Avg += *pDst;
+      pDst += refStride;
+    }
+  }
+  else
+  {
+    for (int j = 0; j < cuHeight; j++)
+    {
+      for (int i = 0; i < cuWidth; i += 4)
+      {
+        Avg += pDst[i + 0];
+        Avg += pDst[i + 1];
+        Avg += pDst[i + 2];
+        Avg += pDst[i + 3];
+      }
+      pDst += refStride;
+    }
+  }
+}
+void InterPrediction::xBIPMVRefine(PredictionUnit& pu, uint32_t nSearchStepShift, MRSADtype& minCost, DistParam &cDistParam, Mv *refineMv /* = nullptr*/)
+{
+  const SizeType cuWidth = pu.lumaSize().width;
+  const SizeType cuHeight = pu.lumaSize().height;
+  const bool bFracPel = (nSearchStepShift % 2);
+
+  const Mv cMvOrgL0 = pu.mv[REF_PIC_LIST_0];
+  Mv cBestMvL0;
+  const Mv cMvOrgL1 = pu.mv[REF_PIC_LIST_1];
+  int32_t bestL0Mean = std::numeric_limits<int32_t>::max();
+  int32_t bestL1Mean = std::numeric_limits<int32_t>::max();;
+  if (!bFracPel)
+  {
+    m_currentSADsArray = { { NotDefinedSAD, NotDefinedSAD, NotDefinedSAD, NotDefinedSAD, NotDefinedSAD, NotDefinedSAD, NotDefinedSAD, NotDefinedSAD, minCost } };
+    SAD_POINT_INDEX cornerIndex(SAD_POINT_INDEX::TOP_LEFT);
+    const std::array<SAD_POINT_INDEX, SAD_POINT_INDEX::COUNT> &lastDirectionIndexesArray = currentSADIndexesSet[m_lastDirection];
+    int32_t LineMeanL0[4] = { 0, 0, 0, 0 };
+    int32_t LineMeanL1[4] = { 0, 0, 0, 0 };
+    const int32_t refStride = m_cYuvPredTempL0.Y().stride;
+    for (SAD_POINT_INDEX nIdx = SAD_POINT_INDEX::BOTTOM; nIdx <= SAD_POINT_INDEX::TOP_LEFT; ++nIdx)
+    {
+      Mv cMvDL0(m_pSearchOffset[nIdx], cMvOrgL0.highPrec);
+      const Pel *pRefL0 = m_cYuvPredTempL0.Y().bufAt(cMvDL0.getHor() + (cDistParam.MVDL0.getHor() >> nSearchStepShift), cMvDL0.getVer() + (cDistParam.MVDL0.getVer() >> nSearchStepShift));
+      const Mv cMvDL1(-cMvDL0);
+      const Pel* pRefL1 = m_cYuvPredTempL1.Y().bufAt(cMvDL1.getHor() + (cDistParam.MVDL1.getHor() >> nSearchStepShift), cMvDL1.getVer() + (cDistParam.MVDL1.getVer() >> nSearchStepShift));
+      int32_t AvgDest = 0;
+      switch (nIdx)
+      {
+      case SAD_POINT_INDEX::BOTTOM:
+        sumUpSamples(pRefL0 + (cuHeight - 1)*refStride, refStride, cuWidth, 1, AvgDest);
+        cDistParam.meanL0 = AvgDest;
+        sumUpSamples(pRefL0 - refStride, refStride, cuWidth, 1, AvgDest);
+        LineMeanL0[3] = cDistParam.meanL0 - AvgDest;
+        cDistParam.meanL0 += cDistParam.partOfMeanL0 - AvgDest;
+
+        sumUpSamples(pRefL1, refStride, cuWidth, 1, AvgDest);
+        cDistParam.meanL1 = AvgDest;
+        sumUpSamples(pRefL1 + cuHeight*refStride, refStride, cuWidth, 1, AvgDest);
+        LineMeanL1[2] = cDistParam.meanL1 - AvgDest;
+        cDistParam.meanL1 += cDistParam.partOfMeanL1 - AvgDest;
+        break;
+      case SAD_POINT_INDEX::TOP:
+        sumUpSamples(pRefL0, refStride, cuWidth, 1, AvgDest);
+        cDistParam.meanL0 = AvgDest;
+        sumUpSamples(pRefL0 + cuHeight*refStride, refStride, cuWidth, 1, AvgDest);
+        LineMeanL0[2] = cDistParam.meanL0 - AvgDest;
+        cDistParam.meanL0 += cDistParam.partOfMeanL0 - AvgDest;
+
+        sumUpSamples(pRefL1 + (cuHeight - 1)*refStride, refStride, cuWidth, 1, AvgDest);
+        cDistParam.meanL1 = AvgDest;
+        sumUpSamples(pRefL1 - refStride, refStride, cuWidth, 1, AvgDest);
+        LineMeanL1[3] = cDistParam.meanL1 - AvgDest;
+        cDistParam.meanL1 += cDistParam.partOfMeanL1 - AvgDest;
+        break;
+      case SAD_POINT_INDEX::RIGHT:
+        sumUpSamples(pRefL0 + cuWidth - 1, refStride, 1, cuHeight, AvgDest);
+        cDistParam.meanL0 = AvgDest;
+        sumUpSamples(pRefL0 - 1, refStride, 1, cuHeight, AvgDest);
+        LineMeanL0[1] = cDistParam.meanL0 - AvgDest;
+        cDistParam.meanL0 += cDistParam.partOfMeanL0 - AvgDest;
+
+        sumUpSamples(pRefL1, refStride, 1, cuHeight, AvgDest);
+        cDistParam.meanL1 = AvgDest;
+        sumUpSamples(pRefL1 + cuWidth, refStride, 1, cuHeight, AvgDest);
+        LineMeanL1[0] = cDistParam.meanL1 - AvgDest;
+        cDistParam.meanL1 += cDistParam.partOfMeanL1 - AvgDest;
+        break;
+      case SAD_POINT_INDEX::LEFT:
+        sumUpSamples(pRefL0, refStride, 1, cuHeight, AvgDest);
+        cDistParam.meanL0 = AvgDest;
+        sumUpSamples(pRefL0 + cuWidth, refStride, 1, cuHeight, AvgDest);
+        LineMeanL0[0] = cDistParam.meanL0 - AvgDest;
+        cDistParam.meanL0 += cDistParam.partOfMeanL0 - AvgDest;
+
+        sumUpSamples(pRefL1 + cuWidth - 1, refStride, 1, cuHeight, AvgDest);
+        cDistParam.meanL1 = AvgDest;
+        sumUpSamples(pRefL1 - 1, refStride, 1, cuHeight, AvgDest);
+        LineMeanL1[1] = cDistParam.meanL1 - AvgDest;
+        cDistParam.meanL1 += cDistParam.partOfMeanL1 - AvgDest;
+        break;
+      default:
+        CHECK(nIdx != SAD_POINT_INDEX::TOP_LEFT, "WRONG INDEX");
+        const int32_t x = (cMvDL0.getHor() == -1) ? 0 : -1;
+        const int32_t y = (cMvDL0.getVer() == -1) ? 0 : -refStride;
+        const int32_t yIndex = (cMvDL0.getVer() == -1) ? 0 : -1;
+
+        const int32_t xL1 = (x) ? 0 : -1;
+        const int32_t yL1 = (y) ? 0 : -refStride;
+        const int32_t yIndexL1 = (yIndex) ? 0 : -1;
+
+        const int32_t sign = cMvDL0.getHor() * cMvDL0.getVer();
+
+        cDistParam.meanL0 = cDistParam.partOfMeanL0 + LineMeanL0[-x] + LineMeanL0[2 - yIndex] + sign * pRefL0[x + y] - sign * pRefL0[y + (int32_t)cuWidth + x] - sign * pRefL0[x + cuHeight*refStride + y] + sign * pRefL0[cuHeight*refStride + (int32_t)cuWidth + y + x];
+        cDistParam.meanL1 = cDistParam.partOfMeanL1 + LineMeanL1[-xL1] + LineMeanL1[2 - yIndexL1] + sign * pRefL1[xL1 + yL1] - sign * pRefL1[yL1 + (int32_t)cuWidth + xL1] - sign * pRefL1[xL1 + cuHeight*refStride + yL1] + sign * pRefL1[cuHeight*refStride + (int32_t)cuWidth + yL1 + xL1];
+      }
+      const SAD_POINT_INDEX currentIndex = (nIdx != SAD_POINT_INDEX::TOP_LEFT) ? (SAD_POINT_INDEX)nIdx : cornerIndex;
+      const SAD_POINT_INDEX currentPoint = lastDirectionIndexesArray[currentIndex];
+
+      const MRSADtype cost = (currentPoint != SAD_POINT_INDEX::NOT_AVAILABLE && m_previousSADsArray[currentPoint] != NotDefinedSAD) ?
+        m_previousSADsArray[currentPoint] 
+        : xDirectMCCostDMVR(pRefL0, pRefL1, refStride, cuWidth, cuHeight, cDistParam);
+
+      m_currentSADsArray[currentIndex] = cost;
+      if (nIdx == SAD_POINT_INDEX::LEFT)
+      {
+        int32_t down = -1, right = -1;
+        if (m_currentSADsArray[SAD_POINT_INDEX::BOTTOM] < m_currentSADsArray[SAD_POINT_INDEX::TOP])
+        {
+          down = 1;
+          cornerIndex += 2;
+        }
+        if (m_currentSADsArray[SAD_POINT_INDEX::RIGHT] < m_currentSADsArray[SAD_POINT_INDEX::LEFT])
+        {
+          right = 1;
+          cornerIndex += 1;
+        }
+        m_pSearchOffset[SAD_POINT_INDEX::TOP_LEFT].set(right, down);
+      }
+      if (cost < minCost)
+      {
+        minCost = cost;
+        cBestMvL0 = cMvDL0;
+        m_lastDirection = currentIndex;
+        bestL0Mean = cDistParam.meanL0;
+        bestL1Mean = cDistParam.meanL1;
+      }
+    }
+  }
+  else
+  {
+    const int32_t refStride = m_HalfPelFilteredBuffL0[0][1].Y().stride;
+    for (SAD_POINT_INDEX nIdx = SAD_POINT_INDEX::BOTTOM; nIdx <= SAD_POINT_INDEX::LEFT; ++nIdx)
+    {
+		  Mv cMvDL0(m_pSearchOffset[nIdx], cMvOrgL0.highPrec);
+      Mv cMvDL1(-cMvDL0);
+      const Pel *pRefL0 = m_filteredBlock[cMvDL0.getAbsHor()][cMvDL0.getAbsVer()][COMPONENT_Y];
+      const Pel *pRefL1 = m_filteredBlockL1[cMvDL1.getAbsHor()][cMvDL1.getAbsVer()];
+      int32_t AvgDest = 0;
+      switch (nIdx)
+      {
+      case SAD_POINT_INDEX::BOTTOM:
+        pRefL0 += refStride;
+        sumUpSamples(pRefL0, refStride, cuWidth, cuHeight, AvgDest);
+        cDistParam.meanL0 = AvgDest;
+        cDistParam.partOfMeanL0 = cDistParam.meanL0;
+        sumUpSamples(pRefL1, refStride, cuWidth, cuHeight, AvgDest);
+        cDistParam.meanL1 = AvgDest;
+        cDistParam.partOfMeanL1 = cDistParam.meanL1;
+        break;
+      case SAD_POINT_INDEX::TOP:
+        sumUpSamples(pRefL0, refStride, cuWidth, 1, AvgDest);
+        cDistParam.meanL0 = AvgDest;
+        sumUpSamples(pRefL0 + cuHeight * refStride, refStride, cuWidth, 1, AvgDest);
+        cDistParam.meanL0 += cDistParam.partOfMeanL0 - AvgDest;
+        sumUpSamples(pRefL1, refStride, cuWidth, 1, AvgDest);
+        pRefL1 += refStride;
+        cDistParam.meanL1 = cDistParam.partOfMeanL1 - AvgDest;
+        sumUpSamples(pRefL1 + (cuHeight - 1) * refStride, refStride, cuWidth, 1, AvgDest);
+        cDistParam.meanL1 += AvgDest;
+        break;
+      case SAD_POINT_INDEX::RIGHT:
+        pRefL0++;
+        sumUpSamples(pRefL0, refStride, cuWidth, cuHeight, AvgDest);
+        cDistParam.meanL0 = AvgDest;
+        cDistParam.partOfMeanL0 = cDistParam.meanL0;
+        sumUpSamples(pRefL1, refStride, cuWidth, cuHeight, AvgDest);
+        cDistParam.meanL1 = AvgDest;
+        cDistParam.partOfMeanL1 = cDistParam.meanL1;
+        break;
+      case SAD_POINT_INDEX::LEFT:
+        sumUpSamples(pRefL0, refStride, 1, cuHeight, AvgDest);
+        cDistParam.meanL0 = AvgDest;
+        sumUpSamples(pRefL0 + cuWidth, refStride, 1, cuHeight, AvgDest);
+        cDistParam.meanL0 += cDistParam.partOfMeanL0 - AvgDest;
+        sumUpSamples(pRefL1, refStride, 1, cuHeight, AvgDest);
+        pRefL1++;
+        cDistParam.meanL1 = cDistParam.partOfMeanL1 - AvgDest;
+        sumUpSamples(pRefL1 + cuWidth - 1, refStride, 1, cuHeight, AvgDest);
+        cDistParam.meanL1 += AvgDest;
+        break;
+      default:
+        CHECK(1, "WRONG INDEX");
+      }
+      const MRSADtype cost = xDirectMCCostDMVR(pRefL0, pRefL1, refStride, cuWidth, cuHeight, cDistParam);
+      if (cost < minCost)
+      {
+        minCost = cost;
+        cBestMvL0 = cMvDL0;
+        if (refineMv)
+        {
+          *refineMv = cMvDL0;
+        }
+      }
+    }
+  }
+  if (!cBestMvL0.IsZero())
+  {
+    pu.mv[REF_PIC_LIST_0] = (cBestMvL0 << nSearchStepShift) + cMvOrgL0;
+    pu.mv[REF_PIC_LIST_1] = ((-cBestMvL0) << nSearchStepShift) + cMvOrgL1;
+    if (!bFracPel)
+    {
+      m_previousSADsArray = m_currentSADsArray;
+      cDistParam.meanL0 = bestL0Mean;
+      cDistParam.meanL1 = bestL1Mean;
+    }
+  }
+}
+
+void InterPrediction::xGenerateFracPixel(PredictionUnit& pu, uint32_t nSearchStepShift, const ClpRngs &clpRngs)
+{
+  const Mv cMvOrgL0 = pu.mv[REF_PIC_LIST_0];
+  const Mv cMvOrgL1 = pu.mv[REF_PIC_LIST_1];
+  const SizeType cuHeight(pu.lumaSize().height);
+  const SizeType notAlignedWidth(pu.lumaSize().width);
+  const SizeType alignSize(8);
+  const SizeType restAlign = notAlignedWidth % alignSize;
+  const SizeType cuWidth = restAlign ? notAlignedWidth + (alignSize - restAlign) : notAlignedWidth;
+  const  int32_t bufferStride = MAX_CU_SIZE + m_bufferWidthExtSize + 16;
+  const uint32_t bufferWidth = restAlign ? cuWidth : cuWidth + alignSize;
+  const uint32_t bufferHeight = cuHeight + 1;
+  //(0,-/+1)
+  Mv cMvL0(cMvOrgL0 + Mv(0, -1 << nSearchStepShift, cMvOrgL0.highPrec));
+  m_HalfPelFilteredBuffL0[0][1] = PelUnitBuf(pu.chromaFormat, PelBuf(m_filteredBlock[0][1][COMPONENT_Y], bufferStride, bufferWidth, bufferHeight));
+  clipMv(cMvL0, pu.cu->lumaPos(), *pu.cu->slice->getSPS());
+  xPredInterBlk(COMPONENT_Y, pu, pu.cu->slice->getRefPic(REF_PIC_LIST_0, pu.refIdx[REF_PIC_LIST_0]), cMvL0
+    , m_HalfPelFilteredBuffL0[0][1]
+    , true, clpRngs.comp[COMPONENT_Y], false, true, FRUC_MERGE_OFF, false
+    , true
+    , cuWidth
+    , cuHeight + 1
+  );
+  Mv cMvL1(cMvOrgL1 + Mv(0, -1 << nSearchStepShift, cMvOrgL1.highPrec));
+  m_HalfPelFilteredBuffL1[0][1] = PelUnitBuf(pu.chromaFormat, PelBuf(m_filteredBlockL1[0][1], bufferStride, bufferWidth, bufferHeight));
+  clipMv(cMvL1, pu.cu->lumaPos(), *pu.cu->slice->getSPS());
+  xPredInterBlk(COMPONENT_Y, pu, pu.cu->slice->getRefPic(REF_PIC_LIST_1, pu.refIdx[REF_PIC_LIST_1]), cMvL1
+    , m_HalfPelFilteredBuffL1[0][1]
+    , true, clpRngs.comp[COMPONENT_Y], false, true, FRUC_MERGE_OFF, false
+    , true
+    , cuWidth
+    , cuHeight + 1
+  );
+  //(-/+1,0)
+  cMvL0 = cMvOrgL0 + Mv(-1 << nSearchStepShift, 0, cMvOrgL0.highPrec);
+  m_HalfPelFilteredBuffL0[1][0] = PelUnitBuf(pu.chromaFormat, PelBuf(m_filteredBlock[1][0][COMPONENT_Y], bufferStride, bufferWidth, bufferHeight));
+  clipMv(cMvL0, pu.cu->lumaPos(), *pu.cu->slice->getSPS());
+  xPredInterBlk(COMPONENT_Y, pu, pu.cu->slice->getRefPic(REF_PIC_LIST_0, pu.refIdx[REF_PIC_LIST_0]), cMvL0
+    , m_HalfPelFilteredBuffL0[1][0]
+    , true, clpRngs.comp[COMPONENT_Y], false, true, FRUC_MERGE_OFF, false
+    , true
+    , bufferWidth
+    , cuHeight
+  );
+  cMvL1 = cMvOrgL1 + Mv(-1 << nSearchStepShift, 0, cMvOrgL1.highPrec);
+  m_HalfPelFilteredBuffL1[1][0] = PelUnitBuf(pu.chromaFormat, PelBuf(m_filteredBlockL1[1][0], bufferStride, bufferWidth, bufferHeight));
+  clipMv(cMvL1, pu.cu->lumaPos(), *pu.cu->slice->getSPS());
+  xPredInterBlk(COMPONENT_Y, pu, pu.cu->slice->getRefPic(REF_PIC_LIST_1, pu.refIdx[REF_PIC_LIST_1]), cMvL1
+    , m_HalfPelFilteredBuffL1[1][0]
+    , true, clpRngs.comp[COMPONENT_Y], false, true, FRUC_MERGE_OFF, false
+    , true
+    , bufferWidth
+    , cuHeight
+  );
+}
+#endif  // DMVR_JVET_K0217
 void InterPrediction::xProcessDMVR( PredictionUnit& pu, PelUnitBuf &pcYuvDst, const ClpRngs &clpRngs, const bool bBIOApplied )
 {
   const int iRefIdx0  = pu.refIdx[0];
@@ -3863,7 +4404,7 @@ void InterPrediction::xProcessDMVR( PredictionUnit& pu, PelUnitBuf &pcYuvDst, co
     pu.mv[0].setHighPrec();
     pu.mv[1].setHighPrec();
   }
-
+#if !DMVR_JVET_K0217
   pcYuvDst.addAvg( srcPred0, srcPred1, clpRngs, false, true );
 
   //list 0
@@ -3915,7 +4456,150 @@ void InterPrediction::xProcessDMVR( PredictionUnit& pu, PelUnitBuf &pcYuvDst, co
 
     xPredInterBlk( compID, pu, pu.cu->slice->getRefPic( REF_PIC_LIST_1, iRefIdx1 ), mv, srcPred1, true, clpRngs.comp[compID], bBIOApplied, false, FRUC_MERGE_OFF, true );
   }
+#else
+  const Size cuSize(pu.lumaSize());
+  Mv L0StartPoint;
+  Mv L1StartPoint;
+  Mv StartingMVL0(pu.mv[REF_PIC_LIST_0]);
+  Mv StartingMVL1(pu.mv[REF_PIC_LIST_1]);
 
+  Mv initialMV0(StartingMVL0);
+  Mv initialMV1(StartingMVL1);
+#if DMVR_JVET_SEARCH_RANGE_K0217 > 2
+  m_checkedMVsList.clear();
+  m_checkedMVsList.push_back(StartingMVL0);
+#endif
+  DistParam cDistParam;
+  MRSADtype minCost = std::numeric_limits<MRSADtype>::max();
+
+  const Mv mvBlkExt(m_searchRange << searchStepShift, pu.mv[REF_PIC_LIST_0].highPrec);
+  const SizeType MC_extension = m_searchRange << 1;
+  const Mv searchOffsetMv(-(int32_t)(m_searchRange << searchStepShift), pu.mv[REF_PIC_LIST_0].highPrec);
+  const uint32_t dstStride = MAX_CU_SIZE + m_bufferWidthExtSize;
+
+  m_cYuvPredTempL0 = PelUnitBuf(pu.chromaFormat, PelBuf(m_cYuvPredTempDMVRL0, dstStride, cuSize.width + MC_extension, cuSize.height + MC_extension));
+  Mv mvL0(pu.mv[REF_PIC_LIST_0] + searchOffsetMv);
+  m_iRefListIdx = 0;
+  clipMv(mvL0, pu.lumaPos(), *pu.cs->sps);
+  xPredInterBlk(COMPONENT_Y, pu, pu.cu->slice->getRefPic(REF_PIC_LIST_0, iRefIdx0), mvL0, m_cYuvPredTempL0, true, clpRngs.comp[COMPONENT_Y], false, false
+    , FRUC_MERGE_OFF
+    , false, true, cuSize.width + MC_extension, cuSize.height + MC_extension
+  );
+
+  m_cYuvPredTempL1 = PelUnitBuf(pu.chromaFormat, PelBuf(m_cYuvPredTempDMVRL1, dstStride, srcPred1.Y().width + MC_extension, srcPred1.Y().height + MC_extension));
+  Mv mvL1(pu.mv[REF_PIC_LIST_1] + searchOffsetMv);
+  m_iRefListIdx = 1;
+  clipMv(mvL1, pu.lumaPos(), *pu.cs->sps);
+  xPredInterBlk(COMPONENT_Y, pu, pu.cu->slice->getRefPic(REF_PIC_LIST_1, iRefIdx1), mvL1, m_cYuvPredTempL1, true, clpRngs.comp[COMPONENT_Y], false, false
+    , FRUC_MERGE_OFF
+    , false, true, cuSize.width + MC_extension, cuSize.height + MC_extension
+  );
+
+  bool notZeroCost(true);
+  for (int i = 0; i < m_searchRange; i++)
+  {
+    initialMV0 = pu.mv[REF_PIC_LIST_0];
+    initialMV1 = pu.mv[REF_PIC_LIST_1];
+
+    L0StartPoint = initialMV0 - StartingMVL0 + mvBlkExt;
+    Pel *AddrL0 = m_cYuvPredTempL0.Y().bufAt(L0StartPoint.getHor() >> searchStepShift, L0StartPoint.getVer() >> searchStepShift);
+    L1StartPoint = initialMV1 - StartingMVL1 + mvBlkExt;
+    Pel *AddrL1 = m_cYuvPredTempL1.Y().bufAt(L1StartPoint.getHor() >> searchStepShift, L1StartPoint.getVer() >> searchStepShift);
+    int32_t AvgL0 = 0;
+    int32_t AvgL1 = 0;
+    if (i == 0)
+    {
+      sumUpSamples(AddrL0, dstStride, cuSize.width, cuSize.height, AvgL0);
+      sumUpSamples(AddrL1, dstStride, cuSize.width, cuSize.height, AvgL1);
+
+      cDistParam.meanL0 = AvgL0;
+      cDistParam.meanL1 = AvgL1;
+      m_lastDirection = SAD_POINT_INDEX::CENTER;
+    }
+    else
+    {
+      AvgL0 = cDistParam.meanL0;
+      AvgL1 = cDistParam.meanL1;
+    }
+    cDistParam.partOfMeanL0 = AvgL0;
+    cDistParam.partOfMeanL1 = AvgL1;
+    if (i == 0)
+    {
+        minCost = xDirectMCCostDMVR(AddrL0, AddrL1, dstStride, cuSize.width, cuSize.height, cDistParam);
+    }
+    if (!minCost)
+    {
+	    notZeroCost = false;
+	    break;
+    }
+    cDistParam.MVDL0 = L0StartPoint;
+    cDistParam.MVDL1 = L1StartPoint;
+    xBIPMVRefine(pu, searchStepShift, minCost, cDistParam);
+#if DMVR_JVET_SEARCH_RANGE_K0217 > 2
+    auto found = std::find(m_checkedMVsList.cbegin(), m_checkedMVsList.cend(), pu.mv[REF_PIC_LIST_0]);
+    if (found != m_checkedMVsList.end())
+    {
+      break;
+    }
+    else
+    {
+      m_checkedMVsList.push_back(pu.mv[REF_PIC_LIST_0]);
+    }
+#else
+    if (i == 0 && StartingMVL0 == pu.mv[REF_PIC_LIST_0])
+    {
+      break;
+    }
+
+#endif
+  }
+
+  // Half Pel refinement
+  bool bApplyHalfPel = (notZeroCost
+    && ((StartingMVL0 - pu.mv[REF_PIC_LIST_0]).getAbsHor() >> searchStepShift) < m_searchRange
+    && ((StartingMVL0 - pu.mv[REF_PIC_LIST_0]).getAbsVer() >> searchStepShift) < m_searchRange);
+  MRSADtype uiIntPelCostL0 = minCost;
+  Mv cRefineMv;
+  if (bApplyHalfPel)
+  {
+    xGenerateFracPixel(pu, searchStepShift - 1, clpRngs);
+    xBIPMVRefine(pu, searchStepShift - 1, minCost, cDistParam, &cRefineMv);
+  }
+  if (bApplyHalfPel && minCost < uiIntPelCostL0)
+  {
+    srcPred0.Y().copyFrom(m_HalfPelFilteredBuffL0[cRefineMv.getAbsHor()][cRefineMv.getAbsVer()].Y().subBuf(Position{ cRefineMv.getHor() == 1 ? 1 : 0, cRefineMv.getVer() == 1 ? 1 : 0 }, cuSize));
+    srcPred1.Y().copyFrom(m_HalfPelFilteredBuffL1[cRefineMv.getAbsHor()][cRefineMv.getAbsVer()].Y().subBuf(Position{ -cRefineMv.getHor() == 1 ? 1 : 0, -cRefineMv.getVer() == 1 ? 1 : 0 }, cuSize));
+  }
+  else
+  {
+    L0StartPoint = pu.mv[REF_PIC_LIST_0] - StartingMVL0 + mvBlkExt;
+    L1StartPoint = pu.mv[REF_PIC_LIST_1] - StartingMVL1 + mvBlkExt;
+
+    srcPred0.Y().copyFrom(m_cYuvPredTempL0.Y().subBuf(Position{ L0StartPoint.getHor() >> searchStepShift, L0StartPoint.getVer() >> searchStepShift }, cuSize));
+    srcPred1.Y().copyFrom(m_cYuvPredTempL1.Y().subBuf(Position{ L1StartPoint.getHor() >> searchStepShift, L1StartPoint.getVer() >> searchStepShift }, cuSize));
+  }
+  m_iRefListIdx = 0;
+  mvL0 = pu.mv[REF_PIC_LIST_0];
+  clipMv(mvL0, pu.lumaPos(), *pu.cs->sps);
+
+  xPredInterBlk(COMPONENT_Y, pu, pu.cu->slice->getRefPic(REF_PIC_LIST_0, iRefIdx0), mvL0, srcPred0, true, clpRngs.comp[COMPONENT_Y], bBIOApplied, false, FRUC_MERGE_OFF, true, bBIOApplied);
+  xPredInterBlk(COMPONENT_Cb, pu, pu.cu->slice->getRefPic(REF_PIC_LIST_0, iRefIdx0), mvL0, srcPred0, true, clpRngs.comp[COMPONENT_Cb], bBIOApplied, false, FRUC_MERGE_OFF, true);
+  xPredInterBlk(COMPONENT_Cr, pu, pu.cu->slice->getRefPic(REF_PIC_LIST_0, iRefIdx0), mvL0, srcPred0, true, clpRngs.comp[COMPONENT_Cr], bBIOApplied, false, FRUC_MERGE_OFF, true);
+  
+  m_iRefListIdx = 1;
+  mvL1 = pu.mv[REF_PIC_LIST_1];
+  clipMv(mvL1, pu.lumaPos(), *pu.cs->sps);
+
+  xPredInterBlk(COMPONENT_Y, pu, pu.cu->slice->getRefPic(REF_PIC_LIST_1, iRefIdx1), mvL1, srcPred1, true, clpRngs.comp[COMPONENT_Y], bBIOApplied, false, FRUC_MERGE_OFF, true, bBIOApplied);
+  xPredInterBlk(COMPONENT_Cb, pu, pu.cu->slice->getRefPic(REF_PIC_LIST_1, iRefIdx1), mvL1, srcPred1, true, clpRngs.comp[COMPONENT_Cb], bBIOApplied, false, FRUC_MERGE_OFF, true);
+  xPredInterBlk(COMPONENT_Cr, pu, pu.cu->slice->getRefPic(REF_PIC_LIST_1, iRefIdx1), mvL1, srcPred1, true, clpRngs.comp[COMPONENT_Cr], bBIOApplied, false, FRUC_MERGE_OFF, true);
+
+#if DMVR_JVET_LOW_LATENCY_K0217
+  pu.mvd[REF_PIC_LIST_0] = pu.mv[REF_PIC_LIST_0] - StartingMVL0;
+  pu.mv[REF_PIC_LIST_0] = StartingMVL0;
+  pu.mv[REF_PIC_LIST_1] = StartingMVL1;
+#endif
+#endif // #if !DMVR_JVET_K0217
   PU::spanMotionInfo( pu );
 }
 #endif
