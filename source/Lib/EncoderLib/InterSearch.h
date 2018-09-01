@@ -197,6 +197,10 @@ protected:
 #if JVET_K0357_AMVR
     unsigned    imvShift;
 #endif
+#if JVET_K0157
+    bool        inCtuSearch;
+    bool        zeroMV;
+#endif
   } IntTZSearchStruct;
 
   // sub-functions for ME
@@ -317,6 +321,9 @@ protected:
                                     const Mv&             cMvPred,
                                     const int             iSrchRng,
                                     SearchRange&          sr
+#if JVET_K0157
+                                  , IntTZSearchStruct &  cStruct
+#endif
                                   );
 
   void xPatternSearchFast         ( const PredictionUnit& pu,

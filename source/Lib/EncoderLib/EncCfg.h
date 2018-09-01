@@ -270,6 +270,9 @@ protected:
 #if JEM_TOOLS
   bool      m_DMVR;
 #endif
+#if JVET_K0157
+  bool      m_compositeRefEnabled;        //composite reference
+#endif
   // ADD_NEW_TOOL : (encoder lib) add tool enabling flags and associated parameters here
 
   bool      m_useFastLCTU;
@@ -822,6 +825,11 @@ public:
   void      setMDMS                         ( bool b )       { m_MDMS = b; }
   bool      getMDMS                         ()         const { return m_MDMS; }
 #endif
+#if JVET_K0157
+  void      setUseCompositeRef              (bool b)         { m_compositeRefEnabled = b; }
+  bool      getUseCompositeRef              ()         const { return m_compositeRefEnabled; }
+#endif
+
   // ADD_NEW_TOOL : (encoder lib) add access functions here
 
   void      setMaxCUWidth                   ( uint32_t  u )      { m_maxCUWidth  = u; }

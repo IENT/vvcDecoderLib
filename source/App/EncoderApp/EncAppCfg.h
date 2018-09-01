@@ -283,6 +283,9 @@ protected:
   bool      m_DMVR;
   bool      m_MDMS;
 #endif
+#if JVET_K0157
+  bool      m_compositeRefEnabled;
+#endif
   // ADD_NEW_TOOL : (encoder app) add tool enabling flags and associated parameters here
 
   unsigned  m_uiMaxCUWidth;                                   ///< max. CU width in pixel

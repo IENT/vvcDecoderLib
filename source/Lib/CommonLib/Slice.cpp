@@ -1343,7 +1343,11 @@ int Slice::checkThatAllRefPicsAreAvailable( PicList& rcListPic, const ReferenceP
 
 /** Function for constructing an explicit Reference Picture Set out of the available pictures in a referenced Reference Picture Set
 */
-void Slice::createExplicitReferencePictureSetFromReference( PicList& rcListPic, const ReferencePictureSet *pReferencePictureSet, bool isRAP, int pocRandomAccess, bool bUseRecoveryPoint, const bool bEfficientFieldIRAPEnabled)
+void Slice::createExplicitReferencePictureSetFromReference(PicList& rcListPic, const ReferencePictureSet *pReferencePictureSet, bool isRAP, int pocRandomAccess, bool bUseRecoveryPoint, const bool bEfficientFieldIRAPEnabled
+#if JVET_K0157
+                                                         , bool isEncodeLtRef, bool isCompositeRefEnable
+#endif
+)
 {
   Picture* rpcPic;
   int i, j;
@@ -1383,7 +1387,11 @@ void Slice::createExplicitReferencePictureSetFromReference( PicList& rcListPic, 
         }
         else
         {
+#if JVET_K0157
+          if (bEfficientFieldIRAPEnabled && rpcPic->getPOC() == this->getAssociatedIRAPPOC() && this->getAssociatedIRAPPOC() == this->getPOC() + (isCompositeRefEnable ? 2 : 1))
+#else
           if(bEfficientFieldIRAPEnabled && rpcPic->getPOC() == this->getAssociatedIRAPPOC() && this->getAssociatedIRAPPOC() == this->getPOC()+1)
+#endif
           {
             irapIsInRPS = true;
           }
@@ -1402,7 +1410,11 @@ void Slice::createExplicitReferencePictureSetFromReference( PicList& rcListPic, 
     while ( iterPic != rcListPic.end())
     {
       rpcPic = *(iterPic++);
+#if JVET_K0157
+      if (rpcPic->getPOC() == this->getAssociatedIRAPPOC() && this->getAssociatedIRAPPOC() == this->getPOC() + (isCompositeRefEnable ? 2 : 1))
+#else
       if(rpcPic->getPOC() == this->getAssociatedIRAPPOC() && this->getAssociatedIRAPPOC() == this->getPOC()+1)
+#endif
       {
         pLocalRPS->setDeltaPOC(k, 1);
         pLocalRPS->setUsed(k, true);
@@ -1412,6 +1424,53 @@ void Slice::createExplicitReferencePictureSetFromReference( PicList& rcListPic, 
       }
     }
   }
+#if JVET_K0157
+  if (isCompositeRefEnable && isEncodeLtRef)
+  {
+    useNewRPS = true;
+    nrOfNegativePictures = 0;
+    nrOfPositivePictures = 0;
+    for (i = 0; i<pReferencePictureSet->getNumberOfPictures(); i++)
+    {
+      j = 0;
+      k = 0;
+
+      // loop through all pictures in the reference picture buffer
+      PicList::iterator iterPic = rcListPic.begin();
+      while (iterPic != rcListPic.end())
+      {
+        j++;
+        rpcPic = *(iterPic++);
+
+        if (rpcPic->getPOC() == this->getPOC() + 1 + pReferencePictureSet->getDeltaPOC(i) && rpcPic->referenced)
+        {
+          // This picture exists as a reference picture
+          // and should be added to the explicit Reference Picture Set
+          pLocalRPS->setDeltaPOC(k, pReferencePictureSet->getDeltaPOC(i) + 1);
+          pLocalRPS->setUsed(k, pReferencePictureSet->getUsed(i) && (!isRAP));
+          if (bEfficientFieldIRAPEnabled)
+          {
+            pLocalRPS->setUsed(k, pLocalRPS->getUsed(k) && !(bUseRecoveryPoint && this->getPOC() > pocRandomAccess && this->getPOC() + pReferencePictureSet->getDeltaPOC(i) + 1 < pocRandomAccess));
+          }
+
+          if (pLocalRPS->getDeltaPOC(k) < 0)
+          {
+            nrOfNegativePictures++;
+          }
+          else
+          {
+            if (bEfficientFieldIRAPEnabled && rpcPic->getPOC() == this->getAssociatedIRAPPOC() && this->getAssociatedIRAPPOC() == this->getPOC() + 2)
+            {
+              irapIsInRPS = true;
+            }
+            nrOfPositivePictures++;
+          }
+          k++;
+        }
+      }
+    }
+  }
+#endif
   pLocalRPS->setNumberOfNegativePictures(nrOfNegativePictures);
   pLocalRPS->setNumberOfPositivePictures(nrOfPositivePictures);
   pLocalRPS->setNumberOfPictures(nrOfNegativePictures+nrOfPositivePictures);
@@ -1837,6 +1896,9 @@ SPSNext::SPSNext( SPS& sps )
 #endif
 #if JEM_TOOLS
   , m_CIPFMode                  ( 0 )
+#endif
+#if JVET_K0157
+    , m_compositeRefEnabled     ( false )
 #endif
   // ADD_NEW_TOOL : (sps extension) add tool enabling flags here (with "false" as default values)
 {

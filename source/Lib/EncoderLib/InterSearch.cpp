@@ -1857,6 +1857,17 @@ void InterSearch::xMotionEstimation(PredictionUnit& pu, PelUnitBuf& origBuf, Ref
 #if JVET_K0357_AMVR
   cStruct.imvShift      = pu.cu->imv << 1;
 #endif
+#if JVET_K0157
+  cStruct.inCtuSearch = false;
+  cStruct.zeroMV = false;
+  {
+    if (pu.cs->sps->getSpsNext().getUseCompositeRef() && pu.cs->slice->getRefPic(eRefPicList, iRefIdxPred)->longTerm)
+    {
+      cStruct.inCtuSearch = true;
+    }
+  }
+#endif
+
   auto blkCache = dynamic_cast<CacheBlkInfoCtrl*>( m_modeCtrl );
 
   bool bQTBTMV  = false;
@@ -1893,7 +1904,11 @@ void InterSearch::xMotionEstimation(PredictionUnit& pu, PelUnitBuf& origBuf, Ref
   {
     if( !bQTBTMV )
     {
-      xSetSearchRange( pu, ( bBi ? rcMv : rcMvPred ), iSrchRng, cStruct.searchRange );
+      xSetSearchRange(pu, (bBi ? rcMv : rcMvPred), iSrchRng, cStruct.searchRange
+#if JVET_K0157
+        , cStruct
+#endif
+      );
     }
     cStruct.subShiftMode = m_pcEncCfg->getFastInterSearchMode() == FASTINTERSEARCH_MODE1 || m_pcEncCfg->getFastInterSearchMode() == FASTINTERSEARCH_MODE3 ? 2 : 0;
     xPatternSearch( cStruct, rcMv, ruiCost);
@@ -1966,7 +1981,11 @@ void InterSearch::xMotionEstimation(PredictionUnit& pu, PelUnitBuf& origBuf, Ref
 void InterSearch::xSetSearchRange ( const PredictionUnit& pu,
                                     const Mv& cMvPred,
                                     const int iSrchRng,
-                                    SearchRange& sr )
+                                    SearchRange& sr
+#if JVET_K0157
+                                  , IntTZSearchStruct& cStruct
+#endif
+)
 {
 #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
   const int iMvShift = cMvPred.highPrec ? 4 : 2;
@@ -1994,6 +2013,35 @@ void InterSearch::xSetSearchRange ( const PredictionUnit& pu,
   sr.top    = mvTL.ver;
   sr.right  = mvBR.hor;
   sr.bottom = mvBR.ver;
+
+#if JVET_K0157
+  if (pu.cs->sps->getSpsNext().getUseCompositeRef() && cStruct.inCtuSearch)
+  {
+    Position posRB = pu.Y().bottomRight();
+    Position posTL = pu.Y().topLeft();
+    const PreCalcValues *pcv = pu.cs->pcv;
+    Position posRBinCTU(posRB.x & pcv->maxCUWidthMask, posRB.y & pcv->maxCUHeightMask);
+    Position posLTinCTU = Position(posTL.x & pcv->maxCUWidthMask, posTL.y & pcv->maxCUHeightMask).offset(-4, -4);
+    if (sr.left < -posLTinCTU.x)
+      sr.left = -posLTinCTU.x;
+    if (sr.top < -posLTinCTU.y)
+      sr.top = -posLTinCTU.y;
+    if (sr.right >((int)pcv->maxCUWidth - 4 - posRBinCTU.x))
+      sr.right = (int)pcv->maxCUWidth - 4 - posRBinCTU.x;
+    if (sr.bottom >((int)pcv->maxCUHeight - 4 - posRBinCTU.y))
+      sr.bottom = (int)pcv->maxCUHeight - 4 - posRBinCTU.y;
+    if (posLTinCTU.x == -4 || posLTinCTU.y == -4)
+    {
+      sr.left = sr.right = sr.bottom = sr.top = 0;
+      cStruct.zeroMV = 1;
+    }
+    if (posRBinCTU.x == pcv->maxCUWidthMask || posRBinCTU.y == pcv->maxCUHeightMask)
+    {
+      sr.left = sr.right = sr.bottom = sr.top = 0;
+      cStruct.zeroMV = 1;
+    }
+  }
+#endif
 }
 
 
@@ -2165,7 +2213,11 @@ void InterSearch::xTZSearch( const PredictionUnit& pu,
     // set search range
     Mv currBestMv(cStruct.iBestX, cStruct.iBestY );
     currBestMv <<= 2;
-    xSetSearchRange( pu, currBestMv, m_iSearchRange>>(bFastSettings?1:0), sr );
+    xSetSearchRange(pu, currBestMv, m_iSearchRange >> (bFastSettings ? 1 : 0), sr
+#if JVET_K0157
+      , cStruct
+#endif
+    );
   }
 
   // start search
@@ -2425,7 +2477,11 @@ void InterSearch::xTZSearchSelective( const PredictionUnit& pu,
     // set search range
     Mv currBestMv(cStruct.iBestX, cStruct.iBestY );
     currBestMv <<= 2;
-    xSetSearchRange( pu, currBestMv, m_iSearchRange, sr );
+    xSetSearchRange( pu, currBestMv, m_iSearchRange, sr
+#if JVET_K0157
+      , cStruct
+#endif
+    );
   }
 
   // Initial search
@@ -2624,7 +2680,11 @@ void InterSearch::xPatternSearchFracDIF(
 
 
 #if JVET_K0357_AMVR
+#if JVET_K0157
+  if (cStruct.imvShift || (pu.cs->sps->getSpsNext().getUseCompositeRef() && cStruct.zeroMV))
+#else
   if( cStruct.imvShift )
+#endif
   {
     m_pcRdCost->setDistParam( m_cDistParam, *cStruct.pcPatternKey, cStruct.piRefY + iOffset, cStruct.iRefStride, m_lumaClpRng.bd, COMPONENT_Y, 0, 1, m_pcEncCfg->getUseHADME() && !bIsLosslessCoded );
     ruiCost = m_cDistParam.distFunc( m_cDistParam );
