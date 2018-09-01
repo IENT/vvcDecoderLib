@@ -1726,7 +1726,8 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
       setNewestBgPOC(pocCurr);
       setLastLTRefPoc(pocCurr);
     }
-    else if (pcPic->cs->sps->getSpsNext().getUseCompositeRef() && getLastLTRefPoc() >= 0 && getEncodedLTRef()==false && !getPicBg()->getSpliceFull() && (pocCurr - getLastLTRefPoc()) > (m_pcCfg->getFrameRate() * 2)) {
+    else if (pcPic->cs->sps->getSpsNext().getUseCompositeRef() && getLastLTRefPoc() >= 0 && getEncodedLTRef()==false && !getPicBg()->getSpliceFull() && (pocCurr - getLastLTRefPoc()) > (m_pcCfg->getFrameRate() * 2))
+    {
       setUseLTRef(false);
       setPrepareLTRef(false);
       setEncodedLTRef(true);
