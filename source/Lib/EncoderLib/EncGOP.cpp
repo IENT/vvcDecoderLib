@@ -1771,14 +1771,6 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
         pcSlice->setNumRefIdx(REF_PIC_LIST_0, 0);
         pcSlice->setNumRefIdx(REF_PIC_LIST_1, 0);
       }
-#if JVET_K0076_CPR
-    if (pcSlice->getSPS()->getSpsNext().getIBCMode())
-    {
-      if (m_pcCfg->getIntraPeriod() > 0 && pcSlice->getPOC() % m_pcCfg->getIntraPeriod() == 0)
-      {
-        pcSlice->setNumRefIdx(REF_PIC_LIST_0, 0);
-        pcSlice->setNumRefIdx(REF_PIC_LIST_1, 0);
-      }
 
       pcSlice->setNumRefIdx(REF_PIC_LIST_0, pcSlice->getNumRefIdx(REF_PIC_LIST_0) + 1);
     }
