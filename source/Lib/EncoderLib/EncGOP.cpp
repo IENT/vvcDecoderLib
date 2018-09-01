@@ -299,13 +299,13 @@ EncGOP::EncGOP()
 
   m_bInitAMaxBT         = true;
 #if JVET_K0157
-  m_iBgPOC = -1;
-  m_pcPicBg = NULL;
-  m_pcPicOrig = NULL;
+  m_bgPOC = -1;
+  m_picBg = NULL;
+  m_picOrig = NULL;
   m_isEncodedLTRef = false;
   m_isUseLTRef = false;
   m_isPrepareLTRef = true;
-  m_iLastLTRefPoc = 0;
+  m_lastLTRefPoc = 0;
 #endif
 }
 
@@ -337,17 +337,17 @@ void  EncGOP::destroy()
   }
 #endif
 #if JVET_K0157
-  if (m_pcPicBg)
+  if (m_picBg)
   {
-    m_pcPicBg->destroy();
-    delete m_pcPicBg;
-    m_pcPicBg = NULL;
+    m_picBg->destroy();
+    delete m_picBg;
+    m_picBg = NULL;
   }
-  if (m_pcPicOrig)
+  if (m_picOrig)
   {
-    m_pcPicOrig->destroy();
-    delete m_pcPicOrig;
-    m_pcPicOrig = NULL;
+    m_picOrig->destroy();
+    delete m_picOrig;
+    m_picOrig = NULL;
   }
 #endif
 }
@@ -1567,14 +1567,14 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
     int iTimeOffset;
     int pocCurr;
 #if JVET_K0157
-    int iMultipleFactor = m_pcCfg->getUseCompositeRef() ? 2 : 1;
+    int multipleFactor = m_pcCfg->getUseCompositeRef() ? 2 : 1;
 #endif
 
     if(iPOCLast == 0) //case first frame or first top field
     {
       pocCurr=0;
 #if JVET_K0157
-      iTimeOffset = iMultipleFactor;
+      iTimeOffset = multipleFactor;
 #else
       iTimeOffset = 1;
 #endif
@@ -1587,7 +1587,7 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
     else
     {
 #if JVET_K0157
-      pocCurr = iPOCLast - iNumPicRcvd * iMultipleFactor + m_pcCfg->getGOPEntry(iGOPid).m_POC - ((isField && m_iGopSize>1) ? 1 : 0);
+      pocCurr = iPOCLast - iNumPicRcvd * multipleFactor + m_pcCfg->getGOPEntry(iGOPid).m_POC - ((isField && m_iGopSize>1) ? 1 : 0);
 #else
       pocCurr = iPOCLast - iNumPicRcvd + m_pcCfg->getGOPEntry(iGOPid).m_POC - ((isField && m_iGopSize>1) ? 1:0);
 #endif
@@ -1600,7 +1600,7 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
       pocCurr++;
       iTimeOffset--;
     }
-    if (pocCurr / iMultipleFactor >= m_pcCfg->getFramesToBeEncoded())
+    if (pocCurr / multipleFactor >= m_pcCfg->getFramesToBeEncoded())
 #else
     if(pocCurr>=m_pcCfg->getFramesToBeEncoded())
 #endif
@@ -1734,13 +1734,13 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
       setLastLTRefPoc(-1);
     }
 
-    if (pcPic->cs->sps->getSpsNext().getUseCompositeRef() && m_pcPicBg->getSpliceFull() && getUseLTRef())
+    if (pcPic->cs->sps->getSpsNext().getUseCompositeRef() && m_picBg->getSpliceFull() && getUseLTRef())
     {
-      m_pcEncLib->selectReferencePictureSet(pcSlice, pocCurr, iGOPid, m_iBgPOC, rcListPic);
+      m_pcEncLib->selectReferencePictureSet(pcSlice, pocCurr, iGOPid, m_bgPOC);
     }
     else
     {
-      m_pcEncLib->selectReferencePictureSet(pcSlice, pocCurr, iGOPid, -1, rcListPic);
+      m_pcEncLib->selectReferencePictureSet(pcSlice, pocCurr, iGOPid, -1);
     }
 #else
     m_pcEncLib->selectReferencePictureSet(pcSlice, pocCurr, iGOPid);
@@ -2922,8 +2922,8 @@ void EncGOP::xGetBuffer( PicList&                  rcListPic,
   }
 
 #if JVET_K0157
-  int iMultipleFactor = m_pcCfg->getUseCompositeRef() ? 2 : 1;
-  for (i = 0; i < (iNumPicRcvd * iMultipleFactor - iTimeOffset + 1); i += iMultipleFactor)
+  int multipleFactor = m_pcCfg->getUseCompositeRef() ? 2 : 1;
+  for (i = 0; i < (iNumPicRcvd * multipleFactor - iTimeOffset + 1); i += multipleFactor)
 #else
   for ( i = 0; i < (iNumPicRcvd - iTimeOffset + 1); i++ )
 #endif
@@ -3851,107 +3851,115 @@ void EncGOP::arrangeLongtermPicturesInRPS(Slice *pcSlice, PicList& rcListPic)
 #if JVET_K0157
 void EncGOP::arrangeCompositeReference(Slice* pcSlice, PicList& rcListPic, int pocCurr)
 {
-  Picture* pcCurPic = NULL;
+  Picture* curPic = NULL;
   PicList::iterator  iterPic = rcListPic.begin();
   const PreCalcValues *pcv = pcSlice->getPPS()->pcv;
-  m_iBgPOC = pocCurr + 1;
-  if (m_pcPicBg->getSpliceFull())
+  m_bgPOC = pocCurr + 1;
+  if (m_picBg->getSpliceFull())
+  {
     return;
+  }
   while (iterPic != rcListPic.end())
   {
-    pcCurPic = *(iterPic++);
-    if (pcCurPic->getPOC() == pocCurr)
+    curPic = *(iterPic++);
+    if (curPic->getPOC() == pocCurr)
     {
       break;
     }
   }
   if (pcSlice->getSliceType() == I_SLICE)
+  {
     return;
-
-  int iWidth = pcv->lumaWidth;
-  int iHeight = pcv->lumaHeight;
-  int iStride = pcCurPic->getOrigBuf().get(COMPONENT_Y).stride;
-  int iCStride = pcCurPic->getOrigBuf().get(COMPONENT_Cb).stride;
-  Pel* pCurLumaAddr = pcCurPic->getOrigBuf().get(COMPONENT_Y).buf;
-  Pel* pCurCbAddr = pcCurPic->getOrigBuf().get(COMPONENT_Cb).buf;
-  Pel* pCurCrAddr = pcCurPic->getOrigBuf().get(COMPONENT_Cr).buf;
-  Pel* pBgOrgLumaAddr = m_pcPicOrig->getOrigBuf().get(COMPONENT_Y).buf;
-  Pel* pBgOrgCbAddr = m_pcPicOrig->getOrigBuf().get(COMPONENT_Cb).buf;
-  Pel* pBgOrgCrAddr = m_pcPicOrig->getOrigBuf().get(COMPONENT_Cr).buf;
-  int iCUMaxWidth = pcv->maxCUWidth;
-  int iCUMaxHeight = pcv->maxCUHeight;
-  int iMaxReplace = (pcv->sizeInCtus) / 2;
-  iMaxReplace = iMaxReplace < 1 ? 1 : iMaxReplace;
-  typedef struct tagCostStr { double dCost; int iCtuIdx; }  CostStr;
-  CostStr* pcMinCtuCost = new CostStr[iMaxReplace];
-  for (int i = 0; i < iMaxReplace; i++)
-  {
-    pcMinCtuCost[i].dCost = 1e10;
-    pcMinCtuCost[i].iCtuIdx = -1;
   }
-  int uiBitIncrementY = pcSlice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA) - 8;
-  int uiBitIncrementUV = pcSlice->getSPS()->getBitDepth(CHANNEL_TYPE_CHROMA) - 8;
-  for (int y = 0; y < iHeight; y += iCUMaxHeight)
-  {
-    for (int x = 0; x < iWidth; x += iCUMaxWidth)
-    {
-      double dLCUdist = 0.0;
-      double dLCUdistcb = 0.0;
-      double dLCUdistcr = 0.0;
-      int    iRealPixelCnt = 0;
-      double dLCUCost = 1e10;
-      int iLargeDist = 0;
 
-      for (int tmpy = 0; tmpy < iCUMaxHeight; tmpy++)
+  int width = pcv->lumaWidth;
+  int height = pcv->lumaHeight;
+  int stride = curPic->getOrigBuf().get(COMPONENT_Y).stride;
+  int cStride = curPic->getOrigBuf().get(COMPONENT_Cb).stride;
+  Pel* curLumaAddr = curPic->getOrigBuf().get(COMPONENT_Y).buf;
+  Pel* curCbAddr = curPic->getOrigBuf().get(COMPONENT_Cb).buf;
+  Pel* curCrAddr = curPic->getOrigBuf().get(COMPONENT_Cr).buf;
+  Pel* bgOrgLumaAddr = m_picOrig->getOrigBuf().get(COMPONENT_Y).buf;
+  Pel* bgOrgCbAddr = m_picOrig->getOrigBuf().get(COMPONENT_Cb).buf;
+  Pel* bgOrgCrAddr = m_picOrig->getOrigBuf().get(COMPONENT_Cr).buf;
+  int cuMaxWidth = pcv->maxCUWidth;
+  int cuMaxHeight = pcv->maxCUHeight;
+  int maxReplace = (pcv->sizeInCtus) / 2;
+  maxReplace = maxReplace < 1 ? 1 : maxReplace;
+  typedef struct tagCostStr
+  {
+    double cost;
+    int ctuIdx;
+  }CostStr;
+  CostStr* minCtuCost = new CostStr[maxReplace];
+  for (int i = 0; i < maxReplace; i++)
+  {
+    minCtuCost[i].cost = 1e10;
+    minCtuCost[i].ctuIdx = -1;
+  }
+  int bitIncrementY = pcSlice->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA) - 8;
+  int bitIncrementUV = pcSlice->getSPS()->getBitDepth(CHANNEL_TYPE_CHROMA) - 8;
+  for (int y = 0; y < height; y += cuMaxHeight)
+  {
+    for (int x = 0; x < width; x += cuMaxWidth)
+    {
+      double lcuDist = 0.0;
+      double lcuDistCb = 0.0;
+      double lcuDistCr = 0.0;
+      int    realPixelCnt = 0;
+      double lcuCost = 1e10;
+      int largeDist = 0;
+
+      for (int tmpy = 0; tmpy < cuMaxHeight; tmpy++)
       {
-        if (y + tmpy >= iHeight)
+        if (y + tmpy >= height)
         {
           break;
         }
-        for (int tmpx = 0; tmpx < iCUMaxWidth; tmpx++)
+        for (int tmpx = 0; tmpx < cuMaxWidth; tmpx++)
         {
-          if (x + tmpx >= iWidth)
+          if (x + tmpx >= width)
           {
             break;
           }
 
-          iRealPixelCnt++;
-          dLCUdist += abs(pCurLumaAddr[(y + tmpy)*iStride + x + tmpx] - pBgOrgLumaAddr[(y + tmpy)*iStride + x + tmpx]);
-          if (abs(pCurLumaAddr[(y + tmpy)*iStride + x + tmpx] - pBgOrgLumaAddr[(y + tmpy)*iStride + x + tmpx]) >(20 << uiBitIncrementY))
+          realPixelCnt++;
+          lcuDist += abs(curLumaAddr[(y + tmpy)*stride + x + tmpx] - bgOrgLumaAddr[(y + tmpy)*stride + x + tmpx]);
+          if (abs(curLumaAddr[(y + tmpy)*stride + x + tmpx] - bgOrgLumaAddr[(y + tmpy)*stride + x + tmpx]) >(20 << bitIncrementY))
           {
-            iLargeDist++;
+            largeDist++;
           }
 
           if (tmpy % 2 == 0 && tmpx % 2 == 0)
           {
-            dLCUdistcb += abs(pCurCbAddr[(y + tmpy) / 2 * iCStride + (x + tmpx) / 2] - pBgOrgCbAddr[(y + tmpy) / 2 * iCStride + (x + tmpx) / 2]);
-            dLCUdistcr += abs(pCurCrAddr[(y + tmpy) / 2 * iCStride + (x + tmpx) / 2] - pBgOrgCrAddr[(y + tmpy) / 2 * iCStride + (x + tmpx) / 2]);
+            lcuDistCb += abs(curCbAddr[(y + tmpy) / 2 * cStride + (x + tmpx) / 2] - bgOrgCbAddr[(y + tmpy) / 2 * cStride + (x + tmpx) / 2]);
+            lcuDistCr += abs(curCrAddr[(y + tmpy) / 2 * cStride + (x + tmpx) / 2] - bgOrgCrAddr[(y + tmpy) / 2 * cStride + (x + tmpx) / 2]);
           }
         }
       }
 
       //Test the vertical or horizontal edge for background patches candidates
-      int iYinLCU = y / iCUMaxHeight;
-      int iXinLCU = x / iCUMaxWidth;
-      int iLCUIdx = iYinLCU * pcv->widthInCtus + iXinLCU;
-      if ((iLargeDist / (double)iRealPixelCnt < 0.01 &&dLCUdist / iRealPixelCnt < (3.5 * (1 << uiBitIncrementY)) && dLCUdistcb / iRealPixelCnt < (0.5 * (1 << uiBitIncrementUV)) && dLCUdistcr / iRealPixelCnt < (0.5 * (1 << uiBitIncrementUV)) && m_pcPicBg->getSpliceIdx(iLCUIdx) == 0))
+      int yInLCU = y / cuMaxHeight;
+      int xInLCU = x / cuMaxWidth;
+      int iLCUIdx = yInLCU * pcv->widthInCtus + xInLCU;
+      if ((largeDist / (double)realPixelCnt < 0.01 &&lcuDist / realPixelCnt < (3.5 * (1 << bitIncrementY)) && lcuDistCb / realPixelCnt < (0.5 * (1 << bitIncrementUV)) && lcuDistCr / realPixelCnt < (0.5 * (1 << bitIncrementUV)) && m_picBg->getSpliceIdx(iLCUIdx) == 0))
       {
-        dLCUCost = dLCUdist / iRealPixelCnt + dLCUdistcb / iRealPixelCnt + dLCUdistcr / iRealPixelCnt;
-        //obtain the iMaxReplace smallest cost
-        //1) find the largest cost in the iMaxReplace candidates
-        for (int i = 0; i < iMaxReplace - 1; i++)
+        lcuCost = lcuDist / realPixelCnt + lcuDistCb / realPixelCnt + lcuDistCr / realPixelCnt;
+        //obtain the maxReplace smallest cost
+        //1) find the largest cost in the maxReplace candidates
+        for (int i = 0; i < maxReplace - 1; i++)
         {
-          if (pcMinCtuCost[i].dCost > pcMinCtuCost[i + 1].dCost)
+          if (minCtuCost[i].cost > minCtuCost[i + 1].cost)
           {
-            swap(pcMinCtuCost[i].dCost, pcMinCtuCost[i + 1].dCost);
-            swap(pcMinCtuCost[i].iCtuIdx, pcMinCtuCost[i + 1].iCtuIdx);
+            swap(minCtuCost[i].cost, minCtuCost[i + 1].cost);
+            swap(minCtuCost[i].ctuIdx, minCtuCost[i + 1].ctuIdx);
           }
         }
         // 2) compare the current cost with the largest cost
-        if (dLCUCost < pcMinCtuCost[iMaxReplace - 1].dCost)
+        if (lcuCost < minCtuCost[maxReplace - 1].cost)
         {
-          pcMinCtuCost[iMaxReplace - 1].dCost = dLCUCost;
-          pcMinCtuCost[iMaxReplace - 1].iCtuIdx = iLCUIdx;
+          minCtuCost[maxReplace - 1].cost = lcuCost;
+          minCtuCost[maxReplace - 1].ctuIdx = iLCUIdx;
         }
       }
     }
@@ -3959,100 +3967,100 @@ void EncGOP::arrangeCompositeReference(Slice* pcSlice, PicList& rcListPic, int p
 
   // modify QP for background CTU
   {
-    for (int i = 0; i < iMaxReplace; i++)
+    for (int i = 0; i < maxReplace; i++)
     {
-      if (pcMinCtuCost[i].iCtuIdx != -1)
+      if (minCtuCost[i].ctuIdx != -1)
       {
-        m_pcPicBg->setSpliceIdx(pcMinCtuCost[i].iCtuIdx, pocCurr);
+        m_picBg->setSpliceIdx(minCtuCost[i].ctuIdx, pocCurr);
       }
     }
   }
-  delete[]pcMinCtuCost;
+  delete[]minCtuCost;
 }
 
 void EncGOP::updateCompositeReference(Slice* pcSlice, PicList& rcListPic, int pocCurr)
 {
-  Picture* pcCurPic = NULL;
+  Picture* curPic = NULL;
   const PreCalcValues *pcv = pcSlice->getPPS()->pcv;
   PicList::iterator  iterPic = rcListPic.begin();
   iterPic = rcListPic.begin();
   while (iterPic != rcListPic.end())
   {
-    pcCurPic = *(iterPic++);
-    if (pcCurPic->getPOC() == pocCurr)
+    curPic = *(iterPic++);
+    if (curPic->getPOC() == pocCurr)
     {
       break;
     }
   }
-  assert(pcCurPic->getPOC() == pocCurr);
+  assert(curPic->getPOC() == pocCurr);
 
-  int iWidth = pcv->lumaWidth;
-  int iHeight = pcv->lumaHeight;
-  int iStride = pcCurPic->getRecoBuf().get(COMPONENT_Y).stride;
-  int iCStride = pcCurPic->getRecoBuf().get(COMPONENT_Cb).stride;
+  int width = pcv->lumaWidth;
+  int height = pcv->lumaHeight;
+  int stride = curPic->getRecoBuf().get(COMPONENT_Y).stride;
+  int cStride = curPic->getRecoBuf().get(COMPONENT_Cb).stride;
 
-  Pel* pBgLumaAddr = m_pcPicBg->getRecoBuf().get(COMPONENT_Y).buf;
-  Pel* pBgCbAddr = m_pcPicBg->getRecoBuf().get(COMPONENT_Cb).buf;
-  Pel* pBgCrAddr = m_pcPicBg->getRecoBuf().get(COMPONENT_Cr).buf;
-  Pel* pCurLumaAddr = pcCurPic->getRecoBuf().get(COMPONENT_Y).buf;
-  Pel* pCurCbAddr = pcCurPic->getRecoBuf().get(COMPONENT_Cb).buf;
-  Pel* pCurCrAddr = pcCurPic->getRecoBuf().get(COMPONENT_Cr).buf;
+  Pel* bgLumaAddr = m_picBg->getRecoBuf().get(COMPONENT_Y).buf;
+  Pel* bgCbAddr = m_picBg->getRecoBuf().get(COMPONENT_Cb).buf;
+  Pel* bgCrAddr = m_picBg->getRecoBuf().get(COMPONENT_Cr).buf;
+  Pel* curLumaAddr = curPic->getRecoBuf().get(COMPONENT_Y).buf;
+  Pel* curCbAddr = curPic->getRecoBuf().get(COMPONENT_Cb).buf;
+  Pel* curCrAddr = curPic->getRecoBuf().get(COMPONENT_Cr).buf;
 
-  int iMaxCUWidth = pcv->maxCUWidth;
-  int iMaxCUHeight = pcv->maxCUHeight;
+  int maxCuWidth = pcv->maxCUWidth;
+  int maxCuHeight = pcv->maxCUHeight;
 
   // Update background reference
   if (pcSlice->getSliceType() == I_SLICE)//(pocCurr == 0)
   {
-    pcCurPic->extendPicBorder();
-    pcCurPic->setBorderExtension(true);
+    curPic->extendPicBorder();
+    curPic->setBorderExtension(true);
 
-    m_pcPicBg->getRecoBuf().copyFrom(pcCurPic->getRecoBuf());
-    m_pcPicOrig->getOrigBuf().copyFrom(pcCurPic->getOrigBuf());
+    m_picBg->getRecoBuf().copyFrom(curPic->getRecoBuf());
+    m_picOrig->getOrigBuf().copyFrom(curPic->getOrigBuf());
   }
   else
   {
     //cout << "update B" << pocCurr << endl;
-    for (int y = 0; y < iHeight; y += iMaxCUHeight)
+    for (int y = 0; y < height; y += maxCuHeight)
     {
-      for (int x = 0; x < iWidth; x += iMaxCUWidth)
+      for (int x = 0; x < width; x += maxCuWidth)
       {
-        if (m_pcPicBg->getSpliceIdx((y / iMaxCUHeight)*pcv->widthInCtus + x / iMaxCUWidth) == pocCurr)
+        if (m_picBg->getSpliceIdx((y / maxCuHeight)*pcv->widthInCtus + x / maxCuWidth) == pocCurr)
         {
-          for (int tmpy = 0; tmpy < iMaxCUHeight; tmpy++)
+          for (int tmpy = 0; tmpy < maxCuHeight; tmpy++)
           {
-            if (y + tmpy >= iHeight)
+            if (y + tmpy >= height)
             {
               break;
             }
-            for (int tmpx = 0; tmpx < iMaxCUWidth; tmpx++)
+            for (int tmpx = 0; tmpx < maxCuWidth; tmpx++)
             {
-              if (x + tmpx >= iWidth)
+              if (x + tmpx >= width)
               {
                 break;
               }
-              pBgLumaAddr[(y + tmpy)*iStride + x + tmpx] = pCurLumaAddr[(y + tmpy)*iStride + x + tmpx];
+              bgLumaAddr[(y + tmpy)*stride + x + tmpx] = curLumaAddr[(y + tmpy)*stride + x + tmpx];
               if (tmpy % 2 == 0 && tmpx % 2 == 0)
               {
-                pBgCbAddr[(y + tmpy) / 2 * iCStride + (x + tmpx) / 2] = pCurCbAddr[(y + tmpy) / 2 * iCStride + (x + tmpx) / 2];
-                pBgCrAddr[(y + tmpy) / 2 * iCStride + (x + tmpx) / 2] = pCurCrAddr[(y + tmpy) / 2 * iCStride + (x + tmpx) / 2];
+                bgCbAddr[(y + tmpy) / 2 * cStride + (x + tmpx) / 2] = curCbAddr[(y + tmpy) / 2 * cStride + (x + tmpx) / 2];
+                bgCrAddr[(y + tmpy) / 2 * cStride + (x + tmpx) / 2] = curCrAddr[(y + tmpy) / 2 * cStride + (x + tmpx) / 2];
               }
             }
           }
         }
       }
     }
-    m_pcPicBg->setBorderExtension(false);
-    m_pcPicBg->extendPicBorder();
-    m_pcPicBg->setBorderExtension(true);
+    m_picBg->setBorderExtension(false);
+    m_picBg->extendPicBorder();
+    m_picBg->setBorderExtension(true);
 
-    pcCurPic->extendPicBorder();
-    pcCurPic->setBorderExtension(true);
-    m_pcPicOrig->getOrigBuf().copyFrom(pcCurPic->getOrigBuf());
+    curPic->extendPicBorder();
+    curPic->setBorderExtension(true);
+    m_picOrig->getOrigBuf().copyFrom(curPic->getOrigBuf());
 
-    m_pcPicBg->setBorderExtension(false);
-    m_pcPicBg->extendPicBorder();
-    m_pcPicBg->setBorderExtension(true);
+    m_picBg->setBorderExtension(false);
+    m_picBg->extendPicBorder();
+    m_picBg->setBorderExtension(true);
   }
 }
 #endif

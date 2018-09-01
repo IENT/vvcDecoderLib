@@ -236,7 +236,7 @@ public:
 
   void selectReferencePictureSet(Slice* slice, int POCCurr, int GOPid
 #if JVET_K0157
-    , int LtPoc, PicList& rcListPic
+    , int ltPoc
 #endif
   );
   int getReferencePictureSetIdxForSOP(int POCCurr, int GOPid );

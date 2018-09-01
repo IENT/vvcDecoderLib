@@ -198,8 +198,8 @@ protected:
     unsigned    imvShift;
 #endif
 #if JVET_K0157
-    bool        bInCtuSearch;
-    bool        bZeroMV;
+    bool        inCtuSearch;
+    bool        zeroMV;
 #endif
   } IntTZSearchStruct;
 

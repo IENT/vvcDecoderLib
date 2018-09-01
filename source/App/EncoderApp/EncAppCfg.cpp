@@ -2559,7 +2559,7 @@ bool EncAppCfg::xCheckParameter()
   }
 
 #if JVET_K0157
-  int iMultipleFactor = m_compositeRefEnabled ? 2 : 1;
+  int multipleFactor = m_compositeRefEnabled ? 2 : 1;
 #endif
   bool verifiedGOP=false;
   bool errorGOP=false;
@@ -2582,7 +2582,7 @@ bool EncAppCfg::xCheckParameter()
   for(int i=0; i<m_iGOPSize; i++)
   {
 #if JVET_K0157
-    if (m_GOPList[i].m_POC == m_iGOPSize * iMultipleFactor)
+    if (m_GOPList[i].m_POC == m_iGOPSize * multipleFactor)
 #else
     if(m_GOPList[i].m_POC==m_iGOPSize)
 #endif
@@ -2620,7 +2620,7 @@ bool EncAppCfg::xCheckParameter()
   {
     int curGOP = (checkGOP-1)%m_iGOPSize;
 #if JVET_K0157
-    int curPOC = ((checkGOP - 1) / m_iGOPSize)*m_iGOPSize * iMultipleFactor + m_GOPList[curGOP].m_POC;
+    int curPOC = ((checkGOP - 1) / m_iGOPSize)*m_iGOPSize * multipleFactor + m_GOPList[curGOP].m_POC;
 #else
     int curPOC = ((checkGOP-1)/m_iGOPSize)*m_iGOPSize + m_GOPList[curGOP].m_POC;
 #endif
@@ -2651,7 +2651,7 @@ bool EncAppCfg::xCheckParameter()
               for(int k=0; k<m_iGOPSize; k++)
               {
 #if JVET_K0157
-                if (absPOC % (m_iGOPSize * iMultipleFactor) == m_GOPList[k].m_POC % (m_iGOPSize * iMultipleFactor))
+                if (absPOC % (m_iGOPSize * multipleFactor) == m_GOPList[k].m_POC % (m_iGOPSize * multipleFactor))
 #else
                 if(absPOC%m_iGOPSize == m_GOPList[k].m_POC%m_iGOPSize)
 #endif
@@ -2707,7 +2707,7 @@ bool EncAppCfg::xCheckParameter()
           //step backwards in coding order and include any extra available pictures we might find useful to replace the ones with POC < 0.
           int offGOP = (checkGOP-1+offset)%m_iGOPSize;
 #if JVET_K0157
-          int offPOC = ((checkGOP - 1 + offset) / m_iGOPSize)*(m_iGOPSize * iMultipleFactor) + m_GOPList[offGOP].m_POC;
+          int offPOC = ((checkGOP - 1 + offset) / m_iGOPSize)*(m_iGOPSize * multipleFactor) + m_GOPList[offGOP].m_POC;
 #else
           int offPOC = ((checkGOP-1+offset)/m_iGOPSize)*m_iGOPSize + m_GOPList[offGOP].m_POC;
 #endif

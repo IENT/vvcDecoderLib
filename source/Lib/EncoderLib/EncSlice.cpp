@@ -173,7 +173,7 @@ void EncSlice::initEncSlice(Picture* pcPic, const int pocLast, const int pocCurr
   rpcSlice->setPic( pcPic );
   rpcSlice->initSlice();
 #if JVET_K0157
-  int iMultipleFactor = pcPic->cs->sps->getSpsNext().getUseCompositeRef() ? 2 : 1;
+  int multipleFactor = pcPic->cs->sps->getSpsNext().getUseCompositeRef() ? 2 : 1;
   if (pcPic->cs->sps->getSpsNext().getUseCompositeRef() && isEncodeLtRef)
   {
     rpcSlice->setPicOutputFlag(false);
@@ -212,7 +212,7 @@ void EncSlice::initEncSlice(Picture* pcPic, const int pocLast, const int pocCurr
     else
     {
 #if JVET_K0157
-      poc = poc % (m_pcCfg->getGOPSize() * iMultipleFactor);
+      poc = poc % (m_pcCfg->getGOPSize() * multipleFactor);
 #else
       poc = poc % m_pcCfg->getGOPSize();
 #endif
@@ -225,7 +225,7 @@ void EncSlice::initEncSlice(Picture* pcPic, const int pocLast, const int pocCurr
     else
     {
 #if JVET_K0157
-      int step = m_pcCfg->getGOPSize() * iMultipleFactor;
+      int step = m_pcCfg->getGOPSize() * multipleFactor;
 #else
       int step = m_pcCfg->getGOPSize();
 #endif
@@ -233,7 +233,7 @@ void EncSlice::initEncSlice(Picture* pcPic, const int pocLast, const int pocCurr
       for( int i=step>>1; i>=1; i>>=1 )
       {
 #if JVET_K0157
-        for (int j = i; j<(m_pcCfg->getGOPSize() * iMultipleFactor); j += step)
+        for (int j = i; j<(m_pcCfg->getGOPSize() * multipleFactor); j += step)
 #else
         for ( int j=i; j<m_pcCfg->getGOPSize(); j+=step )
 #endif
@@ -267,7 +267,7 @@ void EncSlice::initEncSlice(Picture* pcPic, const int pocLast, const int pocCurr
     if(m_pcCfg->getDecodingRefreshType() == 3)
     {
 #if JVET_K0157
-      eSliceType = (pocLast == 0 || pocCurr % (m_pcCfg->getIntraPeriod() * iMultipleFactor) == 0 || m_pcGOPEncoder->getGOPSize() == 0) ? I_SLICE : eSliceType;
+      eSliceType = (pocLast == 0 || pocCurr % (m_pcCfg->getIntraPeriod() * multipleFactor) == 0 || m_pcGOPEncoder->getGOPSize() == 0) ? I_SLICE : eSliceType;
 #else
       eSliceType = (pocLast == 0 || pocCurr % m_pcCfg->getIntraPeriod() == 0             || m_pcGOPEncoder->getGOPSize() == 0) ? I_SLICE : eSliceType;
 #endif
@@ -275,7 +275,7 @@ void EncSlice::initEncSlice(Picture* pcPic, const int pocLast, const int pocCurr
     else
     {
 #if JVET_K0157
-      eSliceType = (pocLast == 0 || (pocCurr - (isField ? 1 : 0)) % (m_pcCfg->getIntraPeriod() * iMultipleFactor) == 0 || m_pcGOPEncoder->getGOPSize() == 0) ? I_SLICE : eSliceType;
+      eSliceType = (pocLast == 0 || (pocCurr - (isField ? 1 : 0)) % (m_pcCfg->getIntraPeriod() * multipleFactor) == 0 || m_pcGOPEncoder->getGOPSize() == 0) ? I_SLICE : eSliceType;
 #else
       eSliceType = (pocLast == 0 || (pocCurr - (isField ? 1 : 0)) % m_pcCfg->getIntraPeriod() == 0 || m_pcGOPEncoder->getGOPSize() == 0) ? I_SLICE : eSliceType;
 #endif
@@ -513,7 +513,7 @@ void EncSlice::initEncSlice(Picture* pcPic, const int pocLast, const int pocCurr
       if(m_pcCfg->getDecodingRefreshType() == 3)
       {
 #if JVET_K0157
-        eSliceType = (pocLast == 0 || (pocCurr) % (m_pcCfg->getIntraPeriod() * iMultipleFactor) == 0 || m_pcGOPEncoder->getGOPSize() == 0) ? I_SLICE : eSliceType;
+        eSliceType = (pocLast == 0 || (pocCurr) % (m_pcCfg->getIntraPeriod() * multipleFactor) == 0 || m_pcGOPEncoder->getGOPSize() == 0) ? I_SLICE : eSliceType;
 #else
         eSliceType = (pocLast == 0 || (pocCurr)                     % m_pcCfg->getIntraPeriod() == 0 || m_pcGOPEncoder->getGOPSize() == 0) ? I_SLICE : eSliceType;
 #endif
@@ -521,7 +521,7 @@ void EncSlice::initEncSlice(Picture* pcPic, const int pocLast, const int pocCurr
       else
       {
 #if JVET_K0157
-        eSliceType = (pocLast == 0 || (pocCurr - (isField ? 1 : 0)) % (m_pcCfg->getIntraPeriod() * iMultipleFactor) == 0 || m_pcGOPEncoder->getGOPSize() == 0) ? I_SLICE : eSliceType;
+        eSliceType = (pocLast == 0 || (pocCurr - (isField ? 1 : 0)) % (m_pcCfg->getIntraPeriod() * multipleFactor) == 0 || m_pcGOPEncoder->getGOPSize() == 0) ? I_SLICE : eSliceType;
 #else
         eSliceType = (pocLast == 0 || (pocCurr - (isField ? 1 : 0)) % m_pcCfg->getIntraPeriod() == 0 || m_pcGOPEncoder->getGOPSize() == 0) ? I_SLICE : eSliceType;
 #endif

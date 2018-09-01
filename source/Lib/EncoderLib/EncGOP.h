@@ -132,13 +132,13 @@ private:
   SEIWriter               m_seiWriter;
 
 #if JVET_K0157
-  Picture *               m_pcPicBg;
-  Picture *               m_pcPicOrig;
-  int                     m_iBgPOC;
-  bool					          m_isEncodedLTRef;
-  bool					          m_isPrepareLTRef;
-  bool					          m_isUseLTRef;
-  int					            m_iLastLTRefPoc;
+  Picture *               m_picBg;
+  Picture *               m_picOrig;
+  int                     m_bgPOC;
+  bool                    m_isEncodedLTRef;
+  bool                    m_isPrepareLTRef;
+  bool                    m_isUseLTRef;
+  int                     m_lastLTRefPoc;
 #endif
   //--Adaptive Loop filter
   EncSampleAdaptiveOffset*  m_pcSAO;
@@ -194,20 +194,20 @@ public:
 
   PicList*   getListPic()      { return m_pcListPic; }
 #if JVET_K0157
-  void      setPicBg(Picture* pcTmpPicBg) { m_pcPicBg = pcTmpPicBg; }
-  Picture*  getPicBg() const { return m_pcPicBg; }
-  void      setPicOrig(Picture* pcTmpPicBg) { m_pcPicOrig = pcTmpPicBg; }
-  Picture*  getPicOrig() { return m_pcPicOrig; }
-  void      setNewestBgPOC(int poc) { m_iBgPOC = poc; }
-  int       getNewestBgPOC() const { return m_iBgPOC; }
+  void      setPicBg(Picture* tmpPicBg) { m_picBg = tmpPicBg; }
+  Picture*  getPicBg() const { return m_picBg; }
+  void      setPicOrig(Picture* tmpPicBg) { m_picOrig = tmpPicBg; }
+  Picture*  getPicOrig() { return m_picOrig; }
+  void      setNewestBgPOC(int poc) { m_bgPOC = poc; }
+  int       getNewestBgPOC() const { return m_bgPOC; }
   void      setEncodedLTRef(bool isEncodedLTRef) { m_isEncodedLTRef = isEncodedLTRef; }
   bool      getEncodedLTRef() { return m_isEncodedLTRef; }
   void      setUseLTRef(bool isUseLTRef) { m_isUseLTRef = isUseLTRef; }
   bool      getUseLTRef() { return m_isUseLTRef; }
   void      setPrepareLTRef(bool isPrepareLTRef) { m_isPrepareLTRef = isPrepareLTRef; }
   bool      getPrepareLTRef() { return m_isPrepareLTRef; }
-  void      setLastLTRefPoc(int iLastLTRefPoc) { m_iLastLTRefPoc = iLastLTRefPoc; }
-  int       getLastLTRefPoc() const { return m_iLastLTRefPoc; }
+  void      setLastLTRefPoc(int iLastLTRefPoc) { m_lastLTRefPoc = iLastLTRefPoc; }
+  int       getLastLTRefPoc() const { return m_lastLTRefPoc; }
 
 #endif
   void  printOutSummary      ( uint32_t uiNumAllPicCoded, bool isField, const bool printMSEBasedSNR, const bool printSequenceMSE, const BitDepths &bitDepths );
