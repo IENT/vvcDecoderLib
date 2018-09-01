@@ -439,17 +439,17 @@ void EncLib::init( bool isFieldCoding, AUWriterIf* auWriterIf )
 #if JVET_K0157
   if (sps0.getSpsNext().getUseCompositeRef()) 
   {
-    Picture *pcPicBg = new Picture;
-    pcPicBg->create(sps0.getChromaFormatIdc(), Size(sps0.getPicWidthInLumaSamples(), sps0.getPicHeightInLumaSamples()), sps0.getMaxCUWidth(), sps0.getMaxCUWidth() + 16, false);
-    pcPicBg->getRecoBuf().fill(0);
-    pcPicBg->finalInit(sps0, pps0);
-    pcPicBg->allocateNewSlice();
-    pcPicBg->createSpliceIdx(pps0.pcv->sizeInCtus);
-    m_cGOPEncoder.setPicBg(pcPicBg);
-    Picture *pcPicOrig = new Picture;
-    pcPicOrig->create(sps0.getChromaFormatIdc(), Size(sps0.getPicWidthInLumaSamples(), sps0.getPicHeightInLumaSamples()), sps0.getMaxCUWidth(), sps0.getMaxCUWidth() + 16, false);
-    pcPicOrig->getOrigBuf().fill(0);
-    m_cGOPEncoder.setPicOrig(pcPicOrig);
+    Picture *picBg = new Picture;
+    picBg->create(sps0.getChromaFormatIdc(), Size(sps0.getPicWidthInLumaSamples(), sps0.getPicHeightInLumaSamples()), sps0.getMaxCUWidth(), sps0.getMaxCUWidth() + 16, false);
+    picBg->getRecoBuf().fill(0);
+    picBg->finalInit(sps0, pps0);
+    picBg->allocateNewSlice();
+    picBg->createSpliceIdx(pps0.pcv->sizeInCtus);
+    m_cGOPEncoder.setPicBg(picBg);
+    Picture *picOrig = new Picture;
+    picOrig->create(sps0.getChromaFormatIdc(), Size(sps0.getPicWidthInLumaSamples(), sps0.getPicHeightInLumaSamples()), sps0.getMaxCUWidth(), sps0.getMaxCUWidth() + 16, false);
+    picOrig->getOrigBuf().fill(0);
+    m_cGOPEncoder.setPicOrig(picOrig);
   }
 #endif
 }
@@ -591,18 +591,18 @@ void EncLib::encode( bool flush, PelStorage* pcPicYuvOrg, PelStorage* cPicYuvTru
 #if JVET_K0157
   if (m_compositeRefEnabled && m_cGOPEncoder.getPicBg()->getSpliceFull() && m_iPOCLast >= 10 && m_iNumPicRcvd == 0 && m_cGOPEncoder.getEncodedLTRef() == false)
   {
-    Picture* pcPicCurr = NULL;
-    xGetNewPicBuffer(rcListPicYuvRecOut, pcPicCurr, 2);
-    const PPS *pPPS = m_ppsMap.getPS(2);
-    const SPS *pSPS = m_spsMap.getPS(pPPS->getSPSId());
+    Picture* picCurr = NULL;
+    xGetNewPicBuffer(rcListPicYuvRecOut, picCurr, 2);
+    const PPS *pps = m_ppsMap.getPS(2);
+    const SPS *sps = m_spsMap.getPS(pps->getSPSId());
 
-    pcPicCurr->M_BUFS(0, PIC_ORIGINAL).copyFrom(m_cGOPEncoder.getPicBg()->getRecoBuf());
-    pcPicCurr->finalInit(*pSPS, *pPPS);
-    pcPicCurr->poc = m_iPOCLast - 1;
+    picCurr->M_BUFS(0, PIC_ORIGINAL).copyFrom(m_cGOPEncoder.getPicBg()->getRecoBuf());
+    picCurr->finalInit(*sps, *pps);
+    picCurr->poc = m_iPOCLast - 1;
     m_iPOCLast -= 2;
     if (getUseAdaptiveQP())
     {
-      AQpPreanalyzer::preanalyze(pcPicCurr);
+      AQpPreanalyzer::preanalyze(picCurr);
     }
     if (m_RCEnableRateControl)
     {
@@ -1707,12 +1707,12 @@ void EncLib::xInitRPS(SPS &sps, bool isFieldCoding)
    // for a specific slice (with POC = POCCurr)
 void EncLib::selectReferencePictureSet(Slice* slice, int POCCurr, int GOPid
 #if JVET_K0157
-                                      , int LtPoc, PicList& rcListPic
+                                      , int ltPoc
 #endif
 )
 {
 #if JVET_K0157
-  bool isEncodeLtRef = (POCCurr == LtPoc);
+  bool isEncodeLtRef = (POCCurr == ltPoc);
   if (m_compositeRefEnabled && isEncodeLtRef)
   {
     POCCurr++;
@@ -1760,64 +1760,64 @@ void EncLib::selectReferencePictureSet(Slice* slice, int POCCurr, int GOPid
 
 #if JVET_K0157
   ReferencePictureSet *rps = const_cast<ReferencePictureSet *>(slice->getSPS()->getRPSList()->getReferencePictureSet(slice->getRPSidx()));
-  if (m_compositeRefEnabled && LtPoc != -1 && !isEncodeLtRef)
+  if (m_compositeRefEnabled && ltPoc != -1 && !isEncodeLtRef)
   {
-    if (LtPoc != -1 && rps->getNumberOfLongtermPictures() != 1 && !isEncodeLtRef)
+    if (ltPoc != -1 && rps->getNumberOfLongtermPictures() != 1 && !isEncodeLtRef)
     {
       int idx = rps->getNumberOfPictures();
       int maxPicOrderCntLSB = 1 << slice->getSPS()->getBitsForPOC();
-      int LtPocLsb = LtPoc % maxPicOrderCntLSB;
+      int ltPocLsb = ltPoc % maxPicOrderCntLSB;
 
       rps->setNumberOfPictures(rps->getNumberOfPictures() + 1);
       rps->setNumberOfLongtermPictures(1);
-      rps->setPOC(idx, LtPoc);
-      rps->setPocLSBLT(idx, LtPocLsb);
-      rps->setDeltaPOC(idx, -POCCurr + LtPoc);
+      rps->setPOC(idx, ltPoc);
+      rps->setPocLSBLT(idx, ltPocLsb);
+      rps->setDeltaPOC(idx, -POCCurr + ltPoc);
       rps->setUsed(idx, true);
     }
   }
   else if (m_compositeRefEnabled && isEncodeLtRef)
   {
-    ReferencePictureSet* pLocalRPS = slice->getLocalRPS();
-    (*pLocalRPS) = ReferencePictureSet();
-    int iRefPics = rps->getNumberOfPictures();
-    pLocalRPS->setNumberOfPictures(rps->getNumberOfPictures());
-    for (int i = 0; i < iRefPics; i++)
+    ReferencePictureSet* localRPS = slice->getLocalRPS();
+    (*localRPS) = ReferencePictureSet();
+    int refPics = rps->getNumberOfPictures();
+    localRPS->setNumberOfPictures(rps->getNumberOfPictures());
+    for (int i = 0; i < refPics; i++)
     {
-      pLocalRPS->setDeltaPOC(i, rps->getDeltaPOC(i) + 1);
-      pLocalRPS->setUsed(i, rps->getUsed(i));
+      localRPS->setDeltaPOC(i, rps->getDeltaPOC(i) + 1);
+      localRPS->setUsed(i, rps->getUsed(i));
     }
-    pLocalRPS->setNumberOfNegativePictures(rps->getNumberOfNegativePictures());
-    pLocalRPS->setNumberOfPositivePictures(rps->getNumberOfPositivePictures());
-    pLocalRPS->setInterRPSPrediction(true);
+    localRPS->setNumberOfNegativePictures(rps->getNumberOfNegativePictures());
+    localRPS->setNumberOfPositivePictures(rps->getNumberOfPositivePictures());
+    localRPS->setInterRPSPrediction(true);
     int deltaRPS = 1;
-    int iNewIdc = 0;
-    for (int i = 0; i < iRefPics; i++)
+    int newIdc = 0;
+    for (int i = 0; i < refPics; i++)
     {
-      int deltaPOC = ((i != iRefPics) ? rps->getDeltaPOC(i) : 0);  // check if the reference abs POC is >= 0
-      int iRefIdc = 0;
-      for (int j = 0; j < pLocalRPS->getNumberOfPictures(); j++) // loop through the  pictures in the new RPS
+      int deltaPOC = ((i != refPics) ? rps->getDeltaPOC(i) : 0);  // check if the reference abs POC is >= 0
+      int refIdc = 0;
+      for (int j = 0; j < localRPS->getNumberOfPictures(); j++) // loop through the  pictures in the new RPS
       {
-        if ((deltaPOC + deltaRPS) == pLocalRPS->getDeltaPOC(j))
+        if ((deltaPOC + deltaRPS) == localRPS->getDeltaPOC(j))
         {
-          if (pLocalRPS->getUsed(j))
+          if (localRPS->getUsed(j))
           {
-            iRefIdc = 1;
+            refIdc = 1;
           }
           else
           {
-            iRefIdc = 2;
+            refIdc = 2;
           }
         }
       }
-      pLocalRPS->setRefIdc(i, iRefIdc);
-      iNewIdc++;
+      localRPS->setRefIdc(i, refIdc);
+      newIdc++;
     }
-    pLocalRPS->setNumRefIdc(iNewIdc + 1);
-    pLocalRPS->setRefIdc(iNewIdc, 0);
-    pLocalRPS->setDeltaRPS(deltaRPS);
-    pLocalRPS->setDeltaRIdxMinus1(slice->getSPS()->getRPSList()->getNumberOfReferencePictureSets() - 1 - rIdx);
-    slice->setRPS(pLocalRPS);
+    localRPS->setNumRefIdc(newIdc + 1);
+    localRPS->setRefIdc(newIdc, 0);
+    localRPS->setDeltaRPS(deltaRPS);
+    localRPS->setDeltaRIdxMinus1(slice->getSPS()->getRPSList()->getNumberOfReferencePictureSets() - 1 - rIdx);
+    slice->setRPS(localRPS);
     slice->setRPSidx(-1);
     return;
   }

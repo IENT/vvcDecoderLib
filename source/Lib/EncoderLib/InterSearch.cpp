@@ -1858,12 +1858,12 @@ void InterSearch::xMotionEstimation(PredictionUnit& pu, PelUnitBuf& origBuf, Ref
   cStruct.imvShift      = pu.cu->imv << 1;
 #endif
 #if JVET_K0157
-  cStruct.bInCtuSearch = false;
-  cStruct.bZeroMV = false;
+  cStruct.inCtuSearch = false;
+  cStruct.zeroMV = false;
   {
     if (pu.cs->sps->getSpsNext().getUseCompositeRef() && pu.cs->slice->getRefPic(eRefPicList, iRefIdxPred)->longTerm)
     {
-      cStruct.bInCtuSearch = true;
+      cStruct.inCtuSearch = true;
     }
   }
 #endif
@@ -2015,7 +2015,7 @@ void InterSearch::xSetSearchRange ( const PredictionUnit& pu,
   sr.bottom = mvBR.ver;
 
 #if JVET_K0157
-  if (pu.cs->sps->getSpsNext().getUseCompositeRef() && cStruct.bInCtuSearch)
+  if (pu.cs->sps->getSpsNext().getUseCompositeRef() && cStruct.inCtuSearch)
   {
     Position posRB = pu.Y().bottomRight();
     Position posTL = pu.Y().topLeft();
@@ -2033,12 +2033,12 @@ void InterSearch::xSetSearchRange ( const PredictionUnit& pu,
     if (posLTinCTU.x == -4 || posLTinCTU.y == -4)
     {
       sr.left = sr.right = sr.bottom = sr.top = 0;
-      cStruct.bZeroMV = 1;
+      cStruct.zeroMV = 1;
     }
     if (posRBinCTU.x == pcv->maxCUWidthMask || posRBinCTU.y == pcv->maxCUHeightMask)
     {
       sr.left = sr.right = sr.bottom = sr.top = 0;
-      cStruct.bZeroMV = 1;
+      cStruct.zeroMV = 1;
     }
   }
 #endif
@@ -2681,7 +2681,7 @@ void InterSearch::xPatternSearchFracDIF(
 
 #if JVET_K0357_AMVR
 #if JVET_K0157
-  if (cStruct.imvShift || (pu.cs->sps->getSpsNext().getUseCompositeRef() && cStruct.bZeroMV))
+  if (cStruct.imvShift || (pu.cs->sps->getSpsNext().getUseCompositeRef() && cStruct.zeroMV))
 #else
   if( cStruct.imvShift )
 #endif
