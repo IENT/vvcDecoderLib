@@ -269,9 +269,9 @@ public:
 namespace std
 {
   template <>
-  struct hash<Mv> : public unary_function<Mv, size_t>
+  struct hash<Mv> : public unary_function<Mv, uint64_t>
   {
-    size_t operator()(const Mv& value) const
+    uint64_t operator()(const Mv& value) const
     {
       return (((uint64_t)value.hor << 32) + value.ver);
     }
