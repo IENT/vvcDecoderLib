@@ -40,6 +40,9 @@
 #include "EncLib.h"
 #include "CommonLib/UnitTools.h"
 #include "CommonLib/Picture.h"
+#if K0149_BLOCK_STATISTICS
+#include "CommonLib/dtrace_blockstatistics.h"
+#endif
 
 #if ENABLE_WPP_PARALLELISM
 #include <mutex>
@@ -1440,6 +1443,11 @@ void EncSlice::compressSlice( Picture* pcPic, const bool bCompressEntireSlice, c
   }
   else
 #endif
+#if K0149_BLOCK_STATISTICS
+  const SPS *sps = pcSlice->getSPS();
+  CHECK(sps == 0, "No SPS present");
+  writeBlockStatisticsHeader(sps);
+#endif
   encodeCtus( pcPic, bCompressEntireSlice, bFastDeltaQP, startCtuTsAddr, boundingCtuTsAddr, m_pcLib );
 
 #if HEVC_DEPENDENT_SLICES
@@ -1664,6 +1672,10 @@ void EncSlice::encodeCtus( Picture* pcPic, const bool bCompressEntireSlice, cons
     pEncLib->getCuEncoder( dataId )->compressCtu( cs, ctuArea, ctuRsAddr, prevQP, currQP );
 #else
     m_pcCuEncoder->compressCtu( cs, ctuArea, ctuRsAddr, prevQP, currQP );
+#endif
+
+#if K0149_BLOCK_STATISTICS
+    getAndStoreBlockStatistics(cs, ctuArea);
 #endif
 
     pCABACWriter->resetBits();

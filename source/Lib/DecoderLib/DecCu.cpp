@@ -48,6 +48,10 @@
 #if RExt__DECODER_DEBUG_TOOL_STATISTICS
 #include "CommonLib/CodingStatistics.h"
 #endif
+#if K0149_BLOCK_STATISTICS
+#include "CommonLib/ChromaFormat.h"
+#include "CommonLib/dtrace_blockstatistics.h"
+#endif
 
 //! \ingroup DecoderLib
 //! \{
@@ -114,6 +118,9 @@ void DecCu::decompressCtu( CodingStructure& cs, const UnitArea& ctuArea )
       DTRACE_BLOCK_REC( cs.picture->getRecoBuf( currCU ), currCU, currCU.predMode );
     }
   }
+#if K0149_BLOCK_STATISTICS
+  getAndStoreBlockStatistics(cs, ctuArea);
+#endif
 }
 
 // ====================================================================================================================
