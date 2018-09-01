@@ -121,6 +121,10 @@ uint32_t DecApp::decode()
      * requires the DecApp::decode() method to be called again with the same
      * nal unit. */
 #if RExt__DECODER_DEBUG_STATISTICS
+    CodingStatistics& stat = CodingStatistics::GetSingletonInstance();
+    CHECK(m_statMode < STATS__MODE_NONE || m_statMode > STATS__MODE_ALL, "Wrong coding statistics output mode");
+    stat.m_mode = m_statMode;
+
     CodingStatistics::CodingStatisticsData* backupStats = new CodingStatistics::CodingStatisticsData(CodingStatistics::GetStatistics());
 #endif
 

@@ -132,6 +132,16 @@ enum CodingStatisticsType
   STATS__NUM_STATS
 };
 
+enum CodingStatisticsMode
+{
+  STATS__MODE_NONE  = 0,
+  STATS__MODE_BITS  = 1,
+  STATS__MODE_TOOLS = 2,
+
+  STATS__MODE_ALL   =
+    STATS__MODE_BITS | STATS__MODE_TOOLS
+};
+
 static inline const char* getName(CodingStatisticsType name)
 {
   static const char *statNames[]=
@@ -354,11 +364,13 @@ public:
     friend class CodingStatistics;
   };
 
+  int m_mode;
+
 private:
 
   CodingStatisticsData data;
 
-  CodingStatistics() : data()
+  CodingStatistics() : m_mode(STATS__MODE_ALL), data()
   {
   }
 
@@ -436,11 +448,8 @@ private:
     printf( "\n" );
   }
 
-public:
-
-  ~CodingStatistics()
+  void OutputBitStats()
   {
-#if RExt__DECODER_DEBUG_BIT_STATISTICS
     const int64_t es = CODINGSTATISTICS_ENTROPYSCALE;
 
     int64_t countTotal = 0;
@@ -622,10 +631,10 @@ public:
     OutputDashedLine( "GRAND TOTAL" );
     epTotalBits += cavlcTotalBits;
     OutputLine      ( "TOTAL",                  '~', "~~GT~~", "~~GT~~", "~~GT~~", cabacTotalBits, epTotalBits );
-#endif //RExt__DECODER_DEBUG_BIT_STATISTICS
+  }
 
-#ifdef RExt__DECODER_DEBUG_TOOL_STATISTICS
-#if JEM_TOOLS
+  void OutputToolStats()
+  {
     printf("\n");
     printf( " %-45s-   Width Height   Type        Count  Impacted pixels  %% Impacted pixels\n", "Tools statistics" );
     OutputDashedLine( "" );
@@ -684,7 +693,20 @@ public:
         }
       }
     }
-#endif //JEM_TOOLS
+  }
+
+public:
+
+  ~CodingStatistics()
+  {
+#if RExt__DECODER_DEBUG_BIT_STATISTICS
+    if (m_mode & STATS__MODE_BITS)
+      OutputBitStats();
+#endif //RExt__DECODER_DEBUG_BIT_STATISTICS
+
+#ifdef RExt__DECODER_DEBUG_TOOL_STATISTICS
+    if (m_mode & STATS__MODE_TOOLS)
+      OutputToolStats();
 #endif //RExt__DECODER_DEBUG_TOOL_STATISTICS
   }
 
