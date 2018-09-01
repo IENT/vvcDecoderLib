@@ -75,6 +75,9 @@
 #define REUSE_CU_RESULTS                                  1
 #endif
 
+#define JVET_K0390_RATECTRL                               1
+#define RATECTRL_FIX_FULLNBIT                             1  //fix the QP-lambda relationship in rate control if JVET-K0154 for FULL_NBIT is enabled
+
 #define JVET_K0352_MERGE_ENCOPT                           1 // encoder optimization for merge
 #define JVET_K0556_MAX_TT_SIZE_64                         1 // Maximum TT size is set to 64x64 for P/B-slice
 
