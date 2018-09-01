@@ -89,7 +89,7 @@
 
 #define JVET_K0351_LESS_CONSTRAINT                        1 // Only disallow binary split with same orientation in center partition of the ternary split and release the other constraints in K0351.
 
-#define JVET_K0251_QP_EXT                                 1 // Extending the QP parameter value range for coarse quantization 
+#define JVET_K0251_QP_EXT                                 1 // Extending the QP parameter value range for coarse quantization
 
 #define JVET_K_AFFINE                                     1
 #if JVET_K_AFFINE
@@ -178,7 +178,7 @@
 #endif // ! ENABLE_TRACING
 
 #define WCG_EXT                                           0 // part of JEM sharp Luma qp
-#define WCG_WPSNR                                         WCG_EXT 
+#define WCG_WPSNR                                         WCG_EXT
 
 #if HEVC_TOOLS
 #define HEVC_USE_INTRA_SMOOTHING_T32                      1
@@ -321,8 +321,7 @@
 
 #define SHARP_LUMA_DELTA_QP                               1 ///< include non-normative LCU deltaQP and normative chromaQP change
 #define ER_CHROMA_QP_WCG_PPS                              1 ///< Chroma QP model for WCG used in Anchor 3.2
-#define ENABLE_QPA                                        0
-
+#define ENABLE_QPA                                        1 ///< Non-normative perceptual QP adaptation according to JVET-H0047 and JVET-K0206. Deactivated by default, activated using encoder arguments --PerceptQPA=1 --SliceChromaQPOffsetPeriodicity=1
 
 #if JEM_TOOLS && !JVET_K0371_ALF
 #define COM16_C806_ALF_TEMPPRED_NUM                       6 //tbd
@@ -1553,8 +1552,8 @@ enum AlfFilterType
 struct AlfFilterShape
 {
   AlfFilterShape( int size )
-    : filterLength( size ), 
-    numCoeff( size * size / 4 + 1 ), 
+    : filterLength( size ),
+    numCoeff( size * size / 4 + 1 ),
     filterSize( size * size / 2 + 1 )
   {
     if( size == 5 )
@@ -1597,7 +1596,7 @@ struct AlfFilterShape
                     2,
                 2,  2,  2,
             2,  2,  2,  2,  2,
-        2,  2,  2,  1,  1 
+        2,  2,  2,  1,  1
       };
 
       golombIdx = {

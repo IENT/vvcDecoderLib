@@ -115,6 +115,7 @@ protected:
   bool      m_cabacZeroWordPaddingEnabled;
   bool      m_bClipInputVideoToRec709Range;
   bool      m_bClipOutputVideoToRec709Range;
+  bool      m_packedYUVMode;                                  ///< If true, output 10-bit and 12-bit YUV data as 5-byte and 3-byte (respectively) packed YUV data
 
   // profile/level
   Profile::Name m_profile;
@@ -338,7 +339,7 @@ protected:
   int       m_maxNumOffsetsPerPic;                            ///< SAO maximun number of offset per picture
   bool      m_saoCtuBoundary;                                 ///< SAO parameter estimation using non-deblocked pixels for CTU bottom and right boundary areas
 #if K0238_SAO_GREEDY_MERGE_ENCODING
-  bool      m_saoGreedyMergeEnc;                              ///< SAO greedy merge encoding algorithm 
+  bool      m_saoGreedyMergeEnc;                              ///< SAO greedy merge encoding algorithm
 #endif
   // coding tools (loop filter)
   bool      m_bLoopFilterDisable;                             ///< flag for using deblocking filter

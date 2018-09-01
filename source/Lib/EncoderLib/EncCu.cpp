@@ -795,9 +795,9 @@ void EncCu::updateLambda( Slice* slice, double dQP )
 #endif
 #endif
   double qp_temp = (double) dQP + bitdepth_luma_qp_scale - SHIFT_QP;
-  
+
   double dQPFactor = m_pcEncCfg->getGOPEntry( m_pcSliceEncoder->getGopId() ).m_QPFactor;
-  
+
   if( slice->getSliceType() == I_SLICE )
   {
     if( m_pcEncCfg->getIntraQpFactor() >= 0.0 /*&& m_pcEncCfg->getGOPEntry( m_pcSliceEncoder->getGopId() ).m_sliceType != I_SLICE*/ )
@@ -848,7 +848,7 @@ void EncCu::updateLambda( Slice* slice, double dQP )
   dLambda *= lambdaModifier;
 
   int qpBDoffset = slice->getSPS()->getQpBDOffset(CHANNEL_TYPE_LUMA);
-  int iQP = max( -qpBDoffset, min( MAX_QP, (int) floor( dQP + 0.5 ) ) );
+  int iQP = Clip3(-qpBDoffset, MAX_QP, (int)floor(dQP + 0.5));
   m_pcSliceEncoder->setUpLambda(slice, dLambda, iQP);
 
 #else
@@ -1469,7 +1469,7 @@ void EncCu::xCheckIntraPCM(CodingStructure *&tempCS, CodingStructure *&bestCS, P
   cu.ipcm             = true;
 
   tempCS->addPU(tempCS->area, partitioner.chType);
-  
+
   tempCS->addTU( tempCS->area, partitioner.chType );
 
   m_pcIntraSearch->IPCMSearch(*tempCS, partitioner);
@@ -2508,7 +2508,7 @@ void EncCu::xEncodeInterResidual( CodingStructure *&tempCS, CodingStructure *&be
       }
     }
 #endif
-  }//end emt loop 
+  } //end emt loop
 }
 
 

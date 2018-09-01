@@ -109,7 +109,7 @@ public:
   int getGopId()        const { return m_gopID; }
   double  calculateLambda( const Slice* slice, const int GOPid, const int depth, const double refQP, const double dQP, int &iQP );
   void    setUpLambda( Slice* slice, const double dLambda, int iQP );
-  
+
 private:
 #endif
 #if HEVC_TILES_WPP
@@ -120,6 +120,10 @@ private:
 
 
 public:
+#if ENABLE_QPA
+  int                     m_adaptedLumaQP;
+
+#endif
   EncSlice();
   virtual ~EncSlice();
 
