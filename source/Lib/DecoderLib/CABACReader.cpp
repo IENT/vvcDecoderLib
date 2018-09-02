@@ -195,7 +195,7 @@ bool CABACReader::coding_tree_unit( CodingStructure& cs, const UnitArea& area, i
         ctx += leftCTUAddr > -1 ? ( ctbAlfFlag[leftCTUAddr] ? 1 : 0 ) : 0;
         ctx += aboveCTUAddr > -1 ? ( ctbAlfFlag[aboveCTUAddr] ? 1 : 0 ) : 0;
 
-        if( alfSliceParam.chromaCtbPresentFlag && compIdx )
+        if( compIdx && alfSliceParam.chromaCtbPresentFlag )
         {
           ctbAlfFlag[ctuRsAddr] = 1;
         }
