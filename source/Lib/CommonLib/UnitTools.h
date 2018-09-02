@@ -101,6 +101,13 @@ namespace CU
   bool isObmcFlagCoded                (const CodingUnit& cu);
 #endif
 
+#if JVET_K0248_GBI
+  bool  isGBiIdxCoded                  (const CodingUnit& cu);
+  uint8_t getValidGbiIdx               (const CodingUnit& cu);
+  void  setGbiIdx                      (      CodingUnit& cu, uint8_t uh);
+  uint8_t deriveGbiIdx                 (uint8_t gbiLO, uint8_t gbiL1);
+#endif
+
   PUTraverser traversePUs             (      CodingUnit& cu);
   TUTraverser traverseTUs             (      CodingUnit& cu);
   cPUTraverser traversePUs            (const CodingUnit& cu);
@@ -176,7 +183,11 @@ namespace PU
 #endif
 #if JEM_TOOLS
   bool isAffineMrgFlagCoded           (const PredictionUnit &pu );
+#if JVET_K0248_GBI
+  void getAffineMergeCand             (const PredictionUnit &pu, MvField (*mvFieldNeighbours)[3], unsigned char &interDirNeighbours, unsigned char &gbiIdx, int &numValidMergeCand);
+#else
   void getAffineMergeCand             (const PredictionUnit &pu, MvField (*mvFieldNeighbours)[3], unsigned char &interDirNeighbours, int &numValidMergeCand );
+#endif
   void setAllAffineMvField            (      PredictionUnit &pu, MvField *mvField, RefPicList eRefList );
   void setAllAffineMv                 (      PredictionUnit &pu, Mv affLT, Mv affRT, Mv affLB, RefPicList eRefList );
   bool isBIOLDB                       (const PredictionUnit &pu);

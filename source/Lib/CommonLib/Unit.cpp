@@ -287,6 +287,9 @@ CodingUnit& CodingUnit::operator=( const CodingUnit& other )
 #if JVET_K0076_CPR
   ibc               = other.ibc;
 #endif
+#if JVET_K0248_GBI
+  GBiIdx            = other.GBiIdx;
+#endif
   return *this;
 }
 
@@ -333,6 +336,9 @@ void CodingUnit::initData()
 #endif
 #if JVET_K0076_CPR
   ibc               = false;
+#endif
+#if JVET_K0248_GBI
+  GBiIdx            = GBI_DEFAULT;
 #endif
 }
 

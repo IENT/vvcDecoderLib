@@ -925,6 +925,10 @@ bool EncAppCfg::parseCfg( int argc, char* argv[] )
   ( "IBCHashSearchRange4SmallBlk",                    m_IBCHashSearchRange4SmallBlk,                     256u, "Small block search range in based IBC search")
   ( "IBCFastMethod",                                  m_IBCFastMethod,                                     6u, "Fast methods for IBC")
 #endif
+#if JVET_K0248_GBI
+  ("GBi" ,                                            m_GBi,                                            false, "Enable Generalized Bi-prediction(GBi)")
+  ("GBiFast",                                         m_GBiFast,                                        false, "Fast methods for Generalized Bi-prediction(GBi)\n")
+#endif
   // ADD_NEW_TOOL : (encoder app) add parsing parameters here
 
   ("LCTUFast",                                        m_useFastLCTU,                                    false, "Fast methods for large CTU")
@@ -2065,6 +2069,10 @@ bool EncAppCfg::xCheckParameter()
 #if JEM_TOOLS
     xConfirmPara( m_DMVR, "DMVR is only allowed with NEXT profile" );
     xConfirmPara( m_MDMS, "MDMS is only allowed with NEXT profile" );
+#endif
+#if JVET_K0248_GBI
+    xConfirmPara( m_GBi,     "GBi is only allowed with NEXT profile" );
+    xConfirmPara( m_GBiFast, "GBiFast is only allowed with NEXT profile");
 #endif
 #if JEM_TOOLS
     xConfirmPara( m_IntraPDPC, "PDPC is only allowed with NEXT profile" );
@@ -3448,6 +3456,10 @@ void EncAppCfg::xPrintParameter()
 #endif
 #if JVET_K0076_CPR
     msg(VERBOSE, "CPR:%d ", m_IBCMode);
+#endif
+#if JVET_K0248_GBI
+    msg( VERBOSE, "GBi:%d ", m_GBi );
+    msg( VERBOSE, "GBiFast:%d ", m_GBiFast);
 #endif
   }
   // ADD_NEW_TOOL (add some output indicating the usage of tools)

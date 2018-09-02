@@ -557,6 +557,9 @@ public:
 #if JEM_TOOLS
   bool          LICFlags          [ MRG_MAX_NUM_CANDS      ];
 #endif
+#if JVET_K0248_GBI
+  uint8_t       GBiIdx            [ MRG_MAX_NUM_CANDS      ];
+#endif
   unsigned char interDirNeighbours[ MRG_MAX_NUM_CANDS      ];
   MergeType     mrgTypeNeighbours [ MRG_MAX_NUM_CANDS      ];
   int           numValidMergeCand;

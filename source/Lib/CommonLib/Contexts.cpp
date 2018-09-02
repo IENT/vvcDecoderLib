@@ -1018,6 +1018,16 @@ const CtxSet ContextSetCfg::AffineType = ContextSetCfg::addCtxSet
 #endif
 #endif
 
+#if JVET_K0248_GBI
+const CtxSet ContextSetCfg::GBiIdx = ContextSetCfg::addCtxSet
+({
+  // 4 ctx for 1st bin; 1 ctx for each of rest bins
+  {   95,  79,  63,  31,  31,  31,  31,},
+  {   95,  79,  63,  31,  31,  31,  31,},
+  {  CNU, CNU, CNU, CNU, CNU, CNU, CNU,},
+});
+#endif
+
 const CtxSet ContextSetCfg::Mvd = ContextSetCfg::addCtxSet
 ({
   {  169, 198,},
@@ -1721,6 +1731,9 @@ void CtxWSizeStore::xInitMappingTable( const SPS* sps )
 #if JVET_K0357_AMVR
   unsigned        numImvCtx           = ( spsNext.getImvMode() > 1 ? 4 : 3 );
 #endif
+#if JVET_K0248_GBI
+  unsigned        numGBiCtx           = ( GBI_NUM + 2 );
+#endif
   addCtxSetToMapping      ( m_codeId2ctxId, Ctx::SplitFlag,              0, numCtxSplitFlag );
   if( spsNext.getUseQTBT() )  // hard-wired in JEM
   {
@@ -1834,6 +1847,12 @@ void CtxWSizeStore::xInitMappingTable( const SPS* sps )
   if( spsNext.getLICEnabled() ) // hard-wired in JEM
   {
     addCtxSetToMapping    ( m_codeId2ctxId, Ctx::LICFlag,                0, 1 );
+  }
+#endif
+#if JVET_K0248_GBI 
+  if (true)
+  {
+    addCtxSetToMapping    ( m_codeId2ctxId, Ctx::GBiIdx,                 0, numGBiCtx );
   }
 #endif
 #if !JVET_K0371_ALF

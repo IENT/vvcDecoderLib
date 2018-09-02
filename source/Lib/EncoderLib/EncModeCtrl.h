@@ -428,6 +428,11 @@ struct CodedCUInfo
 
   bool validMv[NUM_REF_PIC_LIST_01][MAX_STORED_CU_INFO_REFS];
   Mv   saveMv [NUM_REF_PIC_LIST_01][MAX_STORED_CU_INFO_REFS];
+
+#if JVET_K0248_GBI   
+  uint8_t GBiIdx;
+#endif
+
 #if ENABLE_SPLIT_PARALLELISM
 
   uint64_t
@@ -474,6 +479,12 @@ public:
 
   bool getMv  ( const UnitArea& area, const RefPicList refPicList, const int iRefIdx,       Mv& rMv ) const;
   void setMv  ( const UnitArea& area, const RefPicList refPicList, const int iRefIdx, const Mv& rMv );
+
+#if JVET_K0248_GBI 
+  bool  getInter  ( const UnitArea& area );
+  void  setGbiIdx ( const UnitArea& area, uint8_t gBiIdx );
+  uint8_t getGbiIdx ( const UnitArea& area );
+#endif
 };
 
 #if REUSE_CU_RESULTS

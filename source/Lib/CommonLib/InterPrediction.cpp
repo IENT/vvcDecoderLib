@@ -1622,8 +1622,15 @@ void InterPrediction::applyBiOptFlow( const PredictionUnit &pu, const CPelUnitBu
   
   const ClpRng& clpRng        = pu.cu->cs->slice->clpRng(COMPONENT_Y);
   const int   bitDepth        = clipBitDepths.recon[ toChannelType(COMPONENT_Y) ];
+#if JVET_K0248_GBI
+  const uint8_t gbiIdx        = pu.cu->GBiIdx;
+  const int   iLog2WeightBase = g_GbiLog2WeightBase;
+  const int   shiftNum        = IF_INTERNAL_PREC + ((gbiIdx != GBI_DEFAULT) ? iLog2WeightBase : 1) - bitDepth;
+  const int   offset          = (1 << (shiftNum - 1)) + ((gbiIdx != GBI_DEFAULT) ? (IF_INTERNAL_OFFS << iLog2WeightBase) : 2 * IF_INTERNAL_OFFS);
+#else
   const int   shiftNum        = IF_INTERNAL_PREC + 1 - bitDepth;
   const int   offset          = ( 1 << ( shiftNum - 1 ) ) + 2 * IF_INTERNAL_OFFS;
+#endif
   const bool  bShortRefMV     = ( pu.cs->slice->getCheckLDC() && PU::isBIOLDB(pu) );
 #if JVET_K0485_BIO
   const int64_t limit         = (16 << (IF_INTERNAL_PREC - bShortRefMV - bitDepth));
@@ -1691,7 +1698,11 @@ void InterPrediction::applyBiOptFlow( const PredictionUnit &pu, const CPelUnitBu
         pSrcY0Temp = pSrcY0 + (stridePredMC + 1) + ((yu*iSrc0Stride + xu) << 2);
         pSrcY1Temp = pSrcY1 + (stridePredMC + 1) + ((yu*iSrc1Stride + xu) << 2);
         pDstY0 = pDstY + ((yu*iDstStride + xu) << 2);
-
+#if JVET_K0248_GBI
+        if( gbiIdx != GBI_DEFAULT )
+          pcYuvDst.bufs[0].addWeightedAvg(CPelBuf(pSrcY0Temp, iSrc0Stride, pu.lumaSize()), CPelBuf(pSrcY1Temp, iSrc1Stride, pu.lumaSize()), clpRng, gbiIdx);
+        else
+#endif
         g_pelBufOP.addAvg4(pSrcY0Temp, iSrc0Stride, pSrcY1Temp, iSrc1Stride, pDstY0, iDstStride, (1 << 2), (1 << 2), shiftNum, offset, clpRng);
         continue;
       }
@@ -1748,7 +1759,13 @@ void InterPrediction::applyBiOptFlow( const PredictionUnit &pu, const CPelUnitBu
       pGradY1 = m_pGradY1 + offsetPos + ((yu*iWidthG + xu) << 2);
 
       pDstY0 = pDstY + ((yu*iDstStride + xu) << 2);
-      g_pelBufOP.addBIOAvg4(pSrcY0Temp, iSrc0Stride, pSrcY1Temp, iSrc1Stride, pDstY0, iDstStride, pGradX0, pGradX1, pGradY0, pGradY1, iWidthG, (1 << 2), (1 << 2), (int)tmpx, (int)tmpy, shiftNum, offset, clpRng);
+
+#if JVET_K0248_GBI
+      if (gbiIdx != GBI_DEFAULT)
+        g_pelBufOP.addBIOAvg4GBI(pSrcY0Temp, iSrc0Stride, pSrcY1Temp, iSrc1Stride, pDstY0, iDstStride, pGradX0, pGradX1, pGradY0, pGradY1, iWidthG, (1 << 2), (1 << 2), (int)tmpx, (int)tmpy, shiftNum, offset, clpRng, gbiIdx);
+      else
+#endif
+        g_pelBufOP.addBIOAvg4(pSrcY0Temp, iSrc0Stride, pSrcY1Temp, iSrc1Stride, pDstY0, iDstStride, pGradX0, pGradX1, pGradY0, pGradY1, iWidthG, (1 << 2), (1 << 2), (int)tmpx, (int)tmpy, shiftNum, offset, clpRng);
 #else
       pSrcY0Temp = pSrcY0 + ((yu*iSrc0Stride + xu) << 2);
       pSrcY1Temp = pSrcY1 + ((yu*iSrc0Stride + xu) << 2);
@@ -1759,15 +1776,35 @@ void InterPrediction::applyBiOptFlow( const PredictionUnit &pu, const CPelUnitBu
 
       pDstY0 = pDstY + ((yu*iDstStride + xu) << 2);
 
+#if JVET_K0248_GBI
+      const int8_t w0 = getGbiWeight(gbiIdx, REF_PIC_LIST_0);
+      const int8_t w1 = getGbiWeight(gbiIdx, REF_PIC_LIST_1);
+      const int8_t iLog2WeightBase = g_iGbiLog2WeightBase;
+      int32_t(*pMulW0)(Pel) = GET_INT_MULTIPLIER(w0);
+      int32_t(*pMulW1)(Pel) = GET_INT_MULTIPLIER(w1);
+#endif
+
       // apply BIO offset for the sub-block
       for (int y = 0; y < 4; y++)
       {
         for (int x = 0; x < 4; x++)
         {
           int b = (int)tmpx * (pGradX0[x] - pGradX1[x]) + (int)tmpy * (pGradY0[x] - pGradY1[x]);
-          b = (b > 0) ? ((b + 32) >> 6) : (-((-b + 32) >> 6));
 
-          pDstY0[x] = ( ClipPel( ( int16_t ) ( ( pSrcY0Temp[x] + pSrcY1Temp[x] + b + offset ) >> shiftNum ), clpRng ) );
+#if JVET_K0248_GBI 
+          if( gbiIdx != GBI_DEFAULT)
+          {
+            b = (b>0) ? (((b << log2WeightBase) + 64) >> 7) : (-((((-b) << log2WeightBase) + 64) >> 7));
+            pDstY0[x] = (ClipPel((int16_t)(((int64_t)pMulW0(pSrcY0Temp[x]) + (int64_t)pMulW1(pSrcY1Temp[x]) + (int64_t)b + (int64_t)offset) >> shiftNum), clpRng));
+          }
+          else
+          {
+#endif
+            b = (b > 0) ? ((b + 32) >> 6) : (-((-b + 32) >> 6));
+            pDstY0[x] = ( ClipPel( ( int16_t ) ( ( pSrcY0Temp[x] + pSrcY1Temp[x] + b + offset ) >> shiftNum ), clpRng ) );
+#if JVET_K0248_GBI 
+          }
+#endif
         }
         pDstY0 += iDstStride; pSrcY0Temp += iSrc0Stride; pSrcY1Temp += iSrc1Stride;
         pGradX0 += iWidthG; pGradX1 += iWidthG; pGradY0 += iWidthG; pGradY1 += iWidthG;
@@ -1840,9 +1877,25 @@ void InterPrediction::xWeightedAverage( const PredictionUnit& pu, const CPelUnit
       applyBiOptFlow( pu, pcYuvSrc0, pcYuvSrc1, iRefIdx0, iRefIdx1, pcYuvDst, clipBitDepths );
 #if JVET_K0485_BIO
       else
-        pcYuvDst.bufs[0].addAvg(CPelBuf(pSrcY0, src0Stride, pu.lumaSize()), CPelBuf(pSrcY1, src1Stride, pu.lumaSize()), clpRngs.comp[0]);
+#if JVET_K0248_GBI 
+      {
+        if (pu.cu->GBiIdx != GBI_DEFAULT)
+          pcYuvDst.bufs[0].addWeightedAvg(CPelBuf(pSrcY0, src0Stride, pu.lumaSize()), CPelBuf(pSrcY1, src1Stride, pu.lumaSize()), clpRngs.comp[0], pu.cu->GBiIdx);
+        else
+#endif
+          pcYuvDst.bufs[0].addAvg(CPelBuf(pSrcY0, src0Stride, pu.lumaSize()), CPelBuf(pSrcY1, src1Stride, pu.lumaSize()), clpRngs.comp[0]);
+#if JVET_K0248_GBI
+      }
+#endif
 #endif
     }
+#if JVET_K0248_GBI
+    if( pu.cu->GBiIdx != GBI_DEFAULT)
+    {
+      pcYuvDst.addWeightedAvg( pcYuvSrc0, pcYuvSrc1, clpRngs, pu.cu->GBiIdx, bBIOApplied );
+      return;
+    }
+#endif
     pcYuvDst.addAvg( pcYuvSrc0, pcYuvSrc1, clpRngs, bBIOApplied );
 #else
     pcYuvDst.addAvg( pcYuvSrc0, pcYuvSrc1, clpRngs );
@@ -4508,7 +4561,14 @@ void InterPrediction::xProcessDMVR( PredictionUnit& pu, PelUnitBuf &pcYuvDst, co
     pu.mv[1].setHighPrec();
   }
 #if !DMVR_JVET_K0217
-  pcYuvDst.addAvg( srcPred0, srcPred1, clpRngs, false, true );
+#if JVET_K0248_GBI
+  if( pu.cu->GBiIdx != GBI_DEFAULT)
+  {
+    pcYuvDst.addWeightedAvg( srcPred0, srcPred1, clpRngs, pu.cu->GBiIdx, false, true );
+  }
+  else
+#endif
+    pcYuvDst.addAvg( srcPred0, srcPred1, clpRngs, false, true );
 
   //list 0
   //get init cost

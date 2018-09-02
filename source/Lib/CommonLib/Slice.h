@@ -875,6 +875,9 @@ private:
   bool              m_DMVR;                       // 26
   bool              m_MDMS;                       // 27
 #endif
+#if JVET_K0248_GBI
+  bool              m_GBi;                        // 28
+#endif
   bool              m_MTTEnabled;                 //
 #if ENABLE_WPP_PARALLELISM
   bool              m_NextDQP;
@@ -1076,7 +1079,10 @@ public:
   void      setUseMDMS            ( bool b )                                        { m_MDMS = b; }
   bool      getUseMDMS            ()                                      const     { return m_MDMS; }
 #endif
-
+#if JVET_K0248_GBI
+  void      setUseGBi             ( bool b )                                        { m_GBi = b; }
+  bool      getUseGBi             ()                                      const     { return m_GBi; }
+#endif
   //=====  additional parameters  =====
   // qtbt
   void      setCTUSize            ( unsigned    ctuSize )                           { m_CTUSize = ctuSize; }

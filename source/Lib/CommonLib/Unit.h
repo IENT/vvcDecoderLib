@@ -326,6 +326,9 @@ struct CodingUnit : public UnitArea
 #if JVET_K0076_CPR
   bool           ibc;
 #endif
+#if JVET_K0248_GBI
+  uint8_t        GBiIdx;
+#endif
   // needed for fast imv mode decisions
   int8_t          imvNumCand;
 

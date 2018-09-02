@@ -313,6 +313,10 @@ void EncApp::xInitLibCfg()
   m_cEncLib.setIBCHashSearchRange4SmallBlk                       ( m_IBCHashSearchRange4SmallBlk );
   m_cEncLib.setIBCFastMethod                                     ( m_IBCFastMethod );
 #endif
+#if JVET_K0248_GBI
+  m_cEncLib.setUseGBi                                            ( m_GBi );
+  m_cEncLib.setUseGBiFast                                        ( m_GBiFast);
+#endif
   // ADD_NEW_TOOL : (encoder app) add setting of tool enabling flags and associated parameters here
 
   m_cEncLib.setMaxCUWidth                                        ( m_QTBT ? m_uiCTUSize : m_uiMaxCUWidth );

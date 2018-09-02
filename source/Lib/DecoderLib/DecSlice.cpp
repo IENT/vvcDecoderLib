@@ -272,6 +272,14 @@ void DecSlice::decompressSlice( Slice* slice, InputBitstream* bitstream )
     }
 #endif
 
+#if JVET_K0248_GBI
+    bool updateGbiCodingOrder = cs.slice->getSliceType() == B_SLICE && ctuTsAddr == startCtuTsAddr;
+    if(updateGbiCodingOrder)
+    {
+      resetGbiCodingOrder( true, cs );
+    }
+#endif
+
     isLastCtuOfSliceSegment = cabacReader.coding_tree_unit( cs, ctuArea, pic->m_prevQP, ctuRsAddr );
 
     m_pcCuDecoder->decompressCtu( cs, ctuArea );
