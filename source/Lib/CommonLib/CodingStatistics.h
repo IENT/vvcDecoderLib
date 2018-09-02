@@ -120,6 +120,9 @@ enum CodingStatisticsType
   STATS__CABAC_BITS__EMT_CU_FLAG,
   STATS__CABAC_BITS__EMT_TU_INDEX,
 #endif
+#if JVET_K0248_GBI
+  STATS__CABAC_BITS__GBI_IDX,
+#endif
   STATS__CABAC_BITS__OTHER,
   STATS__CABAC_BITS__INVALID,
   STATS__TOOL_TOTAL_FRAME,// This is a special case and is not included in the report.
@@ -217,6 +220,9 @@ static inline const char* getName(CodingStatisticsType name)
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
     "CABAC_BITS__EMT_CU_FLAG",
     "CABAC_BITS__EMT_TU_INDX",
+#endif
+#if JVET_K0248_GBI
+    "CABAC_BITS__GBI_IDX",
 #endif
     "CABAC_BITS__OTHER",
     "CABAC_BITS__INVALID",

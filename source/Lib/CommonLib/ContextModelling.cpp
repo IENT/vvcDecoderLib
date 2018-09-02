@@ -778,5 +778,9 @@ void MergeCtx::setMergeInfo( PredictionUnit& pu, int candIdx )
     pu.cu->LICFlag = ( pu.cs->slice->getUseLIC() ? LICFlags[candIdx] : false );
   }
 #endif
+
+#if JVET_K0248_GBI 
+  pu.cu->GBiIdx = ( interDirNeighbours[candIdx]==3 ) ? GBiIdx[candIdx] : GBI_DEFAULT;
+#endif
   
 }

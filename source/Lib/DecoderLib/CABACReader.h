@@ -102,6 +102,9 @@ public:
   void        cu_lic_flag               ( CodingUnit&                   cu );
   void        obmc_flag                 ( CodingUnit&                   cu );
 #endif
+#if JVET_K0248_GBI
+  void        cu_gbi_flag               ( CodingUnit&                   cu );
+#endif
   void        intra_luma_pred_modes     ( CodingUnit&                   cu );
   void        intra_chroma_pred_modes   ( CodingUnit&                   cu );
 #if JEM_TOOLS||JVET_K0190

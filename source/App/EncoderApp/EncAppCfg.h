@@ -295,6 +295,10 @@ protected:
   unsigned  m_IBCHashSearchRange4SmallBlk;
   unsigned  m_IBCFastMethod;
 #endif
+#if JVET_K0248_GBI
+  bool      m_GBi;
+  bool      m_GBiFast;
+#endif
   // ADD_NEW_TOOL : (encoder app) add tool enabling flags and associated parameters here
 
   unsigned  m_uiMaxCUWidth;                                   ///< max. CU width in pixel

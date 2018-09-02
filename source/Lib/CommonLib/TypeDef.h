@@ -56,6 +56,8 @@
 #endif
 
 
+#define JVET_K0248_GBI                                    1
+
 #define JVET_K1000_SIMPLIFIED_EMT                         1 // EMT with only DCT-2, DCT-8 and DST-7
 
 #define JVET_K0371_ALF                                    1

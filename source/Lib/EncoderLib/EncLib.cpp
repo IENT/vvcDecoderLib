@@ -1025,6 +1025,9 @@ void EncLib::xInitSPS(SPS &sps)
 #if JVET_K0157
   sps.getSpsNext().setUseCompositeRef       ( m_compositeRefEnabled );
 #endif
+#if JVET_K0248_GBI
+  sps.getSpsNext().setUseGBi                ( m_GBi );
+#endif
 
 #if JVET_K0076_CPR
   sps.getSpsNext().setIBCMode               ( m_IBCMode );

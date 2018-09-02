@@ -282,6 +282,10 @@ protected:
   unsigned  m_IBCHashSearchRange4SmallBlk;
   unsigned  m_IBCFastMethod;
 #endif
+#if JVET_K0248_GBI
+  bool      m_GBi;
+  bool      m_GBiFast;
+#endif
   // ADD_NEW_TOOL : (encoder lib) add tool enabling flags and associated parameters here
 
   bool      m_useFastLCTU;
@@ -854,6 +858,12 @@ public:
   unsigned  getIBCHashSearchRange4SmallBlk  ()         const { return m_IBCHashSearchRange4SmallBlk; }
   void      setIBCFastMethod                (unsigned n)     { m_IBCFastMethod = n; }
   unsigned  getIBCFastMethod                ()         const { return m_IBCFastMethod; }
+#endif
+#if JVET_K0248_GBI
+  void      setUseGBi                       ( bool b )       { m_GBi = b; }
+  bool      getUseGBi                       ()         const { return m_GBi;     }
+  void      setUseGBiFast                   ( uint32_t b )   { m_GBiFast = b;    }
+  bool      getUseGBiFast                   ()         const { return m_GBiFast; }
 #endif
   // ADD_NEW_TOOL : (encoder lib) add access functions here
 

@@ -106,6 +106,10 @@ private:
   CodingStructure **m_pSaveCS;
 
   ClpRng          m_lumaClpRng;
+#if JVET_K0248_GBI 
+  uint32_t        m_auiEstWeightIdxBits[GBI_NUM];
+  GBiMotionParam  m_cUniMotions;
+#endif
 
 #if JEM_TOOLS
   PelStorage      m_obmcOrgMod;
@@ -398,6 +402,11 @@ protected:
                                   , Mv                    mvAffine4Para[2][33][3]
                                   , int                   refIdx4Para[2]
 #endif
+#if JVET_K0248_GBI 
+                                  , uint8_t               gbiIdx = GBI_DEFAULT
+                                  , bool                  enforceGBiPred = false
+                                  , uint32_t              gbiIdxBits = 0
+#endif
                                   );
 
   void xAffineMotionEstimation    ( PredictionUnit& pu,
@@ -424,7 +433,22 @@ protected:
 
   void xCopyAffineAMVPInfo        ( AffineAMVPInfo& src, AffineAMVPInfo& dst );
   void xCheckBestAffineMVP        ( PredictionUnit &pu, AffineAMVPInfo &affineAMVPInfo, RefPicList eRefPicList, Mv acMv[3], Mv acMvPred[3], int& riMVPIdx, uint32_t& ruiBits, Distortion& ruiCost );
+
+#if JVET_K0248_GBI 
+  bool xReadBufferedAffineUniMv(PredictionUnit& pu, RefPicList eRefPicList, int32_t iRefIdx, Mv acMvPred[3], Mv acMv[3], uint32_t& ruiBits, Distortion& ruiCost);
 #endif
+#endif
+
+#if JVET_K0248_GBI 
+  double xGetMEDistortionWeight(uint8_t gbiIdx, RefPicList eRefPicList);
+  bool xReadBufferedUniMv(PredictionUnit& pu, RefPicList eRefPicList, int32_t iRefIdx, Mv& pcMvPred, Mv& rcMv, uint32_t& ruiBits, Distortion& ruiCost);
+public:
+  void resetBufferedUniMotions() { m_cUniMotions.reset(); }
+  uint32_t getWeightIdxBits(uint8_t gbiIdx) { return m_auiEstWeightIdxBits[gbiIdx]; }
+  void initWeightIdxBits();
+protected:
+#endif
+
   void xExtDIFUpSamplingH         ( CPelBuf* pcPattern );
   void xExtDIFUpSamplingQ         ( CPelBuf* pcPatternKey, Mv halfPelRef );
 
