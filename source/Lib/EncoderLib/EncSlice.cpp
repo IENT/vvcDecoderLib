@@ -1318,7 +1318,19 @@ void EncSlice::compressSlice( Picture* pcPic, const bool bCompressEntireSlice, c
     else
     {
       m_pcCuEncoder->setPrevPOC(pcSlice->getPOC());
+#if SEQ_ENCODING_BF
+      if (m_pcCfg->getGOPSize() != m_pcCfg->getIntraPeriod())
+      {
+#endif
       m_pcCuEncoder->setClearSubMergeStatic(true);
+#if SEQ_ENCODING_BF
+      }
+      else
+      {
+        m_pcCuEncoder->clearSubMergeStatics();
+        m_pcCuEncoder->setClearSubMergeStatic(false);
+      }
+#endif
     }
   }
 #endif
