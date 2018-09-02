@@ -1271,7 +1271,9 @@ void CABACWriter::split_cu_mode_mt(const PartSplit split, const CodingStructure&
 void CABACWriter::coding_unit( const CodingUnit& cu, Partitioner& partitioner, CUCtx& cuCtx )
 {
   CodingStructure& cs = *cu.cs;
-
+#if JVET_K0076_CPR
+  cs.chType = partitioner.chType;
+#endif
   // transquant bypass flag
   if( cs.pps->getTransquantBypassEnabledFlag() )
   {
@@ -1279,7 +1281,11 @@ void CABACWriter::coding_unit( const CodingUnit& cu, Partitioner& partitioner, C
   }
 
   // skip flag
+#if JVET_K0076_CPR_DT
+  if (!cs.slice->isIntra() && cu.Y().valid())
+#else
   if( !cs.slice->isIntra() )
+#endif
   {
     cu_skip_flag( cu );
   }
@@ -1392,6 +1398,12 @@ void CABACWriter::cu_pred_data( const CodingUnit& cu )
     intra_chroma_pred_modes( cu );
     return;
   }
+#if JVET_K0076_CPR_DT
+  if (!cu.Y().valid()) // dual tree chroma CU
+  {
+    return;
+  }
+#endif 
   for( auto &pu : CU::traversePUs( cu ) )
   {
     prediction_unit( pu );
@@ -2198,7 +2210,10 @@ void CABACWriter::imv_mode( const CodingUnit& cu )
   }
 
   unsigned ctxId = DeriveCtx::CtxIMVFlag( cu );
-  m_BinEncoder.encodeBin( ( cu.imv > 0 ), Ctx::ImvFlag( ctxId ) );
+#if JVET_K0076_CPR
+  if (!(cu.firstPU->interDir == 1 && cu.cs->slice->getRefPic(REF_PIC_LIST_0, cu.firstPU->refIdx[REF_PIC_LIST_0])->getPOC() == cu.cs->slice->getPOC())) // the first bin of IMV flag does need to be signaled in CPR block
+#endif
+    m_BinEncoder.encodeBin( ( cu.imv > 0 ), Ctx::ImvFlag( ctxId ) );
   DTRACE( g_trace_ctx, D_SYNTAX, "imv_mode() value=%d ctx=%d\n", (cu.imv > 0), ctxId );
 
   if( spsNext.getImvMode() == IMV_4PEL && cu.imv > 0 )

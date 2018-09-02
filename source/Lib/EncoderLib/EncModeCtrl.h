@@ -76,6 +76,10 @@ enum EncTestModeType
 #if JVET_K0357_AMVR
   ETM_TRIGGER_IMV_LIST,
 #endif
+#if JVET_K0076_CPR
+  ETM_IBC,    // ibc mode
+  ETM_IBC_MERGE, // ibc merge mode
+#endif
   ETM_INVALID
 };
 

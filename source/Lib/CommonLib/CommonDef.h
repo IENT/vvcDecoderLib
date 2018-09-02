@@ -449,7 +449,14 @@ static const int NTAPS_CHROMA             =                         4; ///< Numb
 #if JEM_TOOLS
 static const int NTAPS_LUMA_FRUC          =                         2;
 #endif
-
+#if JVET_K0076_CPR
+static const int IBC_MAX_CAND_SIZE =                               16; // max block size for ibc search
+static const int IBC_NUM_CANDIDATES =                              64; ///< Maximum number of candidates to store/test
+static const int CHROMA_REFINEMENT_CANDIDATES =                     8; /// 8 candidates BV to choose from
+static const int IBC_FAST_METHOD_NOINTRA_IBCCBF0 =               0x01;
+static const int IBC_FAST_METHOD_BUFFERBV =                      0X02;
+static const int IBC_FAST_METHOD_ADAPTIVE_SEARCHRANGE =          0X04;
+#endif
 // ====================================================================================================================
 // Macro functions
 // ====================================================================================================================

@@ -878,7 +878,9 @@ void HLSyntaxReader::parseSPSNext( SPSNext& spsNext, const bool usePCM )
   READ_FLAG( symbol,    "dmvr_flag" );                              spsNext.setUseDMVR                ( symbol != 0 );
   READ_FLAG( symbol,    "mdms_flag" );                              spsNext.setUseMDMS                ( symbol != 0 );
 #endif
-
+#if JVET_K0076_CPR
+  READ_FLAG( symbol,    "ibc_flag" );                               spsNext.setIBCMode                ( symbol != 0 );
+#endif
   for( int k = 0; k < SPSNext::NumReservedFlags; k++ )
   {
     READ_FLAG( symbol,  "reserved_flag" );                          if( symbol != 0 ) EXIT("Incompatible version: SPSNext reserved flag not equal to zero (bitstream was probably created with newer software version)" );

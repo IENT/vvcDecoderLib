@@ -940,6 +940,9 @@ private:
 #if JVET_K0157
   bool              m_compositeRefEnabled;        //composite longterm reference
 #endif
+#if JVET_K0076_CPR
+  unsigned    m_IBCMode;
+#endif
   // ADD_NEW_TOOL : (sps extension) add tool enabling flags and associated parameters here
 
 public:
@@ -1164,6 +1167,10 @@ public:
 #if JVET_K0157
   void      setUseCompositeRef(bool b) { m_compositeRefEnabled = b; }
   bool      getUseCompositeRef()                                      const { return m_compositeRefEnabled; }
+#endif
+#if JVET_K0076_CPR
+  void      setIBCMode            (unsigned IBCMode)                                { m_IBCMode = IBCMode; }
+  unsigned  getIBCMode            ()                                      const     { return m_IBCMode; }
 #endif
   // ADD_NEW_TOOL : (sps extension) add access functions for tool enabling flags and associated parameters here
 

@@ -50,6 +50,12 @@
 #include <assert.h>
 #include <cassert>
 
+#define JVET_K0076_CPR                                    1 // current picture referencing or intra block copy mode
+#if JVET_K0076_CPR
+#define JVET_K0076_CPR_DT                                 1 // dualItree support for CPR
+#endif
+
+
 #define JVET_K1000_SIMPLIFIED_EMT                         1 // EMT with only DCT-2, DCT-8 and DST-7
 
 #define JVET_K0371_ALF                                    1
@@ -299,6 +305,9 @@
 #endif
 #if JVET_K0371_ALF
 #define ENABLE_SIMD_OPT_ALF                             ( 1 && ENABLE_SIMD_OPT )                            ///< SIMD optimization for ALF
+#endif
+#if JVET_K0076_CPR
+#define ENABLE_SIMD_OPT_CPR                             ( 1 && ENABLE_SIMD_OPT )                            ///< SIMD optimization for CPR
 #endif
 // End of SIMD optimizations
 
@@ -988,6 +997,9 @@ enum MergeType
   MRG_TYPE_SUBPU_ATMVP_EXT,      // 2
   MRG_TYPE_FRUC,                 // 3
   MRG_TYPE_FRUC_SET,             // 4
+#endif
+#if JVET_K0076_CPR
+  MRG_TYPE_IBC,                  // 5
 #endif
 #if !JEM_TOOLS && JVET_K0346
   MRG_TYPE_SUBPU_ATMVP,

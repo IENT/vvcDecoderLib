@@ -1026,6 +1026,9 @@ void EncLib::xInitSPS(SPS &sps)
   sps.getSpsNext().setUseCompositeRef       ( m_compositeRefEnabled );
 #endif
 
+#if JVET_K0076_CPR
+  sps.getSpsNext().setIBCMode               ( m_IBCMode );
+#endif
   // ADD_NEW_TOOL : (encoder lib) set tool enabling flags and associated parameters here
 
   int minCUSize = ( /*sps.getSpsNext().getUseQTBT() ? 1 << MIN_CU_LOG2 :*/ sps.getMaxCUWidth() >> sps.getLog2DiffMaxMinCodingBlockSize() );
@@ -1533,7 +1536,14 @@ void EncLib::xInitPPS(PPS &pps, const SPS &sps)
     }
   }
   CHECK(!(bestPos <= 15), "Unspecified error");
-  pps.setNumRefIdxL0DefaultActive(bestPos);
+#if JVET_K0076_CPR
+  if (sps.getSpsNext().getIBCMode())
+  {
+    pps.setNumRefIdxL0DefaultActive(bestPos + 1);
+  }
+  else
+#endif
+    pps.setNumRefIdxL0DefaultActive(bestPos);
   pps.setNumRefIdxL1DefaultActive(bestPos);
   pps.setTransquantBypassEnabledFlag(getTransquantBypassEnabledFlag());
   pps.setUseTransformSkip( m_useTransformSkip );
