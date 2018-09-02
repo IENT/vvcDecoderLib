@@ -323,7 +323,12 @@ struct CodingUnit : public UnitArea
   bool           LICFlag;
   bool           obmcFlag;
 #endif
-
+#if JVET_K0076_CPR
+  bool           ibc;
+#endif
+#if JVET_K0248_GBI
+  uint8_t        GBiIdx;
+#endif
   // needed for fast imv mode decisions
   int8_t          imvNumCand;
 
@@ -377,6 +382,10 @@ struct InterPredictionData
 #endif
 #if JEM_TOOLS || JVET_K_AFFINE
   Mv        mvdAffi [NUM_REF_PIC_LIST_01][3];
+#endif
+#if JVET_K0076_CPR
+  Mv        bv;                             // block vector for intraBC
+  Mv        bvd;                            // block vector difference for intraBC
 #endif
 };
 

@@ -67,6 +67,14 @@ typedef Distortion (*FpDistFunc) (const DistParam&);
 class DistParam
 {
 public:
+#if DMVR_JVET_K0217
+  int32_t meanL0;
+  int32_t meanL1;
+  Mv MVDL0;
+  Mv MVDL1;
+  int32_t partOfMeanL0;
+  int32_t partOfMeanL1;
+#endif
   CPelBuf               org;
   CPelBuf               cur;
 #if WCG_EXT
@@ -89,7 +97,18 @@ public:
   // - 0 = no subsampling, 1 = even rows, 2 = every 4th, etc.
   int                   subShift;
 
-  DistParam() : org(), cur(), step( 1 ), bitDepth( 0 ), useMR( false ), applyWeight( false ), isBiPred( false ), wpCur( nullptr ), compID( MAX_NUM_COMPONENT ), maximumDistortionForEarlyExit( std::numeric_limits<Distortion>::max() ), subShift( 0 ) { }
+  DistParam() :
+#if DMVR_JVET_K0217
+  meanL0(0),
+  meanL1(0),
+  MVDL0({}),
+  MVDL1({}),
+  partOfMeanL0(0), 
+  partOfMeanL1(0),
+#endif
+  org(), cur(), step( 1 ), bitDepth( 0 ), useMR( false ), applyWeight( false ), isBiPred( false ), wpCur( nullptr ), compID( MAX_NUM_COMPONENT ), maximumDistortionForEarlyExit( std::numeric_limits<Distortion>::max() ), subShift( 0 )
+
+  { }
 };
 
 /// RD cost computation class
@@ -112,11 +131,16 @@ private:
 
   // for motion cost
   Mv                      m_mvPredictor;
+#if JVET_K0076_CPR
+  Mv                      m_bvPredictors[2];
+#endif
   double                  m_motionLambda;
   int                     m_iCostScale;
 
   bool                    m_useQtbt;
-
+#if JVET_K0076_CPR
+  double                  m_dCost; // for cpr
+#endif
 public:
   RdCost();
   virtual ~RdCost();
@@ -172,6 +196,112 @@ public:
   }
   void           setCostScale             ( int iCostScale )           { m_iCostScale = iCostScale; }
   Distortion     getCost                  ( uint32_t b )                   { return Distortion( m_motionLambda * b ); }
+
+#if JVET_K0076_CPR
+  // for cpr
+  void           getMotionCost(int iAdd, bool bIsTransquantBypass) { m_dCost = m_dLambdaMotionSAD[(bIsTransquantBypass && m_costMode == COST_MIXED_LOSSLESS_LOSSY_CODING) ? 1 : 0] + iAdd; }
+
+  void    setPredictors(Mv* pcMv)
+  {
+    for (int i = 0; i<2; i++)
+    {
+      m_bvPredictors[i] = pcMv[i];
+    }
+  }
+
+  inline Distortion getBvCostMultiplePreds(int x, int y, bool useIMV)
+  {
+    return Distortion((m_dCost * getBitsMultiplePreds(x, y, useIMV)) / 65536.0);
+  }
+
+  unsigned int    getBitsMultiplePreds(int x, int y, bool useIMV)
+  {
+    int rmvH[2];
+    int rmvV[2];
+    rmvH[0] = x - m_bvPredictors[0].getHor();
+    rmvH[1] = x - m_bvPredictors[1].getHor();
+
+    rmvV[0] = y - m_bvPredictors[0].getVer();
+    rmvV[1] = y - m_bvPredictors[1].getVer();
+    int absCand[2];
+    absCand[0] = abs(rmvH[0]) + abs(rmvV[0]);
+    absCand[1] = abs(rmvH[1]) + abs(rmvV[1]);
+
+    int rmvHQP[2];
+    int rmvVQP[2];
+    if (x % 4 == 0 && y % 4 == 0 && useIMV)
+    {
+      int imvShift = 2;
+      int offset = 1 << (imvShift - 1);
+
+      rmvHQP[0] = (x >> 2) - ((m_bvPredictors[0].getHor() + offset) >> 2);
+      rmvHQP[1] = (x >> 2) - ((m_bvPredictors[1].getHor() + offset) >> 2);
+      rmvVQP[0] = (y >> 2) - ((m_bvPredictors[0].getVer() + offset) >> 2);
+      rmvVQP[1] = (y >> 2) - ((m_bvPredictors[1].getVer() + offset) >> 2);
+
+      int absCandQP[2];
+      absCandQP[0] = abs(rmvHQP[0]) + abs(rmvVQP[0]);
+      absCandQP[1] = abs(rmvHQP[1]) + abs(rmvVQP[1]);
+      unsigned int uiCandBits0QP, uiCandBits1QP;
+      if (absCand[0] < absCand[1])
+      {
+        unsigned int uiCandBits0 = getIComponentBits(rmvH[0]) + getIComponentBits(rmvV[0]);
+        if (absCandQP[0] < absCandQP[1])
+        {
+          uiCandBits0QP = getIComponentBits(rmvHQP[0]) + getIComponentBits(rmvVQP[0]);
+          return uiCandBits0QP < uiCandBits0 ? uiCandBits0QP : uiCandBits0;
+        }
+        else
+        {
+          uiCandBits1QP = getIComponentBits(rmvHQP[1]) + getIComponentBits(rmvVQP[1]);
+          return uiCandBits1QP < uiCandBits0 ? uiCandBits1QP : uiCandBits0;
+        }
+      }
+      else
+      {
+        unsigned int uiCandBits1 = getIComponentBits(rmvH[1]) + getIComponentBits(rmvV[1]);
+        if (absCandQP[0] < absCandQP[1])
+        {
+          uiCandBits0QP = getIComponentBits(rmvHQP[0]) + getIComponentBits(rmvVQP[0]);
+          return uiCandBits0QP < uiCandBits1 ? uiCandBits0QP : uiCandBits1;
+        }
+        else
+        {
+          uiCandBits1QP = getIComponentBits(rmvHQP[1]) + getIComponentBits(rmvVQP[1]);
+          return uiCandBits1QP < uiCandBits1 ? uiCandBits1QP : uiCandBits1;
+        }
+      }
+    }
+    else
+
+    {
+      if (absCand[0] < absCand[1])
+      {
+        return getIComponentBits(rmvH[0]) + getIComponentBits(rmvV[0]);
+      }
+      else
+      {
+        return getIComponentBits(rmvH[1]) + getIComponentBits(rmvV[1]);
+      }
+    }
+  }
+
+  unsigned int getIComponentBits(int val)
+  {
+    if (!val) return 1;
+
+    unsigned int length = 1;
+    unsigned int temp = (val <= 0) ? (-val << 1) + 1 : (val << 1);
+
+    while (1 != temp)
+    {
+      temp >>= 1;
+      length += 2;
+    }
+
+    return length;
+  }
+#endif
 
 #if ENABLE_SPLIT_PARALLELISM
   void copyState( const RdCost& other );

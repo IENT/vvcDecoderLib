@@ -131,6 +131,9 @@ public:
   void        cu_lic_flag               ( const CodingUnit&             cu );
   void        obmc_flag                 ( const CodingUnit&             cu );
 #endif
+#if JVET_K0248_GBI
+  void        cu_gbi_flag               ( const CodingUnit&             cu );
+#endif
   void        intra_luma_pred_modes     ( const CodingUnit&             cu );
   void        intra_luma_pred_mode      ( const PredictionUnit&         pu );
   void        intra_chroma_pred_modes   ( const CodingUnit&             cu );

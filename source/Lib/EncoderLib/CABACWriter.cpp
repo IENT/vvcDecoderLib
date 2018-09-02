@@ -1271,7 +1271,9 @@ void CABACWriter::split_cu_mode_mt(const PartSplit split, const CodingStructure&
 void CABACWriter::coding_unit( const CodingUnit& cu, Partitioner& partitioner, CUCtx& cuCtx )
 {
   CodingStructure& cs = *cu.cs;
-
+#if JVET_K0076_CPR
+  cs.chType = partitioner.chType;
+#endif
   // transquant bypass flag
   if( cs.pps->getTransquantBypassEnabledFlag() )
   {
@@ -1279,7 +1281,11 @@ void CABACWriter::coding_unit( const CodingUnit& cu, Partitioner& partitioner, C
   }
 
   // skip flag
+#if JVET_K0076_CPR_DT
+  if (!cs.slice->isIntra() && cu.Y().valid())
+#else
   if( !cs.slice->isIntra() )
+#endif
   {
     cu_skip_flag( cu );
   }
@@ -1392,6 +1398,12 @@ void CABACWriter::cu_pred_data( const CodingUnit& cu )
     intra_chroma_pred_modes( cu );
     return;
   }
+#if JVET_K0076_CPR_DT
+  if (!cu.Y().valid()) // dual tree chroma CU
+  {
+    return;
+  }
+#endif 
   for( auto &pu : CU::traversePUs( cu ) )
   {
     prediction_unit( pu );
@@ -1403,6 +1415,10 @@ void CABACWriter::cu_pred_data( const CodingUnit& cu )
 #if JEM_TOOLS
   obmc_flag  ( cu );
   cu_lic_flag( cu );
+#endif
+
+#if JVET_K0248_GBI
+  cu_gbi_flag( cu );
 #endif
 }
 
@@ -1434,6 +1450,50 @@ void CABACWriter::obmc_flag( const CodingUnit& cu )
 }
 #endif
 
+#if JVET_K0248_GBI
+void CABACWriter::cu_gbi_flag( const CodingUnit& cu )
+{
+  if (!CU::isGBiIdxCoded(cu))
+  {
+    return;
+  }
+
+  CHECK( !(GBI_NUM > 1 && (GBI_NUM == 2 || (GBI_NUM & 0x01) == 1 ) ), " !( GBI_NUM > 1 && ( GBI_NUM == 2 || ( GBI_NUM & 0x01 ) == 1 ) ) ");
+  const uint8_t gbiCodingIdx = (uint8_t)g_GbiCodingOrder[CU::getValidGbiIdx( cu )];
+
+  int ctxId = 0;
+
+  int32_t numGBi = ( cu.slice->getCheckLDC() ) ? 5 : 3;
+
+  m_BinEncoder.encodeBin( (gbiCodingIdx == 0 ? 1 : 0 ), Ctx::GBiIdx( ctxId ) );
+
+  if( numGBi > 2 && gbiCodingIdx != 0 )
+  {
+    uint32_t prefixNumBits = numGBi - 2;
+    uint32_t step = 1;
+    uint8_t prefixSymbol = gbiCodingIdx;
+
+    int ctxIdGBi = 4;
+    uint8_t idx = 1;
+    for( int ui = 0; ui < prefixNumBits; ++ui )
+    {
+      if(prefixSymbol == idx)
+      {
+        m_BinEncoder.encodeBin( 1, Ctx::GBiIdx( ctxIdGBi ) );
+        break;
+      }
+      else
+      {
+        m_BinEncoder.encodeBin( 0, Ctx::GBiIdx( ctxIdGBi ) );
+        ctxIdGBi += step;
+        idx += step;
+      }
+    }
+  }
+
+  DTRACE( g_trace_ctx, D_SYNTAX, "cu_gbi_flag() gbi_idx=%d\n", cu.GBiIdx ? 1 : 0 );
+}
+#endif
 
 void CABACWriter::intra_luma_pred_modes( const CodingUnit& cu )
 {
@@ -2198,7 +2258,10 @@ void CABACWriter::imv_mode( const CodingUnit& cu )
   }
 
   unsigned ctxId = DeriveCtx::CtxIMVFlag( cu );
-  m_BinEncoder.encodeBin( ( cu.imv > 0 ), Ctx::ImvFlag( ctxId ) );
+#if JVET_K0076_CPR
+  if (!(cu.firstPU->interDir == 1 && cu.cs->slice->getRefPic(REF_PIC_LIST_0, cu.firstPU->refIdx[REF_PIC_LIST_0])->getPOC() == cu.cs->slice->getPOC())) // the first bin of IMV flag does need to be signaled in CPR block
+#endif
+    m_BinEncoder.encodeBin( ( cu.imv > 0 ), Ctx::ImvFlag( ctxId ) );
   DTRACE( g_trace_ctx, D_SYNTAX, "imv_mode() value=%d ctx=%d\n", (cu.imv > 0), ctxId );
 
   if( spsNext.getImvMode() == IMV_4PEL && cu.imv > 0 )

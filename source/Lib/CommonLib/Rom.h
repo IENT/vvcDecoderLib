@@ -310,6 +310,24 @@ extern const int g_ipred_mode_table[];
 #endif
 #endif
 #endif
+#if JVET_K0248_GBI
+extern const int8_t g_GbiLog2WeightBase;
+extern const int8_t g_GbiWeightBase;
+extern const int8_t g_GbiWeights[GBI_NUM];
+extern const int8_t g_GbiSearchOrder[GBI_NUM];
+extern       int8_t g_GbiCodingOrder[GBI_NUM];
+extern       int8_t g_GbiParsingOrder[GBI_NUM];
+int8_t getGbiWeight(uint8_t gbiIdx, uint8_t uhRefFrmList);
+
+class CodingStructure;
+void resetGbiCodingOrder(bool bRunDecoding, const CodingStructure &cs);
+uint32_t deriveWeightIdxBits(uint8_t gbiIdx);
+
+template<int32_t n> int32_t integerScalor(Pel p);
+extern int32_t(*g_apIntMultiplier[])(Pel);
+
+#define GET_INT_MULTIPLIER(w)  (*( g_apIntMultiplier - (-2) + (w) ))   // Make sure -2 is the minimal weight values defined in g_apIntMultiplier
+#endif 
 
 #if JVET_K0371_ALF
 constexpr uint8_t g_tbMax[257] = { 0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,

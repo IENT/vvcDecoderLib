@@ -48,6 +48,10 @@
 #if RExt__DECODER_DEBUG_TOOL_STATISTICS
 #include "CommonLib/CodingStatistics.h"
 #endif
+#if K0149_BLOCK_STATISTICS
+#include "CommonLib/ChromaFormat.h"
+#include "CommonLib/dtrace_blockstatistics.h"
+#endif
 
 //! \ingroup DecoderLib
 //! \{
@@ -92,10 +96,19 @@ void DecCu::decompressCtu( CodingStructure& cs, const UnitArea& ctuArea )
 
     for( auto &currCU : cs.traverseCUs( CS::getArea( cs, ctuArea, chType ), chType ) )
     {
+#if JVET_K0076_CPR_DT
+      cs.chType = chType;
+      if (currCU.predMode != MODE_INTRA && currCU.Y().valid())
+      {
+        xDeriveCUMV(currCU);
+      }
+#endif
       switch( currCU.predMode )
       {
       case MODE_INTER:
+#if !JVET_K0076_CPR_DT
         xDeriveCUMV( currCU );
+#endif
         xReconInter( currCU );
         break;
       case MODE_INTRA:
@@ -114,6 +127,9 @@ void DecCu::decompressCtu( CodingStructure& cs, const UnitArea& ctuArea )
       DTRACE_BLOCK_REC( cs.picture->getRecoBuf( currCU ), currCU, currCU.predMode );
     }
   }
+#if K0149_BLOCK_STATISTICS
+  getAndStoreBlockStatistics(cs, ctuArea);
+#endif
 }
 
 // ====================================================================================================================
@@ -340,7 +356,20 @@ void DecCu::xFillPCMBuffer(CodingUnit &cu)
 void DecCu::xReconInter(CodingUnit &cu)
 {
   // inter prediction
+#if JVET_K0076_CPR_DT
+  const bool luma = cu.Y().valid();
+  const bool chroma = cu.Cb().valid();
+  if (luma && chroma)
+  {
+    m_pcInterPred->motionCompensation(cu);
+  }
+  else
+  {
+    m_pcInterPred->motionCompensation(cu, REF_PIC_LIST_0, luma, chroma);
+  }
+#else
   m_pcInterPred->motionCompensation( cu );
+#endif
 #if JEM_TOOLS
   m_pcInterPred->subBlockOBMC      ( cu );
 #endif
@@ -443,7 +472,9 @@ void DecCu::xDeriveCUMV( CodingUnit &cu )
       CodingStatistics::IncrementStatisticTool(CodingStatisticsClassType{ STATS__TOOL_AFF, pu.Y().width, pu.Y().height });
 #endif
 #endif
-
+#if JVET_K0248_GBI
+    uint8_t gbiIdx = GBI_DEFAULT;
+#endif
     if( pu.mergeFlag )
     {
 #if JEM_TOOLS
@@ -466,7 +497,11 @@ void DecCu::xDeriveCUMV( CodingUnit &cu )
           MvField       affineMvField[2][3];
           unsigned char interDirNeighbours;
           int           numValidMergeCand;
+#if JVET_K0248_GBI
+          PU::getAffineMergeCand( pu, affineMvField, interDirNeighbours, gbiIdx, numValidMergeCand);
+#else
           PU::getAffineMergeCand( pu, affineMvField, interDirNeighbours, numValidMergeCand );
+#endif
           pu.interDir = interDirNeighbours;
           for( int i = 0; i < 2; ++i )
           {
@@ -478,6 +513,9 @@ void DecCu::xDeriveCUMV( CodingUnit &cu )
               pu.mvpNum[i] = 0;
               pu.mvd[i]    = Mv();
               PU::setAllAffineMvField( pu, mvField, RefPicList( i ) );
+#if JVET_K0248_GBI
+              pu.cu->GBiIdx = gbiIdx;
+#endif
             }
           }
           PU::spanMotionInfo( pu, mrgCtx );
@@ -522,6 +560,9 @@ void DecCu::xDeriveCUMV( CodingUnit &cu )
             pu.mv    [REF_PIC_LIST_1] = Mv(0, 0);
             pu.refIdx[REF_PIC_LIST_1] = -1;
             pu.interDir               =  1;
+#if JVET_K0248_GBI
+            pu.cu->GBiIdx = GBI_DEFAULT;
+#endif
           }
 
           PU::spanMotionInfo( pu, mrgCtx );
@@ -612,7 +653,20 @@ void DecCu::xDeriveCUMV( CodingUnit &cu )
               PU::fillMvpCand(pu, eRefList, pu.refIdx[eRefList], amvpInfo);
 #endif
               pu.mvpNum [eRefList] = amvpInfo.numCand;
+#if JVET_K0076_CPR
+              Mv mvd = pu.mvd[eRefList];
+              if (eRefList == REF_PIC_LIST_0 && pu.cs->slice->getRefPic(eRefList, pu.refIdx[eRefList])->getPOC() == pu.cs->slice->getPOC())
+              {
+                pu.cu->ibc = true;
+#if REUSE_CU_RESULTS
+                if (!cu.cs->pcv->isEncoder)
+#endif
+                  mvd <<= 2;
+              }
+              pu.mv[eRefList] = amvpInfo.mvCand[pu.mvpIdx[eRefList]] + mvd;
+#else
               pu.mv     [eRefList] = amvpInfo.mvCand[pu.mvpIdx [eRefList]] + pu.mvd[eRefList];
+#endif
 
 #if JEM_TOOLS || JVET_K_AFFINE
               if( pu.cs->sps->getSpsNext().getUseAffine() )

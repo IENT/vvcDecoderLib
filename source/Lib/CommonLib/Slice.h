@@ -875,6 +875,9 @@ private:
   bool              m_DMVR;                       // 26
   bool              m_MDMS;                       // 27
 #endif
+#if JVET_K0248_GBI
+  bool              m_GBi;                        // 28
+#endif
   bool              m_MTTEnabled;                 //
 #if ENABLE_WPP_PARALLELISM
   bool              m_NextDQP;
@@ -936,6 +939,12 @@ private:
 #endif
 #if JEM_TOOLS
   unsigned    m_CIPFMode;
+#endif
+#if JVET_K0157
+  bool              m_compositeRefEnabled;        //composite longterm reference
+#endif
+#if JVET_K0076_CPR
+  unsigned    m_IBCMode;
 #endif
   // ADD_NEW_TOOL : (sps extension) add tool enabling flags and associated parameters here
 
@@ -1070,7 +1079,10 @@ public:
   void      setUseMDMS            ( bool b )                                        { m_MDMS = b; }
   bool      getUseMDMS            ()                                      const     { return m_MDMS; }
 #endif
-
+#if JVET_K0248_GBI
+  void      setUseGBi             ( bool b )                                        { m_GBi = b; }
+  bool      getUseGBi             ()                                      const     { return m_GBi; }
+#endif
   //=====  additional parameters  =====
   // qtbt
   void      setCTUSize            ( unsigned    ctuSize )                           { m_CTUSize = ctuSize; }
@@ -1157,6 +1169,14 @@ public:
   int       getIntraPDPCMode      ()                                      const     { return m_IntraPDPCMode; }
   bool      isIntraPDPC           ()                                      const     { return 0 != (m_IntraPDPCMode&1); }
   bool      isPlanarPDPC          ()                                      const     { return 0 != (m_IntraPDPCMode&2); }
+#endif
+#if JVET_K0157
+  void      setUseCompositeRef(bool b) { m_compositeRefEnabled = b; }
+  bool      getUseCompositeRef()                                      const { return m_compositeRefEnabled; }
+#endif
+#if JVET_K0076_CPR
+  void      setIBCMode            (unsigned IBCMode)                                { m_IBCMode = IBCMode; }
+  unsigned  getIBCMode            ()                                      const     { return m_IBCMode; }
 #endif
   // ADD_NEW_TOOL : (sps extension) add access functions for tool enabling flags and associated parameters here
 
@@ -1985,9 +2005,13 @@ public:
   bool                        isTemporalLayerSwitchingPoint( PicList& rcListPic )                                           const;
   bool                        isStepwiseTemporalLayerSwitchingPointCandidate( PicList& rcListPic )                          const;
   int                         checkThatAllRefPicsAreAvailable( PicList& rcListPic, const ReferencePictureSet *pReferencePictureSet, bool printErrors, int pocRandomAccess = 0, bool bUseRecoveryPoint = false) const;
-  void                        createExplicitReferencePictureSetFromReference( PicList& rcListPic, const ReferencePictureSet *pReferencePictureSet, bool isRAP, int pocRandomAccess, bool bUseRecoveryPoint, const bool bEfficientFieldIRAPEnabled);
+  void                        createExplicitReferencePictureSetFromReference(PicList& rcListPic, const ReferencePictureSet *pReferencePictureSet, bool isRAP, int pocRandomAccess, bool bUseRecoveryPoint, const bool bEfficientFieldIRAPEnabled
+#if JVET_K0157
+                              , bool isEncodeLtRef, bool isCompositeRefEnable
+#endif
+  );
   void                        setMaxNumMergeCand(uint32_t val )                          { m_maxNumMergeCand = val;                                      }
-  uint32_t                        getMaxNumMergeCand() const                             { return m_maxNumMergeCand;                                     }
+  uint32_t                    getMaxNumMergeCand() const                             { return m_maxNumMergeCand;                                     }
 
   void                        setNoOutputPriorPicsFlag( bool val )                   { m_noOutputPriorPicsFlag = val;                                }
   bool                        getNoOutputPriorPicsFlag() const                       { return m_noOutputPriorPicsFlag;                               }

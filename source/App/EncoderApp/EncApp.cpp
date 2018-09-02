@@ -301,6 +301,22 @@ void EncApp::xInitLibCfg()
   m_cEncLib.setUseDMVR                                           ( m_DMVR );
   m_cEncLib.setMDMS                                              ( m_MDMS );
 #endif
+#if JVET_K0157
+  m_cEncLib.setUseCompositeRef                                   ( m_compositeRefEnabled );
+#endif
+#if JVET_K0076_CPR
+  m_cEncLib.setIBCMode                                           ( m_IBCMode );
+  m_cEncLib.setIBCLocalSearchRangeX                              ( m_IBCLocalSearchRangeX );
+  m_cEncLib.setIBCLocalSearchRangeY                              ( m_IBCLocalSearchRangeY );
+  m_cEncLib.setIBCHashSearch                                     ( m_IBCHashSearch );
+  m_cEncLib.setIBCHashSearchMaxCand                              ( m_IBCHashSearchMaxCand );
+  m_cEncLib.setIBCHashSearchRange4SmallBlk                       ( m_IBCHashSearchRange4SmallBlk );
+  m_cEncLib.setIBCFastMethod                                     ( m_IBCFastMethod );
+#endif
+#if JVET_K0248_GBI
+  m_cEncLib.setUseGBi                                            ( m_GBi );
+  m_cEncLib.setUseGBiFast                                        ( m_GBiFast);
+#endif
   // ADD_NEW_TOOL : (encoder app) add setting of tool enabling flags and associated parameters here
 
   m_cEncLib.setMaxCUWidth                                        ( m_QTBT ? m_uiCTUSize : m_uiMaxCUWidth );
@@ -602,6 +618,17 @@ void EncApp::xCreateLib( std::list<PelUnitBuf*>& recBufList
 #endif
   if (!m_reconFileName.empty())
   {
+    if (m_packedYUVMode && ((m_outputBitDepth[CH_L] != 10 && m_outputBitDepth[CH_L] != 12)
+        || ((m_iSourceWidth & (1 + (m_outputBitDepth[CH_L] & 3))) != 0)))
+    {
+      EXIT ("Invalid output bit-depth or image width for packed YUV output, aborting\n");
+    }
+    if (m_packedYUVMode && (m_chromaFormatIDC != CHROMA_400) && ((m_outputBitDepth[CH_C] != 10 && m_outputBitDepth[CH_C] != 12)
+        || (((m_iSourceWidth / SPS::getWinUnitX (m_chromaFormatIDC)) & (1 + (m_outputBitDepth[CH_C] & 3))) != 0)))
+    {
+      EXIT ("Invalid chroma output bit-depth or image width for packed YUV output, aborting\n");
+    }
+
     m_cVideoIOYuvReconFile.open(m_reconFileName, true, m_outputBitDepth, m_outputBitDepth, m_internalBitDepth);  // write mode
   }
 
@@ -790,7 +817,10 @@ void EncApp::xWriteOutput( int iNumEncoded, std::list<PelUnitBuf*>& recBufList
 
       if (!m_reconFileName.empty())
       {
-        m_cVideoIOYuvReconFile.write( *pcPicYuvRecTop, *pcPicYuvRecBottom, ipCSC, m_confWinLeft, m_confWinRight, m_confWinTop, m_confWinBottom, NUM_CHROMA_FORMAT, m_isTopFieldFirst );
+        m_cVideoIOYuvReconFile.write( *pcPicYuvRecTop, *pcPicYuvRecBottom,
+                                      ipCSC,
+                                      false, // TODO: m_packedYUVMode,
+                                      m_confWinLeft, m_confWinRight, m_confWinTop, m_confWinBottom, NUM_CHROMA_FORMAT, m_isTopFieldFirst );
       }
     }
   }
@@ -802,7 +832,9 @@ void EncApp::xWriteOutput( int iNumEncoded, std::list<PelUnitBuf*>& recBufList
       if (!m_reconFileName.empty())
       {
         m_cVideoIOYuvReconFile.write( *pcPicYuvRec,
-                                      ipCSC, m_confWinLeft, m_confWinRight, m_confWinTop, m_confWinBottom, NUM_CHROMA_FORMAT, m_bClipOutputVideoToRec709Range );
+                                      ipCSC,
+                                      m_packedYUVMode,
+                                      m_confWinLeft, m_confWinRight, m_confWinTop, m_confWinBottom, NUM_CHROMA_FORMAT, m_bClipOutputVideoToRec709Range );
       }
     }
   }

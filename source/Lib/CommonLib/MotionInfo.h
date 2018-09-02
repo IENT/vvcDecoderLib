@@ -111,7 +111,9 @@ struct MotionInfo
 
   Mv      mv     [ NUM_REF_PIC_LIST_01 ];
   int16_t   refIdx [ NUM_REF_PIC_LIST_01 ];
-
+#if JVET_K0076_CPR
+  Mv      bv;
+#endif
 #if JEM_TOOLS
   MotionInfo()        : isInter(  false ), usesLIC( false ), interDir( 0 ), sliceIdx( 0 ), refIdx{ NOT_VALID, NOT_VALID } { }
   // ensure that MotionInfo(0) produces '\x000....' bit pattern - needed to work with AreaBuf - don't use this constructor for anything else
@@ -154,5 +156,68 @@ struct MotionInfo
     return !( *this == mi );
   }
 };
+
+#if JVET_K0248_GBI
+class GBiMotionParam
+{
+  bool       m_readOnly[2][33];       // 2 RefLists, 33 RefFrams
+  Mv         m_mv[2][33];             
+  Distortion m_dist[2][33];          
+
+  bool       m_readOnlyAffine[2][33];
+  Mv         m_mvAffine[2][33][3];   
+  Distortion m_distAffine[2][33];    
+
+public:
+
+  void reset()
+  {
+    Mv* pMv = &( m_mv[0][0] );
+    for( int ui = 0; ui < 1 * 2 * 33; ++ui, ++pMv )
+    {
+      pMv->set( std::numeric_limits<int16_t>::max(), std::numeric_limits<int16_t>::max() );
+    }
+    memset( m_readOnly, false, 2 * 33 * sizeof(bool));
+    memset( m_dist, -1, 2 * 33 * sizeof(Distortion));
+    memset( m_readOnlyAffine, false, 2 * 33 * sizeof(bool));
+    memset( m_mvAffine, 0, 2 * 33 * 3 * sizeof(Mv));
+    memset( m_distAffine, -1, 2 * 33 * sizeof(Distortion));
+  }
+
+  void setReadMode( bool b, uint32_t uiRefList, uint32_t uiRefIdx ) { m_readOnly[uiRefList][uiRefIdx] = b; }
+  bool isReadMode( uint32_t uiRefList, uint32_t uiRefIdx ) { return m_readOnly[uiRefList][uiRefIdx]; }
+
+  void setReadModeAffine( bool b, uint32_t uiRefList, uint32_t uiRefIdx ) { m_readOnlyAffine[uiRefList][uiRefIdx] = b; }
+  bool isReadModeAffine( uint32_t uiRefList, uint32_t uiRefIdx ) { return m_readOnlyAffine[uiRefList][uiRefIdx]; }
+
+  Mv&  getMv( uint32_t uiRefList, uint32_t uiRefIdx ) { return m_mv[uiRefList][uiRefIdx]; }
+
+  void copyFrom( Mv& rcMv, Distortion uiDist, uint32_t uiRefList, uint32_t uiRefIdx )
+  {
+    m_mv[uiRefList][uiRefIdx] = rcMv;
+    m_dist[uiRefList][uiRefIdx] = uiDist;
+  }
+
+  void copyTo( Mv& rcMv, Distortion& ruiDist, uint32_t uiRefList, uint32_t uiRefIdx )
+  {
+    rcMv = m_mv[uiRefList][uiRefIdx];
+    ruiDist = m_dist[uiRefList][uiRefIdx];
+  }
+
+  Mv& getAffineMv(uint32_t uiRefList, uint32_t uiRefIdx, uint32_t uiAffineMvIdx ) { return m_mvAffine[uiRefList][uiRefIdx][uiAffineMvIdx]; }
+
+  void copyAffineMvFrom( Mv(&racAffineMvs)[3], Distortion uiDist, uint32_t uiRefList, uint32_t uiRefIdx )
+  {
+    memcpy( m_mvAffine[uiRefList][uiRefIdx], racAffineMvs, 3 * sizeof( Mv ) );
+    m_distAffine[uiRefList][uiRefIdx] = uiDist;
+  }
+
+  void copyAffineMvTo( Mv acAffineMvs[3], Distortion& ruiDist, uint32_t uiRefList, uint32_t uiRefIdx )
+  {
+    memcpy( acAffineMvs, m_mvAffine[uiRefList][uiRefIdx], 3 * sizeof( Mv ) );
+    ruiDist = m_distAffine[uiRefList][uiRefIdx];
+  }
+};
+#endif
 
 #endif // __MOTIONINFO__

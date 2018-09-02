@@ -209,7 +209,81 @@ int g_aiLMCodeWord[LM_SYMBOL_NUM][16];
 const int g_ipred_mode_table[] = { 1,1,1,2,2,2,3,3,3,4,4,4,5,5,5,6,6,6,7,7,7,8,8,8,9,9,9,10,10,10,11,11,11,12,12,12,13,13,13,14,14,14,15,15,15 };
 #endif
 #endif
+#endif
 
+#if JVET_K0248_GBI
+const int8_t g_GbiLog2WeightBase = 3;
+const int8_t g_GbiWeightBase = ( 1 << g_GbiLog2WeightBase);
+const int8_t g_GbiWeights[GBI_NUM] = { -2, 3, 4, 5, 10 };
+const int8_t g_GbiSearchOrder[GBI_NUM] = { GBI_DEFAULT, GBI_DEFAULT - 2, GBI_DEFAULT + 2, GBI_DEFAULT - 1, GBI_DEFAULT + 1 };
+int8_t g_GbiCodingOrder[GBI_NUM];
+int8_t g_GbiParsingOrder[GBI_NUM];
+
+int8_t getGbiWeight( uint8_t gbiIdx, uint8_t uhRefFrmList )
+{
+  // Weghts for the model: P0 + w * (P1 - P0) = (1-w) * P0 + w * P1
+  // Retuning  1-w for P0 or w for P1
+  return ( uhRefFrmList == REF_PIC_LIST_0 ? g_GbiWeightBase - g_GbiWeights[gbiIdx] : g_GbiWeights[gbiIdx] );
+}
+
+void resetGbiCodingOrder( bool bRunDecoding, const CodingStructure &cs )
+{
+  // Form parsing order: { GBI_DEFAULT, GBI_DEFAULT+1, GBI_DEFAULT-1, GBI_DEFAULT+2, GBI_DEFAULT-2, ... }
+  g_GbiParsingOrder[0] = GBI_DEFAULT;
+  for (int i = 1; i <= (GBI_NUM >> 1); ++i)
+  {
+    g_GbiParsingOrder[2 * i - 1] = GBI_DEFAULT + (int8_t)i;
+    g_GbiParsingOrder[2 * i] = GBI_DEFAULT - (int8_t)i;
+  }
+
+  // Form encoding order
+  if (!bRunDecoding)
+  {
+    for (int i = 0; i < GBI_NUM; ++i)
+    {
+      g_GbiCodingOrder[(uint32_t)g_GbiParsingOrder[i]] = i;
+    }
+  }
+}
+
+uint32_t deriveWeightIdxBits( uint8_t gbiIdx ) // Note: align this with TEncSbac::codeGbiIdx and TDecSbac::parseGbiIdx
+{
+  uint32_t numBits = 1;
+  uint8_t  gbiCodingIdx = (uint8_t)g_GbiCodingOrder[gbiIdx];
+
+  if(GBI_NUM > 2 && gbiCodingIdx != 0 )
+  {
+    uint32_t prefixNumBits = GBI_NUM - 2;
+    uint32_t step = 1;
+    uint8_t  prefixSymbol = gbiCodingIdx;
+
+    // Truncated unary code
+    uint8_t idx = 1;
+    for( int ui = 0; ui < prefixNumBits; ++ui )
+    {
+      if(prefixSymbol == idx)
+      {
+        ++numBits;
+        break;
+      }
+      else
+      {
+        ++numBits;
+        idx += step;
+      }
+    }
+  }
+  return numBits;
+}
+
+int32_t(*g_apIntMultiplier[])(Pel) =  // NOTE: Make sure these operators cover all the weights specified in g_GbiWeights
+{
+  &integerScalor< -2>, &integerScalor< -1>,
+  &integerScalor<  0>, &integerScalor<  1>, &integerScalor<  2>, &integerScalor<  3>, &integerScalor<  4>,
+  &integerScalor<  5>, &integerScalor<  6>, &integerScalor<  7>, &integerScalor<  8>, &integerScalor<  9>,
+  &integerScalor< 10>
+};
+template<int32_t n> int32_t integerScalor(Pel p) { return p * n; }
 #endif
 
 // initialize ROM variables
