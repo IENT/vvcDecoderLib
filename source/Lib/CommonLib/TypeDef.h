@@ -50,13 +50,25 @@
 #include <assert.h>
 #include <cassert>
 
+#ifndef BMS_TOOLS
+#define BMS_TOOLS                                         1 // Inclusion of BMS only tools (which include JEM tools) into compiled executable
+#endif
+
+#if BMS_TOOLS
+#define JEM_TOOLS                                         1
 #define JVET_K0076_CPR                                    1 // current picture referencing or intra block copy mode
+#define JVET_K0248_GBI                                    1
+#define JVET_K0485_BIO                                    1 // BIO simplifications
+#else
+#define JEM_TOOLS                                         0
+#define JVET_K0076_CPR                                    0 // current picture referencing or intra block copy mode
+#define JVET_K0248_GBI                                    0
+#define JVET_K0485_BIO                                    0 // BIO simplifications
+#endif
+
 #if JVET_K0076_CPR
 #define JVET_K0076_CPR_DT                                 1 // dualItree support for CPR
 #endif
-
-
-#define JVET_K0248_GBI                                    1
 
 #define JVET_K1000_SIMPLIFIED_EMT                         1 // EMT with only DCT-2, DCT-8 and DST-7
 
@@ -118,15 +130,10 @@
 
 #define JVET_K0357_AMVR                                   1 // Adaptive motion vector resolution separated from JEM_TOOLS macro
 
-#define JVET_K0485_BIO                                    1 // BIO simplifications
 #if JVET_K0485_BIO
 #define JVET_K0485_BIO_EXTEND_SIZE                        1
 #endif
 
-#ifndef JEM_TOOLS
-#define JEM_TOOLS                                         1 // Defines the inclusion of JEM tools into compiled executable
-
-#endif
 #ifndef JVET_B0051_NON_MPM_MODE
 #define JVET_B0051_NON_MPM_MODE                         ( 1 && JEM_TOOLS )
 
