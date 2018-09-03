@@ -1339,6 +1339,11 @@ void InterSearch::xIntraBlockCopyEstimation(PredictionUnit& pu, PelUnitBuf& orig
     Mv        cMvSrchRngLT;
     Mv        cMvSrchRngRB;
 
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
+	cMvSrchRngLT.highPrec = false;
+	cMvSrchRngRB.highPrec = false;
+#endif
+
     PelUnitBuf* pBuf = &origBuf;
 
     //  Search key pattern initialization
@@ -1383,8 +1388,14 @@ void InterSearch::xSetIntraSearchRange(PredictionUnit& pu, Mv& cMvPred, int iRoi
   const SPS &sps = *pu.cs->sps;
 
   Mv cTmpMvPred = cMvPred;
-
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
+  int iMvShift1 = 2 + (cTmpMvPred.highPrec ? VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : 0);
+#else
+  int iMvShift1 = 2;
+#endif
+  cTmpMvPred <<= iMvShift1;
   clipMv(cTmpMvPred, pu.cu->lumaPos(), sps);
+  cTmpMvPred >>= iMvShift1;
 
   int srLeft, srRight, srTop, srBottom;
 
@@ -1395,9 +1406,9 @@ void InterSearch::xSetIntraSearchRange(PredictionUnit& pu, Mv& cMvPred, int iRoi
   const int iPicHeight = pu.cs->slice->getSPS()->getPicHeightInLumaSamples();
 
   srLeft = -std::min(cuPelX, localSearchRangeX);
-  srTop = -std::min(cuPelY, localSearchRangeX);
+  srTop = -std::min(cuPelY, localSearchRangeY);
 
-  srRight = std::min(iPicWidth - cuPelX - iRoiWidth, localSearchRangeY);
+  srRight = std::min(iPicWidth - cuPelX - iRoiWidth, localSearchRangeX);
   srBottom = std::min(iPicHeight - cuPelY - iRoiHeight, localSearchRangeY);
 
   rcMvSrchRngLT.setHor(srLeft);
@@ -1405,8 +1416,12 @@ void InterSearch::xSetIntraSearchRange(PredictionUnit& pu, Mv& cMvPred, int iRoi
   rcMvSrchRngRB.setHor(srRight);
   rcMvSrchRngRB.setVer(srBottom);
 
+  rcMvSrchRngLT <<= 2;
+  rcMvSrchRngRB <<= 2;
   clipMv(rcMvSrchRngLT, pu.cu->lumaPos(), sps);
   clipMv(rcMvSrchRngRB, pu.cu->lumaPos(), sps);
+  rcMvSrchRngLT >>= 2;
+  rcMvSrchRngRB >>= 2;
 }
 
 bool InterSearch::predIntraBCSearch(CodingUnit& cu, Partitioner& partitioner, const int localSearchRangeX, const int localSearchRangeY, IbcHashMap& ibcHashMap)
