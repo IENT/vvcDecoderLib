@@ -93,9 +93,7 @@
 #define JVET_K0554                                        1 // when adopting, also remove the macro HM_QTBT_ONLY_QT_IMPLICIT (keep the case for value 0)
 
 #define JVET_K0346                                        1 // simplifications on ATMVP
-#if JVET_K0346
-#define SEQ_ENCODING_BF                                   1 // bug-fix for the mismatch between sequential and parallel encoding of JVET-K0346
-#endif
+
 #define JVET_K0063_PDPC_SIMP                              1 // Simplified PDPC
 
 #define JVET_K0351_LESS_CONSTRAINT                        1 // Only disallow binary split with same orientation in center partition of the ternary split and release the other constraints in K0351.
