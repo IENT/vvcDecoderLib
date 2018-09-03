@@ -2037,7 +2037,7 @@ void EncCu::xCheckRDCostInter( CodingStructure *&tempCS, CodingStructure *&bestC
 #if JEM_TOOLS || JVET_K0357_AMVR || JVET_K1000_SIMPLIFIED_EMT
   xEncodeInterResidual(tempCS, bestCS, partitioner, encTestMode, 0
 #if JVET_K0357_AMVR
-    , (m_pImvTempCS ? m_pImvTempCS[wIdx][encTestMode.partSize] : NULL)
+    , m_pImvTempCS ? m_pImvTempCS[wIdx][encTestMode.partSize] : NULL
 #endif
   );
 #else
@@ -2106,7 +2106,7 @@ void EncCu::xCheckRDCostInterWoOBMC( CodingStructure *&tempCS, CodingStructure *
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT || JVET_K0357_AMVR
   xEncodeInterResidual(tempCS, bestCS, partitioner, encTestMode, 0
 #if JVET_K0357_AMVR
-    , (m_pImvTempCS ? m_pImvTempCS[wIdx][encTestMode.partSize] : NULL)
+    , m_pImvTempCS ? m_pImvTempCS[wIdx][encTestMode.partSize] : NULL
 #endif
 #if JVET_K1000_SIMPLIFIED_EMT
     , !m_pcEncCfg->getFastInterEMT()
@@ -2455,14 +2455,13 @@ void EncCu::xEncodeInterResidual( CodingStructure *&tempCS, CodingStructure *&be
     const bool skipResidual = residualPass == 1;
     m_pcInterSearch->encodeResAndCalcRdInterCU( *tempCS, partitioner, skipResidual );
 
-#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
-    double emtFirstPassCost = tempCS->cost;
-#endif
-
     xEncodeDontSplit( *tempCS, partitioner );
 
     xCheckDQP( *tempCS, partitioner );
 
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
+    double emtFirstPassCost = tempCS->cost;
+#endif
 #if JEM_TOOLS
     double emtFirstPassCostFruc = tempCS->cost;
 #endif
@@ -2475,7 +2474,6 @@ void EncCu::xEncodeInterResidual( CodingStructure *&tempCS, CodingStructure *&be
       }
       imvCS->copyStructure( *tempCS, partitioner.chType );
     }
-
 #endif
     if( NULL != bestHasNonResi && (bestCostInternal > tempCS->cost) )
     {
@@ -2496,16 +2494,15 @@ void EncCu::xEncodeInterResidual( CodingStructure *&tempCS, CodingStructure *&be
     {
       const double thresholdToSkipEmtSecondPass = 1.1; // Skip checking EMT transforms
       const bool bCond1 = !cu->firstTU->cbf[COMPONENT_Y];
+
 #if JEM_TOOLS
       const bool bCond2 = bMergeFruc && (emtFirstPassCostFruc > (bestCost * thresholdToSkipEmtSecondPass));
       const bool bCond3 = !bMergeFruc && (emtFirstPassCost > (bestCost * thresholdToSkipEmtSecondPass));
-#elif JVET_K1000_SIMPLIFIED_EMT
-      const bool bCond3 = emtFirstPassCost > ( bestCost * thresholdToSkipEmtSecondPass );
-#endif
 
-#if JEM_TOOLS
-      if( m_pcEncCfg->getFastInterEMT() && (bCond1 || bCond2 || bCond3 ) ) 
+      if( m_pcEncCfg->getFastInterEMT() && (bCond1 || bCond2 || bCond3 ) )
 #else
+      const bool bCond3 = emtFirstPassCost > ( bestCost * thresholdToSkipEmtSecondPass );
+
       if( m_pcEncCfg->getFastInterEMT() && (bCond1 || bCond3 ) ) 
 #endif
       {
