@@ -69,9 +69,10 @@ struct PelBufferOps
   void ( *linTf4 )        ( const Pel* src0, int src0Stride,                                  Pel *dst, int dstStride, int width, int height, int scale, int shift, int offset, const ClpRng& clpRng, bool bClip );
   void ( *linTf8 )        ( const Pel* src0, int src0Stride,                                  Pel *dst, int dstStride, int width, int height, int scale, int shift, int offset, const ClpRng& clpRng, bool bClip );
 #if JVET_K0485_BIO
-  void(*addBIOAvg4)          (const Pel* src0, int src0Stride, const Pel* src1, int src1Stride, Pel *dst, int dstStride, const Pel *pGradX0, const Pel *pGradX1, const Pel *pGradY0, const Pel*pGradY1, int gradStride, int width, int height, int tmpx, int tmpy, int shift, int offset, const ClpRng& clpRng);
+  void ( *addBIOAvg4 )    ( const Pel* src0, int src0Stride, const Pel* src1, int src1Stride, Pel *dst, int dstStride, const Pel *pGradX0, const Pel *pGradX1, const Pel *pGradY0, const Pel*pGradY1, int gradStride, int width, int height, int tmpx, int tmpy, int shift, int offset, const ClpRng& clpRng);
 #if JVET_K0248_GBI
-  void(*addBIOAvg4GBI)    (const Pel* src0, int src0Stride, const Pel* src1, int src1Stride, Pel *dst, int dstStride, const Pel *pGradX0, const Pel *pGradX1, const Pel *pGradY0, const Pel*pGradY1, int gradStride, int width, int height, int tmpx, int tmpy, int shift, int offset, const ClpRng& clpRng, const uint8_t gbiIdx);
+  void ( *addBIOAvg4GBI ) ( const Pel* src0, int src0Stride, const Pel* src1, int src1Stride, Pel *dst, int dstStride, const Pel *pGradX0, const Pel *pGradX1, const Pel *pGradY0, const Pel*pGradY1, int gradStride, int width, int height, int tmpx, int tmpy, int shift, int offset, const ClpRng& clpRng, uint8_t gbiIdx);
+  void ( *addAvg4GBI )    ( const Pel* src0, int src0Stride, const Pel* src1, int src1Stride, Pel *dst, int dstStride, int width, int height, int shift, int offset, const ClpRng& clpRng, uint8_t gbiIdx);
 #endif
 #endif
 };
