@@ -126,6 +126,26 @@ void addBIOAvgCoreGBI(const Pel* src0, int src0Stride, const Pel* src1, int src1
     pGradX0 += gradStride; pGradX1 += gradStride; pGradY0 += gradStride; pGradY1 += gradStride;
   }
 }
+void addAvgCoreGBI(const Pel* src1, int src1Stride, const Pel* src2, int src2Stride, Pel* dest, int dstStride, int width, int height, int rshift, int offset, const ClpRng& clpRng, uint8_t gbiIdx)
+{
+  const int8_t w0 = getGbiWeight(gbiIdx, REF_PIC_LIST_0);
+  const int8_t w1 = getGbiWeight(gbiIdx, REF_PIC_LIST_1);
+  int32_t(*pMulW0)(Pel) = GET_INT_MULTIPLIER(w0);
+  int32_t(*pMulW1)(Pel) = GET_INT_MULTIPLIER(w1);
+
+  for (int y = 0; y < height; y++)
+  {
+    for (int x = 0; x < width; x += 4)
+    {
+      dest[x  ] = ClipPel((int16_t)rightShift(((int64_t)pMulW0(src1[x]  ) + (int64_t)pMulW1(src2[x  ]) + (int64_t)offset), rshift), clpRng);
+      dest[x+1] = ClipPel((int16_t)rightShift(((int64_t)pMulW0(src1[x+1]) + (int64_t)pMulW1(src2[x+1]) + (int64_t)offset), rshift), clpRng);
+      dest[x+2] = ClipPel((int16_t)rightShift(((int64_t)pMulW0(src1[x+2]) + (int64_t)pMulW1(src2[x+2]) + (int64_t)offset), rshift), clpRng);
+      dest[x+3] = ClipPel((int16_t)rightShift(((int64_t)pMulW0(src1[x+3]) + (int64_t)pMulW1(src2[x+3]) + (int64_t)offset), rshift), clpRng);
+
+    }
+    dest += dstStride;       src1 += src1Stride;     src2 += src2Stride;
+  }
+}
 #endif
 #endif
 
@@ -167,6 +187,7 @@ PelBufferOps::PelBufferOps()
   addBIOAvg4    = addBIOAvgCore;
 #if JVET_K0248_GBI
   addBIOAvg4GBI = addBIOAvgCoreGBI;
+  addAvg4GBI    = addAvgCoreGBI;
 #endif
 
 #endif

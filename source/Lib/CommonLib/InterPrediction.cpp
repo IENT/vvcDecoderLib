@@ -1619,14 +1619,14 @@ void InterPrediction::applyBiOptFlow( const PredictionUnit &pu, const CPelUnitBu
     }
   }
 #endif
-  
+
   const ClpRng& clpRng        = pu.cu->cs->slice->clpRng(COMPONENT_Y);
   const int   bitDepth        = clipBitDepths.recon[ toChannelType(COMPONENT_Y) ];
 #if JVET_K0248_GBI
   const uint8_t gbiIdx        = pu.cu->GBiIdx;
   const int   iLog2WeightBase = g_GbiLog2WeightBase;
   const int   shiftNum        = IF_INTERNAL_PREC + ((gbiIdx != GBI_DEFAULT) ? iLog2WeightBase : 1) - bitDepth;
-  const int   offset          = (1 << (shiftNum - 1)) + ((gbiIdx != GBI_DEFAULT) ? (IF_INTERNAL_OFFS << iLog2WeightBase) : 2 * IF_INTERNAL_OFFS);
+  const int   offset          = (1 << (shiftNum - 1)) + ((gbiIdx != GBI_DEFAULT) ? (IF_INTERNAL_OFFS << iLog2WeightBase) : 2 * IF_INTERNAL_OFFS); 
 #else
   const int   shiftNum        = IF_INTERNAL_PREC + 1 - bitDepth;
   const int   offset          = ( 1 << ( shiftNum - 1 ) ) + 2 * IF_INTERNAL_OFFS;
@@ -1700,10 +1700,10 @@ void InterPrediction::applyBiOptFlow( const PredictionUnit &pu, const CPelUnitBu
         pDstY0 = pDstY + ((yu*iDstStride + xu) << 2);
 #if JVET_K0248_GBI
         if( gbiIdx != GBI_DEFAULT )
-          pcYuvDst.bufs[0].addWeightedAvg(CPelBuf(pSrcY0Temp, iSrc0Stride, pu.lumaSize()), CPelBuf(pSrcY1Temp, iSrc1Stride, pu.lumaSize()), clpRng, gbiIdx);
+          g_pelBufOP.addAvg4GBI(pSrcY0Temp, iSrc0Stride, pSrcY1Temp, iSrc1Stride, pDstY0, iDstStride, (1 << 2), (1 << 2), shiftNum, offset, clpRng, gbiIdx);
         else
 #endif
-        g_pelBufOP.addAvg4(pSrcY0Temp, iSrc0Stride, pSrcY1Temp, iSrc1Stride, pDstY0, iDstStride, (1 << 2), (1 << 2), shiftNum, offset, clpRng);
+          g_pelBufOP.addAvg4(pSrcY0Temp, iSrc0Stride, pSrcY1Temp, iSrc1Stride, pDstY0, iDstStride, (1 << 2), (1 << 2), shiftNum, offset, clpRng);
         continue;
       }
 #endif
@@ -1877,7 +1877,7 @@ void InterPrediction::xWeightedAverage( const PredictionUnit& pu, const CPelUnit
       applyBiOptFlow( pu, pcYuvSrc0, pcYuvSrc1, iRefIdx0, iRefIdx1, pcYuvDst, clipBitDepths );
 #if JVET_K0485_BIO
       else
-#if JVET_K0248_GBI 
+#if JVET_K0248_GBI
       {
         if (pu.cu->GBiIdx != GBI_DEFAULT)
           pcYuvDst.bufs[0].addWeightedAvg(CPelBuf(pSrcY0, src0Stride, pu.lumaSize()), CPelBuf(pSrcY1, src1Stride, pu.lumaSize()), clpRngs.comp[0], pu.cu->GBiIdx);
