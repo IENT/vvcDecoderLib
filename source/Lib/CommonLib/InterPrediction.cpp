@@ -663,10 +663,52 @@ void InterPrediction::xSubPuMC( PredictionUnit& pu, PelUnitBuf& predBuf, const R
 }
 #endif
 
+#if JVET_K0076_CPR_DT
+void InterPrediction::xChromaMC(PredictionUnit &pu, PelUnitBuf& pcYuvPred)
+{
+  // separated tree, chroma
+  const CompArea lumaArea = CompArea(COMPONENT_Y, pu.chromaFormat, pu.Cb().lumaPos(), recalcSize(pu.chromaFormat, CHANNEL_TYPE_CHROMA, CHANNEL_TYPE_LUMA, pu.Cb().size()));
+  PredictionUnit subPu;
+  subPu.cs = pu.cs;
+  subPu.cu = pu.cu;
+  
+  Picture * refPic = pu.cu->slice->getPic();
+  for (int y = lumaArea.y; y < lumaArea.y + lumaArea.height; y += MIN_PU_SIZE)
+  {
+    for (int x = lumaArea.x; x < lumaArea.x + lumaArea.width; x += MIN_PU_SIZE)
+    {
+      const MotionInfo &curMi = pu.cs->picture->cs->getMotionInfo(Position{ x, y });
+      
+      subPu.UnitArea::operator=(UnitArea(pu.chromaFormat, Area(x, y, MIN_PU_SIZE, MIN_PU_SIZE)));
+      PelUnitBuf subPredBuf = pcYuvPred.subBuf(UnitAreaRelative(pu, subPu));
+      
+      xPredInterBlk(COMPONENT_Cb, subPu, refPic, curMi.mv[0], subPredBuf, false, pu.cu->slice->clpRng(COMPONENT_Cb)
 #if JEM_TOOLS
-void InterPrediction::xPredInterUni(const PredictionUnit& pu, const RefPicList& eRefPicList, PelUnitBuf& pcYuvPred, const bool& bi, const bool& bBIOApplied /*= false*/, const bool& bDMVRApplied /*= false*/ )
+        , false, false, FRUC_MERGE_OFF, false
+#endif
+      );
+      xPredInterBlk(COMPONENT_Cr, subPu, refPic, curMi.mv[0], subPredBuf, false, pu.cu->slice->clpRng(COMPONENT_Cr)
+#if JEM_TOOLS
+        , false, false, FRUC_MERGE_OFF, false
+#endif
+      );
+    }
+  }
+}
+#endif
+
+#if JEM_TOOLS
+void InterPrediction::xPredInterUni(const PredictionUnit& pu, const RefPicList& eRefPicList, PelUnitBuf& pcYuvPred, const bool& bi, const bool& bBIOApplied /*= false*/, const bool& bDMVRApplied /*= false*/ 
+#if JVET_K0076_CPR_DT
+  , const bool luma, const bool chroma
+#endif
+)
 #else
-void InterPrediction::xPredInterUni(const PredictionUnit& pu, const RefPicList& eRefPicList, PelUnitBuf& pcYuvPred, const bool& bi )
+void InterPrediction::xPredInterUni(const PredictionUnit& pu, const RefPicList& eRefPicList, PelUnitBuf& pcYuvPred, const bool& bi 
+#if JVET_K0076_CPR_DT
+  , const bool luma, const bool chroma
+#endif
+)
 #endif
 {
   const SPS &sps = *pu.cs->sps;
@@ -702,7 +744,12 @@ void InterPrediction::xPredInterUni(const PredictionUnit& pu, const RefPicList& 
   for( uint32_t comp = COMPONENT_Y; comp < pcYuvPred.bufs.size() && comp <= m_maxCompIDToPred; comp++ )
   {
     const ComponentID compID = ComponentID( comp );
-
+#if JVET_K0076_CPR_DT
+    if (compID == COMPONENT_Y && !luma)
+      continue;
+    if (compID != COMPONENT_Y && !chroma)
+      continue;
+#endif
 #if JEM_TOOLS
     if( pu.cu->affine )
     {
@@ -1572,11 +1619,18 @@ void InterPrediction::applyBiOptFlow( const PredictionUnit &pu, const CPelUnitBu
     }
   }
 #endif
-  
+
   const ClpRng& clpRng        = pu.cu->cs->slice->clpRng(COMPONENT_Y);
   const int   bitDepth        = clipBitDepths.recon[ toChannelType(COMPONENT_Y) ];
+#if JVET_K0248_GBI
+  const uint8_t gbiIdx        = pu.cu->GBiIdx;
+  const int   iLog2WeightBase = g_GbiLog2WeightBase;
+  const int   shiftNum        = IF_INTERNAL_PREC + ((gbiIdx != GBI_DEFAULT) ? iLog2WeightBase : 1) - bitDepth;
+  const int   offset          = (1 << (shiftNum - 1)) + ((gbiIdx != GBI_DEFAULT) ? (IF_INTERNAL_OFFS << iLog2WeightBase) : 2 * IF_INTERNAL_OFFS); 
+#else
   const int   shiftNum        = IF_INTERNAL_PREC + 1 - bitDepth;
   const int   offset          = ( 1 << ( shiftNum - 1 ) ) + 2 * IF_INTERNAL_OFFS;
+#endif
   const bool  bShortRefMV     = ( pu.cs->slice->getCheckLDC() && PU::isBIOLDB(pu) );
 #if JVET_K0485_BIO
   const int64_t limit         = (16 << (IF_INTERNAL_PREC - bShortRefMV - bitDepth));
@@ -1644,8 +1698,12 @@ void InterPrediction::applyBiOptFlow( const PredictionUnit &pu, const CPelUnitBu
         pSrcY0Temp = pSrcY0 + (stridePredMC + 1) + ((yu*iSrc0Stride + xu) << 2);
         pSrcY1Temp = pSrcY1 + (stridePredMC + 1) + ((yu*iSrc1Stride + xu) << 2);
         pDstY0 = pDstY + ((yu*iDstStride + xu) << 2);
-
-        g_pelBufOP.addAvg4(pSrcY0Temp, iSrc0Stride, pSrcY1Temp, iSrc1Stride, pDstY0, iDstStride, (1 << 2), (1 << 2), shiftNum, offset, clpRng);
+#if JVET_K0248_GBI
+        if( gbiIdx != GBI_DEFAULT )
+          g_pelBufOP.addAvg4GBI(pSrcY0Temp, iSrc0Stride, pSrcY1Temp, iSrc1Stride, pDstY0, iDstStride, (1 << 2), (1 << 2), shiftNum, offset, clpRng, gbiIdx);
+        else
+#endif
+          g_pelBufOP.addAvg4(pSrcY0Temp, iSrc0Stride, pSrcY1Temp, iSrc1Stride, pDstY0, iDstStride, (1 << 2), (1 << 2), shiftNum, offset, clpRng);
         continue;
       }
 #endif
@@ -1701,7 +1759,13 @@ void InterPrediction::applyBiOptFlow( const PredictionUnit &pu, const CPelUnitBu
       pGradY1 = m_pGradY1 + offsetPos + ((yu*iWidthG + xu) << 2);
 
       pDstY0 = pDstY + ((yu*iDstStride + xu) << 2);
-      g_pelBufOP.addBIOAvg4(pSrcY0Temp, iSrc0Stride, pSrcY1Temp, iSrc1Stride, pDstY0, iDstStride, pGradX0, pGradX1, pGradY0, pGradY1, iWidthG, (1 << 2), (1 << 2), (int)tmpx, (int)tmpy, shiftNum, offset, clpRng);
+
+#if JVET_K0248_GBI
+      if (gbiIdx != GBI_DEFAULT)
+        g_pelBufOP.addBIOAvg4GBI(pSrcY0Temp, iSrc0Stride, pSrcY1Temp, iSrc1Stride, pDstY0, iDstStride, pGradX0, pGradX1, pGradY0, pGradY1, iWidthG, (1 << 2), (1 << 2), (int)tmpx, (int)tmpy, shiftNum, offset, clpRng, gbiIdx);
+      else
+#endif
+        g_pelBufOP.addBIOAvg4(pSrcY0Temp, iSrc0Stride, pSrcY1Temp, iSrc1Stride, pDstY0, iDstStride, pGradX0, pGradX1, pGradY0, pGradY1, iWidthG, (1 << 2), (1 << 2), (int)tmpx, (int)tmpy, shiftNum, offset, clpRng);
 #else
       pSrcY0Temp = pSrcY0 + ((yu*iSrc0Stride + xu) << 2);
       pSrcY1Temp = pSrcY1 + ((yu*iSrc0Stride + xu) << 2);
@@ -1712,15 +1776,35 @@ void InterPrediction::applyBiOptFlow( const PredictionUnit &pu, const CPelUnitBu
 
       pDstY0 = pDstY + ((yu*iDstStride + xu) << 2);
 
+#if JVET_K0248_GBI
+      const int8_t w0 = getGbiWeight(gbiIdx, REF_PIC_LIST_0);
+      const int8_t w1 = getGbiWeight(gbiIdx, REF_PIC_LIST_1);
+      const int8_t iLog2WeightBase = g_iGbiLog2WeightBase;
+      int32_t(*pMulW0)(Pel) = GET_INT_MULTIPLIER(w0);
+      int32_t(*pMulW1)(Pel) = GET_INT_MULTIPLIER(w1);
+#endif
+
       // apply BIO offset for the sub-block
       for (int y = 0; y < 4; y++)
       {
         for (int x = 0; x < 4; x++)
         {
           int b = (int)tmpx * (pGradX0[x] - pGradX1[x]) + (int)tmpy * (pGradY0[x] - pGradY1[x]);
-          b = (b > 0) ? ((b + 32) >> 6) : (-((-b + 32) >> 6));
 
-          pDstY0[x] = ( ClipPel( ( int16_t ) ( ( pSrcY0Temp[x] + pSrcY1Temp[x] + b + offset ) >> shiftNum ), clpRng ) );
+#if JVET_K0248_GBI 
+          if( gbiIdx != GBI_DEFAULT)
+          {
+            b = (b>0) ? (((b << log2WeightBase) + 64) >> 7) : (-((((-b) << log2WeightBase) + 64) >> 7));
+            pDstY0[x] = (ClipPel((int16_t)(((int64_t)pMulW0(pSrcY0Temp[x]) + (int64_t)pMulW1(pSrcY1Temp[x]) + (int64_t)b + (int64_t)offset) >> shiftNum), clpRng));
+          }
+          else
+          {
+#endif
+            b = (b > 0) ? ((b + 32) >> 6) : (-((-b + 32) >> 6));
+            pDstY0[x] = ( ClipPel( ( int16_t ) ( ( pSrcY0Temp[x] + pSrcY1Temp[x] + b + offset ) >> shiftNum ), clpRng ) );
+#if JVET_K0248_GBI 
+          }
+#endif
         }
         pDstY0 += iDstStride; pSrcY0Temp += iSrc0Stride; pSrcY1Temp += iSrc1Stride;
         pGradX0 += iWidthG; pGradX1 += iWidthG; pGradY0 += iWidthG; pGradY1 += iWidthG;
@@ -1793,9 +1877,25 @@ void InterPrediction::xWeightedAverage( const PredictionUnit& pu, const CPelUnit
       applyBiOptFlow( pu, pcYuvSrc0, pcYuvSrc1, iRefIdx0, iRefIdx1, pcYuvDst, clipBitDepths );
 #if JVET_K0485_BIO
       else
-        pcYuvDst.bufs[0].addAvg(CPelBuf(pSrcY0, src0Stride, pu.lumaSize()), CPelBuf(pSrcY1, src1Stride, pu.lumaSize()), clpRngs.comp[0]);
+#if JVET_K0248_GBI
+      {
+        if (pu.cu->GBiIdx != GBI_DEFAULT)
+          pcYuvDst.bufs[0].addWeightedAvg(CPelBuf(pSrcY0, src0Stride, pu.lumaSize()), CPelBuf(pSrcY1, src1Stride, pu.lumaSize()), clpRngs.comp[0], pu.cu->GBiIdx);
+        else
+#endif
+          pcYuvDst.bufs[0].addAvg(CPelBuf(pSrcY0, src0Stride, pu.lumaSize()), CPelBuf(pSrcY1, src1Stride, pu.lumaSize()), clpRngs.comp[0]);
+#if JVET_K0248_GBI
+      }
+#endif
 #endif
     }
+#if JVET_K0248_GBI
+    if( pu.cu->GBiIdx != GBI_DEFAULT)
+    {
+      pcYuvDst.addWeightedAvg( pcYuvSrc0, pcYuvSrc1, clpRngs, pu.cu->GBiIdx, bBIOApplied );
+      return;
+    }
+#endif
     pcYuvDst.addAvg( pcYuvSrc0, pcYuvSrc1, clpRngs, bBIOApplied );
 #else
     pcYuvDst.addAvg( pcYuvSrc0, pcYuvSrc1, clpRngs );
@@ -1811,8 +1911,33 @@ void InterPrediction::xWeightedAverage( const PredictionUnit& pu, const CPelUnit
   }
 }
 
-void InterPrediction::motionCompensation( PredictionUnit &pu, PelUnitBuf &predBuf, const RefPicList &eRefPicList )
+void InterPrediction::motionCompensation( PredictionUnit &pu, PelUnitBuf &predBuf, const RefPicList &eRefPicList 
+#if JVET_K0076_CPR_DT
+  , const bool luma, const bool chroma
+#endif
+)
 {
+#if JVET_K0076_CPR_DT
+    // dual tree handling for CPR as the only ref
+ if (!luma || !chroma)
+ {
+    if (!luma && chroma)
+    {
+      xChromaMC(pu, predBuf);
+      return;
+    }
+    else // (luma && !chroma)
+    {
+      xPredInterUni(pu, eRefPicList, predBuf, false, 
+#if JEM_TOOLS
+        false, false, 
+#endif
+        luma, chroma);
+      return;
+    }
+ }
+  // else, go with regular MC below
+#endif
         CodingStructure &cs = *pu.cs;
   const PPS &pps            = *cs.pps;
   const SliceType sliceType =  cs.slice->getSliceType();
@@ -1836,7 +1961,11 @@ void InterPrediction::motionCompensation( PredictionUnit &pu, PelUnitBuf &predBu
   else
   {
 #if JEM_TOOLS || JVET_K0346
+#if JVET_K0076_CPR
+    if (pu.mergeType != MRG_TYPE_DEFAULT_N && pu.mergeType != MRG_TYPE_IBC)
+#else
     if( pu.mergeType != MRG_TYPE_DEFAULT_N )
+#endif
     {
       xSubPuMC( pu, predBuf, eRefPicList );
     }
@@ -1855,14 +1984,22 @@ void InterPrediction::motionCompensation( PredictionUnit &pu, PelUnitBuf &predBu
   return;
 }
 
-void InterPrediction::motionCompensation( CodingUnit &cu, const RefPicList &eRefPicList )
+void InterPrediction::motionCompensation( CodingUnit &cu, const RefPicList &eRefPicList 
+#if JVET_K0076_CPR_DT
+  , const bool luma, const bool chroma
+#endif
+)
 {
   for( auto &pu : CU::traversePUs( cu ) )
   {
     PelUnitBuf predBuf = cu.cs->getPredBuf( pu );
 #if JEM_TOOLS
     pu.mvRefine = true;
-    motionCompensation( pu, predBuf, eRefPicList );
+    motionCompensation( pu, predBuf, eRefPicList 
+#if JVET_K0076_CPR_DT
+      , luma, chroma
+#endif
+    );
     pu.mvRefine = false;
 #else
     motionCompensation( pu, predBuf, eRefPicList );
@@ -1870,10 +2007,18 @@ void InterPrediction::motionCompensation( CodingUnit &cu, const RefPicList &eRef
   }
 }
 
-void InterPrediction::motionCompensation( PredictionUnit &pu, const RefPicList &eRefPicList /*= REF_PIC_LIST_X*/ )
+void InterPrediction::motionCompensation( PredictionUnit &pu, const RefPicList &eRefPicList /*= REF_PIC_LIST_X*/ 
+#if JVET_K0076_CPR_DT
+  , const bool luma, const bool chroma
+#endif
+)
 {
   PelUnitBuf predBuf = pu.cs->getPredBuf( pu );
-  motionCompensation( pu, predBuf, eRefPicList );
+  motionCompensation( pu, predBuf, eRefPicList 
+#if JVET_K0076_CPR_DT
+    , luma, chroma
+#endif
+  );
 }
 
 #if JEM_TOOLS
@@ -2944,6 +3089,10 @@ void InterPrediction::xFrucCollectBlkStartMv( PredictionUnit& pu, const MergeCtx
   for( int nMergeIndex = 0; nMergeIndex < mergeCtx.numValidMergeCand << 1; nMergeIndex++ )
   {
     bool mrgTpDflt = ( pu.cs->sps->getSpsNext().getUseSubPuMvp() ) ? mergeCtx.mrgTypeNeighbours[nMergeIndex>>1] == MRG_TYPE_DEFAULT_N : true;
+#if JVET_K0076_CPR
+    if ((mergeCtx.interDirNeighbours[nMergeIndex >> 1] == 1 || mergeCtx.interDirNeighbours[nMergeIndex >> 1] == 3) && pu.cs->slice->getRefPic(REF_PIC_LIST_0, mergeCtx.mvFieldNeighbours[nMergeIndex].refIdx)->getPOC() == pu.cs->slice->getPOC())
+      continue;
+#endif
     if( mergeCtx.mvFieldNeighbours[nMergeIndex].refIdx >= 0 && mrgTpDflt )
     {
       if( nTargetRefIdx >= 0 && ( mergeCtx.mvFieldNeighbours[nMergeIndex].refIdx != nTargetRefIdx || ( nMergeIndex & 0x01 ) != ( int )eTargetRefList ) )
@@ -3132,7 +3281,14 @@ void InterPrediction::xFrucCollectSubBlkStartMv( PredictionUnit& pu, const Merge
           }
 
           mvCand.refIdx = rMvStart.refIdx;
+#if JVET_K0157
+          if (pColPic->cs->slice->getRefPic((RefPicList)nRefListColPic, colMi.refIdx[nRefListColPic])->longTerm)
+            mvCand.mv = rColMv;
+          else
+            mvCand.mv = PU::scaleMv(rColMv, nCurPOC, nCurRefPOC, pColPic->getPOC(), pColPic->cs->slice->getRefPOC((RefPicList)nRefListColPic, colMi.refIdx[nRefListColPic]), pu.cs->slice);
+#else
           mvCand.mv     = PU::scaleMv( rColMv , nCurPOC , nCurRefPOC , pColPic->getPOC(), pColPic->cs->slice->getRefPOC( ( RefPicList )nRefListColPic , colMi.refIdx[nRefListColPic] ), pu.cs->slice );
+#endif
           if( mvCand.refIdx < 0 )
           {
             printf( "base" );
@@ -4405,7 +4561,14 @@ void InterPrediction::xProcessDMVR( PredictionUnit& pu, PelUnitBuf &pcYuvDst, co
     pu.mv[1].setHighPrec();
   }
 #if !DMVR_JVET_K0217
-  pcYuvDst.addAvg( srcPred0, srcPred1, clpRngs, false, true );
+#if JVET_K0248_GBI
+  if( pu.cu->GBiIdx != GBI_DEFAULT)
+  {
+    pcYuvDst.addWeightedAvg( srcPred0, srcPred1, clpRngs, pu.cu->GBiIdx, false, true );
+  }
+  else
+#endif
+    pcYuvDst.addAvg( srcPred0, srcPred1, clpRngs, false, true );
 
   //list 0
   //get init cost

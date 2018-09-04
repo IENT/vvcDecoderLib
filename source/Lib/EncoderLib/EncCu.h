@@ -45,6 +45,9 @@
 #include "CommonLib/TrQuant.h"
 #include "CommonLib/Unit.h"
 #include "CommonLib/UnitPartitioner.h"
+#if JVET_K0076_CPR
+#include "CommonLib/IbcHashMap.h"
+#endif
 
 #if REUSE_CU_RESULTS
 #include "DecoderLib/DecCu.h"
@@ -109,6 +112,9 @@ private:
 
   CABACWriter*          m_CABACEstimator;
   RateCtrl*             m_pcRateCtrl;
+#if JVET_K0076_CPR
+  IbcHashMap            m_ibcHashMap;
+#endif
 #if JVET_K0357_AMVR
   CodingStructure    ***m_pImvTempCS;
 #endif
@@ -131,7 +137,10 @@ private:
 #if JEM_TOOLS
   MotionInfo            m_SubPuFrucBuf    [( MAX_CU_SIZE * MAX_CU_SIZE ) >> ( MIN_CU_LOG2 << 1 )];
 #endif
-
+#if JVET_K0076_CPR
+  int                   m_ctuIbcSearchRangeX;
+  int                   m_ctuIbcSearchRangeY;
+#endif
 #if ENABLE_SPLIT_PARALLELISM || ENABLE_WPP_PARALLELISM
   EncLib*               m_pcEncLib;
 #endif
@@ -218,21 +227,24 @@ protected:
   void xCheckRDCostMerge2Nx2NFRUC
                               ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode );
 #endif
-#if JEM_TOOLS || JVET_K0357_AMVR || JVET_K1000_SIMPLIFIED_EMT
   void xEncodeInterResidual   ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode, int residualPass = 0
-#if JVET_K0357_AMVR
+#if JEM_TOOLS || JVET_K0357_AMVR
     , CodingStructure* imvCS = NULL
 #endif
-#if JVET_K1000_SIMPLIFIED_EMT
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
     , int emtMode = 1
 #endif
-    , bool* bestHasNonResi = NULL );
-#else
-  void xEncodeInterResidual   ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode, int residualPass, bool* bestHasNonResi );
+    , bool* bestHasNonResi = NULL
+#if JVET_K0248_GBI
+    , double* equGBiCost = NULL
 #endif
+  );
 #if REUSE_CU_RESULTS
-
   void xReuseCachedResult     ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &Partitioner );
+#endif
+#if JVET_K0076_CPR
+  void xCheckRDCostIntraBC    ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &pm, const EncTestMode& encTestMode );
+  void xCheckRDCostIntraBCMerge2Nx2N( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode );
 #endif
 };
 

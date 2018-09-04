@@ -281,7 +281,19 @@ public:
   }
 #endif
 };// END CLASS DEFINITION MV
-
+#if JVET_K0076_CPR
+namespace std
+{
+  template <>
+  struct hash<Mv> : public unary_function<Mv, uint64_t>
+  {
+    uint64_t operator()(const Mv& value) const
+    {
+      return (((uint64_t)value.hor << 32) + value.ver);
+    }
+  };
+};
+#endif
 #if JVET_K0357_AMVR
 void roundMV( Mv& rcMv, unsigned imvShift );
 #endif

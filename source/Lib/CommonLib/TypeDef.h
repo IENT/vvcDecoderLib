@@ -50,6 +50,26 @@
 #include <assert.h>
 #include <cassert>
 
+#ifndef BMS_TOOLS
+#define BMS_TOOLS                                         1 // Inclusion of BMS only tools (which include JEM tools) into compiled executable
+#endif
+
+#if BMS_TOOLS
+#define JEM_TOOLS                                         1
+#define JVET_K0076_CPR                                    1 // current picture referencing or intra block copy mode
+#define JVET_K0248_GBI                                    1
+#define JVET_K0485_BIO                                    1 // BIO simplifications
+#else
+#define JEM_TOOLS                                         0
+#define JVET_K0076_CPR                                    0 // current picture referencing or intra block copy mode
+#define JVET_K0248_GBI                                    0
+#define JVET_K0485_BIO                                    0 // BIO simplifications
+#endif
+
+#if JVET_K0076_CPR
+#define JVET_K0076_CPR_DT                                 1 // dualItree support for CPR
+#endif
+
 #define JVET_K1000_SIMPLIFIED_EMT                         1 // EMT with only DCT-2, DCT-8 and DST-7
 
 #define JVET_K0371_ALF                                    1
@@ -75,6 +95,9 @@
 #define REUSE_CU_RESULTS                                  1
 #endif
 
+#define JVET_K0390_RATECTRL                               1
+#define RATECTRL_FIX_FULLNBIT                             1  //fix the QP-lambda relationship in rate control if JVET-K0154 for FULL_NBIT is enabled
+
 #define JVET_K0352_MERGE_ENCOPT                           1 // encoder optimization for merge
 #define JVET_K0556_MAX_TT_SIZE_64                         1 // Maximum TT size is set to 64x64 for P/B-slice
 
@@ -82,11 +105,12 @@
 #define JVET_K0554                                        1 // when adopting, also remove the macro HM_QTBT_ONLY_QT_IMPLICIT (keep the case for value 0)
 
 #define JVET_K0346                                        1 // simplifications on ATMVP
+
 #define JVET_K0063_PDPC_SIMP                              1 // Simplified PDPC
 
 #define JVET_K0351_LESS_CONSTRAINT                        1 // Only disallow binary split with same orientation in center partition of the ternary split and release the other constraints in K0351.
 
-#define JVET_K0251_QP_EXT                                 1 // Extending the QP parameter value range for coarse quantization 
+#define JVET_K0251_QP_EXT                                 1 // Extending the QP parameter value range for coarse quantization
 
 #define JVET_K_AFFINE                                     1
 #if JVET_K_AFFINE
@@ -104,15 +128,10 @@
 
 #define JVET_K0357_AMVR                                   1 // Adaptive motion vector resolution separated from JEM_TOOLS macro
 
-#define JVET_K0485_BIO                                    1 // BIO simplifications
 #if JVET_K0485_BIO
 #define JVET_K0485_BIO_EXTEND_SIZE                        1
 #endif
 
-#ifndef JEM_TOOLS
-#define JEM_TOOLS                                         1 // Defines the inclusion of JEM tools into compiled executable
-
-#endif
 #ifndef JVET_B0051_NON_MPM_MODE
 #define JVET_B0051_NON_MPM_MODE                         ( 1 && JEM_TOOLS )
 
@@ -166,11 +185,16 @@
 
 #ifndef ENABLE_TRACING
 #define ENABLE_TRACING                                    0 // DISABLE by default (enable only when debugging, requires 15% run-time in decoding) -- see documentation in 'doc/DTrace for NextSoftware.pdf'
-
+#if ENABLE_TRACING
+#define K0149_BLOCK_STATISTICS                            1 // enables block statistics, which can be analysed with YUView (https://github.com/IENT/YUView)
+#if K0149_BLOCK_STATISTICS
+#define BLOCK_STATS_AS_CSV                                0 // statistics will be written in a comma separated value format. this is not supported by YUView
+#endif
+#endif
 #endif // ! ENABLE_TRACING
 
 #define WCG_EXT                                           0 // part of JEM sharp Luma qp
-#define WCG_WPSNR                                         WCG_EXT 
+#define WCG_WPSNR                                         WCG_EXT
 
 #if HEVC_TOOLS
 #define HEVC_USE_INTRA_SMOOTHING_T32                      1
@@ -189,6 +213,7 @@
 #define HEVC_USE_SIGN_HIDING                              1
 #endif
 
+#define JVET_K0157                                        1
 
 #define KEEP_PRED_AND_RESI_SIGNALS                        0
 
@@ -291,6 +316,9 @@
 #if JVET_K0371_ALF
 #define ENABLE_SIMD_OPT_ALF                             ( 1 && ENABLE_SIMD_OPT )                            ///< SIMD optimization for ALF
 #endif
+#if JVET_K0076_CPR
+#define ENABLE_SIMD_OPT_CPR                             ( 1 && ENABLE_SIMD_OPT )                            ///< SIMD optimization for CPR
+#endif
 // End of SIMD optimizations
 
 
@@ -313,8 +341,7 @@
 
 #define SHARP_LUMA_DELTA_QP                               1 ///< include non-normative LCU deltaQP and normative chromaQP change
 #define ER_CHROMA_QP_WCG_PPS                              1 ///< Chroma QP model for WCG used in Anchor 3.2
-#define ENABLE_QPA                                        0
-
+#define ENABLE_QPA                                        1 ///< Non-normative perceptual QP adaptation according to JVET-H0047 and JVET-K0206. Deactivated by default, activated using encoder arguments --PerceptQPA=1 --SliceChromaQPOffsetPeriodicity=1
 
 #if JEM_TOOLS && !JVET_K0371_ALF
 #define COM16_C806_ALF_TEMPPRED_NUM                       6 //tbd
@@ -981,6 +1008,9 @@ enum MergeType
   MRG_TYPE_FRUC,                 // 3
   MRG_TYPE_FRUC_SET,             // 4
 #endif
+#if JVET_K0076_CPR
+  MRG_TYPE_IBC,                  // 5
+#endif
 #if !JEM_TOOLS && JVET_K0346
   MRG_TYPE_SUBPU_ATMVP,
 #endif
@@ -1545,8 +1575,8 @@ enum AlfFilterType
 struct AlfFilterShape
 {
   AlfFilterShape( int size )
-    : filterLength( size ), 
-    numCoeff( size * size / 4 + 1 ), 
+    : filterLength( size ),
+    numCoeff( size * size / 4 + 1 ),
     filterSize( size * size / 2 + 1 )
   {
     if( size == 5 )
@@ -1589,7 +1619,7 @@ struct AlfFilterShape
                     2,
                 2,  2,  2,
             2,  2,  2,  2,  2,
-        2,  2,  2,  1,  1 
+        2,  2,  2,  1,  1
       };
 
       golombIdx = {

@@ -56,7 +56,11 @@
 #if JVET_K0367_AFFINE_FIX_POINT
 #include "CommonLib/AffineGradientSearch.h"
 #endif
-
+#if JVET_K0076_CPR
+#include "CommonLib/IbcHashMap.h"
+#include <unordered_map>
+#include <vector>
+#endif
 //! \ingroup EncoderLib
 //! \{
 
@@ -67,7 +71,12 @@
 static const uint32_t MAX_NUM_REF_LIST_ADAPT_SR = 2;
 static const uint32_t MAX_IDX_ADAPT_SR          = 33;
 static const uint32_t NUM_MV_PREDICTORS         = 3;
-
+#if JVET_K0076_CPR
+struct BlkRecord
+{
+  std::unordered_map<Mv, Distortion> bvRecord;
+};
+#endif
 class EncModeCtrl;
 
 /// encoder search class
@@ -97,11 +106,17 @@ private:
   CodingStructure **m_pSaveCS;
 
   ClpRng          m_lumaClpRng;
+#if JVET_K0248_GBI 
+  uint32_t        m_auiEstWeightIdxBits[GBI_NUM];
+  GBiMotionParam  m_cUniMotions;
+#endif
 
 #if JEM_TOOLS
   PelStorage      m_obmcOrgMod;
 #endif
-
+#if JVET_K0076_CPR
+  std::unordered_map< Position, std::unordered_map< Size, BlkRecord> > m_ctuRecord;
+#endif
 protected:
   // interface to option
   EncCfg*         m_pcEncCfg;
@@ -138,7 +153,10 @@ protected:
 #if JEM_TOOLS
   MotionInfo      m_SubPuFrucBuf                [( MAX_CU_SIZE * MAX_CU_SIZE ) >> ( MIN_CU_LOG2 << 1 )];
 #endif
-
+#if JVET_K0076_CPR
+  unsigned int    m_uiNumBVs, m_uiNumBV16s;
+  Mv              m_acBVs[IBC_NUM_CANDIDATES];
+#endif
 public:
   InterSearch();
   virtual ~InterSearch();
@@ -163,7 +181,9 @@ public:
   void destroy                      ();
 
   void setTempBuffers               (CodingStructure ****pSlitCS, CodingStructure ****pFullCS, CodingStructure **pSaveCS );
-
+#if JVET_K0076_CPR
+  void resetCtuRecord               ()             { m_ctuRecord.clear(); }
+#endif
 #if ENABLE_SPLIT_PARALLELISM
   void copyState                    ( const InterSearch& other );
 #endif
@@ -197,6 +217,10 @@ protected:
 #if JVET_K0357_AMVR
     unsigned    imvShift;
 #endif
+#if JVET_K0157
+    bool        inCtuSearch;
+    bool        zeroMV;
+#endif
   } IntTZSearchStruct;
 
   // sub-functions for ME
@@ -217,7 +241,14 @@ public:
   /// set ME search range
   void setAdaptiveSearchRange       ( int iDir, int iRefIdx, int iSearchRange) { CHECK(iDir >= MAX_NUM_REF_LIST_ADAPT_SR || iRefIdx>=int(MAX_IDX_ADAPT_SR), "Invalid index"); m_aaiAdaptSR[iDir][iRefIdx] = iSearchRange; }
 
-
+#if JVET_K0076_CPR
+  bool  predIntraBCSearch           ( CodingUnit& cu, Partitioner& partitioner, const int localSearchRangeX, const int localSearchRangeY, IbcHashMap& ibcHashMap);
+  void  xIntraPatternSearch         ( PredictionUnit& pu, IntTZSearchStruct&  cStruct, Mv& rcMv, Distortion&  ruiCost, Mv* cMvSrchRngLT, Mv* cMvSrchRngRB, Mv* pcMvPred);
+  void  xSetIntraSearchRange        ( PredictionUnit& pu, Mv& cMvPred, int iRoiWidth, int iRoiHeight, const int localSearchRangeX, const int localSearchRangeY, Mv& rcMvSrchRngLT, Mv& rcMvSrchRngRB);
+  void  xIntraBlockCopyEstimation   ( PredictionUnit& pu, PelUnitBuf& origBuf, Mv     *pcMvPred, Mv     &rcMv, Distortion &ruiCost, const int localSearchRangeX, const int localSearchRangeY);
+  void  xIntraBCSearchMVCandUpdate  ( Distortion  uiSad, int x, int y, Distortion* uiSadBestCand, Mv* cMVCand);
+  int   xIntraBCSearchMVChromaRefine( PredictionUnit& pu, int iRoiWidth, int iRoiHeight, int cuPelX, int cuPelY, Distortion* uiSadBestCand, Mv*     cMVCand);
+#endif
 protected:
 
   // -------------------------------------------------------------------------------------------------------------------
@@ -317,6 +348,9 @@ protected:
                                     const Mv&             cMvPred,
                                     const int             iSrchRng,
                                     SearchRange&          sr
+#if JVET_K0157
+                                  , IntTZSearchStruct &  cStruct
+#endif
                                   );
 
   void xPatternSearchFast         ( const PredictionUnit& pu,
@@ -368,6 +402,11 @@ protected:
                                   , Mv                    mvAffine4Para[2][33][3]
                                   , int                   refIdx4Para[2]
 #endif
+#if JVET_K0248_GBI 
+                                  , uint8_t               gbiIdx = GBI_DEFAULT
+                                  , bool                  enforceGBiPred = false
+                                  , uint32_t              gbiIdxBits = 0
+#endif
                                   );
 
   void xAffineMotionEstimation    ( PredictionUnit& pu,
@@ -394,7 +433,22 @@ protected:
 
   void xCopyAffineAMVPInfo        ( AffineAMVPInfo& src, AffineAMVPInfo& dst );
   void xCheckBestAffineMVP        ( PredictionUnit &pu, AffineAMVPInfo &affineAMVPInfo, RefPicList eRefPicList, Mv acMv[3], Mv acMvPred[3], int& riMVPIdx, uint32_t& ruiBits, Distortion& ruiCost );
+
+#if JVET_K0248_GBI 
+  bool xReadBufferedAffineUniMv(PredictionUnit& pu, RefPicList eRefPicList, int32_t iRefIdx, Mv acMvPred[3], Mv acMv[3], uint32_t& ruiBits, Distortion& ruiCost);
 #endif
+#endif
+
+#if JVET_K0248_GBI 
+  double xGetMEDistortionWeight(uint8_t gbiIdx, RefPicList eRefPicList);
+  bool xReadBufferedUniMv(PredictionUnit& pu, RefPicList eRefPicList, int32_t iRefIdx, Mv& pcMvPred, Mv& rcMv, uint32_t& ruiBits, Distortion& ruiCost);
+public:
+  void resetBufferedUniMotions() { m_cUniMotions.reset(); }
+  uint32_t getWeightIdxBits(uint8_t gbiIdx) { return m_auiEstWeightIdxBits[gbiIdx]; }
+  void initWeightIdxBits();
+protected:
+#endif
+
   void xExtDIFUpSamplingH         ( CPelBuf* pcPattern );
   void xExtDIFUpSamplingQ         ( CPelBuf* pcPatternKey, Mv halfPelRef );
 
@@ -403,13 +457,24 @@ protected:
   // -------------------------------------------------------------------------------------------------------------------
 
   void  setWpScalingDistParam     ( int iRefIdx, RefPicList eRefPicListCur, Slice *slice );
-
+#if JVET_K0076_CPR
+private:
+  void  xxIntraBlockCopyHashSearch(PredictionUnit& pu, Mv* mvPred, int numMvPred, Mv &mv, int& idxMvPred, IbcHashMap& ibcHashMap);
+#endif
 
 public:
 
-  void encodeResAndCalcRdInterCU  (CodingStructure &cs, Partitioner &partitioner, const bool &skipResidual);
+  void encodeResAndCalcRdInterCU  (CodingStructure &cs, Partitioner &partitioner, const bool &skipResidual
+#if JVET_K0076_CPR_DT
+    , const bool luma = true, const bool chroma = true
+#endif
+  );
   void xEncodeInterResidualQT     (CodingStructure &cs, Partitioner &partitioner, const ComponentID &compID);
-  void xEstimateInterResidualQT   (CodingStructure &cs, Partitioner &partitioner, Distortion *puiZeroDist = NULL);
+  void xEstimateInterResidualQT   (CodingStructure &cs, Partitioner &partitioner, Distortion *puiZeroDist = NULL
+#if JVET_K0076_CPR_DT
+    , const bool luma = true, const bool chroma = true
+#endif
+  );
   uint64_t xGetSymbolFracBitsInter  (CodingStructure &cs, Partitioner &partitioner);
 
 };// END CLASS DEFINITION EncSearch

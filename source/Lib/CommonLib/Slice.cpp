@@ -444,7 +444,15 @@ void Slice::setRefPicList( PicList& rcListPic, bool checkNumPocTotalCurr, bool b
       pcRefPic = xGetLongTermRefPic(rcListPic, m_pRPS->getPOC(i), m_pRPS->getCheckLTMSBPresent(i));
     }
   }
-
+#if JVET_K0076_CPR
+  if (getSPS()->getSpsNext().getIBCMode())
+  {
+    RefPicSetLtCurr[NumPicLtCurr] = getPic();
+    //getPic()->setIsLongTerm(true);
+    getPic()->longTerm = true;
+    NumPicLtCurr++;
+  }
+#endif
   // ref_pic_list_init
   Picture*  rpsCurrList0[MAX_NUM_REF+1];
   Picture*  rpsCurrList1[MAX_NUM_REF+1];
@@ -457,7 +465,14 @@ void Slice::setRefPicList( PicList& rcListPic, bool checkNumPocTotalCurr, bool b
     // - Otherwise, when the current picture contains a P or B slice, the value of NumPocTotalCurr shall not be equal to 0.
     if (getRapPicFlag())
     {
-      CHECK(numPicTotalCurr != 0, "Invalid state");
+#if JVET_K0076_CPR
+      if (getSPS()->getSpsNext().getIBCMode())
+      {
+        CHECK(numPicTotalCurr != 1, "Invalid state");
+      }
+      else
+#endif
+        CHECK(numPicTotalCurr != 0, "Invalid state");
     }
 
     if (m_eSliceType == I_SLICE)
@@ -527,7 +542,13 @@ void Slice::setRefPicList( PicList& rcListPic, bool checkNumPocTotalCurr, bool b
       m_bIsUsedAsLongTerm[REF_PIC_LIST_1][rIdx] = ( cIdx >= NumPicStCurr0 + NumPicStCurr1 );
     }
   }
-
+#if JVET_K0076_CPR
+  if (getSPS()->getSpsNext().getIBCMode())
+  {
+    m_apcRefPicList[REF_PIC_LIST_0][m_aiNumRefIdx[REF_PIC_LIST_0] - 1] = getPic();
+    m_bIsUsedAsLongTerm[REF_PIC_LIST_0][m_aiNumRefIdx[REF_PIC_LIST_0] - 1] = true;
+  }
+#endif
     // For generalized B
   // note: maybe not existed case (always L0 is copied to L1 if L1 is empty)
   if( bCopyL0toL1ErrorCase && isInterB() && getNumRefIdx(REF_PIC_LIST_1) == 0)
@@ -558,7 +579,14 @@ int Slice::getNumRpsCurrTempList() const
       numRpsCurrTempList++;
     }
   }
-  return numRpsCurrTempList;
+#if JVET_K0076_CPR
+  if (getSPS()->getSpsNext().getIBCMode())
+  {
+    return numRpsCurrTempList + 1;
+  }
+  else
+#endif
+    return numRpsCurrTempList;
 }
 
 void Slice::initEqualRef()
@@ -1343,7 +1371,11 @@ int Slice::checkThatAllRefPicsAreAvailable( PicList& rcListPic, const ReferenceP
 
 /** Function for constructing an explicit Reference Picture Set out of the available pictures in a referenced Reference Picture Set
 */
-void Slice::createExplicitReferencePictureSetFromReference( PicList& rcListPic, const ReferencePictureSet *pReferencePictureSet, bool isRAP, int pocRandomAccess, bool bUseRecoveryPoint, const bool bEfficientFieldIRAPEnabled)
+void Slice::createExplicitReferencePictureSetFromReference(PicList& rcListPic, const ReferencePictureSet *pReferencePictureSet, bool isRAP, int pocRandomAccess, bool bUseRecoveryPoint, const bool bEfficientFieldIRAPEnabled
+#if JVET_K0157
+                                                         , bool isEncodeLtRef, bool isCompositeRefEnable
+#endif
+)
 {
   Picture* rpcPic;
   int i, j;
@@ -1383,7 +1415,11 @@ void Slice::createExplicitReferencePictureSetFromReference( PicList& rcListPic, 
         }
         else
         {
+#if JVET_K0157
+          if (bEfficientFieldIRAPEnabled && rpcPic->getPOC() == this->getAssociatedIRAPPOC() && this->getAssociatedIRAPPOC() == this->getPOC() + (isCompositeRefEnable ? 2 : 1))
+#else
           if(bEfficientFieldIRAPEnabled && rpcPic->getPOC() == this->getAssociatedIRAPPOC() && this->getAssociatedIRAPPOC() == this->getPOC()+1)
+#endif
           {
             irapIsInRPS = true;
           }
@@ -1402,7 +1438,11 @@ void Slice::createExplicitReferencePictureSetFromReference( PicList& rcListPic, 
     while ( iterPic != rcListPic.end())
     {
       rpcPic = *(iterPic++);
+#if JVET_K0157
+      if (rpcPic->getPOC() == this->getAssociatedIRAPPOC() && this->getAssociatedIRAPPOC() == this->getPOC() + (isCompositeRefEnable ? 2 : 1))
+#else
       if(rpcPic->getPOC() == this->getAssociatedIRAPPOC() && this->getAssociatedIRAPPOC() == this->getPOC()+1)
+#endif
       {
         pLocalRPS->setDeltaPOC(k, 1);
         pLocalRPS->setUsed(k, true);
@@ -1412,6 +1452,53 @@ void Slice::createExplicitReferencePictureSetFromReference( PicList& rcListPic, 
       }
     }
   }
+#if JVET_K0157
+  if (isCompositeRefEnable && isEncodeLtRef)
+  {
+    useNewRPS = true;
+    nrOfNegativePictures = 0;
+    nrOfPositivePictures = 0;
+    for (i = 0; i<pReferencePictureSet->getNumberOfPictures(); i++)
+    {
+      j = 0;
+      k = 0;
+
+      // loop through all pictures in the reference picture buffer
+      PicList::iterator iterPic = rcListPic.begin();
+      while (iterPic != rcListPic.end())
+      {
+        j++;
+        rpcPic = *(iterPic++);
+
+        if (rpcPic->getPOC() == this->getPOC() + 1 + pReferencePictureSet->getDeltaPOC(i) && rpcPic->referenced)
+        {
+          // This picture exists as a reference picture
+          // and should be added to the explicit Reference Picture Set
+          pLocalRPS->setDeltaPOC(k, pReferencePictureSet->getDeltaPOC(i) + 1);
+          pLocalRPS->setUsed(k, pReferencePictureSet->getUsed(i) && (!isRAP));
+          if (bEfficientFieldIRAPEnabled)
+          {
+            pLocalRPS->setUsed(k, pLocalRPS->getUsed(k) && !(bUseRecoveryPoint && this->getPOC() > pocRandomAccess && this->getPOC() + pReferencePictureSet->getDeltaPOC(i) + 1 < pocRandomAccess));
+          }
+
+          if (pLocalRPS->getDeltaPOC(k) < 0)
+          {
+            nrOfNegativePictures++;
+          }
+          else
+          {
+            if (bEfficientFieldIRAPEnabled && rpcPic->getPOC() == this->getAssociatedIRAPPOC() && this->getAssociatedIRAPPOC() == this->getPOC() + 2)
+            {
+              irapIsInRPS = true;
+            }
+            nrOfPositivePictures++;
+          }
+          k++;
+        }
+      }
+    }
+  }
+#endif
   pLocalRPS->setNumberOfNegativePictures(nrOfNegativePictures);
   pLocalRPS->setNumberOfPositivePictures(nrOfPositivePictures);
   pLocalRPS->setNumberOfPictures(nrOfNegativePictures+nrOfPositivePictures);
@@ -1837,6 +1924,12 @@ SPSNext::SPSNext( SPS& sps )
 #endif
 #if JEM_TOOLS
   , m_CIPFMode                  ( 0 )
+#endif
+#if JVET_K0157
+    , m_compositeRefEnabled     ( false )
+#endif
+#if JVET_K0076_CPR
+    , m_IBCMode                 ( 0 )
 #endif
   // ADD_NEW_TOOL : (sps extension) add tool enabling flags here (with "false" as default values)
 {
@@ -2630,7 +2723,12 @@ void calculateParameterSetChangedFlag(bool &bChanged, const std::vector<uint8_t>
 
 uint32_t PreCalcValues::getValIdx( const Slice &slice, const ChannelType chType ) const
 {
+#if JVET_K0076_CPR_DT
+  return (slice.isIntra() || (slice.getNumRefIdx(REF_PIC_LIST_0) == 1 && slice.getNumRefIdx(REF_PIC_LIST_1) == 0 && slice.getRefPOC(REF_PIC_LIST_0, 0) == slice.getPOC()))
+    ? (ISingleTree ? 0 : (chType << 1)) : 1;
+#else
   return slice.isIntra() ? ( ISingleTree ? 0 : ( chType << 1 ) ) : 1;
+#endif
 }
 
 uint32_t PreCalcValues::getMaxBtDepth( const Slice &slice, const ChannelType chType ) const
@@ -2645,7 +2743,12 @@ uint32_t PreCalcValues::getMinBtSize( const Slice &slice, const ChannelType chTy
 
 uint32_t PreCalcValues::getMaxBtSize( const Slice &slice, const ChannelType chType ) const
 {
+#if JVET_K0076_CPR_DT
+  return (( !slice.isIntra() && !(slice.getNumRefIdx(REF_PIC_LIST_0) == 1 && slice.getNumRefIdx(REF_PIC_LIST_1) == 0 && slice.getRefPOC(REF_PIC_LIST_0, 0) == slice.getPOC()) )
+    || isLuma(chType) || ISingleTree) ? slice.getMaxBTSize() : MAX_BT_SIZE_C;
+#else
   return ( !slice.isIntra() || isLuma( chType ) || ISingleTree ) ? slice.getMaxBTSize() : MAX_BT_SIZE_C;
+#endif
 }
 
 uint32_t PreCalcValues::getMinTtSize( const Slice &slice, const ChannelType chType ) const

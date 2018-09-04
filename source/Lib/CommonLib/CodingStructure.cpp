@@ -564,7 +564,13 @@ cTUTraverser CodingStructure::traverseTUs( const UnitArea& unit, const ChannelTy
 
 void CodingStructure::allocateVectorsAtPicLevel()
 {
-  const int  twice = ( !pcv->ISingleTree && slice->isIntra() && pcv->chrFormat != CHROMA_400 ) ? 2 : 1;
+  const int  twice = ( 
+#if JVET_K0076_CPR_DT
+  (!pcv->ISingleTree && (slice->isIntra() || (this->slice->getNumRefIdx(REF_PIC_LIST_0) == 1 && this->slice->getNumRefIdx(REF_PIC_LIST_1) == 0 && this->slice->getRefPOC(REF_PIC_LIST_0, 0) == this->slice->getPOC())))
+#else
+    !pcv->ISingleTree && slice->isIntra()
+#endif
+    && pcv->chrFormat != CHROMA_400 ) ? 2 : 1;
   size_t allocSize = twice * unitScale[0].scale( area.blocks[0].size() ).area();
 
   cus.reserve( allocSize );
@@ -762,7 +768,11 @@ void CodingStructure::useSubStructure( const CodingStructure& subStruct, const C
   if( cpyResi ) picture->getResiBuf( clippedArea ).copyFrom( subResiBuf );
   if( cpyReco ) picture->getRecoBuf( clippedArea ).copyFrom( subRecoBuf );
 
+#if JVET_K0076_CPR_DT
+  if (!subStruct.m_isTuEnc && (!slice->isIntra() && subStruct.chType != CHANNEL_TYPE_CHROMA))
+#else
   if( !subStruct.m_isTuEnc && !slice->isIntra() )
+#endif
   {
     // copy motion buffer
     MotionBuf ownMB  = getMotionBuf          ( clippedArea );
@@ -1398,3 +1408,38 @@ const TransformUnit* CodingStructure::getTURestricted( const Position &pos, cons
   }
 }
 
+#if JVET_K0076_CPR_DT
+IbcLumaCoverage CodingStructure::getIbcLumaCoverage(const CompArea& chromaArea) const
+{
+  CHECK(chType != CHANNEL_TYPE_CHROMA, "Error");
+
+  static const unsigned int unitArea = MIN_PU_SIZE * MIN_PU_SIZE;
+  CompArea lumaArea = CompArea(COMPONENT_Y, chromaArea.chromaFormat, chromaArea.lumaPos(), recalcSize(chromaArea.chromaFormat, CHANNEL_TYPE_CHROMA, CHANNEL_TYPE_LUMA, chromaArea.size()));
+  lumaArea = clipArea(lumaArea, picture->block(COMPONENT_Y));
+  const unsigned int fullArea = lumaArea.area();
+  unsigned int ibcArea = 0;
+  for (SizeType y = 0; y < lumaArea.height; y += MIN_PU_SIZE)
+  {
+    for (SizeType x = 0; x < lumaArea.width; x += MIN_PU_SIZE)
+    {
+      Position pos = lumaArea.offset(x, y);
+      if (picture->cs->getMotionInfo(pos).isInter) // need to change if inter slice allows dualtree
+      {
+        ibcArea += unitArea;
+      }
+    }
+  }
+
+  IbcLumaCoverage coverage = IBC_LUMA_COVERAGE_FULL;
+  if (ibcArea == 0)
+  {
+    coverage = IBC_LUMA_COVERAGE_NONE;
+  }
+  else if (ibcArea < fullArea)
+  {
+    coverage = IBC_LUMA_COVERAGE_PARTIAL;
+  }
+
+  return coverage;
+}
+#endif

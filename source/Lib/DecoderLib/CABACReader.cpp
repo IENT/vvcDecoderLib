@@ -195,7 +195,7 @@ bool CABACReader::coding_tree_unit( CodingStructure& cs, const UnitArea& area, i
         ctx += leftCTUAddr > -1 ? ( ctbAlfFlag[leftCTUAddr] ? 1 : 0 ) : 0;
         ctx += aboveCTUAddr > -1 ? ( ctbAlfFlag[aboveCTUAddr] ? 1 : 0 ) : 0;
 
-        if( alfSliceParam.chromaCtbPresentFlag && compIdx )
+        if( compIdx && alfSliceParam.chromaCtbPresentFlag )
         {
           ctbAlfFlag[ctuRsAddr] = 1;
         }
@@ -1247,7 +1247,9 @@ bool CABACReader::split_cu_flag( CodingStructure& cs, Partitioner &partitioner )
 bool CABACReader::coding_unit( CodingUnit &cu, Partitioner &partitioner, CUCtx& cuCtx )
 {
   CodingStructure& cs = *cu.cs;
-
+#if JVET_K0076_CPR
+  cs.chType = partitioner.chType;
+#endif
   // transquant bypass flag
   if( cs.pps->getTransquantBypassEnabledFlag() )
   {
@@ -1255,7 +1257,11 @@ bool CABACReader::coding_unit( CodingUnit &cu, Partitioner &partitioner, CUCtx& 
   }
 
   // skip flag
+#if JVET_K0076_CPR_DT
+  if (!cs.slice->isIntra() && cu.Y().valid())
+#else
   if( !cs.slice->isIntra() )
+#endif
   {
     cu_skip_flag( cu );
   }
@@ -1353,7 +1359,12 @@ void CABACReader::imv_mode( CodingUnit& cu, MergeCtx& mrgCtx )
 
   unsigned value = 0;
   unsigned ctxId = DeriveCtx::CtxIMVFlag( cu );
-  value = m_BinDecoder.decodeBin( Ctx::ImvFlag( ctxId ) );
+#if JVET_K0076_CPR
+  if (cu.firstPU->interDir == 1 && cu.cs->slice->getRefPic(REF_PIC_LIST_0, cu.firstPU->refIdx[REF_PIC_LIST_0])->getPOC() == cu.cs->slice->getPOC()) // the first bin of IMV flag does need to be signaled in CPR block
+    value = 1;
+  else
+#endif
+    value = m_BinDecoder.decodeBin( Ctx::ImvFlag( ctxId ) );
   DTRACE( g_trace_ctx, D_SYNTAX, "imv_mode() value=%d ctx=%d\n", value, ctxId );
 
   if( spsNext.getImvMode() == IMV_4PEL && value )
@@ -1418,7 +1429,14 @@ void CABACReader::cu_pred_data( CodingUnit &cu )
     intra_chroma_pred_modes( cu );
     return;
   }
-
+#if JVET_K0076_CPR_DT
+  if (!cu.Y().valid()) // dual tree chroma CU
+  {
+    cu.predMode = MODE_INTER;
+    cu.ibc = true;
+    return;
+  }
+#endif 
   MergeCtx mrgCtx;
 
   for( auto &pu : CU::traversePUs( cu ) )
@@ -1437,6 +1455,10 @@ void CABACReader::cu_pred_data( CodingUnit &cu )
   {
     PU::spanLICFlags( pu, cu.LICFlag );
   }
+#endif
+
+#if JVET_K0248_GBI
+  cu_gbi_flag( cu );
 #endif
 }
 
@@ -1475,6 +1497,56 @@ void CABACReader::obmc_flag( CodingUnit& cu )
 }
 #endif
 
+#if JVET_K0248_GBI
+void CABACReader::cu_gbi_flag( CodingUnit& cu )
+{
+  if( !CU::isGBiIdxCoded(cu) )
+  {
+    return;
+  }
+
+  uint8_t gbiIdx = GBI_DEFAULT;
+  
+  CHECK( !( GBI_NUM > 1 && (GBI_NUM == 2 || (GBI_NUM & 0x01 ) == 1 ) ), " !( GBI_NUM > 1 && ( GBI_NUM == 2 || ( GBI_NUM & 0x01 ) == 1 ) ) " );
+
+  RExt__DECODER_DEBUG_BIT_STATISTICS_CREATE_SET( STATS__CABAC_BITS__GBI_IDX );
+  
+  int ctxId = 0;
+
+  uint32_t idx = 0;
+  uint32_t symbol;
+  
+  symbol = ( m_BinDecoder.decodeBin( Ctx::GBiIdx( ctxId ) ) );
+
+  int32_t numGBi = ( cu.slice->getCheckLDC() ) ? 5 : 3;
+
+  if( symbol == 0 )
+  {
+    uint32_t prefixNumBits = numGBi - 2;
+    uint32_t step = 1;
+
+    unsigned ctxIdGBi = 4;
+    idx = 1;
+
+    for( int ui = 0; ui < prefixNumBits; ++ui )
+    {
+      symbol = ( m_BinDecoder.decodeBin( Ctx::GBiIdx( ctxIdGBi ) ) );
+
+      if( symbol == 1 )
+      {
+        break;
+      }
+      ctxIdGBi += step;
+      idx += step;
+    }
+  }
+  
+  gbiIdx = ( uint8_t )g_GbiParsingOrder[idx];
+  CU::setGbiIdx( cu, gbiIdx);
+
+  DTRACE( g_trace_ctx, D_SYNTAX, "cu_gbi_flag() gbi_idx=%d\n", cu.GBiIdx ? 1 : 0 );
+}
+#endif
 
 void CABACReader::intra_luma_pred_modes( CodingUnit &cu )
 {
@@ -1953,6 +2025,9 @@ void CABACReader::prediction_unit( PredictionUnit& pu, MergeCtx& mrgCtx )
     pu.mv    [REF_PIC_LIST_1] = Mv(0, 0);
     pu.refIdx[REF_PIC_LIST_1] = -1;
     pu.interDir               =  1;
+#if JVET_K0248_GBI
+    pu.cu->GBiIdx = GBI_DEFAULT;
+#endif
   }
 
   PU::spanMotionInfo( pu, mrgCtx );

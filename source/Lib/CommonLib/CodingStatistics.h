@@ -120,6 +120,9 @@ enum CodingStatisticsType
   STATS__CABAC_BITS__EMT_CU_FLAG,
   STATS__CABAC_BITS__EMT_TU_INDEX,
 #endif
+#if JVET_K0248_GBI
+  STATS__CABAC_BITS__GBI_IDX,
+#endif
   STATS__CABAC_BITS__OTHER,
   STATS__CABAC_BITS__INVALID,
   STATS__TOOL_TOTAL_FRAME,// This is a special case and is not included in the report.
@@ -130,6 +133,16 @@ enum CodingStatisticsType
 #endif
   STATS__TOOL_TOTAL,
   STATS__NUM_STATS
+};
+
+enum CodingStatisticsMode
+{
+  STATS__MODE_NONE  = 0,
+  STATS__MODE_BITS  = 1,
+  STATS__MODE_TOOLS = 2,
+
+  STATS__MODE_ALL   =
+    STATS__MODE_BITS | STATS__MODE_TOOLS
 };
 
 static inline const char* getName(CodingStatisticsType name)
@@ -207,6 +220,9 @@ static inline const char* getName(CodingStatisticsType name)
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
     "CABAC_BITS__EMT_CU_FLAG",
     "CABAC_BITS__EMT_TU_INDX",
+#endif
+#if JVET_K0248_GBI
+    "CABAC_BITS__GBI_IDX",
 #endif
     "CABAC_BITS__OTHER",
     "CABAC_BITS__INVALID",
@@ -354,11 +370,13 @@ public:
     friend class CodingStatistics;
   };
 
+  int m_mode;
+
 private:
 
   CodingStatisticsData data;
 
-  CodingStatistics() : data()
+  CodingStatistics() : m_mode(STATS__MODE_ALL), data()
   {
   }
 
@@ -436,11 +454,8 @@ private:
     printf( "\n" );
   }
 
-public:
-
-  ~CodingStatistics()
+  void OutputBitStats()
   {
-#if RExt__DECODER_DEBUG_BIT_STATISTICS
     const int64_t es = CODINGSTATISTICS_ENTROPYSCALE;
 
     int64_t countTotal = 0;
@@ -622,10 +637,10 @@ public:
     OutputDashedLine( "GRAND TOTAL" );
     epTotalBits += cavlcTotalBits;
     OutputLine      ( "TOTAL",                  '~', "~~GT~~", "~~GT~~", "~~GT~~", cabacTotalBits, epTotalBits );
-#endif //RExt__DECODER_DEBUG_BIT_STATISTICS
+  }
 
-#ifdef RExt__DECODER_DEBUG_TOOL_STATISTICS
-#if JEM_TOOLS
+  void OutputToolStats()
+  {
     printf("\n");
     printf( " %-45s-   Width Height   Type        Count  Impacted pixels  %% Impacted pixels\n", "Tools statistics" );
     OutputDashedLine( "" );
@@ -684,7 +699,20 @@ public:
         }
       }
     }
-#endif //JEM_TOOLS
+  }
+
+public:
+
+  ~CodingStatistics()
+  {
+#if RExt__DECODER_DEBUG_BIT_STATISTICS
+    if (m_mode & STATS__MODE_BITS)
+      OutputBitStats();
+#endif //RExt__DECODER_DEBUG_BIT_STATISTICS
+
+#ifdef RExt__DECODER_DEBUG_TOOL_STATISTICS
+    if (m_mode & STATS__MODE_TOOLS)
+      OutputToolStats();
 #endif //RExt__DECODER_DEBUG_TOOL_STATISTICS
   }
 

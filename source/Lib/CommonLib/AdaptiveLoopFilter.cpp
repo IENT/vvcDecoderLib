@@ -217,19 +217,25 @@ void AdaptiveLoopFilter::create( const int picWidth, const int picHeight, const 
   // Laplacian based activity
   for( int i = 0; i < NUM_DIRECTIONS; i++ )
   {
-    m_laplacian[i] = new int*[m_CLASSIFICATION_BLK_SIZE + 5];
-
-    for( int y = 0; y < m_CLASSIFICATION_BLK_SIZE + 5; y++ )
+    if ( m_laplacian[i] == nullptr )
     {
-      m_laplacian[i][y] = new int[m_CLASSIFICATION_BLK_SIZE + 5];
+      m_laplacian[i] = new int*[m_CLASSIFICATION_BLK_SIZE + 5];
+
+      for( int y = 0; y < m_CLASSIFICATION_BLK_SIZE + 5; y++ )
+      {
+        m_laplacian[i][y] = new int[m_CLASSIFICATION_BLK_SIZE + 5];
+      }
     }
   }
 
   // Classification
-  m_classifier = new AlfClassifier*[picHeight];
-  for( int i = 0; i < picHeight; i++ )
+  if ( m_classifier == nullptr )
   {
-    m_classifier[i] = new AlfClassifier[picWidth];
+    m_classifier = new AlfClassifier*[picHeight];
+    for( int i = 0; i < picHeight; i++ )
+    {
+      m_classifier[i] = new AlfClassifier[picWidth];
+    }
   }
 }
 
@@ -2303,6 +2309,10 @@ void AdaptiveLoopFilter::xCUAdaptive( CodingStructure& cs, const PelUnitBuf &rec
 
     for( auto &currCU : cs.traverseCUs( ctuArea, CH_L ) )
     {
+#if JVET_K0076_CPR_DT
+      if (currCU.chType != CH_L)
+        break;
+#endif
       const Position&    cuPos   = currCU.lumaPos();
       const int          qtDepth = currCU.qtDepth;
       const unsigned     qtSize  = maxCUSize >> qtDepth;

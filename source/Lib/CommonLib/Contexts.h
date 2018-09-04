@@ -391,6 +391,9 @@ public:
   static const CtxSet   FrucFlag;
   static const CtxSet   FrucMode;
 #endif
+#if JVET_K0248_GBI
+  static const CtxSet   GBiIdx;
+#endif
 #if JVET_K0371_ALF
   static const CtxSet   ctbAlfFlag;
 #endif

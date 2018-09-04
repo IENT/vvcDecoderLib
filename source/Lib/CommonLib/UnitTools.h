@@ -101,6 +101,13 @@ namespace CU
   bool isObmcFlagCoded                (const CodingUnit& cu);
 #endif
 
+#if JVET_K0248_GBI
+  bool  isGBiIdxCoded                  (const CodingUnit& cu);
+  uint8_t getValidGbiIdx               (const CodingUnit& cu);
+  void  setGbiIdx                      (      CodingUnit& cu, uint8_t uh);
+  uint8_t deriveGbiIdx                 (uint8_t gbiLO, uint8_t gbiL1);
+#endif
+
   PUTraverser traversePUs             (      CodingUnit& cu);
   TUTraverser traverseTUs             (      CodingUnit& cu);
   cPUTraverser traversePUs            (const CodingUnit& cu);
@@ -164,7 +171,11 @@ namespace PU
 #if JEM_TOOLS
   void spanLICFlags                   (      PredictionUnit &pu, const bool LICFlag );
 
-  bool getInterMergeSubPuMvpCand      (const PredictionUnit &pu, MergeCtx &mrgCtx, bool& LICFlag, const int count );
+  bool getInterMergeSubPuMvpCand      (const PredictionUnit &pu, MergeCtx &mrgCtx, bool& LICFlag, const int count 
+#if JVET_K0076_CPR
+    , const int countIBC
+#endif
+  );
   bool getInterMergeSubPuRecurCand    (const PredictionUnit &pu, MergeCtx &mrgCtx, const int count );
 #endif
 #if JVET_K0357_AMVR
@@ -172,7 +183,11 @@ namespace PU
 #endif
 #if JEM_TOOLS
   bool isAffineMrgFlagCoded           (const PredictionUnit &pu );
+#if JVET_K0248_GBI
+  void getAffineMergeCand             (const PredictionUnit &pu, MvField (*mvFieldNeighbours)[3], unsigned char &interDirNeighbours, unsigned char &gbiIdx, int &numValidMergeCand);
+#else
   void getAffineMergeCand             (const PredictionUnit &pu, MvField (*mvFieldNeighbours)[3], unsigned char &interDirNeighbours, int &numValidMergeCand );
+#endif
   void setAllAffineMvField            (      PredictionUnit &pu, MvField *mvField, RefPicList eRefList );
   void setAllAffineMv                 (      PredictionUnit &pu, Mv affLT, Mv affRT, Mv affLB, RefPicList eRefList );
   bool isBIOLDB                       (const PredictionUnit &pu);
@@ -184,7 +199,11 @@ namespace PU
   void setAllAffineMv                 (      PredictionUnit &pu, Mv affLT, Mv affRT, Mv affLB, RefPicList eRefList );
 #endif
 #if !JEM_TOOLS && JVET_K0346
-  bool getInterMergeSubPuMvpCand(const PredictionUnit &pu, MergeCtx &mrgCtx, bool& LICFlag, const int count);
+  bool getInterMergeSubPuMvpCand(const PredictionUnit &pu, MergeCtx &mrgCtx, bool& LICFlag, const int count
+#if JVET_K0076_CPR
+    , const int countIBC
+#endif
+  );
   bool getInterMergeSubPuRecurCand(const PredictionUnit &pu, MergeCtx &mrgCtx, const int count);
 #endif
   bool isBiPredFromDifferentDir       (const PredictionUnit &pu);
@@ -207,6 +226,11 @@ namespace PU
   bool isLMCModeEnabled               (const PredictionUnit &pu, unsigned mode);
 #endif
   bool isChromaIntraModeCrossCheckMode(const PredictionUnit &pu);
+#if JVET_K0076_CPR
+  void getIntraBCMVPsEncOnly          (PredictionUnit &pu, Mv* MvPred, int& nbPred);
+  bool getDerivedBV                   (PredictionUnit &pu, const Mv& currentMv, Mv& derivedMv);
+  bool isBlockVectorValid             (PredictionUnit& pu, int xPos, int yPos, int width, int height, int picWidth, int picHeight, int xStartInCU, int yStartInCU, int xBv, int yBv, int ctuSize);
+#endif
 }
 
 // TU tools
