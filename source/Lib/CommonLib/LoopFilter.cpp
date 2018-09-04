@@ -508,10 +508,12 @@ unsigned LoopFilter::xGetBoundaryStrengthSingle ( const CodingUnit& cu, const De
 #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
     if( cu.cs->sps->getSpsNext().getUseHighPrecMv() )
     {
+#if !REMOVE_MV_ADAPT_PREC
       mvP0.setHighPrec();
       mvP1.setHighPrec();
       mvQ0.setHighPrec();
       mvQ1.setHighPrec();
+#endif
       nThreshold = 4 << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
     }
 #endif
@@ -571,8 +573,10 @@ unsigned LoopFilter::xGetBoundaryStrengthSingle ( const CodingUnit& cu, const De
 #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
   if( cu.cs->sps->getSpsNext().getUseHighPrecMv() )
   {
+#if !REMOVE_MV_ADAPT_PREC
     mvP0.setHighPrec();
     mvQ0.setHighPrec();
+#endif
     nThreshold = 4 << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
   }
 #endif

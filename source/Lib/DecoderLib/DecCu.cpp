@@ -606,9 +606,13 @@ void DecCu::xDeriveCUMV( CodingUnit &cu )
 #if JVET_K0337_AFFINE_MVD_PREDICTION
               mvRT += pu.mvdAffi[eRefList][0];
 #endif
-
-              CHECK( !mvLT.highPrec, "unexpected lp mv" );
-              CHECK( !mvRT.highPrec, "unexpected lp mv" );
+#if REMOVE_MV_ADAPT_PREC
+              mvLT.setHighPrec();
+              mvRT.setHighPrec();
+#else
+              CHECK(!mvLT.highPrec, "unexpected lp mv");
+              CHECK(!mvRT.highPrec, "unexpected lp mv");
+#endif
 
 #if JVET_K_AFFINE_BUG_FIXES
               Mv mvLB;
@@ -619,7 +623,11 @@ void DecCu::xDeriveCUMV( CodingUnit &cu )
 #if JVET_K0337_AFFINE_MVD_PREDICTION
                 mvLB += pu.mvdAffi[eRefList][0];
 #endif
-                CHECK( !mvLB.highPrec, "unexpected lp mv" );
+#if REMOVE_MV_ADAPT_PREC
+                mvLB.setHighPrec();
+#else
+                CHECK(!mvLB.highPrec, "unexpected lp mv");
+#endif
               }
 #endif
 #else
@@ -658,10 +666,12 @@ void DecCu::xDeriveCUMV( CodingUnit &cu )
               if (eRefList == REF_PIC_LIST_0 && pu.cs->slice->getRefPic(eRefList, pu.refIdx[eRefList])->getPOC() == pu.cs->slice->getPOC())
               {
                 pu.cu->ibc = true;
+#if !REMOVE_MV_ADAPT_PREC
 #if REUSE_CU_RESULTS
                 if (!cu.cs->pcv->isEncoder)
 #endif
                   mvd <<= 2;
+#endif
               }
               pu.mv[eRefList] = amvpInfo.mvCand[pu.mvpIdx[eRefList]] + mvd;
 #else
@@ -669,7 +679,11 @@ void DecCu::xDeriveCUMV( CodingUnit &cu )
 #endif
 
 #if JEM_TOOLS || JVET_K_AFFINE
-              if( pu.cs->sps->getSpsNext().getUseAffine() )
+              if( pu.cs->sps->getSpsNext().getUseAffine()
+#if REMOVE_MV_ADAPT_PREC
+                || pu.cs->sps->getSpsNext().getUseHighPrecMv()
+#endif
+                )
               {
                 pu.mv[eRefList].setHighPrec();
               }

@@ -995,7 +995,11 @@ void InterPrediction::xPredInterBlk ( const ComponentID& compID, const Predictio
 
   int iAddPrecShift = 0;
 
-  if( _mv.highPrec )
+#if REMOVE_MV_ADAPT_PREC
+  if (pu.cs->sps->getSpsNext().getUseHighPrecMv())
+#else
+  if (_mv.highPrec)
+#endif
   {
     CHECKD( !pu.cs->sps->getSpsNext().getUseHighPrecMv(), "Found a high-precision motion vector, but the high-precision MV extension is disabled!" );
 
@@ -1019,7 +1023,11 @@ void InterPrediction::xPredInterBlk ( const ComponentID& compID, const Predictio
 
   int iAddPrecShift = 0;
 
+#if REMOVE_MV_ADAPT_PREC
+  if (pu.cs->sps->getSpsNext().getUseHighPrecMv())
+#else
   if (_mv.highPrec)
+#endif
   {
     CHECKD(!pu.cs->sps->getSpsNext().getUseHighPrecMv(), "Found a high-precision motion vector, but the high-precision MV extension is disabled!");
 
@@ -1245,10 +1253,11 @@ void InterPrediction::xPredAffineBlk( const ComponentID& compID, const Predictio
   Mv mvLT =_mv[0];
   Mv mvRT =_mv[1];
   Mv mvLB =_mv[2];
-
+#if !REMOVE_MV_ADAPT_PREC
   mvLT.setHighPrec();
   mvRT.setHighPrec();
   mvLB.setHighPrec();
+#endif
 
   // get affine sub-block width and height
   const int width  = pu.Y().width;
@@ -1418,7 +1427,11 @@ void InterPrediction::xGetLICParams( const CodingUnit& cu,
                                            int&        scale,
                                            int&        offset )
 {
+#if REMOVE_MV_ADAPT_PREC
+  const int       lumaShift     = 2 + VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+#else
   const int       lumaShift     = ( mv.highPrec ? 2 + VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : 2 );
+#endif
   const int       horShift      = ( lumaShift + ::getComponentScaleX(compID, cu.chromaFormat) );
   const int       verShift      = ( lumaShift + ::getComponentScaleY(compID, cu.chromaFormat) );
   const int       horIntMv      = ( mv.getHor() + ( ( 1 << horShift ) >> 1 ) ) >> horShift;
@@ -1446,7 +1459,11 @@ void InterPrediction::xGetLICParams( const CodingUnit& cu,
   // above
   if( cuAbove )
   {
-    Mv            subPelMv  ( horIntMv << horShift, verIntMv << verShift, mv.highPrec );
+#if REMOVE_MV_ADAPT_PREC
+    Mv            subPelMv(horIntMv << horShift, verIntMv << verShift);
+#else
+    Mv            subPelMv(horIntMv << horShift, verIntMv << verShift, mv.highPrec);
+#endif
                   clipMv    ( subPelMv, cuAbove->lumaPos(), *cu.cs->sps );
     const int     hOff    = ( subPelMv.getHor() >> horShift );
     const int     vOff    = ( subPelMv.getVer() >> verShift ) - 1;
@@ -1470,7 +1487,11 @@ void InterPrediction::xGetLICParams( const CodingUnit& cu,
   // left
   if( cuLeft )
   {
-    Mv            subPelMv  ( horIntMv << horShift, verIntMv << verShift, mv.highPrec );
+#if REMOVE_MV_ADAPT_PREC
+    Mv            subPelMv(horIntMv << horShift, verIntMv << verShift);
+#else
+    Mv            subPelMv(horIntMv << horShift, verIntMv << verShift, mv.highPrec);
+#endif
                   clipMv    ( subPelMv, cuLeft->lumaPos(), *cu.cs->sps );
     const int     hOff    = ( subPelMv.getHor() >> horShift ) - 1;
     const int     vOff    = ( subPelMv.getVer() >> verShift );
@@ -3607,10 +3628,12 @@ uint32_t InterPrediction::xFrucRefineMvSearch ( MvField* pBestMvField, RefPicLis
       Mv mvOffset = pSearchOffset[nDirect];
       mvOffset <<= nSearchStepShift;
       MvField mvCand = mvCurCenter;
+#if !REMOVE_MV_ADAPT_PREC
       if( mvCand.mv.highPrec && !mvOffset.highPrec )
       {
         mvOffset.highPrec = true;
       }
+#endif
       mvCand.mv += mvOffset;
 #if DISTORTION_TYPE_BUGFIX
       Distortion uiCost = (Distortion) xFrucGetMvCost(
@@ -4029,7 +4052,11 @@ void InterPrediction::xPredInterLines( const PredictionUnit& pu, const Picture* 
 
   int iAddPrecShift = 0;
 
-  if( _mv.highPrec )
+#if REMOVE_MV_ADAPT_PREC
+  if (pu.cs->sps->getSpsNext().getUseHighPrecMv())
+#else
+  if (_mv.highPrec)
+#endif
   {
     CHECK( !pu.cs->sps->getSpsNext().getUseHighPrecMv(), "Found a high-precision motion vector, but the high-precision MV extension is disabled!" );
 
@@ -4083,7 +4110,11 @@ void InterPrediction::xFillPredBlckAndBorder( const PredictionUnit& pu, RefPicLi
 
   const Picture* refPic = pu.cu->slice->getRefPic(eRefPicList, iRefIdx);
 
+#if REMOVE_MV_ADAPT_PREC
+  const int nMVUnit = 2 + VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+#else
   const int nMVUnit = 2;
+#endif
 
   int dstStride = MAX_CU_SIZE + DMVR_INTME_RANGE*2;
 
@@ -4169,11 +4200,13 @@ void InterPrediction::xBIPMVRefine( PredictionUnit& pu, RefPicList eRefPicList, 
       Mv mvOffset = pSearchOffset[nDirect];
       mvOffset <<= nSearchStepShift;
 
-      if( pu.cu->slice->getSPS()->getSpsNext().getUseHighPrecMv() )
+#if !REMOVE_MV_ADAPT_PREC
+      if (pu.cu->slice->getSPS()->getSpsNext().getUseHighPrecMv())
       {
-        CHECK( !cMvOrg.highPrec, "wrong" );
+        CHECK(!cMvOrg.highPrec, "wrong");
         mvOffset.highPrec = true;
       }
+#endif
 
       Mv cMvTemp = cMvCtr;
       cMvTemp += mvOffset;
@@ -4296,7 +4329,11 @@ void InterPrediction::xBIPMVRefine(PredictionUnit& pu, uint32_t nSearchStepShift
     const int32_t refStride = m_cYuvPredTempL0.Y().stride;
     for (SAD_POINT_INDEX nIdx = SAD_POINT_INDEX::BOTTOM; nIdx <= SAD_POINT_INDEX::TOP_LEFT; ++nIdx)
     {
+#if REMOVE_MV_ADAPT_PREC
+      Mv cMvDL0(m_pSearchOffset[nIdx]);
+#else
       Mv cMvDL0(m_pSearchOffset[nIdx], cMvOrgL0.highPrec);
+#endif
       const Pel *pRefL0 = m_cYuvPredTempL0.Y().bufAt(cMvDL0.getHor() + (cDistParam.MVDL0.getHor() >> nSearchStepShift), cMvDL0.getVer() + (cDistParam.MVDL0.getVer() >> nSearchStepShift));
       const Mv cMvDL1(-cMvDL0);
       const Pel* pRefL1 = m_cYuvPredTempL1.Y().bufAt(cMvDL1.getHor() + (cDistParam.MVDL1.getHor() >> nSearchStepShift), cMvDL1.getVer() + (cDistParam.MVDL1.getVer() >> nSearchStepShift));
@@ -4408,7 +4445,11 @@ void InterPrediction::xBIPMVRefine(PredictionUnit& pu, uint32_t nSearchStepShift
     const int32_t refStride = m_HalfPelFilteredBuffL0[0][1].Y().stride;
     for (SAD_POINT_INDEX nIdx = SAD_POINT_INDEX::BOTTOM; nIdx <= SAD_POINT_INDEX::LEFT; ++nIdx)
     {
-		  Mv cMvDL0(m_pSearchOffset[nIdx], cMvOrgL0.highPrec);
+#if REMOVE_MV_ADAPT_PREC
+      Mv cMvDL0(m_pSearchOffset[nIdx]);
+#else
+      Mv cMvDL0(m_pSearchOffset[nIdx], cMvOrgL0.highPrec);
+#endif
       Mv cMvDL1(-cMvDL0);
       const Pel *pRefL0 = m_filteredBlock[cMvDL0.getAbsHor()][cMvDL0.getAbsVer()][COMPONENT_Y];
       const Pel *pRefL1 = m_filteredBlockL1[cMvDL1.getAbsHor()][cMvDL1.getAbsVer()];
@@ -4496,7 +4537,11 @@ void InterPrediction::xGenerateFracPixel(PredictionUnit& pu, uint32_t nSearchSte
   const uint32_t bufferWidth = restAlign ? cuWidth : cuWidth + alignSize;
   const uint32_t bufferHeight = cuHeight + 1;
   //(0,-/+1)
+#if REMOVE_MV_ADAPT_PREC
+  Mv cMvL0(cMvOrgL0 + Mv(0, -1 << nSearchStepShift));
+#else
   Mv cMvL0(cMvOrgL0 + Mv(0, -1 << nSearchStepShift, cMvOrgL0.highPrec));
+#endif
   m_HalfPelFilteredBuffL0[0][1] = PelUnitBuf(pu.chromaFormat, PelBuf(m_filteredBlock[0][1][COMPONENT_Y], bufferStride, bufferWidth, bufferHeight));
   clipMv(cMvL0, pu.cu->lumaPos(), *pu.cu->slice->getSPS());
   xPredInterBlk(COMPONENT_Y, pu, pu.cu->slice->getRefPic(REF_PIC_LIST_0, pu.refIdx[REF_PIC_LIST_0]), cMvL0
@@ -4506,7 +4551,11 @@ void InterPrediction::xGenerateFracPixel(PredictionUnit& pu, uint32_t nSearchSte
     , cuWidth
     , cuHeight + 1
   );
+#if REMOVE_MV_ADAPT_PREC
+  Mv cMvL1(cMvOrgL1 + Mv(0, -1 << nSearchStepShift));
+#else
   Mv cMvL1(cMvOrgL1 + Mv(0, -1 << nSearchStepShift, cMvOrgL1.highPrec));
+#endif
   m_HalfPelFilteredBuffL1[0][1] = PelUnitBuf(pu.chromaFormat, PelBuf(m_filteredBlockL1[0][1], bufferStride, bufferWidth, bufferHeight));
   clipMv(cMvL1, pu.cu->lumaPos(), *pu.cu->slice->getSPS());
   xPredInterBlk(COMPONENT_Y, pu, pu.cu->slice->getRefPic(REF_PIC_LIST_1, pu.refIdx[REF_PIC_LIST_1]), cMvL1
@@ -4517,7 +4566,11 @@ void InterPrediction::xGenerateFracPixel(PredictionUnit& pu, uint32_t nSearchSte
     , cuHeight + 1
   );
   //(-/+1,0)
+#if REMOVE_MV_ADAPT_PREC
+  cMvL0 = cMvOrgL0 + Mv(-1 << nSearchStepShift, 0);
+#else
   cMvL0 = cMvOrgL0 + Mv(-1 << nSearchStepShift, 0, cMvOrgL0.highPrec);
+#endif
   m_HalfPelFilteredBuffL0[1][0] = PelUnitBuf(pu.chromaFormat, PelBuf(m_filteredBlock[1][0][COMPONENT_Y], bufferStride, bufferWidth, bufferHeight));
   clipMv(cMvL0, pu.cu->lumaPos(), *pu.cu->slice->getSPS());
   xPredInterBlk(COMPONENT_Y, pu, pu.cu->slice->getRefPic(REF_PIC_LIST_0, pu.refIdx[REF_PIC_LIST_0]), cMvL0
@@ -4527,7 +4580,11 @@ void InterPrediction::xGenerateFracPixel(PredictionUnit& pu, uint32_t nSearchSte
     , bufferWidth
     , cuHeight
   );
+#if REMOVE_MV_ADAPT_PREC
+  cMvL1 = cMvOrgL1 + Mv(-1 << nSearchStepShift, 0);
+#else
   cMvL1 = cMvOrgL1 + Mv(-1 << nSearchStepShift, 0, cMvOrgL1.highPrec);
+#endif
   m_HalfPelFilteredBuffL1[1][0] = PelUnitBuf(pu.chromaFormat, PelBuf(m_filteredBlockL1[1][0], bufferStride, bufferWidth, bufferHeight));
   clipMv(cMvL1, pu.cu->lumaPos(), *pu.cu->slice->getSPS());
   xPredInterBlk(COMPONENT_Y, pu, pu.cu->slice->getRefPic(REF_PIC_LIST_1, pu.refIdx[REF_PIC_LIST_1]), cMvL1
@@ -4557,8 +4614,10 @@ void InterPrediction::xProcessDMVR( PredictionUnit& pu, PelUnitBuf &pcYuvDst, co
   if( pu.cu->slice->getSPS()->getSpsNext().getUseHighPrecMv() )
   {
     searchStepShift += 2;
+#if !REMOVE_MV_ADAPT_PREC
     pu.mv[0].setHighPrec();
     pu.mv[1].setHighPrec();
+#endif
   }
 #if !DMVR_JVET_K0217
 #if JVET_K0248_GBI
@@ -4635,9 +4694,17 @@ void InterPrediction::xProcessDMVR( PredictionUnit& pu, PelUnitBuf &pcYuvDst, co
   DistParam cDistParam;
   MRSADtype minCost = std::numeric_limits<MRSADtype>::max();
 
+#if REMOVE_MV_ADAPT_PREC
+  const Mv mvBlkExt(m_searchRange << searchStepShift);
+#else
   const Mv mvBlkExt(m_searchRange << searchStepShift, pu.mv[REF_PIC_LIST_0].highPrec);
+#endif
   const SizeType MC_extension = m_searchRange << 1;
+#if REMOVE_MV_ADAPT_PREC
+  const Mv searchOffsetMv(-(int32_t)(m_searchRange << searchStepShift));
+#else
   const Mv searchOffsetMv(-(int32_t)(m_searchRange << searchStepShift), pu.mv[REF_PIC_LIST_0].highPrec);
+#endif
   const uint32_t dstStride = MAX_CU_SIZE + m_bufferWidthExtSize;
 
   m_cYuvPredTempL0 = PelUnitBuf(pu.chromaFormat, PelBuf(m_cYuvPredTempDMVRL0, dstStride, cuSize.width + MC_extension, cuSize.height + MC_extension));
