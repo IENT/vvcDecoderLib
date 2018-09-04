@@ -96,6 +96,7 @@ enum CodingStatisticsType
   STATS__TOOL_TOTAL_FRAME,// This is a special case and is not included in the report.
 #if JEM_TOOLS || JVET_K_AFFINE
   STATS__CABAC_BITS__AFFINE_FLAG,
+  STATS__TOOL_AFF,
 #if JVET_K0337_AFFINE_6PARA
   STATS__CABAC_BITS__AFFINE_TYPE,
 #endif
@@ -120,7 +121,6 @@ enum CodingStatisticsType
   STATS__CABAC_BITS__NSST,
   STATS__CABAC_BITS__LIC_FLAG,
   STATS__CABAC_BITS__OBMC_FLAG,
-  STATS__TOOL_AFF,
   STATS__TOOL_NSST,
   STATS__TOOL_EMT,
 #endif

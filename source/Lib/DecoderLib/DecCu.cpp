@@ -467,9 +467,11 @@ void DecCu::xDeriveCUMV( CodingUnit &cu )
     MergeCtx mrgCtx;
 
 #if RExt__DECODER_DEBUG_TOOL_STATISTICS
-#if JEM_TOOLS
-    if (pu.cu->affine)
-      CodingStatistics::IncrementStatisticTool(CodingStatisticsClassType{ STATS__TOOL_AFF, pu.Y().width, pu.Y().height });
+#if JEM_TOOLS || JVET_K_AFFINE
+    if( pu.cu->affine )
+    {
+      CodingStatistics::IncrementStatisticTool( CodingStatisticsClassType{ STATS__TOOL_AFF, pu.Y().width, pu.Y().height } );
+    }
 #endif
 #endif
 #if JVET_K0248_GBI
