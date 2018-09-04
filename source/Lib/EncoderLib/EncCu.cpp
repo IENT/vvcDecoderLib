@@ -2661,9 +2661,9 @@ void EncCu::xCheckRDCostInter( CodingStructure *&tempCS, CodingStructure *&bestC
 #if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
     , 1
 #endif
-    , 0,
+    , 0
 #if JVET_K0248_GBI
-    &equGBiCost
+    , &equGBiCost
 #endif
   );
 #if JVET_K0248_GBI
