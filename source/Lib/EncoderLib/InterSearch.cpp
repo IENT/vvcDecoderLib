@@ -1850,7 +1850,7 @@ void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
             xMotionEstimation( pu, origBuf, eRefPicList, cMvPred[iRefList][iRefIdxTemp], iRefIdxTemp, cMvTemp[iRefList][iRefIdxTemp], aaiMvpIdx[iRefList][iRefIdxTemp], uiBitsTemp, uiCostTemp, amvp[eRefPicList] );
           }
 #if JVET_K0248_GBI
-          if( cu.cs->sps->getSpsNext().getUseGBi() && !m_cUniMotions.isReadMode(( uint32_t)iRefList, (uint32_t)iRefIdxTemp ))
+          if( cu.cs->sps->getSpsNext().getUseGBi() && cu.GBiIdx == GBI_DEFAULT && cu.cs->slice->isInterB() )
           {
             const bool checkIdentical = true;
             m_cUniMotions.setReadMode( checkIdentical, (uint32_t)iRefList, (uint32_t)iRefIdxTemp );
@@ -2727,7 +2727,7 @@ Distortion InterSearch::xGetAffineTemplateCost( PredictionUnit& pu, PelUnitBuf& 
 void InterSearch::xMotionEstimation(PredictionUnit& pu, PelUnitBuf& origBuf, RefPicList eRefPicList, Mv& rcMvPred, int iRefIdxPred, Mv& rcMv, int& riMVPIdx, uint32_t& ruiBits, Distortion& ruiCost, const AMVPInfo& amvpInfo, bool bBi)
 {
 #if JVET_K0248_GBI
-  if ( pu.cu->cs->sps->getSpsNext().getUseGBi() && !bBi && xReadBufferedUniMv( pu, eRefPicList, iRefIdxPred, rcMvPred, rcMv, ruiBits, ruiCost ) )
+  if( pu.cu->cs->sps->getSpsNext().getUseGBi() && pu.cu->GBiIdx != GBI_DEFAULT && !bBi && xReadBufferedUniMv( pu, eRefPicList, iRefIdxPred, rcMvPred, rcMv, ruiBits, ruiCost ) )
   {
     return;
   }
@@ -3888,7 +3888,7 @@ void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
         xAffineMotionEstimation( pu, origBuf, eRefPicList, cMvPred[iRefList][iRefIdxTemp], iRefIdxTemp, cMvTemp[iRefList][iRefIdxTemp], uiBitsTemp, uiCostTemp );
       }
 #if JVET_K0248_GBI
-      if ( pu.cu->cs->sps->getSpsNext().getUseGBi() && !m_cUniMotions.isReadModeAffine( (uint8_t)iRefList, (uint8_t)iRefIdxTemp ) )
+      if( pu.cu->cs->sps->getSpsNext().getUseGBi() && pu.cu->GBiIdx == GBI_DEFAULT && pu.cu->slice->isInterB() )
       {
         m_cUniMotions.setReadModeAffine( true, (uint8_t)iRefList, (uint8_t)iRefIdxTemp );
         m_cUniMotions.copyAffineMvFrom( cMvTemp[iRefList][iRefIdxTemp], uiCostTemp - m_pcRdCost->getCost( uiBitsTemp ), (uint8_t)iRefList, (uint8_t)iRefIdxTemp );
@@ -4441,7 +4441,7 @@ void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
                                            bool            bBi )
 {
 #if JVET_K0248_GBI
-  if( pu.cu->cs->sps->getSpsNext().getUseGBi() && !bBi && xReadBufferedAffineUniMv( pu, eRefPicList, iRefIdxPred, acMvPred, acMv, ruiBits, ruiCost ))
+  if( pu.cu->cs->sps->getSpsNext().getUseGBi() && pu.cu->GBiIdx != GBI_DEFAULT && !bBi && xReadBufferedAffineUniMv( pu, eRefPicList, iRefIdxPred, acMvPred, acMv, ruiBits, ruiCost ) )
   {
     return;
   }
