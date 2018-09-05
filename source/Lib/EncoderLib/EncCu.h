@@ -227,21 +227,19 @@ protected:
   void xCheckRDCostMerge2Nx2NFRUC
                               ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode );
 #endif
+  void xEncodeInterResidual   ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode, int residualPass = 0
 #if JEM_TOOLS || JVET_K0357_AMVR
+    , CodingStructure* imvCS = NULL
+#endif
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
+    , int emtMode = 1
+#endif
+    , bool* bestHasNonResi = NULL
 #if JVET_K0248_GBI
-  void xEncodeInterResidual   ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode, int residualPass = 0, CodingStructure* imvCS = NULL, int emtMode = 1, bool* bestHasNonResi = NULL, double* equGBiCost = NULL);
-#else
-  void xEncodeInterResidual   ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode, int residualPass = 0, CodingStructure* imvCS = NULL, int emtMode = 1, bool* bestHasNonResi = NULL);
+    , double* equGBiCost = NULL
 #endif
-#else
-#if JVET_K0248_GBI
-  void xEncodeInterResidual   ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode, int residualPass, bool* bestHasNonResi, double* equGBiCost = NULL);
-#else
-  void xEncodeInterResidual   ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &partitioner, const EncTestMode& encTestMode, int residualPass, bool* bestHasNonResi);
-#endif
-#endif
+  );
 #if REUSE_CU_RESULTS
-
   void xReuseCachedResult     ( CodingStructure *&tempCS, CodingStructure *&bestCS, Partitioner &Partitioner );
 #endif
 #if JVET_K0076_CPR
