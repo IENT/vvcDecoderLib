@@ -3196,7 +3196,7 @@ bool PU::getInterMergeSubPuMvpCand( const PredictionUnit &pu, MergeCtx& mrgCtx, 
 )
 {
 #if JVET_K0076_CPR
-  if (count == countIBC)
+  if (count == countIBC && pu.cs->slice->getSPS()->getSpsNext().getIBCMode())
     return false;
 #endif
   const Slice   &slice   = *pu.cs->slice;
