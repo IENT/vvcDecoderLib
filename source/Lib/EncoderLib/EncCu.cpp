@@ -1730,9 +1730,9 @@ void EncCu::xCheckRDCostMerge2Nx2N( CodingStructure *&tempCS, CodingStructure *&
         ComprCUCtx cuECtx = m_modeCtrl->getComprCUCtx();
         bestIsSkip = blkCache->isSkip(tempCS->area) && cuECtx.bestCU;
       }
-#else
-      bestIsSkip = blkCache->isSkip( tempCS->area );
+      else
 #endif
+      bestIsSkip = blkCache->isSkip( tempCS->area );
     }
 
     static_vector<double, MRG_MAX_NUM_CANDS> candCostList;
