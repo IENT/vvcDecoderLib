@@ -4396,7 +4396,7 @@ void InterSearch::xCheckBestAffineMVP( PredictionUnit &pu, AffineAMVPInfo &affin
       if ( iVerIdx != 0 )
       {
 #if JVET_K0185_AFFINE_6PARA_ENC
-        secondPred = (iVerIdx == 1 ? affineAMVPInfo.mvCandRT[iMVPIdx] : affineAMVPInfo.mvCandLT[iMVPIdx]) + (acMv[0] - affineAMVPInfo.mvCandLT[iMVPIdx]);
+        secondPred = (iVerIdx == 1 ? affineAMVPInfo.mvCandRT[iMVPIdx] : affineAMVPInfo.mvCandLB[iMVPIdx]) + (acMv[0] - affineAMVPInfo.mvCandLT[iMVPIdx]);
 #else
         secondPred = affineAMVPInfo.mvCandRT[iMVPIdx] + (acMv[0] - affineAMVPInfo.mvCandLT[iMVPIdx]);
 #endif
