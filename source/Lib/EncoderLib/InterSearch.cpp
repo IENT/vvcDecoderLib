@@ -2955,7 +2955,11 @@ void InterSearch::xMotionEstimation(PredictionUnit& pu, PelUnitBuf& origBuf, Ref
   {
     xPatternSearchIntRefine( pu, cStruct, rcMv, rcMvPred, riMVPIdx, ruiBits, ruiCost, amvpInfo, fWeight);
   }
-  DTRACE( g_trace_ctx, D_ME, "   MECost<L%d,%d>: %6d (%d)  MV:%d,%d\n", ( int ) eRefPicList, ( int ) bBi, ruiCost, ruiBits, rcMv.getHor() << ( pu.cs->sps->getSpsNext().getUseHighPrecMv() ? 2 : 0 ), rcMv.getVer() << ( pu.cs->sps->getSpsNext().getUseHighPrecMv() ? 2 : 0 ) );
+#if REMOVE_MV_ADAPT_PREC
+  DTRACE( g_trace_ctx, D_ME, "   MECost<L%d,%d>: %6d (%d)  MV:%d,%d\n", ( int ) eRefPicList, ( int ) bBi, ruiCost, ruiBits, rcMv.getHor() << 2, rcMv.getVer() << 2);
+#else
+  DTRACE(g_trace_ctx, D_ME, "   MECost<L%d,%d>: %6d (%d)  MV:%d,%d\n", (int)eRefPicList, (int)bBi, ruiCost, ruiBits, rcMv.getHor() << (pu.cs->sps->getSpsNext().getUseHighPrecMv() ? 2 : 0), rcMv.getVer() << (pu.cs->sps->getSpsNext().getUseHighPrecMv() ? 2 : 0));
+#endif
 #else
   DTRACE( g_trace_ctx, D_ME, "   MECost<L%d,%d>: %6d (%d)  MV:%d,%d\n", ( int ) eRefPicList, ( int ) bBi, ruiCost, ruiBits, rcMv.getHor(), rcMv.getVer() );
 #endif

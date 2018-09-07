@@ -677,13 +677,8 @@ void DecCu::xDeriveCUMV( CodingUnit &cu )
 #else
               pu.mv     [eRefList] = amvpInfo.mvCand[pu.mvpIdx [eRefList]] + pu.mvd[eRefList];
 #endif
-
 #if JEM_TOOLS || JVET_K_AFFINE
-              if( pu.cs->sps->getSpsNext().getUseAffine()
-#if REMOVE_MV_ADAPT_PREC
-                || pu.cs->sps->getSpsNext().getUseHighPrecMv()
-#endif
-                )
+              if( pu.cs->sps->getSpsNext().getUseAffine())
               {
                 pu.mv[eRefList].setHighPrec();
               }

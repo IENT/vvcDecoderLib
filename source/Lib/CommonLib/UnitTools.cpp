@@ -92,11 +92,12 @@ static void xInitFrucMvpEl( CodingStructure& cs, int x, int y, int nCurPOC, int 
 
     int nColRefPOC = pColPic->cs->slice->getRefPOC( eRefPicList, frucMi.refIdx[eRefPicList] );
     Mv mvColPic = frucMi.mv[eRefPicList];
+#if !REMOVE_MV_ADAPT_PREC
     if( cs.sps->getSpsNext().getUseHighPrecMv() )
     {
       mvColPic.setHighPrec();
     }
-
+#endif
 #if JVET_K0157
     Mv mv2CurRefPic;
     if (cs.slice->getRefPic(eRefPicList, frucMi.refIdx[eRefPicList])->longTerm)
@@ -109,19 +110,22 @@ static void xInitFrucMvpEl( CodingStructure& cs, int x, int y, int nCurPOC, int 
 
     int xCurPic = 0;
     int yCurPic = 0;
+#if !REMOVE_MV_ADAPT_PREC
     if( cs.sps->getSpsNext().getUseHighPrecMv() )
     {
+#endif
       int nOffset = 1 << ( VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE + 1 );
 
       xCurPic = x + ( MIN_PU_SIZE >> 1 ) - ( ( mv2CurRefPic.getHor() + nOffset ) >> ( 2 + VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE ) );
       yCurPic = y + ( MIN_PU_SIZE >> 1 ) - ( ( mv2CurRefPic.getVer() + nOffset ) >> ( 2 + VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE ) );
+#if !REMOVE_MV_ADAPT_PREC
     }
     else
     {
       xCurPic = x - ( ( mv2CurRefPic.getHor() + 2 ) >> 2 ) + ( MIN_PU_SIZE >> 1 );
       yCurPic = y - ( ( mv2CurRefPic.getVer() + 2 ) >> 2 ) + ( MIN_PU_SIZE >> 1 );
     }
-
+#endif
     if( 0 <= xCurPic && xCurPic < cs.picture->Y().width && 0 <= yCurPic && yCurPic < cs.picture->Y().height )
     {
       MotionInfo &curMiFRUC = cs.getMotionInfoFRUC( Position{ xCurPic, yCurPic } );
@@ -2239,10 +2243,7 @@ void PU::fillMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, const in
   {
     unsigned imvShift = pu.cu->imv << 1;
 #if REMOVE_MV_ADAPT_PREC
-    if (pu.cs->sps->getSpsNext().getUseHighPrecMv())
-    {
       imvShift += VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
-    }
 #endif
     for( int i = 0; i < pInfo->numCand; i++ )
     {
@@ -2344,9 +2345,10 @@ void PU::fillMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, const in
 #endif
     pInfo->numCand++;
   }
-
+#if !REMOVE_MV_ADAPT_PREC
   if( pu.cs->sps->getSpsNext().getUseHighPrecMv() )
   {
+#endif
     for( Mv &mv : pInfo->mvCand )
     {
 #if REMOVE_MV_ADAPT_PREC
@@ -2355,7 +2357,9 @@ void PU::fillMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, const in
       if (mv.highPrec) mv.setLowPrec();
 #endif
     }
+#if !REMOVE_MV_ADAPT_PREC
   }
+#endif
 #if JVET_K0357_AMVR
   if (pu.cu->imv != 0)
   {
@@ -3311,13 +3315,15 @@ bool PU::getInterMergeSubPuMvpCand( const PredictionUnit &pu, MergeCtx& mrgCtx, 
   ////////          GET Initial Temporal Vector                  ////////
   ///////////////////////////////////////////////////////////////////////
   int mvPrec = 2;
+#if !REMOVE_MV_ADAPT_PREC
   if( pu.cs->sps->getSpsNext().getUseHighPrecMv() )
   {
-#if !REMOVE_MV_ADAPT_PREC
     cTMv.setHighPrec();
 #endif
     mvPrec += VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+#if !REMOVE_MV_ADAPT_PREC
   }
+#endif
   int mvRndOffs = ( 1 << mvPrec ) >> 1;
 
   Mv cTempVector    = cTMv;
@@ -4465,13 +4471,15 @@ bool PU::getInterMergeSubPuMvpCand(const PredictionUnit &pu, MergeCtx& mrgCtx, b
   ////////          GET Initial Temporal Vector                  ////////
   ///////////////////////////////////////////////////////////////////////
   int mvPrec = 2;
+#if !REMOVE_MV_ADAPT_PREC
   if (pu.cs->sps->getSpsNext().getUseHighPrecMv())
   {
-#if !REMOVE_MV_ADAPT_PREC
     cTMv.setHighPrec();
 #endif
     mvPrec += VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+#if !REMOVE_MV_ADAPT_PREC
   }
+#endif
   int mvRndOffs = (1 << mvPrec) >> 1;
 
   Mv cTempVector = cTMv;
@@ -4883,11 +4891,7 @@ void PU::applyImv( PredictionUnit& pu, MergeCtx &mrgCtx, InterPrediction *interP
       pu.mvpIdx[0] = mvp_idx;
       pu.mv    [0] = amvpInfo.mvCand[mvp_idx] + pu.mvd[0];
 #if REMOVE_MV_ADAPT_PREC
-      if (pu.cs->sps->getSpsNext().getUseAffine()
-        || pu.cs->sps->getSpsNext().getUseHighPrecMv())
-      {
         pu.mv[0].setHighPrec();
-      }
 #endif
 #if JVET_K0076_CPR
       if (pu.interDir == 1 && pu.cs->slice->getRefPic(REF_PIC_LIST_0, pu.refIdx[REF_PIC_LIST_0])->getPOC() == pu.cs->slice->getPOC())
@@ -4917,11 +4921,7 @@ void PU::applyImv( PredictionUnit& pu, MergeCtx &mrgCtx, InterPrediction *interP
       pu.mvpIdx[1] = mvp_idx;
       pu.mv    [1] = amvpInfo.mvCand[mvp_idx] + pu.mvd[1];
 #if REMOVE_MV_ADAPT_PREC
-      if (pu.cs->sps->getSpsNext().getUseAffine()
-        || pu.cs->sps->getSpsNext().getUseHighPrecMv())
-      {
-        pu.mv[1].setHighPrec();
-      }
+      pu.mv[1].setHighPrec();
 #endif
     }
   }

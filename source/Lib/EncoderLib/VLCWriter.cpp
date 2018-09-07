@@ -565,11 +565,15 @@ void HLSWriter::codeSPSNext( const SPSNext& spsNext, const bool usePCM )
 #endif
 #endif
 #if JEM_TOOLS
+#if !REMOVE_MV_ADAPT_PREC
   WRITE_FLAG( spsNext.getUseHighPrecMv() ? 1 : 0,                                               "high_precision_motion_vectors" );
+#endif
   WRITE_FLAG( spsNext.getUseBIO() ? 1 : 0,                                                      "bio_enable_flag" );
 #endif
 #if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
+#if !REMOVE_MV_ADAPT_PREC
   WRITE_FLAG(spsNext.getUseHighPrecMv() ? 1 : 0,                                                "high_precision_motion_vectors");
+#endif
 #endif
   WRITE_FLAG( spsNext.getDisableMotCompress() ? 1 : 0,                                          "disable_motion_compression_flag" );
 #if JEM_TOOLS
