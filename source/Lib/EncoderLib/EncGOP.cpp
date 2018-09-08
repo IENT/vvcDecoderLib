@@ -2522,7 +2522,14 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
     {
       for( const CodingUnit *cu : pcPic->cs->cus )
       {
-        if( !pcSlice->isIntra() )
+        if( !pcSlice->isIntra() 
+#if JVET_K0076_CPR
+            &&
+          !(pcSlice->getNumRefIdx(REF_PIC_LIST_0) == 1 &&
+            pcSlice->getNumRefIdx(REF_PIC_LIST_1) == 0 &&
+            pcSlice->getRefPOC(REF_PIC_LIST_0, 0) == pcSlice->getPOC())
+#endif  			
+          )
         {
           m_uiBlkSize[pcSlice->getDepth()] += cu->Y().area();
           m_uiNumBlk [pcSlice->getDepth()]++;
