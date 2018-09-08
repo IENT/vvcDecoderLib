@@ -834,7 +834,7 @@ bool EncAppCfg::parseCfg( int argc, char* argv[] )
 #endif
   ("SubPuMvpLog2Size",                               m_SubPuMvpLog2Size,                                   2u, "Sub-PU TMVP size index: 2^n")
 #if !REMOVE_MV_ADAPT_PREC 
-  ("HighPrecMv",                                     m_highPrecisionMv,                                 false, "High precision motion vectors for temporal merging (0:off, 1:on)  [default: off]")
+  ("HighPrecMv",                                     m_highPrecisionMv,                                    false, "High precision motion vectors for temporal merging (0:off, 1:on)  [default: off]")
 #endif
 #endif
 #if JEM_TOOLS || JVET_K_AFFINE
@@ -2127,7 +2127,7 @@ bool EncAppCfg::xCheckParameter()
 #endif
 #if JVET_K_AFFINE
 #if !REMOVE_MV_ADAPT_PREC 
-    xConfirmPara( m_Affine && !m_highPrecisionMv, "Affine is not yet implemented for HighPrecMv off." );
+    xConfirmPara(m_Affine && !m_highPrecisionMv, "Affine is not yet implemented for HighPrecMv off.");
 #endif
 #endif
 #if JEM_TOOLS
@@ -3416,7 +3416,7 @@ void EncAppCfg::xPrintParameter()
 #endif
 #if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
 #if !REMOVE_MV_ADAPT_PREC 
-    msg(VERBOSE, "HighPrecMv:%d ", m_highPrecisionMv);
+    msg( VERBOSE, "HighPrecMv:%d ", m_highPrecisionMv );
 #endif
 #endif
     msg( VERBOSE, "DisMDC:%d ", m_DisableMotionCompression );

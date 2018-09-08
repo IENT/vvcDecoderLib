@@ -327,7 +327,7 @@ protected:
 #if REMOVE_MV_ADAPT_PREC
   void xFrucInsertMv2StartList  (const MvField & rMvField, std::list<MvField> & rList);
 #else
-  void xFrucInsertMv2StartList  (const MvField & rMvField, std::list<MvField> & rList,bool setHighPrec);
+  void xFrucInsertMv2StartList  (const MvField & rMvField, std::list<MvField> & rList, bool setHighPrec);
 #endif
   bool xFrucIsInList            (const MvField & rMvField, std::list<MvField> & rList);
 

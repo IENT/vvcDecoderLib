@@ -507,7 +507,7 @@ unsigned LoopFilter::xGetBoundaryStrengthSingle ( const CodingUnit& cu, const De
     int nThreshold = 4;
 #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
 #if !REMOVE_MV_ADAPT_PREC
-    if( cu.cs->sps->getSpsNext().getUseHighPrecMv() )
+    if (cu.cs->sps->getSpsNext().getUseHighPrecMv())
     {
       mvP0.setHighPrec();
       mvP1.setHighPrec();
@@ -574,7 +574,7 @@ unsigned LoopFilter::xGetBoundaryStrengthSingle ( const CodingUnit& cu, const De
   int nThreshold = 4;
 #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
 #if !REMOVE_MV_ADAPT_PREC
-  if( cu.cs->sps->getSpsNext().getUseHighPrecMv() )
+  if (cu.cs->sps->getSpsNext().getUseHighPrecMv())
   {
     mvP0.setHighPrec();
     mvQ0.setHighPrec();

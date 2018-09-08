@@ -978,7 +978,7 @@ void EncLib::xInitSPS(SPS &sps)
 #endif
 #if !JEM_TOOLS && JVET_K0346 && !JVET_K_AFFINE
 #if !REMOVE_MV_ADAPT_PREC
-  sps.getSpsNext().setUseHighPrecMv(m_highPrecMv);
+  sps.getSpsNext().setUseHighPrecMv         ( m_highPrecMv );
 #endif
 #endif
   sps.getSpsNext().setDisableMotCompress    ( m_DisableMotionCompression );

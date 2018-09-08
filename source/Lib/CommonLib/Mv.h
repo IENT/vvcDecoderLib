@@ -282,40 +282,38 @@ public:
   void roundMV2SignalPrecision()
   {
 #if REMOVE_MV_ADAPT_PREC
-    setLowPrec();
-    setHighPrec();
+    const int nShift = VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+    const int nOffset = 1 << (nShift - 1);
+    hor = hor >= 0 ? (hor + nOffset) >> nShift : -((-hor + nOffset) >> nShift);
+    ver = ver >= 0 ? (ver + nOffset) >> nShift : -((-ver + nOffset) >> nShift);
+    hor = hor >= 0 ? (hor) << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : -((-hor) << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE);
+    ver = ver >= 0 ? (ver) << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : -((-ver) << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE);
 #else
     const bool isHP = highPrec;
     setLowPrec();
     if( isHP ) setHighPrec();
 #endif
   }
-
+#if !REMOVE_MV_ADAPT_PREC
   void setLowPrec()
   {
-#if !REMOVE_MV_ADAPT_PREC
     if (!highPrec) return;
-#endif
     const int nShift  = VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
     const int nOffset = 1 << ( nShift - 1 );
     hor = hor >= 0 ? ( hor + nOffset ) >> nShift : -( ( -hor + nOffset ) >> nShift );
     ver = ver >= 0 ? ( ver + nOffset ) >> nShift : -( ( -ver + nOffset ) >> nShift );
-#if !REMOVE_MV_ADAPT_PREC
     highPrec = false;
-#endif
   }
-
+#endif
+#if !REMOVE_MV_ADAPT_PREC
   void setHighPrec()
   {
-#if !REMOVE_MV_ADAPT_PREC
     if (highPrec) return;
-#endif
     hor = hor >= 0 ? ( hor ) << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : -( ( -hor ) << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE );
     ver = ver >= 0 ? ( ver ) << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : -( ( -ver ) << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE );
-#if !REMOVE_MV_ADAPT_PREC
     highPrec = true;
-#endif
   }
+#endif
 #endif
 };// END CLASS DEFINITION MV
 #if JVET_K0076_CPR

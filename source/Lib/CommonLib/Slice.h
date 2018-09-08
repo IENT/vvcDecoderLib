@@ -1021,7 +1021,7 @@ public:
 #endif
 #if JEM_TOOLS
 #if !REMOVE_MV_ADAPT_PREC
-  void      setUseHighPrecMv      ( bool b )                                        { m_highPrecMv = b; }
+  void      setUseHighPrecMv      (bool b)                                          { m_highPrecMv = b; }
   bool      getUseHighPrecMv      ()                                      const     { return m_highPrecMv; }
 #endif
   void      setUseBIO             ( bool b )                                        { m_BIO = b; }
@@ -1029,8 +1029,8 @@ public:
 #endif
 #if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
 #if !REMOVE_MV_ADAPT_PREC
-  void      setUseHighPrecMv(bool b) { m_highPrecMv = b; }
-  bool      getUseHighPrecMv()                                      const { return m_highPrecMv; }
+  void      setUseHighPrecMv      (bool b)                                          { m_highPrecMv = b; }
+  bool      getUseHighPrecMv      ()                                      const     { return m_highPrecMv; }
 #endif
 #endif
   void      setDisableMotCompress ( bool b )                                        { m_DisableMotionCompression = b; }

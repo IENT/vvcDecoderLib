@@ -767,8 +767,8 @@ public:
 #endif
 #if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
 #if !REMOVE_MV_ADAPT_PREC
-  void      setHighPrecisionMv(bool b) { m_highPrecMv = b; }
-  bool      getHighPrecisionMv()       { return m_highPrecMv; }
+  void      setHighPrecisionMv              ( bool b )       { m_highPrecMv = b; }
+  bool      getHighPrecisionMv              ()               { return m_highPrecMv; }
 #endif
 #endif
   void      setDisableMotionCompression     ( bool b )       { m_DisableMotionCompression = b; }

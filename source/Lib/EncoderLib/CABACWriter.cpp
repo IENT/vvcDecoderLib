@@ -2704,10 +2704,10 @@ void CABACWriter::mvd_coding( const Mv &rMvd )
   unsigned  verAbs  = unsigned( verMvd < 0 ? -verMvd : verMvd );
 
 #if (JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE) && !REMOVE_MV_ADAPT_PREC
-  if( rMvd.highPrec )
+  if (rMvd.highPrec)
   {
-    CHECK( horAbs & ((1<<VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE)-1), "mvd-x has high precision fractional part." );
-    CHECK( verAbs & ((1<<VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE)-1), "mvd-y has high precision fractional part." );
+    CHECK(horAbs & ((1 << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE) - 1), "mvd-x has high precision fractional part.");
+    CHECK(verAbs & ((1 << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE) - 1), "mvd-y has high precision fractional part.");
     horAbs >>= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
     verAbs >>= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
   }

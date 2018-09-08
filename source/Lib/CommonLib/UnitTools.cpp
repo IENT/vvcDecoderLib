@@ -93,7 +93,7 @@ static void xInitFrucMvpEl( CodingStructure& cs, int x, int y, int nCurPOC, int 
     int nColRefPOC = pColPic->cs->slice->getRefPOC( eRefPicList, frucMi.refIdx[eRefPicList] );
     Mv mvColPic = frucMi.mv[eRefPicList];
 #if !REMOVE_MV_ADAPT_PREC
-    if( cs.sps->getSpsNext().getUseHighPrecMv() )
+    if (cs.sps->getSpsNext().getUseHighPrecMv())
     {
       mvColPic.setHighPrec();
     }
@@ -111,21 +111,22 @@ static void xInitFrucMvpEl( CodingStructure& cs, int x, int y, int nCurPOC, int 
     int xCurPic = 0;
     int yCurPic = 0;
 #if !REMOVE_MV_ADAPT_PREC
-    if( cs.sps->getSpsNext().getUseHighPrecMv() )
+    if (cs.sps->getSpsNext().getUseHighPrecMv())
     {
 #endif
-      int nOffset = 1 << ( VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE + 1 );
+      int nOffset = 1 << (VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE + 1);
 
-      xCurPic = x + ( MIN_PU_SIZE >> 1 ) - ( ( mv2CurRefPic.getHor() + nOffset ) >> ( 2 + VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE ) );
-      yCurPic = y + ( MIN_PU_SIZE >> 1 ) - ( ( mv2CurRefPic.getVer() + nOffset ) >> ( 2 + VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE ) );
+      xCurPic = x + (MIN_PU_SIZE >> 1) - ((mv2CurRefPic.getHor() + nOffset) >> (2 + VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE));
+      yCurPic = y + (MIN_PU_SIZE >> 1) - ((mv2CurRefPic.getVer() + nOffset) >> (2 + VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE));
 #if !REMOVE_MV_ADAPT_PREC
     }
     else
     {
-      xCurPic = x - ( ( mv2CurRefPic.getHor() + 2 ) >> 2 ) + ( MIN_PU_SIZE >> 1 );
-      yCurPic = y - ( ( mv2CurRefPic.getVer() + 2 ) >> 2 ) + ( MIN_PU_SIZE >> 1 );
+      xCurPic = x - ((mv2CurRefPic.getHor() + 2) >> 2) + (MIN_PU_SIZE >> 1);
+      yCurPic = y - ((mv2CurRefPic.getVer() + 2) >> 2) + (MIN_PU_SIZE >> 1);
     }
 #endif
+
     if( 0 <= xCurPic && xCurPic < cs.picture->Y().width && 0 <= yCurPic && yCurPic < cs.picture->Y().height )
     {
       MotionInfo &curMiFRUC = cs.getMotionInfoFRUC( Position{ xCurPic, yCurPic } );
@@ -2009,7 +2010,7 @@ bool PU::getColocatedMVP(const PredictionUnit &pu, const RefPicList &eRefPicList
     else
     {
 #if (JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE) && !REMOVE_MV_ADAPT_PREC
-      if( pu.cs->sps->getSpsNext().getUseHighPrecMv() )
+      if (pu.cs->sps->getSpsNext().getUseHighPrecMv())
       {
         // allow extended precision for temporal scaling
         cColMv.setHighPrec();
@@ -2243,7 +2244,7 @@ void PU::fillMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, const in
   {
     unsigned imvShift = pu.cu->imv << 1;
 #if REMOVE_MV_ADAPT_PREC
-      imvShift += VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+    imvShift += VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
     for( int i = 0; i < pInfo->numCand; i++ )
     {
@@ -2339,20 +2340,23 @@ void PU::fillMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, const in
   {
 #if (JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE) && !REMOVE_MV_ADAPT_PREC
     const bool prec = pInfo->mvCand[pInfo->numCand].highPrec;
-    pInfo->mvCand[pInfo->numCand] = Mv( 0, 0, prec );
+    pInfo->mvCand[pInfo->numCand] = Mv(0, 0, prec);
 #else
-    pInfo->mvCand[pInfo->numCand] = Mv( 0, 0 );
+    pInfo->mvCand[pInfo->numCand] = Mv(0, 0);
 #endif
     pInfo->numCand++;
   }
 #if !REMOVE_MV_ADAPT_PREC
-  if( pu.cs->sps->getSpsNext().getUseHighPrecMv() )
+  if (pu.cs->sps->getSpsNext().getUseHighPrecMv())
   {
 #endif
-    for( Mv &mv : pInfo->mvCand )
+    for (Mv &mv : pInfo->mvCand)
     {
 #if REMOVE_MV_ADAPT_PREC
-      mv.setLowPrec();
+      const int nShift = VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+      const int nOffset = 1 << (nShift - 1);
+      mv.hor = mv.hor >= 0 ? (mv.hor + nOffset) >> nShift : -((-mv.hor + nOffset) >> nShift);
+      mv.ver = mv.ver >= 0 ? (mv.ver + nOffset) >> nShift : -((-mv.ver + nOffset) >> nShift);
 #else
       if (mv.highPrec) mv.setLowPrec();
 #endif
@@ -2530,7 +2534,6 @@ bool isValidAffineCandidate( const PredictionUnit &pu, Mv cMv0, Mv cMv1, Mv cMv2
   // same motion vector, translation model
   if ( deltaHor == zeroMv )
     return false;
-
 #if !REMOVE_MV_ADAPT_PREC
   deltaHor.setHighPrec();
   deltaVer.setHighPrec();
@@ -2554,6 +2557,10 @@ bool isValidAffineCandidate( const PredictionUnit &pu, Mv cMv0, Mv cMv1, Mv cMv2
 
 void PU::fillAffineMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, const int &refIdx, AffineAMVPInfo &affiAMVPInfo)
 {
+#if REMOVE_MV_ADAPT_PREC
+  const int nShift = VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  const int nOffset = 1 << (nShift - 1);
+#endif
   affiAMVPInfo.numCand = 0;
 
   if (refIdx < 0)
@@ -2616,9 +2623,12 @@ void PU::fillAffineMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, co
 #if REMOVE_MV_ADAPT_PREC
     for (int i = 0; i < affiAMVPInfo.numCand; i++)
     {
-      affiAMVPInfo.mvCandLT[i].setLowPrec();
-      affiAMVPInfo.mvCandRT[i].setLowPrec();
-      affiAMVPInfo.mvCandLB[i].setLowPrec();
+      affiAMVPInfo.mvCandLT[i].hor = affiAMVPInfo.mvCandLT[i].hor >= 0 ? (affiAMVPInfo.mvCandLT[i].hor + nOffset) >> nShift : -((-affiAMVPInfo.mvCandLT[i].hor + nOffset) >> nShift);
+      affiAMVPInfo.mvCandLT[i].ver = affiAMVPInfo.mvCandLT[i].ver >= 0 ? (affiAMVPInfo.mvCandLT[i].ver + nOffset) >> nShift : -((-affiAMVPInfo.mvCandLT[i].ver + nOffset) >> nShift);
+      affiAMVPInfo.mvCandRT[i].hor = affiAMVPInfo.mvCandRT[i].hor >= 0 ? (affiAMVPInfo.mvCandRT[i].hor + nOffset) >> nShift : -((-affiAMVPInfo.mvCandRT[i].hor + nOffset) >> nShift);
+      affiAMVPInfo.mvCandRT[i].ver = affiAMVPInfo.mvCandRT[i].ver >= 0 ? (affiAMVPInfo.mvCandRT[i].ver + nOffset) >> nShift : -((-affiAMVPInfo.mvCandRT[i].ver + nOffset) >> nShift);
+      affiAMVPInfo.mvCandLB[i].hor = affiAMVPInfo.mvCandLB[i].hor >= 0 ? (affiAMVPInfo.mvCandLB[i].hor + nOffset) >> nShift : -((-affiAMVPInfo.mvCandLB[i].hor + nOffset) >> nShift);
+      affiAMVPInfo.mvCandLB[i].ver = affiAMVPInfo.mvCandLB[i].ver >= 0 ? (affiAMVPInfo.mvCandLB[i].ver + nOffset) >> nShift : -((-affiAMVPInfo.mvCandLB[i].ver + nOffset) >> nShift);
     }
 #endif
     return;
@@ -2875,9 +2885,12 @@ void PU::fillAffineMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, co
 #if REMOVE_MV_ADAPT_PREC
   for (int i = 0; i < affiAMVPInfo.numCand; i++)
   {
-    affiAMVPInfo.mvCandLT[i].setLowPrec();
-    affiAMVPInfo.mvCandRT[i].setLowPrec();
-    affiAMVPInfo.mvCandLB[i].setLowPrec();
+    affiAMVPInfo.mvCandLT[i].hor = affiAMVPInfo.mvCandLT[i].hor >= 0 ? (affiAMVPInfo.mvCandLT[i].hor + nOffset) >> nShift : -((-affiAMVPInfo.mvCandLT[i].hor + nOffset) >> nShift);
+    affiAMVPInfo.mvCandLT[i].ver = affiAMVPInfo.mvCandLT[i].ver >= 0 ? (affiAMVPInfo.mvCandLT[i].ver + nOffset) >> nShift : -((-affiAMVPInfo.mvCandLT[i].ver + nOffset) >> nShift);
+    affiAMVPInfo.mvCandRT[i].hor = affiAMVPInfo.mvCandRT[i].hor >= 0 ? (affiAMVPInfo.mvCandRT[i].hor + nOffset) >> nShift : -((-affiAMVPInfo.mvCandRT[i].hor + nOffset) >> nShift);
+    affiAMVPInfo.mvCandRT[i].ver = affiAMVPInfo.mvCandRT[i].ver >= 0 ? (affiAMVPInfo.mvCandRT[i].ver + nOffset) >> nShift : -((-affiAMVPInfo.mvCandRT[i].ver + nOffset) >> nShift);
+    affiAMVPInfo.mvCandLB[i].hor = affiAMVPInfo.mvCandLB[i].hor >= 0 ? (affiAMVPInfo.mvCandLB[i].hor + nOffset) >> nShift : -((-affiAMVPInfo.mvCandLB[i].hor + nOffset) >> nShift);
+    affiAMVPInfo.mvCandLB[i].ver = affiAMVPInfo.mvCandLB[i].ver >= 0 ? (affiAMVPInfo.mvCandLB[i].ver + nOffset) >> nShift : -((-affiAMVPInfo.mvCandLB[i].ver + nOffset) >> nShift);
   }
 #endif
   if ( affiAMVPInfo.numCand < 2 )
@@ -3064,7 +3077,7 @@ bool PU::addMVPCandWithScaling( const PredictionUnit &pu, const RefPicList &eRef
           if( scale != 4096 )
           {
 #if (JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE) && !REMOVE_MV_ADAPT_PREC
-            if( slice.getSPS()->getSpsNext().getUseHighPrecMv() )
+            if (slice.getSPS()->getSpsNext().getUseHighPrecMv())
             {
               cMv.setHighPrec();
             }
@@ -3208,6 +3221,7 @@ static bool deriveScaledMotionTemporal( const Slice&      slice,
         cColMv.setHighPrec();
       }
 #endif
+
       cColMv    = cColMv.scaleMv( iScale );
     }
 
@@ -3250,7 +3264,7 @@ bool PU::getInterMergeSubPuMvpCand( const PredictionUnit &pu, MergeCtx& mrgCtx, 
 )
 {
 #if JVET_K0076_CPR
-  if (count == countIBC)
+  if (count == countIBC && pu.cs->slice->getSPS()->getSpsNext().getIBCMode())
     return false;
 #endif
   const Slice   &slice   = *pu.cs->slice;
@@ -3316,7 +3330,7 @@ bool PU::getInterMergeSubPuMvpCand( const PredictionUnit &pu, MergeCtx& mrgCtx, 
   ///////////////////////////////////////////////////////////////////////
   int mvPrec = 2;
 #if !REMOVE_MV_ADAPT_PREC
-  if( pu.cs->sps->getSpsNext().getUseHighPrecMv() )
+  if (pu.cs->sps->getSpsNext().getUseHighPrecMv())
   {
     cTMv.setHighPrec();
 #endif
@@ -3706,7 +3720,6 @@ static void getNeighboringMvField( const Slice& slice, const MotionInfo &miNB, M
         else
         {
           Mv mvNB = miNB.mv[eRefPicListSrc];
-
 #if !REMOVE_MV_ADAPT_PREC
           if (slice.getSPS()->getSpsNext().getUseHighPrecMv())
           {
@@ -3762,7 +3775,6 @@ static void getNeighboringMvField( const Slice& slice, const MotionInfo &miNB, M
       else
       {
         Mv mvNB = miNB.mv[eRefPicListSrc];
-
 #if !REMOVE_MV_ADAPT_PREC
         if (slice.getSPS()->getSpsNext().getUseHighPrecMv())
         {
@@ -3991,7 +4003,6 @@ bool PU::getInterMergeSubPuRecurCand( const PredictionUnit &pu, MergeCtx& mrgCtx
           }
         }
       }
-
 #if !REMOVE_MV_ADAPT_PREC
       if (pu.cs->sps->getSpsNext().getUseHighPrecMv())
       {
@@ -4218,9 +4229,9 @@ void PU::setAllAffineMv( PredictionUnit& pu, Mv affLT, Mv affRT, Mv affLB, RefPi
 #if REMOVE_MV_ADAPT_PREC
   if (setHighPrec)
   {
-    affLT.setHighPrec();
-    affRT.setHighPrec();
-    affLB.setHighPrec();
+    affLT <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+    affRT <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+    affLB <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
   }
 #else
   affLT.setHighPrec();
@@ -4376,6 +4387,7 @@ static bool deriveScaledMotionTemporal( const Slice&      slice,
         cColMv.setHighPrec();
       }
 #endif
+
       cColMv = cColMv.scaleMv(iScale);
     }
 
@@ -4876,7 +4888,7 @@ void PU::applyImv( PredictionUnit& pu, MergeCtx &mrgCtx, InterPrediction *interP
       if (pu.cu->imv)
       {
 #if !REMOVE_MV_ADAPT_PREC
-        CHECK(pu.mvd[0].highPrec, "Motion vector difference should never be high precision");
+        CHECK( pu.mvd[0].highPrec, "Motion vector difference should never be high precision" );
 #endif
         pu.mvd[0] = Mv( pu.mvd[0].hor << imvShift, pu.mvd[0].ver << imvShift );
       }
@@ -4891,7 +4903,7 @@ void PU::applyImv( PredictionUnit& pu, MergeCtx &mrgCtx, InterPrediction *interP
       pu.mvpIdx[0] = mvp_idx;
       pu.mv    [0] = amvpInfo.mvCand[mvp_idx] + pu.mvd[0];
 #if REMOVE_MV_ADAPT_PREC
-        pu.mv[0].setHighPrec();
+      pu.mv[0] <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
 #if JVET_K0076_CPR
       if (pu.interDir == 1 && pu.cs->slice->getRefPic(REF_PIC_LIST_0, pu.refIdx[REF_PIC_LIST_0])->getPOC() == pu.cs->slice->getPOC())
@@ -4906,7 +4918,7 @@ void PU::applyImv( PredictionUnit& pu, MergeCtx &mrgCtx, InterPrediction *interP
       if( !( pu.cu->cs->slice->getMvdL1ZeroFlag() && pu.interDir == 3 ) && pu.cu->imv )/* PRED_BI */
       {
 #if !REMOVE_MV_ADAPT_PREC
-        CHECK(pu.mvd[1].highPrec, "Motion vector difference should never be high precision");
+        CHECK( pu.mvd[1].highPrec, "Motion vector difference should never be high precision" );
 #endif
         pu.mvd[1] = Mv( pu.mvd[1].hor << imvShift, pu.mvd[1].ver << imvShift );
       }
@@ -4921,7 +4933,7 @@ void PU::applyImv( PredictionUnit& pu, MergeCtx &mrgCtx, InterPrediction *interP
       pu.mvpIdx[1] = mvp_idx;
       pu.mv    [1] = amvpInfo.mvCand[mvp_idx] + pu.mvd[1];
 #if REMOVE_MV_ADAPT_PREC
-      pu.mv[1].setHighPrec();
+      pu.mv[1] <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
     }
   }

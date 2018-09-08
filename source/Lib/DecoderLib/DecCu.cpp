@@ -467,9 +467,11 @@ void DecCu::xDeriveCUMV( CodingUnit &cu )
     MergeCtx mrgCtx;
 
 #if RExt__DECODER_DEBUG_TOOL_STATISTICS
-#if JEM_TOOLS
-    if (pu.cu->affine)
-      CodingStatistics::IncrementStatisticTool(CodingStatisticsClassType{ STATS__TOOL_AFF, pu.Y().width, pu.Y().height });
+#if JEM_TOOLS || JVET_K_AFFINE
+    if( pu.cu->affine )
+    {
+      CodingStatistics::IncrementStatisticTool( CodingStatisticsClassType{ STATS__TOOL_AFF, pu.Y().width, pu.Y().height } );
+    }
 #endif
 #endif
 #if JVET_K0248_GBI
@@ -607,8 +609,8 @@ void DecCu::xDeriveCUMV( CodingUnit &cu )
               mvRT += pu.mvdAffi[eRefList][0];
 #endif
 #if REMOVE_MV_ADAPT_PREC
-              mvLT.setHighPrec();
-              mvRT.setHighPrec();
+              mvLT <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+              mvRT <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #else
               CHECK(!mvLT.highPrec, "unexpected lp mv");
               CHECK(!mvRT.highPrec, "unexpected lp mv");
@@ -624,7 +626,7 @@ void DecCu::xDeriveCUMV( CodingUnit &cu )
                 mvLB += pu.mvdAffi[eRefList][0];
 #endif
 #if REMOVE_MV_ADAPT_PREC
-                mvLB.setHighPrec();
+                mvLB <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #else
                 CHECK(!mvLB.highPrec, "unexpected lp mv");
 #endif
@@ -677,10 +679,15 @@ void DecCu::xDeriveCUMV( CodingUnit &cu )
 #else
               pu.mv     [eRefList] = amvpInfo.mvCand[pu.mvpIdx [eRefList]] + pu.mvd[eRefList];
 #endif
+
 #if JEM_TOOLS || JVET_K_AFFINE
-              if( pu.cs->sps->getSpsNext().getUseAffine())
+              if( pu.cs->sps->getSpsNext().getUseAffine() )
               {
+#if REMOVE_MV_ADAPT_PREC
+                pu.mv[eRefList] <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+#else
                 pu.mv[eRefList].setHighPrec();
+#endif
               }
 #endif
             }

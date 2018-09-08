@@ -994,11 +994,10 @@ void InterPrediction::xPredInterBlk ( const ComponentID& compID, const Predictio
   const bool          rndRes = ( !bi || pu.cu->LICFlag );
 
   int iAddPrecShift = 0;
-
 #if !REMOVE_MV_ADAPT_PREC
   if (_mv.highPrec)
   {
-    CHECKD( !pu.cs->sps->getSpsNext().getUseHighPrecMv(), "Found a high-precision motion vector, but the high-precision MV extension is disabled!" );
+    CHECKD(!pu.cs->sps->getSpsNext().getUseHighPrecMv(), "Found a high-precision motion vector, but the high-precision MV extension is disabled!");
 #endif
     iAddPrecShift = VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #if !REMOVE_MV_ADAPT_PREC
@@ -1014,8 +1013,8 @@ void InterPrediction::xPredInterBlk ( const ComponentID& compID, const Predictio
   xFrac <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE - iAddPrecShift;
   yFrac <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE - iAddPrecShift;
 #if !REMOVE_MV_ADAPT_PREC
-  CHECKD( !pu.cs->sps->getSpsNext().getUseHighPrecMv() && ( ( xFrac & 3 ) != 0 ), "Invalid fraction" );
-  CHECKD( !pu.cs->sps->getSpsNext().getUseHighPrecMv() && ( ( yFrac & 3 ) != 0 ), "Invalid fraction" );
+  CHECKD(!pu.cs->sps->getSpsNext().getUseHighPrecMv() && ((xFrac & 3) != 0), "Invalid fraction");
+  CHECKD(!pu.cs->sps->getSpsNext().getUseHighPrecMv() && ((yFrac & 3) != 0), "Invalid fraction");
 #endif
 #elif JVET_K0346 || JVET_K_AFFINE
   const ChromaFormat  chFmt = pu.chromaFormat;
@@ -1023,9 +1022,7 @@ void InterPrediction::xPredInterBlk ( const ComponentID& compID, const Predictio
 
   int iAddPrecShift = 0;
 
-#if REMOVE_MV_ADAPT_PREC
-
-#else
+#if !REMOVE_MV_ADAPT_PREC
   if (_mv.highPrec)
   {
     CHECKD(!pu.cs->sps->getSpsNext().getUseHighPrecMv(), "Found a high-precision motion vector, but the high-precision MV extension is disabled!");
@@ -1432,7 +1429,7 @@ void InterPrediction::xGetLICParams( const CodingUnit& cu,
 #if REMOVE_MV_ADAPT_PREC
   const int       lumaShift     = 2 + VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #else
-  const int       lumaShift     = ( mv.highPrec ? 2 + VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : 2 );
+  const int       lumaShift     = (mv.highPrec ? 2 + VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : 2);
 #endif
   const int       horShift      = ( lumaShift + ::getComponentScaleX(compID, cu.chromaFormat) );
   const int       verShift      = ( lumaShift + ::getComponentScaleY(compID, cu.chromaFormat) );
@@ -1462,9 +1459,9 @@ void InterPrediction::xGetLICParams( const CodingUnit& cu,
   if( cuAbove )
   {
 #if REMOVE_MV_ADAPT_PREC
-    Mv            subPelMv(horIntMv << horShift, verIntMv << verShift);
+    Mv            subPelMv  (horIntMv  << horShift, verIntMv << verShift);
 #else
-    Mv            subPelMv(horIntMv << horShift, verIntMv << verShift, mv.highPrec);
+    Mv            subPelMv  (horIntMv  << horShift, verIntMv << verShift, mv.highPrec);
 #endif
                   clipMv    ( subPelMv, cuAbove->lumaPos(), *cu.cs->sps );
     const int     hOff    = ( subPelMv.getHor() >> horShift );
@@ -1490,9 +1487,9 @@ void InterPrediction::xGetLICParams( const CodingUnit& cu,
   if( cuLeft )
   {
 #if REMOVE_MV_ADAPT_PREC
-    Mv            subPelMv(horIntMv << horShift, verIntMv << verShift);
+    Mv            subPelMv  (horIntMv  << horShift, verIntMv << verShift);
 #else
-    Mv            subPelMv(horIntMv << horShift, verIntMv << verShift, mv.highPrec);
+    Mv            subPelMv  (horIntMv  << horShift, verIntMv << verShift, mv.highPrec);
 #endif
                   clipMv    ( subPelMv, cuLeft->lumaPos(), *cu.cs->sps );
     const int     hOff    = ( subPelMv.getHor() >> horShift ) - 1;
@@ -2977,10 +2974,14 @@ uint32_t InterPrediction::xFrucGetTempMatchCost( PredictionUnit& pu, int nWidth,
   {
     Mv mvTop( 0 , - ( FRUC_MERGE_TEMPLATE_SIZE << nMVUnit ) );
 #if !REMOVE_MV_ADAPT_PREC
-    if( pu.cs->sps->getSpsNext().getUseHighPrecMv() )
+    if (pu.cs->sps->getSpsNext().getUseHighPrecMv())
     {
 #endif
+#if REMOVE_MV_ADAPT_PREC
+      mvTop <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+#else
       mvTop.setHighPrec();
+#endif
 #if !REMOVE_MV_ADAPT_PREC
     }
 #endif
@@ -3004,10 +3005,14 @@ uint32_t InterPrediction::xFrucGetTempMatchCost( PredictionUnit& pu, int nWidth,
   {
     Mv mvLeft( - ( FRUC_MERGE_TEMPLATE_SIZE << nMVUnit ) , 0 );
 #if !REMOVE_MV_ADAPT_PREC
-    if( pu.cs->sps->getSpsNext().getUseHighPrecMv() )
+    if (pu.cs->sps->getSpsNext().getUseHighPrecMv())
     {
 #endif
+#if REMOVE_MV_ADAPT_PREC
+      mvLeft <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+#else
       mvLeft.setHighPrec();
+#endif
 #if !REMOVE_MV_ADAPT_PREC
     }
 #endif
@@ -3087,14 +3092,14 @@ bool InterPrediction::xFrucIsInList( const MvField & rMvField , std::list<MvFiel
 #if REMOVE_MV_ADAPT_PREC
 void InterPrediction::xFrucInsertMv2StartList(const MvField & rMvField, std::list<MvField> & rList)
 #else
-void InterPrediction::xFrucInsertMv2StartList( const MvField & rMvField , std::list<MvField> & rList, bool setHighPrec )
+void InterPrediction::xFrucInsertMv2StartList(const MvField & rMvField, std::list<MvField> & rList, bool setHighPrec)
 #endif
 {
   CHECK( rMvField.refIdx < 0, "invalid ref idx" );
 
   MvField mf = rMvField;
 #if !REMOVE_MV_ADAPT_PREC
-  if( setHighPrec )
+  if (setHighPrec)
   {
     mf.mv.setHighPrec();
   }
@@ -3119,9 +3124,9 @@ void InterPrediction::xFrucCollectBlkStartMv( PredictionUnit& pu, const MergeCtx
       MvField mvCnd;
       mvCnd.setMvField( pInfo->mvCand[nAMVPIndex], nTargetRefIdx );
 #if REMOVE_MV_ADAPT_PREC
-      xFrucInsertMv2StartList( mvCnd, m_listMVFieldCand[eTargetRefList] );
+      xFrucInsertMv2StartList(mvCnd, m_listMVFieldCand[eTargetRefList]);
 #else
-      xFrucInsertMv2StartList( mvCnd, m_listMVFieldCand[eTargetRefList], pu.cs->sps->getSpsNext().getUseHighPrecMv() );
+      xFrucInsertMv2StartList(mvCnd, m_listMVFieldCand[eTargetRefList], pu.cs->sps->getSpsNext().getUseHighPrecMv());
 #endif
     }
   }
@@ -3140,7 +3145,7 @@ void InterPrediction::xFrucCollectBlkStartMv( PredictionUnit& pu, const MergeCtx
 #if REMOVE_MV_ADAPT_PREC
       xFrucInsertMv2StartList(mergeCtx.mvFieldNeighbours[nMergeIndex], m_listMVFieldCand[nMergeIndex & 0x01]);
 #else
-      xFrucInsertMv2StartList( mergeCtx.mvFieldNeighbours[nMergeIndex] , m_listMVFieldCand[nMergeIndex&0x01], pu.cs->sps->getSpsNext().getUseHighPrecMv() );
+      xFrucInsertMv2StartList(mergeCtx.mvFieldNeighbours[nMergeIndex], m_listMVFieldCand[nMergeIndex & 0x01], pu.cs->sps->getSpsNext().getUseHighPrecMv());
 #endif
     }
   }
@@ -3173,7 +3178,7 @@ void InterPrediction::xFrucCollectBlkStartMv( PredictionUnit& pu, const MergeCtx
 #if REMOVE_MV_ADAPT_PREC
             xFrucInsertMv2StartList(mvCand, m_listMVFieldCand[nList & 0x01]);
 #else
-            xFrucInsertMv2StartList( mvCand , m_listMVFieldCand[nList&0x01], pu.cs->sps->getSpsNext().getUseHighPrecMv() );
+            xFrucInsertMv2StartList(mvCand, m_listMVFieldCand[nList & 0x01], pu.cs->sps->getSpsNext().getUseHighPrecMv());
 #endif
           }
         }
@@ -3233,7 +3238,7 @@ void InterPrediction::xFrucCollectBlkStartMv( PredictionUnit& pu, const MergeCtx
 #if REMOVE_MV_ADAPT_PREC
           xFrucInsertMv2StartList(mvCand, m_listMVFieldCand[nList & 0x01]);
 #else
-          xFrucInsertMv2StartList( mvCand , m_listMVFieldCand[nList&0x01], pu.cs->sps->getSpsNext().getUseHighPrecMv() );
+          xFrucInsertMv2StartList(mvCand, m_listMVFieldCand[nList & 0x01], pu.cs->sps->getSpsNext().getUseHighPrecMv());
 #endif
         }
       }
@@ -3250,7 +3255,7 @@ void InterPrediction::xFrucCollectSubBlkStartMv( PredictionUnit& pu, const Merge
 #if REMOVE_MV_ADAPT_PREC
   xFrucInsertMv2StartList(rMvStart, rStartMvList);
 #else
-  xFrucInsertMv2StartList( rMvStart , rStartMvList, pu.cs->sps->getSpsNext().getUseHighPrecMv() );
+  xFrucInsertMv2StartList(rMvStart, rStartMvList, pu.cs->sps->getSpsNext().getUseHighPrecMv());
 #endif
   // add some neighbors if not already present
 
@@ -3296,7 +3301,7 @@ void InterPrediction::xFrucCollectSubBlkStartMv( PredictionUnit& pu, const Merge
 #if REMOVE_MV_ADAPT_PREC
       xFrucInsertMv2StartList(mvCand, rStartMvList);
 #else
-      xFrucInsertMv2StartList( mvCand , rStartMvList, pu.cs->sps->getSpsNext().getUseHighPrecMv() );
+      xFrucInsertMv2StartList(mvCand, rStartMvList, pu.cs->sps->getSpsNext().getUseHighPrecMv());
 #endif
     }
   }
@@ -3334,11 +3339,12 @@ void InterPrediction::xFrucCollectSubBlkStartMv( PredictionUnit& pu, const Merge
           CHECK( colMi.isInter == false, "invalid motion info" );
           Mv rColMv = colMi.mv[nRefListColPic];
 #if !REMOVE_MV_ADAPT_PREC
-          if( pu.cs->sps->getSpsNext().getUseHighPrecMv() )
+          if (pu.cs->sps->getSpsNext().getUseHighPrecMv())
           {
             rColMv.setHighPrec();
           }
 #endif
+
           mvCand.refIdx = rMvStart.refIdx;
 #if JVET_K0157
           if (pColPic->cs->slice->getRefPic((RefPicList)nRefListColPic, colMi.refIdx[nRefListColPic])->longTerm)
@@ -3355,7 +3361,7 @@ void InterPrediction::xFrucCollectSubBlkStartMv( PredictionUnit& pu, const Merge
 #if REMOVE_MV_ADAPT_PREC
           xFrucInsertMv2StartList(mvCand, rStartMvList);
 #else
-          xFrucInsertMv2StartList( mvCand , rStartMvList, pu.cs->sps->getSpsNext().getUseHighPrecMv() );
+          xFrucInsertMv2StartList(mvCand, rStartMvList, pu.cs->sps->getSpsNext().getUseHighPrecMv());
 #endif
         }
       }
@@ -3396,7 +3402,7 @@ void InterPrediction::xFrucCollectSubBlkStartMv( PredictionUnit& pu, const Merge
 #if REMOVE_MV_ADAPT_PREC
           xFrucInsertMv2StartList(mvCand, rStartMvList);
 #else
-          xFrucInsertMv2StartList( mvCand, rStartMvList, pu.cs->sps->getSpsNext().getUseHighPrecMv() );
+          xFrucInsertMv2StartList(mvCand, rStartMvList, pu.cs->sps->getSpsNext().getUseHighPrecMv());
 #endif
         }
         const MotionInfo subPuExtMi = mergeCtx.subPuMvpExtMiBuf.at( g_miScaling.scale( Position( x, y ) ) );
@@ -3406,7 +3412,7 @@ void InterPrediction::xFrucCollectSubBlkStartMv( PredictionUnit& pu, const Merge
 #if REMOVE_MV_ADAPT_PREC
           xFrucInsertMv2StartList(mvCand, rStartMvList);
 #else
-          xFrucInsertMv2StartList( mvCand, rStartMvList, pu.cs->sps->getSpsNext().getUseHighPrecMv() );
+          xFrucInsertMv2StartList(mvCand, rStartMvList, pu.cs->sps->getSpsNext().getUseHighPrecMv());
 #endif
         }
       }
@@ -3459,7 +3465,7 @@ uint32_t InterPrediction::xFrucFindBestMvFromList( MvField* pBestMvField, RefPic
 #if REMOVE_MV_ADAPT_PREC
         uiCost = xFrucGetMvCost(rMvStart.mv, pos->mv, MAX_INT, FRUC_MERGE_REFINE_MVWEIGHT, VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE);
 #else
-        uiCost = xFrucGetMvCost( rMvStart.mv , pos->mv, MAX_INT, FRUC_MERGE_REFINE_MVWEIGHT, pu.cs->sps->getSpsNext().getUseHighPrecMv() ? VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : 0 );
+        uiCost = xFrucGetMvCost(rMvStart.mv, pos->mv, MAX_INT, FRUC_MERGE_REFINE_MVWEIGHT, pu.cs->sps->getSpsNext().getUseHighPrecMv() ? VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : 0);
 #endif
         if( uiCost > uiMinCost )
           continue;
@@ -3547,13 +3553,14 @@ uint32_t InterPrediction::xFrucRefineMv( MvField* pBestMvField, RefPicList eCurR
 {
   int nSearchStepShift = 0;
 #if REMOVE_MV_ADAPT_PREC
-  nSearchStepShift = VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  nSearchStepShift  = VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #else
-  if( pu.cs->sps->getSpsNext().getUseHighPrecMv() )
+  if (pu.cs->sps->getSpsNext().getUseHighPrecMv())
   {
     nSearchStepShift = VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
   }
 #endif
+
   switch( nSearchMethod )
   {
     case 0:
@@ -3663,7 +3670,7 @@ uint32_t InterPrediction::xFrucRefineMvSearch ( MvField* pBestMvField, RefPicLis
   int nBestDirect;
   int rSearchRange = pu.cs->sps->getSpsNext().getFRUCRefineRange();
 #if !REMOVE_MV_ADAPT_PREC
-  if( !pu.cs->sps->getSpsNext().getUseHighPrecMv() )
+  if (!pu.cs->sps->getSpsNext().getUseHighPrecMv())
   {
     rSearchRange >>= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
   }
@@ -3688,7 +3695,7 @@ uint32_t InterPrediction::xFrucRefineMvSearch ( MvField* pBestMvField, RefPicLis
       mvOffset <<= nSearchStepShift;
       MvField mvCand = mvCurCenter;
 #if !REMOVE_MV_ADAPT_PREC
-      if( mvCand.mv.highPrec && !mvOffset.highPrec )
+      if (mvCand.mv.highPrec && !mvOffset.highPrec)
       {
         mvOffset.highPrec = true;
       }
@@ -3709,7 +3716,7 @@ uint32_t InterPrediction::xFrucRefineMvSearch ( MvField* pBestMvField, RefPicLis
 #if REMOVE_MV_ADAPT_PREC
         VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE
 #else      
-        pu.cs->sps->getSpsNext().getUseHighPrecMv() ? VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : 0 
+        pu.cs->sps->getSpsNext().getUseHighPrecMv() ? VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : 0
 #endif
       );
       if (bMvCostZero && uiCost != MAX_UINT)
@@ -4029,9 +4036,9 @@ bool InterPrediction::xFrucGetCurBlkTemplate( PredictionUnit& pu, int nCurBlkWid
     Mv mvTop( 0 , - ( FRUC_MERGE_TEMPLATE_SIZE << nMVUnit ) );
     PelUnitBuf pcMbBuf = ( PelUnitBuf(pu.chromaFormat, PelBuf(m_acYuvPredFrucTemplate[0][0], nCurBlkWidth, FRUC_MERGE_TEMPLATE_SIZE) ) );
 #if REMOVE_MV_ADAPT_PREC
-    mvTop.setHighPrec();
+    mvTop <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #else
-    if( pu.cs->sps->getSpsNext().getUseHighPrecMv() )
+    if (pu.cs->sps->getSpsNext().getUseHighPrecMv())
     {
       mvTop.setHighPrec();
     }
@@ -4044,9 +4051,9 @@ bool InterPrediction::xFrucGetCurBlkTemplate( PredictionUnit& pu, int nCurBlkWid
     Mv mvLeft( - ( FRUC_MERGE_TEMPLATE_SIZE << nMVUnit ) , 0 );
     PelUnitBuf pcMbBuf = ( PelUnitBuf(pu.chromaFormat, PelBuf(m_acYuvPredFrucTemplate[1][0], FRUC_MERGE_TEMPLATE_SIZE, nCurBlkHeight) ) );
 #if REMOVE_MV_ADAPT_PREC
-    mvLeft.setHighPrec();
+    mvLeft <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #else
-    if( pu.cs->sps->getSpsNext().getUseHighPrecMv() )
+    if (pu.cs->sps->getSpsNext().getUseHighPrecMv())
     {
       mvLeft.setHighPrec();
     }
@@ -4092,15 +4099,16 @@ void InterPrediction::xFrucUpdateTemplate( PredictionUnit& pu, int nWidth, int n
   {
     Mv mvOther( 0 , - ( FRUC_MERGE_TEMPLATE_SIZE << nMVUnit ) );
 #if REMOVE_MV_ADAPT_PREC
-    mvOther.setHighPrec();
+    mvOther <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
     mvOther += pMvFieldOther->mv;
 #if !REMOVE_MV_ADAPT_PREC
-    if( pu.cs->sps->getSpsNext().getUseHighPrecMv() )
+    if (pu.cs->sps->getSpsNext().getUseHighPrecMv())
     {
       mvOther.setHighPrec();
     }
 #endif
+
     clipMv(mvOther, pu.cu->lumaPos(), sps);
     xPredInterBlk(COMPONENT_Y, pu, pu.cu->slice->getRefPic(eCurRefPicList, pMvFieldOther->refIdx), mvOther, pcBufPredRefTop, false, pu.cu->slice->clpRng( COMPONENT_Y ), false, false, FRUC_MERGE_TEMPLATE, false);
     pcBufPredCurTop.removeHighFreq( pcBufPredRefTop, false, pu.cs->slice->clpRngs() );
@@ -4110,15 +4118,16 @@ void InterPrediction::xFrucUpdateTemplate( PredictionUnit& pu, int nWidth, int n
   {
     Mv mvOther( -( FRUC_MERGE_TEMPLATE_SIZE << nMVUnit ), 0 );
 #if REMOVE_MV_ADAPT_PREC
-    mvOther.setHighPrec();
+    mvOther <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
     mvOther += pMvFieldOther->mv;
 #if !REMOVE_MV_ADAPT_PREC
-    if( pu.cs->sps->getSpsNext().getUseHighPrecMv() )
+    if (pu.cs->sps->getSpsNext().getUseHighPrecMv())
     {
       mvOther.setHighPrec();
     }
 #endif
+
     clipMv(mvOther, pu.cu->lumaPos(), sps);
     xPredInterBlk(COMPONENT_Y, pu, pu.cu->slice->getRefPic(eCurRefPicList, pMvFieldOther->refIdx), mvOther, pcBufPredRefLeft, false, pu.cu->slice->clpRng( COMPONENT_Y ), false, false, FRUC_MERGE_TEMPLATE, false);
     pcBufPredCurLeft.removeHighFreq( pcBufPredRefLeft, false, pu.cs->slice->clpRngs() );
@@ -4133,18 +4142,16 @@ void InterPrediction::xPredInterLines( const PredictionUnit& pu, const Picture* 
   const ComponentID compID  = COMPONENT_Y;
 
   int iAddPrecShift = 0;
-
-#if REMOVE_MV_ADAPT_PREC
-
-#else
+#if !REMOVE_MV_ADAPT_PREC
   if (_mv.highPrec)
   {
-    CHECK( !pu.cs->sps->getSpsNext().getUseHighPrecMv(), "Found a high-precision motion vector, but the high-precision MV extension is disabled!" );
+    CHECK(!pu.cs->sps->getSpsNext().getUseHighPrecMv(), "Found a high-precision motion vector, but the high-precision MV extension is disabled!");
 #endif
     iAddPrecShift = VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #if !REMOVE_MV_ADAPT_PREC
   }
 #endif
+
   int shiftHor = 2 + iAddPrecShift + ::getComponentScaleX( compID, chFmt );
   int shiftVer = 2 + iAddPrecShift + ::getComponentScaleY( compID, chFmt );
 
@@ -4157,10 +4164,12 @@ void InterPrediction::xPredInterLines( const PredictionUnit& pu, const Picture* 
 
   xFrac <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE - iAddPrecShift;
   yFrac <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE - iAddPrecShift;
+
 #if !REMOVE_MV_ADAPT_PREC
-  CHECK( !pu.cs->sps->getSpsNext().getUseHighPrecMv() && ( ( xFrac & 3 ) != 0 ), "Invalid fraction" );
-  CHECK( !pu.cs->sps->getSpsNext().getUseHighPrecMv() && ( ( yFrac & 3 ) != 0 ), "Invalid fraction" );
+  CHECK(!pu.cs->sps->getSpsNext().getUseHighPrecMv() && ((xFrac & 3) != 0), "Invalid fraction");
+  CHECK(!pu.cs->sps->getSpsNext().getUseHighPrecMv() && ((yFrac & 3) != 0), "Invalid fraction");
 #endif
+
   unsigned width  = dstBuf.width;
   unsigned height = dstBuf.height;
 
@@ -4191,7 +4200,6 @@ void InterPrediction::xFillPredBlckAndBorder( const PredictionUnit& pu, RefPicLi
   Mv  mv;
 
   const Picture* refPic = pu.cu->slice->getRefPic(eRefPicList, iRefIdx);
-
 #if REMOVE_MV_ADAPT_PREC
   const int nMVUnit = 2 + VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #else
@@ -4281,7 +4289,6 @@ void InterPrediction::xBIPMVRefine( PredictionUnit& pu, RefPicList eRefPicList, 
 
       Mv mvOffset = pSearchOffset[nDirect];
       mvOffset <<= nSearchStepShift;
-
 #if !REMOVE_MV_ADAPT_PREC
       if (pu.cu->slice->getSPS()->getSpsNext().getUseHighPrecMv())
       {
@@ -4694,7 +4701,7 @@ void InterPrediction::xProcessDMVR( PredictionUnit& pu, PelUnitBuf &pcYuvDst, co
   //mv refinement
   uint32_t searchStepShift = 2;
 #if !REMOVE_MV_ADAPT_PREC
-  if( pu.cu->slice->getSPS()->getSpsNext().getUseHighPrecMv() )
+  if (pu.cu->slice->getSPS()->getSpsNext().getUseHighPrecMv())
   {
 #endif
     searchStepShift += 2;
