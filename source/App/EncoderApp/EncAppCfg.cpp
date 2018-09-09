@@ -833,10 +833,14 @@ bool EncAppCfg::parseCfg( int argc, char* argv[] )
   ("SubPuMvp",                                       m_SubPuMvpMode,                                       0, "Enable Sub-PU temporal motion vector prediction (0:off, 1:on)  [default: off]")
 #endif
   ("SubPuMvpLog2Size",                               m_SubPuMvpLog2Size,                                   2u, "Sub-PU TMVP size index: 2^n")
-  ("HighPrecMv",                                     m_highPrecisionMv,                                 false, "High precision motion vectors for temporal merging (0:off, 1:on)  [default: off]")
+#if !REMOVE_MV_ADAPT_PREC 
+  ("HighPrecMv",                                     m_highPrecisionMv,                                    false, "High precision motion vectors for temporal merging (0:off, 1:on)  [default: off]")
+#endif
 #endif
 #if JEM_TOOLS || JVET_K_AFFINE
+#if !REMOVE_MV_ADAPT_PREC 
   ("HighPrecMv",                                      m_highPrecisionMv,                               false, "High precision motion vectors for temporal merging (0:off, 1:on)  [default: off]")
+#endif
   ("Affine",                                          m_Affine,                                        false, "Enable affine prediction (0:off, 1:on)  [default: off]")
 #if JVET_K0337_AFFINE_6PARA
   ( "AffineType",                                     m_AffineType,                                     true,  "Enable affine type prediction (0:off, 1:on)  [default: on]" )
@@ -2122,7 +2126,9 @@ bool EncAppCfg::xCheckParameter()
     xConfirmPara( !( m_OBMCBlkSize == 4 || m_OBMCBlkSize == 8 ), "OBMC Block Size must be set to 4 or 8 samples" );
 #endif
 #if JVET_K_AFFINE
-    xConfirmPara( m_Affine && !m_highPrecisionMv, "Affine is not yet implemented for HighPrecMv off." );
+#if !REMOVE_MV_ADAPT_PREC 
+    xConfirmPara(m_Affine && !m_highPrecisionMv, "Affine is not yet implemented for HighPrecMv off.");
+#endif
 #endif
 #if JEM_TOOLS
     xConfirmPara( m_DMVR && !m_QTBT, "DMVR without QTBT results in encoder-decoder mismatch!" );
@@ -3403,11 +3409,15 @@ void EncAppCfg::xPrintParameter()
 #endif
 #endif
 #if JEM_TOOLS
+#if !REMOVE_MV_ADAPT_PREC 
     msg( VERBOSE, "HighPrecMv:%d ", m_highPrecisionMv );
+#endif
     msg( VERBOSE, "BIO:%d ", m_BIO );
 #endif
 #if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
-    msg(VERBOSE, "HighPrecMv:%d ", m_highPrecisionMv);
+#if !REMOVE_MV_ADAPT_PREC 
+    msg( VERBOSE, "HighPrecMv:%d ", m_highPrecisionMv );
+#endif
 #endif
     msg( VERBOSE, "DisMDC:%d ", m_DisableMotionCompression );
 #if JEM_TOOLS

@@ -241,7 +241,9 @@ void EncApp::xInitLibCfg()
 #endif
 #endif
 #if JEM_TOOLS
+#if !REMOVE_MV_ADAPT_PREC 
   m_cEncLib.setHighPrecisionMv                                   ( m_highPrecisionMv );
+#endif
   m_cEncLib.setAffine                                            ( m_Affine );
 #if JVET_K0337_AFFINE_6PARA
   m_cEncLib.setAffineType                                        ( m_AffineType );
