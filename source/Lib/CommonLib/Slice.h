@@ -829,15 +829,11 @@ private:
 #endif
 #endif
 #if JEM_TOOLS
-#if !REMOVE_MV_ADAPT_PREC
   bool              m_highPrecMv;                 // 11
-#endif
   bool              m_BIO;                        // 12
 #endif
 #if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
-#if !REMOVE_MV_ADAPT_PREC
   bool              m_highPrecMv;
-#endif
 #endif
   bool              m_DisableMotionCompression;   // 13
 #if JEM_TOOLS
@@ -1020,18 +1016,14 @@ public:
 #endif
 #endif
 #if JEM_TOOLS
-#if !REMOVE_MV_ADAPT_PREC
-  void      setUseHighPrecMv      (bool b)                                          { m_highPrecMv = b; }
+  void      setUseHighPrecMv      ( bool b )                                        { m_highPrecMv = b; }
   bool      getUseHighPrecMv      ()                                      const     { return m_highPrecMv; }
-#endif
   void      setUseBIO             ( bool b )                                        { m_BIO = b; }
   bool      getUseBIO             ()                                      const     { return m_BIO; }
 #endif
 #if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
-#if !REMOVE_MV_ADAPT_PREC
-  void      setUseHighPrecMv      (bool b)                                          { m_highPrecMv = b; }
-  bool      getUseHighPrecMv      ()                                      const     { return m_highPrecMv; }
-#endif
+  void      setUseHighPrecMv(bool b) { m_highPrecMv = b; }
+  bool      getUseHighPrecMv()                                      const { return m_highPrecMv; }
 #endif
   void      setDisableMotCompress ( bool b )                                        { m_DisableMotionCompression = b; }
   bool      getDisableMotCompress ()                                      const     { return m_DisableMotionCompression; }

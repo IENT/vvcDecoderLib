@@ -264,10 +264,7 @@ void getAndStoreBlockStatistics(const CodingStructure& cs, const UnitArea& ctuAr
 void writeAllData(const CodingStructure& cs, const UnitArea& ctuArea)
 {
   const int maxNumChannelType = cs.pcv->chrFormat != CHROMA_400 && CS::isDualITree( cs ) ? 2 : 1;
-#if REMOVE_MV_ADAPT_PREC
-  const int nShift = VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
-  const int nOffset = 1 << (nShift - 1);
-#endif
+
   for( int ch = 0; ch < maxNumChannelType; ch++ )
   {
     const ChannelType chType = ChannelType( ch );
@@ -374,15 +371,8 @@ void writeAllData(const CodingStructure& cs, const UnitArea& ctuArea)
                 Mv mv = pu.mv[REF_PIC_LIST_0];
                 Mv mvd = pu.mvd[REF_PIC_LIST_0];
 #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
-#if REMOVE_MV_ADAPT_PREC
-                mv.hor = mv.hor >= 0 ? (mv.hor + nOffset) >> nShift : -((-mv.hor + nOffset) >> nShift);
-                mv.ver = mv.ver >= 0 ? (mv.ver + nOffset) >> nShift : -((-mv.ver + nOffset) >> nShift);
-                mvd.hor = mvd.hor >= 0 ? (mvd.hor + nOffset) >> nShift : -((-mvd.hor + nOffset) >> nShift);
-                mvd.ver = mvd.ver >= 0 ? (mvd.ver + nOffset) >> nShift : -((-mvd.ver + nOffset) >> nShift);
-#else
                 mv.setLowPrec();
                 mvd.setLowPrec();
-#endif
 #endif
                 DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_ALL, pu, GetBlockStatisticName(BlockStatistic::MVDL0), mvd.hor, mvd.ver);
                 DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_ALL, pu, GetBlockStatisticName(BlockStatistic::MVL0), mv.hor, mv.ver);
@@ -392,15 +382,8 @@ void writeAllData(const CodingStructure& cs, const UnitArea& ctuArea)
                 Mv mv = pu.mv[REF_PIC_LIST_1];
                 Mv mvd = pu.mvd[REF_PIC_LIST_1];
 #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
-#if REMOVE_MV_ADAPT_PREC
-                mv.hor = mv.hor >= 0 ? (mv.hor + nOffset) >> nShift : -((-mv.hor + nOffset) >> nShift);
-                mv.ver = mv.ver >= 0 ? (mv.ver + nOffset) >> nShift : -((-mv.ver + nOffset) >> nShift);
-                mvd.hor = mvd.hor >= 0 ? (mvd.hor + nOffset) >> nShift : -((-mvd.hor + nOffset) >> nShift);
-                mvd.ver = mvd.ver >= 0 ? (mvd.ver + nOffset) >> nShift : -((-mvd.ver + nOffset) >> nShift);
-#else
                 mv.setLowPrec();
                 mvd.setLowPrec();
-#endif
 #endif
                 DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_ALL, pu, GetBlockStatisticName(BlockStatistic::MVDL1), mvd.hor, mvd.ver);
                 DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_ALL, pu, GetBlockStatisticName(BlockStatistic::MVL1), mv.hor, mv.ver);
@@ -418,18 +401,9 @@ void writeAllData(const CodingStructure& cs, const UnitArea& ctuArea)
                 mv[2] = mb.at(0, mb.height - 1).mv[REF_PIC_LIST_0];
 #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
                 // motion vectors should use low precision or they will appear to large
-#if REMOVE_MV_ADAPT_PREC
-                mv[0].hor = mv[0].hor >= 0 ? (mv[0].hor + nOffset) >> nShift : -((-mv[0].hor + nOffset) >> nShift);
-                mv[0].ver = mv[0].ver >= 0 ? (mv[0].ver + nOffset) >> nShift : -((-mv[0].ver + nOffset) >> nShift);
-                mv[1].hor = mv[1].hor >= 0 ? (mv[1].hor + nOffset) >> nShift : -((-mv[1].hor + nOffset) >> nShift);
-                mv[1].ver = mv[1].ver >= 0 ? (mv[1].ver + nOffset) >> nShift : -((-mv[1].ver + nOffset) >> nShift);
-                mv[2].hor = mv[2].hor >= 0 ? (mv[2].hor + nOffset) >> nShift : -((-mv[2].hor + nOffset) >> nShift);
-                mv[2].ver = mv[2].ver >= 0 ? (mv[2].ver + nOffset) >> nShift : -((-mv[2].ver + nOffset) >> nShift);
-#else
                 mv[0].setLowPrec();
                 mv[1].setLowPrec();
                 mv[2].setLowPrec();
-#endif
 #endif
                 DTRACE_BLOCK_AFFINETF(g_trace_ctx, D_BLOCK_STATISTICS_ALL, pu, GetBlockStatisticName(BlockStatistic::AffineMVL0), mv[0].hor, mv[0].ver, mv[1].hor, mv[1].ver, mv[2].hor, mv[2].ver);
               }
@@ -442,18 +416,9 @@ void writeAllData(const CodingStructure& cs, const UnitArea& ctuArea)
                 mv[2] = mb.at(0, mb.height - 1).mv[REF_PIC_LIST_1];
 #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
                 // motion vectors should use low precision or they will appear to large
-#if REMOVE_MV_ADAPT_PREC
-                mv[0].hor = mv[0].hor >= 0 ? (mv[0].hor + nOffset) >> nShift : -((-mv[0].hor + nOffset) >> nShift);
-                mv[0].ver = mv[0].ver >= 0 ? (mv[0].ver + nOffset) >> nShift : -((-mv[0].ver + nOffset) >> nShift);
-                mv[1].hor = mv[1].hor >= 0 ? (mv[1].hor + nOffset) >> nShift : -((-mv[1].hor + nOffset) >> nShift);
-                mv[1].ver = mv[1].ver >= 0 ? (mv[1].ver + nOffset) >> nShift : -((-mv[1].ver + nOffset) >> nShift);
-                mv[2].hor = mv[2].hor >= 0 ? (mv[2].hor + nOffset) >> nShift : -((-mv[2].hor + nOffset) >> nShift);
-                mv[2].ver = mv[2].ver >= 0 ? (mv[2].ver + nOffset) >> nShift : -((-mv[2].ver + nOffset) >> nShift);
-#else
                 mv[0].setLowPrec();
                 mv[1].setLowPrec();
                 mv[2].setLowPrec();
-#endif
 #endif
                 DTRACE_BLOCK_AFFINETF(g_trace_ctx, D_BLOCK_STATISTICS_ALL, pu, GetBlockStatisticName(BlockStatistic::AffineMVL1), mv[0].hor, mv[0].ver, mv[1].hor, mv[1].ver, mv[2].hor, mv[2].ver);
               }
@@ -542,10 +507,6 @@ void writeAllData(const CodingStructure& cs, const UnitArea& ctuArea)
 
 void writeAllCodedData(const CodingStructure & cs, const UnitArea & ctuArea)
 {
-#if REMOVE_MV_ADAPT_PREC
-  const int nShift = VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
-  const int nOffset = 1 << (nShift - 1);
-#endif
   const int maxNumChannelType = cs.pcv->chrFormat != CHROMA_400 && CS::isDualITree(cs) ? 2 : 1;
 
   for (int ch = 0; ch < maxNumChannelType; ch++)
@@ -724,16 +685,9 @@ void writeAllCodedData(const CodingStructure & cs, const UnitArea & ctuArea)
                 Mv mv = pu.mv[REF_PIC_LIST_0];
                 Mv mvd = pu.mvd[REF_PIC_LIST_0];
   #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
-#if REMOVE_MV_ADAPT_PREC
-                mv.hor = mv.hor >= 0 ? (mv.hor + nOffset) >> nShift : -((-mv.hor + nOffset) >> nShift);
-                mv.ver = mv.ver >= 0 ? (mv.ver + nOffset) >> nShift : -((-mv.ver + nOffset) >> nShift);
-                mvd.hor = mvd.hor >= 0 ? (mvd.hor + nOffset) >> nShift : -((-mvd.hor + nOffset) >> nShift);
-                mvd.ver = mvd.ver >= 0 ? (mvd.ver + nOffset) >> nShift : -((-mvd.ver + nOffset) >> nShift);
-#else
                 mv.setLowPrec();
                 mvd.setLowPrec();
-#endif
-#endif
+  #endif
                 DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::MVDL0), mvd.hor, mvd.ver);
                 DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::MVL0), mv.hor, mv.ver);
               }
@@ -742,16 +696,9 @@ void writeAllCodedData(const CodingStructure & cs, const UnitArea & ctuArea)
                 Mv mv = pu.mv[REF_PIC_LIST_1];
                 Mv mvd = pu.mvd[REF_PIC_LIST_1];
   #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
-#if REMOVE_MV_ADAPT_PREC
-                mv.hor = mv.hor >= 0 ? (mv.hor + nOffset) >> nShift : -((-mv.hor + nOffset) >> nShift);
-                mv.ver = mv.ver >= 0 ? (mv.ver + nOffset) >> nShift : -((-mv.ver + nOffset) >> nShift);
-                mvd.hor = mvd.hor >= 0 ? (mvd.hor + nOffset) >> nShift : -((-mvd.hor + nOffset) >> nShift);
-                mvd.ver = mvd.ver >= 0 ? (mvd.ver + nOffset) >> nShift : -((-mvd.ver + nOffset) >> nShift);
-#else
                 mv.setLowPrec();
                 mvd.setLowPrec();
-#endif
-#endif
+  #endif
                 DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::MVDL0), mvd.hor, mvd.ver);
                 DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::MVL1), mv.hor, mv.ver);
               }
@@ -768,19 +715,10 @@ void writeAllCodedData(const CodingStructure & cs, const UnitArea & ctuArea)
                 mv[2] = mb.at(0, mb.height - 1).mv[REF_PIC_LIST_0];
   #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
                 // motion vectors should use low precision or they will appear to large
-#if REMOVE_MV_ADAPT_PREC
-                mv[0].hor = mv[0].hor >= 0 ? (mv[0].hor + nOffset) >> nShift : -((-mv[0].hor + nOffset) >> nShift);
-                mv[0].ver = mv[0].ver >= 0 ? (mv[0].ver + nOffset) >> nShift : -((-mv[0].ver + nOffset) >> nShift);
-                mv[1].hor = mv[1].hor >= 0 ? (mv[1].hor + nOffset) >> nShift : -((-mv[1].hor + nOffset) >> nShift);
-                mv[1].ver = mv[1].ver >= 0 ? (mv[1].ver + nOffset) >> nShift : -((-mv[1].ver + nOffset) >> nShift);
-                mv[2].hor = mv[2].hor >= 0 ? (mv[2].hor + nOffset) >> nShift : -((-mv[2].hor + nOffset) >> nShift);
-                mv[2].ver = mv[2].ver >= 0 ? (mv[2].ver + nOffset) >> nShift : -((-mv[2].ver + nOffset) >> nShift);
-#else
                 mv[0].setLowPrec();
                 mv[1].setLowPrec();
                 mv[2].setLowPrec();
-#endif
-#endif
+  #endif
                 DTRACE_BLOCK_AFFINETF(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::AffineMVL0), mv[0].hor, mv[0].ver, mv[1].hor, mv[1].ver, mv[2].hor, mv[2].ver);
               }
               if (pu.interDir != 1 /* PRED_L1 */)
@@ -792,19 +730,10 @@ void writeAllCodedData(const CodingStructure & cs, const UnitArea & ctuArea)
                 mv[2] = mb.at(0, mb.height - 1).mv[REF_PIC_LIST_1];
   #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
                 // motion vectors should use low precision or they will appear to large
-#if REMOVE_MV_ADAPT_PREC
-                mv[0].hor = mv[0].hor >= 0 ? (mv[0].hor + nOffset) >> nShift : -((-mv[0].hor + nOffset) >> nShift);
-                mv[0].ver = mv[0].ver >= 0 ? (mv[0].ver + nOffset) >> nShift : -((-mv[0].ver + nOffset) >> nShift);
-                mv[1].hor = mv[1].hor >= 0 ? (mv[1].hor + nOffset) >> nShift : -((-mv[1].hor + nOffset) >> nShift);
-                mv[1].ver = mv[1].ver >= 0 ? (mv[1].ver + nOffset) >> nShift : -((-mv[1].ver + nOffset) >> nShift);
-                mv[2].hor = mv[2].hor >= 0 ? (mv[2].hor + nOffset) >> nShift : -((-mv[2].hor + nOffset) >> nShift);
-                mv[2].ver = mv[2].ver >= 0 ? (mv[2].ver + nOffset) >> nShift : -((-mv[2].ver + nOffset) >> nShift);
-#else
                 mv[0].setLowPrec();
                 mv[1].setLowPrec();
                 mv[2].setLowPrec();
-#endif
-#endif
+  #endif
                 DTRACE_BLOCK_AFFINETF(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::AffineMVL1), mv[0].hor, mv[0].ver, mv[1].hor, mv[1].ver, mv[2].hor, mv[2].ver);
               }
             }

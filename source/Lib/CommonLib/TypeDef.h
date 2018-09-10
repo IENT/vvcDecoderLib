@@ -128,8 +128,6 @@
 
 #define JVET_K0357_AMVR                                   1 // Adaptive motion vector resolution separated from JEM_TOOLS macro
 
-#define REMOVE_MV_ADAPT_PREC                              1 // remove the high precision flag in the MV class
-
 #if JVET_K0485_BIO
 #define JVET_K0485_BIO_EXTEND_SIZE                        1
 #endif
