@@ -44,9 +44,7 @@
 void roundMV( Mv & rMV, unsigned imvShift )
 {
   CHECK( imvShift == 0, "roundMV called for imvShift=0" );
-#if !REMOVE_MV_ADAPT_PREC
-  if (rMV.highPrec) imvShift += VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
-#endif
+  if( rMV.highPrec ) imvShift += VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
   int offset = 1 << ( imvShift - 1 );
 
   rMV.setHor( ( ( rMV.getHor() + offset ) >> imvShift ) << imvShift );
@@ -65,13 +63,10 @@ void roundAffineMv( int& mvx, int& mvy, int nShift )
 
 void clipMv( Mv& rcMv, const Position& pos, const SPS& sps )
 {
-#if (JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE) && !REMOVE_MV_ADAPT_PREC
-  int iMvShift = 2 + (rcMv.highPrec ? VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : 0);
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
+  int iMvShift = 2 + ( rcMv.highPrec ? VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : 0 );
 #else
   int iMvShift = 2;
-#endif
-#if REMOVE_MV_ADAPT_PREC
-  iMvShift += VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
   int iOffset = 8;
   int iHorMax = ( sps.getPicWidthInLumaSamples() + iOffset - ( int ) pos.x - 1 ) << iMvShift;

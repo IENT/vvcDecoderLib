@@ -1836,15 +1836,11 @@ SPSNext::SPSNext( SPS& sps )
 #endif
 #endif
 #if JEM_TOOLS
-#if !REMOVE_MV_ADAPT_PREC
   , m_highPrecMv                ( false )
-#endif
   , m_BIO                       ( false )
 #endif
 #if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
-#if !REMOVE_MV_ADAPT_PREC
   , m_highPrecMv                ( false )
-#endif
 #endif
   , m_DisableMotionCompression  ( false )
 #if JEM_TOOLS

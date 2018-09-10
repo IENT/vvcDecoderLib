@@ -228,9 +228,7 @@ protected:
 #endif
 #endif
 #if JEM_TOOLS
-#if !REMOVE_MV_ADAPT_PREC
   bool      m_highPrecMv;
-#endif
   bool      m_Affine;
 #if JVET_K0337_AFFINE_6PARA
   bool      m_AffineType;
@@ -244,9 +242,7 @@ protected:
 #endif
 #endif
 #if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
-#if !REMOVE_MV_ADAPT_PREC
   bool      m_highPrecMv;
-#endif
 #endif
   bool      m_DisableMotionCompression;
 #if JEM_TOOLS
@@ -742,10 +738,8 @@ public:
 #endif
 #endif
 #if JEM_TOOLS
-#if !REMOVE_MV_ADAPT_PREC
   void      setHighPrecisionMv              ( bool b )       { m_highPrecMv = b; }
   bool      getHighPrecisionMv              ()               { return m_highPrecMv; }
-#endif
 
   void      setBIO                          ( bool b )       { m_BIO = b; }
   bool      getBIO                          ()         const { return m_BIO; }
@@ -766,10 +760,8 @@ public:
 #endif
 #endif
 #if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
-#if !REMOVE_MV_ADAPT_PREC
-  void      setHighPrecisionMv              ( bool b )       { m_highPrecMv = b; }
-  bool      getHighPrecisionMv              ()               { return m_highPrecMv; }
-#endif
+  void      setHighPrecisionMv(bool b) { m_highPrecMv = b; }
+  bool      getHighPrecisionMv()       { return m_highPrecMv; }
 #endif
   void      setDisableMotionCompression     ( bool b )       { m_DisableMotionCompression = b; }
   bool      getDisableMotionCompression     ()         const { return m_DisableMotionCompression; }
