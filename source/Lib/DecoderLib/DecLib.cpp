@@ -1167,7 +1167,7 @@ bool DecLib::xDecodeSlice(InputNALUnit &nalu, int &iSkipFrame, int iPOCLastDispl
     pcSlice->checkCRA(pcSlice->getRPS(), m_pocCRA, m_associatedIRAPType, m_cListPic );
     // Set reference list
     pcSlice->setRefPicList( m_cListPic, true, true );
-
+	
     if (!pcSlice->isIntra())
     {
       bool bLowDelay = true;
@@ -1197,6 +1197,12 @@ bool DecLib::xDecodeSlice(InputNALUnit &nalu, int &iSkipFrame, int iPOCLastDispl
 
     //---------------
     pcSlice->setRefPOCList();
+#if JVET_K0076_CPR
+    if (pcSlice->getNumRefIdx(REF_PIC_LIST_0) == 1 &&
+        pcSlice->getNumRefIdx(REF_PIC_LIST_1) == 0 &&
+        pcSlice->getRefPOC(REF_PIC_LIST_0, 0) == pcSlice->getPOC())
+      pcSlice->setCprIsOnlyRefPic(true);
+#endif
 
 #if JEM_TOOLS
     if( pcSlice->getSPS()->getSpsNext().getUseBIO() )

@@ -566,7 +566,7 @@ void CodingStructure::allocateVectorsAtPicLevel()
 {
   const int  twice = ( 
 #if JVET_K0076_CPR_DT
-  (!pcv->ISingleTree && (slice->isIntra() || (this->slice->getNumRefIdx(REF_PIC_LIST_0) == 1 && this->slice->getNumRefIdx(REF_PIC_LIST_1) == 0 && this->slice->getRefPOC(REF_PIC_LIST_0, 0) == this->slice->getPOC())))
+  (!pcv->ISingleTree && (slice->isIntra() || this->slice->getCprIsOnlyRefPic()))
 #else
     !pcv->ISingleTree && slice->isIntra()
 #endif

@@ -411,7 +411,7 @@ void EncCu::compressCtu( CodingStructure& cs, const UnitArea& area, const unsign
 
   if( !cs.pcv->ISingleTree && 
 #if JVET_K0076_CPR_DT
-  (cs.slice->isIntra() || (cs.slice->getNumRefIdx(REF_PIC_LIST_0) == 1 && cs.slice->getNumRefIdx(REF_PIC_LIST_1) == 0 && cs.slice->getRefPOC(REF_PIC_LIST_0, 0) == cs.slice->getPOC()))
+  (cs.slice->isIntra() || cs.slice->getCprIsOnlyRefPic())
 #else
     cs.slice->isIntra() 
 #endif

@@ -1274,7 +1274,11 @@ void EncSlice::compressSlice( Picture* pcPic, const bool bCompressEntireSlice, c
 #if JVET_K0346
   if (pcSlice->getSPS()->getSpsNext().getUseSubPuMvp())
   {
-    if (!pcSlice->isIntra())
+    if (!pcSlice->isIntra()
+#if JVET_K0076_CPR
+        && !pcSlice->getCprIsOnlyRefPic()
+#endif
+       )
     {
       if (pcSlice->getPOC() > m_pcCuEncoder->getPrevPOC() && m_pcCuEncoder->getClearSubMergeStatic())
       {

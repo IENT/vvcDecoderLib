@@ -243,13 +243,7 @@ bool CS::isDualITree( const CodingStructure &cs )
 {
 #if JVET_K0076_CPR_DT
   // for I slice, or P slice with CPR is the only ref
-  return (cs.slice->isIntra() ||
-          (
-            cs.slice->getNumRefIdx(REF_PIC_LIST_0) == 1 &&
-            cs.slice->getNumRefIdx(REF_PIC_LIST_1) == 0 &&
-            cs.slice->getRefPOC(REF_PIC_LIST_0, 0) == cs.slice->getPOC()
-          )
-         ) && !cs.pcv->ISingleTree;
+  return (cs.slice->isIntra() || cs.slice->getCprIsOnlyRefPic()) && !cs.pcv->ISingleTree;
 #else
   return cs.slice->isIntra() && !cs.pcv->ISingleTree;
 #endif

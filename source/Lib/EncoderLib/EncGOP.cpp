@@ -1684,6 +1684,7 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
     if (pcSlice->getSliceType() == I_SLICE && pcSlice->getSPS()->getSpsNext().getIBCMode())
     {
       pcSlice->setSliceType(P_SLICE);
+      pcSlice->setCprIsOnlyRefPic(true);
     }
 #endif
     // Set the nal unit type
@@ -1889,7 +1890,11 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
 
     if( m_pcCfg->getUseAMaxBT() )
     {
-      if( !pcSlice->isIntra() )
+      if( !pcSlice->isIntra() 
+#if JVET_K0076_CPR
+       && !pcSlice->getCprIsOnlyRefPic()
+#endif
+        )
       {
         int refLayer = pcSlice->getDepth();
         if( refLayer > 9 ) refLayer = 9; // Max layer is 10
@@ -2524,10 +2529,7 @@ void EncGOP::compressGOP( int iPOCLast, int iNumPicRcvd, PicList& rcListPic,
       {
         if( !pcSlice->isIntra() 
 #if JVET_K0076_CPR
-            &&
-          !(pcSlice->getNumRefIdx(REF_PIC_LIST_0) == 1 &&
-            pcSlice->getNumRefIdx(REF_PIC_LIST_1) == 0 &&
-            pcSlice->getRefPOC(REF_PIC_LIST_0, 0) == pcSlice->getPOC())
+         && !pcSlice->getCprIsOnlyRefPic()
 #endif  			
           )
         {
