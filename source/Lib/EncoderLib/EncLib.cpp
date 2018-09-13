@@ -965,7 +965,9 @@ void EncLib::xInitSPS(SPS &sps)
 #endif
 #endif
 #if JEM_TOOLS || JVET_K_AFFINE
+#if !REMOVE_MV_ADAPT_PREC
   sps.getSpsNext().setUseHighPrecMv         ( m_highPrecMv );
+#endif
   sps.getSpsNext().setUseAffine             ( m_Affine );
 #if JVET_K0337_AFFINE_6PARA
   sps.getSpsNext().setUseAffineType         ( m_AffineType );
@@ -975,7 +977,9 @@ void EncLib::xInitSPS(SPS &sps)
   sps.getSpsNext().setUseBIO                ( m_BIO );
 #endif
 #if !JEM_TOOLS && JVET_K0346 && !JVET_K_AFFINE
-  sps.getSpsNext().setUseHighPrecMv(m_highPrecMv);
+#if !REMOVE_MV_ADAPT_PREC
+  sps.getSpsNext().setUseHighPrecMv         ( m_highPrecMv );
+#endif
 #endif
   sps.getSpsNext().setDisableMotCompress    ( m_DisableMotionCompression );
 #if JEM_TOOLS
