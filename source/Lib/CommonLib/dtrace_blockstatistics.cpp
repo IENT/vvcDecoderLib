@@ -699,7 +699,7 @@ void writeAllCodedData(const CodingStructure & cs, const UnitArea & ctuArea)
                 mv.setLowPrec();
                 mvd.setLowPrec();
   #endif
-                DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::MVDL0), mvd.hor, mvd.ver);
+                DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::MVDL1), mvd.hor, mvd.ver);
                 DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::MVL1), mv.hor, mv.ver);
               }
   #if JEM_TOOLS || JVET_K_AFFINE
