@@ -898,7 +898,8 @@ int InterSearch::xIntraBCSearchMVChromaRefine(PredictionUnit& pu,
     Mv cMvQuaterPixl = cMVCand[iCand];
     cMvQuaterPixl <<= 2;
 #if REMOVE_MV_ADAPT_PREC
-    cMvQuaterPixl <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+    cMvQuaterPixl.hor = cMvQuaterPixl.hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+    cMvQuaterPixl.ver = cMvQuaterPixl.ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
     pu.mv[0] = cMvQuaterPixl;
     pu.interDir = 1;
@@ -1397,12 +1398,14 @@ void InterSearch::xSetIntraSearchRange(PredictionUnit& pu, Mv& cMvPred, int iRoi
 #endif
   cTmpMvPred <<= iMvShift1;
 #if REMOVE_MV_ADAPT_PREC
-  cTmpMvPred <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  cTmpMvPred.hor = cTmpMvPred.hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  cTmpMvPred.ver = cTmpMvPred.ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
   clipMv(cTmpMvPred, pu.cu->lumaPos(), sps);
   cTmpMvPred >>= iMvShift1;
 #if REMOVE_MV_ADAPT_PREC
-  cTmpMvPred >>= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  cTmpMvPred.hor = cTmpMvPred.hor >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  cTmpMvPred.ver = cTmpMvPred.ver >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
 
   int srLeft, srRight, srTop, srBottom;
@@ -1427,14 +1430,18 @@ void InterSearch::xSetIntraSearchRange(PredictionUnit& pu, Mv& cMvPred, int iRoi
   rcMvSrchRngLT <<= 2;
   rcMvSrchRngRB <<= 2;
 #if REMOVE_MV_ADAPT_PREC
-  rcMvSrchRngLT <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
-  rcMvSrchRngRB <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  rcMvSrchRngLT.hor = rcMvSrchRngLT.hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  rcMvSrchRngLT.ver = rcMvSrchRngLT.ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  rcMvSrchRngRB.hor = rcMvSrchRngRB.hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  rcMvSrchRngRB.ver = rcMvSrchRngRB.ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
   clipMv(rcMvSrchRngLT, pu.cu->lumaPos(), sps);
   clipMv(rcMvSrchRngRB, pu.cu->lumaPos(), sps);
 #if REMOVE_MV_ADAPT_PREC
-  rcMvSrchRngLT >>= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
-  rcMvSrchRngRB >>= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  rcMvSrchRngLT.hor = rcMvSrchRngLT.hor >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  rcMvSrchRngLT.ver = rcMvSrchRngLT.ver >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  rcMvSrchRngRB.hor = rcMvSrchRngRB.hor >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  rcMvSrchRngRB.ver = rcMvSrchRngRB.ver >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
   rcMvSrchRngLT >>= 2;
   rcMvSrchRngRB >>= 2;
@@ -1548,13 +1555,16 @@ bool InterSearch::predIntraBCSearch(CodingUnit& cu, Partitioner& partitioner, co
 
     pu.bv = cMv;
 #if REMOVE_MV_ADAPT_PREC
-    cMv <<= (2 + VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE);
+    const int shift = 2 + VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+    cMv.hor = cMv.hor << shift;
+    cMv.ver = cMv.ver << shift;
 #else
     cMv <<= 2;
 #endif
     pu.mv[0] = cMv; // store in fractional pel accuracy
 #if REMOVE_MV_ADAPT_PREC
-    cMv >>= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+    cMv.hor = cMv.hor >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+    cMv.ver = cMv.ver >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
     pu.mvpIdx[REF_PIC_LIST_0] = bvpIdxBest;
 
@@ -1972,7 +1982,8 @@ void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
           iRefIdxBi[1] = bestBiPRefIdxL1;
           pu.mv    [REF_PIC_LIST_1] = cMvBi[1];
 #if REMOVE_MV_ADAPT_PREC
-          pu.mv    [REF_PIC_LIST_1] <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+          pu.mv[REF_PIC_LIST_1].hor = pu.mv[REF_PIC_LIST_1].hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+          pu.mv[REF_PIC_LIST_1].ver = pu.mv[REF_PIC_LIST_1].ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
           pu.refIdx[REF_PIC_LIST_1] = iRefIdxBi[1];
           pu.mvpIdx[REF_PIC_LIST_1] = bestBiPMvpL1;
@@ -2046,7 +2057,8 @@ void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
           {
             pu.mv    [1 - iRefList] = cMv    [1 - iRefList];
 #if REMOVE_MV_ADAPT_PREC
-            pu.mv    [1 - iRefList] <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+            pu.mv[1 - iRefList].hor = pu.mv[1 - iRefList].hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+            pu.mv[1 - iRefList].ver = pu.mv[1 - iRefList].ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
             pu.refIdx[1 - iRefList] = iRefIdx[1 - iRefList];
 
@@ -2115,7 +2127,8 @@ void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
                 //  Set motion
                 pu.mv    [eRefPicList] = cMvBi    [iRefList];
 #if REMOVE_MV_ADAPT_PREC
-                pu.mv    [eRefPicList] <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+                pu.mv[eRefPicList].hor = pu.mv[eRefPicList].hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+                pu.mv[eRefPicList].ver = pu.mv[eRefPicList].ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
                 pu.refIdx[eRefPicList] = iRefIdxBi[iRefList];
 
@@ -2194,8 +2207,10 @@ void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
         pu.mv    [REF_PIC_LIST_0] = cMvBi[0];
         pu.mv    [REF_PIC_LIST_1] = cMvBi[1];
 #if REMOVE_MV_ADAPT_PREC
-        pu.mv    [REF_PIC_LIST_0] <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
-        pu.mv    [REF_PIC_LIST_1] <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+        pu.mv[REF_PIC_LIST_0].hor = pu.mv[REF_PIC_LIST_0].hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+        pu.mv[REF_PIC_LIST_0].ver = pu.mv[REF_PIC_LIST_0].ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+        pu.mv[REF_PIC_LIST_1].hor = pu.mv[REF_PIC_LIST_1].hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+        pu.mv[REF_PIC_LIST_1].ver = pu.mv[REF_PIC_LIST_1].ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
         pu.mvd   [REF_PIC_LIST_0] = cMvBi[0] - cMvPredBi[0][iRefIdxBi[0]];
         pu.mvd   [REF_PIC_LIST_1] = cMvBi[1] - cMvPredBi[1][iRefIdxBi[1]];
@@ -2214,7 +2229,8 @@ void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
         uiLastMode = 0;
         pu.mv    [REF_PIC_LIST_0] = cMv[0];
 #if REMOVE_MV_ADAPT_PREC
-        pu.mv    [REF_PIC_LIST_0] <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+        pu.mv    [REF_PIC_LIST_0].hor = pu.mv[REF_PIC_LIST_0].hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+        pu.mv    [REF_PIC_LIST_0].ver = pu.mv[REF_PIC_LIST_0].ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
         pu.mvd   [REF_PIC_LIST_0] = cMv[0] - cMvPred[0][iRefIdx[0]];
         pu.refIdx[REF_PIC_LIST_0] = iRefIdx[0];
@@ -2229,7 +2245,8 @@ void InterSearch::predInterSearch(CodingUnit& cu, Partitioner& partitioner)
         uiLastMode = 1;
         pu.mv    [REF_PIC_LIST_1] = cMv[1];
 #if REMOVE_MV_ADAPT_PREC
-        pu.mv    [REF_PIC_LIST_1] <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+        pu.mv    [REF_PIC_LIST_1].hor = pu.mv[REF_PIC_LIST_1].hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+        pu.mv    [REF_PIC_LIST_1].ver = pu.mv[REF_PIC_LIST_1].ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
         pu.mvd   [REF_PIC_LIST_1] = cMv[1] - cMvPred[1][iRefIdx[1]];
         pu.refIdx[REF_PIC_LIST_1] = iRefIdx[1];
@@ -2718,7 +2735,8 @@ Distortion InterSearch::xGetTemplateCost( const PredictionUnit& pu,
 
   const Picture* picRef = pu.cu->slice->getRefPic( eRefPicList, iRefIdx );
 #if REMOVE_MV_ADAPT_PREC
-  cMvCand <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  cMvCand.hor = cMvCand.hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  cMvCand.ver = cMvCand.ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
   clipMv( cMvCand, pu.cu->lumaPos(), *pu.cs->sps );
 
@@ -2761,10 +2779,13 @@ Distortion InterSearch::xGetAffineTemplateCost( PredictionUnit& pu, PelUnitBuf& 
   // prediction pattern
   const bool bi = pu.cu->slice->testWeightPred() && pu.cu->slice->getSliceType()==P_SLICE;
 #if REMOVE_MV_ADAPT_PREC
-  Mv mv[3] = { acMvCand[0], acMvCand[1], acMvCand[2] };
-  mv[0] <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
-  mv[1] <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
-  mv[2] <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  Mv mv[3];
+  mv[0].hor = acMvCand[0].hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  mv[0].ver = acMvCand[0].ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  mv[1].hor = acMvCand[1].hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  mv[1].ver = acMvCand[1].ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  mv[2].hor = acMvCand[2].hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  mv[2].ver = acMvCand[2].ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
   xPredAffineBlk(COMPONENT_Y, pu, picRef, mv, predBuf, bi, pu.cu->slice->clpRng(COMPONENT_Y));
 #else
   xPredAffineBlk(COMPONENT_Y, pu, picRef, acMvCand, predBuf, bi, pu.cu->slice->clpRng(COMPONENT_Y));
@@ -2986,7 +3007,8 @@ void InterSearch::xSetSearchRange ( const PredictionUnit& pu,
 #endif
   Mv cFPMvPred = cMvPred;
 #if REMOVE_MV_ADAPT_PREC
-  cFPMvPred <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  cFPMvPred.hor = cFPMvPred.hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  cFPMvPred.ver = cFPMvPred.ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
   clipMv( cFPMvPred, pu.cu->lumaPos(), *pu.cs->sps );
 
@@ -3156,11 +3178,13 @@ void InterSearch::xTZSearch( const PredictionUnit& pu,
 
   int iSearchRange = m_iSearchRange;
 #if REMOVE_MV_ADAPT_PREC
-  rcMv <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  rcMv.hor = rcMv.hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  rcMv.ver = rcMv.ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
   clipMv( rcMv, pu.cu->lumaPos(), *pu.cs->sps );
 #if REMOVE_MV_ADAPT_PREC
-  rcMv >>= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  rcMv.hor = rcMv.hor >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  rcMv.ver = rcMv.ver >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
   rcMv.divideByPowerOf2(2);
 
@@ -3199,11 +3223,13 @@ void InterSearch::xTZSearch( const PredictionUnit& pu,
     Mv integerMv2Nx2NPred = *pIntegerMv2Nx2NPred;
     integerMv2Nx2NPred <<= 2;
 #if REMOVE_MV_ADAPT_PREC
-    integerMv2Nx2NPred <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+    integerMv2Nx2NPred.hor = integerMv2Nx2NPred.hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+    integerMv2Nx2NPred.ver = integerMv2Nx2NPred.ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
     clipMv( integerMv2Nx2NPred, pu.cu->lumaPos(), *pu.cs->sps );
 #if REMOVE_MV_ADAPT_PREC
-    integerMv2Nx2NPred >>= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+    integerMv2Nx2NPred.hor = integerMv2Nx2NPred.hor >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+    integerMv2Nx2NPred.ver = integerMv2Nx2NPred.ver >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
     integerMv2Nx2NPred.divideByPowerOf2(2);
 
@@ -3440,11 +3466,13 @@ void InterSearch::xTZSearchSelective( const PredictionUnit& pu,
   int   iStartY                 = 0;
   int   iDist                   = 0;
 #if REMOVE_MV_ADAPT_PREC
-  rcMv <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  rcMv.hor = rcMv.hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  rcMv.ver = rcMv.ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
   clipMv( rcMv, pu.cu->lumaPos(), *pu.cs->sps );
 #if REMOVE_MV_ADAPT_PREC
-  rcMv >>= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  rcMv.hor = rcMv.hor >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  rcMv.ver = rcMv.ver >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
   rcMv.divideByPowerOf2(2);
 
@@ -3477,11 +3505,13 @@ void InterSearch::xTZSearchSelective( const PredictionUnit& pu,
     Mv integerMv2Nx2NPred = *pIntegerMv2Nx2NPred;
     integerMv2Nx2NPred <<= 2;
 #if REMOVE_MV_ADAPT_PREC
-    integerMv2Nx2NPred <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+    integerMv2Nx2NPred.hor = integerMv2Nx2NPred.hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+    integerMv2Nx2NPred.ver = integerMv2Nx2NPred.ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
     clipMv( integerMv2Nx2NPred, pu.cu->lumaPos(), *pu.cs->sps );
 #if REMOVE_MV_ADAPT_PREC
-    integerMv2Nx2NPred >>= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+    integerMv2Nx2NPred.hor = integerMv2Nx2NPred.hor >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+    integerMv2Nx2NPred.ver = integerMv2Nx2NPred.ver >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
     integerMv2Nx2NPred.divideByPowerOf2(2);
 
@@ -3633,11 +3663,13 @@ void InterSearch::xPatternSearchIntRefine(PredictionUnit& pu, IntTZSearchStruct&
       {
         Mv cTempMV = cTestMv[iMVPIdx];
 #if REMOVE_MV_ADAPT_PREC
-        cTempMV <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+        cTempMV.hor = cTempMV.hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+        cTempMV.ver = cTempMV.ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
         clipMv(cTempMV, pu.cu->lumaPos(), sps);
 #if REMOVE_MV_ADAPT_PREC
-        cTempMV >>= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+        cTempMV.hor = cTempMV.hor >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+        cTempMV.ver = cTempMV.ver >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
         m_cDistParam.cur.buf = cStruct.piRefY  + cStruct.iRefStride * (cTempMV.getVer() >>  2) + (cTempMV.getHor() >> 2);
         uiDist = uiSATD = (Distortion) (m_cDistParam.distFunc( m_cDistParam ) * fWeight);
@@ -3896,14 +3928,18 @@ void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
       {
         Mv mvFour[3];
 #if REMOVE_MV_ADAPT_PREC
-        mvAffine4Para[iRefList][iRefIdxTemp][0] <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
-        mvAffine4Para[iRefList][iRefIdxTemp][1] <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+        mvAffine4Para[iRefList][iRefIdxTemp][0].hor = mvAffine4Para[iRefList][iRefIdxTemp][0].hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+        mvAffine4Para[iRefList][iRefIdxTemp][0].ver = mvAffine4Para[iRefList][iRefIdxTemp][0].ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+        mvAffine4Para[iRefList][iRefIdxTemp][1].hor = mvAffine4Para[iRefList][iRefIdxTemp][1].hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+        mvAffine4Para[iRefList][iRefIdxTemp][1].ver = mvAffine4Para[iRefList][iRefIdxTemp][1].ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
         mvFour[0] = mvAffine4Para[iRefList][iRefIdxTemp][0];
         mvFour[1] = mvAffine4Para[iRefList][iRefIdxTemp][1];
 #if REMOVE_MV_ADAPT_PREC
-        mvAffine4Para[iRefList][iRefIdxTemp][0] >>= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
-        mvAffine4Para[iRefList][iRefIdxTemp][1] >>= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+        mvAffine4Para[iRefList][iRefIdxTemp][0].hor = mvAffine4Para[iRefList][iRefIdxTemp][0].hor >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+        mvAffine4Para[iRefList][iRefIdxTemp][0].ver = mvAffine4Para[iRefList][iRefIdxTemp][0].ver >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+        mvAffine4Para[iRefList][iRefIdxTemp][1].hor = mvAffine4Para[iRefList][iRefIdxTemp][1].hor >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+        mvAffine4Para[iRefList][iRefIdxTemp][1].ver = mvAffine4Para[iRefList][iRefIdxTemp][1].ver >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
 
         int shift = MAX_CU_DEPTH;
@@ -3912,7 +3948,8 @@ void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
         vx2 >>= shift;
         vy2 >>= shift;
 #if REMOVE_MV_ADAPT_PREC
-        mvFour[2] = Mv(vx2, vy2);
+        mvFour[2].hor = vx2;
+        mvFour[2].ver = vy2;
 #else
         mvFour[2] = Mv(vx2, vy2, true);
 #endif
@@ -3920,7 +3957,8 @@ void InterSearch::xPredAffineInterSearch( PredictionUnit&       pu,
 #if REMOVE_MV_ADAPT_PREC
         for (int i = 0; i < 3; i++)
         {
-          mvFour[i] >>= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+          mvFour[i].hor = mvFour[i].hor >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+          mvFour[i].ver = mvFour[i].ver >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
         }
 #endif
         Distortion uiCandCostInherit = xGetAffineTemplateCost( pu, origBuf, predBuf, mvFour, aaiMvpIdx[iRefList][iRefIdxTemp], AMVP_MAX_NUM_CANDS, eRefPicList, iRefIdxTemp );
@@ -4637,9 +4675,12 @@ void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
   Mv acMvTemp[3];
   ::memcpy( acMvTemp, acMv, sizeof(Mv)*3 );
 #if REMOVE_MV_ADAPT_PREC
-  acMvTemp[0] <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
-  acMvTemp[1] <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
-  acMvTemp[2] <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  acMvTemp[0].hor = acMvTemp[0].hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  acMvTemp[0].ver = acMvTemp[0].ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  acMvTemp[1].hor = acMvTemp[1].hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  acMvTemp[1].ver = acMvTemp[1].ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  acMvTemp[2].hor = acMvTemp[2].hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+  acMvTemp[2].ver = acMvTemp[2].ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #else
   acMvTemp[0].setHighPrec();
   acMvTemp[1].setHighPrec();
@@ -4710,8 +4751,9 @@ void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
     m_pcRdCost->setPredictor( acMvPred[i] );
     DTRACE( g_trace_ctx, D_COMMON, "#mvForBits=(%d,%d) \n", acMvTemp[i].getHor(), acMvTemp[i].getVer() );
 #if REMOVE_MV_ADAPT_PREC
-    Mv mv0 = acMvTemp[0];
-    mv0 >>= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+    Mv mv0;
+    mv0.hor = acMvTemp[0].hor >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+    mv0.ver = acMvTemp[0].ver >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
     const int shift = VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #else
     const int shift = acMvTemp[i].highPrec ? VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : 0;
@@ -4721,7 +4763,8 @@ void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
     if ( i != 0 )
     {
 #if REMOVE_MV_ADAPT_PREC
-      secondPred = acMvPred[i] + (mv0 - acMvPred[0]);
+      secondPred.hor = acMvPred[i].hor + mv0.hor - acMvPred[0].hor;
+      secondPred.ver = acMvPred[i].ver + mv0.ver - acMvPred[0].ver;
 #else
       secondPred = acMvPred[i] + (acMvTemp[0] - acMvPred[0]);
 #endif
@@ -5052,8 +5095,9 @@ void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
     {
       m_pcRdCost->setPredictor( acMvPred[i] );
 #if REMOVE_MV_ADAPT_PREC
-      Mv mv0 = acMvTemp[0];
-      mv0 >>= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+      Mv mv0;
+      mv0.hor = acMvTemp[0].hor >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+      mv0.ver = acMvTemp[0].ver >> VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
       const int shift = VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #else
       const int shift = acMvTemp[i].highPrec ? VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE : 0;
@@ -5063,7 +5107,8 @@ void InterSearch::xAffineMotionEstimation( PredictionUnit& pu,
       if ( i != 0 )
       {
 #if REMOVE_MV_ADAPT_PREC
-        secondPred = acMvPred[i] + (mv0 - acMvPred[0]);
+        secondPred.hor = acMvPred[i].hor + mv0.hor - acMvPred[0].hor;
+        secondPred.ver = acMvPred[i].ver + mv0.ver - acMvPred[0].ver;
 #else
         secondPred = acMvPred[i] + (acMvTemp[0] - acMvPred[0]);
 #endif

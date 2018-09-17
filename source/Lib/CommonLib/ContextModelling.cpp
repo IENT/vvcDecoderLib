@@ -770,7 +770,9 @@ void MergeCtx::setMergeInfo( PredictionUnit& pu, int candIdx )
     pu.cu->ibc = true;
     pu.bv = pu.mv[REF_PIC_LIST_0];
 #if REMOVE_MV_ADAPT_PREC
-    pu.bv >>= (2 + VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE);
+    const int shift = 2 + VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+    pu.bv.hor = pu.bv.hor >> shift;
+    pu.bv.ver = pu.bv.ver >> shift;
 #else
     pu.bv >>= 2; // used for only integer resolution
 #endif

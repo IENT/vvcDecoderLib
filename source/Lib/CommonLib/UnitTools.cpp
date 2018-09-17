@@ -2473,7 +2473,8 @@ void PU::xInheritedAffineMv( const PredictionUnit &pu, const PredictionUnit* puN
   verTmp = iMvScaleVer + iDMvHorY * (posCurX - posNeiX) + iDMvVerY * (posCurY - posNeiY);
   roundAffineMv( horTmp, verTmp, shift );
 #if REMOVE_MV_ADAPT_PREC
-  rcMv[0] = Mv(horTmp, verTmp);
+  rcMv[0].hor = horTmp;
+  rcMv[0].ver = verTmp;
 #else
   rcMv[0] = Mv(horTmp, verTmp, true);
 #endif
@@ -2483,7 +2484,8 @@ void PU::xInheritedAffineMv( const PredictionUnit &pu, const PredictionUnit* puN
   verTmp = iMvScaleVer + iDMvHorY * (posCurX + curW - posNeiX) + iDMvVerY * (posCurY - posNeiY);
   roundAffineMv( horTmp, verTmp, shift );
 #if REMOVE_MV_ADAPT_PREC
-  rcMv[1] = Mv(horTmp, verTmp);
+  rcMv[1].hor = horTmp;
+  rcMv[1].ver = verTmp;
 #else
   rcMv[1] = Mv(horTmp, verTmp, true);
 #endif
@@ -2496,7 +2498,8 @@ void PU::xInheritedAffineMv( const PredictionUnit &pu, const PredictionUnit* puN
     verTmp = iMvScaleVer + iDMvHorY * (posCurX - posNeiX) + iDMvVerY * (posCurY + curH - posNeiY);
     roundAffineMv( horTmp, verTmp, shift );
 #if REMOVE_MV_ADAPT_PREC
-    rcMv[2] = Mv(horTmp, verTmp);
+    rcMv[2].hor = horTmp;
+    rcMv[2].ver = verTmp;
 #else
     rcMv[2] = Mv(horTmp, verTmp, true);
 #endif
@@ -4223,9 +4226,12 @@ void PU::setAllAffineMv( PredictionUnit& pu, Mv affLT, Mv affRT, Mv affLB, RefPi
 #if REMOVE_MV_ADAPT_PREC
   if (setHighPrec)
   {
-    affLT <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
-    affRT <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
-    affLB <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+    affLT.hor = affLT.hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+    affLT.ver = affLT.ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+    affRT.hor = affRT.hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+    affRT.ver = affRT.ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+    affLB.hor = affLB.hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+    affLB.ver = affLB.ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
   }
 #else
   affLT.setHighPrec();
@@ -4280,7 +4286,8 @@ void PU::setAllAffineMv( PredictionUnit& pu, Mv affLT, Mv affRT, Mv affLB, RefPi
         for ( int x = (w >> MIN_CU_LOG2); x < ((w + blockHeight) >> MIN_CU_LOG2); x++ )
         {
 #if REMOVE_MV_ADAPT_PREC
-          mb.at(x, y).mv[eRefList] = Mv(mvScaleTmpHor, mvScaleTmpVer);
+          mb.at(x, y).mv[eRefList].hor = mvScaleTmpHor;
+          mb.at(x, y).mv[eRefList].ver = mvScaleTmpVer;
 #else
           mb.at(x, y).mv[eRefList] = Mv(mvScaleTmpHor, mvScaleTmpVer, true);
 #endif
@@ -4897,7 +4904,8 @@ void PU::applyImv( PredictionUnit& pu, MergeCtx &mrgCtx, InterPrediction *interP
       pu.mvpIdx[0] = mvp_idx;
       pu.mv    [0] = amvpInfo.mvCand[mvp_idx] + pu.mvd[0];
 #if REMOVE_MV_ADAPT_PREC
-      pu.mv[0] <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+      pu.mv[0].hor = pu.mv[0].hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+      pu.mv[0].ver = pu.mv[0].ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
 #if JVET_K0076_CPR
       if (pu.interDir == 1 && pu.cs->slice->getRefPic(REF_PIC_LIST_0, pu.refIdx[REF_PIC_LIST_0])->getPOC() == pu.cs->slice->getPOC())
@@ -4927,7 +4935,8 @@ void PU::applyImv( PredictionUnit& pu, MergeCtx &mrgCtx, InterPrediction *interP
       pu.mvpIdx[1] = mvp_idx;
       pu.mv    [1] = amvpInfo.mvCand[mvp_idx] + pu.mvd[1];
 #if REMOVE_MV_ADAPT_PREC
-      pu.mv[1] <<= VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+      pu.mv[1].hor = pu.mv[1].hor << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
+      pu.mv[1].ver = pu.mv[1].ver << VCEG_AZ07_MV_ADD_PRECISION_BIT_FOR_STORE;
 #endif
     }
   }

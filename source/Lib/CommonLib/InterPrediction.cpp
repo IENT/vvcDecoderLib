@@ -4421,7 +4421,9 @@ void InterPrediction::xBIPMVRefine(PredictionUnit& pu, uint32_t nSearchStepShift
     for (SAD_POINT_INDEX nIdx = SAD_POINT_INDEX::BOTTOM; nIdx <= SAD_POINT_INDEX::TOP_LEFT; ++nIdx)
     {
 #if REMOVE_MV_ADAPT_PREC
-      Mv cMvDL0(m_pSearchOffset[nIdx]);
+      Mv cMvDL0;
+      cMvDL0.hor = m_pSearchOffset[nIdx].hor;
+      cMvDL0.ver = m_pSearchOffset[nIdx].ver;
 #else
       Mv cMvDL0(m_pSearchOffset[nIdx], cMvOrgL0.highPrec);
 #endif
@@ -4537,7 +4539,9 @@ void InterPrediction::xBIPMVRefine(PredictionUnit& pu, uint32_t nSearchStepShift
     for (SAD_POINT_INDEX nIdx = SAD_POINT_INDEX::BOTTOM; nIdx <= SAD_POINT_INDEX::LEFT; ++nIdx)
     {
 #if REMOVE_MV_ADAPT_PREC
-      Mv cMvDL0(m_pSearchOffset[nIdx]);
+      Mv cMvDL0;
+      cMvDL0.hor = m_pSearchOffset[nIdx].hor;
+      cMvDL0.ver = m_pSearchOffset[nIdx].ver;
 #else
       Mv cMvDL0(m_pSearchOffset[nIdx], cMvOrgL0.highPrec);
 #endif
@@ -4629,7 +4633,9 @@ void InterPrediction::xGenerateFracPixel(PredictionUnit& pu, uint32_t nSearchSte
   const uint32_t bufferHeight = cuHeight + 1;
   //(0,-/+1)
 #if REMOVE_MV_ADAPT_PREC
-  Mv cMvL0(cMvOrgL0 + Mv(0, -1 << nSearchStepShift));
+  Mv cMvL0;
+  cMvL0.hor = cMvOrgL0.hor;
+  cMvL0.ver = cMvOrgL0.ver + (-1 << nSearchStepShift);
 #else
   Mv cMvL0(cMvOrgL0 + Mv(0, -1 << nSearchStepShift, cMvOrgL0.highPrec));
 #endif
@@ -4643,7 +4649,9 @@ void InterPrediction::xGenerateFracPixel(PredictionUnit& pu, uint32_t nSearchSte
     , cuHeight + 1
   );
 #if REMOVE_MV_ADAPT_PREC
-  Mv cMvL1(cMvOrgL1 + Mv(0, -1 << nSearchStepShift));
+  Mv cMvL1;
+  cMvL1.hor = cMvOrgL1.hor;
+  cMvL1.ver = cMvOrgL1.ver + (-1 << nSearchStepShift);
 #else
   Mv cMvL1(cMvOrgL1 + Mv(0, -1 << nSearchStepShift, cMvOrgL1.highPrec));
 #endif
@@ -4658,7 +4666,8 @@ void InterPrediction::xGenerateFracPixel(PredictionUnit& pu, uint32_t nSearchSte
   );
   //(-/+1,0)
 #if REMOVE_MV_ADAPT_PREC
-  cMvL0 = cMvOrgL0 + Mv(-1 << nSearchStepShift, 0);
+  cMvL0.ver = cMvOrgL0.ver;
+  cMvL0.hor = cMvOrgL0.hor + (-1 << nSearchStepShift);
 #else
   cMvL0 = cMvOrgL0 + Mv(-1 << nSearchStepShift, 0, cMvOrgL0.highPrec);
 #endif
@@ -4672,7 +4681,8 @@ void InterPrediction::xGenerateFracPixel(PredictionUnit& pu, uint32_t nSearchSte
     , cuHeight
   );
 #if REMOVE_MV_ADAPT_PREC
-  cMvL1 = cMvOrgL1 + Mv(-1 << nSearchStepShift, 0);
+  cMvL1.ver = cMvOrgL1.ver;
+  cMvL1.hor = cMvOrgL1.hor + (-1 << nSearchStepShift);
 #else
   cMvL1 = cMvOrgL1 + Mv(-1 << nSearchStepShift, 0, cMvOrgL1.highPrec);
 #endif
@@ -4787,13 +4797,17 @@ void InterPrediction::xProcessDMVR( PredictionUnit& pu, PelUnitBuf &pcYuvDst, co
   DistParam cDistParam;
   MRSADtype minCost = std::numeric_limits<MRSADtype>::max();
 #if REMOVE_MV_ADAPT_PREC
-  const Mv mvBlkExt(m_searchRange << searchStepShift);
+  Mv mvBlkExt;
+  mvBlkExt.hor = m_searchRange << searchStepShift;
+  mvBlkExt.ver = m_searchRange << searchStepShift;
 #else
   const Mv mvBlkExt(m_searchRange << searchStepShift, pu.mv[REF_PIC_LIST_0].highPrec);
 #endif
   const SizeType MC_extension = m_searchRange << 1;
 #if REMOVE_MV_ADAPT_PREC
-  const Mv searchOffsetMv(-(int32_t)(m_searchRange << searchStepShift));
+  Mv searchOffsetMv;
+  searchOffsetMv.hor = -(int32_t)(m_searchRange << searchStepShift);
+  searchOffsetMv.ver = -(int32_t)(m_searchRange << searchStepShift);
 #else
   const Mv searchOffsetMv(-(int32_t)(m_searchRange << searchStepShift), pu.mv[REF_PIC_LIST_0].highPrec);
 #endif
