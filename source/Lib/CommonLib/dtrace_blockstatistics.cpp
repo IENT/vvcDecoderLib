@@ -433,6 +433,9 @@ void writeAllData(const CodingStructure& cs, const UnitArea& ctuArea)
           DTRACE_BLOCK_SCALAR(g_trace_ctx, D_BLOCK_STATISTICS_ALL, cu, GetBlockStatisticName(BlockStatistic::IMVMode), cu.imv);
 #endif
           DTRACE_BLOCK_SCALAR(g_trace_ctx, D_BLOCK_STATISTICS_ALL, cu, GetBlockStatisticName(BlockStatistic::RootCbf), cu.rootCbf);
+#if JVET_K0248_GBI
+          DTRACE_BLOCK_SCALAR(g_trace_ctx, D_BLOCK_STATISTICS_ALL, cu, GetBlockStatisticName(BlockStatistic::GBiIdx), cu.GBiIdx);
+#endif
         }
         break;
       case MODE_INTRA:
@@ -453,6 +456,7 @@ void writeAllData(const CodingStructure& cs, const UnitArea& ctuArea)
             DTRACE_BLOCK_SCALAR_CHROMA(g_trace_ctx, D_BLOCK_STATISTICS_ALL, cu, GetBlockStatisticName(BlockStatistic::PDPCFlag_Chroma), cu.pdpc);
             DTRACE_BLOCK_SCALAR_CHROMA(g_trace_ctx, D_BLOCK_STATISTICS_ALL, cu, GetBlockStatisticName(BlockStatistic::NSSTIdx_Chroma),  cu.nsstIdx);
 #endif
+
           }
 
           const uint32_t numChType = ::getNumberValidChannels( cu.chromaFormat );
@@ -472,10 +476,10 @@ void writeAllData(const CodingStructure& cs, const UnitArea& ctuArea)
                 {
                   const uint32_t uiChFinalMode  = PU::getFinalIntraMode( pu, ChannelType( chType ) );
                   DTRACE_BLOCK_SCALAR_CHROMA(g_trace_ctx, D_BLOCK_STATISTICS_ALL, pu, GetBlockStatisticName(BlockStatistic::Chroma_IntraMode), uiChFinalMode);
-            #if ENABLE_CHROMA_422
+#if ENABLE_CHROMA_422
                     assert(0);
-            #endif
-                  }
+#endif
+                }
               }
             }
           }

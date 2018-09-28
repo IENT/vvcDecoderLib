@@ -112,6 +112,9 @@ enum class BlockStatistic {
   AffineType,
 #endif
 #endif
+#if JVET_K0248_GBI
+  GBiIdx,
+#endif
 
 // for dual tree
   // general
@@ -206,6 +209,9 @@ static const std::map<BlockStatistic, std::tuple<std::string, BlockStatisticType
   { BlockStatistic::NSSTIdx,                std::tuple<std::string, BlockStatisticType, std::string>{"NSSTIdx",                     BlockStatisticType::Integer,                "[0, 3]"}},
 #endif
 
+#if JVET_K0248_GBI
+  { BlockStatistic::GBiIdx,                 std::tuple<std::string, BlockStatisticType, std::string>{"GBiIdx",                      BlockStatisticType::Integer,                "[0, " + std::to_string(GBI_NUM) + "]"}},
+#endif
 
   // for dual tree
   { BlockStatistic::PartSize_Chroma,               std::tuple<std::string, BlockStatisticType, std::string>{"PartSize_Chroma",                    BlockStatisticType::Integer,                "[0, " + std::to_string(NUMBER_OF_PART_SIZES) + "]"}},
