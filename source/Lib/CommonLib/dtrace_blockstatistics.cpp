@@ -156,13 +156,27 @@ void CDTrace::dtrace_block_scalar( int k, const PredictionUnit &pu, std::string 
 #endif
 }
 
-void CDTrace::dtrace_block_vector( int k, const PredictionUnit &pu, std::string stat_type, signed val_x, signed val_y )
+void CDTrace::dtrace_block_vector( int k, const PredictionUnit &pu, std::string stat_type, signed val_x, signed val_y, bool isChroma /*= false*/  )
 {
   const CodingStructure& cs = *pu.cs;
 #if BLOCK_STATS_AS_CSV
-  dtrace<false>( k, "BlockStat;%d;%4d;%4d;%2d;%2d;%s;%4d;%4d\n", cs.picture->poc, pu.lx(), pu.ly(), pu.lwidth(), pu.lheight(), stat_type.c_str(), val_x, val_y );
+  if(isChroma)
+  {
+    dtrace<false>( k, "BlockStat;%d;%4d;%4d;%2d;%2d;%s;%4d;%4d\n", cs.picture->poc,  pu.Cb().x*2, pu.Cb().y*2, pu.Cb().width*2, pu.Cb().height*2, stat_type.c_str(), val_x*2, val_y*2 );
+  }
+  else
+  {
+    dtrace<false>( k, "BlockStat;%d;%4d;%4d;%2d;%2d;%s;%4d;%4d\n", cs.picture->poc, pu.lx(), pu.ly(), pu.lwidth(), pu.lheight(), stat_type.c_str(), val_x, val_y );
+  }
 #else
-  dtrace<false>( k, "BlockStat: POC %d @(%4d,%4d) [%2dx%2d] %s={%4d,%4d}\n", cs.picture->poc, pu.lx(), pu.ly(), pu.lwidth(), pu.lheight(), stat_type.c_str(), val_x, val_y );
+  if(isChroma)
+  {
+    dtrace<false>( k, "BlockStat: POC %d @(%4d,%4d) [%2dx%2d] %s={%4d,%4d}\n", cs.picture->poc, pu.Cb().x*2, pu.Cb().y*2, pu.Cb().width*2, pu.Cb().height*2, stat_type.c_str(), val_x*2, val_y*2 );
+  }
+  else
+  {
+    dtrace<false>( k, "BlockStat: POC %d @(%4d,%4d) [%2dx%2d] %s={%4d,%4d}\n", cs.picture->poc, pu.lx(), pu.ly(), pu.lwidth(), pu.lheight(), stat_type.c_str(), val_x, val_y );
+  }
 #endif
 }
 
@@ -435,6 +449,45 @@ void writeAllData(const CodingStructure& cs, const UnitArea& ctuArea)
           DTRACE_BLOCK_SCALAR(g_trace_ctx, D_BLOCK_STATISTICS_ALL, cu, GetBlockStatisticName(BlockStatistic::RootCbf), cu.rootCbf);
 #if JVET_K0248_GBI
           DTRACE_BLOCK_SCALAR(g_trace_ctx, D_BLOCK_STATISTICS_ALL, cu, GetBlockStatisticName(BlockStatistic::GBiIdx), cu.GBiIdx);
+#endif
+
+#if JVET_K0076_CPR
+          if(chType == CHANNEL_TYPE_LUMA)
+          {
+            DTRACE_BLOCK_SCALAR(g_trace_ctx, D_BLOCK_STATISTICS_ALL, cu, GetBlockStatisticName(BlockStatistic::IBCFlag), cu.ibc);
+          }
+          else if(chType == CHANNEL_TYPE_CHROMA)
+          {
+            DTRACE_BLOCK_SCALAR_CHROMA(g_trace_ctx, D_BLOCK_STATISTICS_ALL, cu, GetBlockStatisticName(BlockStatistic::IBCFlag_Chroma), cu.ibc);
+          }
+
+          const uint32_t numChType = ::getNumberValidChannels( cu.chromaFormat );
+
+          for( uint32_t chType = CHANNEL_TYPE_LUMA; chType < numChType; chType++ )
+          {
+            if( cu.blocks[chType].valid() )
+            {
+              for( const PredictionUnit &pu : CU::traversePUs( cu ) )
+              {
+                if( isLuma( ChannelType( chType ) ) )
+                {
+                  if(cu.ibc)
+                  {
+                    DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_ALL, pu, GetBlockStatisticName(BlockStatistic::IBC_BV), pu.mv[0].hor, pu.mv[0].ver);
+                    DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_ALL, pu, GetBlockStatisticName(BlockStatistic::IBC_BVD), pu.mvd[0].hor, pu.mvd[0].ver);
+                  }
+                }
+                else
+                {
+                  if(cu.ibc)
+                  {
+                    DTRACE_BLOCK_VECTOR_CHROMA(g_trace_ctx, D_BLOCK_STATISTICS_ALL, pu, GetBlockStatisticName(BlockStatistic::IBC_BV_Chroma), pu.mv[0].hor, pu.mv[0].ver);
+                    DTRACE_BLOCK_VECTOR_CHROMA(g_trace_ctx, D_BLOCK_STATISTICS_ALL, pu, GetBlockStatisticName(BlockStatistic::IBC_BVD_Chroma), pu.mvd[0].hor, pu.mvd[0].ver);
+                  }
+                }
+              }
+            }
+          }
 #endif
         }
         break;

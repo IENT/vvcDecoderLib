@@ -47,6 +47,7 @@
 #define DTRACE_BLOCK_SCALAR(ctx,channel,cs_cu_pu,stat_type,val)      ctx->dtrace_block_scalar( channel, cs_cu_pu, stat_type, val )
 #define DTRACE_BLOCK_SCALAR_CHROMA(ctx,channel,cs_cu_pu,stat_type,val)      ctx->dtrace_block_scalar( channel, cs_cu_pu, stat_type, val, true)
 #define DTRACE_BLOCK_VECTOR(ctx,channel,cu_pu,stat_type,v_x,v_y)     ctx->dtrace_block_vector( channel, cu_pu, stat_type, v_x, v_y )
+#define DTRACE_BLOCK_VECTOR_CHROMA(ctx,channel,pu,stat_type,v_x,v_y)     ctx->dtrace_block_vector( channel, pu, stat_type, v_x, v_y, true )
 #define DTRACE_BLOCK_AFFINETF(ctx,channel,pu,stat_type,v_x0,v_y0,v_x1,v_y1,v_x2,v_y2)  ctx->dtrace_block_affinetf( channel, pu, stat_type, v_x0, v_y0, v_x1, v_y1, v_x2, v_y2 )
 
 enum class BlockStatistic {
@@ -76,6 +77,15 @@ enum class BlockStatistic {
   PDPCFlag,
   NSSTIdx,
 #endif
+#if JVET_K0076_CPR
+  IBCFlag,
+  IBCFlag_Chroma,
+  IBC_BV,
+  IBC_BV_Chroma,
+  IBC_BVD,
+  IBC_BVD_Chroma,
+#endif
+
   // inter
   SkipFlag,
   RootCbf,
@@ -208,7 +218,14 @@ static const std::map<BlockStatistic, std::tuple<std::string, BlockStatisticType
   { BlockStatistic::PDPCFlag,               std::tuple<std::string, BlockStatisticType, std::string>{"PDPCFlag",                    BlockStatisticType::Flag,                   ""}},
   { BlockStatistic::NSSTIdx,                std::tuple<std::string, BlockStatisticType, std::string>{"NSSTIdx",                     BlockStatisticType::Integer,                "[0, 3]"}},
 #endif
-
+#if JVET_K0076_CPR
+  { BlockStatistic::IBCFlag,                std::tuple<std::string, BlockStatisticType, std::string>{"IBCFlag",                     BlockStatisticType::Flag,                   ""}},
+  { BlockStatistic::IBCFlag_Chroma,         std::tuple<std::string, BlockStatisticType, std::string>{"IBCFlag_Chroma",              BlockStatisticType::Flag,                   ""}},
+  { BlockStatistic::IBC_BV,                 std::tuple<std::string, BlockStatisticType, std::string>{"IBC_BV",                      BlockStatisticType::Vector,                 "Scale: 4"}},
+  { BlockStatistic::IBC_BV_Chroma,          std::tuple<std::string, BlockStatisticType, std::string>{"IBC_BV_Chroma",               BlockStatisticType::Vector,                 "Scale: 4"}},
+  { BlockStatistic::IBC_BVD,                std::tuple<std::string, BlockStatisticType, std::string>{"IBC_BD",                      BlockStatisticType::Vector,                 "Scale: 4"}},
+  { BlockStatistic::IBC_BVD_Chroma,         std::tuple<std::string, BlockStatisticType, std::string>{"IBC_BD_Chroma",               BlockStatisticType::Vector,                 "Scale: 4"}},
+#endif
 #if JVET_K0248_GBI
   { BlockStatistic::GBiIdx,                 std::tuple<std::string, BlockStatisticType, std::string>{"GBiIdx",                      BlockStatisticType::Integer,                "[0, " + std::to_string(GBI_NUM) + "]"}},
 #endif
