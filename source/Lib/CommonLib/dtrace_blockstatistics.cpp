@@ -308,12 +308,12 @@ void writeAllData(const CodingStructure& cs, const UnitArea& ctuArea)
           DTRACE_BLOCK_SCALAR(g_trace_ctx, D_BLOCK_STATISTICS_ALL, cu, GetBlockStatisticName(BlockStatistic::SkipFlag), cu.skip);
         }
 
-  #if (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT) && HM_EMT_NSST_AS_IN_JEM
+#if (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT) && HM_EMT_NSST_AS_IN_JEM
         if (!(!((cs.sps->getSpsNext().getUseIntraEMT() && CU::isIntra(cu)) || (cs.sps->getSpsNext().getUseInterEMT() && CU::isInter(cu))) || isChroma(cu.chType)))
         {
           DTRACE_BLOCK_SCALAR(g_trace_ctx, D_BLOCK_STATISTICS_ALL, cu, GetBlockStatisticName(BlockStatistic::EMTFlag), cu.emtFlag);
         }
-  #endif
+#endif
       }
       else if( chType == CHANNEL_TYPE_CHROMA )
       {
@@ -331,12 +331,12 @@ void writeAllData(const CodingStructure& cs, const UnitArea& ctuArea)
           DTRACE_BLOCK_SCALAR_CHROMA(g_trace_ctx, D_BLOCK_STATISTICS_ALL, cu, GetBlockStatisticName(BlockStatistic::TransQuantBypassFlag_Chroma), cu.transQuantBypass);
         }
 
-  #if (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT) && HM_EMT_NSST_AS_IN_JEM
+#if (JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT) && HM_EMT_NSST_AS_IN_JEM
         if (!(!((cs.sps->getSpsNext().getUseIntraEMT() && CU::isIntra(cu)) || (cs.sps->getSpsNext().getUseInterEMT() && CU::isInter(cu))) || isChroma(cu.chType)))
         {
           DTRACE_BLOCK_SCALAR_CHROMA(g_trace_ctx, D_BLOCK_STATISTICS_ALL, cu, GetBlockStatisticName(BlockStatistic::EMTFlag_Chroma), cu.emtFlag);
         }
-  #endif
+#endif
       }
 
 
@@ -597,12 +597,12 @@ void writeAllCodedData(const CodingStructure & cs, const UnitArea & ctuArea)
         // prediction mode and partitioning data
         DTRACE_BLOCK_SCALAR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, cu, GetBlockStatisticName(BlockStatistic::PredMode), cu.predMode);
 
-  #if JEM_TOOLS
+#if JEM_TOOLS
         if (!(!cu.cs->sps->getSpsNext().isIntraPDPC() || cu.predMode == MODE_INTER))
         {
           DTRACE_BLOCK_SCALAR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, cu, GetBlockStatisticName(BlockStatistic::PDPCFlag), cu.pdpc);
         }
-  #endif
+#endif
         if (CU::isIntra(cu) && cu.partSize == SIZE_2Nx2N)
         {
           if (!(!sps.getUsePCM() || cu.lumaSize().width > (1 << sps.getPCMLog2MaxSize()) || cu.lumaSize().width < (1 << sps.getPCMLog2MinSize())))
@@ -633,12 +633,12 @@ void writeAllCodedData(const CodingStructure & cs, const UnitArea & ctuArea)
           DTRACE_BLOCK_SCALAR_CHROMA(g_trace_ctx, D_BLOCK_STATISTICS_CODED, cu, GetBlockStatisticName(BlockStatistic::TransQuantBypassFlag_Chroma), cu.transQuantBypass);
         }
 
-  #if JEM_TOOLS
+#if JEM_TOOLS
         if (!(!cu.cs->sps->getSpsNext().isIntraPDPC() || cu.predMode == MODE_INTER))
         {
           DTRACE_BLOCK_SCALAR_CHROMA(g_trace_ctx, D_BLOCK_STATISTICS_CODED, cu, GetBlockStatisticName(BlockStatistic::PDPCFlag_Chroma), cu.pdpc);
         }
-  #endif
+#endif
         if (CU::isIntra(cu) && cu.partSize == SIZE_2Nx2N)
         {
           if (!(!sps.getUsePCM() || cu.lumaSize().width > (1 << sps.getPCMLog2MaxSize()) || cu.lumaSize().width < (1 << sps.getPCMLog2MinSize())))
@@ -679,18 +679,18 @@ void writeAllCodedData(const CodingStructure & cs, const UnitArea & ctuArea)
             if (pu.mergeFlag)
             {
               DTRACE_BLOCK_SCALAR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::MergeType), pu.mergeType);
-  #if JEM_TOOLS
+#if JEM_TOOLS
               if (pu.cs->slice->getSPS()->getSpsNext().getUseFRUCMrgMode())
               {
                 DTRACE_BLOCK_SCALAR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::FrucMrgMode), pu.frucMrgMode);
               }
-  #endif
-  #if JEM_TOOLS || JVET_K_AFFINE
-  #if JEM_TOOLS
+#endif
+#if JEM_TOOLS || JVET_K_AFFINE
+#if JEM_TOOLS
               if (!(cu.cs->slice->isIntra() || !cu.cs->sps->getSpsNext().getUseAffine() || cu.partSize != SIZE_2Nx2N || cu.firstPU->frucMrgMode)
-  #else
+#else
               if (!(cu.cs->slice->isIntra() || !cu.cs->sps->getSpsNext().getUseAffine() || cu.partSize != SIZE_2Nx2N)
-  #endif
+#endif
                 && !(!cu.firstPU->mergeFlag && !(cu.lumaSize().width > 8 && cu.lumaSize().height > 8))
                 && !(cu.firstPU->mergeFlag && !PU::isAffineMrgFlagCoded(*cu.firstPU)))
               {
@@ -700,13 +700,13 @@ void writeAllCodedData(const CodingStructure & cs, const UnitArea & ctuArea)
                   DTRACE_BLOCK_SCALAR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::AffineType), pu.cu->affineType);
                 }
               }
-  #endif
-  #if JEM_TOOLS
+#endif
+#if JEM_TOOLS
               if (!(pu.frucMrgMode || pu.cu->affine))
-  #endif
-  #if !JEM_TOOLS && JVET_K_AFFINE
+#endif
+#if !JEM_TOOLS && JVET_K_AFFINE
               if (!(pu.cu->affine))
-  #endif
+#endif
               {
                 DTRACE_BLOCK_SCALAR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::MergeIdx), pu.mergeIdx);
               }
@@ -717,12 +717,12 @@ void writeAllCodedData(const CodingStructure & cs, const UnitArea & ctuArea)
               {
                 DTRACE_BLOCK_SCALAR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::InterDir), pu.interDir);
               }
-  #if JEM_TOOLS || JVET_K_AFFINE
-  #if JEM_TOOLS
+#if JEM_TOOLS || JVET_K_AFFINE
+#if JEM_TOOLS
               if (!(cu.cs->slice->isIntra() || !cu.cs->sps->getSpsNext().getUseAffine() || cu.partSize != SIZE_2Nx2N || cu.firstPU->frucMrgMode)
-  #else
+#else
               if (!(cu.cs->slice->isIntra() || !cu.cs->sps->getSpsNext().getUseAffine() || cu.partSize != SIZE_2Nx2N)
-  #endif
+#endif
                 && !(!cu.firstPU->mergeFlag && !(cu.lumaSize().width > 8 && cu.lumaSize().height > 8))
                 && !(cu.firstPU->mergeFlag && !PU::isAffineMrgFlagCoded(*cu.firstPU)))
               {
@@ -732,7 +732,7 @@ void writeAllCodedData(const CodingStructure & cs, const UnitArea & ctuArea)
                   DTRACE_BLOCK_SCALAR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::AffineType), pu.cu->affineType);
                 }
               }
-  #endif
+#endif
             }
             if (pu.interDir != 2 /* PRED_L1 */)
             {
@@ -745,18 +745,18 @@ void writeAllCodedData(const CodingStructure & cs, const UnitArea & ctuArea)
               DTRACE_BLOCK_SCALAR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::RefIdxL1), pu.refIdx[REF_PIC_LIST_1]);
             }
 
-  #if JEM_TOOLS || JVET_K_AFFINE
+#if JEM_TOOLS || JVET_K_AFFINE
             if (!pu.cu->affine)
             {
-  #endif
+#endif
               if (pu.interDir != 2 /* PRED_L1 */)
               {
                 Mv mv = pu.mv[REF_PIC_LIST_0];
                 Mv mvd = pu.mvd[REF_PIC_LIST_0];
-  #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
                 mv.setLowPrec();
                 mvd.setLowPrec();
-  #endif
+#endif
                 DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::MVDL0), mvd.hor, mvd.ver);
                 DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::MVL0), mv.hor, mv.ver);
               }
@@ -764,14 +764,14 @@ void writeAllCodedData(const CodingStructure & cs, const UnitArea & ctuArea)
               {
                 Mv mv = pu.mv[REF_PIC_LIST_1];
                 Mv mvd = pu.mvd[REF_PIC_LIST_1];
-  #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
                 mv.setLowPrec();
                 mvd.setLowPrec();
-  #endif
+#endif
                 DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::MVDL1), mvd.hor, mvd.ver);
                 DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::MVL1), mv.hor, mv.ver);
               }
-  #if JEM_TOOLS || JVET_K_AFFINE
+#if JEM_TOOLS || JVET_K_AFFINE
             }
             else
             {
@@ -782,12 +782,12 @@ void writeAllCodedData(const CodingStructure & cs, const UnitArea & ctuArea)
                 mv[0] = mb.at(0, 0).mv[REF_PIC_LIST_0];
                 mv[1] = mb.at(mb.width - 1, 0).mv[REF_PIC_LIST_0];
                 mv[2] = mb.at(0, mb.height - 1).mv[REF_PIC_LIST_0];
-  #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
                 // motion vectors should use low precision or they will appear to large
                 mv[0].setLowPrec();
                 mv[1].setLowPrec();
                 mv[2].setLowPrec();
-  #endif
+#endif
                 DTRACE_BLOCK_AFFINETF(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::AffineMVL0), mv[0].hor, mv[0].ver, mv[1].hor, mv[1].ver, mv[2].hor, mv[2].ver);
               }
               if (pu.interDir != 1 /* PRED_L1 */)
@@ -797,23 +797,23 @@ void writeAllCodedData(const CodingStructure & cs, const UnitArea & ctuArea)
                 mv[0] = mb.at(0, 0).mv[REF_PIC_LIST_1];
                 mv[1] = mb.at(mb.width - 1, 0).mv[REF_PIC_LIST_1];
                 mv[2] = mb.at(0, mb.height - 1).mv[REF_PIC_LIST_1];
-  #if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
+#if JEM_TOOLS || JVET_K0346 || JVET_K_AFFINE
                 // motion vectors should use low precision or they will appear to large
                 mv[0].setLowPrec();
                 mv[1].setLowPrec();
                 mv[2].setLowPrec();
-  #endif
+#endif
                 DTRACE_BLOCK_AFFINETF(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::AffineMVL1), mv[0].hor, mv[0].ver, mv[1].hor, mv[1].ver, mv[2].hor, mv[2].ver);
               }
             }
-  #endif
-  #if JVET_K0357_AMVR
+#endif
+#if JVET_K0357_AMVR
             if (cu.cs->sps->getSpsNext().getUseIMV() && CU::hasSubCUNonZeroMVd(cu))
             {
               DTRACE_BLOCK_SCALAR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, cu, GetBlockStatisticName(BlockStatistic::IMVMode), cu.imv);
             }
-  #endif
-  #if JEM_TOOLS
+#endif
+#if JEM_TOOLS
             if (cu.cs->sps->getSpsNext().getUseOBMC() && CU::isObmcFlagCoded(cu))
             {
               DTRACE_BLOCK_SCALAR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, cu, GetBlockStatisticName(BlockStatistic::OBMCFlag), cu.obmcFlag);
@@ -822,7 +822,7 @@ void writeAllCodedData(const CodingStructure & cs, const UnitArea & ctuArea)
             {
               DTRACE_BLOCK_SCALAR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, cu, GetBlockStatisticName(BlockStatistic::LICFlag), cu.LICFlag);
             }
-  #endif
+#endif
 
 #if JVET_K0076_CPR
           if( isLuma( ChannelType( chType ) ) )
