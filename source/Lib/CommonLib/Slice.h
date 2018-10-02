@@ -1839,9 +1839,6 @@ private:
   clock_t                    m_iProcessingStartTime;
   double                     m_dProcessingTime;
   uint32_t                       m_uiMaxBTSize;
-#if  JVET_K0076_CPR
-  bool                       m_bCprIsOnlyRefPic;
-#endif
 
 #if JVET_K0371_ALF
   AlfSliceParam              m_alfSliceParam;
@@ -1962,10 +1959,6 @@ public:
 
   void                        setMaxBTSize(int i)                                    { m_uiMaxBTSize = i; }
   uint32_t                        getMaxBTSize() const                                   { return m_uiMaxBTSize; }
-#if  JVET_K0076_CPR
-  bool                        getCprIsOnlyRefPic() const                             { return m_bCprIsOnlyRefPic; }
-  void                        setCprIsOnlyRefPic(bool b)                             { m_bCprIsOnlyRefPic = b; }
-#endif
 
 #if JEM_TOOLS
   bool                        getUseLIC()                                   const    { return m_UseLIC; }

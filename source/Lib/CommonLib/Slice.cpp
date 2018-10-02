@@ -136,9 +136,6 @@ Slice::Slice()
 , m_iProcessingStartTime          ( 0 )
 , m_dProcessingTime               ( 0 )
 , m_uiMaxBTSize                   ( 0 )
-#if JVET_K0076_CPR
-, m_bCprIsOnlyRefPic              ( false )
-#endif
 {
   for(uint32_t i=0; i<NUM_REF_PIC_LIST_01; i++)
   {
@@ -2726,12 +2723,7 @@ void calculateParameterSetChangedFlag(bool &bChanged, const std::vector<uint8_t>
 
 uint32_t PreCalcValues::getValIdx( const Slice &slice, const ChannelType chType ) const
 {
-#if JVET_K0076_CPR_DT
-  return (slice.isIntra() || slice.getCprIsOnlyRefPic())
-    ? (ISingleTree ? 0 : (chType << 1)) : 1;
-#else
-  return slice.isIntra() ? ( ISingleTree ? 0 : ( chType << 1 ) ) : 1;
-#endif
+  return slice.isIRAP() ? ( ISingleTree ? 0 : ( chType << 1 ) ) : 1;
 }
 
 uint32_t PreCalcValues::getMaxBtDepth( const Slice &slice, const ChannelType chType ) const
@@ -2746,12 +2738,7 @@ uint32_t PreCalcValues::getMinBtSize( const Slice &slice, const ChannelType chTy
 
 uint32_t PreCalcValues::getMaxBtSize( const Slice &slice, const ChannelType chType ) const
 {
-#if JVET_K0076_CPR_DT
-  return ((!slice.isIntra() && !slice.getCprIsOnlyRefPic())
-    || isLuma(chType) || ISingleTree) ? slice.getMaxBTSize() : MAX_BT_SIZE_C;
-#else
-  return ( !slice.isIntra() || isLuma( chType ) || ISingleTree ) ? slice.getMaxBTSize() : MAX_BT_SIZE_C;
-#endif
+  return ( !slice.isIRAP() || isLuma( chType ) || ISingleTree ) ? slice.getMaxBTSize() : MAX_BT_SIZE_C;
 }
 
 uint32_t PreCalcValues::getMinTtSize( const Slice &slice, const ChannelType chType ) const

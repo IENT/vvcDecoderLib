@@ -157,7 +157,7 @@ void CS::initFrucMvp( CodingStructure &cs )
 
       const Picture* pColPic  = cs.slice->getRefPic( eRefPicList, nRefIdx );
 
-      if( pColPic->cs->slice->isIntra() )
+      if( pColPic->cs->slice->isIRAP() )
       {
         continue;
       }
@@ -241,12 +241,7 @@ void CS::initFrucMvp( CodingStructure &cs )
 
 bool CS::isDualITree( const CodingStructure &cs )
 {
-#if JVET_K0076_CPR_DT
-  // for I slice, or P slice with CPR is the only ref
-  return (cs.slice->isIntra() || cs.slice->getCprIsOnlyRefPic()) && !cs.pcv->ISingleTree;
-#else
-  return cs.slice->isIntra() && !cs.pcv->ISingleTree;
-#endif
+  return cs.slice->isIRAP() && !cs.pcv->ISingleTree;
 }
 
 UnitArea CS::getArea( const CodingStructure &cs, const UnitArea &area, const ChannelType chType )
@@ -1387,7 +1382,7 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx, co
 
 #if JEM_TOOLS || JVET_K0346
 #if JVET_K0076_CPR
-  bool enableSubPuMvp = slice.getSPS()->getSpsNext().getUseSubPuMvp() && !(slice.getPOC() == slice.getRefPic(REF_PIC_LIST_0, 0)->getPOC() && slice.getNumRefIdx(REF_PIC_LIST_0) == 1);
+  bool enableSubPuMvp = slice.getSPS()->getSpsNext().getUseSubPuMvp() && !(slice.isIRAP());
 #else
   bool enableSubPuMvp = slice.getSPS()->getSpsNext().getUseSubPuMvp();
 #endif
