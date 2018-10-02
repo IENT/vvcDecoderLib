@@ -609,8 +609,14 @@ void writeAllCodedData(const CodingStructure & cs, const UnitArea & ctuArea)
           {
             DTRACE_BLOCK_SCALAR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, cu, GetBlockStatisticName(BlockStatistic::IPCM), cu.ipcm);
           }
+        }                       
+#if JVET_K0076_CPR
+        if(CU::isInter(cu))
+        {
+          DTRACE_BLOCK_SCALAR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, cu, GetBlockStatisticName(BlockStatistic::IBCFlag), cu.ibc);
         }
-      }
+#endif
+      }           
       else if (chType == CHANNEL_TYPE_CHROMA )
       {
         DTRACE_BLOCK_SCALAR_CHROMA(g_trace_ctx, D_BLOCK_STATISTICS_CODED, cu, GetBlockStatisticName(BlockStatistic::PartSize_Chroma), cu.partSize);
@@ -640,6 +646,12 @@ void writeAllCodedData(const CodingStructure & cs, const UnitArea & ctuArea)
             DTRACE_BLOCK_SCALAR_CHROMA(g_trace_ctx, D_BLOCK_STATISTICS_CODED, cu, GetBlockStatisticName(BlockStatistic::IPCM_Chroma), cu.ipcm);
           }
         }
+#if JVET_K0076_CPR
+        if(CU::isInter(cu))
+        {
+          DTRACE_BLOCK_SCALAR_CHROMA(g_trace_ctx, D_BLOCK_STATISTICS_CODED, cu, GetBlockStatisticName(BlockStatistic::IBCFlag_Chroma), cu.ibc);
+        }
+#endif
       }
 
       for (auto &pu : CU::traversePUs(cu))
@@ -811,6 +823,25 @@ void writeAllCodedData(const CodingStructure & cs, const UnitArea & ctuArea)
               DTRACE_BLOCK_SCALAR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, cu, GetBlockStatisticName(BlockStatistic::LICFlag), cu.LICFlag);
             }
   #endif
+
+#if JVET_K0076_CPR
+          if( isLuma( ChannelType( chType ) ) )
+          {
+            if(cu.ibc)
+            {
+              DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::IBC_BV), pu.mv[0].hor, pu.mv[0].ver);
+              DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::IBC_BVD), pu.mvd[0].hor, pu.mvd[0].ver);
+            }
+          }
+          else
+          {
+            if(cu.ibc)
+            {
+              DTRACE_BLOCK_VECTOR_CHROMA(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::IBC_BV_Chroma), pu.mv[0].hor, pu.mv[0].ver);
+              DTRACE_BLOCK_VECTOR_CHROMA(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::IBC_BVD_Chroma), pu.mvd[0].hor, pu.mvd[0].ver);
+            }
+          }
+#endif
             break;
           }
           default:
@@ -894,6 +925,12 @@ void writeAllCodedData(const CodingStructure & cs, const UnitArea & ctuArea)
         {
           DTRACE_BLOCK_SCALAR_CHROMA(g_trace_ctx, D_BLOCK_STATISTICS_CODED, cu, GetBlockStatisticName(BlockStatistic::EMTFlag_Chroma), cu.emtFlag);
         }
+      }
+#endif
+#if JVET_K0248_GBI
+      if( CU::isGBiIdxCoded(cu) )
+      {
+        DTRACE_BLOCK_SCALAR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, cu, GetBlockStatisticName(BlockStatistic::GBiIdx), cu.GBiIdx);
       }
 #endif
     }
