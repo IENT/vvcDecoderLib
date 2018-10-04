@@ -488,7 +488,6 @@ void writeAllData(const CodingStructure& cs, const UnitArea& ctuArea)
                   if(cu.ibc)
                   {
                     DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_ALL, pu, GetBlockStatisticName(BlockStatistic::IBC_BV), pu.mv[0].hor, pu.mv[0].ver);
-                    DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_ALL, pu, GetBlockStatisticName(BlockStatistic::IBC_BVD), pu.mvd[0].hor, pu.mvd[0].ver);
                   }
                 }
                 else
@@ -863,7 +862,6 @@ void writeAllCodedData(const CodingStructure & cs, const UnitArea & ctuArea)
             if(cu.ibc)
             {
               DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::IBC_BV), pu.mv[0].hor, pu.mv[0].ver);
-              DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::IBC_BVD), pu.mvd[0].hor, pu.mvd[0].ver);
             }
           }
           else
