@@ -388,8 +388,15 @@ void writeAllData(const CodingStructure& cs, const UnitArea& ctuArea)
                 mv.setLowPrec();
                 mvd.setLowPrec();
 #endif
+#if JVET_K0076_CPR
+                if(!cu.ibc)
+                {
+#endif
                 DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_ALL, pu, GetBlockStatisticName(BlockStatistic::MVDL0), mvd.hor, mvd.ver);
                 DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_ALL, pu, GetBlockStatisticName(BlockStatistic::MVL0), mv.hor, mv.ver);
+#if JVET_K0076_CPR
+                }
+#endif
               }
               if (pu.interDir != 1 /* PRED_L1 */)
               {
@@ -399,8 +406,15 @@ void writeAllData(const CodingStructure& cs, const UnitArea& ctuArea)
                 mv.setLowPrec();
                 mvd.setLowPrec();
 #endif
+#if JVET_K0076_CPR
+                if(!cu.ibc)
+                {
+#endif
                 DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_ALL, pu, GetBlockStatisticName(BlockStatistic::MVDL1), mvd.hor, mvd.ver);
                 DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_ALL, pu, GetBlockStatisticName(BlockStatistic::MVL1), mv.hor, mv.ver);
+#if JVET_K0076_CPR
+                }
+#endif
               }
 #if JEM_TOOLS || JVET_K_AFFINE
             }
@@ -757,8 +771,15 @@ void writeAllCodedData(const CodingStructure & cs, const UnitArea & ctuArea)
                 mv.setLowPrec();
                 mvd.setLowPrec();
 #endif
+#if JVET_K0076_CPR
+                if(!cu.ibc)
+                {
+#endif
                 DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::MVDL0), mvd.hor, mvd.ver);
                 DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::MVL0), mv.hor, mv.ver);
+#if JVET_K0076_CPR
+                }
+#endif
               }
               if (pu.interDir != 1 /* PRED_L1 */)
               {
@@ -768,8 +789,15 @@ void writeAllCodedData(const CodingStructure & cs, const UnitArea & ctuArea)
                 mv.setLowPrec();
                 mvd.setLowPrec();
 #endif
+#if JVET_K0076_CPR
+                if(!cu.ibc)
+                {
+#endif
                 DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::MVDL1), mvd.hor, mvd.ver);
                 DTRACE_BLOCK_VECTOR(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::MVL1), mv.hor, mv.ver);
+#if JVET_K0076_CPR
+                }
+#endif
               }
 #if JEM_TOOLS || JVET_K_AFFINE
             }
