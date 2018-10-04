@@ -495,8 +495,13 @@ void writeAllData(const CodingStructure& cs, const UnitArea& ctuArea)
                 {
                   if(cu.ibc)
                   {
-                    DTRACE_BLOCK_VECTOR_CHROMA(g_trace_ctx, D_BLOCK_STATISTICS_ALL, pu, GetBlockStatisticName(BlockStatistic::IBC_BV_Chroma), pu.mv[0].hor, pu.mv[0].ver);
-                    DTRACE_BLOCK_VECTOR_CHROMA(g_trace_ctx, D_BLOCK_STATISTICS_ALL, pu, GetBlockStatisticName(BlockStatistic::IBC_BVD_Chroma), pu.mvd[0].hor, pu.mvd[0].ver);
+                    // separated tree, chroma
+                    const CompArea lumaArea = CompArea(COMPONENT_Y, pu.chromaFormat, pu.Cb().lumaPos(), recalcSize(pu.chromaFormat, CHANNEL_TYPE_CHROMA, CHANNEL_TYPE_LUMA, pu.Cb().size()));
+                    const MotionInfo &curMi = pu.cs->picture->cs->getMotionInfo(Position{ lumaArea.x, lumaArea.y });
+                    Mv bv = curMi.mv[0];
+                    bv.hor = bv.hor >> ::getChannelTypeScaleX( ChannelType( chType ), cu.chromaFormat );
+                    bv.ver = bv.ver >> ::getChannelTypeScaleY( ChannelType( chType ), cu.chromaFormat );
+                    DTRACE_BLOCK_VECTOR_CHROMA(g_trace_ctx, D_BLOCK_STATISTICS_ALL, pu, GetBlockStatisticName(BlockStatistic::IBC_BV_Chroma), bv.hor, bv.ver);
                   }
                 }
               }
@@ -668,7 +673,7 @@ void writeAllCodedData(const CodingStructure & cs, const UnitArea & ctuArea)
 #endif
       }
 
-      for (auto &pu : CU::traversePUs(cu))
+      for (const PredictionUnit &pu : CU::traversePUs(cu))
       {
         switch (pu.cu->predMode)
         {
@@ -865,8 +870,14 @@ void writeAllCodedData(const CodingStructure & cs, const UnitArea & ctuArea)
           {
             if(cu.ibc)
             {
-              DTRACE_BLOCK_VECTOR_CHROMA(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::IBC_BV_Chroma), pu.mv[0].hor, pu.mv[0].ver);
-              DTRACE_BLOCK_VECTOR_CHROMA(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::IBC_BVD_Chroma), pu.mvd[0].hor, pu.mvd[0].ver);
+              // separated tree, chroma
+              const CompArea lumaArea = CompArea(COMPONENT_Y, pu.chromaFormat, pu.Cb().lumaPos(), recalcSize(pu.chromaFormat, CHANNEL_TYPE_CHROMA, CHANNEL_TYPE_LUMA, pu.Cb().size()));                      
+              const MotionInfo &curMi = pu.cs->picture->cs->getMotionInfo(Position{ lumaArea.x, lumaArea.y });
+              Mv bv = curMi.mv[0];
+              bv.setLowPrec();
+              bv.hor = bv.hor >> ::getChannelTypeScaleX( ChannelType( chType ), cu.chromaFormat );
+              bv.ver = bv.ver >> ::getChannelTypeScaleY( ChannelType( chType ), cu.chromaFormat );
+              DTRACE_BLOCK_VECTOR_CHROMA(g_trace_ctx, D_BLOCK_STATISTICS_CODED, pu, GetBlockStatisticName(BlockStatistic::IBC_BV_Chroma), bv.hor, bv.ver);
             }
           }
 #endif

@@ -82,8 +82,7 @@ enum class BlockStatistic {
   IBCFlag_Chroma,
   IBC_BV,
   IBC_BV_Chroma,
-  IBC_BVD,
-  IBC_BVD_Chroma,
+  IBC_BVD,  
 #endif
 
   // inter
@@ -224,7 +223,6 @@ static const std::map<BlockStatistic, std::tuple<std::string, BlockStatisticType
   { BlockStatistic::IBC_BV,                 std::tuple<std::string, BlockStatisticType, std::string>{"IBC_BV",                      BlockStatisticType::Vector,                 "Scale: 4"}},
   { BlockStatistic::IBC_BV_Chroma,          std::tuple<std::string, BlockStatisticType, std::string>{"IBC_BV_Chroma",               BlockStatisticType::Vector,                 "Scale: 4"}},
   { BlockStatistic::IBC_BVD,                std::tuple<std::string, BlockStatisticType, std::string>{"IBC_BD",                      BlockStatisticType::Vector,                 "Scale: 4"}},
-  { BlockStatistic::IBC_BVD_Chroma,         std::tuple<std::string, BlockStatisticType, std::string>{"IBC_BD_Chroma",               BlockStatisticType::Vector,                 "Scale: 4"}},
 #endif
 #if JVET_K0248_GBI
   { BlockStatistic::GBiIdx,                 std::tuple<std::string, BlockStatisticType, std::string>{"GBiIdx",                      BlockStatisticType::Integer,                "[0, " + std::to_string(GBI_NUM) + "]"}},
