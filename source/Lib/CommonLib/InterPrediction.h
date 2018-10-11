@@ -324,8 +324,11 @@ protected:
 #endif
   void xFrucUpdateTemplate      (PredictionUnit& pu, int nWidth, int nHeight, RefPicList eCurRefPicList, const MvField& rCurMvField );
 
-
-  void xFrucInsertMv2StartList  (const MvField & rMvField, std::list<MvField> & rList,bool setHighPrec);
+#if REMOVE_MV_ADAPT_PREC
+  void xFrucInsertMv2StartList(const MvField & rMvField, std::list<MvField> & rList);
+#else
+  void xFrucInsertMv2StartList(const MvField & rMvField, std::list<MvField> & rList, bool setHighPrec);
+#endif
   bool xFrucIsInList            (const MvField & rMvField, std::list<MvField> & rList);
 
   bool xFrucGetCurBlkTemplate   (PredictionUnit& pu, int nCurBlkWidth , int nCurBlkHeight);
