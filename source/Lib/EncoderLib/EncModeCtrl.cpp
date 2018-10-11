@@ -1306,11 +1306,7 @@ void EncModeCtrlMTnoRQT::initCULevel( Partitioner &partitioner, const CodingStru
   }
 
   // add first pass modes
-#if JVET_K0076_CPR
-  if ((!m_slice->isIntra() && !cs.sps->getSpsNext().getIBCMode()) || (m_slice->getNumRefIdx(REF_PIC_LIST_0) > 1 && cs.sps->getSpsNext().getIBCMode()))
-#else
-  if( !m_slice->isIntra() )
-#endif
+  if( !m_slice->isIRAP() )
   {
     for( int qpLoop = maxQP; qpLoop >= minQP; qpLoop-- )
     {
@@ -1595,11 +1591,8 @@ bool EncModeCtrlMTnoRQT::tryMode( const EncTestMode& encTestmode, const CodingSt
 #endif
     CHECK( !slice.isIntra() && !cuECtx.bestTU, "No possible non-intra encoding for a P- or B-slice found" );
 
-    if( !( slice.isIntra() || bestMode.type == ETM_INTRA ||
-#if JVET_K0076_CPR
-    (cs.sps->getSpsNext().getIBCMode() && m_slice->getNumRefIdx(REF_PIC_LIST_0) == 1) ||
-#endif
-         ( ( !m_pcEncCfg->getDisableIntraPUsInInterSlices() ) && !relatedCU.isInter && (
+    if( !( slice.isIRAP() || bestMode.type == ETM_INTRA || 
+	  ( ( !m_pcEncCfg->getDisableIntraPUsInInterSlices() ) && !relatedCU.isInter && (
                                          ( cuECtx.bestTU->cbf[0] != 0 ) ||
            ( ( numComp > COMPONENT_Cb ) && cuECtx.bestTU->cbf[1] != 0 ) ||
            ( ( numComp > COMPONENT_Cr ) && cuECtx.bestTU->cbf[2] != 0 )  // avoid very complex intra if it is unlikely
@@ -1656,11 +1649,7 @@ bool EncModeCtrlMTnoRQT::tryMode( const EncTestMode& encTestmode, const CodingSt
     if( lastTestMode().type != ETM_INTRA && cuECtx.bestCS && cuECtx.bestCU && interHadActive( cuECtx ) )
     {
       // Get SATD threshold from best Inter-CU
-      if( !cs.slice->isIntra() && m_pcEncCfg->getUsePbIntraFast() 
-#if JVET_K0076_CPR
-        && !(cs.slice->getNumRefIdx(REF_PIC_LIST_0) == 1 && cs.sps->getSpsNext().getIBCMode())
-#endif
-        )
+      if( !cs.slice->isIRAP() && m_pcEncCfg->getUsePbIntraFast() )
       {
         CodingUnit* bestCU = cuECtx.bestCU;
         if( bestCU && CU::isInter( *bestCU ) )

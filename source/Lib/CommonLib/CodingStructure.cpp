@@ -564,13 +564,7 @@ cTUTraverser CodingStructure::traverseTUs( const UnitArea& unit, const ChannelTy
 
 void CodingStructure::allocateVectorsAtPicLevel()
 {
-  const int  twice = ( 
-#if JVET_K0076_CPR_DT
-  (!pcv->ISingleTree && (slice->isIntra() || this->slice->getCprIsOnlyRefPic()))
-#else
-    !pcv->ISingleTree && slice->isIntra()
-#endif
-    && pcv->chrFormat != CHROMA_400 ) ? 2 : 1;
+  const int  twice = ( !pcv->ISingleTree && slice->isIRAP() && pcv->chrFormat != CHROMA_400 ) ? 2 : 1;
   size_t allocSize = twice * unitScale[0].scale( area.blocks[0].size() ).area();
 
   cus.reserve( allocSize );

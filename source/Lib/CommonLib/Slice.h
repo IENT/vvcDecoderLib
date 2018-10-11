@@ -829,11 +829,15 @@ private:
 #endif
 #endif
 #if JEM_TOOLS
+#if !REMOVE_MV_ADAPT_PREC
   bool              m_highPrecMv;                 // 11
+#endif
   bool              m_BIO;                        // 12
 #endif
 #if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
+#if !REMOVE_MV_ADAPT_PREC
   bool              m_highPrecMv;
+#endif
 #endif
   bool              m_DisableMotionCompression;   // 13
 #if JEM_TOOLS
@@ -1016,14 +1020,18 @@ public:
 #endif
 #endif
 #if JEM_TOOLS
-  void      setUseHighPrecMv      ( bool b )                                        { m_highPrecMv = b; }
-  bool      getUseHighPrecMv      ()                                      const     { return m_highPrecMv; }
+#if !REMOVE_MV_ADAPT_PREC
+  void      setUseHighPrecMv(bool b) { m_highPrecMv = b; }
+  bool      getUseHighPrecMv()                                      const { return m_highPrecMv; }
+#endif
   void      setUseBIO             ( bool b )                                        { m_BIO = b; }
   bool      getUseBIO             ()                                      const     { return m_BIO; }
 #endif
 #if !JEM_TOOLS && (JVET_K0346 || JVET_K_AFFINE)
+#if !REMOVE_MV_ADAPT_PREC
   void      setUseHighPrecMv(bool b) { m_highPrecMv = b; }
   bool      getUseHighPrecMv()                                      const { return m_highPrecMv; }
+#endif
 #endif
   void      setDisableMotCompress ( bool b )                                        { m_DisableMotionCompression = b; }
   bool      getDisableMotCompress ()                                      const     { return m_DisableMotionCompression; }
@@ -1839,9 +1847,6 @@ private:
   clock_t                    m_iProcessingStartTime;
   double                     m_dProcessingTime;
   uint32_t                       m_uiMaxBTSize;
-#if  JVET_K0076_CPR
-  bool                       m_bCprIsOnlyRefPic;
-#endif
 
 #if JVET_K0371_ALF
   AlfSliceParam              m_alfSliceParam;
@@ -1962,10 +1967,6 @@ public:
 
   void                        setMaxBTSize(int i)                                    { m_uiMaxBTSize = i; }
   uint32_t                        getMaxBTSize() const                                   { return m_uiMaxBTSize; }
-#if  JVET_K0076_CPR
-  bool                        getCprIsOnlyRefPic() const                             { return m_bCprIsOnlyRefPic; }
-  void                        setCprIsOnlyRefPic(bool b)                             { m_bCprIsOnlyRefPic = b; }
-#endif
 
 #if JEM_TOOLS
   bool                        getUseLIC()                                   const    { return m_UseLIC; }
