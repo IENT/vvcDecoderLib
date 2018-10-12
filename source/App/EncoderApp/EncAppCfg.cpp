@@ -2029,14 +2029,14 @@ bool EncAppCfg::xCheckParameter()
     xConfirmPara( m_altResiCompId > 0, "Alternative residual compression can only be used with NEXT profile" );
 #endif
 #endif
-#if JEM_TOOLS || JVET_K_AFFINE
+#if (JEM_TOOLS || JVET_K_AFFINE) && !REMOVE_MV_ADAPT_PREC
     xConfirmPara( m_highPrecisionMv, "High precision MV for temporal merging can only be used with NEXT profile" );
     xConfirmPara( m_Affine, "Affine is only allowed with NEXT profile" );
 #endif
 #if JEM_TOOLS
     xConfirmPara( m_BIO, "BIO only allowed with NEXT profile" );
 #endif
-#if !JEM_TOOLS && JVET_K0346 && !JVET_K_AFFINE
+#if !JEM_TOOLS && JVET_K0346 && !JVET_K_AFFINE && !REMOVE_MV_ADAPT_PREC
     xConfirmPara(m_highPrecisionMv, "High precision MV for temporal merging can only be used with NEXT profile");
 #endif
     xConfirmPara( m_DisableMotionCompression, "Disable motion data compression only allowed with NEXT profile" );
