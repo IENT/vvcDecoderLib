@@ -47,6 +47,7 @@
 #define DTRACE_BLOCK_SCALAR(ctx,channel,cs_cu_pu,stat_type,val)      ctx->dtrace_block_scalar( channel, cs_cu_pu, stat_type, val )
 #define DTRACE_BLOCK_SCALAR_CHROMA(ctx,channel,cs_cu_pu,stat_type,val)      ctx->dtrace_block_scalar( channel, cs_cu_pu, stat_type, val, true)
 #define DTRACE_BLOCK_VECTOR(ctx,channel,cu_pu,stat_type,v_x,v_y)     ctx->dtrace_block_vector( channel, cu_pu, stat_type, v_x, v_y )
+#define DTRACE_BLOCK_VECTOR_CHROMA(ctx,channel,pu,stat_type,v_x,v_y)     ctx->dtrace_block_vector( channel, pu, stat_type, v_x, v_y, true )
 #define DTRACE_BLOCK_AFFINETF(ctx,channel,pu,stat_type,v_x0,v_y0,v_x1,v_y1,v_x2,v_y2)  ctx->dtrace_block_affinetf( channel, pu, stat_type, v_x0, v_y0, v_x1, v_y1, v_x2, v_y2 )
 
 enum class BlockStatistic {
@@ -61,7 +62,7 @@ enum class BlockStatistic {
   QP,
   SplitSeries,
   TransQuantBypassFlag,
-#if JVET_K1000_SIMPLIFIED_EMT
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   EMTFlag,
 #endif
   TransformSkipFlag_Y,
@@ -76,6 +77,13 @@ enum class BlockStatistic {
   PDPCFlag,
   NSSTIdx,
 #endif
+#if JVET_K0076_CPR
+  IBCFlag,
+  IBC_BV,
+  IBCFlag_Chroma,
+  IBC_BV_Chroma,
+#endif
+
   // inter
   SkipFlag,
   RootCbf,
@@ -112,6 +120,9 @@ enum class BlockStatistic {
   AffineType,
 #endif
 #endif
+#if JVET_K0248_GBI
+  GBiIdx,
+#endif
 
 // for dual tree
   // general
@@ -124,7 +135,7 @@ enum class BlockStatistic {
   QP_Chroma,
   SplitSeries_Chroma,
   TransQuantBypassFlag_Chroma,
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   EMTFlag_Chroma, // this is called flag, though the type is UChar ?!
 #endif
 
@@ -196,7 +207,7 @@ static const std::map<BlockStatistic, std::tuple<std::string, BlockStatisticType
   { BlockStatistic::AffineType,             std::tuple<std::string, BlockStatisticType, std::string>{"AffineType",                  BlockStatisticType::Flag,                   ""} },
 #endif
 #endif
-#if JVET_K1000_SIMPLIFIED_EMT
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   { BlockStatistic::EMTFlag,                std::tuple<std::string, BlockStatisticType, std::string>{"EMTFlag",                     BlockStatisticType::Flag,                   ""}},
 #endif
 #if JEM_TOOLS
@@ -205,7 +216,15 @@ static const std::map<BlockStatistic, std::tuple<std::string, BlockStatisticType
   { BlockStatistic::PDPCFlag,               std::tuple<std::string, BlockStatisticType, std::string>{"PDPCFlag",                    BlockStatisticType::Flag,                   ""}},
   { BlockStatistic::NSSTIdx,                std::tuple<std::string, BlockStatisticType, std::string>{"NSSTIdx",                     BlockStatisticType::Integer,                "[0, 3]"}},
 #endif
-
+#if JVET_K0076_CPR
+  { BlockStatistic::IBCFlag,                std::tuple<std::string, BlockStatisticType, std::string>{"IBCFlag",                     BlockStatisticType::Flag,                   ""}},
+  { BlockStatistic::IBCFlag_Chroma,         std::tuple<std::string, BlockStatisticType, std::string>{"IBCFlag_Chroma",              BlockStatisticType::Flag,                   ""}},
+  { BlockStatistic::IBC_BV,                 std::tuple<std::string, BlockStatisticType, std::string>{"IBC_BV",                      BlockStatisticType::Vector,                 "Scale: 4"}},
+  { BlockStatistic::IBC_BV_Chroma,          std::tuple<std::string, BlockStatisticType, std::string>{"IBC_BV_Chroma",               BlockStatisticType::Vector,                 "Scale: 4"}},
+#endif
+#if JVET_K0248_GBI
+  { BlockStatistic::GBiIdx,                 std::tuple<std::string, BlockStatisticType, std::string>{"GBiIdx",                      BlockStatisticType::Integer,                "[0, " + std::to_string(GBI_NUM) + "]"}},
+#endif
 
   // for dual tree
   { BlockStatistic::PartSize_Chroma,               std::tuple<std::string, BlockStatisticType, std::string>{"PartSize_Chroma",                    BlockStatisticType::Integer,                "[0, " + std::to_string(NUMBER_OF_PART_SIZES) + "]"}},
@@ -217,7 +236,7 @@ static const std::map<BlockStatistic, std::tuple<std::string, BlockStatisticType
   { BlockStatistic::QP_Chroma,                     std::tuple<std::string, BlockStatisticType, std::string>{"QP_Chroma",                          BlockStatisticType::Integer,                "[0, 51]"}},
   { BlockStatistic::SplitSeries_Chroma,            std::tuple<std::string, BlockStatisticType, std::string>{"SplitSeries_Chroma",                 BlockStatisticType::Integer,                "[0, " + std::to_string(std::numeric_limits<SplitSeries>::max()) + "]"}},
   { BlockStatistic::TransQuantBypassFlag_Chroma,   std::tuple<std::string, BlockStatisticType, std::string>{"TransQuantBypassFlag_Chroma",        BlockStatisticType::Flag,                   ""}},
-#if JEM_TOOLS
+#if JEM_TOOLS || JVET_K1000_SIMPLIFIED_EMT
   { BlockStatistic::EMTFlag_Chroma,                std::tuple<std::string, BlockStatisticType, std::string>{"EMTFlag_Chroma",                     BlockStatisticType::Integer,                "[0, 10]"}}, // todo: actual limits?
 #endif
   { BlockStatistic::IPCM_Chroma,                   std::tuple<std::string, BlockStatisticType, std::string>{"IPCM_Chroma",                        BlockStatisticType::Flag,                   ""}},
