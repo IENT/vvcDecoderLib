@@ -33,7 +33,7 @@ deploy:
     release: vvcDecoderLib-$(APPVEYOR_REPO_BRANCH)-$(APPVEYOR_REPO_TAG_NAME)-$(APPVEYOR_REPO_COMMIT)
     description: 'VTM vvcDecoderLib Release'
     auth_token:
-        secure: EmeMQhrEjNDVPIMkyFL89QLXU0BM1qd7XFXxvwrQ3UkVODRlebkReXVdledbfK1Q
+        secure: C7WoDgPizFJo+n3jCMe24CXapd41rMoK7IvudstVpJ0/5POExUcWV/4as27hSANE
     artifact: bin/vs15/msvc-19.15/x86_64/release/VVCDecoderLib.dll, VTMEncoderDecoder.zip
     draft: false
     prerelease: false
@@ -46,7 +46,7 @@ deploy:
     release: vvcDecoderLib-$(APPVEYOR_REPO_BRANCH)-$(APPVEYOR_REPO_TAG_NAME)-$(APPVEYOR_REPO_COMMIT)
     description: 'BMS vvcDecoderLib Release'
     auth_token:
-        secure: EmeMQhrEjNDVPIMkyFL89QLXU0BM1qd7XFXxvwrQ3UkVODRlebkReXVdledbfK1Q
+        secure: C7WoDgPizFJo+n3jCMe24CXapd41rMoK7IvudstVpJ0/5POExUcWV/4as27hSANE
     artifact: bin/vs15/msvc-19.15/x86_64/release/VVCDecoderLib.dll, VTMEncoderDecoder.zip
     draft: false
     prerelease: false
