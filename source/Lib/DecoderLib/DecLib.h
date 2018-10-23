@@ -158,7 +158,12 @@ public:
   void  setFirstSliceInSequence (bool val) { m_bFirstSliceInSequence = val; }
   void  setDecodedSEIMessageOutputStream(std::ostream *pOpStream) { m_pDecodedSEIOutputStream = pOpStream; }
   uint32_t  getNumberOfChecksumErrorsDetected() const { return m_numberOfChecksumErrorsDetected; }
-
+  
+  // access channels for Decoder Wrapper
+  PicList*             getPicList()             { return &m_cListPic;}
+  ParameterSetManager* getParameterSetManager() { return &m_parameterSetManager; }
+  Slice*               getSlicePilot()          { return m_apcSlicePilot; }
+  void                 deleteTempBuffersAndCoeffs() { m_pcPic->destroyTempBuffers(); m_pcPic->cs->destroyCoeffs(); };
 protected:
   void  xUpdateRasInit(Slice* slice);
 
