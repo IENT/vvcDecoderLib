@@ -1,0 +1,55 @@
+skip_tags: true
+platform: x64
+configuration: Release
+image: Visual Studio 2017
+
+install:
+ - mkdir build
+ - cd build
+ - cmake -G "Visual Studio 15 2017 Win64" ..
+
+build:
+  parallel: true                    # enable MSBuild parallel builds
+  project: build\NextSoftware.sln   # path to Visual Studio solution or project
+
+after_build:
+ - cd C:\projects\libvvc
+ - mkdir release
+ - copy bin\vs15\msvc-19.15\x86_64\release\*.exe release
+ - 7z a VTMEncoderDecoder.zip .\release\*
+  
+artifacts:
+  - path: bin/vs15/msvc-19.15/x86_64/release/VVCDecoderLib.dll
+    name: VVCDecoderLib DLL File
+    type: dll
+    
+  - path: VTMEncoderDecoder.zip
+    name: VTM Encoder and Decoder
+    type: zip
+    
+deploy:
+  - provider: GitHub
+    name: VTM
+    release: vvcDecoderLib-$(APPVEYOR_REPO_BRANCH)-$(APPVEYOR_REPO_TAG_NAME)-$(APPVEYOR_REPO_COMMIT)
+    description: 'VTM vvcDecoderLib Release'
+    auth_token:
+        secure: EmeMQhrEjNDVPIMkyFL89QLXU0BM1qd7XFXxvwrQ3UkVODRlebkReXVdledbfK1Q
+    artifact: bin/vs15/msvc-19.15/x86_64/release/VVCDecoderLib.dll, VTMEncoderDecoder.zip
+    draft: false
+    prerelease: false
+    on:
+        branch: master
+        appveyor_repo_tag: true
+
+  - provider: GitHub
+    name: BMS
+    release: vvcDecoderLib-$(APPVEYOR_REPO_BRANCH)-$(APPVEYOR_REPO_TAG_NAME)-$(APPVEYOR_REPO_COMMIT)
+    description: 'BMS vvcDecoderLib Release'
+    auth_token:
+        secure: EmeMQhrEjNDVPIMkyFL89QLXU0BM1qd7XFXxvwrQ3UkVODRlebkReXVdledbfK1Q
+    artifact: bin/vs15/msvc-19.15/x86_64/release/VVCDecoderLib.dll, VTMEncoderDecoder.zip
+    draft: false
+    prerelease: false
+    on:
+        branch: BMS
+        appveyor_repo_tag: true
