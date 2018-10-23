@@ -37,6 +37,7 @@ deploy:
     artifact: bin/vs15/msvc-19.15/x86_64/release/VVCDecoderLib.dll, VTMEncoderDecoder.zip
     draft: false
     prerelease: false
+    force_update: true
     on:
         branch: master
         appveyor_repo_tag: true
@@ -50,6 +51,7 @@ deploy:
     artifact: bin/vs15/msvc-19.15/x86_64/release/VVCDecoderLib.dll, VTMEncoderDecoder.zip
     draft: false
     prerelease: false
+    force_update: true
     on:
         branch: BMS
         appveyor_repo_tag: true
