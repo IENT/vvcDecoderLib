@@ -13,7 +13,7 @@ build:
   project: build\NextSoftware.sln   # path to Visual Studio solution or project
 
 after_build:
- - cd C:\projects\libvvc
+ - cd C:\projects\vvcdecoderlib
  - mkdir release
  - copy bin\vs15\msvc-19.15\x86_64\release\*.exe release
  - 7z a VTMEncoderDecoder.zip .\release\*
