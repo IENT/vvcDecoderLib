@@ -1,3 +1,4 @@
+skip_tags: true
 platform: x64
 configuration: Release
 image: Visual Studio 2017
@@ -27,7 +28,7 @@ artifacts:
     type: zip
     
 deploy:
-  - provider: GitHub
+    provider: GitHub
     name: VTM
     release: vvcDecoderLib-$(APPVEYOR_REPO_BRANCH)-$(APPVEYOR_REPO_TAG_NAME)-$(APPVEYOR_REPO_COMMIT)
     description: 'VTM vvcDecoderLib Release'
@@ -38,19 +39,18 @@ deploy:
     prerelease: false
     force_update: true
     on:
-        branch: master
         appveyor_repo_tag: true
 
-  - provider: GitHub
-    name: BMS
-    release: vvcDecoderLib-$(APPVEYOR_REPO_BRANCH)-$(APPVEYOR_REPO_TAG_NAME)-$(APPVEYOR_REPO_COMMIT)
-    description: 'BMS vvcDecoderLib Release'
-    auth_token:
-        secure: C7WoDgPizFJo+n3jCMe24CXapd41rMoK7IvudstVpJ0/5POExUcWV/4as27hSANE
-    artifact: bin/vs15/msvc-19.15/x86_64/release/VVCDecoderLib.dll, VTMEncoderDecoder.zip
-    draft: false
-    prerelease: false
-    force_update: true
-    on:
-        branch: BMS
-        appveyor_repo_tag: true
+  #- provider: GitHub
+  #  name: BMS
+  #  release: vvcDecoderLib-$(APPVEYOR_REPO_BRANCH)-$(APPVEYOR_REPO_TAG_NAME)-$(APPVEYOR_REPO_COMMIT)
+  #  description: 'BMS vvcDecoderLib Release'
+  #  auth_token:
+  #      secure: C7WoDgPizFJo+n3jCMe24CXapd41rMoK7IvudstVpJ0/5POExUcWV/4as27hSANE
+  #  artifact: bin/vs15/msvc-19.15/x86_64/release/VVCDecoderLib.dll, VTMEncoderDecoder.zip
+  #  draft: false
+  #  prerelease: false
+  #  force_update: true
+  #  on:
+  #      branch: BMS
+  #      appveyor_repo_tag: true
